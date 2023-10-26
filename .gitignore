@@ -1,5 +1,6 @@
 .Rproj.user/
 .Rdata
+*.Rdata
 .Rhistory
 
 /*/Figures/
@@ -7,7 +8,12 @@
 /*/*/Trace*
 
 Diversity/
+DiversityAnalysis.R
+analysis.R
+*tryout.R
 MinimalWorkingExample/
+minimal_working_example.R
 Train/
 
 tmp/
+To Do.txt
