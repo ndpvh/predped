@@ -1,0 +1,13 @@
+There are some things that need to be done in order for the code to be better:
+	- Check redundancy
+	- Document parameter types and their function
+	- Document the code itself: Explain output of the functions
+	- More explicit function names
+		- In general, the code could be more explicit as well: A lot of things happen at once
+	- Unnest many of the functions
+	- Put tests on all functions
+	- Sort out the different goal functions: See what is actual goals and what is utility
+	- Everything is still pretty intensive for the CPU: Could we speed things up a bit more?
+		- Especially true for the gifs as well
+
+The Github package `m4ma` could also use some documentation

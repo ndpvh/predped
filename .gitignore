@@ -1,0 +1,13 @@
+.Rproj.user/
+.Rdata
+.Rhistory
+
+/*/Figures/
+/*/Trace*
+/*/*/Trace*
+
+Diversity/
+MinimalWorkingExample/
+Train/
+
+tmp/
