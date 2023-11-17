@@ -20,16 +20,3 @@ setClass("agent", list(id = "numeric",
                        interacting = "logical",
                        parameters = "list",
                        goals = "list"))
-
-# Let say you have a function move that changes the position and orientation 
-# of the agent
-setGeneric("move", function(object){})
-setMethod("move", 
-          "agent", 
-          function(object){
-            object@position <- 1:2
-            object@orientation <- 180
-            return(object)
-          })
-
-example <- move(example)
