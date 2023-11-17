@@ -26,17 +26,14 @@ setMethod("move",
           })
 
 #' @rdname move-methods
-#' @aliases move, rectangle
+#' @aliases move, object
 setMethod("move", 
-          "rectangle",
+          "object",
           function(object, ...){
+              # If the object cannot be moved, do not move it
+              if(!object@moveable){
+                  return(object)
+              }
+
               # Actual movement function: to create myself
           })
-
-#' @rdname move-methods
-#' @aliases move, circle
-setMethod("move", 
-          "circle",
-          function(object, ...){
-              # Actual movement function: to create myself
-          })    
