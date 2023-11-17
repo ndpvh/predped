@@ -15,5 +15,7 @@ MinimalWorkingExample/
 minimal_working_example.R
 Train/
 
+*.drawio*
+
 tmp/
 To Do.txt
