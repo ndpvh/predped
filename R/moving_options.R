@@ -127,8 +127,9 @@ moving_options_agent <- function(agent, objects, centers){
 #
 # @returns Logical denoting whether the cells position is deemed okay or not
 #
-# TO DO: This is quite the misnomer, as it currently allows being outside of the 
-# bounds as well. Try to come up with a better name for this function.
+# TO DO: 
+#   - This is quite the misnomer, as it currently allows being outside of the 
+#     bounds as well. Try to come up with a better name for this function.
 #
 # Replacement of `inObject`
 within_bounds <- function(x, limits, outside = TRUE) {
@@ -191,12 +192,15 @@ free_cells <- function(agent, object, centers) {
 # @returns A logical vector denoting whether the cells positions are deemed okay 
 # or not
 #
-# TO DO: Make sure that logical depends on the number of centers, not on a 
-# hard-coded value. Furthermore make sure that centers itself depends on the 
-# angles, which again should not be hardcoded in there. Also make robust against 
-# the drop-argument being a different size than `idx`. Another to do (in test)
-# is to unreverse the logical that is given back, and unreverse it in the 
-# `free_cells` function as well (another reverse is found in `blocked_agent`).
+# TO DO: 
+#   - Make sure that logical depends on the number of centers, not on a 
+#     hard-coded value. 
+#   - Make sure that centers itself depends on the provided angles, which again 
+#     should not be hardcoded in there. 
+#   - Make robust against the drop-argument being a different size than `idx`. 
+#   - Test whether you can unreverse the logical that is given back, and 
+#     unreverse it in the `free_cells` function as well (another reverse is 
+#     found in `blocked_agent`).
 #
 # Replacement of `isBlocked`
 blocked_cells <- function(agent, object, centers, check = logical(33)) {
@@ -248,9 +252,13 @@ blocked_cells <- function(agent, object, centers, check = logical(33)) {
 #' @return Logical indicating whether object is in the room and not blocked 
 #' by any objects. 
 # 
-# TO DO: Delete the extra check at the beginning of this function. Allow for 
-# agent to become rectangle as well (see agent specifications): At this moment, 
-# still assumed to be circular.
+# TO DO: 
+#   - Delete the extra check at the beginning of this function. 
+#   - Allow for agent to become rectangle as well (see agent specifications): 
+#     At this moment, still assumed to be circular.
+#   - Make more general so that overlap with agents is immediately covered as 
+#     well (same generality TO DO exists for `object_intersection` and 
+#     `intersection`)
 # 
 # Replacement of `bodyObjectOK`
 overlap_with_object <- function(agent, objects, centers, free) {
@@ -301,10 +309,12 @@ overlap_with_object <- function(agent, objects, centers, free) {
 # @returns A logical vector denoting whether overlap was found (`TRUE`) or not
 # (`FALSE`)
 #
-# TO DO: Replace this function to work with the objects themselves, allowing 
-# more than one type of object (e.g., circular). Potentially make a more general
-# function that just looks for overlap in a dependent object (y; agent or 
-# moveable object) and independent objects (x; other agents or objects).
+# TO DO: 
+#   - Replace this function to work with the objects themselves, allowing 
+#     more than one type of object (e.g., circular). 
+#   - Make a more general function that just looks for overlap in a dependent 
+#     object (y; agent or moveable object) and independent objects (x; other 
+#     agents or objects).
 #
 # Replacement of `bodyObjectOverlap`
 object_intersection <- function(lines, radius, centers) {
@@ -334,8 +344,9 @@ object_intersection <- function(lines, radius, centers) {
 # @returns A logical that denotes whether the provided lines intersect (TRUE) or
 # not (FALSE)
 #
-# TO DO: Just like for its original parent `object_intersection`, make this 
-# very general.
+# TO DO: 
+#   - Just like for its original parent `object_intersection`, make this 
+#     very general.
 intersection <- function(point, x, y, lines){ 
     # Create the segments that you want to know the intersection of. This is 
     # just adding and subtracting x and y from the point that was provided. Then 
