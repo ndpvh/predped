@@ -19,7 +19,7 @@ unpack_state <- function(state, names, P_n) {
 unpack_list <- function(index){
     # Extract the wanted variable from the list across all agents. Then, 
     # transpose the result and give the result row names
-    transposed <- apply(state, 2, function(x) x[[index]])
+    transposed <- apply(state, 2, function(x) x[[index]]) |>
         t()
     row.names(transposed) <- names
     return(transposed)        

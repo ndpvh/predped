@@ -7,18 +7,12 @@
 #' @param ... Additional arguments that can differ for agents or environmental 
 #' objects.
 #'
-#' @return 
+#' @return list
 #' 
 #' @export
 #' @docType methods
 #' @rdname blocked-methods
-setGeneric("moving_options", function(object, ...){})
-
-#' @rdname blocked-methods
-#' @aliases blocked, agent
-setMethod("moving_options", 
-          "agent",
-          moving_options_agent)
+setGeneric("moving_options", function(agent, ...){})
 
 # Create the blocked_agent function.
 #
@@ -113,6 +107,11 @@ moving_options_agent <- function(agent, objects, centers){
     return(check)
 }
 
+#' @rdname blocked-methods
+#' @aliases blocked, agent
+setMethod("moving_options", 
+          "agent",
+          moving_options_agent)
 
 # Check presence of object in bounds
 #
@@ -445,7 +444,3 @@ nBlock <- function(n, state, r, usePredictedPos = FALSE) {
     }
     return(nBlockers)
 }
-
-
-
-

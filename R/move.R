@@ -12,31 +12,10 @@
 #'
 #' @return The provided object with a changed position and/or orientation
 #' 
-#' @export
+# #' @export
 #' @docType methods
 #' @rdname move-methods
-setGeneric("move", function(object, ...){})
-
-#' @rdname move-methods
-#' @aliases move, agent
-setMethod("move", 
-          "agent",
-          move_agent)
-
-#' @rdname move-methods
-#' @aliases move, object
-setMethod("move", 
-          "object",
-          # Make sure this function has at least roughly the same arguments as 
-          # move_agent. This will make documentation a bit easier to read
-          function(object, ...){
-              # If the object cannot be moved, do not move it
-              if(!object@moveable){
-                  return(object)
-              }
-
-              # Actual movement function: to create myself
-          })
+# setGeneric("move", function(object, ...){})
 
 
 # Create the move_agent function, which will define the generic move function 
