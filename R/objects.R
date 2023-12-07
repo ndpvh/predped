@@ -120,6 +120,7 @@ setMethod("initialize", "rectangle", function(
   .Object <- callNextMethod(.Object, ...)
   if (length(.Object@center) && length(.Object@size)) {
     center <- .Object@center
+    size <- .Object@size
     lower <- center - .Object@size/2
     upper <- center + .Object@size/2
   } else if (length(.Object@lower) && length(.Object@lower)) {
@@ -159,7 +160,7 @@ setMethod("move", signature(object = "rectangle", target = "numeric"), function(
   return(object)
 })
 
-#' Rotate an Rectangle
+#' Rotate a Rectangle
 #'
 #' @param object An object of a type \code{\link[predped]{rectangle-class}}.
 #' @param degrees A single numeric element indicating the target rotation in degrees.
