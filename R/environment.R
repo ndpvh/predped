@@ -1,4 +1,9 @@
 
+setGeneric("rotate", 
+           function(object, degrees, radians, center) standardGeneric("rotate"),
+           signature = "object"
+)
+
 #' An S4 Class to Represent Coordinate Vectors
 #' 
 #' A named numeric vector that can only have two elements (x and y coordinates).
@@ -15,6 +20,34 @@ setMethod("initialize", "coordinate", function(.Object, ...) {
   
   return(.Object)
 })
+
+#' Rotate Point Around Center
+#' 
+#' @param object A numeric vector of length two with the point coordinates.
+#' @param degrees A single numeric element indicating the degrees of rotation.
+#' @param center A numerical vector of length two with the x and y coordinates
+#' around which to rotate the point. Defaults to the origin (0, 0).
+#' 
+#' @export 
+setMethod("rotate", 
+          signature(object = "numeric"), 
+          function(object, radians, center = c(0, 0)) {
+            object <- as(object, "coordinate")
+            center <- as(center, "coordinate")
+            # Change coordinates to move around the origin
+            x_origin <- object - center
+            
+            # Rotate the point to a new position
+            M <- matrix(c(cos(radians), -sin(radians), 
+                          sin(radians), cos(radians)),
+                        nrow = 2, 
+                        ncol = 2)
+            
+            y_origin <- as.numeric(M %*% x_origin)
+            
+            # Change coordinates back to the original center
+            return(as(y_origin + center, "coordinate"))
+          })
 
 setAs("numeric", "coordinate", function(from) new("coordinate", from))
 
@@ -56,9 +89,7 @@ setGeneric("move", function(object, target) standardGeneric("move"))
 #' @return The area of the object.
 #' @export
 #' @name area-method
-setGeneric("area", function(object) {
-  standardGeneric("area")
-})
+setGeneric("area", function(object) standardGeneric("area"))
 
 #' An S4 Class to Represent Rectangle Objects
 #' 
@@ -101,11 +132,58 @@ setMethod("initialize", "rectangle", function(
   }
   if (length(size) != 2) stop("Size vector must have length two (x and y)")
   if (any(size <= 0)) stop("Size vector must be positive")
+  if (length(orientation) != 1) stop("Orientation must be a single element")
   .Object@center <- as(center, "coordinate")
   .Object@lower <- as(lower, "coordinate")
   .Object@upper <- as(upper, "coordinate")
   .Object@size <- size
+  .Object@orientation <- orientation
+  .Object@moveable <- moveable
   return(.Object)
+})
+
+#' @rdname move-method
+#' @export
+setMethod("move", signature(object = "rectangle", target = "numeric"), function(object, target) {
+  target <- as(target, "coordinate")
+  
+  if (!object@moveable) {
+    return(object)
+  }
+  
+  d <- target - object@center
+  object@center <- target
+  object@lower <- object@lower + d
+  object@upper <- object@upper + d
+  
+  return(object)
+})
+
+#' Rotate an Rectangle
+#'
+#' @param object An object of a type \code{\link[predped]{rectangle-class}}.
+#' @param degrees A single numeric element indicating the target rotation in degrees.
+#' @param radians A single numeric element indicating the target rotation in radians.
+#'
+#' @return The object moved to the target coordinates.
+#' @export
+setMethod("rotate", 
+          signature(object = "rectangle"), 
+          function(object, degrees, radians) {
+  if (!object@moveable) {
+    return(object)
+  }
+  
+  # Transform degrees to radians
+  if (missing(radians) && !missing(degrees)) {
+    radians <- degrees * pi / 180
+  } else if (!(!missing(radians) && missing(degrees))) {
+    stop("Either 'degress' or 'radians' must be provided")
+  }
+  
+  object@orientation <- radians
+  
+  return(object)
 })
 
 #'@rdname area-method
@@ -114,21 +192,30 @@ setMethod("area", signature(object = "rectangle"), function(object) prod(object@
 
 #' Get the Corners of an Object
 #'
+#' Get the object corners taking its orientation into account.
+#'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
 #'
 #' @return A two-column matrix containing the x- and y-coordinates of the corners.
 #' @export
 #' @name corners-method
-setGeneric("corners", function(object) {
-  standardGeneric("corners")
-})
+setGeneric("corners", function(object) standardGeneric("corners"))
 
 #'@rdname corners-method
 #'
 setMethod("corners", signature(object = "rectangle"), function(object) {
-  mat <- rbind(object@lower, c(object@lower[1], object@upper[2]), object@upper, c(object@upper[1], object@lower[2]))
-  rownames(mat) <- c("lowerleft", "upperleft", "upperright", "lowerright")
-  colnames(mat) <- c("x", "y")
+  mat <- list(
+    object@lower,
+    as(c(object@lower[1], object@upper[2]), "coordinate"),
+    object@upper,
+    as(c(object@upper[1], object@lower[2]), "coordinate")
+  )
+  names(mat) <- c("lowerleft", "upperleft", "upperright", "lowerright")
+  
+  if (object@orientation != 0) {
+    mat <- lapply(mat, rotate, radians = object@orientation, center = object@center)
+  }
+  
   return(mat)
 })
 
@@ -143,9 +230,7 @@ setMethod("corners", signature(object = "rectangle"), function(object) {
 #' (if \code{outside} is \code{FALSE}) or outside.
 #' @export
 #' @name inObject-method
-setGeneric("inObject", function(object, x, outside = TRUE) {
-  standardGeneric("inObject")
-})
+setGeneric("inObject", function(object, x, outside = TRUE) standardGeneric("inObject"))
 
 #'@rdname inObject-method
 #'
