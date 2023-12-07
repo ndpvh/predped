@@ -37,6 +37,18 @@ setClass("object", list(id = "character",
                         interacted_with = "logical"),
          contains = "VIRTUAL")
 
+#' Move an Object
+#'
+#' Move the center of the object to the target coordinates.
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param target A numeric of length two with the target coordinates.
+#'
+#' @return The object moved to the target coordinates.
+#' @export
+#' @name move-method
+setGeneric("move", function(object, target) standardGeneric("move"))
+
 #' Calculate the Area of an Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
@@ -59,15 +71,22 @@ setGeneric("area", function(object) {
 #' lower left corner. 
 #' @slot upper A numeric vector of length two with the coordinates of the
 #' upper right corner. 
+#' @slot orientation A single numeric element indicating the orientation of the 
+#' rectangle in radians.
 #' 
 #' @export
 #' @name rectangle
 rectangle <- setClass("rectangle", list(center = "numeric", size = "numeric", 
-                                        lower = "numeric", upper = "numeric"), 
+                                        lower = "numeric", upper = "numeric",
+                                        orientation = "numeric"), 
                       contains = c("object"))
 
-setMethod("initialize", "rectangle", function(.Object, ...) {
-  .Object <- callNextMethod()
+setMethod("initialize", "rectangle", function(
+    .Object, 
+    orientation = 0, 
+    moveable = FALSE, ...
+) {
+  .Object <- callNextMethod(.Object, ...)
   if (length(.Object@center) && length(.Object@size)) {
     center <- .Object@center
     lower <- center - .Object@size/2
@@ -147,11 +166,26 @@ setMethod("inObject", signature(object = "rectangle", x = "numeric"), function(o
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 
-setMethod("initialize", "circle", function(.Object, ...) {
-  .Object <- callNextMethod()
+setMethod("initialize", "circle", function(.Object, moveable = FALSE, ...) {
+  .Object <- callNextMethod(.Object, ...)
   .Object@center <- as(.Object@center, "coordinate")
+  .Object@moveable <- moveable
   if (length(.Object@radius) != 1) stop("Slot 'radius' should be a single numeric value")
   return(.Object)
+})
+
+#' @rdname move-method
+#' @export
+setMethod("move", signature(object = "circle", target = "numeric"), function(object, target) {
+  target <- as(target, "coordinate")
+  
+  if (!object@moveable) {
+    return(object)
+  }
+  
+  object@center <- target
+  
+  return(object)
 })
 
 #'@rdname area-method
