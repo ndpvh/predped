@@ -51,14 +51,12 @@ testthat::test_that("Rectangle rotation works", {
   )
   r <- predped::rotate(predped::rectangle(
     lower = c(0, 0),
-    upper = c(1, 2),
-    moveable = TRUE
+    upper = c(1, 2)
   ), radians = 90*pi/180, center = c(0, 0))
   testthat::expect_equal(unname(predped::corners(r)), ref)
   r <- predped::rotate(predped::rectangle(
     lower = c(0, 0),
-    upper = c(1, 2),
-    moveable = TRUE
+    upper = c(1, 2)
   ), degrees = 90, center = c(0, 0))
   testthat::expect_equal(unname(predped::corners(r)), ref)
 })

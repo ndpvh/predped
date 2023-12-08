@@ -171,10 +171,6 @@ setMethod("move", signature(object = "rectangle", target = "numeric"), function(
 setMethod("rotate", 
           signature(object = "rectangle"), 
           function(object, degrees, radians) {
-  if (!object@moveable) {
-    return(object)
-  }
-  
   # Transform degrees to radians
   if (missing(radians) && !missing(degrees)) {
     radians <- degrees * pi / 180
