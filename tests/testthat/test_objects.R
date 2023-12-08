@@ -9,10 +9,15 @@ testthat::test_that("Coordinate initialization works", {
 })
 
 testthat::test_that("Point rotation works", {
-  ref <- c(0, 1)
-  p <- predped::rotate(ref, radians = 90*pi/180, center = c(0, 0))
+  # Center is origin
+  p <- predped::rotate(c(0, 1), radians = pi/2, center = c(0, 0))
   
-  testthat::expect_equal(p, predped::coordinate(c(1, 0)))
+  testthat::expect_equal(p, predped::coordinate(c(-1, 0)))
+  
+  # Center is not origin
+  p <- predped::rotate(c(2, 4), radians = pi/2, center = c(2, 2))
+  
+  testthat::expect_equal(p, predped::coordinate(c(0, 2)))
 })
 
 testthat::test_that("Object is abstract base class", {
@@ -44,20 +49,25 @@ testthat::test_that("Rectangle moving works", {
 
 testthat::test_that("Rectangle rotation works", {
   ref <- list(
-    predped::coordinate(c(-0.5, 1.5)), 
-    predped::coordinate(c(1.5, 1.5)),
-    predped::coordinate(c(1.5, 0.5)),
-    predped::coordinate(c(-0.5, 0.5))
+    predped::coordinate(c(1.5, 0.5)), 
+    predped::coordinate(c(-0.5, 0.5)),
+    predped::coordinate(c(-0.5, 1.5)),
+    predped::coordinate(c(1.5, 1.5))
   )
   r <- predped::rotate(predped::rectangle(
     lower = c(0, 0),
     upper = c(1, 2)
-  ), radians = 90*pi/180, center = c(0, 0))
+  ), radians = pi/2)
   testthat::expect_equal(unname(predped::corners(r)), ref)
   r <- predped::rotate(predped::rectangle(
     lower = c(0, 0),
     upper = c(1, 2)
-  ), degrees = 90, center = c(0, 0))
+  ), degrees = 90)
+  testthat::expect_equal(unname(predped::corners(r)), ref)
+  r <- predped::rotate(predped::rectangle(
+    center = c(0.5, 1),
+    size = c(1, 2)
+  ), radians = pi/2)
   testthat::expect_equal(unname(predped::corners(r)), ref)
 })
 
@@ -82,6 +92,7 @@ testthat::test_that("Rectangle in_object method works", {
   testthat::expect_true(predped::in_object(r, c(1, 1), outside = FALSE))
   testthat::expect_false(predped::in_object(r, c(1, 1), outside = TRUE))
   testthat::expect_false(predped::in_object(r, c(3, 3), outside = FALSE))
+  testthat::expect_true(predped::in_object(r, c(3,3), outside = TRUE))
 })
 
 testthat::test_that("Circle initialization works", {

@@ -41,7 +41,8 @@ setMethod("rotate",
             M <- matrix(c(cos(radians), -sin(radians), 
                           sin(radians), cos(radians)),
                         nrow = 2, 
-                        ncol = 2)
+                        ncol = 2,
+                        byrow = TRUE)
             
             y_origin <- as.numeric(M %*% x_origin)
             
