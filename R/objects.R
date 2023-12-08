@@ -227,11 +227,11 @@ setMethod("corners", signature(object = "rectangle"), function(object) {
 #' (if \code{outside} is \code{FALSE}) or outside.
 #' @export
 #' @name inObject-method
-setGeneric("inObject", function(object, x, outside = TRUE) standardGeneric("inObject"))
+setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
 #'@rdname inObject-method
 #'
-setMethod("inObject", signature(object = "rectangle", x = "numeric"), function(object, x, outside = TRUE) {
+setMethod("in_object", signature(object = "rectangle", x = "numeric"), function(object, x, outside = TRUE) {
   x <- as(x, "coordinate")
   ok <- all(x > object@lower & x < object@upper)
   if (outside) {

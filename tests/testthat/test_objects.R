@@ -74,14 +74,14 @@ testthat::test_that("Rectangle corners method works", {
   ))
 })
 
-testthat::test_that("Rectangle inObject works", {
+testthat::test_that("Rectangle in_object method works", {
   r <- predped::rectangle(
     lower = c(0, 0),
     upper = c(2, 2)
   )
-  testthat::expect_true(predped::inObject(r, c(1, 1), outside = FALSE))
-  testthat::expect_false(predped::inObject(r, c(1, 1), outside = TRUE))
-  testthat::expect_false(predped::inObject(r, c(3, 3), outside = FALSE))
+  testthat::expect_true(predped::in_object(r, c(1, 1), outside = FALSE))
+  testthat::expect_false(predped::in_object(r, c(1, 1), outside = TRUE))
+  testthat::expect_false(predped::in_object(r, c(3, 3), outside = FALSE))
 })
 
 testthat::test_that("Circle initialization works", {
