@@ -12,7 +12,7 @@
 #' @slot goals A list containing the id's of the goals that are assigned to the 
 #' agent
 #' 
-#' @exportClass 
+#' @export
 setClass("agent", list(id = "numeric", 
                        position = "numeric",
                        size = "numeric",
