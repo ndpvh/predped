@@ -92,55 +92,85 @@ setGeneric("move", function(object, target) standardGeneric("move"))
 #' @name area-method
 setGeneric("area", function(object) standardGeneric("area"))
 
+#' An S4 class to Represent Polygon Objects
+#'
+#' Polygons can be used to create flexible shapes and are defined through a set
+#' of points. The last point is automatically connected with the first point.
+#'
+#' This class is suitable for creating custom object classes.
+#'
+#' @slot points A numeric matrix with two columns containing the
+#' x- and y-coordinates of the points.
+#' @slot clock_wise A single logical element indicating whether the points define
+#' the polygon clockwise (default) or counter-clockwise.
+#'
+#' @export
+#' @name polygon
+polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical"), contains = "object")
+
+setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, moveable = FALSE, ...) {
+    .Object <- callNextMethod(.Object, ...)
+
+    if (ncol(.Object@points) != 2) {
+        stop("All points must have an x- and y-coordinate (two-column matrix)")
+    }
+
+    .Object@clock_wise <- clock_wise
+    .Object@moveable <- moveable
+
+    return(.Object)
+})
+
 #' An S4 Class to Represent Rectangle Objects
 #'
-#' Rectangles can be defined by either \code{center} and \code{size} or
-#' \code{lower} and \code{upper}.
+#' Special case of the \code{\link[predped]{polygon-class}}.
+#' Rectangles are defined by \code{center}, \code{size}, and \code{orientation} (optional).
 #'
 #' @slot center A numeric vector of length two with the coordinates of the center.
 #' @slot size A numeric vector of length two with the object width and height.
-#' @slot lower A numeric vector of length two with the coordinates of the
-#' lower left corner.
-#' @slot upper A numeric vector of length two with the coordinates of the
-#' upper right corner.
 #' @slot orientation A single numeric element indicating the orientation of the
 #' rectangle in radians.
 #'
 #' @export
 #' @name rectangle
-rectangle <- setClass("rectangle", list(center = "numeric", size = "numeric",
-                                        lower = "numeric", upper = "numeric",
-                                        orientation = "numeric"),
-                      contains = c("object"))
+rectangle <- setClass("rectangle", list(
+        center = "numeric",
+        size = "numeric",
+        orientation = "numeric"
+    ),
+    contains = c("polygon")
+)
 
 setMethod("initialize", "rectangle", function(
         .Object,
+        center,
+        size,
         orientation = 0,
         moveable = FALSE, ...
 ) {
-    .Object <- callNextMethod(.Object, ...)
-    if (length(.Object@center) && length(.Object@size)) {
-        center <- .Object@center
-        size <- .Object@size
-        lower <- center - .Object@size/2
-        upper <- center + .Object@size/2
-    } else if (length(.Object@lower) && length(.Object@lower)) {
-        lower <- .Object@lower
-        upper <- .Object@upper
-        size <- upper - lower
-        center <- upper - size/2
-    } else {
-        stop("Either 'center' and 'size' or 'lower' and 'upper' must be provided")
-    }
     if (length(size) != 2) stop("Size vector must have length two (x and y)")
     if (any(size <= 0)) stop("Size vector must be positive")
     if (length(orientation) != 1) stop("Orientation must be a single element")
+
     .Object@center <- as(center, "coordinate")
-    .Object@lower <- as(lower, "coordinate")
-    .Object@upper <- as(upper, "coordinate")
+
+    size_half <- size/2
+
+    lower <- center - size_half
+    upper <- center + size_half
+
+    points <- matrix(c(lower, c(lower[1], upper[2]), upper, c(upper[1], lower[2])), 4, 2, byrow = TRUE)
+
+    if (orientation != 0) {
+        points <- t(apply(points, 1, rotate, radians = orientation, center = center))
+    }
+
+    .Object <- callNextMethod(.Object, points = points, clock_wise = TRUE)
+
     .Object@size <- size
-    .Object@orientation <- orientation
     .Object@moveable <- moveable
+    .Object@orientation <- orientation
+
     return(.Object)
 })
 
@@ -155,8 +185,7 @@ setMethod("move", signature(object = "rectangle", target = "numeric"), function(
 
     d <- target - object@center
     object@center <- target
-    object@lower <- object@lower + d
-    object@upper <- object@upper + d
+    object@points <- object@points + d
 
     return(object)
 })
@@ -180,42 +209,15 @@ setMethod("rotate",
               }
 
               object@orientation <- radians
+              object@points <- t(apply(object@points, 1, rotate, radian = radians, center = object@center))
 
               return(object)
-          })
+          }
+)
 
 #'@rdname area-method
 #'
-setMethod("area", signature(object = "rectangle"), function(object) prod(object@upper - object@lower))
-
-#' Get the Corners of an Object
-#'
-#' Get the object corners taking its orientation into account.
-#'
-#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
-#'
-#' @return A two-column matrix containing the x- and y-coordinates of the corners.
-#' @export
-#' @name corners-method
-setGeneric("corners", function(object) standardGeneric("corners"))
-
-#'@rdname corners-method
-#'
-setMethod("corners", signature(object = "rectangle"), function(object) {
-    mat <- list(
-        object@lower,
-        as(c(object@lower[1], object@upper[2]), "coordinate"),
-        object@upper,
-        as(c(object@upper[1], object@lower[2]), "coordinate")
-    )
-    names(mat) <- c("lowerleft", "upperleft", "upperright", "lowerright")
-
-    if (object@orientation != 0) {
-        mat <- lapply(mat, rotate, radians = object@orientation, center = object@center)
-    }
-
-    return(mat)
-})
+setMethod("area", signature(object = "rectangle"), function(object) prod(object@size))
 
 #' Check Whether a Point Lies Within an Object
 #'
@@ -229,17 +231,6 @@ setMethod("corners", signature(object = "rectangle"), function(object) {
 #' @export
 #' @name inObject-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
-
-#'@rdname inObject-method
-#'
-setMethod("in_object", signature(object = "rectangle", x = "numeric"), function(object, x, outside = TRUE) {
-    x <- as(x, "coordinate")
-    ok <- all(x > object@lower & x < object@upper)
-    if (outside) {
-        return(!ok)
-    }
-    return(ok)
-})
 
 #' An S4 Class to Represent Circle Objects
 #'
