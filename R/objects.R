@@ -94,7 +94,8 @@ setGeneric("area", function(object) standardGeneric("area"))
 
 #' An S4 class to Represent Polygon Objects
 #'
-#' Polygons can be used to create flexible shapes and are defined through a set of points.
+#' Polygons can be used to create flexible shapes and are defined through a set
+#' of points. The last point is automatically connected with the first point.
 #'
 #' This class is suitable for creating custom object classes.
 #'
@@ -102,27 +103,19 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' x- and y-coordinates of the points.
 #' @slot clock_wise A single logical element indicating whether the points define
 #' the polygon clockwise (default) or counter-clockwise.
-#' @slot closed A single logical element indicating whether the last point closes
-#' the polygon (i.e., is the same as the first point). If \code{FALSE},
-#' assumes a link between the last and first point.
 #'
 #' @export
 #' @name polygon
-polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical", closed = "logical"), contains = "object")
+polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical"), contains = "object")
 
-setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, closed = TRUE, moveable = FALSE, ...) {
+setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, moveable = FALSE, ...) {
     .Object <- callNextMethod(.Object, ...)
 
     if (ncol(.Object@points) != 2) {
         stop("All points must have an x- and y-coordinate (two-column matrix)")
     }
 
-    if (closed && .Object@points[[1]] != .Object@points[[length(.Object@points)]]) {
-        stop("The last point must be the same as the first point for closed polygons")
-    }
-
     .Object@clock_wise <- clock_wise
-    .Object@closed <- closed
     .Object@moveable <- moveable
 
     return(.Object)
@@ -172,7 +165,7 @@ setMethod("initialize", "rectangle", function(
         points <- t(apply(points, 1, rotate, radians = orientation, center = center))
     }
 
-    .Object <- callNextMethod(.Object, points = points, clock_wise = TRUE, closed = FALSE)
+    .Object <- callNextMethod(.Object, points = points, clock_wise = TRUE)
 
     .Object@size <- size
     .Object@moveable <- moveable
