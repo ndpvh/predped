@@ -309,7 +309,7 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
     check <- (x[1] > xlims[1]) & (x[1] < xlims[2])) &
              (x[2] > ylims[1]) & (x[2] < ylims[2])
     
-    return(ifelse(outside, !check, check))
+    return(ifelse(outside, !check, check)) # Important: Benchmark shows that the other algorithm is faster
 })
 
 #' An S4 Class to Represent Circle Objects
