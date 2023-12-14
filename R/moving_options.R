@@ -119,31 +119,6 @@ setMethod("moving_options",
           "agent",
           moving_options_agent)
 
-# Check presence of object in bounds
-#
-# This checks whether a given position is within bounds of that are provided. 
-#
-# @param x A numeric vector of size 2 that contains the x- and y-positions that 
-# should be checked
-# @param limits A numeric matrix containing the limits of the two coordinates in 
-# its rows
-# @param outside A logical denoting whether a cell's location is currently 
-# inside or outside of the bounds that are provided. Defaults to `TRUE`.
-#
-# @returns Logical denoting whether the cells position is deemed okay or not
-#
-# TO DO: 
-#   - This is quite the misnomer, as it currently allows being outside of the 
-#     bounds as well. Try to come up with a better name for this function.
-#
-# Replacement of `inObject`
-within_bounds <- function(x, limits, outside = TRUE) {
-    check <- (x[1] > min(limits[1,])) & (x[1] < max(limits[1,])) &
-             (x[2] > min(limits[2,])) & (x[2] < max(limits[2,]))
-    
-    return(ifelse(outside, !check, check))
-}
-
 #' Find cells that are not blocked
 #' 
 #' This function checks whether all cells that the agent or the object can move 
@@ -160,13 +135,12 @@ within_bounds <- function(x, limits, outside = TRUE) {
 # 
 # Replacement of `okObject`
 free_cells <- function(agent, state, centers) {
+    # Select the background from the current state
+    background <- find_class("background", state) 
+
     # Check whether the cells are all within the environment (currently defined 
     # by state[[1]])
-    check <- apply(centers, 
-                   1, 
-                   \(x) within_bounds(x, 
-                                      rbind(state[[1]]$x, state[[1]]$y),
-                                      outside = FALSE))
+    check <- apply(centers, 1, \(x) in_object(background@shape, x, outside = FALSE)) 
                 
     # Check whether there are other state than only the environment in the 
     # state list. If so, then we need to adjust the `check` variable so that 
@@ -174,7 +148,7 @@ free_cells <- function(agent, state, centers) {
     # for which we call the `blocked_cells` function
     check <- ifelse(length(state) > 1, 
                     check & !blocked_cells(agent, state, centers),
-                    check)    
+                    check)
     
     # Transform the check back into a matrix that can be used for cell 
     return(matrix(check, ncol = 3))
@@ -320,18 +294,18 @@ overlap_with_object <- function(agent, state, centers, free) {
 #
 # Replacement of `bodyObjectOverlap`
 object_intersection <- function(lines, radius, centers) {
-  # Get the angles of the lines
-  angles <- angle2(p1 = t(lines[, , "P1"]), p2 = t(lines[, , "P2"])) |>
-    (`+`) (90) |>
-    (`%%`) (180) |>
-    unique()
-  
-  # dx and dy to move along line
-  x <- radius * sin(angles * pi / 180)
-  y <- radius * cos(angles * pi / 180)
-  
-  # For each centre check for overlap
-  return(apply(centers, 1, \(points) intersection(points, x, y, lines)))
+    # Get the angles of the lines
+    angles <- angle2(p1 = t(lines[, , "P1"]), p2 = t(lines[, , "P2"])) |>
+        (`+`) (90) |>
+        (`%%`) (180) |>
+        unique()
+    
+    # dx and dy to move along line
+    x <- radius * sin(angles * pi / 180)
+    y <- radius * cos(angles * pi / 180)
+    
+    # For each centre check for overlap
+    return(apply(centers, 1, \(points) intersection(points, x, y, lines)))
 }
 
 # Line to line intersection
