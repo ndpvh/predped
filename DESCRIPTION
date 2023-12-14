@@ -9,6 +9,14 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Imports: methods
 RoxygenNote: 7.2.1
+Collate:
+    'objects.R'
+    'agent.R'
+    'geometry.R'
+    'move_all.R'
+    'move.R'
+    'moving_options.R'
+    'state.R'
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
