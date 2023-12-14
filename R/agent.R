@@ -23,7 +23,7 @@ agent <- setClass("agent", list(id = "character",
                                 current_goal = "numeric"), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
-                                          id = paste(sample(letters, 5)),
+                                          id = character(0),
                                           speed = 1,
                                           orientation = 0,
                                           group = 0,
@@ -38,7 +38,9 @@ setMethod("initialize", "agent", function(.Object,
 ) {
     .Object <- callNextMethod(.Object, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
 
-    .Object@id <- id
+    .Object@id <- ifelse(length(id) == 0, 
+                         paste(sample(letters, 5, replace = TRUE), collapse = ""),
+                         id)
     .Object@speed <- speed
     .Object@orientation <- orientation
     .Object@group <- group
