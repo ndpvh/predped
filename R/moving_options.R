@@ -31,14 +31,20 @@ setGeneric("moving_options", function(agent, ...){})
 #     change the `okBodyBody` and `overlap_with_object` functions, as these would 
 #     in effect do the same thing but more generalized (see TO DO in the latter
 #     function)
+#   - Put the error check in a test function, so that we can reproduce such 
+#     errors
 #
 # Replacement of `get_ok`, which was nested within `move` in `pp_simulate.R`
 moving_options_agent <- function(agent, state, centers){
-    # Create a local function that will be useful for debugging (I assume)
+    # Create a local function that will be useful for debugging
     check_try_error <- function(x, error_number){
-        if(class(try(!all(!x)))){
-            return(list(i = error_number, 
-                        n = agent@id, 
+        e <- !all(!x) |>
+            try() |>
+            class()
+
+        if(e){
+            return(list(error_location = error_location, 
+                        agent_id = agent@id, 
                         state = state, 
                         agent = agent, 
                         centers = centers))
@@ -51,7 +57,7 @@ moving_options_agent <- function(agent, state, centers){
     # might move and check whether it does not provide an error
     check <- free_cells(agent, state, centers)
 
-    errored_out <- check_try_error(check, 1)
+    errored_out <- check_try_error(check, "after `free_cells`"))
     if(!is.null(errored_out)){
         bad <<- errored_out
     }
@@ -68,7 +74,7 @@ moving_options_agent <- function(agent, state, centers){
         check[!check[,2],1] <- FALSE
     }
 
-    errored_out <- check_try_error(check, 2)
+    errored_out <- check_try_error(check, "after `overlap_with_objects`")
     if(!is.null(errored_out)){
         bad <<- errored_out
     }
@@ -92,7 +98,7 @@ moving_options_agent <- function(agent, state, centers){
                         !opposite_check)
     }
 
-    errored_out <- check_try_error(check, 3)
+    errored_out <- check_try_error(check, "after `seesGoalOK`")
     if(!is.null(errored_out)){
         bad <<- errored_out
     }
