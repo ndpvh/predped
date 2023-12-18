@@ -1,15 +1,104 @@
-# Turns an rectangular object into a specification of its constituent lines
+################################################################################
+# GENERAL GEOMETRY
+
+# Turns a rectangular object into a specification of its constituent lines
 # Output a 2 (x/y) x 4 (lines) x 2 (begin/end point) array
 object2lines <- function(o) {
-  array(c(o$x[1], o$y[1], o$x[1], o$y[2], o$x[1], o$y[1], o$x[2], o$y[1],
-          o$x[2], o$y[1], o$x[2], o$y[2], o$x[1], o$y[2], o$x[2], o$y[2]),  
-        dim = c(2, 4, 2), dimnames = list(c("x", "y"), 
-                                          c("L1", "L2", "L3", "L4"), 
-                                          c("P1", "P2")))
+    array(c(o$x[1], o$y[1], o$x[1], o$y[2], o$x[1], o$y[1], o$x[2], o$y[1],
+            o$x[2], o$y[1], o$x[2], o$y[2], o$x[1], o$y[2], o$x[2], o$y[2]),  
+            dim = c(2, 4, 2), dimnames = list(c("x", "y"), 
+                                            c("L1", "L2", "L3", "L4"), 
+                                            c("P1", "P2")))
 }
 
-# Calcualte cell centres for set of cells (index 1..33) for p1 heading at 
-# velocity v1 at angle a1 given time step tStep seconds.
+# Distance from p1 to p2, same sized xy column matrices
+dist <- function(p1, p2) {
+    sqrt(apply((p1 - p2)^2, 1, sum))
+}
+
+# distance from p1 to p2, p1 is a single point, p2 is a matrix
+dist1 <- function(p1, p2) {
+    sqrt(apply((t(p2) - as.vector(p1))^2, 2, sum))
+}
+
+# Shortest absolute angle between a1 and a2
+minAngle <- function(a1,a2) {
+    pmin(abs(a1 - a2), abs(pmin(a1, a2) + (360 - pmax(a1, a2))))
+}
+
+# Shortest angle anti-clockwise from p1 as orign to p2 (> -180 to 180)
+angle2s <- function(p1, p2) {
+    round((atan2(p2[, 2] - p1[, 2], p2[, 1] - p1[, 1]) * 180 / pi), 10)
+}
+
+# Anti-clockwise angle from p1 as origin to p2 (x,y pairs matrices) 0 to <360
+angle2 <- function(p1, p2) {
+    round((atan2(p2[, 2] - p1[, 2], p2[, 1] - p1[, 1]) * 180 / pi), 10) %% 360
+}
+
+################################################################################
+# INTERSECTIONS
+
+##' intersections inside L1 (from P1 to P2) and L2 (from P3 to P4).
+##' @return Vector containing x,y coordinates of intersection of L1
+##' and L2.  If L1 and L2 are parallel, this is infinite-valued.  If
+##' \code{interior.only} is \code{TRUE}, then when the intersection
+##' does not occur between P1 and P2 and P3 and P4, a vector
+##' containing \code{NA}s is returned.
+##' @source Weisstein, Eric W. "Line-Line Intersection."
+##' From MathWorld--A Wolfram Web Resource.
+##' \url{http://mathworld.wolfram.com/Line-LineIntersection.html}
+##' @author David Sterratt
+##' @export
+##' @examples
+##' ## Intersection of two lines
+##' line.line.intersection(c(0, 0), c(1, 1), c(0, 1), c(1, 0))
+##'
+##' ## Two lines that don't intersect
+##' line.line.intersection(c(0, 0), c(0, 1), c(1, 0), c(1, 1))
+#
+# TO DO 
+#   - Change this to either C++ code, or to a more general function that holds
+#     for more kinds of objects
+line.line.intersection <- function(P1, P2, P3, P4, interior.only = FALSE) {
+    P1 <- as.vector(P1)
+    P2 <- as.vector(P2)
+    P3 <- as.vector(P3)
+    P4 <- as.vector(P4)
+    
+    dx1 <- P1[1] - P2[1]
+    dx2 <- P3[1] - P4[1]
+    dy1 <- P1[2] - P2[2]
+    dy2 <- P3[2] - P4[2]
+    
+    D <- det(rbind(c(dx1, dy1),
+                    c(dx2, dy2)))
+    if (D==0) {
+        return(c(Inf, Inf))
+    }
+    D1 <- det(rbind(P1, P2))
+    D2 <- det(rbind(P3, P4))
+    
+    X <- det(rbind(c(D1, dx1),
+                    c(D2, dx2)))/D
+    Y <- det(rbind(c(D1, dy1),
+                    c(D2, dy2)))/D
+    
+    if (interior.only) {
+        ## Compute the fractions of L1 and L2 at which the intersection
+        ## occurs
+        lambda1 <- -((X-P1[1])*dx1 + (Y-P1[2])*dy1)/(dx1^2 + dy1^2)
+        lambda2 <- -((X-P3[1])*dx2 + (Y-P3[2])*dy2)/(dx2^2 + dy2^2)
+        if (!((lambda1>0) & (lambda1<1) &
+            (lambda2>0) & (lambda2<1))) {
+        return(c(NA, NA))
+        }
+    }
+    return(c(X, Y))
+}
+
+################################################################################
+# PREDPED SPECIFIC
 
 #' Compute the centers of the cells
 #' 
