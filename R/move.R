@@ -28,77 +28,97 @@
 #   - objects: 
 #   - iInfo: 
 #   - angle: Angles to consider
+#
+# TO DO
+#   - At this moment, the same checks happen here and in `best_angle`: Try to 
+#     find a way to decrease this burden (`move_options`). Happesn twice in this
+#     function alone: Once for initial computation, and once when this initial 
+#     computation does not pan out
+#   - Do we want to use the agent@busy for the different options?
 move_agent <- function(agent,
-                       P_n, 
-                       p_pred, 
+                       state,
+                       P_n,
+                       agent_predictions, 
                        nests, 
-                       alpha, 
-                       objects, 
+                       alpha,
                        iInfo, 
                        plotGrid = NULL, 
                        printChoice = NULL,
                        sStop = 0.2, # speed to resume after stop
                        usebestAngle = FALSE, 
                        angle = c(-72.5, -50, -32.5, -20, -10, 0, 
-                                 10, 20, 32.5, 50, 72.5)){
+                                 10, 20, 32.5, 50, 72.5)) {
     
+    # If the agent is currently interacting with another object, just continue
+    if(agent@busy) { # Used to be a check of the goal state: attr(state$P[[n]], "stop") > 0, == -1, or else (interacting, reorient, going)
+        agent@cell <- 0
+        check <- TRUE
+    } else {
+        # Transform the parameters
+        agent@parameters <- transform_exponentiate(agent@parameters)
+        mu <- transform_mu(agent@parameters) 
 
-    if (attr(state$P[[n]], "stop") > 0) {  # in interaction wait state
-        cell <- 0 
-        ok <- TRUE
-    } else {  # do update
-        if (attr(state$P[[n]], "stop")==-1) { # Starting after interaction, reorient
-        turn_report <- FALSE
-        attr(state$P[[n]], "stop") <- 0
-        p <- toNatural(state$pMat[n, ])
-        state$a[n] <- bestAngle(p, n, state, P_n, p_pred, objects, iInfo)
-        } else turn_report <- TRUE
-        p <- toNatural(state$pMat[n, ])
-        muM <- getmuM(p) 
-        centres <- c_vd(1:33, p1 = state$p[n, ], v1 = state$v[n], a1 = state$a[n])
-        ok <- moving_options(agent, objects, centers)
-        if (!any(ok) | state$cell[n]==0) {  # stop or will have to 
-        state$v[n] <- sStop
-        # cell <- 0
-        # # Turn to current goal, sometimes does nothing which can be problematic
-        # state$a[n] <- angle2(state$p[n,,drop = FALSE], 
-        #   state$P[[n]][attr(state$P[[n]], "i"), 1:2,drop = FALSE])
-        # centres <- c_vd(1:33, p1 = state$p[n, ], v1 = state$v[n], a1 = state$a[n])
-        # cat(paste(rownames(state$p)[n], "blocked, turning to goal\n"))
-        # ok <- get_ok(n, objects, state, centres,state$r[n])
-        
-        # state$a[n] <- (state$a[n] + 180) %% 360 # and turn around
-        # cell <- -1
-        best <- bestAngle(p, n, state, P_n, p_pred, objects, iInfo)
-        # if (!is.na(best)) {
-            state$a[n] <- best
-            turn <- paste("to",state$a[n],"degrees")
-            cell <- 0
-        # } else {
-        #   cell <- bestSide(n,centres,objects,state)
-        #   if (cell==-1) { # turn 90 degrees anti-clockwise
-        #     state$a[n] <- (state$a[n] + 90) %% 360
-        #     turn <- "anti-clockwise"
-        #   } else if (cell==-2) { # turn backwards
-        #     state$a[n] <- (state$a[n] + 180) %% 360
-        #     turn <- "around"
-        #   } else { # cell==-3, turn 90 degrees clockwise
-        #     state$a[n] <- (state$a[n] - 90) %% 360
-        #     turn <- "clockwise"
-        #   }
-        # }
-        centres <- c_vd(1:33, p1 = state$p[n, ], v1 = state$v[n], a1 = state$a[n])
-        ok <- moving_options(agent, objects, centers)
-        if (turn_report) cat(paste(rownames(state$p)[n], "turning",turn,"\n"))
-        } 
-        V <- utility(p, n, state, P_n, p_pred, centres, objects, ok, 
-                    iInfo = iInfo)
-        Pr <- pCNLs(V, muM, nests, alpha)
+        # If the agent stopped their interaction, check whether they already know
+        # where the next goal is. If they don't. let them reorient themselves to 
+        # the next goal
+        if(!agent@reoriented) {
+            agent@angle <- best_angle(agent, state, P_n, agent_predictions, iInfo)
+            agent@reoriented <- TRUE
+        }
+
+        # Define the centers of the options to move to
+        centers <- compute_cell_centers(1:33,
+                                        agent@position, 
+                                        agent@speed, 
+                                        angles[i])
+
+        # Check for occlusions or blocked cells the agent cannot move to
+        check <- moving_options(agent, state, centers)
+
+        # If there are no good options available, or the agent wants to stop, 
+        # then allow him to
+        if(!any(check) | state$agent[n]==0) {  # stop or will have to 
+            # Change the agent's speed to the starting speed after waiting
+            agent@speed <- sStop 
+
+            # Let the agent reorient to find a better way
+            agent@angle <- best_angle(agent, state, P_n, agent_predictions, iInfo)
+            
+            # Report the degress that the agent is reorienting to
+            turn <- paste("to", agent@angle, "degrees")
+            if(agent@reoriented) {
+                paste(agent@id, "turning", turn, "\n") |>
+                    cat()
+            }
+            
+            #cell <- 0
+            
+            # Define the centers of the options to move to
+            centers <- compute_cell_centers(1:33,
+                                            agent@position, 
+                                            agent@speed, 
+                                            angles[i])
+
+            # Check for occlusions or blocked cells the agent cannot move to
+            check <- moving_options(agent, state, centers)            
+        }
+
+        # Compute the utility of of each option and transform the utilities to 
+        # probabilities
+        V <- utility(agent@parameters, agent, state, P_n, agent_predictions, check, iInfo)
+        Pr <- pCNLs(V, mu, nests, alpha)
+
+
         names(Pr) <- 0:33
         if (!is.null(plotGrid) && plotGrid[n]) {
         draw_grid(state$p[n, ], state$v[n], state$a[n], plotPoints = TRUE, 
                     Pr = Pr[-1])
         }
+    }
+
+
+ 
+        
         cell <- sample.int(length(V), 1, TRUE, prob = Pr) - 1
         if (!is.null(printChoice) && printChoice[n]) {
         if (cell == 0) {
