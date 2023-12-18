@@ -37,3 +37,14 @@ testthat::test_that("Parameter logarithmizing works", {
 
     testthat::expect_equal(twice_transformed, parameters)
 })
+
+testthat::test_that("Nest association parameter transformation works", {
+    # Real parameters inbetween 0 and 1
+    parameters <- list("Central" = 0, "NonCentral" = 0.2, "acc" = 0.4, 
+                       "const" = 0.6, "dec" = 0.8)
+    reference <- list("Central" = 1, "NonCentral" = 0.8^(-1), "acc" = 0.6^(-1), 
+                      "const" = 0.4^(-1), "dec" = 0.2^(-1))
+
+    transformed_parameters <- predped::transform_mu(parameters)
+    testthat::expect_equal(reference, transformed_parameters)
+})
