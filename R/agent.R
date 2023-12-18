@@ -20,7 +20,8 @@ agent <- setClass("agent", list(id = "character",
                                 cell = "numeric",
                                 parameters = "numeric",
                                 goals = "matrix",
-                                current_goal = "numeric"), contains = c("circle"))
+                                current_goal = "numeric",
+                                reoriented = "boolean"), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
                                           id = character(0),
@@ -31,12 +32,13 @@ setMethod("initialize", "agent", function(.Object,
                                           # parameters = c(),
                                           # goals = list(),
                                           # current_goal = list(),
+                                          reoriented = FALSE,
                                           moveable = TRUE,
                                           busy = FALSE,
                                           interactable = TRUE,
                                           interacted_with = FALSE, ...
 ) {
-    .Object <- callNextMethod(.Object, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
+    .Object <- callNextMethod(.Object, reoriented = reoriented, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
 
     .Object@id <- ifelse(length(id) == 0, 
                          paste(sample(letters, 5, replace = TRUE), collapse = ""),
