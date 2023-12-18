@@ -25,6 +25,10 @@ transform_mu <- function(parameters) {
 #' 
 #' @export 
 #' 
+#' TO DO:
+#'  - parameter "bS" should be changed, as an exponentiation with a very high 
+#'    number becomes Inf (see tests)
+#' 
 #' Original function `toNatural`
 transform_exponentiate <- function(parameters) {
     utility_parameters <- c("rU",                     # utility randomness
