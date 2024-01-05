@@ -21,11 +21,10 @@
 # Create the move_agent function, which will define the generic move function 
 # for the agents. Consists of the following arguments
 #   - agent: The agent with all its information
-#   - P_n: 
-#   - p_pred: 
+#   - state: List with the current state of the simulation.
+#   - agent_predictions: List with the predicted movements of all agents
 #   - nests: 
-#   - alpha: 
-#   - objects: 
+#   - alpha:
 #   - iInfo: 
 #   - angle: Angles to consider
 #
@@ -35,9 +34,12 @@
 #     function alone: Once for initial computation, and once when this initial 
 #     computation does not pan out
 #   - Do we want to use the agent@busy for the different options?
+#   - Allow plotGrid and printChoice to happen in an object-based way
+#   - In the end, again centers computed as many times before (in the utility 
+#     function): Do the updating more generally and more streamlined so 
+#     everything becomes a lot clearer
 move_agent <- function(agent,
                        state,
-                       P_n,
                        agent_predictions, 
                        nests, 
                        alpha,
@@ -62,7 +64,7 @@ move_agent <- function(agent,
         # where the next goal is. If they don't. let them reorient themselves to 
         # the next goal
         if(!agent@reoriented) {
-            agent@angle <- best_angle(agent, state, P_n, agent_predictions, iInfo)
+            agent@orientation <- best_angle(agent, state, agent_predictions, iInfo)
             agent@reoriented <- TRUE
         }
 
@@ -70,7 +72,7 @@ move_agent <- function(agent,
         centers <- compute_cell_centers(1:33,
                                         agent@position, 
                                         agent@speed, 
-                                        angles[i])
+                                        angles)
 
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, centers)
@@ -82,10 +84,10 @@ move_agent <- function(agent,
             agent@speed <- sStop 
 
             # Let the agent reorient to find a better way
-            agent@angle <- best_angle(agent, state, P_n, agent_predictions, iInfo)
+            agent@orientation <- best_angle(agent, state, agent_predictions, iInfo)
             
             # Report the degress that the agent is reorienting to
-            turn <- paste("to", agent@angle, "degrees")
+            turn <- paste("to", agent@orientation, "degrees")
             if(agent@reoriented) {
                 paste(agent@id, "turning", turn, "\n") |>
                     cat()
@@ -97,7 +99,7 @@ move_agent <- function(agent,
             centers <- compute_cell_centers(1:33,
                                             agent@position, 
                                             agent@speed, 
-                                            angles[i])
+                                            angles)
 
             # Check for occlusions or blocked cells the agent cannot move to
             check <- moving_options(agent, state, centers)            
@@ -105,57 +107,77 @@ move_agent <- function(agent,
 
         # Compute the utility of of each option and transform the utilities to 
         # probabilities
-        V <- utility(agent@parameters, agent, state, P_n, agent_predictions, check, iInfo)
-        Pr <- pCNLs(V, mu, nests, alpha)
+        V <- utility(agent, state, agent_predictions, check, iInfo)
+        P <- pCNLs(V, mu, nests, alpha)
 
+        # Apply the different options to the probabilities
+        names(P) <- 0:33
 
-        names(Pr) <- 0:33
-        if (!is.null(plotGrid) && plotGrid[n]) {
-        draw_grid(state$p[n, ], state$v[n], state$a[n], plotPoints = TRUE, 
-                    Pr = Pr[-1])
-        }
+        # Check whether the simulation should be drawn. Given that this depends 
+        # on the information `n` (index of the agent) left out for now
+        # if(!is.null(plotGrid) && plotGrid[n]) {
+        # draw_grid(state$p[n, ], state$v[n], state$a[n], plotPoints = TRUE, 
+        #             Pr = Pr[-1])
+        # }
+
+        # Using the probabilities, sample the cell to which the agent will move.
+        # Importantly, 1 is subtracted from the integer as 0 is also an option 
+        # (standing still), but `seq_along` starts at 1
+        cell <- sample.int(seq_along(Pr), 
+                           1, 
+                           TRUE, 
+                           prob = Pr) - 1
+
+        # Check whether the choice should be printed. With the same reasoning 
+        # as plotGrid also ignored for now, but left in for later
+        # if (!is.null(printChoice) && printChoice[n]) {
+        #     if (cell == 0) {
+        #         cat("Standing still\n\n")
+        #     } else {
+        #         cat(paste("\nPedestrian =", row.names(state$p)[n], 
+        #                 " Choice =", cell, 
+        #                 " Ring =", c("accelerate", "constant", 
+        #                             "slow")[ringNum(cell)],
+        #                     " Cone =", coneNum(cell), "\n\n"))
+        #     }
+        #     cat(paste("Probability of standing still =", round(Pr[1], 3)))
+        #     print(matrix(round(Pr[-1], 2), nrow = 3, byrow = TRUE,
+        #                     dimnames = list(speed = c("accelerate", "constant", 
+        #                                             "slow"),
+        #                                     cone = 1:11)))
+        #     cat("\n")
+        # }
+
+        # Check what to do: Either the chosen cell is 0 (stop) or something else
+        # (moving to another location with a different speed and orientation)
+        if(cell == 0) {
+            agent@speed <- sStop  # stopped, reset velocity            
+        } else {
+            agent@position <- compute_cell_centers(cell,
+                                                   agent@position, 
+                                                   agent@speed,
+                                                   agent@orientation)
+            agent@speed <- pmax(agent@speed) * c(1.5, 1, 0.5)[ringNum(cell)], sStop)
+            agent@orientation <- (agent@orientation - angles[coneNum(cell)]) %% 360
+        }       
     }
 
+    return(agent)
 
- 
-        
-        cell <- sample.int(length(V), 1, TRUE, prob = Pr) - 1
-        if (!is.null(printChoice) && printChoice[n]) {
-        if (cell == 0) {
-            cat("Standing still\n\n")
-        } else {
-            cat(paste("\nPedestrian =", row.names(state$p)[n], 
-                    " Choice =", cell, 
-                    " Ring =", c("accelerate", "constant", 
-                                "slow")[ringNum(cell)],
-                        " Cone =", coneNum(cell), "\n\n"))
-        }
-        cat(paste("Probability of standing still =", round(Pr[1], 3)))
-        print(matrix(round(Pr[-1], 2), nrow = 3, byrow = TRUE,
-                        dimnames = list(speed = c("accelerate", "constant", 
-                                                "slow"),
-                                        cone = 1:11)))
-        cat("\n")
-        }
-        if (cell != 0) {
-            state$p[n, ] <- c_vd(cell, state$p[n, ], state$v[n], state$a[n])
-            state$v[n] <- pmax(state$v[n] * c(1.5, 1, .5)[ringNum(cell)], sStop)
-            state$a[n] <- (state$a[n] - angle[coneNum(cell)]) %% 360
-        } else {
-            state$v[n] <- sStop  # stopped, reset velocity
-        }
-    }
-
+    # Commented out but left in for now to remind us that the original 
+    # implementation also gave back information on whether the movement was 
+    # ok or not
+    
     # Change the agent characteristics based on the results of this function
-    agent@position <- 
-    agent@velocity <- 
-    out <- list(p = state$p[n, ], v = state$v[n], a = state$a[n], r = state$r[n], 
-                group = state$group[n], pMat = state$pMat[n, ], cell = cell,P=state$P[[n]])
-    attr(out, "ok") <- ok
+    # agent@position <- 
+    # agent@velocity <- 
+    # out <- list(p = state$p[n, ], v = state$v[n], a = state$a[n], r = state$r[n], 
+    #             group = state$group[n], pMat = state$pMat[n, ], cell = cell,P=state$P[[n]])
+    # attr(out, "ok") <- ok
     
-    # # Bug catch for outside total area
-    # if (!inObject(state$p[n,,drop=F],xlim=objects[[1]]$x,ylim=objects[[1]]$y,outside=FALSE))
-    #   stop(n)
+    # # # Bug catch for outside total area
+    # # if (!inObject(state$p[n,,drop=F],xlim=objects[[1]]$x,ylim=objects[[1]]$y,outside=FALSE))
+    # #   stop(n)
     
-    out
+    # out
 }
