@@ -189,3 +189,14 @@ angular_difference <- function(angle_1,
     return(sapply((discretized_angles + angle_2) %% 360, 
                   \(x) minAngle(x, angle_1)))
 }
+
+# A function to compute the number of the ring or cone to which a cell belongs. 
+# Kept in its original state because this kind of computation should be deleted 
+# from the next version
+ringNum <- function(k) {
+  1 + (k-1) %/% 11
+}
+
+coneNum <- function(k) {
+  1 + ((k-1) %% 11)
+}
