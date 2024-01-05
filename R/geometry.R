@@ -176,7 +176,9 @@ Iangle <- function(p1, a1, p2, border = c(-85, -60, -40, -25, -15, -5, 5, 15,
 }
 
 # Compute the absolute angular difference between discretized angles with the 
-# cone of comparison being created by `angle_1` and `angle_2`
+# cone of comparison being created by `angle_1` and `angle_2`.
+#
+# Original function: `headingAngle`
 angular_difference <- function(angle_1,
                                angle_2, 
                                discretized_angles = c(72.5, 50, 32.5, 20, 10, 0, 350, 
