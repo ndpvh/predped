@@ -174,3 +174,16 @@ Iangle <- function(p1, a1, p2, border = c(-85, -60, -40, -25, -15, -5, 5, 15,
     names(out) <- row.names(p2)
     out
 }
+
+# Compute the absolute angular difference between discretized angles with the 
+# cone of comparison being created by `angle_1` and `angle_2`
+angular_difference <- function(angle_1,
+                               angle_2, 
+                               discretized_angles = c(72.5, 50, 32.5, 20, 10, 0, 350, 
+                                                      340, 327.5, 310, 287.5)) {
+
+    # I just copied the places of angle_1 and angle_2 in this function, but 
+    # don't think it matters
+    return(sapply((discretized_angles + angle_2) %% 360, 
+                  \(x) minAngle(x, angle_1)))
+}
