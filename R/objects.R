@@ -306,7 +306,7 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
     ylims <- range(rect@points[,2])
 
     # Check whether the point lies inside of the rectangle
-    check <- (x[1] > xlims[1]) & (x[1] < xlims[2])) &
+    check <- (x[1] > xlims[1]) & (x[1] < xlims[2]) &
              (x[2] > ylims[1]) & (x[2] < ylims[2])
     
     return(ifelse(outside, !check, check)) # Important: Benchmark shows that the other algorithm is faster
