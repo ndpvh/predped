@@ -768,7 +768,7 @@ intersecting_cones <- function(agent,
     # Delete those cases for which there are no distances (i.e., those that 
     # could not be seen). Then check whether any remain
     idx <- lapply(cone_list, 
-                  \(x) (length(x) == 0)
+                  \(x) (length(x) == 0))
     cone_list[[idx]] <- NULL
 
     if(length(cone_list) == 0) {
