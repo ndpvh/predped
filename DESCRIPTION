@@ -17,7 +17,7 @@ Collate:
     'move.R'
     'moving_options.R'
     'state.R'
-    'colision.R'
+    'collision.R'
     'general.R'
     'parameters.R'
     'see.R'
