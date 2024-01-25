@@ -17,7 +17,7 @@ Collate:
     'move.R'
     'moving_options.R'
     'state.R'
-    'utility.R'
+    'utility_model.R'
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
