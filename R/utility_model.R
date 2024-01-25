@@ -350,7 +350,7 @@ utility_interpersonal_distance <- function(agent,
     
     # Adjust the check to enhance it with blocked objects (`check`) and with 
     # no collistions with the other agents (`all(x > 0)`).
-    check <- check & apply(interpersonal_distance, 2, \(x) all(x > 0)
+    check <- check & apply(interpersonal_distance, 2, \(x) all(x > 0))
 
     # Define the utility of the interpersonal distance as being -Inf if you are 
     # about to collide with someone or something, and as being a function of the
