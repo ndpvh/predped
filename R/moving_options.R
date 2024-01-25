@@ -57,7 +57,7 @@ moving_options_agent <- function(agent, state, centers){
     # might move and check whether it does not provide an error
     check <- free_cells(agent, state, centers)
 
-    errored_out <- check_try_error(check, "after `free_cells`"))
+    errored_out <- check_try_error(check, "after `free_cells`")
     if(!is.null(errored_out)){
         bad <<- errored_out
     }
