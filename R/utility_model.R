@@ -194,7 +194,7 @@ pCNLs <- function(V,
     
     # Nest probabilities
     if(any(unlist(nests) == 0)) {
-        nests <- lapply(nests, \(x) x + 1))
+        nests <- lapply(nests, \(x) x + 1)
     }
 
     # Save all utilities of the different nests in a list
