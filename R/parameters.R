@@ -23,8 +23,6 @@ transform_mu <- function(parameters) {
 #' 
 #' @return A named list containing the transformed parameters
 #' 
-#' @export 
-#' 
 #' TO DO:
 #'  - parameter "bS" should be changed, as an exponentiation with a very high 
 #'    number becomes Inf (see tests)

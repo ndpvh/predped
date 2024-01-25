@@ -85,12 +85,10 @@ utility <- function(object, state, p_pred, centres, objects, ok) {
 
 #' Title
 #'
-#' @param object
-#' @param ...
+#' @param object filler
+#' @param ... filler
 #'
-#' @return
-#' @export
-#'
+#' @return filler
 setGeneric("step", function(object, ...) standardGeneric("step"))
 
 setMethod("step", "agent", function(object,
