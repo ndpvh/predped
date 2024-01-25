@@ -751,7 +751,7 @@ intersecting_cones <- function(agent,
                 } else {
                     distance <- dist1(agent@position, 
                                       intersection)
-                    if(j = 1) {
+                    if(j == 1) {
                         cone_distances[[i]] <- distance
                     } else {
                         cone_distances[[i]] <- c(cone_distances[[i]], 
