@@ -899,7 +899,7 @@ candidate_cones <- function(agent, agent_predictions) {
     # are heading
     end_cones <- apply(ends, 
                        3, 
-                       \(x) Iangle(agent@position, agent@orientation, x)
+                       \(x) Iangle(agent@position, agent@orientation, x))
 
     # If there is only one other agent to consider, the `endCones` should be 
     # rescaled
