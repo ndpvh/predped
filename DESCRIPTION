@@ -8,7 +8,7 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Imports: methods
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Collate:
     'objects.R'
     'agent.R'
