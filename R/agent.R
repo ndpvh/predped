@@ -13,15 +13,18 @@
 #' agent
 #'
 #' @export
-agent <- setClass("agent", list(speed = "numeric",
+agent <- setClass("agent", list(id = "character", 
+                                speed = "numeric",
                                 orientation = "numeric",
                                 group = "numeric",
                                 cell = "numeric",
                                 parameters = "numeric",
                                 goals = "matrix",
-                                current_goal = "numeric"), contains = c("circle"))
+                                current_goal = "numeric",
+                                reoriented = "boolean"), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
+                                          id = character(0),
                                           speed = 1,
                                           orientation = 0,
                                           group = 0,
@@ -29,13 +32,17 @@ setMethod("initialize", "agent", function(.Object,
                                           # parameters = c(),
                                           # goals = list(),
                                           # current_goal = list(),
+                                          reoriented = FALSE,
                                           moveable = TRUE,
                                           busy = FALSE,
                                           interactable = TRUE,
                                           interacted_with = FALSE, ...
 ) {
-    .Object <- callNextMethod(.Object, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
+    .Object <- callNextMethod(.Object, reoriented = reoriented, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
 
+    .Object@id <- ifelse(length(id) == 0, 
+                         paste(sample(letters, 5, replace = TRUE), collapse = ""),
+                         id)
     .Object@speed <- speed
     .Object@orientation <- orientation
     .Object@group <- group
@@ -78,12 +85,10 @@ utility <- function(object, state, p_pred, centres, objects, ok) {
 
 #' Title
 #'
-#' @param object
-#' @param ...
+#' @param object filler
+#' @param ... filler
 #'
-#' @return
-#' @export
-#'
+#' @return filler
 setGeneric("step", function(object, ...) standardGeneric("step"))
 
 setMethod("step", "agent", function(object,

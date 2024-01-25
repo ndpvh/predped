@@ -92,6 +92,19 @@ setGeneric("move", function(object, target) standardGeneric("move"))
 #' @name area-method
 setGeneric("area", function(object) standardGeneric("area"))
 
+#' Check Whether a Point Lies Within an Object
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param x A numeric vector of length two with x and y coordinates of the point.
+#' @param outside A logical indicating whether to return \code{TRUE} if the point
+#' is outside the object.
+#'
+#' @return Logical whether the point is inside the object
+#' (if \code{outside} is \code{FALSE}) or outside.
+#' @export
+#' @name in_object-method
+setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
+
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -119,6 +132,67 @@ setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, moveable
     .Object@moveable <- moveable
 
     return(.Object)
+})
+
+#'@rdname in_object-method
+#' 
+setMethod("in_object", signature(object = "polygon"), function(object, x, outside = TRUE) {
+    # Use a Ray-casting algorithm to find out whether a point lies in a polygon. 
+    # This algorithm checks whether a point lies within an arbitrary polygon by 
+    # checking the even-odd-rule, which says that for any point (x,y) that lies 
+    # within a polygon, the number of times it cross the boundaries of this 
+    # polygon when x goes to infinity should be uneven/odd.
+    #
+    # This is not the most efficient algorithm, but it might be good to have 
+    # as the default, but to specify other algorithms when possible (e.g., for
+    # rectangle, see below).
+    #
+    # TO DO: Benchmark this code and check if less efficient than the specific
+    # method for rectangle
+
+    counter <- 0
+
+    # Extract the edges
+    # A bit hacky now, but also put the first point of this matrix at the end 
+    # as well. This allows us to examine all edges
+    edges <- object@points 
+    edges <- rbind(edges, edges[1,])
+    for(i in 1:(nrow(edges) - 1)) {
+        # Check whether the y-coordinate of the point is already above the 
+        # y-coordinates of both points that make up the edge. If this is the case, 
+        # then moving the x coordinate to infinity would just yield no
+        # intersections. Return TRUE if this is not the case.
+        check_1 <- (edges[i,2] > x[2]) != (edges[i + 1,2] > x[2])
+
+        # Use a derived formula to find out for which value of the x coordinate
+        # the imaginary horizontal line through the point `x` would intersect 
+        # with the edge. This derivation is based on deriving the equation 
+        # y = mx + b for the edge and then equation it to the equation y = x[2], 
+        # which represents the horizontal move from x[2] to infinity.
+        slope <- (edges[i + 1,1] - edges[i,1]) / (edges[i + 1,2] - edges[i,2])
+        x_intersection <- edges[i,1] + slope * (x[2] - edges[i,2])
+
+        # Finally, check whether this intersection point lies further to the 
+        # right (towards infinity) than the initial value of the x coordinate. 
+        # If so, then the intersection indeed happens due to the move from the 
+        # x coordinate to infinity.
+        check_2 <- x[1] < x_intersection
+
+        # If both checks are TRUE, then there is an intersection and we should 
+        # increase the counter
+        if(check_1 && check_2) {
+            counter <- counter + 1
+        }
+    }
+
+    # If outside == FALSE, return TRUE if you have an odd number of intersections.
+    # If outside == TRUE, return TRUE if you have an even number of intersections. 
+    # otherwise
+    #
+    # In other words, return TRUE whenever the two booleans match (TRUE, TRUE ->
+    # even number of intersections when outside of the polygon; FALSE, FALSE ->
+    # odd number of intersections when inside of the polygon)
+    return((counter %% 2 == 0) == outside)    
 })
 
 #' An S4 Class to Represent Rectangle Objects
@@ -205,7 +279,7 @@ setMethod("rotate",
               if (missing(radians) && !missing(degrees)) {
                   radians <- degrees * pi / 180
               } else if (!(!missing(radians) && missing(degrees))) {
-                  stop("Either 'degress' or 'radians' must be provided")
+                  stop("Either 'degrees' or 'radians' must be provided")
               }
 
               object@orientation <- radians
@@ -219,18 +293,24 @@ setMethod("rotate",
 #'
 setMethod("area", signature(object = "rectangle"), function(object) prod(object@size))
 
-#' Check Whether a Point Lies Within an Object
-#'
-#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
-#' @param x A numeric vector of length two with x and y coordinates of the point.
-#' @param outside A logical indicating whether to return \code{TRUE} if the point
-#' is outside the object.
-#'
-#' @return Logical whether the point is inside the object
-#' (if \code{outside} is \code{FALSE}) or outside.
-#' @export
-#' @name inObject-method
-setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
+#'@rdname in_object-method
+#' 
+setMethod("in_object", signature(object = "rectangle"), function(object, x, outside = TRUE) {
+    # Rotate the rectangle and point in the same direction and around the same 
+    # center (the center of the rectangle)
+    rect <- rotate(object, radians = -object@orientation)
+    x <- rotate(coordinate(x), center = object@center, radians = -object@orientation)
+
+    # Determine the limits of the rectangle
+    xlims <- range(rect@points[,1])
+    ylims <- range(rect@points[,2])
+
+    # Check whether the point lies inside of the rectangle
+    check <- (x[1] > xlims[1]) & (x[1] < xlims[2]) &
+             (x[2] > ylims[1]) & (x[2] < ylims[2])
+    
+    return(ifelse(outside, !check, check)) # Important: Benchmark shows that the other algorithm is faster
+})
 
 #' An S4 Class to Represent Circle Objects
 #'
