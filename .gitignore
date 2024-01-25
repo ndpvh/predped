@@ -17,5 +17,7 @@ Train/
 
 *.drawio*
 
+man/
+
 tmp/
 To Do.txt
