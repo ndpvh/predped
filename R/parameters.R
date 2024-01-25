@@ -4,9 +4,9 @@
 #' 
 #' @return A named list containing the transformed parameters
 #' 
-#' @export 
-#' 
-#' Original function `getmuM`
+#' @export transform_mu
+# 
+# Original function `getmuM`
 transform_mu <- function(parameters) {
     parameter_names <- c("Central", "NonCentral", "acc", "const", "dec")
 
@@ -23,11 +23,13 @@ transform_mu <- function(parameters) {
 #' 
 #' @return A named list containing the transformed parameters
 #' 
-#' TO DO:
-#'  - parameter "bS" should be changed, as an exponentiation with a very high 
-#'    number becomes Inf (see tests)
-#' 
-#' Original function `toNatural`
+#' @export transform_exponentiate
+# 
+# TO DO:
+#  - parameter "bS" should be changed, as an exponentiation with a very high 
+#    number becomes Inf (see tests)
+# 
+# Original function `toNatural`
 transform_exponentiate <- function(parameters) {
     utility_parameters <- c("rU",                     # utility randomness
                             "bS",                     # stand still threshold
@@ -70,9 +72,9 @@ transform_exponentiate <- function(parameters) {
 #' 
 #' @return A named list containing the transformed parameters
 #' 
-#' @export 
-#' 
-#' Original function `toReal`
+#' @export transform_logarithmic
+# 
+# Original function `toReal`
 transform_logarithmic <- function(parameters) {
     utility_parameters <- c("rU",                     # utility randomness
                             "bS",                     # stand still threshold

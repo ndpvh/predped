@@ -7,6 +7,8 @@
 #' @param lst The list in which to search for these objects
 #' 
 #' @return A list containing all instances of the class.
+#' 
+#' @export find_class
 find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
 }
@@ -18,6 +20,8 @@ find_class <- function(class_name, lst) {
 #' @param state A list containing the current state of the simulation
 #' 
 #' @return Two lists containing the objects or the agents
+#' 
+#' @export separate_agent_object
 separate_agent_object <- function(state) {
     # Identify the agents from the `state` list
     agents <- find_class("agent", state)
