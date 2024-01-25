@@ -157,7 +157,7 @@ move_agent <- function(agent,
                                                    agent@position, 
                                                    agent@speed,
                                                    agent@orientation)
-            agent@speed <- pmax(agent@speed) * c(1.5, 1, 0.5)[ringNum(cell)], sStop)
+            agent@speed <- pmax(agent@speed * c(1.5, 1, 0.5)[ringNum(cell)], sStop)
             agent@orientation <- (agent@orientation - angles[coneNum(cell)]) %% 360
         }       
     }
