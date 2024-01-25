@@ -11,13 +11,13 @@
 #' @param step The stepsize in the angles to be checked
 #' 
 #' @return The angle that has the highest utility to move to
-#' 
-#' TO DO: 
-#'  - Change the goal argument
-#'  - Write tests for the convergence of this function with its predecessor, 
-#'    especially with regard to angles that are blocked
-#' 
-#' Object-oriented replacement of the function `bestAngle`.
+# 
+# TO DO: 
+#  - Change the goal argument
+#  - Write tests for the convergence of this function with its predecessor, 
+#    especially with regard to angles that are blocked
+# 
+# Object-oriented replacement of the function `bestAngle`.
 best_angle <- function(agent, 
                        state,
                        agent_predictions, 
@@ -63,8 +63,8 @@ best_angle <- function(agent,
 #' 
 #' @return Boolean indicating whether the agent can see the point
 #' (`TRUE`) or not (`FALSE`)
-#' 
-#' The original logic stems from the function `seesGoal`
+# 
+# The original logic stems from the function `seesGoal`
 sees_location <- function(agent, 
                           co, 
                           objects) {
@@ -107,8 +107,8 @@ sees_location <- function(agent,
 #' 
 #' @return Boolean indicating whether the agent can see the goal of interest
 #' (`TRUE`) or not (`FALSE`)
-#' 
-#' Original function: `seesGoal`
+# 
+# Original function: `seesGoal`
 sees_goal <- function(agent, objects) {
     return(sees_location(agent, agent@current_goal@position, objects))
 }
@@ -120,8 +120,8 @@ sees_goal <- function(agent, objects) {
 #' @param agent The agent
 #' @param objects_to_see A list of objects that the agent should be able to see
 #' @param objects The list of objects that can obstruct the view of the agent
-#' 
-#' Original function: `seesMany`
+# 
+# Original function: `seesMany`
 sees_multiple_locations <- function(agent, 
                                     objects_to_see,
                                     objects) {

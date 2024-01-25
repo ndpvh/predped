@@ -116,13 +116,13 @@ line.line.intersection <- function(P1, P2, P3, P4, interior.only = FALSE) {
 #' @param angles All discretized options to change the direction
 #' 
 #' @return Matrix of positions for the different cells
-#' 
-#' TO DO
-#'  - Make the function simpler: At this moment to many arguments for its own 
-#'    good
-#'  - Create a test for this function
-#' 
-#' Replacement of function `c_vd`
+# 
+# TO DO
+#  - Make the function simpler: At this moment to many arguments for its own 
+#    good
+#  - Create a test for this function
+# 
+# Replacement of function `c_vd`
 compute_cell_centers <- function(cell, 
                                  position, 
                                  velocity, 

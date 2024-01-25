@@ -20,28 +20,30 @@
 #' Defaults to `TRUE`.
 #' 
 #' @return <type> with utilities 
-#'
-#' TO DO
-#'  - Is `check` a necessary argument here, or could we just only put the checked
-#'    centers in them
-#'  - Maybe make `precomputed` a list that contains the precomputed items? Then
-#'    we can just simply extract them from this list instead of from `state`: 
-#'    We should think about this, as this information is not directly available
-#'    from `state` anymore if this becomes a list of agents and objects
-#'  - Make it so so that you can just give a set of different utilities that 
-#'    you want accounted for, making the utility function on the lower level 
-#'    highly manipulable at the higher level
-#'  - I have the feeling that a lot of the computations on the lower level can 
-#'    be solved by the object-oriented way of dealing with things. For example,
-#'    we can just access the position of all other agents and define which cell
-#'    of `agent` they occupy in a more straightforward way than is currently 
-#'    implemented in `get_leaders` and `get_buddy`.
-#'  - Make each of the utilities a class of their own, with the method 
-#'    `compute` to compute the specific utility it needs to compute. This will
-#'    allow for a very easy combination of utilities that can be changed at the
-#'    upper level
-#'  - Unless I am mistaken, iInfo is not used in this function and can thus be 
-#'    deleted
+#' 
+#' @export
+#
+# TO DO
+#  - Is `check` a necessary argument here, or could we just only put the checked
+#    centers in them
+#  - Maybe make `precomputed` a list that contains the precomputed items? Then
+#    we can just simply extract them from this list instead of from `state`: 
+#    We should think about this, as this information is not directly available
+#    from `state` anymore if this becomes a list of agents and objects
+#  - Make it so so that you can just give a set of different utilities that 
+#    you want accounted for, making the utility function on the lower level 
+#    highly manipulable at the higher level
+#  - I have the feeling that a lot of the computations on the lower level can 
+#    be solved by the object-oriented way of dealing with things. For example,
+#    we can just access the position of all other agents and define which cell
+#    of `agent` they occupy in a more straightforward way than is currently 
+#    implemented in `get_leaders` and `get_buddy`.
+#  - Make each of the utilities a class of their own, with the method 
+#    `compute` to compute the specific utility it needs to compute. This will
+#    allow for a very easy combination of utilities that can be changed at the
+#    upper level
+#  - Unless I am mistaken, iInfo is not used in this function and can thus be 
+#    deleted
 utility <- function(agent, 
                     state, 
                     agent_predictions = NULL, 
@@ -126,15 +128,17 @@ utility <- function(agent,
 #' @param nests 
 #' @param alpha 
 #' 
-#' TO DO:
-#'  - Nested functions in this function: Should we consider them separate?
-#'  - The order of the arguments don't make sense to me: Would change them so 
-#'    that the defaults remain at the back
-#'  - If I understand correctly, `between_nest` uses the individual probabilities
-#'    of the `within_nest` function to compute the probabilities of the nests. 
-#'    If so, I would try to make this computation more general so that 
-#'    `within_nest` and `between_nest` are computed at once instead of twice 
-#'    in two separate functions
+#' @export
+# 
+# TO DO:
+#  - Nested functions in this function: Should we consider them separate?
+#  - The order of the arguments don't make sense to me: Would change them so 
+#    that the defaults remain at the back
+#  - If I understand correctly, `between_nest` uses the individual probabilities
+#    of the `within_nest` function to compute the probabilities of the nests. 
+#    If so, I would try to make this computation more general so that 
+#    `within_nest` and `between_nest` are computed at once instead of twice 
+#    in two separate functions
 pCNLs <- function(V, 
                   muM = rep(1, length(nests)), 
                   nests, 
@@ -468,9 +472,11 @@ utility_buddy <- function(agent,
 #' @param angles The different angles that should be considered in the utility
 #' function
 #' 
-#' @return  
+#' @return <NA>
 #' 
-#' Original function was `destinationAngle`
+#' @export
+# 
+# Original function was `destinationAngle`
 goal_direction <- function(agent,
                            angles = c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 
                                       327.5, 310, 287.5)) {
@@ -495,19 +501,21 @@ goal_direction <- function(agent,
 #' @return Matrix with each column is a cell each row an in front ped, if none 
 #' returns null
 #' 
-#' TO DO
-#'  - Make sure you don't need to separate agent from object in obstruction 
-#'    functions like `sees_(...)`. Instead, introduce a boolean that makes the 
-#'    difference between `obstructs_view` or not (e.g., agents may be able to 
-#'    see their goal when a cart or agent is in their way, but not when a 
-#'    book case is in the way) 
-#'  - Define how `agent_predictions` are going to look like: Are they a part of 
-#'    agent, or are they something else entirely
-#'  - Optimize how the distances are created. At this moment inefficient (due 
-#'    to our own design and uncertainty around how to handle `agent_predictions`
-#'    and `centers` [list of coordinates or matrix; here matrix assumed])
-#'
-#' Original function was `predClose`
+#' @export
+# 
+# TO DO
+#  - Make sure you don't need to separate agent from object in obstruction 
+#    functions like `sees_(...)`. Instead, introduce a boolean that makes the 
+#    difference between `obstructs_view` or not (e.g., agents may be able to 
+#    see their goal when a cart or agent is in their way, but not when a 
+#    book case is in the way) 
+#  - Define how `agent_predictions` are going to look like: Are they a part of 
+#    agent, or are they something else entirely
+#  - Optimize how the distances are created. At this moment inefficient (due 
+#    to our own design and uncertainty around how to handle `agent_predictions`
+#    and `centers` [list of coordinates or matrix; here matrix assumed])
+#
+# Original function was `predClose`
 others_close <- function(agent, 
                          state, 
                          agent_predictions, 
@@ -600,16 +608,18 @@ others_close <- function(agent,
 #' 
 #' @returns Cell-named vector of distances
 #' 
-#' TO DO
-#'  - Find a way to make this a bit more streamlined, as we again make a 
-#'    distinction between objects and agents within this function, as we 
-#'    do in many of these individual functions (do at a higher level, rewrite
-#'    these functions to get an argument `other_agents` and `objects`)
-#'  - Some things are hardcoded (everything related to the centers) and 
-#'    should be changed to allow for users to determine these things for 
-#'    themselves
-#' 
-#' Original function `blockedAngle` and `iCones2Cells`
+#' @export
+# 
+# TO DO
+#  - Find a way to make this a bit more streamlined, as we again make a 
+#    distinction between objects and agents within this function, as we 
+#    do in many of these individual functions (do at a higher level, rewrite
+#    these functions to get an argument `other_agents` and `objects`)
+#  - Some things are hardcoded (everything related to the centers) and 
+#    should be changed to allow for users to determine these things for 
+#    themselves
+# 
+# Original function `blockedAngle` and `iCones2Cells`
 predict_blocking <- function(agent, 
                              state, 
                              agent_predictions, 
@@ -662,21 +672,23 @@ predict_blocking <- function(agent,
 #' 
 #' @return `NULL` if there are no cones that intersect.
 #' 
-#' TO DO
-#'  - A bug has been reported for this function: "should pass actual position 
-#'    not p_pred to evaluate SEEN"
-#'  - Rewrite functions for utility so that a lot of the computations only need 
-#'    to be done once: here you again need to differentiate agents and objects, 
-#'    which you already did in `others_close`
-#'  - Another part of efficiency can be having only the centers that can be 
-#'    evaluated provided by the agent. This way, you only have to compute potential
-#'    blocking once instead of multiple times
-#'  - And yet another one: Useful to save the distance of an agent to an object
-#'    as well, as this is computed here
-#'  - Given that this function depends heavily on the previous structure of the 
-#'    code, it is important to do an integration test here
-#' 
-#' Original function: `iCones`
+#' @export
+# 
+# TO DO
+#  - A bug has been reported for this function: "should pass actual position 
+#    not p_pred to evaluate SEEN"
+#  - Rewrite functions for utility so that a lot of the computations only need 
+#    to be done once: here you again need to differentiate agents and objects, 
+#    which you already did in `others_close`
+#  - Another part of efficiency can be having only the centers that can be 
+#    evaluated provided by the agent. This way, you only have to compute potential
+#    blocking once instead of multiple times
+#  - And yet another one: Useful to save the distance of an agent to an object
+#    as well, as this is computed here
+#  - Given that this function depends heavily on the previous structure of the 
+#    code, it is important to do an integration test here
+# 
+# Original function: `iCones`
 intersecting_cones <- function(agent,
                                agent_predictions, 
                                objects) {
@@ -823,7 +835,9 @@ intersecting_cones <- function(agent,
 #' (2) x end of the segments. Importantly, "ac" and "cw" denote anticlockwise 
 #' and clockwise respectively.
 #' 
-#' Original function `eObjects`
+#' @export
+# 
+# Original function `eObjects`
 egocentric_objects <- function(agent, other_agents) {
     # Compute the distances between the position of `agent` and all the other 
     # agents
@@ -947,21 +961,23 @@ candidate_cones <- function(agent, agent_predictions) {
 #' their direction and the orientation of the agent, and whether they are a part 
 #' of the ingroup.
 #' 
-#' TO DO
-#'  - Create a function that makes a named list of centers, having a matrix in 
-#'    that denotes the velocities, angles, positions, and blocking. In the 
-#'    blocking matrix, we can then include the type of blocking: "free", "agent", 
-#'    "object", "moveable object". That way, we can just compute the centers 
-#'    variable once and make inference based on this one-time computation   
-#'  - Streamline again, once finding out whether any agents are closeby so that 
-#'    they may serve as leaders (as done in `predict_blocking`)
-#'  - At some point, the velocity is scaled for the agent. However, one of the 
-#'    numbers in this scaling is 5 instead of 2 (to create the outer ring): 
-#'    check whether this is correct or whether this is a bug
-#'  - If the output list is retained, make the contents of this list more 
-#'    explicit than they are right now
-#' 
-#' Original function: `getLeaders` 
+#' @export
+# 
+# TO DO
+#  - Create a function that makes a named list of centers, having a matrix in 
+#    that denotes the velocities, angles, positions, and blocking. In the 
+#    blocking matrix, we can then include the type of blocking: "free", "agent", 
+#    "object", "moveable object". That way, we can just compute the centers 
+#    variable once and make inference based on this one-time computation   
+#  - Streamline again, once finding out whether any agents are closeby so that 
+#    they may serve as leaders (as done in `predict_blocking`)
+#  - At some point, the velocity is scaled for the agent. However, one of the 
+#    numbers in this scaling is 5 instead of 2 (to create the outer ring): 
+#    check whether this is correct or whether this is a bug
+#  - If the output list is retained, make the contents of this list more 
+#    explicit than they are right now
+# 
+# Original function: `getLeaders` 
 get_leaders <- function(agent, 
                         state, 
                         centers, 
@@ -1129,12 +1145,14 @@ get_leaders <- function(agent,
 #' that is information on the cells they occupy and the angle of disagreement 
 #' between their direction and the orientation of the agent.
 #' 
-#' TO DO
-#'  - This function is very similar to `get_leaders`, and might thus benefit 
-#'    from the same TO DO's. 
-#'  - A lot of hardcoding going on here: Streamline these functions at some point
-#' 
-#' Original function: `getBuddy`
+#' @export
+# 
+# TO DO
+#  - This function is very similar to `get_leaders`, and might thus benefit 
+#    from the same TO DO's. 
+#  - A lot of hardcoding going on here: Streamline these functions at some point
+# 
+# Original function: `getBuddy`
 get_buddy <- function(agent, 
                       state, 
                       agent_predictions,
