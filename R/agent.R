@@ -13,15 +13,16 @@
 #' agent
 #'
 #' @export
-agent <- setClass("agent", list(id = "character", 
+agent <- setClass("agent", list(id = "character",
                                 speed = "numeric",
                                 orientation = "numeric",
                                 group = "numeric",
                                 cell = "numeric",
+                                status = "character",
                                 parameters = "numeric",
                                 goals = "matrix",
-                                current_goal = "numeric",
-                                reoriented = "boolean"), contains = c("circle"))
+                                current_goal = "matrix"
+                                ), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
                                           id = character(0),
@@ -29,92 +30,184 @@ setMethod("initialize", "agent", function(.Object,
                                           orientation = 0,
                                           group = 0,
                                           cell = 0,
-                                          # parameters = c(),
-                                          # goals = list(),
-                                          # current_goal = list(),
-                                          reoriented = FALSE,
+                                          status = "move",
                                           moveable = TRUE,
-                                          busy = FALSE,
                                           interactable = TRUE,
-                                          interacted_with = FALSE, ...
+                                          ...
 ) {
-    .Object <- callNextMethod(.Object, reoriented = reoriented, moveable = moveable, busy = busy, interactable = interactable, interacted_with = interacted_with, ...)
+    .Object <- callNextMethod(.Object, moveable = moveable, interactable = interactable, ...)
 
-    .Object@id <- ifelse(length(id) == 0, 
-                         paste(sample(letters, 5, replace = TRUE), collapse = ""),
-                         id)
+    .Object@id <- if (length(id) == 0) paste(sample(letters, 5, replace = TRUE), collapse = "") else id
     .Object@speed <- speed
     .Object@orientation <- orientation
     .Object@group <- group
     .Object@cell <- cell
-    # .Object@parameters <- parameters
-    # .Object@goals <- goals
-    # .Object@current_goal <- current_goal
+    .Object@status <- status
 
     return(.Object)
 })
 
-utility <- function(object, state, p_pred, centres, objects, ok) {
-    PS <- dist1(object@center, matrix(object@current_goal[1:2], ncol = 2))
-    GA <- destinationAngle(object@orientation, matrix(object@center, ncol = 2),
-                           object@goals) / 90
-    ID <- predClose(1, p1 = matrix(object@center, ncol = 2), a1 = object@orientation,
-                    p2 = state$p, r = state$r, centres, p_pred,
-                    objects = objects)
-    BA <- blockedAngle(1, state, p_pred, objects)
-
-    if (length(BA) == 0) BA <- NULL
-
-    FL <- getLeaders(1, state, centres, objects)
-    WB <- getBuddy(1, group = state$group, a = state$a, p_pred, centres,
-                   objects, state = state)
-
-    out <-
-        psUtility(object@parameters, object@speed, PS) +
-        # gaUtility(object@parameters, GA) +
-        caUtility(object@parameters) +
-        idUtility(object@parameters, 1, ID, ok, group = state$group) +
-        baUtility(object@parameters, BA) +
-        flUtility(object@parameters, FL) +
-        wbUtility(object@parameters, WB)
-
-    # Stop baseline (set by gwUtility) and scaling
-    return(c(-object@parameters["bS"], out) / object@parameters["rU"])
-}
-
-
-#' Title
+#' @rdname agent
 #'
-#' @param object filler
-#' @param ... filler
+#' @export
+setGeneric("id", function(object) standardGeneric("id"))
+
+#' @rdname agent
 #'
-#' @return filler
-setGeneric("step", function(object, ...) standardGeneric("step"))
+#' @export
+setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 
-setMethod("step", "agent", function(object,
-                                    state,
-                                    p_pred,
-                                    nests,
-                                    alpha,
-                                    objects,
-                                    sStop = 0.2, # speed to resume after stop
-                                    usebestAngle = FALSE,
-                                    angle = c(-72.5, -50, -32.5, -20, -10,
-                                              0, 10, 20, 32.5, 50, 72.5)) {
-
-    centres <- c_vd(1:33, p1 = object@center, v1 = object@speed, a1 = object@orientation)
-
-    ok <- matrix(TRUE, nrow = 11, ncol = 3)
-
-    V <- utility(object, state, p_pred, centres, objects, ok)
-
-    Pr <- sapply(0:33, function(i) pcnl_rcpp(get_cell_nest()[i, ], V, rep(1, length(nests)), nests, alpha, mu = 1))
-    names(Pr) <- 0:33
-
-    cell <- sample.int(length(V), 1, TRUE, prob = Pr) - 1
-
-    pos <- c_vd(cell, p1 = object@center, v1 = object@speed, a1 = object@orientation)
-
-    return(move(object, as.numeric(pos)))
+setMethod("id", "agent", function(object) {
+    return(setNames(object@id, object@id))
 })
 
+setMethod("id<-", "agent", function(object, value) {
+    object@id <- value
+    return(object)
+})
+
+#' @export
+setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
+
+#' @export
+setGeneric("position<-", function(object, value) standardGeneric("position<-"))
+
+setMethod("position", "agent", function(object, return_matrix = FALSE) {
+    if (return_matrix) {
+        return(matrix(object@center, nrow = 1, ncol = 2, dimnames = list(object@id, names(object@center))))
+    }
+    return(object@center)
+})
+
+setMethod("position<-", "agent", function(object, value) {
+    object@center <- as(value, "coordinate")
+    return(object)
+})
+
+#' @export
+setGeneric("size", function(object) standardGeneric("size"))
+
+setMethod("size", "agent", function(object) {
+    return(setNames(object@radius, object@id))
+})
+
+#' @export
+setGeneric("speed", function(object) standardGeneric("speed"))
+
+#' @export
+setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
+
+setMethod("speed", "agent", function(object) {
+    return(setNames(object@speed, object@id))
+})
+
+setMethod("speed<-", "agent", function(object, value) {
+    object@speed <- value
+    return(object)
+})
+
+#' @export
+setGeneric("orientation", function(object) standardGeneric("orientation"))
+
+#' @export
+setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
+
+setMethod("orientation", "agent", function(object) {
+    return(setNames(object@orientation, object@id))
+})
+
+setMethod("orientation<-", "agent", function(object, value) {
+    object@orientation <- value
+    return(object)
+})
+
+#' @export
+setGeneric("group", function(object) standardGeneric("group"))
+
+#' @export
+setGeneric("group<-", function(object, value) standardGeneric("group<-"))
+
+setMethod("group", "agent", function(object) {
+    return(setNames(object@group, object@id))
+})
+
+setMethod("group<-", "agent", function(object, value) {
+    object@group <- value
+    return(object)
+})
+
+#' @export
+setGeneric("cell", function(object) standardGeneric("cell"))
+
+#' @export
+setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
+
+setMethod("cell", "agent", function(object) {
+    return(setNames(object@cell, object@id))
+})
+
+setMethod("cell<-", "agent", function(object, value) {
+    object@cell <- value
+    return(object)
+})
+
+#' @export
+setGeneric("status", function(object) standardGeneric("status"))
+
+#' @export
+setGeneric("status<-", function(object, value) standardGeneric("status<-"))
+
+setMethod("status", "agent", function(object) {
+    return(setNames(object@status, object@id))
+})
+
+setMethod("status<-", "agent", function(object, value) {
+    stopifnot(value %in% c("move", "stop", "reorient"))
+    object@status <- value
+    return(object)
+})
+
+#' @export
+setGeneric("parameters", function(object) standardGeneric("parameters"))
+
+#' @export
+setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
+
+setMethod("parameters", "agent", function(object) {
+    return(object@parameters)
+})
+
+setMethod("parameters<-", "agent", function(object, value) {
+    object@parameters <- value
+    return(object)
+})
+
+#' @export
+setGeneric("goals", function(object) standardGeneric("goals"))
+
+#' @export
+setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
+
+setMethod("goals", "agent", function(object) {
+    return(object@goals)
+})
+
+setMethod("goals<-", "agent", function(object, value) {
+    object@goals <- value
+    return(object)
+})
+
+#' @export
+setGeneric("current_goal", function(object) standardGeneric("current_goal"))
+
+#' @export
+setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
+
+setMethod("current_goal", "agent", function(object) {
+    return(object@current_goal)
+})
+
+setMethod("current_goal<-", "agent", function(object, value) {
+    object@current_goal <- value
+    return(object)
+})
