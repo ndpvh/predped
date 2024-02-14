@@ -7,8 +7,10 @@ Author: Who wrote it
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
-Imports: methods
-RoxygenNote: 7.2.3
+Imports: 
+    methods,
+    m4ma
+RoxygenNote: 7.2.1
 Collate:
     'objects.R'
     'agent.R'
@@ -23,5 +25,8 @@ Collate:
     'see.R'
     'utility_model.R'    
 Suggests: 
+    fs,
     testthat (>= 3.0.0)
+Remotes:
+    m4ma/m4ma
 Config/testthat/edition: 3

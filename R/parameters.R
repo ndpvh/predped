@@ -1,34 +1,34 @@
-#' Transform nest association to precision (mu)  
-#' 
+#' Transform nest association to precision (mu)
+#'
 #' @param parameters A named list containing the parameters for a given agent
-#' 
+#'
 #' @return A named list containing the transformed parameters
-#' 
+#'
 #' @export transform_mu
-# 
+#
 # Original function `getmuM`
 transform_mu <- function(parameters) {
     parameter_names <- c("Central", "NonCentral", "acc", "const", "dec")
 
     for(i in parameter_names) {
-        parameters[[i]] <- (1 - parameters[[i]])^(-1)
+        parameters[i] <- (1 - parameters[i])^(-1)
     }
-    
+
     return(parameters)
 }
 
 #' Exponentiate the parameters
-#' 
+#'
 #' @param parameters A named list containing the parameters for a given agent
-#' 
+#'
 #' @return A named list containing the transformed parameters
-#' 
+#'
 #' @export transform_exponentiate
-# 
+#
 # TO DO:
-#  - parameter "bS" should be changed, as an exponentiation with a very high 
+#  - parameter "bS" should be changed, as an exponentiation with a very high
 #    number becomes Inf (see tests)
-# 
+#
 # Original function `toNatural`
 transform_exponentiate <- function(parameters) {
     utility_parameters <- c("rU",                     # utility randomness
@@ -38,17 +38,17 @@ transform_exponentiate <- function(parameters) {
                             "bCA", "bCAlr", "aCA",    # current direction
                             "bBA", "aBA",             # blocked angle
                             "bGA", "aGA",             # goal angle
-                            "bPS", "aPS", 
+                            "bPS", "aPS",
                             "sPref", "sSlow",         # preferred velocity
                             "bID", "aID", "dID")      # interpersonal distance
     nest_parameters <- c("Central", "NonCentral", "acc", "const", "dec")
-    
+
     for(i in utility_parameters){
-        parameters[[i]] <- exp(parameters[[i]])
+        parameters[i] <- exp(parameters[i])
     }
 
     for(i in nest_parameters){
-        parameters[[i]] <- pnorm(parameters[[i]])
+        parameters[i] <- pnorm(parameters[i])
     }
 
     return(parameters)
@@ -67,13 +67,13 @@ transform_exponentiate <- function(parameters) {
 }
 
 #' Take the logarithm of the parameters
-#' 
+#'
 #' @param parameters A named list containing the parameters for a given agent
-#' 
+#'
 #' @return A named list containing the transformed parameters
-#' 
+#'
 #' @export transform_logarithmic
-# 
+#
 # Original function `toReal`
 transform_logarithmic <- function(parameters) {
     utility_parameters <- c("rU",                     # utility randomness
@@ -83,11 +83,11 @@ transform_logarithmic <- function(parameters) {
                             "bCA", "bCAlr", "aCA",    # current direction
                             "bBA", "aBA",             # blocked angle
                             "bGA", "aGA",             # goal angle
-                            "bPS", "aPS", 
+                            "bPS", "aPS",
                             "sPref", "sSlow",         # preferred velocity
                             "bID", "aID", "dID")      # interpersonal distance
     nest_parameters <- c("Central", "NonCentral", "acc", "const", "dec")
-    
+
     for(i in utility_parameters){
         parameters[[i]] <- log(parameters[[i]])
     }
