@@ -23,7 +23,8 @@ Collate:
     'general.R'
     'parameters.R'
     'see.R'
-    'utility_model.R'    
+    'utility_model.R'
+    'model_class.R'    
 Suggests: 
     fs,
     testthat (>= 3.0.0)
