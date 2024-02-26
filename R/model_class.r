@@ -9,29 +9,29 @@
 
 model <- setClass("model",
                   list(
-                    name = "character",
-                    Color = "character",
-                    bCA = "numeric",
-                    aCA = "numeric",
-                    bCAlr = "numeric",
-                    bGA = "numeric",
-                    aGA = "numeric",
-                    bBA = "numeric",
-                    aBA = "numeric",
-                    bID = "numeric",
-                    aID = "numeric",
-                    sSlow = "numeric",
-                    sPref = "numeric",
-                    bPS = "numeric",
-                    aPS = "numeric",
-                    bFL = "numeric",
-                    aFL = "numeric",
-                    bWB = "numeric",
-                    aWB = "numeric",
-                    dID = "numeric",
-                    dFL = "numeric",
-                    rU = "numeric",
-                    bS = "numeric",
+                    name = "character", # Name of the agent to be simulated
+                    Color = "character", # Color of the agent in the simulation
+                    bCA = "numeric", # Current direction
+                    aCA = "numeric", # Current direction
+                    bCAlr = "numeric", # Current direction
+                    bGA = "numeric", # Goal Angle
+                    aGA = "numeric", # Goal Angle
+                    bBA = "numeric", # Blocked angle
+                    aBA = "numeric", # Blocked angle
+                    bID = "numeric", # Interpersonal distance
+                    aID = "numeric", # Interpersonal distance
+                    sSlow = "numeric", # Preferred velocity
+                    sPref = "numeric", # Preferred velocity
+                    bPS = "numeric", # Goal angle
+                    aPS = "numeric", # Goal angle
+                    bFL = "numeric", # Follow the leader
+                    aFL = "numeric", # Follow the leader
+                    bWB = "numeric", # Walk beside
+                    aWB = "numeric", # Walk beside
+                    dID = "numeric", # Interpersonal Distance
+                    dFL = "numeric", # Follow the leader
+                    rU = "numeric", # Utility randomness
+                    bS = "numeric", # Stand still threshold
                     pReroute = "numeric"
                   ))
 
@@ -91,4 +91,65 @@ setMethod("initialize",
   return(.Object)
 })
 
-agent_model <- new("model")
+setMethod("show", signature = "model", function(object) {
+  cat("Model object:\n")
+  cat("Name:", object@name, "\n")
+  cat("Color:", object@Color, "\n")
+  cat("bCA:", object@bCA, "\n")
+  cat("aCA:", object@aCA, "\n")
+  cat("bCAlr:", object@bCAlr, "\n")
+  cat("bGA:", object@bGA, "\n")
+  cat("aGA:", object@aGA, "\n")
+  cat("bBA:", object@bBA, "\n")
+  cat("aBA:", object@aBA, "\n")
+  cat("bID:", object@bID, "\n")
+  cat("aID:", object@aID, "\n")
+  cat("sSlow:", object@sSlow, "\n")
+  cat("sPref:", object@sPref, "\n")
+  cat("bPS:", object@bPS, "\n")
+  cat("aPS:", object@aPS, "\n")
+  cat("bFL:", object@bFL, "\n")
+  cat("aFL:", object@aFL, "\n")
+  cat("bWB:", object@bWB, "\n")
+  cat("aWB:", object@aWB, "\n")
+  cat("dID:", object@dID, "\n")
+  cat("dFL:", object@dFL, "\n")
+  cat("rU:", object@rU, "\n")
+  cat("bS:", object@bS, "\n")
+  cat("pReroute:", object@pReroute, "\n")
+
+  return(object) # object is returned invisibly
+})
+
+agent_model <- new("model", name = "Niels")
+
+setGeneric("simulate", function(gstack, p, pSD, group, types)
+             standardGeneric("simulate"))
+
+
+# The idea should shift to taking in a matrix object for parameters
+# Setting agent_names to the rownames and individual parameters to columns
+# This is achievable I believe
+
+model_class <- setClass("model_class", list(
+  parameters = "data.frame",
+  environment = "list"
+))
+
+new_model <- new("model_class", parameters = data, environment = list(0))
+
+setMethod("initialize", "model_class",
+          function(.Object, parameters, environment) {
+            rownames(parameters) <- paste()
+          })
+
+setMethod("Rownames", "model_class")
+
+library(tidyverse)
+data <- tibble(names = c("Dave", "Gerald", "Jane", "James"), bBA = rnorm(4))
+data <- as.data.frame(data)
+
+
+n_mod <- new("model_class", parameters = data, environment = list(0))
+
+rownames(data) <- data$names
