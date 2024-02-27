@@ -20,4 +20,6 @@ Train/
 man/
 
 tmp/
-To Do.txt
+*.txt
+*.rtf
+*.zip
