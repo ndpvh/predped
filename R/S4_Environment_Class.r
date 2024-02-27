@@ -73,7 +73,96 @@ setMethod("Create_Environment", signature = "Environment_Class", function(object
   # It is quite neat when converted to this S4 class object
   space <- list(x = c(-.5, object@length + .5),
                 y = c(-.5, object@width + .5))
-  plotSpace(list(space)) # this function is taken from pp_plot.R
+  # This should be converted to the cashregisters
+  # Not quite sure on how to do this yet, so I will look into it
+  exitCounter <- list(x = c(-.5, object@door_width),
+          y = c(-object@shelf_width + object@width / 1.65, object@width / 1.65))
+  # This will build the shelves in the supermarket environment
+  wallShelves <- list(
+                    # vertical divider shelf 1
+  list(x = c(-.5, object@length / 2.3),
+       y = c(-object@shelf_width + object@width / 2.2, object@width / 2.2)),
+                    # bottom wall shelf
+  list(x = c(object@aisle_width, object@length - object@aisle_width),
+       y = c(-.5, object@shelf_width - .5)),
+                    # right wall shelf
+  list(x = c(object@length - object@shelf_width, object@length + .5),
+       y = c(2 * object@aisle_width, object@width)),
+                    # left wall bottom shelf
+  list(x = c(-.5, object@shelf_width),
+       y = c(-.5 + object@aisle_width,
+             -object@shelf_width + object@aisle_width / 2.2)),
+                    # left wall top shelf
+  list(x = c(-.5, object@shelf_width),
+       y = c(.5 + object@width - 1.5 * object@aisle_width,
+             .5 + object@width - 1.5 * object@door_width)),
+                    # top wall left shelf
+  list(x = c(-.5, (object@length / 2.5)),
+       y = c(.5 + object@width - 1.5 * object@door_width, object@width + .5)),
+                    # top wall right shelf
+  list(x = c(object@length / 2.5, object@length + .5),
+       y = c(object@width, object@width + .5)))
+  # This will build the internal shelves in the supermarket
+  internalShelves <- list(
+                        # vertical divider shelf 2
+  list(x = c(object@length / 2.1 + object@aisle_width, 
+  object@length - object@aisle_width),
+       y = c(-object@shelf_width + object@width / 2.2, object@width / 2.2)),
+                        # bottom right vert midshelf
+  list(x = c(object@length - 2 * object@shelf_width, 
+  object@length - object@shelf_width),
+       y = c(object@door_width, 1.5 * object@aisle_width)),
+                        # bottom left midshelf 1
+  list(x = c(1.5 * object@aisle_width, object@length / 2.2),
+       y = c(object@shelf_width + object@door_width, 2 * object@shelf_width + object@door_width)),
+                        # bottom left midshelf 2
+  list(x = c(1.5 * object@aisle_width, object@length / 2.2),
+       y = c(2 * object@shelf_width + 2 * object@door_width, 3 * object@shelf_width + 2 * object@door_width)),
+                        # bottom right midshelf 1
+  list(x = c(object@length / 2 + object@door_width, object@length - 1.5 * object@aisle_width),
+       y = c(object@shelf_width + object@door_width, 2 * object@shelf_width + object@door_width)),
+                        # bottom right midshelf 2
+  list(x = c(object@length / 2 + object@door_width, object@length - 1.5 * object@aisle_width),
+       y = c(2 * object@shelf_width + 2 * object@door_width, 3 * object@shelf_width + 2 * object@door_width)),
+                        # top left midshelf 1
+  list(x = c(1.5 * object@aisle_width, object@length / 2.1),
+       y = c(object@width - (object@shelf_width + 2.3 * object@door_width),
+             object@width - 2.3 * object@door_width)),
+                        # top left midshelf 2
+  list(x = c(1.5 * object@aisle_width, object@length / 2.1),
+       y = c(object@width - (object@shelf_width + 3.8 * object@door_width),
+             object@width - 3.8 * object@door_width)),
+                        # top left midshelf 3
+  list(x = c(1.5 * object@aisle_width, object@length / 2.1),
+       y = c(object@width - (object@shelf_width + 5.3 * object@door_width),
+             object@width - 5.3 * object@door_width)),
+                        # top right midshelf 1
+  list(x = c(object@length / 2.1 + object@aisle_width,
+  object@length - object@aisle_width),
+       y = c(object@width - (object@shelf_width + .8 * object@door_width),
+             object@width - .8 * object@door_width)),
+                        # top right midshelf 2
+  list(x = c(object@length / 2.1 + object@aisle_width,
+             object@length - object@aisle_width),
+       y = c(object@width - (object@shelf_width + 2.3 * object@door_width),
+             object@width - 2.3 * object@door_width)),
+                        # top right midshelf 3
+  list(x = c(object@length / 2.1 + object@aisle_width,
+             object@length - object@aisle_width),
+       y = c(object@width - (object@shelf_width + 3.8 * object@door_width),
+             object@width - 3.8 * object@door_width)),
+                        # top right midshelf 4
+  list(x = c(object@length / 2.1 + object@aisle_width,
+             object@length - object@aisle_width),
+       y = c(object@width - (object@shelf_width + 5.3 * object@door_width),
+             object@width - 5.3 * object@door_width)))
+  objects <- c(list(space),      # overall space
+               list(exitCounter),  # exit counter
+               wallShelves,        # shelves on walls
+               internalShelves)    # internal shelves 
+  # this function is taken from pp_plot.R, and plots the environment
+  plotSpace(objects)
 })
 
 test <- new("Environment_Class")
+Create_Environment(test)
