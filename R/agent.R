@@ -1,4 +1,9 @@
 #' An S4 Class to Represent Agents
+#' 
+#' Defines the `agent` class, which contains all characteristics of an agent. 
+#' Some of these characteristics are time-independent (e.g., parameters and 
+#' set of goals) while others change during each time step in the simulation or 
+#' estimation (e.g., speed and orientation).
 #'
 #' @slot id A numerical index for the agent
 #' @slot position A numerical vector of two elements denoting the position of
