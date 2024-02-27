@@ -7,7 +7,7 @@
 #' @param state The list that contains the current state of the simulation
 #' @param P_n The goal to move to next
 #' @param agent_predictions The predicted trajectories of the other agents
-#' @param iInfo
+#' @param iInfo Not clear yet
 #' @param step The stepsize in the angles to be checked
 #'
 #' @return The angle that has the highest utility to move to

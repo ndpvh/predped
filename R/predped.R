@@ -7,11 +7,16 @@
 # example. Use the scripts that are available in the GitHub.
 
 #' An S4 Class to Represent the M4MA model
+#' 
+#' The `predped` class defines the M4MA model that can be used to simulate 
+#' data from. It contains the setting in which the agents should walk around as 
+#' well as the parameters of those agents. At this moment, only supports the use
+#' of archetypes: Prototypical agents that have a given parameter set.
 #'
 #' @slot id A character that can be used to identify the specific model defined
 #' by the class
-#' @slot environment A dataframe containing the objects that define the 
-#' environment in which the agents will walk around
+#' @slot setting A dataframe containing the objects that define the 
+#' setting in which the agents will walk around
 #' @slot parameters A dataframe containing the parameters per archetype in its
 #' columns. Defaults to the `params_archetype` dataframe.
 #' @slot archetypes A vector of names for the archetypes one wants to use in the 
@@ -23,14 +28,14 @@
 #' 
 #' @export
 predped <- setClass("predped", list(id = "character",
-                                    environment = "data.frame",
+                                    setting = "data.frame",
                                     parameters = "data.frame",
                                     archetypes = "character",
                                     weights = "numeric"))
 
 setMethod("initialize", "predped", function(.Object,
                                             id,
-                                            environment, 
+                                            setting, 
                                             parameters = params_archetypes,
                                             archetypes = unique(params_archetypes$names),
                                             weights = rep(1/length(archetypes), 
@@ -51,7 +56,7 @@ setMethod("initialize", "predped", function(.Object,
     }
 
     .Object@id <- id 
-    .Object@environment <- environment
+    .Object@setting <- setting
 
     # Select only those parameters that matter for the simulation: Based on the 
     # `archetypes` argument. 
@@ -94,19 +99,19 @@ setMethod("id<-", "predped", function(object, value) {
 #' @rdname predped
 #'
 #' @export
-setGeneric("environment", function(object) standardGeneric("environment"))
+setGeneric("setting", function(object) standardGeneric("setting"))
 
 #' @rdname predped
 #'
 #' @export
-setGeneric("environment<-", function(object, value) standardGeneric("environment<-"))
+setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 
-setMethod("environment", "predped", function(object) {
-    return(setNames(object@environment, object@environment))
+setMethod("setting", "predped", function(object) {
+    return(setNames(object@setting, object@setting))
 })
 
-setMethod("environment<-", "predped", function(object, value) {
-    object@environment <- value
+setMethod("setting<-", "predped", function(object, value) {
+    object@setting <- value
     return(object)
 })
 
@@ -127,7 +132,7 @@ setMethod("parameters", "predped", function(object) {
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
     if(!all(archetypes %in% value)) {
-        stop("Changing the parameters will lead to some archetypes not being defined anymore.")
+        stop("Some archetypes not defined in the new parameters provided.")
     }
 
     object@parameters <- value
@@ -148,14 +153,13 @@ setMethod("archetypes", "predped", function(object) {
     return(setNames(object@archetypes, object@archetypes))
 })
 
-setMethod("archetypes<-", "predped", function(object, 
-                                              archetypes) {
+setMethod("archetypes<-", "predped", function(object, value) {
     # Given that parameters and weights are both dependent on archetypes, 
     # reinitialize the object to accommodate the change 
     return(predped(object@id, 
-                   object@environment, 
+                   object@setting, 
                    parameters = object@parameters, 
-                   archetypes = archetypes, 
+                   archetypes = value, 
                    weights = object@weights))
 })
 
@@ -193,87 +197,87 @@ setMethod("show", "predped", function(object) {
 # To examine later
 
 # ALEXANDER
-setGeneric("simulate", function(gstack, p, pSD, group, types)
-             standardGeneric("simulate"))
+# setGeneric("simulate", function(gstack, p, pSD, group, types)
+#              standardGeneric("simulate"))
 
 
-# The idea should shift to taking in a matrix object for parameters
-# Setting agent_names to the rownames and individual parameters to columns
-# This is achievable I believe
+# # The idea should shift to taking in a matrix object for parameters
+# # Setting agent_names to the rownames and individual parameters to columns
+# # This is achievable I believe
 
-model_class <- setClass("model_class", list(
-  parameters = "data.frame",
-  environment = "list"
-))
+# model_class <- setClass("model_class", list(
+#   parameters = "data.frame",
+#   setting = "list"
+# ))
 
-new_model <- new("model_class", parameters = data, environment = list(0))
+# new_model <- new("model_class", parameters = data, setting = list(0))
 
-setMethod("initialize", "model_class",
-          function(.Object, parameters, environment) {
-            rownames(parameters) <- paste()
-          })
+# setMethod("initialize", "model_class",
+#           function(.Object, parameters, setting) {
+#             rownames(parameters) <- paste()
+#           })
 
-setMethod("Rownames", "model_class")
+# setMethod("Rownames", "model_class")
 
-library(tidyverse)
-data <- tibble(names = c("Dave", "Gerald", "Jane", "James"), bBA = rnorm(4))
-data <- as.data.frame(data)
+# library(tidyverse)
+# data <- tibble(names = c("Dave", "Gerald", "Jane", "James"), bBA = rnorm(4))
+# data <- as.data.frame(data)
 
 
-n_mod <- new("model_class", parameters = data, environment = list(0))
+# n_mod <- new("model_class", parameters = data, setting = list(0))
 
-rownames(data) <- data$names
+# rownames(data) <- data$names
 
-# ECE
-# add parameter transformation options to the model
-setGeneric("TransformParams", function(.Object, transform) standardGeneric("TransformParams"))
-setMethod("TransformParams", "AgentModel", function(.Object, transform) {
-  # it can be "mu", "exponentiate", "logarithmic"
-  if (transform == "mu") {
-    .Object <- transform_mu(.Object)
-  } else if (transform == "exponentiate") {
-    .Object <- transform_exponentiate(.Object)
-  } else if (transform == "logarithmic") {
-    .Object <- transform_logarithmic(.Object)
-  } else {
-    warning("Invalid transformation method, the parameters remain the same.")
-  }
-  return(.Object)
-})
+# # ECE
+# # add parameter transformation options to the model
+# setGeneric("TransformParams", function(.Object, transform) standardGeneric("TransformParams"))
+# setMethod("TransformParams", "AgentModel", function(.Object, transform) {
+#   # it can be "mu", "exponentiate", "logarithmic"
+#   if (transform == "mu") {
+#     .Object <- transform_mu(.Object)
+#   } else if (transform == "exponentiate") {
+#     .Object <- transform_exponentiate(.Object)
+#   } else if (transform == "logarithmic") {
+#     .Object <- transform_logarithmic(.Object)
+#   } else {
+#     warning("Invalid transformation method, the parameters remain the same.")
+#   }
+#   return(.Object)
+# })
 
-# initialize simulation
-setGeneric("InitialSim", function(.Object) standardGeneric("InitialSim"))
-setMethod("InitialSim", "AgentModel", function(.Object) {
-  # empty environment matrix for now
-  .Object@environment <- matrix(0, nrow = 10, ncol = 10) 
-  # empty list of agents
-  .Object@agents <- list()
+# # initialize simulation
+# setGeneric("InitialSim", function(.Object) standardGeneric("InitialSim"))
+# setMethod("InitialSim", "AgentModel", function(.Object) {
+#   # empty setting matrix for now
+#   .Object@setting <- matrix(0, nrow = 10, ncol = 10) 
+#   # empty list of agents
+#   .Object@agents <- list()
 
-  return(.Object)
-})
+#   return(.Object)
+# })
 
-# set simulation method
-setGeneric("simulate", function(.Object, numSteps) standardGeneric("simulate"))
-setMethod("simulate", "AgentModel", function(.Object, numSteps) {
-  for (i in 1:numSteps) {
-    MoveAgents(.Object) # move agent
-    RecordTrace(.Object) # save to trace
-  }
-})
+# # set simulation method
+# setGeneric("simulate", function(.Object, numSteps) standardGeneric("simulate"))
+# setMethod("simulate", "AgentModel", function(.Object, numSteps) {
+#   for (i in 1:numSteps) {
+#     MoveAgents(.Object) # move agent
+#     RecordTrace(.Object) # save to trace
+#   }
+# })
 
-# move agent method
-setGeneric("MoveAgents", function(.Object) standardGeneric("MoveAgents"))
-setMethod("MoveAgents", "AgentModel", function(.Object) {
-  for (agent in .Object@agents) {
-    move_agent(agent) # move function
-  }
-})
+# # move agent method
+# setGeneric("MoveAgents", function(.Object) standardGeneric("MoveAgents"))
+# setMethod("MoveAgents", "AgentModel", function(.Object) {
+#   for (agent in .Object@agents) {
+#     move_agent(agent) # move function
+#   }
+# })
 
-# save method
-setGeneric("RecordTrace", function(.Object) standardGeneric("RecordTrace"))
-setMethod("RecordTrace", "AgentModel", function(.Object) {
-  # save current state of the environment and agents
-  .Object$trace <- c(.Object$trace,
-                     list(environment = .Object$environment,
-                          agents = .Object$agents))
-})
+# # save method
+# setGeneric("RecordTrace", function(.Object) standardGeneric("RecordTrace"))
+# setMethod("RecordTrace", "AgentModel", function(.Object) {
+#   # save current state of the setting and agents
+#   .Object$trace <- c(.Object$trace,
+#                      list(setting = .Object$setting,
+#                           agents = .Object$agents))
+# })

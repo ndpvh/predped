@@ -13,7 +13,7 @@
 #' @param centers The centers of all the positions the agent may move to
 #' @param check Boolean denoting the centers the agent can actually move to
 #' (which are not blocked)
-#' @param iInfo
+#' @param iInfo Not clear yet
 #' @param precomputed Boolean denoting whether the different parts that make up
 #' the utilities have already been computed. Defaults to `FALSE`.
 #' @param subject Boolean denoting whether the utilities are subject-based.
@@ -186,8 +186,8 @@ utility <- function(agent,
 #' `utility`.
 #' @param muM Transformed nest assocation parameters that denote precision.
 #' Result of the `transform_mu` function. Defaults to `1` for each nest.
-#' @param nests
-#' @param alpha
+#' @param nests Not clear yet
+#' @param alpha Not clear yet
 #'
 #' @export
 #

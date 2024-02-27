@@ -10,7 +10,7 @@ License: What license is it under?
 Imports: 
     methods,
     m4ma
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 Collate:
     'objects.R'
     'agent.R'
