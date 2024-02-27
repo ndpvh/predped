@@ -37,7 +37,7 @@ setMethod("initialize", "predped", function(.Object,
                                             id,
                                             setting, 
                                             parameters = params_archetypes,
-                                            archetypes = unique(params_archetypes$names),
+                                            archetypes = unique(params_archetypes$Name),
                                             weights = rep(1/length(archetypes), 
                                                           each = length(archetypes))
 ) {
@@ -51,7 +51,7 @@ setMethod("initialize", "predped", function(.Object,
         stop("Weights should add up to 1.")
     }
 
-    if(!all(archetypes %in% parameters$names)) {
+    if(!all(archetypes %in% parameters$Name)) {
         stop("Some archetypes cannot be found in the parameters list.")
     }
 
@@ -65,14 +65,14 @@ setMethod("initialize", "predped", function(.Object,
     # select only the archetypes from this vector, then we transform this into 
     # a numeric through factorization with `archetype` as its levels, and then 
     # transform this to a character again. 
-    parameters <- parameters[parameters$name %in% archetypes,]
+    parameters <- parameters[parameters$Name %in% archetypes,]
     idx <- factor(parameters, levels = archetypes)
     idx <- order(as.numeric(idx))
 
     .Object@parameters <- parameters[idx,] 
 
     .Object@archetypes <- archetypes
-    .Object@weights <- archetypes
+    .Object@weights <- weights
     
     return(.Object)
 })
@@ -186,11 +186,12 @@ setMethod("weights<-", "predped", function(object, value) {
 #
 # TO DO: Beautify the output
 setMethod("show", "predped", function(object) {
-  cat("Model object:\n")
-  cat("ID:", object@id, "\n")
-  cat("Parameters:", object@parameters, "\n")
+    cat("Model object:\n")
+    cat("ID:", object@id, "\n")
+    cat("Parameters: \n")
+    cat(write.table(object@parameters), "\n")
 
-  return(object) # object is returned invisibly
+    return(object) # object is returned invisibly
 })
 
 ################################################################################
