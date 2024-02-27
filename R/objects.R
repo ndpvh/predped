@@ -103,6 +103,15 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' @name in_object-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
+#' Add a Goal to an Object
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#'
+#' @return The goal that was assigned to the object
+#' @export
+#' @name add_goal-method
+setGeneric("add_goal", function(object) standardGeneric("add_goal"))
+
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -191,6 +200,22 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # even number of intersections when outside of the polygon; FALSE, FALSE ->
     # odd number of intersections when inside of the polygon)
     return((counter %% 2 == 0) == outside)
+})
+
+#'@rdname in_object-method
+#'
+setMethod("add_goal", signature(object = "polygon"), function(object, 
+                                                              counter
+){
+    # Get all the edges on which the goal can be attributed
+    edges <- object@points 
+    edges <- rbind(edges, edges[1,])
+
+    # Select one of these edges at random and a random location on the line 
+    # created by the points
+    idx <- sample.int(nrow(objects@points), 1)
+    x <- runif(1, 0, 1)
+    
 })
 
 #' An S4 Class to Represent Rectangle Objects
