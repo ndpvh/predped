@@ -23,7 +23,7 @@ setMethod("initialize", "goal", function(.Object,
                                          ...
 ) {
 
-    .Object@id <- if (length(id) == 0) paste("goal ", sample(letters, 5, replace = TRUE), collapse = "") else id
+    .Object@id <- if(length(id) == 0) paste("goal", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@position <- coordinate(position)
     .Object@busy <- busy
     .Object@counter <- counter
@@ -64,9 +64,10 @@ setGeneric("replace", function(object,...) standardGeneric("replace"))
 #' 
 #' @export 
 setMethod("replace", "goal", function(object, 
-                                      setting
+                                      setting,
+                                      counter_generator = \(x) rnorm(x, 10, 2)
 ) {
-    return(generate_goal_stack(...))
+    return(generate_goal_stack(1, setting, counter_generator))
 })
 
 #' Generate a goal stack
@@ -86,10 +87,10 @@ generate_goal_stack <- function(n,
                                 counter_generator = \(x) rnorm(x, 10, 2)) {
     # Select the objects in the environment that can contain a goal
     potential_objects <- list()
-    for(i in seq_along(setting)) {
-        if(setting[[i]]@interactable) {
+    for(i in seq_along(setting@objects)) {
+        if(setting@objects[[i]]@interactable) {
             potential_objects <- append(potential_objects, 
-                                        setting[[i]])
+                                        setting@objects[[i]])
         }
     }
 
