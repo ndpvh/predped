@@ -3,14 +3,12 @@
 # Load in the Predictive Pedestrian Package
 # And all of it's dependencies
 source("RCore/PredictivePedestrian.R")
-install.packages("crayon")
-library(crayon)
 
 # Build a class that contains several features of a supermarket
 # These are just some intial ideas for paramter input
 # That I took from the minimal working example 
 
-envir <-   setClass("Environment_Class", list(
+envir <-   setClass("environment_class", list(
   length = "numeric", # desired length of the environment
   width = "numeric",  # desired width of the environment 
   door_width = "numeric", # desired width of the door
@@ -26,10 +24,10 @@ envir <-   setClass("Environment_Class", list(
 # What we want our baseline supermarket template to look like
 
 setMethod("initialize",
-          signature = "Environment_Class",
+          signature = "environment_class",
           function(.Object,
-                   length = 40,
-                   width = 25,
+                   length = 25,
+                   width = 40,
                    door_width = 2.5,
                    shelf_width = 1.2,
                    aisle_width = 3,
@@ -47,10 +45,10 @@ setMethod("initialize",
           })
 
 # A nicer overview of the elements that are in the
-# Environment_Class object
+# environment_class object
 
 setMethod("show",
-          signature = "Environment_Class",
+          signature = "environment_class",
           function(object) {
             cat(crayon::bold("Environment Objects:"), "\n", "\n")
             cat("Environment Length:", object@length, "m", "\n")
@@ -66,9 +64,8 @@ setMethod("show",
 # Here I started to create an empty environment
 # The aim is to add in more of the elements as specified above
 # Will continue to work on this tomorrow
-
-setGeneric("Create_Environment", function(object) { standardGeneric("Create_Environment")})
-setMethod("Create_Environment", signature = "Environment_Class", function(object) {
+setGeneric("create_environment", function(object) { standardGeneric("create_environment")})
+setMethod("create_environment", signature = "environment_class", function(object) {
   # This setup is taken from the minimal working example
   # It is quite neat when converted to this S4 class object
   space <- list(x = c(-.5, object@length + .5),
@@ -161,8 +158,25 @@ setMethod("Create_Environment", signature = "Environment_Class", function(object
                wallShelves,        # shelves on walls
                internalShelves)    # internal shelves 
   # this function is taken from pp_plot.R, and plots the environment
-  plotSpace(objects)
+  environment <- plotSpace(objects) # nolint
+  # This did not pan out as I had planned, so I am abadoning this idea
+  ggplot2::ggsave(filename = "test_plot.png", plot = environment, height = (object@length * 100), width = (object@width * 100), units = "px")
 })
 
-test <- new("Environment_Class")
-Create_Environment(test)
+test <- new("environment_class")
+create_environment(test)
+
+# This is my alternative idea, that works for now
+# Should this be persued as the solution? 
+setGeneric("build_environment", function(object) { standardGeneric("build_environment")})
+setMethod("build_environment", signature = "environment_class", function(object) {
+     background <- data.frame(x = c(0, object@width),
+                              y = c(0, object@length))
+    p <- ggplot2::ggplot(background, ggplot2::aes(x = background$x, y = background$y)) +
+     ggplot2::theme_bw() +
+     ggplot2::xlab("x") +
+     ggplot2::ylab("y") +
+     ggplot2::coord_flip() # To get the scaling right
+})
+
+empty_background <- build_environment(test)
