@@ -128,7 +128,11 @@ setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 #' @name polygon
 polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical"), contains = "object")
 
-setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, moveable = FALSE, ...) {
+setMethod("initialize", "polygon", function(.Object, 
+                                            clock_wise = TRUE, 
+                                            moveable = FALSE, 
+                                            interactable = FALSE,
+                                            ...) {
     .Object <- callNextMethod(.Object, ...)
 
     if (ncol(.Object@points) != 2) {
@@ -137,6 +141,7 @@ setMethod("initialize", "polygon", function(.Object, clock_wise = TRUE, moveable
 
     .Object@clock_wise <- clock_wise
     .Object@moveable <- moveable
+    .Object@interactable <- interactable
 
     return(.Object)
 })
@@ -214,12 +219,27 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
 
     # Select one of these edges at random and a random location on the line 
     # created by the points
-    idx <- sample.int(nrow(objects@points), 1)
+    idx <- sample.int(nrow(object@points), 1)
     co1 <- edges[idx,]
     co2 <- edges[idx + 1,]
 
-    x <- runif(1, 0, 1)
-    y <- co1[2] + ( (co2[2] - co1[2]) / (co2[1] - co1[1]) ) * (x - co1[1])
+    # Check whether we have vertical or horizontal lines, or neither
+    if(co1[1] == co2[1]) {
+        x <- co1[1]
+
+        lim <- range(c(co1[2], co2[2]))
+        y <- lim[1] + runif(1) * diff(lim)
+    } else if(co1[2] == co2[2]) {
+        y <- co1[2]
+
+        lim <- range(c(co1[1], co2[1]))
+        x <- lim[1] + runif(1) * diff(lim)
+    } else {
+        lim <- range(c(co1[1], co2[1]))
+        x <- lim[1] + runif(1) * diff(lim)
+
+        y <- co1[2] + ( (co2[2] - co1[2]) / (co2[1] - co1[1]) ) * (x - co1[1])
+    }
 
     # Create the goal itself
     return(goal(id = id,
@@ -247,12 +267,13 @@ rectangle <- setClass("rectangle", list(
     contains = c("polygon")
 )
 
-setMethod("initialize", "rectangle", function(
-        .Object,
-        center,
-        size,
-        orientation = 0,
-        moveable = FALSE, ...
+setMethod("initialize", "rectangle", function(.Object,
+                                              center,
+                                              size,
+                                              orientation = 0,
+                                              moveable = FALSE,
+                                              interactable = FALSE,
+                                              ...
 ) {
     if (length(size) != 2) stop("Size vector must have length two (x and y)")
     if (any(size <= 0)) stop("Size vector must be positive")
@@ -276,6 +297,7 @@ setMethod("initialize", "rectangle", function(
     .Object@size <- size
     .Object@moveable <- moveable
     .Object@orientation <- orientation
+    .Object@interactable <- interactable
 
     return(.Object)
 })
@@ -352,10 +374,11 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 
-setMethod("initialize", "circle", function(.Object, moveable = FALSE, ...) {
+setMethod("initialize", "circle", function(.Object, moveable = FALSE, interactable = FALSE, ...) {
     .Object <- callNextMethod(.Object, ...)
     .Object@center <- as(.Object@center, "coordinate")
     .Object@moveable <- moveable
+    .Object@interactable <- interactable
     if (length(.Object@radius) != 1) stop("Slot 'radius' should be a single numeric value")
     return(.Object)
 })
