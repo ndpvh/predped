@@ -110,7 +110,7 @@ setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_
 #' @return The goal that was assigned to the object
 #' @export
 #' @name add_goal-method
-setGeneric("add_goal", function(object) standardGeneric("add_goal"))
+setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 
 #' An S4 class to Represent Polygon Objects
 #'
@@ -202,7 +202,7 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     return((counter %% 2 == 0) == outside)
 })
 
-#'@rdname in_object-method
+#'@rdname add_goal-method
 #'
 setMethod("add_goal", signature(object = "polygon"), function(object, 
                                                               id = character(0),

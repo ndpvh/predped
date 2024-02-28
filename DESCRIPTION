@@ -14,6 +14,7 @@ RoxygenNote: 7.3.1
 Collate:
     'objects.R'
     'agent.R'
+    'goals.R'
     'geometry.R'
     'move_all.R'
     'move.R'
