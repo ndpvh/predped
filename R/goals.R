@@ -67,7 +67,7 @@ setMethod("replace", "goal", function(object,
                                       setting,
                                       counter_generator = \(x) rnorm(x, 10, 2)
 ) {
-    return(generate_goal_stack(1, setting, counter_generator))
+    return(generate_goal_stack(1, setting, counter_generator)[[1]])
 })
 
 #' Generate a goal stack
