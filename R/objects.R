@@ -205,7 +205,8 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
 #'@rdname in_object-method
 #'
 setMethod("add_goal", signature(object = "polygon"), function(object, 
-                                                              counter
+                                                              id = character(0),
+                                                              counter = 5
 ){
     # Get all the edges on which the goal can be attributed
     edges <- object@points 
@@ -214,8 +215,16 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     # Select one of these edges at random and a random location on the line 
     # created by the points
     idx <- sample.int(nrow(objects@points), 1)
+    co1 <- edges[idx,]
+    co2 <- edges[idx + 1,]
+
     x <- runif(1, 0, 1)
-    
+    y <- co1[2] + ( (co2[2] - co1[2]) / (co2[1] - co1[1]) ) * (x - co1[1])
+
+    # Create the goal itself
+    return(goal(id = id,
+                position = coordinate(c(x, y)), 
+                counter = counter))    
 })
 
 #' An S4 Class to Represent Rectangle Objects

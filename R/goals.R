@@ -102,7 +102,9 @@ generate_goal_stack <- function(n,
     # on one of its edges, as handled by the `add_goal` method. 
     sampled_objects <- sample(potential_objects, n, replace = TRUE)
     goal_stack <- lapply(sampled_objects, 
-                         \(x) add_goal(x, counter_generator(1)))
+                         \(x) add_goal(x, 
+                                       id = character(0),
+                                       counter = counter_generator(1)))
 
     return(goal_stack)
 }
