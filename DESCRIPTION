@@ -7,6 +7,7 @@ Author: Niels Vanhasbroeck, Malte Lüken, Alexander Anderson, Ece Yatıkçı, An
 Maintainer: Andrew Heathcote <ajheathcote@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
+Encoding: UTF-8
 Imports: 
     methods,
     m4ma
