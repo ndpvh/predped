@@ -153,13 +153,33 @@ utility <- function(agent,
     }
 
     V <- V + m4ma::caUtility_rcpp(p["aCA"], p["bCA"], p["bCAlr"])
-    
+
+
     if (!is.null(interpersonal_distance)) {
-        V <- V + m4ma::idUtility_rcpp(p["bID"], p["dID"], p["aID"], agent_idx - 1, check, agents_group, interpersonal_distance)
+        # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
+        # they have been taken out to speed up the estimation
+        # Get names of ingroup agents
+        names_ingroup <- names(agents_group[-agent_idx][agents_group[-agent_idx] == agents_group[agent_idx]])
+
+        # Check if agent is part of in group
+        is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
+
+        # Check which cells have only positive distance
+        check <- check & apply(interpersonal_distance, 2, function(x) {
+          all(x > 0)
+        })
+
+        V <- V + m4ma::idUtility_rcpp(
+            p["bID"], p["dID"], p["aID"], is_ingroup, check, interpersonal_distance, as.vector(ifelse(check, 0, -Inf)) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
+        )
+    } else {
+        V <- V + as.vector(ifelse(check, 0, -Inf))
     }
 
     if (!is.null(blocked_angle)) {
-        V <- V + m4ma::baUtility_rcpp(p["aBA"], p["bBA"], blocked_angle, as.integer(names(blocked_angle))-1)
+        V <- V + m4ma::baUtility_rcpp(p["aBA"], p["bBA"],
+                                      pmax(blocked_angle, 0), # Make sure all angles are >= 0; this was previously done in baUtility()
+                                      as.integer(names(blocked_angle))-1)
     }
 
     if (!is.null(leaders)) {
