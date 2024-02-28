@@ -80,17 +80,13 @@ setMethod("initialize", "predped", function(.Object,
 #' @rdname predped
 #'
 #' @export
-setGeneric("id", function(object) standardGeneric("id"))
-
-#' @rdname predped
-#'
-#' @export
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
-
 setMethod("id", "predped", function(object) {
     return(setNames(object@id, object@id))
 })
 
+#' @rdname predped
+#'
+#' @export
 setMethod("id<-", "predped", function(object, value) {
     object@id <- value
     return(object)
@@ -118,17 +114,13 @@ setMethod("setting<-", "predped", function(object, value) {
 #' @rdname predped
 #'
 #' @export
-setGeneric("parameters", function(object) standardGeneric("parameters"))
-
-#' @rdname predped
-#'
-#' @export
-setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
-
 setMethod("parameters", "predped", function(object) {
     return(setNames(object@parameters, object@parameters))
 })
 
+#' @rdname predped
+#'
+#' @export
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
     if(!all(archetypes %in% value)) {
