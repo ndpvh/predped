@@ -14,8 +14,6 @@ analysis.R
 MinimalWorkingExample/
 minimal_working_example.R
 Train/
-R/
-S4_Environment_Class.R
 
 *.drawio*
 
