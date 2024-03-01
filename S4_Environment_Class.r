@@ -170,13 +170,24 @@ create_environment(test)
 # Should this be persued as the solution? 
 setGeneric("build_environment", function(object) { standardGeneric("build_environment")})
 setMethod("build_environment", signature = "environment_class", function(object) {
-     background <- data.frame(x = c(0, object@width),
+     data <- data.frame(x = c(0, object@width),
                               y = c(0, object@length))
-    p <- ggplot2::ggplot(background, ggplot2::aes(x = background$x, y = background$y)) +
-     ggplot2::theme_bw() +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = x, y = y)) +
      ggplot2::xlab("x") +
      ggplot2::ylab("y") +
-     ggplot2::coord_flip() # To get the scaling right
+     ggplot2::coord_equal() +
+     ggplot2::geom_rect(xmin = 10, xmax = 20, ymin = 0, ymax = 2) +
+     ggplot2::geom_rect(xmin = 25, xmax = 38, ymin = 0, ymax = 2) +
+     ggplot2::geom_rect(xmin = 38, xmax = 40, ymin = 0, ymax = 25) +
+     ggplot2::geom_rect(xmin = 26, xmax = 38, ymin = 23, ymax = 25) +
+     ggplot2::geom_rect(xmin = 4, xmax = 10, ymin = 19, ymax = 21, fill = "red") +
+     ggplot2::geom_rect(xmin = 4, xmax = 10, ymin = 15, ymax = 17, fill = "red") +
+     ggplot2::geom_rect(xmin = 4, xmax = 10, ymin = 11, ymax = 13, fill = "red") +
+     ggplot2::geom_rect(xmin = 4, xmax = 10, ymin = 7, ymax = 9, fill = "red") +
+     ggplot2::scale_x_continuous(expand = c(0,0)) +
+     ggplot2::scale_y_continuous(expand =  c(0,0))
+   p + ggplot2::geom_segment(x = 4, xend =4, y = 0, yend = 25, linetype = "dashed") +
+       ggplot2::geom_segment(x = 0, xend = 4, y = 6, yend = 6, linetype = "dashed", colour = "red")
 })
 
 empty_background <- build_environment(test)
