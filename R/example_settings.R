@@ -129,6 +129,17 @@ setMethod("initialize",
             return(.Object)
           })
 
+# Validity checks, can be extended
+setValidity("EnvironmentClass",
+            function(object) {
+              if (object@entrance_length >= object@length) {
+                return("Entrance length must be smaller than the overall length.")
+              }
+              if (object@entrance_width >= object@width) {
+                return("Entrance width must be smaller than the overall width.")
+              }
+              return(TRUE)
+            })
 
 # Plot the environment
 setGeneric("PlotEnvironment", function(object) { standardGeneric("PlotEnvironment")}) # nolint: line_length_linter.
