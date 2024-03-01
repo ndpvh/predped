@@ -29,7 +29,6 @@ Collate:
     'objects.R'
     'agent.R'
     'goals.R'
-    'geometry.R'
     'move_all.R'
     'move.R'
     'moving_options.R'
