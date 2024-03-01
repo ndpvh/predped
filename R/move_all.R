@@ -14,13 +14,3 @@ unpack_state <- function(state, names, P_n) {
                 pMat = unpack_list(state, "pMat"),
                 cell = unpack_list(state, "cell")))
 }
-
-# Create a singular function for the unpacking for a given part of the list
-unpack_list <- function(index){
-    # Extract the wanted variable from the list across all agents. Then, 
-    # transpose the result and give the result row names
-    transposed <- apply(state, 2, function(x) x[[index]]) |>
-        t()
-    row.names(transposed) <- names
-    return(transposed)        
-}
