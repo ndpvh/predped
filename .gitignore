@@ -23,3 +23,5 @@ tmp/
 *.txt
 *.rtf
 *.zip
+
+R/geometry.R
