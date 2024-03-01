@@ -28,7 +28,7 @@
 #' 
 #' @export
 predped <- setClass("predped", list(id = "character",
-                                    setting = "data.frame",
+                                    setting = "background",
                                     parameters = "data.frame",
                                     archetypes = "character",
                                     weights = "numeric"))
