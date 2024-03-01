@@ -25,3 +25,4 @@ tmp/
 *.zip
 
 R/geometry.R
+R/move_all.R
