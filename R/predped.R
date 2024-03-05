@@ -66,7 +66,7 @@ setMethod("initialize", "predped", function(.Object,
     # a numeric through factorization with `archetype` as its levels, and then 
     # transform this to a character again. 
     parameters <- parameters[parameters$Name %in% archetypes,]
-    idx <- factor(parameters, levels = archetypes)
+    idx <- factor(parameters$Name, levels = archetypes)
     idx <- order(as.numeric(idx))
 
     .Object@parameters <- parameters[idx,] 
