@@ -25,9 +25,12 @@
 #' in light of the agents actions to achieve their goals. 
 #' 
 #' @param state The current state of the simulation
+#' @param background The setting in which agents are walking around
 #' @param stay_stopped Logical denoting whether agents will predict other agents 
 #' who have stopped to remain immobile. Is passed on to `predict_movement`. 
 #' Defaults to `TRUE`
+#' @param time_step Numeric denoting the time step taken between iterations in 
+#' seconds. Defaults to `0.5` or half a second.
 #' @param ... Arguments to be passed on to `update_agent`
 #' 
 #' @export 
@@ -35,13 +38,17 @@
 # TO DO
 #   - Also update objects when they are moveable and used. To see how we do it
 update_state <- function(state, 
+                         background,
                          stay_stopped = TRUE, 
+                         time_step = 0.5,
                          ...) {
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
     # collisions
     agent_predictions <- lapply(state$agents, 
-                                \(x) predict_movement(x, stay_stopped = stay_stopped))
+                                \(x) predict_movement(x, 
+                                                      stay_stopped = stay_stopped,
+                                                      time_step = time_step))
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
@@ -59,6 +66,8 @@ update_state <- function(state,
         state$agents[[i]] <- update_agent(agent, 
                                           state_copy, 
                                           agent_predictions,
+                                          background,
+                                          time_step = time_step,
                                           ...)
     }
 
@@ -74,19 +83,23 @@ update_state <- function(state,
 #' @param agent The agent in consideration
 #' @param stay_stopped Logical denoting whether agents will predict other agents 
 #' who have stopped to remain immobile. Defaults to `TRUE`.
+#' @param time_step Numeric denoting the time step taken between iterations in 
+#' seconds. Defaults to `0.5` or half a second.
 #' 
 #' @export
 predict_movement <- function(agent, 
-                             stay_stopped = TRUE) {
+                             stay_stopped = TRUE,
+                             time_step = 0.5) {
     
     # Compute the coordinate where the agents will end up when moving at the 
     # same speed in the same direction. Different when an agent is currently 
     # stopped vs when they are actively moving. Also different depending on 
     # whether this is considered in the first place.
     if(stay_stopped & agent@status == "stop") {
-        co <- agent@position
+        co <- position(agent)
     } else {
-        co <- agent@position + m4ma::scaleVel(agent@speed) * m4ma::aTOd(agent@orientation)
+        crossed_distance <- m4ma::scaleVel(agent@speed, tStep = time_step) * m4ma::aTOd(agent@orientation)
+        co <- coordinate(position(agent) + crossed_distance)
     }    
 
     return(co)
@@ -110,6 +123,8 @@ predict_movement <- function(agent,
 #' contains 72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, and 287.5 degrees.
 #' @param standing_start Numeric denoting the speed of the agent when they 
 #' resume walking after stopping. Defaults to `0.2`
+#' @param time_step Numeric denoting the time step taken between iterations in 
+#' seconds. Defaults to `0.5` or half a second.
 #' 
 #' @return Updated agent
 #' 
@@ -152,7 +167,8 @@ update_agent <- function(agent,
                              0, 350, 340, 327.5, 310, 287.5),
                              times = 3),
                              ncol = 3),
-                         standing_start = 0.2
+                         standing_start = 0.2,
+                         time_step = 0.5
                         #  plotGrid = FALSE,        # deprecated?
                         #  printChoice = FALSE,     # deprecated?                     
                         #  usebestAngle = FALSE     # deprecated?
@@ -161,6 +177,15 @@ update_agent <- function(agent,
     if(status(agent) == "stop") { # Used to be a check of the goal state: attr(state$P[[n]], "stop") > 0, == -1, or else (interacting, reorient, going)
         cell(agent) <- 0
         check <- matrix(TRUE, 11, 3)
+
+        # Make sure the agent interacts with their goal and are assigned a new 
+        # one in case their current goal is ended.
+        current_goal(agent) <- interact(agent@current_goal)
+        
+        if(is.null(current_goal(agent))) {
+            current_goal(agent) <- goals(agent)[[1]]
+            goals(agent) <- goals(agent)[-1]
+        }
     } else {
         # If the agent stopped their interaction, check whether they already know
         # where the next goal is. If they don't. let them reorient themselves to
@@ -178,7 +203,7 @@ update_agent <- function(agent,
             a1 = orientation(agent),
             vels = velocities,
             angles = orientations,
-            tStep = 0.5
+            tStep = time_step
         )
 
         # Check for occlusions or blocked cells the agent cannot move to
@@ -210,7 +235,7 @@ update_agent <- function(agent,
                 a1 = orientation(agent),
                 vels = velocities,
                 angles = orientations,
-                tStep = 0.5
+                tStep = time_step
             )
 
             # Check for occlusions or blocked cells the agent cannot move to
@@ -275,7 +300,7 @@ update_agent <- function(agent,
                 a1 = orientation(agent),
                 vels = velocities,
                 angles = orientations,
-                tStep = 0.5
+                tStep = time_step
             ))
             speed(agent) <- pmax(speed(agent) * c(1.5, 1, 0.5)[m4ma::ringNum(cell)], standing_start)
             orientation(agent) <- (orientation(agent) - ifelse(orientations >= 180, 360 - orientations, -orientations)[m4ma::coneNum(cell)]) %% 360
