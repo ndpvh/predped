@@ -94,8 +94,11 @@ setMethod("simulate", "predped", function(object,
 #' 
 #' @export 
 add_agent <- function(object,
+                      background,
                       goal_number,
-                      goal_duration = \(x) rnorm(x, 10, 2)) {
+                      goal_duration = \(x) rnorm(x, 10, 2),
+                      radius = 0.2,
+                      standing_start = 0.2) {
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
 
@@ -104,9 +107,17 @@ add_agent <- function(object,
                                       object@setting, 
                                       counter_generator = goal_duration)
 
-    return(agent(parameters = object@parameters[idx,],
+    # Compute the agent's orientation: Perpendicular to the wall in which you 
+    # have the entrance.
+    angle <- perpendicular_orientation(background)
+
+    return(agent(center = background@entrance,
+                 speed = standing_start,
+                 orientation = angle,
+                 parameters = object@parameters[idx,],
                  goals = goal_stack,
-                 current_goal = goal_stack[[1]]))
+                 current_goal = goal_stack[[1]],
+                 radius = radius))
 }
 
 # Undocumented function because this is in no way a particularly beautiful 
@@ -141,4 +152,46 @@ draw_number <- function(number, iterations) {
     number[number <= 0] <- 1
 
     return(as.integer(number))
+}
+
+# Undocumented function because this is in no way a particularly beautiful 
+# function, nor is it meant to be the final way in which we do this.
+#
+# It takes in the background as an object and computes the orientation the 
+# agent needs to walk in in order to walk perpendicular to the entrance they 
+# just came from.
+#
+# @param background Object of the background class.
+perpendicular_orientation <- function(background) {
+    # Find out where the entrance lies in the background
+    # For this, we compute the sum of the distances between each of 
+    # the points that make up an edge and the entrance point. The edge that has 
+    # the distance closest to the actual size of the edge will be taken as the 
+    # entrance wall.
+    co <- background@entrance
+    points <- background@shape@points 
+    points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
+
+    distances <- cbind(sqrt((points[,1] - points[,3])^2 - (points[,2] - points[,4]^2))
+                       sqrt((points[,1] - co[,1])^2 - (points[,2] - co[,2])^2),
+                       sqrt((points[,3] - co[,1])^2 - (points[,4] - co[,2])^2))
+    distances <- distances[,1] - distances[,2] - distances[,3]
+
+    # Now that we know on which edge the entrance lies, we can compute the 
+    # perpendicular orientation to this edge. Approach computes the orientation 
+    # of the line defined by the entrance and the edge of the wall that contains 
+    # it and then either subtracts (clockwise == TRUE) or adds (clockwise == FALSE)
+    # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
+    # where slope is the slope of the edge
+    edge <- points[which.min(distances),]
+    slope <- (points[,2] - points[,4]) / (points[,1] - points[,3])
+
+    angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
+    if(background@shape@clockwise) {
+        angle <- angle - 90
+    } else {
+        angle <- angle + 90
+    }
+
+    return(angle)
 }
