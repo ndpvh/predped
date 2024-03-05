@@ -409,13 +409,42 @@ setMethod("area", signature(object = "circle"), function(object) pi*object@radiu
 #' \code{\link[predped]{object-class}} defining the objects in the background.
 #'
 #' @export
-background <- setClass("background", list(shape = "object", objects = "list"))
+background <- setClass("background", list(shape = "object", 
+                                          objects = "list",
+                                          entrance = "coordinate", 
+                                          exit = "coordinate"))
 
-setMethod("initialize", "background", function(.Object, ...) {
-    .Object <- callNextMethod()
+setMethod("initialize", "background", function(.Object, 
+                                               shape,
+                                               objects,
+                                               entrance = NULL,
+                                               exit = NULL,
+                                               same_exit = TRUE,
+                                               ...) {
+    # If uncommented, callNextMethod() will throw an error because of same_exit
+    # not being a slot in the `background` class. Therefore manual assignment 
+    # done in this piece of code
+    # .Object <- callNextMethod()
+
+    .Object@shape <- shape 
+    .Object@objects <- objects
     if (!all(sapply(.Object@objects, is, class2 = "object"))) {
         stop("All elements in slot 'objects' must be of type 'object'")
     }
+
+    if(is.null(entrance)) {
+        entrance <- (.Object@points[1,] - .Objects@points[2,]) / 2
+    }
+    .Object@entrance <- coordinate(entrance)
+
+    if(same_exit) {
+        exit <- entrance
+    } else if(is.null(exit)) {
+        d <- nrow(.Object@points)
+        exit <- (.Object@points[d - 1,] - .Object@points[d,]) / 2
+    }
+    .Object@exit <- coordinate(exit)
+
     return(.Object)
 })
 
