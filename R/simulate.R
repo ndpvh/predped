@@ -115,7 +115,7 @@ add_agent <- function(object,
                  speed = standing_start,
                  orientation = angle,
                  parameters = object@parameters[idx,],
-                 goals = goal_stack,
+                 goals = goal_stack[-1],
                  current_goal = goal_stack[[1]],
                  radius = radius))
 }
@@ -172,7 +172,7 @@ perpendicular_orientation <- function(background) {
     points <- background@shape@points 
     points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
-    distances <- cbind(sqrt((points[,1] - points[,3])^2 - (points[,2] - points[,4]^2))
+    distances <- cbind(sqrt((points[,1] - points[,3])^2 - (points[,2] - points[,4]^2)),
                        sqrt((points[,1] - co[,1])^2 - (points[,2] - co[,2])^2),
                        sqrt((points[,3] - co[,1])^2 - (points[,4] - co[,2])^2))
     distances <- distances[,1] - distances[,2] - distances[,3]
