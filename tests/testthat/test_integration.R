@@ -182,7 +182,7 @@ testthat::test_that("Move function result matches reference", {
 
     set.seed(123)
 
-    new_a1 <- predped::move_agent(a1, state, p_pred, b, nests, alpha)
+    new_a1 <- predped::update_agent(a1, state, p_pred, b, nests, alpha)
 
     set.seed(123)
 
