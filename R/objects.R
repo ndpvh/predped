@@ -259,6 +259,10 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
 #'
 #' @export
 #' @name rectangle
+#
+# TO DO
+#   - Currently, orientation is in radians. Might need to change to degrees, as 
+#     everything else is in degrees
 rectangle <- setClass("rectangle", list(
         center = "numeric",
         size = "numeric",
@@ -270,6 +274,7 @@ rectangle <- setClass("rectangle", list(
 setMethod("initialize", "rectangle", function(.Object,
                                               center,
                                               size,
+                                              clock_wise = TRUE,
                                               orientation = 0,
                                               moveable = FALSE,
                                               interactable = FALSE,
@@ -292,7 +297,11 @@ setMethod("initialize", "rectangle", function(.Object,
         points <- t(apply(points, 1, rotate, radians = orientation, center = center))
     }
 
-    .Object <- callNextMethod(.Object, points = points, clock_wise = TRUE)
+    if(!clock_wise) {
+        points <- points[4:1,]
+    }
+
+    .Object <- callNextMethod(.Object, points = points, clock_wise = clock_wise)
 
     .Object@size <- size
     .Object@moveable <- moveable
@@ -416,7 +425,7 @@ background <- setClass("background", list(shape = "object",
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
-                                               objects,
+                                               objects = list(),
                                                entrance = NULL,
                                                exit = NULL,
                                                same_exit = TRUE,
@@ -449,6 +458,21 @@ setMethod("initialize", "background", function(.Object,
 })
 
 #' @export
+setGeneric("shape", function(object) standardGeneric("shape"))
+
+#' @export
+setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
+
+setMethod("shape", "background", function(object) {
+    return(object@shape)
+})
+
+setMethod("shape<-", "background", function(object, value) {
+    object@shape <- value
+    return(object)
+})
+
+#' @export
 setGeneric("objects", function(object) standardGeneric("objects"))
 
 #' @export
@@ -460,5 +484,35 @@ setMethod("objects", "background", function(object) {
 
 setMethod("objects<-", "background", function(object, value) {
     object@objects <- value
+    return(object)
+})
+
+#' @export
+setGeneric("entrance", function(object) standardGeneric("entrance"))
+
+#' @export
+setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
+
+setMethod("entrance", "background", function(object) {
+    return(object@entrance)
+})
+
+setMethod("entrance<-", "background", function(object, value) {
+    object@entrance <- value
+    return(object)
+})
+
+#' @export
+setGeneric("exit", function(object) standardGeneric("exit"))
+
+#' @export
+setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
+
+setMethod("exit", "background", function(object) {
+    return(object@exit)
+})
+
+setMethod("exit<-", "background", function(object, value) {
+    object@exit <- value
     return(object)
 })
