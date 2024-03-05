@@ -16,6 +16,10 @@
 #' for the agent
 #' @slot goals A list containing the id's of the goals that are assigned to the
 #' agent
+#' 
+#' @slot status A character that denotes the status of the agent, or what the 
+#' agent is doing at the moment. Can take on `"move"`, `"stop"`, `"reorient"`, 
+#' and `"exit"`
 #'
 #' @export
 agent <- setClass("agent", list(id = "character",
