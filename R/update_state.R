@@ -25,13 +25,24 @@
 #' in light of the agents actions to achieve their goals. 
 #' 
 #' @param state The current state of the simulation
+#' @param stay_stopped Logical denoting whether agents will predict other agents 
+#' who have stopped to remain immobile. Is passed on to `predict_movement`. 
+#' Defaults to `TRUE`
 #' @param ... Arguments to be passed on to `update_agent`
 #' 
 #' @export 
 # 
 # TO DO
 #   - Also update objects when they are moveable and used. To see how we do it
-update_state <- function(state, ...) {
+update_state <- function(state, 
+                         stay_stopped = TRUE, 
+                         ...) {
+    # Predict where the agents will be at their current velocity and angle. Is 
+    # used by other agents to change their own directions in order to avoid 
+    # collisions
+    agent_predictions <- lapply(state$agents, 
+                                \(x) predict_movement(x, stay_stopped = stay_stopped))
+
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
     for(i in seq_along(state$agents)) {
@@ -42,10 +53,6 @@ update_state <- function(state, ...) {
 
         state_copy <- state 
         state_copy$agents <- state_copy$agents[-i]
-
-        # Compute predictions for this one agent on where to other agents might 
-        # move to. Avoids collisions.
-        agent_predictions <- list()
 
         # Update the position of the agent in the state list and move on to the 
         # next agent.
@@ -58,7 +65,34 @@ update_state <- function(state, ...) {
     return(state)
 }
 
-# Create the move_agent function, which will define the generic move function
+#' Predict agent's movement
+#' 
+#' Use an agents' current speed and orientation to determine where the agent might 
+#' end up in the next step. This information is used by other agents' in the 
+#' simulation to determine where (not) to go to if they want to avoid collisions.
+#' 
+#' @param agent The agent in consideration
+#' @param stay_stopped Logical denoting whether agents will predict other agents 
+#' who have stopped to remain immobile. Defaults to `TRUE`.
+#' 
+#' @export
+predict_movement <- function(agent, 
+                             stay_stopped = TRUE) {
+    
+    # Compute the coordinate where the agents will end up when moving at the 
+    # same speed in the same direction. Different when an agent is currently 
+    # stopped vs when they are actively moving. Also different depending on 
+    # whether this is considered in the first place.
+    if(stay_stopped & agent@status == "stop") {
+        co <- agent@position
+    } else {
+        co <- agent@position + m4ma::scaleVel(agent@speed) * m4ma::aTOd(agent@orientation)
+    }    
+
+    return(co)
+}
+
+# Create the update_agent function, which will define the generic move function
 # for the agents. Consists of the following arguments
 #   - agent: The agent with all its information
 #   - state: List with the current state of the simulation.
@@ -78,36 +112,35 @@ update_state <- function(state, ...) {
 #   - In the end, again centers computed as many times before (in the utility
 #     function): Do the updating more generally and more streamlined so
 #     everything becomes a lot clearer
-move_agent <- function(agent,
-                       state,
-                       agent_predictions,
-                       background,
-                       nests = list(
-                           Central = c(0, 6, 17, 28),
-                           NonCentral = c(0:33)[-c(6, 17, 28)],
-                           acc = c(1:11),
-                           const = c(12:22),
-                           dec = c(0, 23:33)
-                       ),
-                       alpha = list(
-                           Central = rep(1/3, 4),
-                           NonCentral = c(1/3, rep(0.5, 4), 1/3, rep(0.5, 9), 1/3,
-                                          rep(0.5, 9), 1/3, rep(0.5, 5)),
-                           acc = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
-                           const = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
-                           dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5, 5))
-                       ),
-                       plotGrid = FALSE,
-                       printChoice = FALSE,
-                       sStop = 0.2, # speed to resume after stop
-                       usebestAngle = FALSE,
-                       vels = matrix(rep(c(1.5, 1, .5), each = 11), ncol = 3),
-                       angles = matrix(rep(c(
-                           72.5, 50, 32.5, 20, 10,
-                           0, 350, 340, 327.5, 310, 287.5),
-                           times = 3),
-                           ncol = 3))
-{
+update_agent <- function(agent,
+                         state,
+                         agent_predictions,
+                         background,
+                         nests = list(
+                             Central = c(0, 6, 17, 28),
+                             NonCentral = c(0:33)[-c(6, 17, 28)],
+                             acc = c(1:11),
+                             const = c(12:22),
+                             dec = c(0, 23:33)
+                         ),
+                         alpha = list(
+                             Central = rep(1/3, 4),
+                             NonCentral = c(1/3, rep(0.5, 4), 1/3, rep(0.5, 9), 1/3,
+                                            rep(0.5, 9), 1/3, rep(0.5, 5)),
+                             acc = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
+                             const = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
+                             dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5, 5))
+                         ),
+                         plotGrid = FALSE,
+                         printChoice = FALSE,
+                         sStop = 0.2, # speed to resume after stop
+                         usebestAngle = FALSE,
+                         vels = matrix(rep(c(1.5, 1, .5), each = 11), ncol = 3),
+                         angles = matrix(rep(c(
+                             72.5, 50, 32.5, 20, 10,
+                             0, 350, 340, 327.5, 310, 287.5),
+                             times = 3),
+                             ncol = 3)) {
     # If the agent is currently interacting with another object, just continue
     if(status(agent) == "stop") { # Used to be a check of the goal state: attr(state$P[[n]], "stop") > 0, == -1, or else (interacting, reorient, going)
         cell(agent) <- 0
