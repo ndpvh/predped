@@ -168,13 +168,13 @@ perpendicular_orientation <- function(background) {
     # the points that make up an edge and the entrance point. The edge that has 
     # the distance closest to the actual size of the edge will be taken as the 
     # entrance wall.
-    co <- background@entrance
-    points <- background@shape@points 
+    co <- entrance(background)@.Data
+    points <- shape(background)@points
     points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
-    distances <- cbind(sqrt((points[,1] - points[,3])^2 - (points[,2] - points[,4]^2)),
-                       sqrt((points[,1] - co[,1])^2 - (points[,2] - co[,2])^2),
-                       sqrt((points[,3] - co[,1])^2 - (points[,4] - co[,2])^2))
+    distances <- cbind(sqrt((points[,1] - points[,3])^2 + (points[,2] - points[,4])^2),
+                       sqrt((points[,1] - co[1])^2 + (points[,2] - co[2])^2),
+                       sqrt((points[,3] - co[1])^2 + (points[,4] - co[2])^2))
     distances <- distances[,1] - distances[,2] - distances[,3]
 
     # Now that we know on which edge the entrance lies, we can compute the 
@@ -184,13 +184,18 @@ perpendicular_orientation <- function(background) {
     # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
     # where slope is the slope of the edge
     edge <- points[which.min(distances),]
-    slope <- (points[,2] - points[,4]) / (points[,1] - points[,3])
+    slope <- (edge[2] - edge[4]) / (edge[1] - edge[3])
 
     angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
-    if(background@shape@clockwise) {
+    if(background@shape@clock_wise) {
         angle <- angle - 90
     } else {
         angle <- angle + 90
+    }
+
+    # If you have a negative angle, convert this to a positive one
+    if(angle < 0) {
+        angle <- angle + 360
     }
 
     return(angle)
