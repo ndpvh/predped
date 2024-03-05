@@ -92,15 +92,28 @@ predict_movement <- function(agent,
     return(co)
 }
 
-# Create the update_agent function, which will define the generic move function
-# for the agents. Consists of the following arguments
-#   - agent: The agent with all its information
-#   - state: List with the current state of the simulation.
-#   - agent_predictions: List with the predicted movements of all agents
-#   - nests:
-#   - alpha:
-#   - iInfo:
-#   - angle: Angles to consider
+
+
+#' Move an Agent
+#' 
+#' @param agent The agent to move
+#' @param state The current state of affairs. Importantly, the agent in `agent`
+#' should not be present in that state
+#' @param agent_predictions A list containing the predictions of where each agent
+#' might move to
+#' @param background The setting in which agents are walking around
+#' @param velocities Matrix that contains the change in velocity per cell that 
+#' the agent might move to. Defaults to an 11 by 3 matrix where each row contains
+#' 0.5 (deceleration), 1 (same speed), and 1.5 (acceleration).
+#' @param orientations Matrix that contains the change in orientation per cell 
+#' that the agent might move to. Defaults to an 11 by 3 matrix where each column
+#' contains 72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, and 287.5 degrees.
+#' @param standing_start Numeric denoting the speed of the agent when they 
+#' resume walking after stopping. Defaults to `0.2`
+#' 
+#' @return Updated agent
+#' 
+#' @export
 #
 # TO DO
 #   - At this moment, the same checks happen here and in `best_angle`: Try to
@@ -131,16 +144,19 @@ update_agent <- function(agent,
                              const = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
                              dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5, 5))
                          ),
-                         plotGrid = FALSE,
-                         printChoice = FALSE,
-                         sStop = 0.2, # speed to resume after stop
-                         usebestAngle = FALSE,
-                         vels = matrix(rep(c(1.5, 1, .5), each = 11), ncol = 3),
-                         angles = matrix(rep(c(
+                         velocities = c(1.5, 1, 0.5) |>
+                            rep(each = 11) |>
+                            matrix(ncol = 3),
+                         orientations = matrix(rep(c(
                              72.5, 50, 32.5, 20, 10,
                              0, 350, 340, 327.5, 310, 287.5),
                              times = 3),
-                             ncol = 3)) {
+                             ncol = 3),
+                         standing_start = 0.2
+                        #  plotGrid = FALSE,        # deprecated?
+                        #  printChoice = FALSE,     # deprecated?                     
+                        #  usebestAngle = FALSE     # deprecated?
+                         ) {
     # If the agent is currently interacting with another object, just continue
     if(status(agent) == "stop") { # Used to be a check of the goal state: attr(state$P[[n]], "stop") > 0, == -1, or else (interacting, reorient, going)
         cell(agent) <- 0
@@ -150,7 +166,7 @@ update_agent <- function(agent,
         # where the next goal is. If they don't. let them reorient themselves to
         # the next goal
         if(status(agent) == "reorient") {
-            orientation(agent) <- best_angle(agent, state, agent_predictions, background, vels, angles)
+            orientation(agent) <- best_angle(agent, state, agent_predictions, background, velocities, orientations)
             status(agent) <- "move"
         }
 
@@ -160,8 +176,8 @@ update_agent <- function(agent,
             p1 = position(agent),
             v1 = speed(agent),
             a1 = orientation(agent),
-            vels = vels,
-            angles = angles,
+            vels = velocities,
+            angles = orientations,
             tStep = 0.5
         )
 
@@ -172,10 +188,10 @@ update_agent <- function(agent,
         # then allow him to
         if(!any(check) | cell(agent) == 0) {  # stop or will have to
             # Change the agent's speed to the starting speed after waiting
-            speed(agent) <- sStop
+            speed(agent) <- standing_start
 
             # Let the agent reorient to find a better way
-            orientation(agent) <- best_angle(agent, state, agent_predictions, background, vels, angles)
+            orientation(agent) <- best_angle(agent, state, agent_predictions, background, velocities, orientations)
 
             # Report the degress that the agent is reorienting to
             turn <- paste("to", orientation(agent), "degrees")
@@ -192,8 +208,8 @@ update_agent <- function(agent,
                 p1 = position(agent),
                 v1 = speed(agent),
                 a1 = orientation(agent),
-                vels = vels,
-                angles = angles,
+                vels = velocities,
+                angles = orientations,
                 tStep = 0.5
             )
 
@@ -250,19 +266,19 @@ update_agent <- function(agent,
         # Check what to do: Either the chosen cell is 0 (stop) or something else
         # (moving to another location with a different speed and orientation)
         if(cell == 0) {
-            speed(agent) <- sStop  # stopped, reset velocity
+            speed(agent) <- standing_start  # stopped, reset velocity
         } else {
             position(agent) <- as.vector(m4ma::c_vd_rcpp(
                 cells = cell,
                 p1 = position(agent),
                 v1 = speed(agent),
                 a1 = orientation(agent),
-                vels = vels,
-                angles = angles,
+                vels = velocities,
+                angles = orientations,
                 tStep = 0.5
             ))
-            speed(agent) <- pmax(speed(agent) * c(1.5, 1, 0.5)[m4ma::ringNum(cell)], sStop)
-            orientation(agent) <- (orientation(agent) - ifelse(angles >= 180, 360 - angles, -angles)[m4ma::coneNum(cell)]) %% 360
+            speed(agent) <- pmax(speed(agent) * c(1.5, 1, 0.5)[m4ma::ringNum(cell)], standing_start)
+            orientation(agent) <- (orientation(agent) - ifelse(orientations >= 180, 360 - orientations, -orientations)[m4ma::coneNum(cell)]) %% 360
         }
     }
 
