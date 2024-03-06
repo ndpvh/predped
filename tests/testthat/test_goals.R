@@ -10,7 +10,7 @@ testthat::test_that("Goal initialization works", {
 })
 
 # Creating goal stacks
-testthat::test_that("Generating goal stack works", {
+testthat::test_that("Generating goal stack for rectangles works", {
     # All interactable objects
     setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
                                                               size = c(6, 6)),
@@ -25,11 +25,11 @@ testthat::test_that("Generating goal stack works", {
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
 
     ref <- list(goal(id = "goal bwknr", 
-                     position = coordinate(c(1, -0.59)), 
+                     position = coordinate(c(1, -1.4082)), 
                      busy = FALSE,
                      counter = 5), 
                 goal(id = "goal auujv", 
-                     position = coordinate(c(1, 0.68)), 
+                     position = coordinate(c(1, 1.3234)), 
                      busy = FALSE, 
                      counter = 5))
 
@@ -49,11 +49,11 @@ testthat::test_that("Generating goal stack works", {
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
 
     ref <- list(goal(id = "goal bwknr", 
-                     position = coordinate(c(1, 1.41)), 
+                     position = coordinate(c(1, 0.5918)), 
                      busy = FALSE,
                      counter = 5), 
                 goal(id = "goal auujv", 
-                     position = coordinate(c(1, 0.68)), 
+                     position = coordinate(c(1, 1.3234)), 
                      busy = FALSE, 
                      counter = 5))
 
@@ -68,6 +68,69 @@ testthat::test_that("Generating goal stack works", {
                                                   predped::rectangle(center = c(0, 1), 
                                                                      size = c(2, 1),
                                                                      interactable = FALSE)))
+
+    testthat::expect_error(goal(2, setting, \(x) 5))
+})
+
+# Creating goal stacks
+testthat::test_that("Generating goal stack for circles works", {
+    # All interactable objects
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(6, 6)),
+                                   objects = list(predped::circle(center = c(0, -1), 
+                                                                  radius = 1,
+                                                                  interactable = TRUE),
+                                                  predped::circle(center = c(0, 1), 
+                                                                  radius = 1,
+                                                                  interactable = TRUE)))
+
+    set.seed(1)
+    goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+
+    ref <- list(goal(id = "goal abwkn", 
+                     position = coordinate(c(-0.897, -1.4419)), 
+                     busy = FALSE,
+                     counter = 5), 
+                goal(id = "goal sauuj", 
+                     position = coordinate(c(0.9256, 1.3785)), 
+                     busy = FALSE, 
+                     counter = 5))
+
+    testthat::expect_equal(goal_stack, ref, tolerance = 1e-2)
+
+    # Single interactable object
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(6, 6)),
+                                   objects = list(predped::circle(center = c(0, -1), 
+                                                                  radius = 1,
+                                                                  interactable = FALSE),
+                                                  predped::circle(center = c(0, 1), 
+                                                                  radius = 1,
+                                                                  interactable = TRUE)))
+
+    set.seed(1)
+    goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+
+    ref <- list(goal(id = "goal abwkn", 
+                     position = coordinate(c(-0.897, 0.5581)), 
+                     busy = FALSE,
+                     counter = 5), 
+                goal(id = "goal sauuj", 
+                     position = coordinate(c(0.9256, 1.3785)), 
+                     busy = FALSE, 
+                     counter = 5))
+
+    testthat::expect_equal(goal_stack, ref, tolerance = 1e-2)
+
+    # No interactable objects
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(6, 6)),
+                                   objects = list(predped::circle(center = c(0, -1), 
+                                                                  radius = 1,
+                                                                  interactable = FALSE),
+                                                  predped::circle(center = c(0, 1), 
+                                                                  radius = 1,
+                                                                  interactable = FALSE)))
 
     testthat::expect_error(goal(2, setting, \(x) 5))
 })
