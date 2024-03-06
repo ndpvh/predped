@@ -103,6 +103,17 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' @name in_object-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
+#' Sample a Random Point on the Circumference
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param middle_edge Logical denoting whether the point should lie in the middle
+#' of a random edge. Ignored for circles. Defaults to `TRUE`.
+#'
+#' @return Numerical coordinate of a point on the circumference of the object
+#' @export
+#' @name rng_point-method
+setGeneric("rng_point", function(object, middle_edge = TRUE) standardGeneric("rng_point"))
+
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -197,6 +208,21 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # odd number of intersections when inside of the polygon)
     return((counter %% 2 == 0) == outside)
 })
+
+#'@rdname rng_point-method
+#'
+setMethod("rng_point", signature(object = "polygon"), function(object, middle_edge = TRUE) {
+    edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1),])
+    idx <- sample(seq_len(nrow(edges)), 1)
+
+    if(middle_edge) {
+        a <- 0.5
+    } else {
+        a <- runif(1, 0, 1)
+    }
+
+    return(edges[idx, 1:2] + a * (edges[idx, 3:4] - edges[idx, 1:2]))
+})    
 
 #' An S4 Class to Represent Rectangle Objects
 #'
