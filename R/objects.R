@@ -103,15 +103,6 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' @name in_object-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
-#' Add a Goal to an Object
-#'
-#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
-#'
-#' @return The goal that was assigned to the object
-#' @export
-#' @name add_goal-method
-setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
-
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -205,46 +196,6 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # even number of intersections when outside of the polygon; FALSE, FALSE ->
     # odd number of intersections when inside of the polygon)
     return((counter %% 2 == 0) == outside)
-})
-
-#'@rdname add_goal-method
-#'
-setMethod("add_goal", signature(object = "polygon"), function(object, 
-                                                              id = character(0),
-                                                              counter = 5
-){
-    # Get all the edges on which the goal can be attributed
-    edges <- object@points 
-    edges <- rbind(edges, edges[1,])
-
-    # Select one of these edges at random and a random location on the line 
-    # created by the points
-    idx <- sample.int(nrow(object@points), 1)
-    co1 <- edges[idx,]
-    co2 <- edges[idx + 1,]
-
-    # Check whether we have vertical or horizontal lines, or neither
-    if(co1[1] == co2[1]) {
-        x <- co1[1]
-
-        lim <- range(c(co1[2], co2[2]))
-        y <- lim[1] + runif(1) * diff(lim)
-    } else if(co1[2] == co2[2]) {
-        y <- co1[2]
-
-        lim <- range(c(co1[1], co2[1]))
-        x <- lim[1] + runif(1) * diff(lim)
-    } else {
-        lim <- range(c(co1[1], co2[1]))
-        x <- lim[1] + runif(1) * diff(lim)
-
-        y <- co1[2] + ( (co2[2] - co1[2]) / (co2[1] - co1[1]) ) * (x - co1[1])
-    }
-
-    # Create the goal itself
-    return(goal(id = id,
-                position = coordinate(c(x, y)), 
-                counter = counter))    
 })
 
 #' An S4 Class to Represent Rectangle Objects

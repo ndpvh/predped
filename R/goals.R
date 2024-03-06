@@ -94,6 +94,8 @@ generate_goal_stack <- function(n,
         }
     }
 
+    View(potential_objects)
+
     # Throw an error if no objects are interactable
     if(length(potential_objects) == 0) {
         stop("None of the objects in the environment can contain a goal.")
@@ -109,3 +111,77 @@ generate_goal_stack <- function(n,
 
     return(goal_stack)
 }
+
+#' Add a Goal to an Object
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#'
+#' @return The goal that was assigned to the object
+#' @export
+#' @name add_goal-method
+# 
+# Thought it would be more logical to place this method to the objects here, 
+# even though it is not a method of the `goal` class.
+setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
+
+#'@rdname add_goal-method
+#'
+setMethod("add_goal", signature(object = "polygon"), function(object, 
+                                                              id = character(0),
+                                                              counter = 5
+){
+    # Get all the edges on which the goal can be attributed
+    edges <- object@points 
+    edges <- rbind(edges, edges[1,])
+
+    # Select one of these edges at random and a random location on the line 
+    # created by the points
+    idx <- sample.int(nrow(object@points), 1)
+    co1 <- edges[idx,]
+    co2 <- edges[idx + 1,]
+
+    # Check whether we have vertical or horizontal lines, or neither
+    if(co1[1] == co2[1]) {
+        x <- co1[1]
+
+        lim <- range(c(co1[2], co2[2]))
+        y <- lim[1] + runif(1) * diff(lim)
+    } else if(co1[2] == co2[2]) {
+        y <- co1[2]
+
+        lim <- range(c(co1[1], co2[1]))
+        x <- lim[1] + runif(1) * diff(lim)
+    } else {
+        lim <- range(c(co1[1], co2[1]))
+        x <- lim[1] + runif(1) * diff(lim)
+
+        y <- co1[2] + ( (co2[2] - co1[2]) / (co2[1] - co1[1]) ) * (x - co1[1])
+    }
+
+    # Create the goal itself
+    return(goal(id = id,
+                position = coordinate(c(x, y)), 
+                counter = counter))    
+})
+
+#'@rdname add_goal-method
+#'
+setMethod("add_goal", signature(object = "circle"), function(object, 
+                                                             id = character(0),
+                                                             counter = 5
+){
+    # Select a random angle on the circle at which the goal will be placed.
+    # This is done in radians.
+    angle <- runif(1, 0, 2 * pi)
+
+    # Once the angle is determined, we can compute the coordinate of the goal
+    # as x = radius * cos(angle), y = radius * sin(angle), which we do here.
+    co <- c(object@radius * cos(angle), 
+            object@radius * sin(angle)) 
+
+    # Create the goal itself
+    return(goal(id = id,
+                position = coordinate(co), 
+                counter = counter))    
+})
+
