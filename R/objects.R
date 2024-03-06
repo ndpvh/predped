@@ -446,5 +446,5 @@ setMethod("rng_point", signature(object = "circle"), function(object,
     }
     
     # Return the numerical value of the coordinate that was sampled
-    return(as.numeric(object@radius * c(cos(angle), sin(angle))))
+    return(as.numeric(object@center + object@radius * c(cos(angle), sin(angle))))
 })   
