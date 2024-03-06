@@ -14,7 +14,7 @@ testthat::test_that("Finding a class in a list works", {
     testthat::expect_false(any(sapply(rect, function(x) class(x) == "circle")))
     testthat::expect_false(any(sapply(circ, function(x) class(x) == "rectangle")))
 
-    testthat::expect_equal(2, length(rect))
-    testthat::expect_equal(1, length(circ))
-    testthat::expect_equal(0, length(empty))
+    testthat::expect_equal(length(rect), 2)
+    testthat::expect_equal(length(circ), 1)
+    testthat::expect_equal(length(empty), 0)
 })
