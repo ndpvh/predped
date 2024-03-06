@@ -37,8 +37,7 @@ setMethod("initialize", "background", function(.Object,
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
-        d <- nrow(.Object@shape@points)
-        exit <- (.Object@shape@points[d - 1,] - .Object@shape@points[d,]) / 2
+        exit <- rng_point(.Object@shape)
     }
     .Object@exit <- coordinate(exit)
 
