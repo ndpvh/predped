@@ -184,7 +184,7 @@ perpendicular_orientation <- function(background) {
     # it and then either subtracts (clockwise == TRUE) or adds (clockwise == FALSE)
     # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
     # where slope is the slope of the edge
-    edge <- points[which.min(distances),]
+    edge <- as.numeric(points[which.min(distances),])
     slope <- (edge[2] - edge[4]) / (edge[1] - edge[3])
 
     angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
