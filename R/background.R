@@ -30,15 +30,15 @@ setMethod("initialize", "background", function(.Object,
     }
 
     if(is.null(entrance)) {
-        entrance <- (.Object@points[1,] - .Objects@points[2,]) / 2
+        entrance <- rng_point(.Object@shape)
     }
     .Object@entrance <- coordinate(entrance)
 
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
-        d <- nrow(.Object@points)
-        exit <- (.Object@points[d - 1,] - .Object@points[d,]) / 2
+        d <- nrow(.Object@shape@points)
+        exit <- (.Object@shape@points[d - 1,] - .Object@shape@points[d,]) / 2
     }
     .Object@exit <- coordinate(exit)
 
