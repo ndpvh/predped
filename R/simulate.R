@@ -36,9 +36,9 @@ setMethod("simulate", "predped", function(object,
     # For `add_agent`, we should furthermore create a cumulative sum, as we just 
     # need to iteration numbers themselves, not the gaps that are created by 
     # `number`
-    add_agent <- draw_number(add_agent_after, iterations)
-    add_agent <- c(1, cumsum(add_agent))
-    add_agent <- add_agent[add_agent <= iterations]
+    add_agent_index <- draw_number(add_agent_after, iterations)
+    add_agent_index <- c(1, cumsum(add_agent_index))
+    add_agent_index <- add_agent_index[add_agent_index <= iterations]
 
     goal_number <- draw_number(goal_number, iterations)
 
@@ -58,7 +58,7 @@ setMethod("simulate", "predped", function(object,
     for(i in seq_len(iterations)) {
         # Check whether to add a pedestrian and, if so, initiate a new 
         # agent
-        if((i %in% index_add_agent) & (length(agents) <= max_agents)) {
+        if((i %in% add_agent_index) & (length(agents) <= max_agents)) {
             state$agents <- append(agents, add_agent(object,
                                                      goal_number[i],
                                                      goal_duration = goal_duration))
