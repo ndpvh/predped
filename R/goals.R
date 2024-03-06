@@ -94,8 +94,6 @@ generate_goal_stack <- function(n,
         }
     }
 
-    View(potential_objects)
-
     # Throw an error if no objects are interactable
     if(length(potential_objects) == 0) {
         stop("None of the objects in the environment can contain a goal.")
@@ -115,6 +113,11 @@ generate_goal_stack <- function(n,
 #' Add a Goal to an Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param id Character denoting the name of the goal. Defaults to an empty 
+#' character, creating a random one under the hood.
+#' @param counter Integer denoting the number of iterations an agent has to 
+#' interact with the goal in order to complete it
+#' @param ... Arguments passed on to \code{\link[predped]{rng_point-method}}
 #'
 #' @return The goal that was assigned to the object
 #' @export
@@ -128,9 +131,14 @@ setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 #'
 setMethod("add_goal", signature(object = "polygon"), function(object, 
                                                               id = character(0),
-                                                              counter = 5
+                                                              counter = 5,
+                                                              middle_edge = FALSE,
+                                                              forbidden = NULL
+
 ){
-    co <- rng_point(object)
+    co <- rng_point(object, 
+                    middle_edge = middle_edge, 
+                    forbidden = forbidden)
     return(goal(id = id,
                 position = coordinate(co), 
                 counter = counter))    
@@ -140,9 +148,11 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
 #'
 setMethod("add_goal", signature(object = "circle"), function(object, 
                                                              id = character(0),
-                                                             counter = 5
+                                                             counter = 5,
+                                                             forbidden = NULL
 ){
-    co <- rng_point(object)
+    co <- rng_point(object, 
+                    forbidden = forbidden)
     return(goal(id = id,
                 position = coordinate(co), 
                 counter = counter))   
