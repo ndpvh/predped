@@ -108,11 +108,17 @@ setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
 #' @param middle_edge Logical denoting whether the point should lie in the middle
 #' of a random edge. Ignored for circles. Defaults to `TRUE`.
+#' @param forbidden Numeric indicating forbidden values. For `polygon` and 
+#' `rectangle`, this is the edge number on which the point should not be 
+#' generated. For `circle`, this is either a vector or a matrix of angles between 
+#' which the point should not be sampled (in radians). For the latter, it is 
+#' important to note that the intervals created by the angles should not overlap.
+#' Defaults to `NULL`, or the point can be sampled anywhere.
 #'
 #' @return Numerical coordinate of a point on the circumference of the object
 #' @export
 #' @name rng_point-method
-setGeneric("rng_point", function(object, middle_edge = TRUE) standardGeneric("rng_point"))
+setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
 
 #' An S4 class to Represent Polygon Objects
 #'
@@ -211,17 +217,40 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
 
 #'@rdname rng_point-method
 #'
-setMethod("rng_point", signature(object = "polygon"), function(object, middle_edge = TRUE) {
+setMethod("rng_point", signature(object = "polygon"), function(object, 
+                                                               middle_edge = TRUE,
+                                                               forbidden = NULL) {
+    
+    # Sample the edge on which to draw a random point. To make our lives easier, 
+    # we first transform `points` so that it contains the values of the 
+    # first coordinate (x_1, y_1) in the first two columns and the values of the
+    # second coordiante (x_2, y_2) in the last two columns. Each edges is then 
+    # defined in each row.
+    #
+    # Importantly, the forbidden edges should be deleted from the options.
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1),])
+    if(!is.null(forbidden)) {
+        edges <- edges[-forbidden,]
+
+        # Extra check if you delete all except one edge
+        if(!is.matrix(edges)) {
+            edges <- matrix(edges, ncol = 4)
+        }
+    }
+
     idx <- sample(seq_len(nrow(edges)), 1)
 
+    # If the middle of the edge should not be sampled, first sample a random 
+    # number between 0 and 1. This number will determine how far along the 
+    # edge the point will be put.
     if(middle_edge) {
         a <- 0.5
     } else {
         a <- runif(1, 0, 1)
     }
 
-    return(edges[idx, 1:2] + a * (edges[idx, 3:4] - edges[idx, 1:2]))
+    # Return the sampled point as a numeric
+    return(as.numeric(edges[idx, 1:2] + a * (edges[idx, 3:4] - edges[idx, 1:2])))
 })    
 
 #' An S4 Class to Represent Rectangle Objects
@@ -386,3 +415,36 @@ setMethod("move", signature(object = "circle", target = "numeric"), function(obj
 #'@rdname area-method
 #'
 setMethod("area", signature(object = "circle"), function(object) pi*object@radius^2)
+
+#'@rdname rng_point-method
+#'
+setMethod("rng_point", signature(object = "circle"), function(object, 
+                                                              middle_edge = TRUE,
+                                                              forbidden = NULL) {
+
+    # First check which intervals are allowed to be sampled and add a column 
+    # that contains the relative weight of the interval to be sampled in
+    if(!is.null(forbidden)) {
+        # Convert to vector and sort
+        forbidden <- sort(as.numeric(forbidden))
+
+        # Create a matrix that contains all intervals that can be sampled in
+        allowed <- c(0, forbidden, 2 * pi)
+        allowed <- matrix(allowed, ncol = 2, byrow = TRUE)
+        allowed <- cbind(allowed, 
+                         (allowed[,2] - allowed[,1]) / sum(allowed))
+
+        # Sample one of the intervals based on the weight of that interval
+        idx <- sample(1:nrow(allowed), 1, prob = allowed[,3])
+
+        # Now sample a random angle from this interval
+        angle <- runif(1, allowed[idx,1], allowed[idx,2])
+    } else {
+        # If no intervals are forbidden, then we can just sample a random number
+        # directly
+        angle <- runif(1, 0, 2 * pi)
+    }
+    
+    # Return the numerical value of the coordinate that was sampled
+    return(as.numeric(object@radius * c(cos(angle), sin(angle))))
+})   
