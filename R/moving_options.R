@@ -88,7 +88,8 @@ moving_options_agent <- function(agent, state, background, centers){
 
         # Function to rewrite! New arguments are already provided to this one,
         # but not the original one
-        goal_list <- list(current_goal(agent))
+        goal_position <- current_goal(agent)@position@.Data
+        goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
         local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
@@ -106,8 +107,15 @@ moving_options_agent <- function(agent, state, background, centers){
     # If there are still cells free, check whether there are cells in which another
     # agent is currently standing
     if(!all(!check)){
-        agent_idx <- match(id(agent), sapply(state$agents, id))
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
+        # Originally deleted the agent from the state$agent list. However, not 
+        # necessary anymore! The state$agents list already does not contain the 
+        # `agent` anymore
+        #
+        # Additional condition added: If there are not other agents, then we 
+        # don't need to do this check
+        if(length(state$agents) > 0) {
+            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
+        }
     }
 
     # Finally, return the cells that are free to move to
@@ -135,6 +143,8 @@ setMethod("moving_options",
 #' by any state.
 #
 # Replacement of `okObject`
+#
+# Deprecated?
 free_cells <- function(agent, state, centers) {
     # Select the background from the current state
     background <- find_class("background", state)
@@ -181,6 +191,8 @@ free_cells <- function(agent, state, centers) {
 #     found in `blocked_agent`).
 #
 # Replacement of `isBlocked`
+#
+# Deprecated?
 blocked_cells <- function(agent, state, centers, check = logical(33)) {
     # Create a nested function that will check the line of side for each of the
     # cells in center within a specific range
@@ -238,6 +250,8 @@ blocked_cells <- function(agent, state, centers, check = logical(33)) {
 #     `intersection`)
 #
 # Replacement of `bodyObjectOK`
+#
+# Deprecated?
 overlap_with_object <- function(agent, state, centers, free) {
     # Keeping this in here, but I believe it may be deleted afterwards, as this
     # kind of check is already done in `blocked_agent`
@@ -294,6 +308,8 @@ overlap_with_object <- function(agent, state, centers, free) {
 #     agents or state).
 #
 # Replacement of `bodyObjectOverlap`
+#
+# Deprecated?
 object_intersection <- function(lines, radius, centers) {
     # Get the angles of the lines
     angles <- angle2(p1 = t(lines[, , "P1"]), p2 = t(lines[, , "P2"])) |>
@@ -324,6 +340,8 @@ object_intersection <- function(lines, radius, centers) {
 # TO DO:
 #   - Just like for its original parent `object_intersection`, make this
 #     very general.
+#
+# Deprecated?
 intersection <- function(point, x, y, lines){
     # Create the segments that you want to know the intersection of. This is
     # just adding and subtracting x and y from the point that was provided. Then
@@ -357,6 +375,8 @@ intersection <- function(point, x, y, lines){
 
 # Is the cell OK or does body radius r positioned at centers overlap with
 # another body?
+#
+# Deprecated?
 okBodyBody <- function(n, state, centers, ok) {
     if (!any(ok)) {
         return(NULL)
@@ -377,6 +397,8 @@ okBodyBody <- function(n, state, centers, ok) {
 # side of it).
 # returns number and if more than one attribute "ends" specifying blocking
 # profiles from current perspective
+#
+# Deprecated?
 nBlock <- function(n, state, r, usePredictedPos = FALSE) {
     p1 <- state$p[n, , drop = FALSE]
     P <- state$P[[n]][attr(state$P[[n]], "i"), 1:2, drop = FALSE]
