@@ -38,7 +38,8 @@ Collate:
     'see.R'
     'update_state.R'
     'utility_model.R'
-    'predped.R'    
+    'predped.R'
+    'simulate.R'
 Suggests: 
     fs,
     testthat (>= 3.0.0)
