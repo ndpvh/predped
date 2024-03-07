@@ -6,7 +6,7 @@
 # Second, build a simulate method that is akin to the minimal working
 # example. Use the scripts that are available in the GitHub.
 
-#' An S4 Class to Represent the M4MA model
+#' An S4 Class to Represent the M4MA model.
 #' 
 #' The `predped` class defines the M4MA model that can be used to simulate 
 #' data from. It contains the setting in which the agents should walk around as 
@@ -77,14 +77,14 @@ setMethod("initialize", "predped", function(.Object,
     return(.Object)
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setMethod("id", "predped", function(object) {
     return(setNames(object@id, object@id))
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setMethod("id<-", "predped", function(object, value) {
@@ -92,12 +92,12 @@ setMethod("id<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
@@ -111,14 +111,14 @@ setMethod("setting<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setMethod("parameters", "predped", function(object) {
     return(setNames(object@parameters, object@parameters))
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setMethod("parameters<-", "predped", function(object, value) {
@@ -131,12 +131,12 @@ setMethod("parameters<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
@@ -155,12 +155,12 @@ setMethod("archetypes<-", "predped", function(object, value) {
                    weights = object@weights))
 })
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 
-#' @rdname predped
+#' @rdname predped-class
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
@@ -174,7 +174,9 @@ setMethod("weights<-", "predped", function(object, value) {
     return(object)
 })
 
-# Shows what the object looks like:
+#' @rdname predped-class
+#'
+#' @export
 #
 # TO DO: Beautify the output
 setMethod("show", "predped", function(object) {

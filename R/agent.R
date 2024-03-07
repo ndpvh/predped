@@ -1,4 +1,4 @@
-#' An S4 Class to Represent Agents
+#' An S4 Class to Represent Agents.
 #' 
 #' Defines the `agent` class, which contains all characteristics of an agent. 
 #' Some of these characteristics are time-independent (e.g., parameters and 
@@ -56,12 +56,12 @@ setMethod("initialize", "agent", function(.Object,
     return(.Object)
 })
 
-#' @rdname agent
+#' @rdname agent-class
 #'
 #' @export
 setGeneric("id", function(object) standardGeneric("id"))
 
-#' @rdname agent
+#' @rdname agent-class
 #'
 #' @export
 setGeneric("id<-", function(object, value) standardGeneric("id<-"))
@@ -75,9 +75,13 @@ setMethod("id<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 
@@ -93,6 +97,8 @@ setMethod("position<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("size", function(object) standardGeneric("size"))
 
@@ -100,9 +106,13 @@ setMethod("size", "agent", function(object) {
     return(setNames(object@radius, object@id))
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("speed", function(object) standardGeneric("speed"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 
@@ -115,9 +125,13 @@ setMethod("speed<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
 
@@ -130,9 +144,13 @@ setMethod("orientation<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("group", function(object) standardGeneric("group"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 
@@ -145,9 +163,13 @@ setMethod("group<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("cell", function(object) standardGeneric("cell"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 
@@ -160,9 +182,13 @@ setMethod("cell<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("status", function(object) standardGeneric("status"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 
@@ -176,9 +202,13 @@ setMethod("status<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("parameters", function(object) standardGeneric("parameters"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
 
@@ -191,9 +221,13 @@ setMethod("parameters<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("goals", function(object) standardGeneric("goals"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 
@@ -206,9 +240,13 @@ setMethod("goals<-", "agent", function(object, value) {
     return(object)
 })
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("current_goal", function(object) standardGeneric("current_goal"))
 
+#' @rdname agent-class
+#' 
 #' @export
 setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
 

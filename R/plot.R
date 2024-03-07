@@ -1,9 +1,11 @@
-#' Plot an Object
+#' Plot an Object.
 #'
 #' @param object An object of kind \code[predped]{object-class}
 #' @param ... Additional arguments passed on to the geom used to plot the object.
 #'
+#' @return Either a geom or a ggplot
 #' @export
+#' @name plot-method
 setGeneric("plot", function(object) {standardGeneric("plot")})
 
 #'@rdname plot-method
