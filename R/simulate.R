@@ -20,6 +20,7 @@
 #' @param goal_duration Integer or function that determines the duration of each 
 #' goal. Defaults to a function that draws `x` numbers from a normal distribution 
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
+#' @param ... Arguments passed on to the \code[predped]{update_state} function.
 #' 
 #' @export
 setGeneric("simulate", function(object,...) standardGeneric("simulate"))
@@ -29,7 +30,8 @@ setMethod("simulate", "predped", function(object,
                                           iterations = 1800,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
                                           goal_number = \(x) rnorm(x, 10, 2), 
-                                          goal_duration = \(x) rnorm(x, 10, 2)) {
+                                          goal_duration = \(x) rnorm(x, 10, 2),
+                                          ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
     # (`add_agent`) and the number of goals each agent should pursue (`goal_number`).
@@ -68,7 +70,7 @@ setMethod("simulate", "predped", function(object,
         }
 
         # Update the current state
-        state <- update_state(state)
+        state <- update_state(state, background, ...)
 
         # Check whether one of the pedestrians is waiting at the exit
         idx <- c()
