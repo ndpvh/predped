@@ -34,6 +34,7 @@ Collate:
     'collision.R'
     'general.R'
     'parameters.R'
+    'plot.R'
     'see.R'
     'update_state.R'
     'utility_model.R'
