@@ -101,9 +101,9 @@ setMethod("initialize", "circle", function(.Object, moveable = FALSE, interactab
 setGeneric("area", function(object) {standardGeneric("area")})
 setMethod("area", signature(object = "circle"), function(object) pi*object@radius^2)
 
-
-circular <- circle(center = coordinate(c(2, 3)), radius = 20)
-circular@radius
+## A test to check that it works
+# circular <- circle(center = coordinate(c(2, 3)), radius = 20)
+# circular@radius
 
 # Plot function for a circle
 
@@ -127,33 +127,26 @@ setMethod("plot", "rectangle", function(object) {
   )
 })
 
-rectangular <- rectangle(center = coordinate(c(1,2)), size = c(2,2))
-
-test_rect <- plot(rectangular)
-
-p <- ggplot2::ggplot() +
+# A test to see whether it works
+# rectangular <- rectangle(center = coordinate(c(1,2)), size = c(2,2))
+# test_rect <- plot(rectangular)
+# p <- ggplot2::ggplot() +
      ggplot2::xlim(0, 10) +
      ggplot2::ylim(0, 10)
-
-p <- p + test_rect
+# p <- p + test_rect
 
 # Plot function for a polygon 
 setMethod("plot", "polygon", function(object) {
   ggplot2::geom_polygon(
-    ggplot2::aes(x = c(object@points[1], object@points[2]), y = c(object@points[3], object@points[4]))
+    ggplot2::aes(x = object@points[, 1], y = object@points[, 2])
   )
 })
 
-polygonous <- polygon(points = pts)
-
-pts <- matrix(c(1, 5, 10, 15), ncol = 2)
-
-matrix()
-
-test_polygon <- plot(polygonous)
-
-p <- ggplot2::ggplot() +
-     ggplot2::xlim(0, 20) +
-     ggplot2::ylim(0, 20)
-
-p <- p + test_polygon
+# A test to see whether it works
+# pts <- matrix(c(1, 2, 3, 2,  1, 3, 2, 1), ncol = 2)
+# polygonous <- polygon(points = pts)
+# test_polygon <- plot(polygonous)
+# p <- ggplot2::ggplot() +
+#     ggplot2::xlim(0, 20) +
+#     ggplot2::ylim(0, 20)
+# p <- p + test_polygon
