@@ -45,7 +45,8 @@ setMethod("simulate", "predped", function(object,
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
     if(typeof(goal_duration) != "closure") {
-        goal_duration <- function(x) goal_duration[1]
+        number <- goal_duration[1]
+        goal_duration <- function(x) number
     }
 
     # Initialize the trace and state lists. The state will already contain the 
@@ -61,6 +62,7 @@ setMethod("simulate", "predped", function(object,
         if((i %in% add_agent_index) & (length(state$agents) <= max_agents)) {
             state$agents <- append(state$agentsagents, 
                                    add_agent(object,
+                                             object@setting,
                                              goal_number[i],
                                              goal_duration = goal_duration))
         }
@@ -113,12 +115,12 @@ add_agent <- function(object,
     angle <- perpendicular_orientation(background)
 
     return(agent(center = background@entrance,
+                 radius = radius,
                  speed = standing_start,
                  orientation = angle,
-                 parameters = object@parameters[idx,],
+                 parameters = object@parameters[idx, -c(1,2)],
                  goals = goal_stack[-1],
-                 current_goal = goal_stack[[1]],
-                 radius = radius))
+                 current_goal = goal_stack[[1]]))
 }
 
 # Undocumented function because this is in no way a particularly beautiful 
