@@ -65,7 +65,7 @@ update_state <- function(state,
         # next agent.
         state$agents[[i]] <- update_agent(agent, 
                                           state_copy, 
-                                          agent_predictions,
+                                          agent_predictions[-i],
                                           background,
                                           time_step = time_step,
                                           ...)
