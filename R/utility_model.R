@@ -71,27 +71,36 @@ utility <- function(agent,
 
         agent_idx <- match(id(agent), agents_id)
 
+        agent_predictions <- t(sapply(agent_predictions, \(x) x)) # Transform list to matrix
+
         # Preferred speed
-        goal_distance <- m4ma::dist1_rcpp(position(agent), agent@current_goal)
+        goal_position <- matrix(current_goal(agent)@position@.Data,
+                                ncol = 2)
+        goal_distance <- m4ma::dist1_rcpp(position(agent), 
+                                          goal_position)
 
         # Angle between agent and the goal
-        direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), position(agent, return_matrix = TRUE),
-                           agent@current_goal) / 90
+        direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
+                                                      position(agent, return_matrix = TRUE),
+                                                      goal_position) / 90
 
         # Interpersonal distance between agent and other agents
-        interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, p1 = position(agent, return_matrix = TRUE), a1 = orientation(agent),
-                    p2 = agents_position, r = agents_size, centers, agent_predictions,
-                    objects = objects(background))
+        interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
+                                                       p1 = position(agent, return_matrix = TRUE), 
+                                                       a1 = orientation(agent),
+                                                       p2 = agents_position, 
+                                                       r = agents_size, 
+                                                       centers, 
+                                                       agent_predictions, 
+                                                       objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
-        blocked_angle <- m4ma::blockedAngle_rcpp(
-            position(agent, return_matrix = TRUE),
-            orientation(agent),
-            speed(agent),
-            agent_predictions[-agent_idx, , drop = FALSE], # change into index of agent in p_pred!
-            agents_size,
-            objects(background)
-        )
+        blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
+                                                 orientation(agent),
+                                                 speed(agent),
+                                                 agent_predictions, # Not necessary to delete agent from predictions anymore
+                                                 agents_size,
+                                                 objects(background))
 
         # Follow the leader phenomenon
         leaders <- m4ma::getLeaders_rcpp(
@@ -99,7 +108,7 @@ utility <- function(agent,
             agents_position,
             agents_orientation,
             agents_speed,
-            current_goal(agent),
+            goal_position,
             agents_group,
             centers,
             objects(background)
