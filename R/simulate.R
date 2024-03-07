@@ -70,7 +70,7 @@ setMethod("simulate", "predped", function(object,
         }
 
         # Update the current state
-        state <- update_state(state, background, ...)
+        state <- update_state(state, object@setting, ...)
 
         # Check whether one of the pedestrians is waiting at the exit
         idx <- c()
