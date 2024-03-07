@@ -29,8 +29,8 @@ agent <- setClass("agent", list(id = "character",
                                 cell = "numeric",
                                 status = "character",
                                 parameters = "numeric",
-                                goals = "matrix",
-                                current_goal = "matrix"
+                                goals = "list",
+                                current_goal = "goal"
                                 ), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,

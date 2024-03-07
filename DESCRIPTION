@@ -27,9 +27,9 @@ Imports:
 RoxygenNote: 7.3.1
 Collate:
     'objects.R'
+    'goals.R'
     'agent.R'
     `background.R`
-    'goals.R'
     'moving_options.R'
     'collision.R'
     'general.R'
