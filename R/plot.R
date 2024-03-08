@@ -19,7 +19,7 @@ setMethod("plot", "circle", function(object) {
   ))
   
   # Plot circle using geom_polygon
-  ggplot2::geom_polygon(data = cp,
+  ggplot2::geom_polygon(
     ggplot2::aes(x = cp[, 1], y = cp[, 2])
   )
 })
