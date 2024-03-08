@@ -11,11 +11,19 @@ setGeneric("plot", function(object) {standardGeneric("plot")})
 #'@rdname plot-method
 #'
 setMethod("plot", "circle", function(object) {
-    ggplot2::geom_point(
-        ggplot2::aes(x = object@center[[1]], y = object@center[[2]], size = object@radius),
-        show.legend = FALSE
-    )
+  # Create circle point from center x,y and radius r
+  t <- seq(0, 2 * pi, length.out = 100)
+  cp <- as.matrix(data.frame(
+    x = object@center[[1]] + object@radius * cos(t),
+    y = object@center[[2]] + object@radius * sin(t)
+  ))
+  
+  # Plot circle using geom_polygon
+  ggplot2::geom_polygon(data = cp,
+    ggplot2::aes(x = cp[, 1], y = cp[, 2])
+  )
 })
+
 
 #'@rdname plot-method
 #'
@@ -27,7 +35,7 @@ setMethod("plot", "rectangle", function(object) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "polygon", function(object) {
+setMethod("plot", c("polygon", "circle"), function(object) {
   ggplot2::geom_polygon(
     ggplot2::aes(x = object@points[, 1], y = object@points[, 2])
   )
@@ -41,6 +49,5 @@ setMethod("plot", "background", function(object) {
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]])
   }
-  plt <- plt + ggplot2::scale_radius()
   return(plt)
 })
