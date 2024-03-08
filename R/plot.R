@@ -35,7 +35,7 @@ setMethod("plot", "rectangle", function(object) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", c("polygon", "circle"), function(object) {
+setMethod("plot", "polygon", function(object) {
   ggplot2::geom_polygon(
     ggplot2::aes(x = object@points[, 1], y = object@points[, 2])
   )
