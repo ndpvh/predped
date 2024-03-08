@@ -20,7 +20,8 @@ setMethod("plot", "circle", function(object) {
   
   # Plot circle using geom_polygon
   ggplot2::geom_polygon(
-    ggplot2::aes(x = cp[, 1], y = cp[, 2])
+    ggplot2::aes(x = cp[, 1], y = cp[, 2]),
+     fill = "white"
   )
 })
 
@@ -29,7 +30,8 @@ setMethod("plot", "circle", function(object) {
 #'
 setMethod("plot", "rectangle", function(object) {
   ggplot2::geom_tile(
-    ggplot2::aes(x = object@center[[1]], y = object@center[[2]], width = object@size[[1]], height = object@size[[2]])
+    ggplot2::aes(x = object@center[[1]], y = object@center[[2]], width = object@size[[1]], height = object@size[[2]]),
+    fill = "white"
   )
 })
 
@@ -37,7 +39,8 @@ setMethod("plot", "rectangle", function(object) {
 #'
 setMethod("plot", "polygon", function(object) {
   ggplot2::geom_polygon(
-    ggplot2::aes(x = object@points[, 1], y = object@points[, 2])
+    ggplot2::aes(x = object@points[, 1], y = object@points[, 2]), 
+    fill = "white"
   )
 })
 
@@ -46,7 +49,10 @@ setMethod("plot", "polygon", function(object) {
 setMethod("plot", "background", function(object) {
   plt <- ggplot2::ggplot() + 
          ggplot2::coord_equal() +
-         ggplot2::labs(x = "x", y = "y")
+         ggplot2::labs(x = "x", y = "y") +
+         ggplot2::theme(
+          plot.background = element_rect(fill = "black")
+         )
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]])
   }
