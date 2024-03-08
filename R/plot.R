@@ -36,7 +36,8 @@ setMethod("plot", "polygon", function(object) {
 #'@rdname plot-method
 #'
 setMethod("plot", "background", function(object) {
-  plt <- ggplot2::ggplot()
+  plt <- ggplot2::ggplot() + 
+         ggplot2::coord_equal()
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]])
   }
