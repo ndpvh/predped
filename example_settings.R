@@ -1,11 +1,11 @@
 # create an S4 class for the environment
 
 # change these
-setwd("/Users/eceyatikci/predped/predped")
-source("/Users/eceyatikci/predped/predped/RCore/pp_plot.R")
+# setwd("/Users/eceyatikci/predped/predped")
+# gotsource("/Users/eceyatikci/predped/predped/RCore/pp_plot.R")
 
 # Create an environment class
-environment_class <- setClass("EnvironmentClass", slots = list(
+# environment_class <- setClass("EnvironmentClass", slots = list(
   
   # main environment characteristics
   length = "numeric", # length of environment
