@@ -41,5 +41,6 @@ setMethod("plot", "background", function(object) {
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]])
   }
+  plt <- plt + scale_radius()
   return(plt)
 })
