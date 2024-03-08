@@ -22,8 +22,7 @@ setMethod("plot", "circle", function(object) {
 setMethod("plot", "rectangle", function(object) {
   ggplot2::geom_tile(
     ggplot2::aes(x = object@center[[1]], y = object@center[[2]], width = object@size[[1]], height = object@size[[2]])
-  ) +
-  ggplot2::scale_radius()
+  )
 })
 
 #'@rdname plot-method
