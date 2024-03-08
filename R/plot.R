@@ -17,13 +17,6 @@ setMethod("plot", "circle", function(object) {
     )
 })
 
-# NIELS: I'll leave this in there for now, but should be deleted at some point
-#
-# Background is not the background itself, rather the entire environment that is generated
-# perpendicular orientation
-# slope orientation to extract radian which can be used to 
-# dictate where to draw rectangles on the wall
-
 #'@rdname plot-method
 #'
 setMethod("plot", "rectangle", function(object) {
@@ -38,4 +31,14 @@ setMethod("plot", "polygon", function(object) {
   ggplot2::geom_polygon(
     ggplot2::aes(x = object@points[, 1], y = object@points[, 2])
   )
+})
+
+#'@rdname plot-method
+#'
+setMethod("plot", "background", function(object) {
+  plt <- ggplot2::ggplot()
+  for (i in seq_along(objects(object@objects))) {
+    plt <- plt + plot(objects(object@objects)[[i]])
+  }
+  return(plt)
 })
