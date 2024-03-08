@@ -59,5 +59,30 @@ setMethod("plot", "background", function(object, ...) {
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]], ...)
   }
+    # Entrance
+  t_e <- seq((90 * pi) / 180, (-90 * pi) / 180, length.out = 100)
+  cp_e <- as.matrix(data.frame(
+    x = object@entrance[[1]] + 0.5 * cos(t_e),
+    y = object@entrance[[2]] + 0.5 * sin(t_e)
+  ))
+  
+  # Plot circle using geom_polygon
+  plt <- plt + ggplot2::geom_polygon(
+                ggplot2::aes(x = cp_e[, 1], y = cp_e[, 2]),
+                fill = "NA", colour = "black"
+  )
+
+  # Exit
+  t_ex <- seq((270 * pi) / 180, (90 * pi) / 180, length.out = 100)
+  cp_ex <- as.matrix(data.frame(
+    x = object@exit[[1]] + 0.5 * cos(t_ex),
+    y = object@exit[[2]] + 0.5 * sin(t_ex)
+  ))
+  
+  # Plot circle using geom_polygon
+  plt <- plt + ggplot2::geom_polygon(
+                ggplot2::aes(x = cp_ex[, 1], y = cp_ex[, 2]),
+                fill = "NA", colour = "black"
+  )
   return(plt)
 })
