@@ -51,7 +51,9 @@ setMethod("plot", "background", function(object) {
          ggplot2::coord_equal() +
          ggplot2::labs(x = "x", y = "y") +
          ggplot2::theme(
-          plot.background = element_rect(fill = "black")
+          panel.background = element_rect(fill = "black"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()
          )
   for (i in seq_along(objects(object))) {
     plt <- plt + plot(objects(object)[[i]])
