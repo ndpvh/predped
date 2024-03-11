@@ -60,25 +60,26 @@ utility <- function(agent,
     # have to think about how we will save this information. Maybe just make it
     # an agent-characteristic?
     if(!precomputed) {
-        # Question: Does it need all agents to be defined here, or only those 
-        # that are different from `agent` (currently second option implemented)
-        agents_id <- sapply(state$agents, id)
-        agents_position <- t(sapply(state$agents, position))
+        # Make the object-based arguments of predped compatible with the information
+        # needed by m4ma
+        agent_specs <- list(id = sapply(state$agents, id), 
+                            position = sapply(state$agents, position) |>
+                                t(), 
+                            size = sapply(state$agents, size) |>
+                                as.numeric(), 
+                            orientation = sapply(state$agents, orientation) |>
+                                as.numeric(), 
+                            speed = sapply(state$agents, speed) |>
+                                as.numeric(), 
+                            group = sapply(state$agents, group),
+                            predictions = sapply(agent_predictions, \(x) x) |>
+                                t())
+
         # Required for utility helper functions
-        row.names(agents_position) <- agents_id
-        agents_size <- sapply(state$agents, size)
-        agents_orientation <- sapply(state$agents, orientation)
-        agents_speed <- sapply(state$agents, speed)
-        agents_group <- sapply(state$agents, group)
+        row.names(agent_specs$position) <- agent_specs$id
 
-        agent_idx <- match(id(agent), agents_id)
-
-        agent_predictions <- t(sapply(agent_predictions, \(x) x)) # Transform list to matrix
-
-        # Transform arguments if needed
-        if(typeof(agents_size) == "list") {
-            agents_size <- as.numeric(agents_size)
-        }
+        # Retrieve the index of the agent in question
+        agent_idx <- match(id(agent), agent_specs$id)
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@position@.Data,
@@ -95,44 +96,40 @@ utility <- function(agent,
         interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
                                                        p1 = position(agent, return_matrix = TRUE), 
                                                        a1 = orientation(agent),
-                                                       p2 = agents_position, 
-                                                       r = agents_size, 
+                                                       p2 = agent_specs$position, 
+                                                       r = agent_specs$size, 
                                                        centres = centers, 
-                                                       p_pred = agent_predictions, 
+                                                       p_pred = agent_specs$predictions, 
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
-                                                 agent_predictions, # Not necessary to delete agent from predictions anymore
-                                                 agents_size,
+                                                 agent_specs$predictions[-agent_idx,],
+                                                 agent_specs$size,
                                                  objects(background))
 
         # Follow the leader phenomenon
-        leaders <- m4ma::getLeaders_rcpp(
-            agent_idx,
-            agents_position,
-            agents_orientation,
-            agents_speed,
-            goal_position,
-            agents_group,
-            centers,
-            objects(background)
-        )
+        leaders <- m4ma::getLeaders_rcpp(agent_idx,
+                                         agent_specs$position,
+                                         agent_specs$orientation,
+                                         agent_specs$speed,
+                                         goal_position,
+                                         agent_specs$group,
+                                         centers,
+                                         objects(background))
 
         # Walking besides a buddy
-        buddies <- m4ma::getBuddy_rcpp(
-            agent_idx,
-            agents_position,
-            agents_speed,
-            agents_group,
-            agents_orientation,
-            agent_predictions,
-            centers,
-            objects(background),
-            FALSE
-        )
+        buddies <- m4ma::getBuddy_rcpp(agent_idx,
+                                       agent_specs$position,
+                                       agent_specs$speed,
+                                       agent_specs$group,
+                                       agent_specs$orientation,
+                                       agent_specs$predictions,
+                                       centers,
+                                       objects(background),
+                                       FALSE)
 
     # Subject based
     } else if (subject) {
