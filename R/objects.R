@@ -145,6 +145,7 @@ setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
 polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical"), contains = "object")
 
 setMethod("initialize", "polygon", function(.Object, 
+                                            id = NULL,
                                             clock_wise = TRUE, 
                                             moveable = FALSE, 
                                             interactable = FALSE,
@@ -155,6 +156,7 @@ setMethod("initialize", "polygon", function(.Object,
         stop("All points must have an x- and y-coordinate (two-column matrix)")
     }
 
+    .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@clock_wise <- clock_wise
     .Object@moveable <- moveable
     .Object@interactable <- interactable
@@ -288,6 +290,7 @@ rectangle <- setClass("rectangle", list(
 setMethod("initialize", "rectangle", function(.Object,
                                               center,
                                               size,
+                                              id = NULL,
                                               clock_wise = TRUE,
                                               orientation = 0,
                                               moveable = FALSE,
@@ -298,6 +301,7 @@ setMethod("initialize", "rectangle", function(.Object,
     if (any(size <= 0)) stop("Size vector must be positive")
     if (length(orientation) != 1) stop("Orientation must be a single element")
 
+    .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@center <- as(center, "coordinate")
 
     size_half <- size/2
@@ -397,8 +401,9 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 
-setMethod("initialize", "circle", function(.Object, moveable = FALSE, interactable = FALSE, ...) {
+setMethod("initialize", "circle", function(.Object, id = NULL, moveable = FALSE, interactable = FALSE, ...) {
     .Object <- callNextMethod(.Object, ...)
+    .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@center <- as(.Object@center, "coordinate")
     .Object@moveable <- moveable
     .Object@interactable <- interactable
