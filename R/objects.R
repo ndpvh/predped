@@ -142,7 +142,7 @@ setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
 #'
 #' @export
 #' @name polygon
-polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical"), contains = "object")
+polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical", center = "numeric"), contains = "object")
 
 setMethod("initialize", "polygon", function(.Object, 
                                             id = NULL,
@@ -160,6 +160,9 @@ setMethod("initialize", "polygon", function(.Object,
     .Object@clock_wise <- clock_wise
     .Object@moveable <- moveable
     .Object@interactable <- interactable
+
+    points <- .Object@points
+    .Object@center <- coordinate(c(mean(points[,1]), mean(points[,2])))
 
     return(.Object)
 })
