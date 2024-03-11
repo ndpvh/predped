@@ -103,10 +103,17 @@ utility <- function(agent,
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
+        if(length(agent_predictions) == 1) {
+            predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
+        } else {
+            predictions_minus_agent <- sapply(agent_predictions[-agent_idx], \(x) x) |>
+                t()
+        }
+
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
-                                                 agent_specs$predictions[-agent_idx,],
+                                                 predictions_minus_agent,
                                                  agent_specs$size,
                                                  objects(background))
 
