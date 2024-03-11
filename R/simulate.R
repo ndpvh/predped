@@ -79,7 +79,10 @@ setMethod("simulate", "predped", function(object,
                 idx <- c(idx, j)
             }
         }
-        state$agents <- state$agents[-idx]
+
+        if(length(idx) != 0) {
+            state$agents <- state$agents[-idx]
+        }
 
         # Save the new state in the trace
         trace[[i + 1]] <- state
