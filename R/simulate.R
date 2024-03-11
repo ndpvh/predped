@@ -68,7 +68,7 @@ setMethod("simulate", "predped", function(object,
         # Check whether to add a pedestrian and, if so, initiate a new 
         # agent
         if((i %in% add_agent_index) & (length(state$agents) <= max_agents)) {
-            state$agents <- append(state$agentsagents, 
+            state$agents <- append(state$agents, 
                                    add_agent(object,
                                              object@setting,
                                              goal_number[i],
