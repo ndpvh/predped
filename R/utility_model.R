@@ -111,14 +111,21 @@ utility <- function(agent,
                                                  objects(background))
 
         # Follow the leader phenomenon
-        leaders <- m4ma::getLeaders_rcpp(agent_idx,
-                                         agent_specs$position,
-                                         agent_specs$orientation,
-                                         agent_specs$speed,
-                                         goal_position,
-                                         agent_specs$group,
-                                         centers,
-                                         objects(background))
+        # browser()
+        # object_positions <- lapply(objects(background), 
+        #                            \(x) x@center)
+        # object_positions <- lapply(objects(background), 
+        #                            \(x) c("x" = x@center[1] |> as.numeric(), 
+        #                                   "y" = x@center[2] |> as.numeric()) |> as.data.frame())
+        # leaders <- m4ma::getLeaders_rcpp(agent_idx,
+        #                                  agent_specs$position,
+        #                                  agent_specs$orientation,
+        #                                  agent_specs$speed,
+        #                                  goal_position,
+        #                                  agent_specs$group,
+        #                                  centers,
+        #                                  objects(background))
+        leaders <- NULL
 
         # Walking besides a buddy
         buddies <- m4ma::getBuddy_rcpp(agent_idx,
@@ -129,7 +136,7 @@ utility <- function(agent,
                                        agent_specs$predictions,
                                        centers,
                                        objects(background),
-                                       FALSE)
+                                       pickBest = FALSE)
 
     # Subject based
     } else if (subject) {
@@ -158,14 +165,14 @@ utility <- function(agent,
 
     # Always check if utility data is NULL
     if (!is.null(goal_distance)) {
-        V <- V + m4ma::psUtility_rcpp(p["aPS"], p["bPS"], p["sPref"], p["sSlow"], speed(agent), goal_distance)
+        V <- V + m4ma::psUtility_rcpp(p[["aPS"]], p[["bPS"]], p[["sPref"]], p[["sSlow"]], speed(agent), goal_distance)
     }
 
     if (!is.null(direction_goal)) {
-        V <- V + m4ma::gaUtility_rcpp(p["bGA"], p["aGA"], direction_goal)
+        V <- V + m4ma::gaUtility_rcpp(p[["bGA"]], p[["aGA"]], direction_goal)
     }
 
-    V <- V + m4ma::caUtility_rcpp(p["aCA"], p["bCA"], p["bCAlr"])
+    V <- V + m4ma::caUtility_rcpp(p[["aCA"]], p[["bCA"]], p[["bCAlr"]])
 
     if (!is.null(interpersonal_distance)) {
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
@@ -182,28 +189,28 @@ utility <- function(agent,
         })
 
         V <- V + m4ma::idUtility_rcpp(
-            p["bID"], p["dID"], p["aID"], is_ingroup, check, interpersonal_distance, as.vector(ifelse(check, 0, -Inf)) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
+            p[["bID"]], p[["dID"]], p[["aID"]], is_ingroup, check, interpersonal_distance, as.vector(ifelse(check, 0, -Inf)) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
         )
     } else {
         V <- V + as.vector(ifelse(check, 0, -Inf))
     }
 
     if (!is.null(blocked_angle)) {
-        V <- V + m4ma::baUtility_rcpp(p["aBA"], p["bBA"],
+        V <- V + m4ma::baUtility_rcpp(p[["aBA"]], p[["bBA"]],
                                       pmax(blocked_angle, 0), # Make sure all angles are >= 0; this was previously done in baUtility()
                                       as.integer(names(blocked_angle))-1)
     }
 
     if (!is.null(leaders)) {
-        V <- V + m4ma::flUtility_rcpp(p["aFL"], p["bFL"], p["dFL"], leaders[["leaders"]], leaders[["dists"]])
+        V <- V + m4ma::flUtility_rcpp(p[["aFL"]], p[["bFL"]], p[["dFL"]], leaders[["leaders"]], leaders[["dists"]])
     }
 
     if (!is.null(buddies)) {
-        V <- V + m4ma::wbUtility_rcpp(p["aWB"], p["bWB"], buddies[["buddies"]], buddies[["dists"]])
+        V <- V + m4ma::wbUtility_rcpp(p[["aWB"]], p[["bWB"]], buddies[["buddies"]], buddies[["dists"]])
     }
 
     # Stop baseline (set by gwUtility) and scaling
-    V_transformed <- c(-p["bS"], V) / p["rU"]
+    V_transformed <- c(-p[["bS"]], V) / p[["rU"]]
 
     return(V_transformed)
 }
