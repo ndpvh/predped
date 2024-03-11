@@ -58,14 +58,11 @@ update_state <- function(state,
         # Simulation is done relative to the agent to-be-updated
         agent <- state$agents[[i]]
 
-        state_copy <- state 
-        state_copy$agents <- state_copy$agents[-i]
-
         # Update the position of the agent in the state list and move on to the 
         # next agent.
         state$agents[[i]] <- update_agent(agent, 
-                                          state_copy, 
-                                          agent_predictions[-i],
+                                          state,
+                                          agent_predictions,
                                           background,
                                           time_step = time_step,
                                           ...)
