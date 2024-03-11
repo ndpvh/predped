@@ -120,6 +120,14 @@ setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_
 #' @name rng_point-method
 setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
 
+#' Convert a Cirlce with a Center and Radius to a Polygon
+#'
+#' @param object An object that contains circle paramters
+#' @return  Matrix with points necessary to draw the circle
+#' @export 
+#' @name to_polygon-method
+setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
+
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -415,6 +423,17 @@ setMethod("move", signature(object = "circle", target = "numeric"), function(obj
 #'@rdname area-method
 #'
 setMethod("area", signature(object = "circle"), function(object) pi*object@radius^2)
+
+#' @rdname to_polygon-method
+#' @export 
+setMethod("to_polygon", "circle", function(object, ...) {
+  t <- seq(0, 2 * pi, length.out = 100)
+  cp <- as.matrix(data.frame(
+    x = object@center[[1]] + object@radius * cos(t),
+    y = object@center[[2]] + object@radius * sin(t)
+  ))
+  return(cp)
+})
 
 #'@rdname rng_point-method
 #'
