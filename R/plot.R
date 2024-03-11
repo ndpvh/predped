@@ -46,6 +46,33 @@ setMethod("plot", "polygon", function(object, ...) {
 
 #'@rdname plot-method
 #'
+setMethod("plot", "agent", function(object, ...) {
+  angle <- object@orientation * 2 * pi / 360
+  list(plot(circle(center = object@center, 
+                   radius = object@radius), 
+            fill = NA,
+            ...),
+       ggplot2::annotate("segment", 
+                         x = object@center[[1]], 
+                         y = object@center[[2]], 
+                         xend = object@center[[1]] + object@radius * cos(angle), 
+                         yend = object@center[[2]] + object@radius * sin(angle), 
+                         ...)) 
+})
+
+#'@rdname plot-method
+#'
+setMethod("plot", "list", function(object, ...) {
+    plt <- list()
+    for(i in seq_along(object)) {
+        plt <- append(plt, plot(object[[i]], ...))
+    }
+    return(plt)
+})
+
+
+#'@rdname plot-method
+#'
 setMethod("plot", "background", function(object, ...) {
     plt <- ggplot2::ggplot() + 
         predped::plot(shape(object), fill = "white") +
