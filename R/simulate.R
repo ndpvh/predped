@@ -23,6 +23,12 @@
 #' @param ... Arguments passed on to the \code[predped]{update_state} function.
 #' 
 #' @export
+#
+# TO DO
+#   - At this moment, setting is kept separate from rest in trace. However, at 
+#     some point, agents should be able to move things in the environment, meaning
+#     we should keep a trace of moveable objects as well (either list in 
+#     `setting` or a separate list as `moveable_objects`)
 setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 
 setMethod("simulate", "predped", function(object,
@@ -53,7 +59,7 @@ setMethod("simulate", "predped", function(object,
 
     # Initialize the trace and state lists. The state will already contain the 
     # initial condition. The trace list also contains this state. 
-    state <- list("setting" = list(object@setting),
+    state <- list("setting" = object@setting,
                   "agents" = list())
     trace <- list(state)
 
