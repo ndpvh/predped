@@ -1,5 +1,4 @@
 ## Generate a Random Distribution of Shelves 
-# Class for Shelf Distribution
 
 # set a class for shelf distribution
 ShelfDistribution <- setClass("ShelfDistribution",
@@ -44,7 +43,50 @@ setMethod("generate_dist", "ShelfDistribution", function(object) {
     return(object)
 })
 
-# an example for ShelfDistribution Class
-shelf_dist <- new("ShelfDistribution", num_cols = num_cols, num_shelves = num_shelves)
+
+############################################
+#### A METHOD TO COMBINE IT WITH RECTANGLES
+#### How to make this more tidy? It works but not good
+
+# A class for shelves as rectangles
+setClass("ShelfRectangle",
+    contains = "rectangle",
+    slots = list(
+    distribution = "ShelfDistribution"
+    )
+)
+
+# initialize ShelfRectangle
+setMethod("initialize", "ShelfRectangle", function(.Object, center, size, orientation = 0, distribution = NULL, ...) {
+    .Object <- callNextMethod(.Object, center = center, size = size, orientation = orientation, ...)
+    .Object@distribution <- distribution
+    return(.Object)
+})
+
+# a method to plot shelf distribution using ShelfRectangle
+# it should not be a df, should be changed
+setMethod("plot", "ShelfDistribution", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
+    shelf_rectangles <- vector("list", length = sum(object@shelves_dist))
+    index <- 1
+    for (col in 1:object@num_cols) {
+        for (shelf in 1:object@shelves_dist[col]) {
+            shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2, shelf)
+            shelf_rectangle <- new("ShelfRectangle", center = shelf_center, size = c(shelf_width, shelf_length), distribution = object)
+            shelf_rectangles[[index]] <- shelf_rectangle
+            index <- index + 1
+        }
+    }
+    ggplot2::ggplot() +
+        ggplot2::geom_blank(data = data.frame(x = c(0, object@num_cols * (shelf_width + aisle_width)), y = c(0, max(object@shelves_dist) + 1)), aes(x, y)) +
+        ggplot2::coord_fixed() +
+        ggplot2::theme_void() +
+        ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+        lapply(shelf_rectangles, plot, ...) +
+        ggplot2::scale_x_continuous(expand = c(0, 0))
+})
+
+# example use & plot the shelf distribution
+shelf_dist <- new("ShelfDistribution")
 shelf_dist <- generate_dist(shelf_dist)
-print(shelf_dist)
+plot(shelf_dist, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
+
