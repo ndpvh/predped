@@ -60,6 +60,8 @@ utility <- function(agent,
     # have to think about how we will save this information. Maybe just make it
     # an agent-characteristic?
     if(!precomputed) {
+        # Question: Does it need all agents to be defined here, or only those 
+        # that are different from `agent` (currently second option implemented)
         agents_id <- sapply(state$agents, id)
         agents_position <- t(sapply(state$agents, position))
         # Required for utility helper functions
@@ -72,6 +74,11 @@ utility <- function(agent,
         agent_idx <- match(id(agent), agents_id)
 
         agent_predictions <- t(sapply(agent_predictions, \(x) x)) # Transform list to matrix
+
+        # Transform arguments if needed
+        if(typeof(agents_size) == "list") {
+            agents_size <- as.numeric(agents_size)
+        }
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@position@.Data,
@@ -90,8 +97,8 @@ utility <- function(agent,
                                                        a1 = orientation(agent),
                                                        p2 = agents_position, 
                                                        r = agents_size, 
-                                                       centers, 
-                                                       agent_predictions, 
+                                                       centres = centers, 
+                                                       p_pred = agent_predictions, 
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
