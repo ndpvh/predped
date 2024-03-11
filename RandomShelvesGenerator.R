@@ -74,29 +74,30 @@ setMethod("initialize", "ShelfRectangle", function(.Object, center, size, orient
 # a method to plot shelf distribution using ShelfRectangle
 # it should not be a df, should be changed
 # define the generic
-setGeneric("getShelfCoordinates",
+setGeneric("getCoords",
            function(object, ...) {
-               standardGeneric("getShelfCoordinates")
+               standardGeneric("getCoords")
            })
 
-setMethod("getShelfCoordinates", "ShelfDistribution", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
-    shelf_coordinates <- data.frame(xmin = numeric(0), xmax = numeric(0), ymin = numeric(0), ymax = numeric(0))
+setMethod("getCoords", "ShelfDistribution", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
+    shelf_rectangles <- vector("list", length = sum(object@shelves_dist))
     index <- 1
     for (col in 1:object@num_cols) {
         for (shelf in 1:object@shelves_dist[col]) {
             shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2, shelf)
-            shelf_coordinates[index, ] <- c(shelf_center[1] - shelf_width/2, shelf_center[1] + shelf_width/2, shelf - shelf_length/2, shelf + shelf_length/2)
+            shelf_rectangle <- new("ShelfRectangle", center = shelf_center, size = c(shelf_width, shelf_length), distribution = object)
+            shelf_rectangles[[index]] <- shelf_rectangle
             index <- index + 1
         }
     }
-    return(shelf_coordinates)
+  return (shelf_rectangles)
 })
 
 
 # example use & plot the shelf distribution
 # shelf_dist <- new("ShelfDistribution")
 shelf_dist <- generate_dist(shelf_dist)
-getShelfCoordinates(shelf_dist, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
+getCoords(shelf_dist, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
 print(shelf_dist)
 
 ## add circles
