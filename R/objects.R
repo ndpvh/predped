@@ -432,12 +432,12 @@ setMethod("area", signature(object = "circle"), function(object) pi*object@radiu
 #' @rdname to_polygon-method
 #' @export 
 setMethod("to_polygon", signature(object = "circle"), function(object, ...) {
-  t <- seq(0, 2 * pi, length.out = 100)
-  cp <- as.matrix(data.frame(
-    x = object@center[[1]] + object@radius * cos(t),
-    y = object@center[[2]] + object@radius * sin(t)
-  ))
-  return(cp)
+    t <- seq(0, 2 * pi, length.out = 100)
+    cp <- as.matrix(data.frame(
+        x = object@center[[1]] + object@radius * cos(t),
+        y = object@center[[2]] + object@radius * sin(t)
+    ))
+    return(cp)
 })
 
 #'@rdname rng_point-method
