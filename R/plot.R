@@ -47,22 +47,23 @@ setMethod("plot", "polygon", function(object, ...) {
 #'@rdname plot-method
 #'
 setMethod("plot", "background", function(object, ...) {
-  plt <- ggplot2::ggplot() + 
-         predped::plot(shape(object), fill = "white") +
-         ggplot2::coord_equal() +
-         ggplot2::labs(x = "x", y = "y") +
-         ggplot2::theme(
-          panel.background = ggplot2::element_rect(fill = "black"),
-          panel.grid.major = ggplot2::element_blank(),
-          panel.grid.minor = ggplot2::element_blank()
-         )
-  for (i in seq_along(objects(object))) {
-    plt <- plt + plot(objects(object)[[i]], ...)
-  }
-  entrance <- circle(center = c(object@entrance[[1]], object@entrance[[2]]), 
-                radius = 0.5)
-  exit <- circle(center = c(object@exit[[1]], object@exit[[2]]), radius = 0.5)
-plt <- plt + plot(entrance, fill = "NA", colour = "black")
-plt <- plt + plot(exit, fill = "NA", colour = "black")
-  return(plt)
+    plt <- ggplot2::ggplot() + 
+        predped::plot(shape(object), fill = "white") +
+        ggplot2::coord_equal() +
+        ggplot2::labs(x = "x", y = "y") +
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(fill = "black"),
+            panel.grid.major = ggplot2::element_blank(),
+            panel.grid.minor = ggplot2::element_blank()
+        )
+    for (i in seq_along(objects(object))) {
+        plt <- plt + plot(objects(object)[[i]], ...)
+    }
+    entrance <- circle(center = c(object@entrance[[1]], object@entrance[[2]]), 
+                       radius = 0.5)
+    exit <- circle(center = c(object@exit[[1]], object@exit[[2]]), 
+                   radius = 0.5)
+    plt <- plt + plot(entrance, fill = NA, colour = "black")
+    plt <- plt + plot(exit, fill = NA, colour = "black")
+    return(plt)
 })
