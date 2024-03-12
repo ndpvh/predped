@@ -77,6 +77,10 @@ utility <- function(agent,
 
         # Required for utility helper functions
         rownames(agent_specs$position) <- agent_specs$id
+        names(agent_specs$size) <- agent_specs$id
+        names(agent_specs$orientation) <- agent_specs$id
+        names(agent_specs$speed) <- agent_specs$id
+        names(agent_specs$group) <- agent_specs$id
         rownames(agent_specs$predictions) <- agent_specs$id
 
         # Retrieve the index of the agent in question
@@ -120,20 +124,14 @@ utility <- function(agent,
                                                  objects(background))
 
         # Follow the leader phenomenon
-        # browser()
-        # object_positions <- lapply(objects(background), 
-        #                            \(x) x@center)
-        # object_positions <- lapply(objects(background), 
-        #                            \(x) c("x" = x@center[1] |> as.numeric(), 
-        #                                   "y" = x@center[2] |> as.numeric()) |> as.data.frame())
-        # leaders <- m4ma::getLeaders_rcpp(agent_idx,
-        #                                  agent_specs$position,
-        #                                  agent_specs$orientation,
-        #                                  agent_specs$speed,
-        #                                  goal_position,
-        #                                  agent_specs$group,
-        #                                  centers,
-        #                                  objects(background))
+        leaders <- m4ma::getLeaders_rcpp(agent_idx,
+                                         agent_specs$position,
+                                         agent_specs$orientation,
+                                         agent_specs$speed,
+                                         goal_position,
+                                         agent_specs$group,
+                                         centers,
+                                         objects(background))
         leaders <- NULL
 
         # Walking besides a buddy
