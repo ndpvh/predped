@@ -72,8 +72,7 @@ utility <- function(agent,
                             speed = sapply(state$agents, speed) |>
                                 as.numeric(), 
                             group = sapply(state$agents, group),
-                            predictions = sapply(agent_predictions, \(x) x) |>
-                                t())
+                            predictions = agent_predictions)
 
         # Required for utility helper functions
         rownames(agent_specs$position) <- agent_specs$id
@@ -81,7 +80,6 @@ utility <- function(agent,
         names(agent_specs$orientation) <- agent_specs$id
         names(agent_specs$speed) <- agent_specs$id
         names(agent_specs$group) <- agent_specs$id
-        rownames(agent_specs$predictions) <- agent_specs$id
 
         # Retrieve the index of the agent in question
         agent_idx <- match(id(agent), agent_specs$id)
@@ -91,6 +89,11 @@ utility <- function(agent,
                                 ncol = 2)
         goal_distance <- m4ma::dist1_rcpp(position(agent), 
                                           goal_position)
+
+        # print("---------------------")
+        # print(goal_position)
+        # print(goal_distance)
+        # print(current_goal(agent))
 
         # Angle between agent and the goal
         direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
@@ -109,10 +112,17 @@ utility <- function(agent,
 
         # Predict which directions might lead to collisions in the future
         if(length(agent_predictions) == 1) {
+            # When just deleting `agent_idx` from a single-row matrix, we get to 
+            # a numeric, not a matrix. Therefore create empty matrix if there is
+            # only 1 agent.
             predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
         } else {
-            predictions_minus_agent <- sapply(agent_predictions[-agent_idx], \(x) x) |>
-                t()
+            # Another weird case is when you only have 2 agents, where it 
+            # transforms the matrix to a numerical vector. To ensure there are 
+            # no problems, we transform to a matrix and reassign the id's  in 
+            # the rows
+            predictions_minus_agent <- matrix(agent_predictions[-agent_idx,],
+                                              ncol = 2)
             rownames(predictions_minus_agent) <- agent_specs$id[-agent_idx]
         }
 

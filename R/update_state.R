@@ -44,11 +44,17 @@ update_state <- function(state,
                          ...) {
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
-    # collisions
+    # collisions.
+    #
+    # In order for this to work with m4ma, we need to transform it to a matrix 
+    # and provide it rownames that are equal to the id's of the agents
     agent_predictions <- lapply(state$agents, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,
                                                       time_step = time_step))
+    agent_predictions <- sapply(agent_predictions, \(x) x) |>
+        t()
+    rownames(agent_predictions) <- sapply(state$agents, id)
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
@@ -193,15 +199,13 @@ update_agent <- function(agent,
         }
 
         # Define the centers of the options to move to
-        centers <- m4ma::c_vd_rcpp(
-            cells = 1:33,
-            p1 = position(agent),
-            v1 = speed(agent),
-            a1 = orientation(agent),
-            vels = velocities,
-            angles = orientations,
-            tStep = time_step
-        )
+        centers <- m4ma::c_vd_rcpp(cells = 1:33,
+                                   p1 = position(agent),
+                                   v1 = speed(agent),
+                                   a1 = orientation(agent),
+                                   vels = velocities,
+                                   angles = orientations,
+                                   tStep = time_step)
 
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)
@@ -225,15 +229,13 @@ update_agent <- function(agent,
             #cell <- 0
 
             # Define the centers of the options to move to
-            centers <- m4ma::c_vd_rcpp(
-                cells = 1:33,
-                p1 = position(agent),
-                v1 = speed(agent),
-                a1 = orientation(agent),
-                vels = velocities,
-                angles = orientations,
-                tStep = time_step
-            )
+            centers <- m4ma::c_vd_rcpp(cells = 1:33,
+                                       p1 = position(agent),
+                                       v1 = speed(agent),
+                                       a1 = orientation(agent),
+                                       vels = velocities,
+                                       angles = orientations,
+                                       tStep = time_step)
 
             # Check for occlusions or blocked cells the agent cannot move to
             check <- moving_options(agent, state, background, centers)
@@ -243,17 +245,16 @@ update_agent <- function(agent,
         # probabilities
         V <- utility(agent, state, agent_predictions, centers, background, check)
 
-        Pr <- sapply(1:34, function(i) m4ma::pcnl_rcpp(m4ma::get_cell_nest()[i, ], V, rep(1, length(nests)), nests, alpha, mu = 1))
+        Pr <- sapply(1:34, 
+                     function(i) m4ma::pcnl_rcpp(m4ma::get_cell_nest()[i, ], 
+                                                 V, 
+                                                 rep(1, length(nests)), 
+                                                 nests, 
+                                                 alpha, 
+                                                 mu = 1))
 
         # Apply the different options to the probabilities
         names(Pr) <- 0:33
-
-        # Check whether the simulation should be drawn. Given that this depends
-        # on the information `n` (index of the agent) left out for now
-        # if(!is.null(plotGrid) && plotGrid[n]) {
-        # draw_grid(state$p[n, ], state$v[n], state$a[n], plotPoints = TRUE,
-        #             Pr = Pr[-1])
-        # }
 
         # Using the probabilities, sample the cell to which the agent will move.
         # Importantly, 1 is subtracted from the integer as 0 is also an option
@@ -265,40 +266,18 @@ update_agent <- function(agent,
 
         cell(agent) <- cell
 
-        # Check whether the choice should be printed. With the same reasoning
-        # as plotGrid also ignored for now, but left in for later
-        # if (!is.null(printChoice) && printChoice[n]) {
-        #     if (cell == 0) {
-        #         cat("Standing still\n\n")
-        #     } else {
-        #         cat(paste("\nPedestrian =", row.names(state$p)[n],
-        #                 " Choice =", cell,
-        #                 " Ring =", c("accelerate", "constant",
-        #                             "slow")[ringNum(cell)],
-        #                     " Cone =", coneNum(cell), "\n\n"))
-        #     }
-        #     cat(paste("Probability of standing still =", round(Pr[1], 3)))
-        #     print(matrix(round(Pr[-1], 2), nrow = 3, byrow = TRUE,
-        #                     dimnames = list(speed = c("accelerate", "constant",
-        #                                             "slow"),
-        #                                     cone = 1:11)))
-        #     cat("\n")
-        # }
-
         # Check what to do: Either the chosen cell is 0 (stop) or something else
         # (moving to another location with a different speed and orientation)
         if(cell == 0) {
             speed(agent) <- standing_start  # stopped, reset velocity
         } else {
-            position(agent) <- as.vector(m4ma::c_vd_rcpp(
-                cells = cell,
-                p1 = position(agent),
-                v1 = speed(agent),
-                a1 = orientation(agent),
-                vels = velocities,
-                angles = orientations,
-                tStep = time_step
-            ))
+            position(agent) <- as.vector(m4ma::c_vd_rcpp(cells = cell,
+                                                         p1 = position(agent),
+                                                         v1 = speed(agent),
+                                                         a1 = orientation(agent),
+                                                         vels = velocities,
+                                                         angles = orientations,
+                                                         tStep = time_step))
             speed(agent) <- pmax(speed(agent) * c(1.5, 1, 0.5)[m4ma::ringNum(cell)], standing_start)
             orientation(agent) <- (orientation(agent) - ifelse(orientations >= 180, 360 - orientations, -orientations)[m4ma::coneNum(cell)]) %% 360
         }
