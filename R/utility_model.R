@@ -76,7 +76,8 @@ utility <- function(agent,
                                 t())
 
         # Required for utility helper functions
-        row.names(agent_specs$position) <- agent_specs$id
+        rownames(agent_specs$position) <- agent_specs$id
+        rownames(agent_specs$predictions) <- agent_specs$id
 
         # Retrieve the index of the agent in question
         agent_idx <- match(id(agent), agent_specs$id)
@@ -108,13 +109,14 @@ utility <- function(agent,
         } else {
             predictions_minus_agent <- sapply(agent_predictions[-agent_idx], \(x) x) |>
                 t()
+            rownames(predictions_minus_agent) <- agent_specs$id[-agent_idx]
         }
 
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
                                                  predictions_minus_agent,
-                                                 agent_specs$size,
+                                                 agent_specs$size[-agent_idx],
                                                  objects(background))
 
         # Follow the leader phenomenon
