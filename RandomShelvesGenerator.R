@@ -6,8 +6,7 @@
 #' @name Shelves
 #' @export
 #' 
-Shelves <- setClass("Shelves",
-                               slots = list(num_columns = "numeric",
+Shelves <- setClass("Shelves", slots = list(num_columns = "numeric",
                                             total_shelves = "numeric",
                                             shelf_distribution = "numeric",
                                             rectangles = "list"))
@@ -96,7 +95,7 @@ setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_
     for (col in 1:object@num_columns) {
         for (shelf in 1:object@shelf_distribution[col]) {
             shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2, shelf)
-            shelf_rectangles[[index]] <- list(center = shelf_center, size = c(shelf_width, shelf_length))
+            shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
             index <- index + 1
         }
     }
