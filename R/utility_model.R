@@ -185,7 +185,8 @@ utility <- function(agent,
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
         # they have been taken out to speed up the estimation
         # Get names of ingroup agents
-        names_ingroup <- names(agents_group[-agent_idx][agents_group[-agent_idx] == agents_group[agent_idx]])
+        agent_groups <- agent_specs$group[-agent_idx]
+        names_ingroup <- names(agent_groups[agent_groups == agent_specs$group[agent_idx]])
 
         # Check if agent is part of in group
         is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
