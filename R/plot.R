@@ -84,12 +84,23 @@ setMethod("plot", "list", function(object, ...) {
 #'@rdname plot-method
 #'
 setMethod("plot", "background", function(object, ...) {
+    # Not my preferred way of doing things: 
+    #
+    # When making gifs out of the plots we create, the boundaries move around 
+    # with the agent when they get close to the sides of the grid. Changing the 
+    # `expand` argument did not fix that, so we have to fix the limits of the 
+    # plot manually. This is what I am doing here. 
+    xlims <- range(shape(object)@points[,1])
+    ylims <- range(shape(object)@points[,2])
+
+    x_padding <- 0.05 * (xlims[2] - xlims[1])
+    y_padding <- 0.05 * (ylims[2] - ylims[1])
+
     plt <- ggplot2::ggplot() + 
         predped::plot(shape(object), fill = "white") +
         ggplot2::coord_fixed() +
-        ggplot2::scale_x_continuous(expand = ggplot2::expansion(add = 0.5)) +
-        ggplot2::scale_y_continuous(expand = ggplot2::expansion(add = 0.5)) +
-        # ggplot2::expansion(add = 1) +
+        ggplot2::scale_x_continuous(limits = c(xlims[1] - x_padding, xlims[2] + x_padding)) +
+        ggplot2::scale_y_continuous(limits = c(ylims[1] - y_padding, ylims[2] + y_padding)) +
         ggplot2::labs(x = "x", y = "y") +
         ggplot2::theme(
             panel.background = ggplot2::element_rect(fill = "black"),
