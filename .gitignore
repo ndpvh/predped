@@ -28,5 +28,5 @@ R/*_depr.R
 
 R/geometry.R
 R/move_all.R
-predped_in_action.R
-predped_in_action/
+predped_in_action*.R
+predped_in_action*/
