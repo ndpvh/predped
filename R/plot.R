@@ -76,7 +76,10 @@ setMethod("plot", "list", function(object, ...) {
 setMethod("plot", "background", function(object, ...) {
     plt <- ggplot2::ggplot() + 
         predped::plot(shape(object), fill = "white") +
-        ggplot2::coord_equal() +
+        ggplot2::coord_fixed() +
+        ggplot2::scale_x_continuous(expand = ggplot2::expansion(add = 0.5)) +
+        ggplot2::scale_y_continuous(expand = ggplot2::expansion(add = 0.5)) +
+        # ggplot2::expansion(add = 1) +
         ggplot2::labs(x = "x", y = "y") +
         ggplot2::theme(
             panel.background = ggplot2::element_rect(fill = "black"),
