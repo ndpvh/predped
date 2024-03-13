@@ -37,6 +37,8 @@ setMethod("simulate", "predped", function(object,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
                                           goal_number = \(x) rnorm(x, 10, 2), 
                                           goal_duration = \(x) rnorm(x, 10, 2),
+                                          radius = 0.2, 
+                                          standing_start = 0.2,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -72,7 +74,9 @@ setMethod("simulate", "predped", function(object,
                                    add_agent(object,
                                              object@setting,
                                              goal_number[i],
-                                             goal_duration = goal_duration))
+                                             goal_duration = goal_duration,
+                                             radius = radius, 
+                                             standing_start = standing_start))
         }
 
         # Update the current state
