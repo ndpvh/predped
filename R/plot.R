@@ -46,28 +46,18 @@ setMethod("plot", "polygon", function(object, ...) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
+setMethod("plot", "agent", function(object, ...) {
   angle <- object@orientation * 2 * pi / 360
-  plt <- list(plot(circle(center = object@center, 
-                          radius = object@radius), 
-                   fill = NA,
-                   ...),
-              ggplot2::annotate("segment", 
-                                x = object@center[[1]], 
-                                y = object@center[[2]], 
-                                xend = object@center[[1]] + object@radius * cos(angle), 
-                                yend = object@center[[2]] + object@radius * sin(angle), 
-                                ...))
-
-    if(plot_goal) {
-        plt <- append(plt, 
-                      ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
-                                                       y = current_goal(object)@position[2]),
-                                          color = "salmon",
-                                          ...))
-    }
-
-    return(plt)       
+  list(plot(circle(center = object@center, 
+                   radius = object@radius), 
+            fill = NA,
+            ...),
+       ggplot2::annotate("segment", 
+                         x = object@center[[1]], 
+                         y = object@center[[2]], 
+                         xend = object@center[[1]] + object@radius * cos(angle), 
+                         yend = object@center[[2]] + object@radius * sin(angle), 
+                         ...)) 
 })
 
 #'@rdname plot-method
@@ -96,11 +86,32 @@ setMethod("plot", "background", function(object, ...) {
     for (i in seq_along(objects(object))) {
         plt <- plt + plot(objects(object)[[i]], ...)
     }
-    entrance <- circle(center = c(object@entrance[[1]], object@entrance[[2]]), 
-                       radius = 0.5)
-    exit <- circle(center = c(object@exit[[1]], object@exit[[2]]), 
-                   radius = 0.5)
-    plt <- plt + plot(entrance, fill = NA, colour = "black")
-    plt <- plt + plot(exit, fill = NA, colour = "black")
+
+    # Convert entrance & exit to polygon coordinates
+    entrance <- to_polygon(circle(center = c(object@entrance[[1]], object@entrance[[2]]), 
+                       radius = 0.5))
+    exit <- to_polygon(circle(center = c(object@exit[[1]], object@exit[[2]]), 
+                   radius = 0.5))
+    
+    # Check that polygon coordinates are in the background
+    # If not, set those coorinates to NA                   
+    for (i in seq_len(nrow(entrance))) {
+      tst <- in_object(object@shape, entrance[i,])
+      if (tst) {
+        entrance[i,] <- NA
+      }
+    }
+    
+    # Remove the NA values to make half moon shape
+    entrance <- na.omit(entrance)
+    for (i in seq_len(nrow(exit))) {
+      tst <- in_object(object@shape, exit[i,])
+      if (tst) {
+        exit[i,] <- NA
+      }
+    }
+    exit <- na.omit(exit)
+    plt <- plt + plot(polygon(points = entrance), fill = NA, colour = "black")
+    plt <- plt + plot(polygon(points = exit), fill = NA, colour = "black")
     return(plt)
 })
