@@ -102,3 +102,50 @@ setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_
     object@rectangles <- shelf_rectangles  # Update rectangles slot with generated coordinates
     return(object)
 })
+
+#' Plot method for Shelves objects
+#' This method is only to visualize the changes in the code.
+#' TO-DO: Add a method to visualize the rows.
+#' 
+#' @param x A Shelves object.
+#' @param shelf_length Length of each shelf.
+#' @param shelf_width Width of each shelf.
+#' @param aisle_width Width of the aisle between shelves.
+#' @param aisle_color Color of the aisle.
+#' @param shelf_color Color of the shelves.
+#' @param ... Additional arguments passed to geom_rect.
+#' 
+#' Example usage
+#'plotShelves(shelves_coordinates)
+#'
+plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, 
+                        aisle_color = "white", shelf_color = "grey", ...) {
+  
+  # Load required libraries
+  require(ggplot2)
+  
+  # Create data frame for shelves
+  shelves_df <- data.frame(
+    x = unlist(lapply(x@rectangles, function(rect) rect@center[1] - shelf_width / 2)),
+    y = unlist(lapply(x@rectangles, function(rect) rect@center[2] - shelf_length / 2)),
+    width = shelf_width,
+    height = shelf_length
+  )
+  
+  # Create data frame for aisles
+  aisles_df <- data.frame(
+    x = seq(0, max(shelves_df$x) + aisle_width, by = aisle_width),
+    y = 0,
+    width = aisle_width,
+    height = max(shelves_df$y) + shelf_length
+  )
+  
+  # Plot
+  ggplot() +
+    geom_rect(data = aisles_df, aes(xmin = x, xmax = x + width, ymin = y, ymax = y + height), 
+              fill = aisle_color, color = NA) +
+    geom_rect(data = shelves_df, aes(xmin = x, xmax = x + width, ymin = y, ymax = y + height), 
+              fill = shelf_color, color = "black", ...) +
+    coord_fixed() +
+    theme_void()
+}
