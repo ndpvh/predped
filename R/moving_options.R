@@ -53,6 +53,10 @@ moving_options_agent <- function(agent, state, background, centers){
         }
     }
 
+    # Get the index of the agent in the state$agent list
+    agent_id <- sapply(state$agents, id)
+    agent_idx <- which(id(agent) == agent_id)
+
     # Use the `free_cells` function to get all free cells to which the agent
     # might move and check whether it does not provide an error
     check <- m4ma::free_cells_rcpp(agent, background, centers)
@@ -113,8 +117,8 @@ moving_options_agent <- function(agent, state, background, centers){
         #
         # Additional condition added: If there are not other agents, then we 
         # don't need to do this check
-        if(length(state$agents) > 0) {
-            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
+        if(length(state$agents[-agent_idx]) > 0) {
+            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
         }
     }
 
