@@ -111,7 +111,7 @@ utility <- function(agent,
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
-        if(length(agent_predictions) == 1) {
+        if(nrow(agent_predictions) == 1) {
             # When just deleting `agent_idx` from a single-row matrix, we get to 
             # a numeric, not a matrix. Therefore create empty matrix if there is
             # only 1 agent.
