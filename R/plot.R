@@ -46,18 +46,28 @@ setMethod("plot", "polygon", function(object, ...) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "agent", function(object, ...) {
+setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
   angle <- object@orientation * 2 * pi / 360
-  list(plot(circle(center = object@center, 
-                   radius = object@radius), 
-            fill = NA,
-            ...),
-       ggplot2::annotate("segment", 
-                         x = object@center[[1]], 
-                         y = object@center[[2]], 
-                         xend = object@center[[1]] + object@radius * cos(angle), 
-                         yend = object@center[[2]] + object@radius * sin(angle), 
-                         ...)) 
+  plt <- list(plot(circle(center = object@center, 
+                          radius = object@radius), 
+                   fill = NA,
+                   ...),
+              ggplot2::annotate("segment", 
+                                x = object@center[[1]], 
+                                y = object@center[[2]], 
+                                xend = object@center[[1]] + object@radius * cos(angle), 
+                                yend = object@center[[2]] + object@radius * sin(angle), 
+                                ...))
+
+    if(plot_goal) {
+        plt <- append(plt, 
+                      ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
+                                                       y = current_goal(object)@position[2]),
+                                          color = "salmon",
+                                          ...))
+    }
+
+    return(plt)
 })
 
 #'@rdname plot-method
