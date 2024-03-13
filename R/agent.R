@@ -56,6 +56,20 @@ setMethod("initialize", "agent", function(.Object,
     return(.Object)
 })
 
+setMethod("show", "agent", function(object) {
+    cat(crayon::bold("Agent Attributes"), "\n", "\n")
+    cat("Agent ID:", object@id, "\n")
+    cat("Agent Speed:", object@speed, "\n")
+    cat("Agent Orientation:", object@orientation, "\n")
+    cat("Agent Group:", object@group, "\n")
+    cat("Agent Cell:", object@cell, "\n")
+    cat("Agent Status:", object@status, "\n")
+    cat("Agent Parameters:", "\n")
+    cat(write.table(object@parameters), "\n")
+    cat("Agent Goals:", object@goals, "\n")
+    cat("Agent Center:", object@center, "\n")
+})
+
 #' @rdname agent-class
 #'
 #' @export
