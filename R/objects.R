@@ -311,7 +311,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
 
         # Add the half angle to this, and create two points on the perpendicular
         # line created by the point of interest and the angle
-        angle <- edge_angle + angle
+        angle <- edge_angle + abs(angle)
         point <- rbind(edge_2[1:2] + c(cos(angle), sin(angle)) * space_between,
                        edge_2[1:2] + c(cos(angle + pi), sin(angle + pi)) * space_between)
 
