@@ -29,7 +29,7 @@ create_edges <- function(from,
     # the background.
     edges <- list(from = list(), to = list(), cost = list())
     idx <- 1
-    for(i in seq_len(nrow(nodes))) {
+    for(i in seq_len(nrow(nodes) - 1)) {
         for(j in (i + 1):nrow(nodes)) {
             # Check if the nodes can be connected to each other: If occluded, 
             # that means something is standing in the way
