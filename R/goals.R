@@ -258,11 +258,11 @@ setGeneric("path", function(object) standardGeneric("path"))
 #' @export
 setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 
-setMethod("path", "agent", function(object) {
+setMethod("path", "goal", function(object) {
     return(object@path)
 })
 
-setMethod("path<-", "agent", function(object, value) {
+setMethod("path<-", "goal", function(object, value) {
     object@path <- value
     return(object)
 })
@@ -277,11 +277,11 @@ setGeneric("counter", function(object) standardGeneric("counter"))
 #' @export
 setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 
-setMethod("counter", "agent", function(object) {
+setMethod("counter", "goal", function(object) {
     return(object@counter)
 })
 
-setMethod("counter<-", "agent", function(object, value) {
+setMethod("counter<-", "goal", function(object, value) {
     object@counter <- value
     return(object)
 })
@@ -296,11 +296,11 @@ setGeneric("busy", function(object) standardGeneric("busy"))
 #' @export
 setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 
-setMethod("busy", "agent", function(object) {
+setMethod("busy", "goal", function(object) {
     return(object@busy)
 })
 
-setMethod("busy<-", "agent", function(object, value) {
+setMethod("busy<-", "goal", function(object, value) {
     object@busy <- value
     return(object)
 })
