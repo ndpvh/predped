@@ -457,15 +457,21 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
 #'
 setMethod("add_nodes", signature(object = "rectangle"), function(object, 
                                                                  space_between = 0.5) {
+
+    # Approach will be to make a new rectangle that is greater than the original
+    # one by a given factor and then taking its points as the new nodes. If we
+    # want `space_between` space between the corners of the old rectangle and 
+    # the corners of the new one, we will have to create an `extension` factor
+    # based on the rule of Pythagoras, where we know that c^2 = `space_between`^2
+    # and a^2 = b^2 = `extension`^2.
+    extension = sqrt(space_between^2 / 2)
     
-    # Make a new rectangle that is 2 * `space_between` times higher and wider, 
-    # but has all the other characteristics. 
+    # Make the new rectangle and extract its points. Importantly, we need to 
+    # use 2 * `extension`, as we have two edges that need extending.
     rect <- rectangle(center = object@center, 
                       orientation = object@orientation,
-                      size = 2 * space_between + object@size)
+                      size = 2 * extension + object@size)
 
-    # Return the points that make up this rectangle: Those will be `space_between`
-    # steps in x and y away from the corners of the previous rectangle
     return(rect@points)
 })
 
