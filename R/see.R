@@ -57,7 +57,7 @@ best_angle <- function(agent,
     return(utility_angles[which.max(utility_angles[ ,1]), 2])
 }
 
-#' Can agent see an point in space
+#' Can agent see a point in space
 #'
 #' Determines whether an agent can see a point in space. Is an abstraction of the
 #' more specific functions that allowed agents to see goals (`seesGoal`) or
@@ -85,11 +85,11 @@ sees_location <- function(agent,
 
         # Loop over all different lines that are created by the polygon
         for(j in 2:nrow(points)) {
-            intersects[j,] <- line.line.intersection(agent@position,
-                                                     co,
-                                                     points[j - 1,],
-                                                     points[j,],
-                                                     interior.only = TRUE)
+            intersects[j,] <- m4ma::line.line.intersection(agent@position,
+                                                           co,
+                                                           points[j - 1,],
+                                                           points[j,],
+                                                           interior.only = TRUE)
         }
 
         # Check if any intersection was found, and if so, return `FALSE` as the
