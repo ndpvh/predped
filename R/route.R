@@ -17,6 +17,9 @@ create_edges <- function(from,
                          to, 
                          background, 
                          space_between = 0.5) {
+
+    obj <- objects(background)
+
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, to, background, space_between = space_between)
 
@@ -24,13 +27,41 @@ create_edges <- function(from,
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
     # the background.
-    ...
+    edges <- list(from = list(), to = list(), cost = list())
+    idx <- 1
+    for(i in seq_len(nrow(nodes))) {
+        for(j in seq_len(nrow(nodes))) {
+            # The same node cannot be connected to an edge
+            if(i == j) {
+                next
+            }
 
-    # Calculate the distances between the edges and return
-    # the distances between th
-    # which is needed for `cppRouting`
+            # Check if the nodes can be connected to each other: If occluded, 
+            # that means something is standing in the way
+            if(!m4ma::seesGoal(nodes[i,], nodes[j,], obj)) {
+                next
+            }
 
-    return(nodes)
+            # If they passed all the checks, then we can connect them to each
+            # other and compute the distance between both points
+            edges$from[[idx]] <- nodes[i,]
+            edges$to[[idx]] <- nodes[j,]
+            edges$cost[[idx]] <- sqrt((nodes[i,1] - nodes[j,1])^2 + (nodes[i,2] - nodes[j,2])^2)
+
+            idx <- idx + 1
+        }
+    }
+
+    # Transform this list to a dataframe, as required by cppRouting
+    from <- rbind(edges$from) |> t()
+    to <- rbind(edges$to) |> t()
+    cost <- rbind(edges$cost) |> t()
+
+    edges <- cbind(from, to, cost) |>
+        as.data.frame() |>
+        setNames(c("from", "to", "cost"))
+
+    return(edges)
 }
 
 #' Create nodes of graph to walk on
