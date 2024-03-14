@@ -584,3 +584,91 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     return(cbind(center(object)[1] + cos(angles) * adjusted_radius, 
                  center(object)[2] + sin(angles) * adjusted_radius))
 })
+
+
+
+# Getters and setters
+
+#' @rdname radius-method
+#' 
+#' @export 
+setGeneric("radius", function(object) standardGeneric("radius"))
+
+#' @rdname radius-method
+#' 
+#' @export 
+setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
+
+setMethod("radius", signature(object = "circle"), function(object) {
+    return(object@radius)
+})
+
+setMethod("radius<-", signature(object = "circle"), function(object, value) {
+    object@radius <- value
+    return(object)
+})
+
+#' @rdname size-method
+#' 
+#' @export 
+setGeneric("size", function(object) standardGeneric("size"))
+
+#' @rdname size-method
+#' 
+#' @export 
+setGeneric("size<-", function(object, value) standardGeneric("size<-"))
+
+setMethod("size", signature(object = "rectangle"), function(object) {
+    return(object@size)
+})
+
+setMethod("size<-", signature(object = "rectangle"), function(object, value) {
+    object@size <- value
+    return(object)
+})
+
+setMethod("size", signature(object = "circle"), function(object) {
+    return(object@radius)
+})
+
+setMethod("size<-", signature(object = "circle"), function(object, value) {
+    object@radius <- value
+    return(object)
+})
+
+#' @rdname center-method
+#' 
+#' @export 
+setGeneric("center", function(object) standardGeneric("center"))
+
+#' @rdname center-method
+#' 
+#' @export 
+setGeneric("center<-", function(object, value) standardGeneric("center<-"))
+
+setMethod("center", signature(object = "polygon"), function(object) {
+    return(object@center)
+})
+
+setMethod("center<-", signature(object = "polygon"), function(object, value) {
+    object@center <- value
+    return(object)
+})
+
+setMethod("center", signature(object = "rectangle"), function(object) {
+    return(object@center)
+})
+
+setMethod("center<-", signature(object = "rectangle"), function(object, value) {
+    object@center <- value
+    return(object)
+})
+
+setMethod("center", signature(object = "circle"), function(object) {
+    return(object@center)
+})
+
+setMethod("center<-", signature(object = "circle"), function(object, value) {
+    object@center <- value
+    return(object)
+})
