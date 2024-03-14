@@ -70,20 +70,17 @@ setMethod("show", "agent", function(object) {
     cat("Agent Center:", object@center, "\n")
 })
 
-#' @rdname agent-class
-#'
-#' @export
-setGeneric("id", function(object) standardGeneric("id"))
 
 #' @rdname agent-class
 #'
 #' @export
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
-
 setMethod("id", "agent", function(object) {
     return(setNames(object@id, object@id))
 })
 
+#' @rdname agent-class
+#'
+#' @export
 setMethod("id<-", "agent", function(object, value) {
     object@id <- value
     return(object)
@@ -92,13 +89,6 @@ setMethod("id<-", "agent", function(object, value) {
 #' @rdname agent-class
 #' 
 #' @export
-setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
-
-#' @rdname agent-class
-#' 
-#' @export
-setGeneric("position<-", function(object, value) standardGeneric("position<-"))
-
 setMethod("position", "agent", function(object, return_matrix = FALSE) {
     if (return_matrix) {
         return(matrix(object@center, nrow = 1, ncol = 2, dimnames = list(object@id, names(object@center))))
@@ -106,6 +96,9 @@ setMethod("position", "agent", function(object, return_matrix = FALSE) {
     return(object@center)
 })
 
+#' @rdname agent-class
+#' 
+#' @export
 setMethod("position<-", "agent", function(object, value) {
     object@center <- as(value, "coordinate")
     return(object)
