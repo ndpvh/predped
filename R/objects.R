@@ -318,8 +318,11 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
         return(point)
     }
 
-    # Create the edges as needed by the `find_location` function
+    # Create the edges as needed by the `find_location` function. Important to 
+    # note that we need to rbind the first edge to the matrix in order to find 
+    # the node for the final point in the matrix.
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+    edges <- rbind(edges, edges[1,])
 
     # Loop over the edges and do the necessary calculations
     nodes <- matrix(0, nrow = nrow(edges) * 2, 2)
