@@ -12,12 +12,14 @@
 #' @export
 goal <- setClass("goal", list(id = "character",
                               position = "coordinate",
+                              path = "list",
                               busy = "logical",
                               counter = "numeric"))
 
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
                                          position = numeric(2),
+                                         path = list(),
                                          busy = FALSE,
                                          counter = 5,
                                          ...
@@ -27,6 +29,7 @@ setMethod("initialize", "goal", function(.Object,
     .Object@position <- coordinate(position)
     .Object@busy <- busy
     .Object@counter <- counter
+    .Object@path <- path
 
     return(.Object)
 })
@@ -158,3 +161,146 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                 counter = counter))   
 })
 
+#' Find path to a goal
+#' 
+#' Defines a list of coordinates that create a strategic path to the goal of the
+#' agents.
+#'
+#' @param goal The goal with which the agent is interacting
+#' @param agent The agent that wants to go to the goal.
+#' @param background The background/setting that is being used.
+#' @param algorithm Algorithm to use for creating the path-points. Is provided
+#' to the `get_path_pair` function of `cppRouting`. Defaults to "bi", using 
+#' bidirectional Dijkstra.
+#'
+#' @export
+#' @name find_path-method
+setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
+
+#' @rdname find_path-method
+#' 
+setMethod("find_path", "goal", function(object, 
+                                        agent,
+                                        background,
+                                        algorithm = "bi") {
+    # Create the edges that are taken in by `makegraph`
+    edges <- create_edges(position(agent),
+                          position(object), 
+                          background,
+                          space_between = radius(agent) * 2)
+    
+    # Create a graph that can be used by `cppRouting`
+    graph <- cppRouting::makegraph(...)
+    
+    # Use cppRouting to do the strategic planning in this function
+    path_points <- cppRouting::get_path_pair(...,
+                                             position(agent), 
+                                             position(object), 
+                                             algorithm = algorithm)
+
+    return(path_points)
+})
+
+
+
+# Getters and setters
+
+#' @rdname goal-class
+setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("position<-", function(object, value) standardGeneric("position<-"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setMethod("position", "goal", function(object) {
+    return(object@position)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setMethod("position<-", "goal", function(object, value) {
+    object@position <- value
+    return(object)
+})
+
+
+setGeneric("id", function(object) standardGeneric("id"))
+
+setGeneric("id<-", function(object, value) standardGeneric("id<-"))
+
+#' @rdname goal-class
+#'
+#' @export
+setMethod("id", "goal", function(object) {
+    return(object@id)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setMethod("id<-", "goal", function(object, value) {
+    object@id <- value
+    return(object)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("path", function(object) standardGeneric("path"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("path<-", function(object, value) standardGeneric("path<-"))
+
+setMethod("path", "agent", function(object) {
+    return(object@path)
+})
+
+setMethod("path<-", "agent", function(object, value) {
+    object@path <- value
+    return(object)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("counter", function(object) standardGeneric("counter"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
+
+setMethod("counter", "agent", function(object) {
+    return(object@counter)
+})
+
+setMethod("counter<-", "agent", function(object, value) {
+    object@counter <- value
+    return(object)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("busy", function(object) standardGeneric("busy"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
+
+setMethod("busy", "agent", function(object) {
+    return(object@busy)
+})
+
+setMethod("busy<-", "agent", function(object, value) {
+    object@busy <- value
+    return(object)
+})
