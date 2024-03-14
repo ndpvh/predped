@@ -122,11 +122,22 @@ setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) s
 
 #' Convert a Cirlce with a Center and Radius to a Polygon
 #'
-#' @param object An object that contains circle paramters
+#' @param object A circle parameters
 #' @return  Matrix with points necessary to draw the circle
 #' @export 
 #' @name to_polygon-method
 setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
+
+#' Add Nodes along an Object
+#'
+#' @param object An object 
+#' @param space_between Numeric denoting the amount of space that needs to be 
+#' left between the edge of the object and the node. Defaults to `0.5`
+#' 
+#' @return  Matrix with points along the edges of the object
+#' @export 
+#' @name add_nodes-method
+setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 
 #' An S4 class to Represent Polygon Objects
 #'
@@ -264,7 +275,53 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
 
     # Return the sampled point as a numeric
     return(as.numeric(edges[idx, 1:2] + a * (edges[idx, 3:4] - edges[idx, 1:2])))
-})    
+})   
+
+#'@rdname add_nodes-method
+#'
+# Important; assumes that the intersection point between the two edges is on 
+# the third and fourth column of `edge_1` or on the first and second column of 
+# `edge_2`.
+setMethod("add_nodes", signature(object = "polygon"), function(object, 
+                                                               space_between = 0.5) {
+    
+    # Create a local function that will take in two coordinates and will return
+    # the location of the new coordinate
+    find_location <- function(edge_1, edge_2) {
+        # Compute the slopes created by the two lines
+        slope_1 <- (edge_1[2] - edge_1[4]) / (edge_1[1] - edge_1[3])
+        slope_2 <- (edge_2[2] - edge_2[4]) / (edge_2[1] - edge_2[3])
+
+        # Compute the angle between the edges
+        angle <- atan((slope_1 - slope_2) / (1 + slope_1 * slope_2))
+
+        # To have a node that is perpendicular to this intersection between lines,
+        # we will need to half this angle and compute a new slope
+        angle <- angle / 2
+
+        # Get the orienation of edge_1 based on its slope
+        edge_angle <- atan(slope_1)
+
+        # Add the half angle to this, and create two points on the perpendicular
+        # line created by the point of interest and the angle
+        angle <- edge_angle + angle
+        point <- rbind(edge_2 + c(cos(angle), sin(angle)) * space_between,
+                       edge_2 + c(cos(angle + pi), sin(angle + pi)) * space_between)
+
+        return(point)
+    }
+
+    # Create the edges as needed by the `find_location` function
+    edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+
+    # Loop over the edges and do the necessary calculations
+    nodes <- matrix(0, nrow = nrow(edges) * 2, 2)
+    for(i in seq_len(nrow(edges) - 1)) {
+        nodes[(i - 1) * 2 + 1:2,] <- find_location(edges[i,], edges[i + 1,])
+    }
+
+    return(nodes)
+})
 
 #' An S4 Class to Represent Rectangle Objects
 #'
@@ -396,6 +453,22 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
     return(ifelse(outside, !check, check)) # Important: Benchmark shows that the other algorithm is faster
 })
 
+#'@rdname add_nodes-method
+#'
+setMethod("add_nodes", signature(object = "rectangle"), function(object, 
+                                                                 space_between = 0.5) {
+    
+    # Make a new rectangle that is 2 * `space_between` times higher and wider, 
+    # but has all the other characteristics. 
+    rect <- rectangle(center = object@center, 
+                      orientation = object@orientation,
+                      size = 2 * space_between + object@size)
+
+    # Return the points that make up this rectangle: Those will be `space_between`
+    # steps in x and y away from the corners of the previous rectangle
+    return(rect@points)
+})
+
 #' An S4 Class to Represent Circle Objects
 #'
 #' @slot center A numeric vector of length two indicating the center of the circle.
@@ -488,3 +561,20 @@ setMethod("rng_point", signature(object = "circle"), function(object,
     # Return the numerical value of the coordinate that was sampled
     return(as.numeric(object@center + object@radius * c(cos(angle), sin(angle))))
 })   
+
+#'@rdname add_nodes-method
+#'
+setMethod("add_nodes", signature(object = "circle"), function(object, 
+                                                              space_between = 0.5) {
+    
+    # Create the angles at which to put the nodes around the circle
+    angles <- seq(0, 2 * pi, pi / 4)
+
+    # Create a matrix of locations based on the center of the object, the radius,
+    # and the drawn angles and return. Importantly, radius is extended with a
+    # number `space_between` so that some space is left between the object and 
+    # the path point
+    adjusted_radius <- radius(object) + space_between
+    return(cbind(center(object)[1] + cos(angles) * adjusted_radius, 
+                 center(object)[2] + sin(angles) * adjusted_radius))
+})
