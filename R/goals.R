@@ -139,6 +139,16 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
                                                               forbidden = NULL
 
 ){
+    # Create an ever so slightly bigger polygon
+    #
+    # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
+    # check whether the location of the goal can be seen from a given node 
+    # when making the path points: Given that the goal is part of the object, 
+    # it is always unseen. With a slightly bigger object, this is not the case
+    # anymore
+    new_points <- add_nodes(object, space_between = 1e-2)
+    new_object <- polygon(points = new_points)
+
     co <- rng_point(object, 
                     middle_edge = middle_edge, 
                     forbidden = forbidden)
@@ -154,7 +164,17 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                                                              counter = 5,
                                                              forbidden = NULL
 ){
-    co <- rng_point(object, 
+    # Create an ever so slightly bigger circle
+    #
+    # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
+    # check whether the location of the goal can be seen from a given node 
+    # when making the path points: Given that the goal is part of the object, 
+    # it is always unseen. With a slightly bigger object, this is not the case
+    # anymore
+    new_object <- circle(center = center(object), 
+                         radius = radius(object) + 1e-2)
+
+    co <- rng_point(new_object, 
                     forbidden = forbidden)
     return(goal(id = id,
                 position = coordinate(co), 
@@ -188,14 +208,20 @@ setMethod("find_path", "goal", function(object,
                           position(object), 
                           background,
                           space_between = radius(agent) * 2)
+
+    View(edges$edges)
+    View(edges$nodes)
     
     # Create a graph that can be used by `cppRouting`
-    graph <- cppRouting::makegraph(...)
+    graph <- cppRouting::makegraph(edges$edges, 
+                                   directed = TRUE,
+                                   coords = edges$nodes)
+    View(graph)
     
     # Use cppRouting to do the strategic planning in this function
-    path_points <- cppRouting::get_path_pair(...,
-                                             position(agent), 
-                                             position(object), 
+    path_points <- cppRouting::get_path_pair(graph,
+                                             "agent", 
+                                             "goal", 
                                              algorithm = algorithm)
 
     return(path_points)
