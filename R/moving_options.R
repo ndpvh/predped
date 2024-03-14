@@ -132,3 +132,95 @@ setMethod("moving_options",
           "agent",
           moving_options_agent)
 
+# Number of pedestrians in the goal direction (goal cone or the cones on either
+# side of it).
+# returns number and if more than one attribute "ends" specifying blocking
+# profiles from current perspective
+#
+# Deprecated?
+#
+# TO DO:
+#   - The purpose of `cone_set` is not entirely clear and might have to change if 
+#     we wish to consider more or less than 33 choices
+#   - There might be an easier, object-oriented way of finding out how many agents
+#     are blocking the goal
+#
+# Original function: `nBlock`
+agents_between_goal <- function(agent, 
+                                state, 
+                                agent_predictions = NULL) {
+
+    # Get the index of the agent within the state$agents list
+    agent_id <- sapply(state$agents, id)
+    agent_idx <- which(id(agent) == agent_id)
+
+    # If no predicted positions are delivered to the function, we will use the 
+    # current positions to find out whether agents are standing inbetween `agent`
+    # and its goal. Otherwise, we will use the predicted positions.
+    if(is.null(agent_predictions)) {
+        agent_positions <- sapply(state$agents, position)[-agent_idx,]
+    } else {
+        agent_positions <- agent_predictions[-agent_idx,]
+    }
+
+    # If there are no other agents to consider, we can safely exit the function
+    if(nrow(agent_positions) == 0) {
+        return(0)
+    }
+
+    # Create a cone from the agent to the goal location
+    goal_cone <- m4ma::Iangle(position(agent), 
+                              orientation(agent), 
+                              current_goal(agent)@position)
+
+    if(is.na(goal_cone)) {
+        return(0)
+    }
+
+    # Not sure why to do this, but must have something to do with the 33 choices
+    cone_set <- c(goal_cone - 1, goal_cone, goal_cone + 1)
+    cone_set <- cone_set[cone_set > 0 & cone_set < 12]
+
+    # Compute the end points of the orthogonal line segments to the line between
+    # the agent and the other agents with a width equal to the radius of the 
+    # agent. 
+    #
+    # These lines can be used to check the intersection with the cone drawn from 
+    # the agent to their goal. If there is such an intersection, we can assume 
+    # that agent is blocking the goal
+    ends <- m4ma::eObjects(position(agent),
+                           agent_positions, 
+                           size(agent))
+
+    # Create several cones from the agent to these end points
+    end_cones <- apply(ends, 3, \(x) Iangle(position(agent), 
+                                            orientation(agent),
+                                            x))
+
+    # Small fix that one can see multiple times in our code: If the cones are 
+    # a matrix with only 1 row, it will automatically become a vector instead.
+    # Force that it becomes a numeric again
+    if(nrow(ends) == 1) {
+        end_cones <- matrix(end_cones, nrow = 1)
+        rownames(end_cones) <- agent_id[-agent_idx]
+    }
+
+    # Check whether any of the coordinates fall inside of the cone_set
+    blocking <- apply(end_cones, 1, function(x) {
+        if(any(is.na(x))) {
+            return(FALSE)
+        } else {
+            return(any(x %in% cone_set))
+        }
+    })
+
+    # Get the number of blocking agents
+    n_agents <- sum(blocking)
+
+    # Give them the names of the agents
+    if(n_agents > 0) {
+        attr(n_agents, "ends") <- ends[names(blocking), , , drop = FALSE]
+    }
+
+    return(n_agents)
+}
