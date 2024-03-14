@@ -294,24 +294,37 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
 
         # Compute the angle between the edges. For this, we need to check 
         # whether the slopes are finite or note
-        if(is.infinite(slope_1)) {
-            angle <- atan(slope_2) + pi / 2
-        } else if(is.infinite(slope_2)) {
-            angle <- atan(slope_1) - pi / 2
+        if(is.infinite(slope_2)) {
+            angle_2 <- 3 * pi / 2
+            angle_1 <- atan(slope_1)
+        } else if(is.infinite(slope_1)) {
+            angle_1 <- pi / 2
+            angle_2 <- atan(slope_2)
         } else {
-            angle <- atan((slope_1 - slope_2) / (1 + slope_1 * slope_2))
+            angle_1 <- atan(slope_1)
+            angle_2 <- atan(slope_2)
         }
 
-        # To have a node that is perpendicular to this intersection between lines,
-        # we will need to half this angle and compute a new slope
-        angle <- angle / 2
+        # The first angle needs an additional transformation so that it starts 
+        # from pi (180 degrees): This is specific to the first edge only and 
+        # only under given conditions, namely: 
+        #   - whenever the angle is not fully opened to a side (i.e., 
+        #     when the x-coordinate of the angle-point is not enclosed by the two
+        #     x-coordinates of the other points that make up the angle)
+        check_1 <- edge_1[3] < edge_2[3] & edge_1[3] < edge_1[1]
+        check_2 <- edge_1[3] > edge_2[3] & edge_1[3] > edge_1[1]
+        if(!check_1 & !check_2) {
+            angle_1 <- pi + angle_1
+        }
 
-        # Get the orienation of edge_1 based on its slope
-        edge_angle <- atan(slope_1)
-
-        # Add the half angle to this, and create two points on the perpendicular
-        # line created by the point of interest and the angle
-        angle <- edge_angle + abs(angle)
+        # Transform negative angles
+        angle_1 <- ifelse(angle_1 < 0, 2 * pi + angle_1, angle_1)
+        angle_2 <- ifelse(angle_2 < 0, 2 * pi + angle_2, angle_2)
+        
+        # Define the actual angle at which the cosine and sine should be taken
+        # and compute the point
+        angle <- 0.5 * (angle_2 - angle_1) + angle_1
+        
         point <- rbind(edge_2[1:2] + c(cos(angle), sin(angle)) * space_between,
                        edge_2[1:2] + c(cos(angle + pi), sin(angle + pi)) * space_between)
 
@@ -327,8 +340,6 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     # Loop over the edges and do the necessary calculations
     nodes <- matrix(0, nrow = nrow(edges) * 2, 2)
     for(i in seq_len(nrow(edges) - 1)) {
-        print(i)
-        print(find_location(edges[i,], edges[i + 1,]))
         nodes[(i - 1) * 2 + 1:2,] <- find_location(edges[i,], edges[i + 1,])
     }
 
