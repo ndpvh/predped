@@ -31,17 +31,21 @@ create_edges <- function(from,
     idx <- 1
     for(i in seq_len(nrow(nodes) - 1)) {
         for(j in (i + 1):nrow(nodes)) {
+            co_1 <- as.numeric(nodes[i, c("X", "Y")])
+            co_2 <- as.numeric(nodes[j, c("X", "Y")])
+
             # Check if the nodes can be connected to each other: If occluded, 
             # that means something is standing in the way
-            if(!m4ma::seesGoal(nodes[i,], nodes[j,], obj)) {
+            if(!m4ma::seesGoal(co_1, co_2, obj)) {
                 next
             }
 
             # If they passed all the checks, then we can connect them to each
-            # other and compute the distance between both points
-            edges$from[[idx]] <- nodes[i,]
-            edges$to[[idx]] <- nodes[j,]
-            edges$cost[[idx]] <- sqrt((nodes[i,1] - nodes[j,1])^2 + (nodes[i,2] - nodes[j,2])^2)
+            # other and compute the distance between both points. We have to save
+            # the rownames of the nodes in the dataframe
+            edges$from[[idx]] <- nodes$node_ID[i]
+            edges$to[[idx]] <- nodes$node_ID[j]
+            edges$cost[[idx]] <- sqrt((co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2)
 
             idx <- idx + 1
         }
@@ -56,7 +60,7 @@ create_edges <- function(from,
         as.data.frame() |>
         setNames(c("from", "to", "cost"))
 
-    return(edges)
+    return(list(edges = edges, nodes = nodes))
 }
 
 #' Create nodes of graph to walk on
@@ -133,8 +137,20 @@ create_nodes <- function(from,
 
     nodes <- nodes[!is.na(nodes[,1]),]
 
-    # Add the person and the goal to the list of nodes
+    # Create node id's, as expected by `makegraph`
+    ids <- paste0("node ", 1:nrow(nodes))
+
+    # Add the person and the goal to the list of nodes and give them unique 
+    # identifiers. These identifiers are again called in the `find_path` function
+    # of the goals
     nodes <- rbind(nodes, from, to)
+    ids <- c(ids, "agent", "goal")
+
+    # Now, transform the nodes to a dataframe as required by `makegraph` from
+    # the cppRouting package
+    nodes <- cbind(ids, nodes) |>
+        as.data.frame() |>
+        setNames(c("node_ID", "X", "Y"))
 
     return(nodes)
 }
