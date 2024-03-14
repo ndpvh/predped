@@ -292,8 +292,15 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
         slope_1 <- (edge_1[2] - edge_1[4]) / (edge_1[1] - edge_1[3])
         slope_2 <- (edge_2[2] - edge_2[4]) / (edge_2[1] - edge_2[3])
 
-        # Compute the angle between the edges
-        angle <- atan((slope_1 - slope_2) / (1 + slope_1 * slope_2))
+        # Compute the angle between the edges. For this, we need to check 
+        # whether the slopes are finite or note
+        if(is.infinite(slope_1)) {
+            angle <- atan(slope_2) + pi / 2
+        } else if(is.infinite(slope_2)) {
+            angle <- atan(slope_1) - pi / 2
+        } else {
+            angle <- atan((slope_1 - slope_2) / (1 + slope_1 * slope_2))
+        }
 
         # To have a node that is perpendicular to this intersection between lines,
         # we will need to half this angle and compute a new slope
@@ -305,8 +312,8 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
         # Add the half angle to this, and create two points on the perpendicular
         # line created by the point of interest and the angle
         angle <- edge_angle + angle
-        point <- rbind(edge_2 + c(cos(angle), sin(angle)) * space_between,
-                       edge_2 + c(cos(angle + pi), sin(angle + pi)) * space_between)
+        point <- rbind(edge_2[1:2] + c(cos(angle), sin(angle)) * space_between,
+                       edge_2[1:2] + c(cos(angle + pi), sin(angle + pi)) * space_between)
 
         return(point)
     }
@@ -317,6 +324,8 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     # Loop over the edges and do the necessary calculations
     nodes <- matrix(0, nrow = nrow(edges) * 2, 2)
     for(i in seq_len(nrow(edges) - 1)) {
+        print(i)
+        print(find_location(edges[i,], edges[i + 1,]))
         nodes[(i - 1) * 2 + 1:2,] <- find_location(edges[i,], edges[i + 1,])
     }
 
