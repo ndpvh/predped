@@ -14,6 +14,7 @@ goal <- setClass("goal", list(id = "character",
                               position = "coordinate",
                               path = "matrix",
                               busy = "logical",
+                              done = "logical",
                               counter = "numeric"))
 
 setMethod("initialize", "goal", function(.Object,
@@ -21,6 +22,7 @@ setMethod("initialize", "goal", function(.Object,
                                          position = numeric(2),
                                          path = matrix(0, nrow = 2, ncol = 2),
                                          busy = FALSE,
+                                         done = FALSE,
                                          counter = 5,
                                          ...
 ) {
@@ -28,6 +30,7 @@ setMethod("initialize", "goal", function(.Object,
     .Object@id <- if(length(id) == 0) paste("goal", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@position <- coordinate(position)
     .Object@busy <- busy
+    .Object@done <- done
     .Object@counter <- counter
     .Object@path <- path
 
@@ -47,7 +50,8 @@ setGeneric("interact", function(object) standardGeneric("interact"))
 setMethod("interact", "goal", function(object) 
 {
     if(object@counter <= 0) {
-        return(NULL)
+        object@done <- TRUE
+        return(object)
     } else {
         object@counter <- object@counter - 1
         return(object)
@@ -345,5 +349,28 @@ setMethod("busy", "goal", function(object) {
 
 setMethod("busy<-", "goal", function(object, value) {
     object@busy <- value
+    return(object)
+})
+
+#' @rdname goal-class
+setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setGeneric("done<-", function(object, value) standardGeneric("done<-"))
+
+#' @rdname goal-class
+#' 
+#' @export
+setMethod("done", "goal", function(object) {
+    return(object@done)
+})
+
+#' @rdname goal-class
+#' 
+#' @export
+setMethod("done<-", "goal", function(object, value) {
+    object@done <- value
     return(object)
 })

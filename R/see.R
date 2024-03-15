@@ -84,11 +84,11 @@ sees_location <- function(agent,
         intersects <- matrix(0, nrow = nrow(points) - 1, ncol = 2)
 
         # Loop over all different lines that are created by the polygon
-        for(j in 2:nrow(points)) {
-            intersects[j,] <- m4ma::line.line.intersection(agent@position,
+        for(j in seq_len(nrow(points) - 1)) {
+            intersects[j,] <- m4ma::line.line.intersection(position(agent),
                                                            co,
-                                                           points[j - 1,],
                                                            points[j,],
+                                                           points[j + 1,],
                                                            interior.only = TRUE)
         }
 
