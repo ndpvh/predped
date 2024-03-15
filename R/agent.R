@@ -66,7 +66,7 @@ setMethod("show", "agent", function(object) {
     cat("Agent Status:", object@status, "\n")
     cat("Agent Parameters:", "\n")
     cat(write.table(object@parameters), "\n")
-    cat("Agent Goals:", print(object@goals), "\n")
+    cat("Agent Goals", paste(object@goals), "\n")
     cat("Agent Center:", object@center, "\n")
 })
 
