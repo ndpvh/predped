@@ -85,7 +85,7 @@ setMethod("simulate", "predped", function(object,
         # Check whether one of the pedestrians is waiting at the exit
         idx <- c()
         for(j in seq_along(state$agents)) {
-            if(state$agents[[j]]@status == "exit") {
+            if(status(state$agents[[j]]) == "exit") {
                 idx <- c(idx, j)
             }
         }

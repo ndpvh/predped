@@ -533,7 +533,13 @@ update_goal <- function(agent,
             # enter in an interaction state. If not, then they have to change
             # their direction to a new path point
             if(nrow(current_goal(agent)@path) == 1) {
-                status(agent) <- "completing goal"
+                # Check if the goal is the exit goal. If not, then the agent 
+                # should start interacting with the goal
+                if(current_goal(agent)@id == "goal exit") {
+                    status(agent) <- "exit"
+                } else {
+                    status(agent) <- "completing goal"
+                }                
             } else {
                 # Keep it in matrix format, even if you only have 1 row left
                 current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
