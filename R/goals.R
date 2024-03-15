@@ -207,22 +207,37 @@ setMethod("find_path", "goal", function(object,
     edges <- create_edges(position(agent),
                           position(object), 
                           background,
-                          space_between = radius(agent) * 2)
-
-    View(edges$edges)
-    View(edges$nodes)
+                          space_between = radius(agent))
     
     # Create a graph that can be used by `cppRouting`
     graph <- cppRouting::makegraph(edges$edges, 
                                    directed = TRUE,
                                    coords = edges$nodes)
-    View(graph)
     
     # Use cppRouting to do the strategic planning in this function
     path_points <- cppRouting::get_path_pair(graph,
                                              "agent", 
                                              "goal", 
-                                             algorithm = algorithm)
+                                             algorithm = algorithm,
+                                             long = TRUE)
+
+    # Once planned, transform the IDs of the nodes to actual coordinates to 
+    # which the agent can walk. When merging, we should turn of `sort` to ensure 
+    # that the order of the path_points is not changed.
+    nodes <- edges$nodes |>
+        setNames(c("node", "x", "y"))
+    path_points <- merge(path_points, 
+                         nodes, 
+                         by = "node",
+                         sort = FALSE)
+
+    # Only retain the coordinates of interest (where the agent has to walk to) 
+    # and transform to a matrix instead of a dataframe
+    path_points <- path_points[-1, c("x", "y")] |>
+        as.matrix()
+
+    rownames(path_points) <- NULL
+    colnames(path_points) <- c("x", "y")    
 
     return(path_points)
 })
