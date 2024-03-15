@@ -12,14 +12,14 @@
 #' @export
 goal <- setClass("goal", list(id = "character",
                               position = "coordinate",
-                              path = "list",
+                              path = "matrix",
                               busy = "logical",
                               counter = "numeric"))
 
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
                                          position = numeric(2),
-                                         path = list(),
+                                         path = matrix(0, nrow = 2, ncol = 2),
                                          busy = FALSE,
                                          counter = 5,
                                          ...
