@@ -1,72 +1,89 @@
 #' An S4 class representing the distribution and coordinates of shelves in a supermarket.
 #' @slot num_columns Number of columns in the supermarket.
+#' @slot num_rows Number of rows in the supermarket.
 #' @slot total_shelves Total number of shelves in the supermarket.
-#' @slot shelf_distribution Distribution of shelves among columns.
+#' @slot shelf_distribution Distribution of shelves among columns and rows.
 #' @slot rectangles Coordinates of the shelves.
 #' @name Shelves
 #' @export
 #' 
 Shelves <- setClass("Shelves", slots = list(num_columns = "numeric",
+                                            num_rows = "numeric",
                                             total_shelves = "numeric",
-                                            shelf_distribution = "numeric",
+                                            shelf_distribution = "matrix",
                                             rectangles = "list"))
 
-setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, total_shelves = NULL, shelf_distribution = NULL, ...) {
-    # Check if shelf_distribution is provided
+setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_rows = NULL, total_shelves = NULL, shelf_distribution = NULL, ...) {
+    # Check whether shelf_distribution is already provided
     if (!is.null(shelf_distribution)) {
-        num_columns <- length(shelf_distribution)
+        num_columns <- ncol(shelf_distribution)
+        num_rows <- nrow(shelf_distribution)
         total_shelves <- sum(shelf_distribution)
-        warning("You have provided a distribution for the shelves. The number of columns and the number of shelves are adjusted based on the distribution.")
+        warning("You have provided a distribution for the shelves. The number of columns, number of rows, and the number of shelves are adjusted based on the distribution.")
     } else {
-        # Generate random values if shelf_distribution is not provided
+        # Generate random num_columns & num_rows if not provided
         if (is.null(num_columns)) {
-            num_columns <- sample(1:10, 1)  # Random number of columns between 1-10
+            num_columns <- sample(1:10, 1) # Random columns between 1-10
         }
+        if (is.null(num_rows)) {
+            num_rows <- sample(1:10, 1) # Random rows between 1-10
+        }
+        # Generate random shelves between 1 and num_columns * num_rows
+        # TO-DO: Check if it is robust enough
         if (is.null(total_shelves)) {
-            total_shelves <- max(sample(1:20, 1), num_columns)  # Random number of shelves between 1-20
+            total_shelves <- sample(1:(num_columns * num_rows), 1) 
         }
-    }
-
-    # Make sure num_columns does not exceed total_shelves
-    if (!is.null(num_columns) && num_columns > total_shelves) {
-        warning("Number of columns cannot exceed the number of shelves. Adjusting the column number.")
-        num_columns <- total_shelves
     }
 
     if (is.null(shelf_distribution)) {
         # Initialize the distribution
-        shelf_distribution <- rep(0, num_columns)
+        shelf_distribution <- matrix(0, nrow = num_rows, ncol = num_columns)
 
-        # Make sure each column has at least one shelf
-        for (i in 1:min(total_shelves, num_columns)) {
-            shelf_distribution[i] <- 1 
+        # Randomly fill the shelves to each slot
+        shelves_remaining <- total_shelves
+        while (shelves_remaining > 0) {
+            row_index <- sample(1:num_rows, 1)
+            col_index <- sample(1:num_columns, 1)
+            shelf_distribution[row_index, col_index] <- shelf_distribution[row_index, col_index] + 1
+            shelves_remaining <- shelves_remaining - 1
         }
-
-        # Update & distribute the remaining shelves
-        remaining_shelves <- total_shelves - sum(shelf_distribution)
-        while (remaining_shelves > 0) {
-            col_index <- sample(1:num_columns, 1) 
-            shelf_distribution[col_index] <- shelf_distribution[col_index] + 1
-            remaining_shelves <- remaining_shelves - 1
+        
+        # Adjust the number of columns and rows if there are empty columns or rows
+        # TO-DO: Warnings are still triggered even the arguments are not provided by user
+        # This should not be triggered otherwise
+        empty_cols <- which(colSums(shelf_distribution) == 0)
+        empty_rows <- which(rowSums(shelf_distribution) == 0)
+        
+        if (length(empty_cols) > 0) {
+            num_columns <- num_columns - length(empty_cols)
+            shelf_distribution <- shelf_distribution[, colSums(shelf_distribution) != 0]
+            warning(paste(length(empty_cols), "empty column(s) detected and omitted."))
+        }
+        if (length(empty_rows) > 0) {
+            num_rows <- num_rows - length(empty_rows)
+            shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ]
+            warning(paste(length(empty_rows), "empty row(s) detected and omitted."))
         }
     }
 
-    # Initialize the list for rectangles
-    rectangles <- list()
-
     # Assign values to object slots
     .Object@num_columns <- num_columns
-    .Object@total_shelves <- sum(shelf_distribution)
+    .Object@num_rows <- num_rows
+    .Object@total_shelves <- total_shelves
     .Object@shelf_distribution <- shelf_distribution
-    .Object@rectangles <- rectangles 
+    .Object@rectangles <- list()
     
     return(.Object)
 })
+
 
 #' Retrieve coordinates of rectangles.
 #'
 #' This function generates coordinates of rectangles representing shelves within the Shelves object.
 #'
+#' TO-DO: Now it thinks the 2 shelves in the same slot has the same coordinates
+#' TO-DO: Fix this by adjusting the length and of the rectangle?
+#' 
 #' @param object A Shelves object containing information about shelf distribution.
 #' @param shelf_length Length of each shelf.
 #' @param shelf_width Width of each shelf.
@@ -78,34 +95,29 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, total_s
 #' @export
 #' @name getCoordinates
 #' 
-setGeneric("getCoordinates",
-           function(object, ...) {
-               standardGeneric("getCoordinates")
-           })
-
-#'@rdname getCoordinates-method
-#' 
-#' #' Example usage
-#' shelves <- new("Shelves", num_columns = 5, total_shelves = 18)
-#' shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
-#' 
 setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
     shelf_rectangles <- vector("list", length = sum(object@shelf_distribution))
     index <- 1
-    for (col in 1:object@num_columns) {
-        for (shelf in 1:object@shelf_distribution[col]) {
-            shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2, shelf)
-            shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
-            index <- index + 1
+    for (row in 1:object@num_rows) {
+        for (col in 1:object@num_columns) {
+            if (object@shelf_distribution[row, col] > 0) {
+                for (shelf in 1:object@shelf_distribution[row, col]) {
+                    shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2,
+                                      (row - 1) * (shelf_length + aisle_width) + shelf_length / 2)
+                    shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
+                    index <- index + 1
+                }
+            }
         }
     }
     object@rectangles <- shelf_rectangles  # Update rectangles slot with generated coordinates
     return(object)
 })
 
+
 #' Plot method for Shelves objects
 #' This method is only to visualize the changes in the code.
-#' TO-DO: Add a method to visualize the rows.
+#' TO-DO: 
 #' 
 #' @param x A Shelves object.
 #' @param shelf_length Length of each shelf.
@@ -115,9 +127,7 @@ setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_
 #' @param shelf_color Color of the shelves.
 #' @param ... Additional arguments passed to geom_rect.
 #' 
-#' Example usage
-#'plotShelves(shelves_coordinates)
-#'
+#' 
 plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, 
                         aisle_color = "white", shelf_color = "grey", ...) {
   
@@ -149,3 +159,19 @@ plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.
     coord_fixed() +
     theme_void()
 }
+
+# Example use
+shelves <- new("Shelves")
+print(shelves)
+shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
+plotShelves(shelves_coordinates)
+
+
+# Example use
+shelf_distribution <- matrix(c(2, 2,
+                               2, 2,
+                               3, 3), nrow = 3, byrow = TRUE)
+
+shelves <- new("Shelves", shelf_distribution = shelf_distribution)
+shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
+plotShelves(shelves_coordinates)
