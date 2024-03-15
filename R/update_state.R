@@ -65,17 +65,20 @@ update_state <- function(state,
         agent <- state$agents[[i]]
 
         # Update the position of the agent
-        state$agents[[i]] <- update_position(agent, 
-                                             state,
-                                             agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
-                                             background,
-                                             time_step = time_step,
-                                             ...)
+        agent <- update_position(agent, 
+                                 state,
+                                 agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
+                                 background,
+                                 time_step = time_step,
+                                 ...)
 
         # Update the goals of the agent
-        state$agents[[i]] <- update_goal(agent, 
-                                         state, 
-                                         background)
+        agent <- update_goal(agent, 
+                             state, 
+                             background)                             
+
+        # Update the agent himself
+        state$agents[[i]] <- agent
     }
 
     return(state)
@@ -201,6 +204,14 @@ update_position <- function(agent,
                                              background, 
                                              velocities, 
                                              orientations)
+
+            # Report the degress that the agent is reorienting to
+            turn <- paste("to", orientation(agent), "degrees")
+            if(status(agent) == "move") {
+                paste(id(agent), "turning", turn, "\n") |>
+                    cat()
+            }
+
             status(agent) <- "move"
         }
 
@@ -221,6 +232,8 @@ update_position <- function(agent,
         if(!any(check) | cell(agent) == 0) {  # stop or will have to
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
+            status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
+            cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
 
             # Let the agent reorient to find a better way
             orientation(agent) <- best_angle(agent, 
@@ -236,11 +249,6 @@ update_position <- function(agent,
                 paste(id(agent), "turning", turn, "\n") |>
                     cat()
             }
-
-            # Set the status of the agent to not moving anymore, and make him 
-            # stop
-            status(agent) <- "reorient"
-            cell(agent) <- 0
 
             # Define the centers of the options to move to
             centers <- m4ma::c_vd_rcpp(cells = 1:33,
@@ -511,7 +519,13 @@ update_goal <- function(agent,
     if(status(agent) == "move") {
         # Determine how far along the `path` they are
         distance_path_point <- m4ma::dist1(position(agent), 
-                                           current_goal(agent)@path[1,])
+                                           matrix(current_goal(agent)@path[1,], 
+                                                  nrow = 1, 
+                                                  ncol = 2))
+
+        # print("--------------------")
+        # print(distance_path_point)
+        # print(close_enough)
 
         # Check whether they are "close enough" to the path point
         if(distance_path_point < close_enough) {
