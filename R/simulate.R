@@ -129,13 +129,21 @@ add_agent <- function(object,
     # have the entrance.
     angle <- perpendicular_orientation(background)
 
-    return(agent(center = background@entrance,
-                 radius = radius,
-                 speed = standing_start,
-                 orientation = angle,
-                 parameters = object@parameters[idx, -c(1,2)],
-                 goals = goal_stack[-1],
-                 current_goal = goal_stack[[1]]))
+    # Create the agent themselves
+    tmp_agent <- agent(center = background@entrance,
+                       radius = radius,
+                       speed = standing_start,
+                       orientation = angle,
+                       parameters = object@parameters[idx, -c(1,2)],
+                       goals = goal_stack[-1],
+                       current_goal = goal_stack[[1]])
+
+    # Create the path to walk on for the current goal and return the agent
+    current_goal(tmp_agent)@path <- find_path(current_goal(tmp_agent), 
+                                              tmp_agent, 
+                                              background)
+    
+    return(tmp_agent)
 }
 
 # Undocumented function because this is in no way a particularly beautiful 
