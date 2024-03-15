@@ -158,20 +158,25 @@ agents_between_goal <- function(agent,
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        agent_positions <- sapply(state$agents, position)[-agent_idx,]
+        other_agents <- state$agents[-agent_idx]
+        agent_positions <- sapply(other_agents, position)
     } else {
         agent_positions <- agent_predictions[-agent_idx,]
     }
 
     # If there are no other agents to consider, we can safely exit the function
-    if(nrow(agent_positions) == 0) {
+    if(length(agent_positions) == 0) {
         return(0)
     }
 
     # Create a cone from the agent to the goal location
-    goal_cone <- m4ma::Iangle(position(agent), 
+    goal_cone <- m4ma::Iangle(matrix(position(agent), 
+                                     nrow = 1, 
+                                     ncol = 2), 
                               orientation(agent), 
-                              current_goal(agent)@position)
+                              matrix(current_goal(agent)@position,
+                                     nrow = 1, 
+                                     ncol = 2))
 
     if(is.na(goal_cone)) {
         return(0)
@@ -188,7 +193,9 @@ agents_between_goal <- function(agent,
     # These lines can be used to check the intersection with the cone drawn from 
     # the agent to their goal. If there is such an intersection, we can assume 
     # that agent is blocking the goal
-    ends <- m4ma::eObjects(position(agent),
+    ends <- m4ma::eObjects(matrix(position(agent),
+                                  nrow = 1, 
+                                  ncol = 2),
                            agent_positions, 
                            size(agent))
 
