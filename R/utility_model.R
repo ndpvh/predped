@@ -85,10 +85,12 @@ utility <- function(agent,
         agent_idx <- match(id(agent), agent_specs$id)
 
         # Preferred speed
-        goal_position <- matrix(current_goal(agent)@position@.Data,
+        goal_position <- matrix(current_goal(agent)@path[1,],
                                 ncol = 2)
         goal_distance <- m4ma::dist1_rcpp(position(agent), 
                                           goal_position)
+        # print("----------------------")
+        # print(paste0("goal distance: ", goal_distance))
 
         # print("---------------------")
         # print(goal_position)
