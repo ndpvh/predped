@@ -149,7 +149,7 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     new_points <- add_nodes(object, space_between = 1e-2)
     new_object <- polygon(points = new_points)
 
-    co <- rng_point(object, 
+    co <- rng_point(new_object, 
                     middle_edge = middle_edge, 
                     forbidden = forbidden)
     return(goal(id = id,
