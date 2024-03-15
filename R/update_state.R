@@ -369,7 +369,7 @@ update_goal <- function(agent,
                         state,
                         background,
                         standing_start = 0.2,
-                        close_enough = size(agent) / 2,
+                        close_enough = size(agent) / 0.5,
                         report = FALSE,
                         interactive_report = FALSE) {  
 
@@ -383,7 +383,7 @@ update_goal <- function(agent,
         status(agent) <- "completing goal"
         
         # Replace goal if necessary
-        if(is.null(current_goal(agent))) {
+        if(current_goal(agent)@done) {
             # Check if there are goals left to give. If not, then give the agent
             # the task of going to the exit
             if(length(goals(agent)) > 0) {
@@ -441,8 +441,12 @@ update_goal <- function(agent,
                                                   updated_background)
 
             # Turn to the new path point and slow down
-            orientation(agent) <- m4ma::angle2(position(agent), 
-                                               current_goal(agent)@path[1,])
+            orientation(agent) <- m4ma::angle2(matrix(position(agent),
+                                                      nrow = 1, 
+                                                      ncol = 2), 
+                                               matrix(current_goal(agent)@path[1,],
+                                                      nrow = 1, 
+                                                      ncol = 2))
             speed(agent) <- standing_start
 
         } else {
@@ -468,8 +472,12 @@ update_goal <- function(agent,
                                                           updated_background)
 
                     # Turn to the new path point and slow down
-                    orientation(agent) <- m4ma::angle2(position(agent), 
-                                                       current_goal(agent)@path[1,])
+                    orientation(agent) <- m4ma::angle2(matrix(position(agent),
+                                                              nrow = 1, 
+                                                              ncol = 2),
+                                                       matrix(current_goal(agent)@path[1,],
+                                                              nrow = 1, 
+                                                              ncol = 2))
                     speed(agent) <- standing_start
 
                     # If rerouting, check whether we should report on it, and whether 
