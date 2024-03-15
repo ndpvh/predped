@@ -209,9 +209,11 @@ setMethod("find_path", "goal", function(object,
                           background,
                           space_between = radius(agent))
     
-    # Create a graph that can be used by `cppRouting`
+    # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
+    # I put the directed argument to FALSE so that agents are free to decide on
+    # their own which way to go (otherwise, order of nodes matters)
     graph <- cppRouting::makegraph(edges$edges, 
-                                   directed = TRUE,
+                                   directed = FALSE,
                                    coords = edges$nodes)
     
     # Use cppRouting to do the strategic planning in this function
