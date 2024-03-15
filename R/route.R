@@ -56,8 +56,9 @@ create_edges <- function(from,
     to <- rbind(edges$to) |> t()
     cost <- rbind(edges$cost) |> t()
 
-    edges <- cbind(from, to, cost) |>
-        as.data.frame() |>
+    edges <- cbind.data.frame(from, 
+                              to, 
+                              as.numeric(cost)) |>
         setNames(c("from", "to", "cost"))
 
     return(list(edges = edges, nodes = nodes))
@@ -142,14 +143,20 @@ create_nodes <- function(from,
 
     # Add the person and the goal to the list of nodes and give them unique 
     # identifiers. These identifiers are again called in the `find_path` function
-    # of the goals
-    nodes <- rbind(nodes, from, to)
-    ids <- c(ids, "agent", "goal")
+    # of the goals.
+    #
+    # Important, the agent should be added as a first node, and the goal as a 
+    # last node. This will allow us to use `directed = TRUE` in `makegraph`, as 
+    # all edges start from the agent and end in the goal
+    nodes <- rbind(from, nodes, to)
+    rownames(nodes) <- NULL
+    ids <- c("agent", ids, "goal")
 
     # Now, transform the nodes to a dataframe as required by `makegraph` from
     # the cppRouting package
-    nodes <- cbind(ids, nodes) |>
-        as.data.frame() |>
+    nodes <- cbind.data.frame(ids, 
+                              as.numeric(nodes[,1]), 
+                              as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
 
     return(nodes)
