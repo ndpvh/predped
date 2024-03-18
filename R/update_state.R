@@ -433,9 +433,12 @@ update_goal <- function(agent,
             # Given that you have to reroute, replan how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
+            agent_ids <- sapply(state$agents, id)
+            agent_idx <- which(agent_ids == id(agent))
+
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents)
+                                                  state$agents[-agent_idx])
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background)
