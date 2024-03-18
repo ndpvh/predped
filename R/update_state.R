@@ -564,6 +564,7 @@ update_goal <- function(agent,
                 # Keep it in matrix format, even if you only have 1 row left
                 current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                     matrix(ncol = 2)
+                status(agent) <- "reorient"
 
                 # Here, I keep the next code and comment of Andrew in this code:
                 # check if this also gives a problem for our code (I assume not,
