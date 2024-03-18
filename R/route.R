@@ -23,6 +23,9 @@ create_edges <- function(from,
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, to, background, space_between = space_between)
 
+    print(plot(background) + 
+        ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y)))
+
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
@@ -122,13 +125,32 @@ create_nodes <- function(from,
                    do.call("rbind", obj_nodes))
 
     # Check which nodes are contained within the environment and only retain 
-    # those. Furthermore delete all nodes that fall within an object.
+    # those. Furthermore delete all nodes that fall within an object. For this,
+    # we first create slightly bigger objects so that nodes close to each object
+    # are deleted. This ensures that the agents will leave some space between 
+    # them and the object.
+    new_obj <- list()
+    for(i in seq_along(obj)) {
+        if(class(obj[[i]]) == "circle") {
+            new_obj[[i]] <- circle(center = center(obj[[i]]), 
+                                   radius = radius(obj[[i]]) + space_between - 1e-4)
+        } else if(class(obj[[i]]) == "polygon") {
+            points <- add_nodes(obj[[i]], 
+                                space_between = space_between - 1e-4,
+                                only_corners = TRUE)
+            new_obj[[i]] <- polygon(points = points)
+        } else {
+            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
+                                      size = obj[[i]]@size + space_between - 1e-4)
+        }
+    }
+
     for(i in seq_len(nrow(nodes))) {
         if(in_object(shp, nodes[i,])) {
             nodes[i,] <- NA
         } else {
-            for(j in seq_along(obj)) {
-                if(in_object(obj[[j]], nodes[i,], outside = FALSE)) {
+            for(j in seq_along(new_obj)) {
+                if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
                     nodes[i,] <- NA
                     break
                 }
@@ -137,6 +159,10 @@ create_nodes <- function(from,
     }
 
     nodes <- nodes[!is.na(nodes[,1]),]
+
+
+
+    View(nodes)
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
