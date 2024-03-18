@@ -62,7 +62,9 @@ update_state <- function(state,
         # Extract the agent to-be-updated from the state list. Importantly, also
         # removed from this state list, as it should not contain this one agent:
         # Simulation is done relative to the agent to-be-updated
+        print(i)
         agent <- state$agents[[i]]
+        print(status(agent))
 
         # Update the position of the agent
         agent <- update_position(agent, 
@@ -79,6 +81,7 @@ update_state <- function(state,
 
         # Update the agent himself
         state$agents[[i]] <- agent
+        print(status(agent))
     }
 
     return(state)
@@ -391,7 +394,7 @@ update_goal <- function(agent,
                 goals(agent) <- goals(agent)[-1]
             } else {
                 current_goal(agent) <- goal(id = "goal exit",
-                                            position = exit(background)@position)
+                                            position = exit(background))
             }
 
             status(agent) <- "replan"
@@ -549,18 +552,18 @@ update_goal <- function(agent,
                 if(current_goal(agent)@id == "goal exit") {
                     status(agent) <- "exit"
                 } else {
-                    status(agent) <- "completing goal"
+                    status(agent) <- "completing goal"                    
+                    orientation(agent) <- m4ma::angle2(matrix(position(agent), 
+                                                              nrow = 1, 
+                                                              ncol = 2),
+                                                       matrix(current_goal(agent)@position,
+                                                              nrow = 1, 
+                                                              ncol = 2))
                 }                
             } else {
                 # Keep it in matrix format, even if you only have 1 row left
                 current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                     matrix(ncol = 2)
-                orientation(agent) <- m4ma::angle2(matrix(position(agent), 
-                                                          nrow = 1, 
-                                                          ncol = 2),
-                                                   matrix(current_goal(agent)@position,
-                                                          nrow = 1, 
-                                                          ncol = 2))
 
                 # Here, I keep the next code and comment of Andrew in this code:
                 # check if this also gives a problem for our code (I assume not,
