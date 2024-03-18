@@ -283,7 +283,8 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
 # the third and fourth column of `edge_1` or on the first and second column of 
 # `edge_2`.
 setMethod("add_nodes", signature(object = "polygon"), function(object, 
-                                                               space_between = 0.5) {
+                                                               space_between = 0.5,
+                                                               only_corners = FALSE) {
     
     # Create a local function that will take in two coordinates and will return
     # the location of the new coordinate
@@ -337,10 +338,61 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
     edges <- rbind(edges, edges[1,])
 
-    # Loop over the edges and do the necessary calculations
-    nodes <- matrix(0, nrow = nrow(edges) * 2, 2)
+    # Loop over the edges and do the necessary calculations. Immediately delete
+    # the points that are not on the outside of the polygon in question
+    nodes <- matrix(0, nrow = nrow(edges) - 1, 2)
     for(i in seq_len(nrow(edges) - 1)) {
-        nodes[(i - 1) * 2 + 1:2,] <- find_location(edges[i,], edges[i + 1,])
+        potential_nodes <- find_location(edges[i,], edges[i + 1,])
+        idx <- sapply(1:2, 
+                      \(x) in_object(object, potential_nodes[x,], outside = TRUE))
+        nodes[i,] <- potential_nodes[idx,]
+    }
+
+    # Return the nodes as is when you only want nodes to be created at the 
+    # corners of the polygon
+    if(only_corners) {
+        return(nodes)
+    }
+
+    # We need to add some additional spaces so that there is `space_between` 
+    # amount of space between each of the now created nodes. 
+    corner_nodes <- rbind(nodes, nodes[1,])
+    for(i in seq_len(nrow(corner_nodes) - 1)) {
+        # Get the slope and size of the line defined by the two nodes. If the 
+        # length of the line is smaller than `space_between`, we don't need to 
+        # put in some additional points
+        slope <- (corner_nodes[i,2] - corner_nodes[i + 1, 2]) / (corner_nodes[i,1] - corner_nodes[i + 1, 1])
+        size <- sqrt((corner_nodes[i,1] - corner_nodes[i + 1, 1])^2 + (corner_nodes[i,2] - corner_nodes[i + 1, 2])^2)
+
+        if(size < space_between) {
+            next
+        }
+
+        # Divide the line in equal pieces proportional to the amount of space 
+        # you have
+        number_points <- ceiling(size / space_between)
+        dist <- size / number_points
+
+        # Find the points on the line that correspond to each of the distances 
+        # and bind them to the `nodes` matrix. In order for this to work, we 
+        # should add the distances from a starting point to the end point by using
+        # the angle of the slope with a radius equal to the distance from the 
+        # starting point to the end point. The starting point is always defined 
+        # as that node for which x is minimal, except when the line drawn is 
+        # vertical, in which case the y-coordinate matters
+        angle <- atan(slope)
+        if(slope == -Inf) {
+            idx <- which.max(corner_nodes[i:(i + 1), 2])
+        } else if(slope == Inf) {
+            idx <- which.min(corner_nodes[i:(i + 1), 2])
+        } else {
+            idx <- which.min(corner_nodes[i:(i + 1), 1])
+        }
+        start <- corner_nodes[c(i:(i + 1))[idx],]
+
+        new_nodes <- cbind(start[1] + 1:(number_points - 1) * cos(angle) * dist,
+                           start[2] + 1:(number_points - 1) * sin(angle) * dist)
+        nodes <- rbind(nodes, new_nodes)        
     }
 
     return(nodes)
@@ -479,7 +531,8 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
 #'@rdname add_nodes-method
 #'
 setMethod("add_nodes", signature(object = "rectangle"), function(object, 
-                                                                 space_between = 0.5) {
+                                                                 space_between = 0.5,
+                                                                 only_corners = FALSE) {
 
     # Approach will be to make a new rectangle that is greater than the original
     # one by a given factor and then taking its points as the new nodes. If we
@@ -495,7 +548,56 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
                       orientation = object@orientation,
                       size = 2 * extension + object@size)
 
-    return(rect@points)
+    # Return the nodes as is when you only want nodes to be created at the 
+    # corners of the polygon
+    if(only_corners) {
+        return(rect@points)
+    }
+
+    # We need to add some additional spaces so that there is `space_between` 
+    # amount of space between each of the now created nodes. For this, we will 
+    # use logic that is the same as for polygons.
+    nodes <- rect@points
+    corner_nodes <- rbind(rect@points, rect@points[1,])
+    for(i in seq_len(nrow(corner_nodes) - 1)) {
+        # Get the slope and size of the line defined by the two nodes. If the 
+        # length of the line is smaller than `space_between`, we don't need to 
+        # put in some additional points
+        slope <- (corner_nodes[i,2] - corner_nodes[i + 1, 2]) / (corner_nodes[i,1] - corner_nodes[i + 1, 1])
+        size <- sqrt((corner_nodes[i,1] - corner_nodes[i + 1, 1])^2 + (corner_nodes[i,2] - corner_nodes[i + 1, 2])^2)
+
+        if(size < space_between) {
+            next
+        }
+
+        # Divide the line in equal pieces proportional to the amount of space 
+        # you have
+        number_points <- ceiling(size / space_between)
+        dist <- size / number_points
+
+        # Find the points on the line that correspond to each of the distances 
+        # and bind them to the `nodes` matrix. In order for this to work, we 
+        # should add the distances from a starting point to the end point by using
+        # the angle of the slope with a radius equal to the distance from the 
+        # starting point to the end point. The starting point is always defined 
+        # as that node for which x is minimal, except when the line drawn is 
+        # vertical, in which case the y-coordinate matters
+        angle <- atan(slope)
+        if(slope == -Inf) {
+            idx <- which.max(corner_nodes[i:(i + 1), 2])
+        } else if(slope == Inf) {
+            idx <- which.min(corner_nodes[i:(i + 1), 2])
+        } else {
+            idx <- which.min(corner_nodes[i:(i + 1), 1])
+        }
+        start <- corner_nodes[c(i:(i + 1))[idx],]
+
+        new_nodes <- cbind(start[1] + 1:(number_points - 1) * cos(angle) * dist,
+                           start[2] + 1:(number_points - 1) * sin(angle) * dist)
+        nodes <- rbind(nodes, new_nodes)        
+    }
+
+    return(nodes)
 })
 
 #' An S4 Class to Represent Circle Objects
@@ -594,7 +696,9 @@ setMethod("rng_point", signature(object = "circle"), function(object,
 #'@rdname add_nodes-method
 #'
 setMethod("add_nodes", signature(object = "circle"), function(object, 
-                                                              space_between = 0.5) {
+                                                              space_between = 0.5,
+                                                              only_corners = FALSE) {
+    
     
     # Create the angles at which to put the nodes around the circle
     angles <- seq(0, 2 * pi, pi / 4)
@@ -604,8 +708,39 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     # number `space_between` so that some space is left between the object and 
     # the path point
     adjusted_radius <- radius(object) + space_between
-    return(cbind(center(object)[1] + cos(angles) * adjusted_radius, 
-                 center(object)[2] + sin(angles) * adjusted_radius))
+    nodes <- cbind(center(object)[1] + cos(angles) * adjusted_radius, 
+                   center(object)[2] + sin(angles) * adjusted_radius)
+
+    # The argument `only_corners` is quite the misnomer for the circle class, but
+    # is chosen to be consistent with the other `add_nodes` functions. Basically,
+    # the `only_corners` defines whether we just use the pi/4 radians points 
+    # that are chosen, or whether we should add some additional points that 
+    # make use of the `space_between` argument
+    if(only_corners) {
+        return(nodes)
+    }
+
+    # Compute the circumference of the circle for each pi/4 part 
+    dist_part <- 2 * pi * adjusted_radius / 8
+
+    # If this distance is smaller than `space_between`, we can just return the 
+    # already acquired nodes
+    if(dist_part < space_between) {
+        return(nodes)
+    }
+
+    # Otherwise, we will examine how many additional points we can create and 
+    # adjust the angle at which we sampled the nodes
+    number_points <- ceiling(dist_part / space_between)
+    adjusted_angle <- pi / (4 * number_points)
+
+    # Now create the angles at which to sample and create the nodes in the way
+    # we previously did
+    angles <- seq(0, 2 * pi, adjusted_angle)
+    nodes <- cbind(center(object)[1] + cos(angles) * adjusted_radius, 
+                   center(object)[2] + sin(angles) * adjusted_radius)
+
+    return(nodes)
 })
 
 
