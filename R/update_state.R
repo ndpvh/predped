@@ -555,6 +555,12 @@ update_goal <- function(agent,
                 # Keep it in matrix format, even if you only have 1 row left
                 current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                     matrix(ncol = 2)
+                orientation(agent) <- m4ma::angle2(matrix(position(agent), 
+                                                          nrow = 1, 
+                                                          ncol = 2),
+                                                   matrix(current_goal(agent)@position,
+                                                          nrow = 1, 
+                                                          ncol = 2))
 
                 # Here, I keep the next code and comment of Andrew in this code:
                 # check if this also gives a problem for our code (I assume not,
