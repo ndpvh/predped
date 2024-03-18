@@ -39,6 +39,7 @@ setMethod("simulate", "predped", function(object,
                                           goal_duration = \(x) rnorm(x, 10, 2),
                                           radius = 0.2, 
                                           standing_start = 0.2,
+                                          print_iteration = TRUE,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -77,6 +78,11 @@ setMethod("simulate", "predped", function(object,
                                              goal_duration = goal_duration,
                                              radius = radius, 
                                              standing_start = standing_start))
+        }
+
+        # Provide feedback if wanted
+        if(print_iteration) {
+            print(paste0("Iteration: ", i, "; Number of agents: ", length(state$agents)))
         }
 
         # Update the current state
