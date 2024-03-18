@@ -65,8 +65,12 @@ setMethod("show", "agent", function(object) {
     cat("Agent Cell:", object@cell, "\n")
     cat("Agent Status:", object@status, "\n")
     cat("Agent Parameters:", "\n")
-    cat(write.table(object@parameters), "\n")
-    cat("Agent Goals", paste(object@goals), "\n")
+    print(object@parameters[, 1:12])
+    cat("\n", "\n", "Message: to view all agent parameters call", "\n",
+    "`object@parameters` to see the full data.frame", "\n", "\n")
+    cat("Agent Goals:", length(object@goals), "\n")
+    cat("Message: more detailed information on agent goals", "\n",
+    "can be obtained by calling `object@goals` ", "\n", "\n")
     cat("Agent Center:", object@center, "\n")
 })
 
