@@ -89,13 +89,6 @@ utility <- function(agent,
                                 ncol = 2)
         goal_distance <- m4ma::dist1_rcpp(position(agent), 
                                           goal_position)
-        # print("----------------------")
-        # print(paste0("goal distance: ", goal_distance))
-
-        # print("---------------------")
-        # print(goal_position)
-        # print(goal_distance)
-        # print(current_goal(agent))
 
         # Angle between agent and the goal
         direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
