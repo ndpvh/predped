@@ -284,7 +284,8 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
 # `edge_2`.
 setMethod("add_nodes", signature(object = "polygon"), function(object, 
                                                                space_between = 0.5,
-                                                               only_corners = FALSE) {
+                                                               only_corners = FALSE,
+                                                               outside = TRUE) {
     
     # Create a local function that will take in two coordinates and will return
     # the location of the new coordinate
@@ -344,7 +345,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     for(i in seq_len(nrow(edges) - 1)) {
         potential_nodes <- find_location(edges[i,], edges[i + 1,])
         idx <- sapply(1:2, 
-                      \(x) in_object(object, potential_nodes[x,], outside = TRUE))
+                      \(x) in_object(object, potential_nodes[x,], outside = outside))
         nodes[i,] <- potential_nodes[idx,]
     }
 
@@ -532,7 +533,8 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
 #'
 setMethod("add_nodes", signature(object = "rectangle"), function(object, 
                                                                  space_between = 0.5,
-                                                                 only_corners = FALSE) {
+                                                                 only_corners = FALSE,
+                                                                 outside = TRUE) {
 
     # Approach will be to make a new rectangle that is greater than the original
     # one by a given factor and then taking its points as the new nodes. If we
@@ -544,9 +546,15 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
     
     # Make the new rectangle and extract its points. Importantly, we need to 
     # use 2 * `extension`, as we have two edges that need extending.
+    if(outside) {
+        new_size <- object@size + 2 * extension
+    } else {
+        new_size <- object@size - 2 * extension
+    }
+
     rect <- rectangle(center = object@center, 
                       orientation = object@orientation,
-                      size = 2 * extension + object@size)
+                      size = new_size)
 
     # Return the nodes as is when you only want nodes to be created at the 
     # corners of the polygon
@@ -697,7 +705,8 @@ setMethod("rng_point", signature(object = "circle"), function(object,
 #'
 setMethod("add_nodes", signature(object = "circle"), function(object, 
                                                               space_between = 0.5,
-                                                              only_corners = FALSE) {
+                                                              only_corners = FALSE,
+                                                              outside = TRUE) {
     
     
     # Create the angles at which to put the nodes around the circle
@@ -707,7 +716,9 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     # and the drawn angles and return. Importantly, radius is extended with a
     # number `space_between` so that some space is left between the object and 
     # the path point
-    adjusted_radius <- radius(object) + space_between
+    adjusted_radius <- ifelse(outside, 
+                              radius(object) + space_between,
+                              radius(object) - space_between)
     nodes <- cbind(center(object)[1] + cos(angles) * adjusted_radius, 
                    center(object)[2] + sin(angles) * adjusted_radius)
 
