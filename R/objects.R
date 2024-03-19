@@ -139,6 +139,17 @@ setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
 #' @name add_nodes-method
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 
+#' Sample a Random Point on the Circumference
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param other_object Another object of type that extends \code{\link[predped]{object-class}}
+#' with which `object` is to be tested with.
+#'
+#' @return Logical denoting whether the objects intersect
+#' @export
+#' @name intersects-method
+setGeneric("intersects", function(object, other_object) standardGeneric("intersects"))
+
 #' An S4 class to Represent Polygon Objects
 #'
 #' Polygons can be used to create flexible shapes and are defined through a set
@@ -399,6 +410,46 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     return(nodes)
 })
 
+#'@rdname intersects-method
+#'
+setMethod("intersects", signature(object = "polygon"), function(object, other_object) {
+    
+    # Dispath based on the type of the other object
+    if(class(other_object) == "circle") {
+        return(intersects(other_object, object))
+    } else {
+        # Extract the points of the objects and create the edges to be 
+        # evaluated
+        edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+        edges_1 <- rbind(edges_1, edges_1[1,])
+
+        edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
+        edges_2 <- rbind(edges_2, edges_2[1,])
+
+        # Loop over each edge and evaluate whether they intersect. If so, end
+        # it then and there. If not, continue looping
+        idx <- cbind(rep(1:nrow(edges_1), each = nrow(edges_2)),
+                     rep(1:nrow(edges_2), times = nrow(edges_1)))
+        for(i in seq_len(nrow(idx))) {
+            tmp <- m4ma::line.line.intersection(edges_1[idx[i,1], 1:2],
+                                                edges_1[idx[i,1], 3:4], 
+                                                edges_2[idx[i,2], 1:2], 
+                                                edges_2[idx[i,2], 3:4],
+                                                interior.only = TRUE)
+            
+            if(all(is.infinite(tmp))) {
+                tmp <- c(NA, NA)
+            }
+
+            if(!any(is.na(tmp))) {
+                return(TRUE)
+            }
+        }
+
+        return(FALSE)
+    }
+})
+
 #' An S4 Class to Represent Rectangle Objects
 #'
 #' Special case of the \code{\link[predped]{polygon-class}}.
@@ -608,6 +659,23 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
     return(nodes)
 })
 
+#'@rdname intersects-method
+#'
+setMethod("intersects", signature(object = "rectangle"), function(object, other_object) {
+    # Dispath based on the type of the other object. If circle or polygon, then 
+    # we switch the two objects and dispatch to the `intersects` method of these
+    # two classes
+    if(class(other_object) == "circle") {
+        return(intersects(other_object, object))
+    } else if(class(other_object) == "polygon") {
+        return(intersects(other_object, object))
+    } else {
+        new_poly <- polygon(points = other_object@points)
+        return(intersects(new_poly, object))
+    }
+    
+})
+
 #' An S4 Class to Represent Circle Objects
 #'
 #' @slot center A numeric vector of length two indicating the center of the circle.
@@ -754,16 +822,78 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     return(nodes)
 })
 
+#'@rdname intersects-method
+#'
+setMethod("intersects", signature(object = "circle"), function(object, other_object) {
+    # Dispath based on the type of the other object. If circle or polygon, then 
+    # we switch the two objects and dispatch to the `intersects` method of these
+    # two classes
+    if(class(other_object) == "circle") {
+        # This case is rather easy, as we just need to determine whether the 
+        # distance between the centers of the circles is smaller or bigger than 
+        # the sum of their radii
+        distance <- m4ma::dist1(center(object), 
+                                matrix(center(other_object), 
+                                       ncol = 2))
+
+        return(distance <= radius(object) + radius(other_object))
+
+    } else if(class(other_object) == "polygon") {
+        stop("Intersection of a circle with a polygon has not been created yet")
+
+    } else {
+        # Rotate the circle and rectangle so that the rectangle has orientation
+        # 0
+        new_rect <- rotate(other_object, degrees = -orientation(other_object))
+        new_circ <- circle(center = rotate(center(object), 
+                                           radians = - pi * orientation(other_object) / 180,
+                                           center = center(other_object)),
+                           radius = radius(object))
+
+        # With the reoriented objects, we can now apply a simple rule on the 
+        # centers of the objects to determine whether they intersect
+        x1 <- center(new_circ)[1]
+        y1 <- center(new_circ)[2]
+
+        x2 <- center(new_rect)[1]
+        y2 <- center(new_rect)[2]
+
+        # Circle is far enough so that no intersection is possible
+        if((abs(x1 - x2) > size(new_rect)[1] / 2 + radius(new_circ)) | 
+           (abs(y1 - y2) > size(new_rect)[2] / 2 + radius(new_circ))) {
+
+            return(FALSE)
+        }
+
+        # Circle is so close that intersection is guaranteed
+        if((abs(x1 - x2) < size(new_rect)[1] / 2) | 
+           (abs(y1 - y2) < size(new_rect)[2] / 2)) {
+
+            return(TRUE)
+        }
+
+        # Circle might also be at corners, so check whether the distance of the 
+        # circle to the corners of the rectangle are smaller than its radius
+        corner_distance <- (abs(x1 - x2) - size(new_rect)[1])^2 + 
+            (abs(y1 - y2) - size(new_rect)[2])^2
+        if(corner_distance <= radius(new_circ)^2) {
+            return(TRUE)
+        }
+
+        return(FALSE)
+    }  
+})
+
 
 
 # Getters and setters
 
-#' @rdname radius-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
 
-#' @rdname radius-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
@@ -777,12 +907,12 @@ setMethod("radius<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-#' @rdname size-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
-#' @rdname size-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("size<-", function(object, value) standardGeneric("size<-"))
@@ -805,12 +935,12 @@ setMethod("size<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-#' @rdname center-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("center", function(object) standardGeneric("center"))
 
-#' @rdname center-method
+#' @rdname object-class
 #' 
 #' @export 
 setGeneric("center<-", function(object, value) standardGeneric("center<-"))
@@ -839,5 +969,24 @@ setMethod("center", signature(object = "circle"), function(object) {
 
 setMethod("center<-", signature(object = "circle"), function(object, value) {
     object@center <- value
+    return(object)
+})
+
+#' @rdname object-class
+#' 
+#' @export 
+setGeneric("orientation", function(object) standardGeneric("orientation"))
+
+#' @rdname object-class
+#' 
+#' @export 
+setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
+
+setMethod("orientation", signature(object = "rectangle"), function(object) {
+    return(object@orientation)
+})
+
+setMethod("orientation<-", signature(object = "rectangle"), function(object, value) {
+    object@orientation <- value
     return(object)
 })
