@@ -231,12 +231,17 @@ update_position <- function(agent,
         check <- moving_options(agent, state, background, centers)
         
         # If there are no good options available, or the agent wants to stop,
-        # then allow him to
-        if(!any(check) | cell(agent) == 0) {  # stop or will have to
+        # then allow him to and let him replan his route
+        if(!any(check)) { # | cell(agent) == 0) {  # stop or will have to
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            # status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
+            status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
+
+            # # Let the agent replan
+            current_goal(agent)@path <- find_path(current_goal(agent), 
+                                                  agent, 
+                                                  background)
 
             # Let the agent reorient to find a better way
             orientation(agent) <- best_angle(agent, 
@@ -248,7 +253,7 @@ update_position <- function(agent,
 
             # Report the degress that the agent is reorienting to
             turn <- paste("to", orientation(agent), "degrees")
-            if(status(agent) == "move") {
+            if(report) {
                 paste(id(agent), "turning", turn, "\n") |>
                     cat()
             }
@@ -266,9 +271,6 @@ update_position <- function(agent,
             check <- moving_options(agent, state, background, centers)
         }
 
-        print(check)
-        print(speed(agent))
-
         # Compute the utility of of each option and transform the utilities to
         # probabilities
         V <- utility(agent, state, agent_predictions, centers, background, check)
@@ -280,8 +282,6 @@ update_position <- function(agent,
                                                  nests, 
                                                  alpha, 
                                                  mu = 1))
-
-        print(Pr)
 
         # Apply the different options to the probabilities
         names(Pr) <- 0:33
