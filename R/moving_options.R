@@ -92,7 +92,8 @@ moving_options_agent <- function(agent, state, background, centers){
 
         # Function to rewrite! New arguments are already provided to this one,
         # but not the original one
-        goal_position <- current_goal(agent)@position@.Data
+        # goal_position <- current_goal(agent)@position # This was the original one
+        goal_position <- current_goal(agent)@path[1,]
         goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
