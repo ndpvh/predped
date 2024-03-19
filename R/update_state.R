@@ -66,18 +66,18 @@ update_state <- function(state,
         agent <- state$agents[[i]]
         print(status(agent))
 
+        # Update the goals of the agent
+        agent <- update_goal(agent, 
+                             state, 
+                             background) 
+
         # Update the position of the agent
         agent <- update_position(agent, 
                                  state,
                                  agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
                                  time_step = time_step,
-                                 ...)
-
-        # Update the goals of the agent
-        agent <- update_goal(agent, 
-                             state, 
-                             background)                             
+                                 ...)  
 
         # Update the agent himself
         state$agents[[i]] <- agent
@@ -135,7 +135,7 @@ predict_movement <- function(agent,
 #' that the agent might move to. Defaults to an 11 by 3 matrix where each column
 #' contains 72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, and 287.5 degrees.
 #' @param standing_start Numeric denoting the speed of the agent when they 
-#' resume walking after stopping. Defaults to `0.2`
+#' resume walking after stopping. Defaults to `0.1`
 #' @param time_step Numeric denoting the time step taken between iterations in 
 #' seconds. Defaults to `0.5` or half a second.
 #' 
@@ -175,13 +175,13 @@ update_position <- function(agent,
                             velocities = c(1.5, 1, 0.5) |>
                                rep(each = 11) |>
                                matrix(ncol = 3),
-                            orientations = matrix(rep(c(
-                                72.5, 50, 32.5, 20, 10,
-                                0, 350, 340, 327.5, 310, 287.5),
-                                times = 3),
-                                ncol = 3),
-                            standing_start = 0.2,
-                            time_step = 0.5
+                            orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                             350, 340, 327.5, 310, 287.5) |>
+                                rep(times = 3) |>
+                                matrix(ncol = 3),
+                            standing_start = 0.1,
+                            time_step = 0.5,
+                            report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
@@ -210,7 +210,7 @@ update_position <- function(agent,
 
             # Report the degress that the agent is reorienting to
             turn <- paste("to", orientation(agent), "degrees")
-            if(status(agent) == "move") {
+            if(report) {
                 paste(id(agent), "turning", turn, "\n") |>
                     cat()
             }
@@ -235,7 +235,7 @@ update_position <- function(agent,
         if(!any(check) | cell(agent) == 0) {  # stop or will have to
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
+            # status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
 
             # Let the agent reorient to find a better way
@@ -266,6 +266,9 @@ update_position <- function(agent,
             check <- moving_options(agent, state, background, centers)
         }
 
+        print(check)
+        print(speed(agent))
+
         # Compute the utility of of each option and transform the utilities to
         # probabilities
         V <- utility(agent, state, agent_predictions, centers, background, check)
@@ -277,6 +280,8 @@ update_position <- function(agent,
                                                  nests, 
                                                  alpha, 
                                                  mu = 1))
+
+        print(Pr)
 
         # Apply the different options to the probabilities
         names(Pr) <- 0:33
@@ -306,7 +311,7 @@ update_position <- function(agent,
                                                          tStep = time_step))
 
             # Update speed to be either higher than or equal to `standing_start`
-            acceleration <- c(1.5, 1, 0.5)[m4ma::ringNum(cell)]
+            acceleration <- velocities[m4ma::ringNum(cell)]
             speed(agent) <- pmax(speed(agent) * acceleration, 
                                  standing_start)
 
@@ -346,7 +351,7 @@ update_position <- function(agent,
 #' should not be present in that state
 #' @param background The setting in which agents are walking around
 #' @param standing_start Numeric denoting the speed of the agent when they 
-#' resume walking after stopping. Defaults to `0.2`
+#' resume walking after stopping. Defaults to `0.1`
 #' @param close_enough Numeric denoting the distance an agent needs to a path 
 #' point or goal in order to interact with it. Defaults to `radius(agent) / 2`
 #' @param report Logical denoting whether we should report the actions of the 
@@ -371,7 +376,7 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.2,
+                        standing_start = 0.1,
                         close_enough = size(agent) / 0.5,
                         report = FALSE,
                         interactive_report = FALSE) {  
@@ -407,7 +412,7 @@ update_goal <- function(agent,
         }
     } 
     
-    # If the agent has to reorient, then we have to redefine path points. 
+    # If the agent has to replan, then we have to redefine path points. 
     # Either the agent sees their goal, and can walk directly towards it, or 
     # they cannot see their goal and they have to plan their route. Importantly,
     # agents can still plan their path if they can see their goal, but other 
