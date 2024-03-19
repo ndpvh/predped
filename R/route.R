@@ -23,9 +23,6 @@ create_edges <- function(from,
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, to, background, space_between = space_between)
 
-    print(plot(background) + 
-        ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y)))
-
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
@@ -53,6 +50,21 @@ create_edges <- function(from,
             idx <- idx + 1
         }
     }
+
+    idx <- sapply(edges$from, 
+                  \(x) which(nodes$node_ID == x))
+    idy <- sapply(edges$to, 
+                  \(x) which(nodes$node_ID == x))
+
+    tmp_edges <- cbind(nodes$X[idx], 
+                       nodes$Y[idx],
+                       nodes$X[idy], 
+                       nodes$Y[idy]) |>
+        as.data.frame() |>
+        setNames(c("x", "y", "xend", "yend"))
+    print(plot(background) + 
+        ggplot2::geom_segment(ggplot2::aes(x = tmp_edges$x, y = tmp_edges$y, 
+                                           xend = tmp_edges$xend, yend = tmp_edges$yend)))
 
     # Transform this list to a dataframe, as required by cppRouting
     from <- rbind(edges$from) |> t()
@@ -90,31 +102,13 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5) {
-    # Define a rectangle within which we will generate the different path points.
-    #
-    # Depending on the shape of the background, we need a slightly different 
-    # approach
+    
+    # Create a matrix of coordinates close to the edge of the shape of the object.
+    # These will serve as the first nodes of the network.
     shp <- shape(background)
-    if(class(shp) == "circle") {
-        x_range <- c(center(shp)[1] - radius(shp),
-                     center(shp)[1] + radius(shp))
-        y_range <- c(center(shp)[2] - radius(shp),
-                     center(shp)[2] + radius(shp))
-    } else {
-        x_range <- range(shp@points[,1])
-        y_range <- range(shp@points[,2])
-    }
-
-    # Create a matrix of all coordinates of equidistant locations in the 
-    # background. These will serve as the nodes of our network
-    x_co <- seq(x_range[1] + space_between / 2, 
-                x_range[2] - space_between / 2,
-                space_between)
-    y_co <- seq(y_range[1] + space_between / 2,
-                y_range[2] - space_between / 2,
-                space_between)
-    nodes <- cbind(rep(x_co, each = length(y_co)),
-                   rep(y_co, times = length(x_co)))
+    nodes <- add_nodes(shp, 
+                       space_between = space_between,
+                       outside = FALSE)
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
@@ -159,10 +153,6 @@ create_nodes <- function(from,
     }
 
     nodes <- nodes[!is.na(nodes[,1]),]
-
-
-
-    View(nodes)
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
