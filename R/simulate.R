@@ -136,7 +136,8 @@ add_agent <- function(object,
     angle <- perpendicular_orientation(background)
 
     # Create the agent themselves
-    tmp_agent <- agent(center = background@entrance,
+    starting_position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+    tmp_agent <- agent(center = starting_position,
                        radius = radius,
                        speed = standing_start,
                        orientation = angle,
