@@ -219,3 +219,100 @@ testthat::test_that("Circle random generation of point works", {
     testthat::expect_equal(tst, ref)
     testthat::expect_false(any(inside)) # Also nice to see plotted: plot(sim)
 })
+
+testthat::test_that("Circle intersection works", {
+    circ <- predped::circle(center = c(0, 0), 
+                            radius = 2)
+
+    obj <- list(predped::circle(center = c(0, 1), 
+                                radius = 2),
+                predped::circle(center = c(0, 10), 
+                                radius = 2),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2)), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(circ, x))
+    ref <- list(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
+
+testthat::test_that("Rectangle intersection works", {
+    rect <- predped::rectangle(center = c(0, 0), 
+                               size = c(2, 2))
+
+    obj <- list(predped::circle(center = c(0, 1), 
+                                radius = 2),
+                predped::circle(center = c(0, 10), 
+                                radius = 2),
+                # Commented out for now, but to solve later: Seems to be a special
+                # case: Parallel lines not detected as intersecting, even when 
+                # contained within themselves.
+                # predped::rectangle(center = c(0, 1),
+                #                    size = c(2, 2)), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45),
+                predped::polygon(points = rbind(c(0, 0), 
+                                                c(0.5, 4),
+                                                c(1, -1))),
+                predped::polygon(points = rbind(c(0, 4),
+                                                c(0.5, 8),
+                                                c(-1, 3))))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(rect, x))
+    ref <- list(TRUE, FALSE, #TRUE, 
+                FALSE, TRUE, FALSE, TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
+
+testthat::test_that("Polygon intersection works", {
+    rect <- predped::polygon(points = rbind(c(-1, -1), 
+                                            c(-1, 1),
+                                            c(1, 1),
+                                            c(1, -1)))
+
+    obj <- list(# Again a special case
+                # predped::rectangle(center = c(0, 0),
+                #                    size = c(2, 2)), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45),
+                predped::polygon(points = rbind(c(0, 0), 
+                                                c(0.5, 4),
+                                                c(1, -1))),
+                predped::polygon(points = rbind(c(0, 4),
+                                                c(0.5, 8),
+                                                c(-1, 3))))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(rect, x))
+    ref <- list(#TRUE, 
+                FALSE, TRUE, FALSE, TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
