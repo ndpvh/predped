@@ -58,7 +58,8 @@ moving_options_agent <- function(agent, state, background, centers){
     agent_idx <- which(id(agent) == agent_id)
 
     # Use the `free_cells` function to get all free cells to which the agent
-    # might move and check whether it does not provide an error
+    # might move and check whether it does not provide an error. Also add a 
+    # function that checks the intersection of a circle with another object
     check <- m4ma::free_cells_rcpp(agent, background, centers)
 
     # errored_out <- check_try_error(check, "after `free_cells`")
@@ -72,9 +73,11 @@ moving_options_agent <- function(agent, state, background, centers){
     # of this function can overwrite the local `check` variable without any
     # issues
     if(!all(!check)){
-        # check <- overlap_with_object(agent, state, centers, check)
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check)
-        # Not sure why this is done, but I'll leave it in just to be certain
+        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
+        check <- overlap_with_objects(agent, background, centers, check)
+
+        # If something blocks the way in the previous column, then it should also 
+        # block the way on the columns
         check[!check[,3],2] <- FALSE
         check[!check[,2],1] <- FALSE
     }
@@ -102,6 +105,11 @@ moving_options_agent <- function(agent, state, background, centers){
         # agent should still move even if it cannot see their goal (hence the
         # if-statement), otherwise the agent will get stuck
         check <- if(!all(!local_check)) local_check else !opposite_check
+
+        # If something blocks the way in the previous column, then it should also 
+        # block the way on the columns
+        check[!check[,3],2] <- FALSE
+        check[!check[,2],1] <- FALSE
     }
     
     # errored_out <- check_try_error(check, "after `seesGoalOK`")
@@ -121,6 +129,11 @@ moving_options_agent <- function(agent, state, background, centers){
         if(length(state$agents[-agent_idx]) > 0) {
             check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
         }
+
+        # If something blocks the way in the previous column, then it should also 
+        # block the way on the columns
+        check[!check[,3],2] <- FALSE
+        check[!check[,2],1] <- FALSE
     }
 
     # Finally, return the cells that are free to move to
@@ -231,4 +244,44 @@ agents_between_goal <- function(agent,
     }
 
     return(n_agents)
+}
+
+# Temporary function to see if this one actually works
+overlap_with_objects <- function(agent, 
+                                 background, 
+                                 centers, 
+                                 check) {
+    
+    shp <- shape(background)
+    obj <- objects(background)
+
+    # Loop over the centers
+    for(i in seq_len(nrow(centers))) {
+        # If that center is already out of the running, continue
+        if(!check[i]) {
+            next
+        }
+
+        # Create a temporary circle, transform to a polygon with several points
+        # and find out whether these are (a) contained within the background and
+        # (b) not contained within any of the objects
+        circ <- circle(center = centers[i,], 
+                       radius = radius(agent))
+
+        # Check whether contained in background
+        if(intersects(circ, shp)) {
+            check[i] <- FALSE
+            next
+        }
+
+        # Check whether not contained within objects
+        local_check <- sapply(obj, 
+                              \(x) intersects(circ, x))
+
+        if(any(local_check)) {
+            check[i] <- FALSE
+        }
+    }
+
+    return(check)
 }
