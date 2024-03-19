@@ -111,10 +111,16 @@ setMethod("position<-", "agent", function(object, value) {
 #' @rdname agent-class
 #' 
 #' @export
-setGeneric("size", function(object) standardGeneric("size"))
-
 setMethod("size", "agent", function(object) {
     return(setNames(object@radius, object@id))
+})
+
+#' @rdname agent-class
+#'
+#' @export 
+setMethod("size<-", "agent", function(object, value) {
+    object@radius <- value
+    return(object)
 })
 
 #' @rdname agent-class
@@ -139,17 +145,13 @@ setMethod("speed<-", "agent", function(object, value) {
 #' @rdname agent-class
 #' 
 #' @export
-setGeneric("orientation", function(object) standardGeneric("orientation"))
-
-#' @rdname agent-class
-#' 
-#' @export
-setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
-
 setMethod("orientation", "agent", function(object) {
     return(setNames(object@orientation, object@id))
 })
 
+#' @rdname agent-class
+#' 
+#' @export
 setMethod("orientation<-", "agent", function(object, value) {
     object@orientation <- value
     return(object)
