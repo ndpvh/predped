@@ -831,12 +831,17 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
     if(class(other_object) == "circle") {
         # This case is rather easy, as we just need to determine whether the 
         # distance between the centers of the circles is smaller or bigger than 
-        # the sum of their radii
+        # the sum of their radii. 
+        #
+        # However, to ensure that a circle can also be contained within the 
+        # other circle, we also have to ensure that the distance between the 
+        # centers is bigger than the difference between the radii
         distance <- m4ma::dist1(center(object), 
                                 matrix(center(other_object), 
                                        ncol = 2))
 
-        return(distance <= radius(object) + radius(other_object))
+        return((distance <= radius(object) + radius(other_object)) & 
+               (distance >= abs(radius(object) - radius(other_object))))
 
     } else if(class(other_object) == "polygon") {
         stop("Intersection of a circle with a polygon has not been created yet")
