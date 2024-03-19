@@ -865,7 +865,14 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
             return(FALSE)
         }
 
-        # Circle is so close that intersection is guaranteed
+        # Circle is so close that intersection is not possible
+        if((abs(x1 - x2) < size(new_rect)[1] / 2 - radius(new_circ)) & 
+           (abs(y1 - y2) < size(new_rect)[2] / 2 - radius(new_circ))) {
+
+            return(FALSE)
+        }
+
+        # Circle is, however, close enough so that intersection is guaranteed
         if((abs(x1 - x2) < size(new_rect)[1] / 2) | 
            (abs(y1 - y2) < size(new_rect)[2] / 2)) {
 
