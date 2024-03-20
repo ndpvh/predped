@@ -24,17 +24,19 @@ create_edges <- function(from,
     # cannot take shortcuts
     new_obj <- list()
     for(i in seq_along(obj)) {
-        if(class(obj[[i]]) == "circle") {
+        if(inherits(obj[[i]], "circle")) {
             new_obj[[i]] <- circle(center = center(obj[[i]]), 
-                                   radius = radius(obj[[i]]) + space_between - 1e-4)
-        } else if(class(obj[[i]]) == "polygon") {
+                                   radius = radius(obj[[i]]) + space_between)
+        } else if(inherits(obj[[i]], "polygon")) {
             points <- add_nodes(obj[[i]], 
-                                space_between = space_between - 1e-4,
+                                space_between = space_between,
                                 only_corners = TRUE)
             new_obj[[i]] <- polygon(points = points)
-        } else {
+        } else if(inherits(obj[[i]], "rectangle")) {
             new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + space_between - 1e-4)
+                                      size = obj[[i]]@size + space_between)
+        } else {
+            stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
     }
 
@@ -145,17 +147,19 @@ create_nodes <- function(from,
     # them and the object.
     new_obj <- list()
     for(i in seq_along(obj)) {
-        if(class(obj[[i]]) == "circle") {
+        if(inherits(obj[[i]], "circle")) {
             new_obj[[i]] <- circle(center = center(obj[[i]]), 
-                                   radius = radius(obj[[i]]) + space_between - 1e-4)
-        } else if(class(obj[[i]]) == "polygon") {
+                                   radius = radius(obj[[i]]) + space_between)
+        } else if(inherits(obj[[i]], "polygon")) {
             points <- add_nodes(obj[[i]], 
-                                space_between = space_between - 1e-4,
+                                space_between = space_between,
                                 only_corners = TRUE)
             new_obj[[i]] <- polygon(points = points)
-        } else {
+        } else if(inherits(obj[[i]], "rectangle")) {
             new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + space_between - 1e-4)
+                                      size = obj[[i]]@size + space_between)
+        } else {
+            stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
     }
 
