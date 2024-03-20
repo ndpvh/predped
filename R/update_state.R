@@ -81,7 +81,6 @@ update_state <- function(state,
 
         # Update the agent himself
         state$agents[[i]] <- agent
-        print(status(agent))
     }
 
     return(state)
@@ -230,58 +229,23 @@ update_position <- function(agent,
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)
         
-        # If there are no good options available, or the agent wants to stop,
-        # then allow him to and let him replan his route
-        if(!any(check)) { # | cell(agent) == 0) {  # stop or will have to
+        # If there are no good options available, trigger a replanning of the 
+        # agent: This will create new path points and let the agent reorient. 
+        if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            status(agent) <- "reorient" # Not sure if needed: is more like a soft reorientation
+            status(agent) <- "replan" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
-
-            # # Let the agent replan
-            current_goal(agent)@path <- find_path(current_goal(agent), 
-                                                  agent, 
-                                                  background)
-
-            # Let the agent reorient to find a better way
-            orientation(agent) <- best_angle(agent, 
-                                             state, 
-                                             agent_predictions, 
-                                             background, 
-                                             velocities, 
-                                             orientations)
-
-            # Report the degress that the agent is reorienting to
-            turn <- paste("to", orientation(agent), "degrees")
-            if(report) {
-                paste(id(agent), "turning", turn, "\n") |>
-                    cat()
-            }
-
-            # Define the centers of the options to move to
-            centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                       p1 = position(agent),
-                                       v1 = speed(agent),
-                                       a1 = orientation(agent),
-                                       vels = velocities,
-                                       angles = orientations,
-                                       tStep = time_step)
-
-            # Check for occlusions or blocked cells the agent cannot move to
-            check <- moving_options(agent, state, background, centers)
+            return(agent)
         }
 
         # Compute the utility of of each option and transform the utilities to
         # probabilities
         V <- utility(agent, state, agent_predictions, centers, background, check)
 
-        Pr <- sapply(1:34, 
-                     function(i) m4ma::pcnl_rcpp(m4ma::get_cell_nest()[i, ], 
-                                                 V, 
-                                                 rep(1, length(nests)), 
-                                                 nests, 
-                                                 alpha, 
-                                                 mu = 1))
+        V <- V - max(V)
+        exp_V <- exp(V)
+        Pr <- exp_V / sum(exp_V)
 
         # Apply the different options to the probabilities
         names(Pr) <- 0:33
@@ -301,6 +265,7 @@ update_position <- function(agent,
         # If stopped, we need to reset the agent's velocity
         if(cell == 0) {
             speed(agent) <- standing_start
+            status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
         } else {
             position(agent) <- as.vector(m4ma::c_vd_rcpp(cells = cell,
                                                          p1 = position(agent),
@@ -317,10 +282,10 @@ update_position <- function(agent,
 
             # Update orientation to be in degrees and relative to the current 
             # orientation of the agent
-            rel_orienation <- ifelse(orientations >= 180, 
-                                     360 - orientations, 
-                                     -orientations)[m4ma::coneNum(cell)]
-            orientation(agent) <- (orientation(agent) - rel_orienation) %% 360
+            rel_orientation <- ifelse(orientations >= 180, 
+                                      orientations - 360, 
+                                      orientations)[m4ma::coneNum(cell)]
+            orientation(agent) <- (orientation(agent) + rel_orientation) %% 360
         }
     }
 
@@ -546,41 +511,32 @@ update_goal <- function(agent,
         # print(distance_path_point)
         # print(close_enough)
 
-        # Check whether they are "close enough" to the path point
-        if(distance_path_point < close_enough) {
-            # Check whether they are at their goal. If so, then they have to 
-            # enter in an interaction state. If not, then they have to change
-            # their direction to a new path point
-            if(nrow(current_goal(agent)@path) == 1) {
-                # Check if the goal is the exit goal. If not, then the agent 
-                # should start interacting with the goal
-                if(current_goal(agent)@id == "goal exit") {
-                    status(agent) <- "exit"
-                } else {
-                    status(agent) <- "completing goal"                    
-                    orientation(agent) <- m4ma::angle2(matrix(position(agent), 
-                                                              nrow = 1, 
-                                                              ncol = 2),
-                                                       matrix(current_goal(agent)@position,
-                                                              nrow = 1, 
-                                                              ncol = 2))
-                }                
+        # Check whether they are "close enough" to the goal
+        if((distance_path_point < close_enough) & (nrow(current_goal(agent)@path) == 1)) {
+            # If they are close enough to the goal, they can enter in an 
+            # interaction state.
+            #
+            # Check if the goal is the exit goal. If so, the interaction state
+            # is not "completing goal" but rather "exit", allowing us to delete
+            # the agent
+            if(current_goal(agent)@id == "goal exit") {
+                status(agent) <- "exit"
             } else {
-                # Keep it in matrix format, even if you only have 1 row left
-                current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
-                    matrix(ncol = 2)
-                status(agent) <- "reorient"
-
-                # Here, I keep the next code and comment of Andrew in this code:
-                # check if this also gives a problem for our code (I assume not,
-                # as the path points are all in field of view of each node)
-                #
-                # Next subgoal (i.e., offset = 1) can already be seen OR is very 
-                # close (even though not in field of view, otherwise can get stuck)
-                # if (seesCurrentGoal(j, state, objects, offset = 1) | 
-                #     dist1(state$p[j, ], state$P[[j]][i, 1:2, drop = FALSE]) < 
-                #     closeEnough) {
+                status(agent) <- "completing goal"                    
+                orientation(agent) <- m4ma::angle2(matrix(position(agent), 
+                                                            nrow = 1, 
+                                                            ncol = 2),
+                                                    matrix(current_goal(agent)@position,
+                                                            nrow = 1, 
+                                                            ncol = 2))
             }
+        # If they are close_enough to the path point, then we can delete the 
+        # path point they are currently at and let the agent reorient
+        } else if(distance_path_point < close_enough) {
+            # Keep it in matrix format, even if you only have 1 row left
+            current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
+                matrix(ncol = 2)
+            status(agent) <- "reorient"
         }
     }
 
