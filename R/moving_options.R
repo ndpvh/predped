@@ -101,15 +101,11 @@ moving_options_agent <- function(agent, state, background, centers){
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
         local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
+
         # Here, change `check` based on the results of the function. Importantly,
         # agent should still move even if it cannot see their goal (hence the
         # if-statement), otherwise the agent will get stuck
         check <- if(!all(!local_check)) local_check else !opposite_check
-
-        # If something blocks the way in the previous column, then it should also 
-        # block the way on the columns
-        check[!check[,3],2] <- FALSE
-        check[!check[,2],1] <- FALSE
     }
     
     # errored_out <- check_try_error(check, "after `seesGoalOK`")
@@ -262,9 +258,8 @@ overlap_with_objects <- function(agent,
             next
         }
 
-        # Create a temporary circle, transform to a polygon with several points
-        # and find out whether these are (a) contained within the background and
-        # (b) not contained within any of the objects
+        # Create a temporary circle, and find out whether these are (a) contained 
+        # within the background and (b) not contained within any of the objects
         circ <- circle(center = centers[i,], 
                        radius = radius(agent))
 
