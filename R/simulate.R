@@ -40,6 +40,7 @@ setMethod("simulate", "predped", function(object,
                                           radius = 0.2, 
                                           standing_start = 0.2,
                                           print_iteration = TRUE,
+                                          close_enough = 2 * radius,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -77,7 +78,8 @@ setMethod("simulate", "predped", function(object,
                                              goal_number[i],
                                              goal_duration = goal_duration,
                                              radius = radius, 
-                                             standing_start = standing_start))
+                                             standing_start = standing_start,
+                                             close_enough = close_enough))
         }
 
         # Provide feedback if wanted
@@ -122,7 +124,8 @@ add_agent <- function(object,
                       goal_number,
                       goal_duration = \(x) rnorm(x, 10, 2),
                       radius = 0.2,
-                      standing_start = 0.2) {
+                      standing_start = 0.2,
+                      close_enough = 2 * radius) {
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
 
@@ -148,7 +151,8 @@ add_agent <- function(object,
     # Create the path to walk on for the current goal and return the agent
     current_goal(tmp_agent)@path <- find_path(current_goal(tmp_agent), 
                                               tmp_agent, 
-                                              background)
+                                              background,
+                                              space_between = close_enough)
     
     return(tmp_agent)
 }

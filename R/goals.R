@@ -206,12 +206,13 @@ setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
 setMethod("find_path", "goal", function(object, 
                                         agent,
                                         background,
-                                        algorithm = "bi") {
+                                        algorithm = "bi",
+                                        space_between = radius(agent)) {
     # Create the edges that are taken in by `makegraph`
     edges <- create_edges(position(agent),
                           position(object), 
                           background,
-                          space_between = radius(agent))
+                          space_between = space_between)
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
     # I put the directed argument to FALSE so that agents are free to decide on

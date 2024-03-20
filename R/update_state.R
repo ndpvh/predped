@@ -176,7 +176,7 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.2,
+                            standing_start = 0.1 * parameters(agent)[["sPref"]],
                             time_step = 0.5,
                             report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
@@ -340,7 +340,7 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.1,
+                        standing_start = 0.1 * parameters(agent)[["sPref"]],
                         close_enough = 2 * radius(agent),
                         report = FALSE,
                         interactive_report = FALSE) {  
@@ -413,7 +413,8 @@ update_goal <- function(agent,
                                                   state$agents[-agent_idx])
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
-                                                  updated_background)
+                                                  updated_background,
+                                                  space_between = close_enough)
 
             # Turn to the new path point and slow down
             orientation(agent) <- m4ma::angle2(matrix(position(agent),
@@ -444,7 +445,8 @@ update_goal <- function(agent,
                                                           state$agents)
                     current_goal(agent)@path <- find_path(current_goal(agent), 
                                                           agent, 
-                                                          updated_background)
+                                                          updated_background,
+                                                          space_between = close_enough)
 
                     # Turn to the new path point and slow down
                     orientation(agent) <- m4ma::angle2(matrix(position(agent),
