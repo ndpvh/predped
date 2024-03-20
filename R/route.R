@@ -20,6 +20,24 @@ create_edges <- function(from,
 
     obj <- objects(background)
 
+    # Make each of the objects in the background a bit bigger. This way, agents
+    # cannot take shortcuts
+    new_obj <- list()
+    for(i in seq_along(obj)) {
+        if(class(obj[[i]]) == "circle") {
+            new_obj[[i]] <- circle(center = center(obj[[i]]), 
+                                   radius = radius(obj[[i]]) + space_between - 1e-4)
+        } else if(class(obj[[i]]) == "polygon") {
+            points <- add_nodes(obj[[i]], 
+                                space_between = space_between - 1e-4,
+                                only_corners = TRUE)
+            new_obj[[i]] <- polygon(points = points)
+        } else {
+            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
+                                      size = obj[[i]]@size + space_between - 1e-4)
+        }
+    }
+
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, to, background, space_between = space_between)
 
@@ -33,9 +51,14 @@ create_edges <- function(from,
         for(j in (i + 1):nrow(nodes)) {
             co_1 <- as.numeric(nodes[i, c("X", "Y")])
             co_2 <- as.numeric(nodes[j, c("X", "Y")])
+            ids <- c(nodes$node_ID[i], nodes$node_ID[j])
 
             # Check if the nodes can be connected to each other: If occluded, 
             # that means something is standing in the way
+            if(!m4ma::seesGoal(co_1, co_2, new_obj) & !any(ids %in% c("agent", "goal"))) {
+                next
+            }
+
             if(!m4ma::seesGoal(co_1, co_2, obj)) {
                 next
             }
