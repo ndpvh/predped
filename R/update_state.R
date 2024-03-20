@@ -62,9 +62,7 @@ update_state <- function(state,
         # Extract the agent to-be-updated from the state list. Importantly, also
         # removed from this state list, as it should not contain this one agent:
         # Simulation is done relative to the agent to-be-updated
-        print(i)
         agent <- state$agents[[i]]
-        print(status(agent))
 
         # Update the goals of the agent
         agent <- update_goal(agent, 
@@ -178,7 +176,7 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.1,
+                            standing_start = 0.2,
                             time_step = 0.5,
                             report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
@@ -215,6 +213,7 @@ update_position <- function(agent,
             }
 
             status(agent) <- "move"
+            speed(agent) <- standing_start # Otherwise the agent will overshoot his goals when reorienting
         }
 
         # Define the centers of the options to move to
@@ -342,7 +341,7 @@ update_goal <- function(agent,
                         state,
                         background,
                         standing_start = 0.1,
-                        close_enough = size(agent) / 0.5,
+                        close_enough = 2 * radius(agent),
                         report = FALSE,
                         interactive_report = FALSE) {  
 
@@ -507,12 +506,8 @@ update_goal <- function(agent,
                                                   nrow = 1, 
                                                   ncol = 2))
 
-        # print("--------------------")
-        # print(distance_path_point)
-        # print(close_enough)
-
         # Check whether they are "close enough" to the goal
-        if((distance_path_point < close_enough) & (nrow(current_goal(agent)@path) == 1)) {
+        if((distance_path_point <= close_enough) & (nrow(current_goal(agent)@path) == 1)) {
             # If they are close enough to the goal, they can enter in an 
             # interaction state.
             #
@@ -532,7 +527,7 @@ update_goal <- function(agent,
             }
         # If they are close_enough to the path point, then we can delete the 
         # path point they are currently at and let the agent reorient
-        } else if(distance_path_point < close_enough) {
+        } else if(distance_path_point <= close_enough) {
             # Keep it in matrix format, even if you only have 1 row left
             current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                 matrix(ncol = 2)
