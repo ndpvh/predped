@@ -85,9 +85,6 @@ create_edges <- function(from,
                        nodes$Y[idy]) |>
         as.data.frame() |>
         setNames(c("x", "y", "xend", "yend"))
-    print(plot(background) + 
-        ggplot2::geom_segment(ggplot2::aes(x = tmp_edges$x, y = tmp_edges$y, 
-                                           xend = tmp_edges$xend, yend = tmp_edges$yend)))
 
     # Transform this list to a dataframe, as required by cppRouting
     from <- rbind(edges$from) |> t()
