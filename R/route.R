@@ -34,14 +34,17 @@ create_edges <- function(from,
             new_obj[[i]] <- polygon(points = points)
         } else if(inherits(obj[[i]], "rectangle")) {
             new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + space_between)
+                                      size = obj[[i]]@size + 2 * space_between)
         } else {
             stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
     }
 
     # Create the nodes that will serve as potential path points
-    nodes <- create_nodes(from, to, background, space_between = space_between)
+    nodes <- create_nodes(from, 
+                          to, 
+                          background, 
+                          space_between = space_between)
 
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
@@ -76,6 +79,7 @@ create_edges <- function(from,
         }
     }
 
+    ############################################################################
     idx <- sapply(edges$from, 
                   \(x) which(nodes$node_ID == x))
     idy <- sapply(edges$to, 
@@ -87,6 +91,10 @@ create_edges <- function(from,
                        nodes$Y[idy]) |>
         as.data.frame() |>
         setNames(c("x", "y", "xend", "yend"))
+    print(plot(background) + 
+        ggplot2::geom_segment(ggplot2::aes(x = tmp_edges$x, y = tmp_edges$y, 
+                                           xend = tmp_edges$xend, yend = tmp_edges$yend)))
+    ############################################################################
 
     # Transform this list to a dataframe, as required by cppRouting
     from <- rbind(edges$from) |> t()
@@ -120,6 +128,8 @@ create_edges <- function(from,
 # TO DO:
 #   - Extend `in_object` to deal with matrices in a vectorized way and get rid 
 #     of the loop over nodes
+#   - Vectorize the creation of the diagonal nodes in rectangles and circles and
+#     find a way to vectorize this for polygons (i.e., get rid of the while loop)
 create_nodes <- function(from, 
                          to, 
                          background, 
@@ -127,17 +137,45 @@ create_nodes <- function(from,
     
     # Create a matrix of coordinates close to the edge of the shape of the object.
     # These will serve as the first nodes of the network.
+    #
+    # For this, we will several columns/rows of nodes that close in on the 
+    # center of the figure. The algorithm used here is not ideal, but is better
+    # than nothing (especially for irregular polygons, this algorithm may fail)
     shp <- shape(background)
-    nodes <- add_nodes(shp, 
-                       space_between = space_between,
-                       outside = FALSE)
+
+    continue <- TRUE
+    iter <- 1
+    nodes <- list()
+    while(continue) {
+        new_nodes <- add_nodes(shp, 
+                               space_between = space_between * iter,
+                               outside = FALSE,
+                               only_corners = TRUE)
+        nodes[[iter]] <- new_nodes
+        iter <- iter + 1
+
+        # If the distance between the nodes is too small, we can break from the 
+        # loop
+        new_nodes <- cbind(new_nodes, new_nodes[c(2:nrow(new_nodes), 1),])
+        distances <- (new_nodes[,1] - new_nodes[,3])^2 + (new_nodes[,2] - new_nodes[,4])^2
+        if(min(distances) < space_between^2) {
+            continue <- FALSE
+        }
+    }
+
+    # nodes <- add_nodes(shp, 
+    #                    space_between = space_between,
+    #                    outside = FALSE,
+    #                    only_corners = TRUE)
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
     obj_nodes <- lapply(obj, 
-                        \(x) add_nodes(x, space_between = space_between))
+                        \(x) add_nodes(x, 
+                                       space_between = space_between,
+                                       only_corners = TRUE))
 
-    nodes <- rbind(nodes,
+    nodes <- rbind(do.call("rbind", nodes),
                    do.call("rbind", obj_nodes))
 
     # Check which nodes are contained within the environment and only retain 
@@ -157,7 +195,7 @@ create_nodes <- function(from,
             new_obj[[i]] <- polygon(points = points)
         } else if(inherits(obj[[i]], "rectangle")) {
             new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + space_between)
+                                      size = obj[[i]]@size + 2 * space_between)
         } else {
             stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
