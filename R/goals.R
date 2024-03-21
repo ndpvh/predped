@@ -208,6 +208,7 @@ setMethod("find_path", "goal", function(object,
                                         background,
                                         algorithm = "bi",
                                         space_between = radius(agent)) {
+                                            
     # Create the edges that are taken in by `makegraph`
     edges <- create_edges(position(agent),
                           position(object), 
