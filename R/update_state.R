@@ -41,7 +41,10 @@ update_state <- function(state,
                          background,
                          stay_stopped = TRUE, 
                          time_step = 0.5,
+                         close_enough = 0.5,
+                         space_between = close_enough,
                          ...) {
+
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
     # collisions.
@@ -67,7 +70,9 @@ update_state <- function(state,
         # Update the goals of the agent
         agent <- update_goal(agent, 
                              state, 
-                             background) 
+                             background,
+                             close_enough = close_enough,
+                             space_between = space_between) 
 
         # Update the position of the agent
         agent <- update_position(agent, 
@@ -242,6 +247,13 @@ update_position <- function(agent,
         # probabilities
         V <- utility(agent, state, agent_predictions, centers, background, check)
 
+        if(!any(is.finite(V))) {
+            speed(agent) <- standing_start
+            status(agent) <- "replan"
+            cell(agent) <- 0
+            return(agent)
+        }
+
         V <- V - max(V)
         exp_V <- exp(V)
         Pr <- exp_V / sum(exp_V)
@@ -340,8 +352,9 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.1 * parameters(agent)[["sPref"]],
+                        standing_start = 0.05 * parameters(agent)[["sPref"]],
                         close_enough = 2 * radius(agent),
+                        space_between = radius(agent),
                         report = FALSE,
                         interactive_report = FALSE) {  
 
@@ -411,10 +424,12 @@ update_goal <- function(agent,
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents[-agent_idx])
+            View(current_goal(agent))
+            View(agent)
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
-                                                  space_between = close_enough)
+                                                  space_between = space_between)
 
             # Turn to the new path point and slow down
             orientation(agent) <- m4ma::angle2(matrix(position(agent),
@@ -446,7 +461,7 @@ update_goal <- function(agent,
                     current_goal(agent)@path <- find_path(current_goal(agent), 
                                                           agent, 
                                                           updated_background,
-                                                          space_between = close_enough)
+                                                          space_between = space_between)
 
                     # Turn to the new path point and slow down
                     orientation(agent) <- m4ma::angle2(matrix(position(agent),
@@ -529,7 +544,7 @@ update_goal <- function(agent,
             }
         # If they are close_enough to the path point, then we can delete the 
         # path point they are currently at and let the agent reorient
-        } else if(distance_path_point <= close_enough) {
+        } else if(distance_path_point <= abs(close_enough - radius(agent))) {
             # Keep it in matrix format, even if you only have 1 row left
             current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                 matrix(ncol = 2)
