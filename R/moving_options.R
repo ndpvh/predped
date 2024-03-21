@@ -169,15 +169,18 @@ agents_between_goal <- function(agent,
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
         other_agents <- state$agents[-agent_idx]
-        agent_positions <- sapply(other_agents, position)
+        agent_positions <- sapply(other_agents, position) |>
+            matrix(ncol = 2)
     } else {
-        agent_positions <- agent_predictions[-agent_idx,]
+        agent_positions <- agent_predictions[-agent_idx,] |>
+            matrix(ncol = 2)
     }
 
     # If there are no other agents to consider, we can safely exit the function
     if(length(agent_positions) == 0) {
         return(0)
     }
+    colnames(agent_positions) <- c("x", "y")
 
     # Create a cone from the agent to the goal location
     goal_cone <- m4ma::Iangle(matrix(position(agent), 
@@ -192,7 +195,9 @@ agents_between_goal <- function(agent,
         return(0)
     }
 
-    # Not sure why to do this, but must have something to do with the 33 choices
+    # The discrete cone bin in which the goal is contained is the same for each
+    # of the velicities. Furhermore retain only those goal cones that fall 
+    # within view of the agent.
     cone_set <- c(goal_cone - 1, goal_cone, goal_cone + 1)
     cone_set <- cone_set[cone_set > 0 & cone_set < 12]
 
@@ -202,17 +207,22 @@ agents_between_goal <- function(agent,
     #
     # These lines can be used to check the intersection with the cone drawn from 
     # the agent to their goal. If there is such an intersection, we can assume 
-    # that agent is blocking the goal
+    # that agent is blocking the goal.
+    #
+    # Important note: Only extract the anticlockwise cone (`ac`), which is also 
+    # the direction that Iangle works in
     ends <- m4ma::eObjects(matrix(position(agent),
                                   nrow = 1, 
                                   ncol = 2),
                            agent_positions, 
-                           size(agent))
+                           size(agent))$ac
 
     # Create several cones from the agent to these end points
-    end_cones <- apply(ends, 3, \(x) Iangle(position(agent), 
-                                            orientation(agent),
-                                            x))
+    end_cones <- apply(ends,
+                       1, 
+                       \(x) m4ma::Iangle(matrix(position(agent), ncol = 2), 
+                                         orientation(agent),
+                                         matrix(x, ncol = 2)))
 
     # Small fix that one can see multiple times in our code: If the cones are 
     # a matrix with only 1 row, it will automatically become a vector instead.
@@ -235,9 +245,9 @@ agents_between_goal <- function(agent,
     n_agents <- sum(blocking)
 
     # Give them the names of the agents
-    if(n_agents > 0) {
-        attr(n_agents, "ends") <- ends[names(blocking), , , drop = FALSE]
-    }
+    # if(n_agents > 0) {
+    #     attr(n_agents, "ends") <- ends[names(blocking), , , drop = FALSE]
+    # }
 
     return(n_agents)
 }
