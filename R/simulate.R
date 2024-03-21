@@ -160,6 +160,11 @@ add_agent <- function(object,
                        goals = goal_stack[-1],
                        current_goal = goal_stack[[1]])
 
+    # Adjust the preferred and slowing speeds of the agents based on the 
+    # time_step (in seconds): These speeds are per second
+    parameters(tmp_agent)[["sPref"]] <- parameters(tmp_agent)[["sPref"]] * time_step
+    parameters(tmp_agent)[["sSlow"]] <- parameters(tmp_agent)[["sSlow"]] * time_step
+
     # Create the path to walk on for the current goal and return the agent
     current_goal(tmp_agent)@path <- find_path(current_goal(tmp_agent), 
                                               tmp_agent, 
