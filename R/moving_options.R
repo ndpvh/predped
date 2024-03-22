@@ -224,22 +224,15 @@ agents_between_goal <- function(agent,
                                          orientation(agent),
                                          matrix(x, ncol = 2)))
 
-    # Small fix that one can see multiple times in our code: If the cones are 
-    # a matrix with only 1 row, it will automatically become a vector instead.
-    # Force that it becomes a numeric again
-    if(nrow(ends) == 1) {
-        end_cones <- matrix(end_cones, nrow = 1)
-        rownames(end_cones) <- agent_id[-agent_idx]
-    }
-
     # Check whether any of the coordinates fall inside of the cone_set
-    blocking <- apply(end_cones, 1, function(x) {
-        if(any(is.na(x))) {
-            return(FALSE)
-        } else {
-            return(any(x %in% cone_set))
-        }
-    })
+    blocking <- sapply(end_cones, 
+                       function(x) {
+                           if(any(is.na(x))) {
+                               return(FALSE)
+                           } else {
+                               return(any(x %in% cone_set))
+                           }
+                       })
 
     # Get the number of blocking agents
     n_agents <- sum(blocking)
