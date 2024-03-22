@@ -181,7 +181,7 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.1 * parameters(agent)[["sPref"]],
+                            standing_start = 0.05 * parameters(agent)[["sPref"]],
                             time_step = 0.5,
                             report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
@@ -198,6 +198,11 @@ update_position <- function(agent,
     # If the agent stopped their interaction, but still has to replan their path,
     # just return them as being at standstill.
     } else if(status(agent) == "replan") {
+        cell(agent) <- 0
+        speed(agent) <- standing_start
+
+    # If the agent is currently waiting, let him wait a bit longer
+    } else if(status(agent) == "wait") {
         cell(agent) <- 0
         speed(agent) <- standing_start
                         
@@ -534,6 +539,52 @@ update_goal <- function(agent,
         # able to reorient in the next move
         status(agent) <- "reorient"
     }
+
+    # If the agent is currently waiting, check the following:
+    #   - Check whether the counter is lower than 0. If so, then the agent will
+    #     not wait any longer, but rather replan.
+    #   - Check whether the agent blocking the way has left. If so, the agent 
+    #     no longer has to wait around and can start moving again.
+    if(status(agent) == "wait") {
+        # Check the counter
+        waiting_counter(agent) <- waiting_counter(agent) - 1
+
+        # If counter is low enough, the agent will have to replan his approach
+        # to the goal. To make sure agents don't get stuck easily, let them 
+        # pursue another goal and come back later. Only applicable if the agent
+        # still has other goals to pursue
+        if(waiting_counter(agent) < 0) {
+            if(length(goals(agent)) != 0) {
+                goals(agent) <- append(current_goal(agent), 
+                                       goals(agent))
+                current_goal(agent) <- goals(agent)[[2]]
+                goals(agent) <- goals(agent)[-2]
+            }
+            status(agent) <- "replan"
+
+        # If the counter is not low enough yet, but the agent is still waiting, 
+        # we can check whether other agents are still blocking his way
+        } else {
+            # Find out who the current agent is
+            agent_ids <- sapply(state$agents, id)
+            agent_idx <- which(agent_ids == id(agent))
+
+            # Draw a circle around the current goal of the agent and find out whether
+            # any of the other agents intersects with this. If so, then we can assume
+            # one of the agents is blocking the access to the goal, and the agent
+            # cannot start the interaction phase.
+            goal_circle <- circle(center = current_goal(agent)@position,
+                                radius = radius(agent))
+            blocking_agents <- sapply(state$agents[-agent_idx], 
+                                    \(x) intersects(goal_circle, x))
+
+            # If no agents are blocking access to the goal, allow the agent to move
+            # again
+            if(!any(blocking_agents)) {
+                status(agent) <- "replan"
+            }
+        }        
+    }
         
     # Finally, it might also be that the agent is close to the goal and can 
     # start interacting with it. This is what's handled in this code block.
@@ -570,6 +621,39 @@ update_goal <- function(agent,
             current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                 matrix(ncol = 2)
             status(agent) <- "reorient"
+        }
+
+        # We need to allow for another option in goal handling: namely the case 
+        # where another agent is blocking the access of the agent to their 
+        # current goal. To avoid the agent from constantly replanning, we will 
+        # use the status "wait" to indicate that they should be patient instead.
+        #
+        # To initiate "wait", we check whether any of the agents is currently 
+        # blocking access to the current goal of the agent. We do so by drawing 
+        # a circle around the current goal and checking whether another agent 
+        # intersects this circle. If so, then we will let the agent wait.
+        #
+        # Find out who the current agent is
+        agent_ids <- sapply(state$agents, id)
+        agent_idx <- which(agent_ids == id(agent))
+
+        # Delete him from the list and find out whether there is an intersection
+        goal_circle <- circle(center = current_goal(agent)@position,
+                            radius = radius(agent))
+        blocking_agents <- sapply(state$agents[-agent_idx], 
+                                \(x) intersects(goal_circle, x))
+
+        # If another agent is blocking the goal, let the agent wait. Only invoke
+        # this the moment that the agent is actually in its last movement towards
+        # the goal (i.e., when the position of the current goal is also the 
+        # last path point)
+        if(any(blocking_agents) & (nrow(current_goal(agent)@path) == 1)) {
+            status(agent) <- "wait"
+
+            # Add the counter of the goal the other agent is finishing up as the 
+            # counter for how long this agent will wait around
+            idx <- Position(\(x) x == TRUE, blocking_agents)    # Returns first position to be TRUE
+            waiting_counter(agent) <- current_goal(state$agents[[idx]])@counter
         }
     }
 

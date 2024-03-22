@@ -31,6 +31,7 @@ agent <- setClass("agent", list(id = "character",
                                 parameters = "data.frame",
                                 goals = "list",
                                 current_goal = "goal",
+                                waiting_counter = "numeric",
                                 color = "character"), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
@@ -43,6 +44,7 @@ setMethod("initialize", "agent", function(.Object,
                                           moveable = TRUE,
                                           interactable = TRUE,
                                           color = "black",
+                                          waiting_counter = 0,
                                           ...
 ) {
     .Object <- callNextMethod(.Object, moveable = moveable, interactable = interactable, ...)
@@ -54,6 +56,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@cell <- cell
     .Object@status <- status
     .Object@color <- color
+    .Object@waiting_counter <- waiting_counter
 
     return(.Object)
 })
@@ -213,7 +216,7 @@ setMethod("status", "agent", function(object) {
 })
 
 setMethod("status<-", "agent", function(object, value) {
-    stopifnot(value %in% c("move", "replan", "reorient", "completing goal", "exit"))
+    stopifnot(value %in% c("move", "replan", "reorient", "completing goal", "exit", "wait"))
     object@status <- value
     return(object)
 })
@@ -291,5 +294,24 @@ setMethod("color", "agent", function(object) {
 
 setMethod("color<-", "agent", function(object, value) {
     object@color <- value
+    return(object)
+})
+
+#' @rdname agent-class
+#' 
+#' @export
+setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
+
+#' @rdname agent-class
+#' 
+#' @export
+setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))
+
+setMethod("waiting_counter", "agent", function(object) {
+    return(setNames(object@waiting_counter, object@id))
+})
+
+setMethod("waiting_counter<-", "agent", function(object, value) {
+    object@waiting_counter <- value
     return(object)
 })
