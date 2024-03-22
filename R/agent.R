@@ -30,8 +30,8 @@ agent <- setClass("agent", list(id = "character",
                                 status = "character",
                                 parameters = "data.frame",
                                 goals = "list",
-                                current_goal = "goal"
-                                ), contains = c("circle"))
+                                current_goal = "goal",
+                                color = "character"), contains = c("circle"))
 
 setMethod("initialize", "agent", function(.Object,
                                           id = character(0),
@@ -42,6 +42,7 @@ setMethod("initialize", "agent", function(.Object,
                                           status = "move",
                                           moveable = TRUE,
                                           interactable = TRUE,
+                                          color = "black",
                                           ...
 ) {
     .Object <- callNextMethod(.Object, moveable = moveable, interactable = interactable, ...)
@@ -52,6 +53,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@group <- group
     .Object@cell <- cell
     .Object@status <- status
+    .Object@color <- color
 
     return(.Object)
 })
@@ -66,6 +68,7 @@ setMethod("show", "agent", function(object) {
     cat("Agent Status:", object@status, "\n")
     cat("Agent Parameters:", "\n")
     print(object@parameters[, 1:12])
+    cat("Agent Color:", object@color, "\n")
     cat("\n", "\n", "Message: to view all agent parameters call", "\n",
     "`object@parameters` to see the full data.frame", "\n", "\n")
     cat("Agent Goals:", length(object@goals), "\n")
@@ -269,5 +272,24 @@ setMethod("current_goal", "agent", function(object) {
 
 setMethod("current_goal<-", "agent", function(object, value) {
     object@current_goal <- value
+    return(object)
+})
+
+#' @rdname agent-class
+#' 
+#' @export
+setGeneric("color", function(object) standardGeneric("color"))
+
+#' @rdname agent-class
+#' 
+#' @export
+setGeneric("color<-", function(object, value) standardGeneric("color<-"))
+
+setMethod("color", "agent", function(object) {
+    return(setNames(object@color, object@id))
+})
+
+setMethod("color<-", "agent", function(object, value) {
+    object@color <- value
     return(object)
 })
