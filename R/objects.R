@@ -415,7 +415,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
 setMethod("intersects", signature(object = "polygon"), function(object, other_object) {
     
     # Dispath based on the type of the other object
-    if(class(other_object) == "circle") {
+    if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
     } else {
         # Extract the points of the objects and create the edges to be 
@@ -665,12 +665,12 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
     # Dispath based on the type of the other object. If circle or polygon, then 
     # we switch the two objects and dispatch to the `intersects` method of these
     # two classes
-    if(class(other_object) == "circle") {
+    if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
-    } else if(class(other_object) == "polygon") {
-        return(intersects(other_object, object))
-    } else {
+    } else if(inherits(other_object, "rectangle")) {
         new_poly <- polygon(points = other_object@points)
+        return(intersects(other_object, object))
+    } else {        
         return(intersects(new_poly, object))
     }
     
@@ -828,7 +828,7 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
     # Dispath based on the type of the other object. If circle or polygon, then 
     # we switch the two objects and dispatch to the `intersects` method of these
     # two classes
-    if(class(other_object) == "circle") {
+    if(inherits(other_object, "circle")) {
         # This case is rather easy, as we just need to determine whether the 
         # distance between the centers of the circles is smaller or bigger than 
         # the sum of their radii. 
@@ -843,10 +843,7 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return((distance <= radius(object) + radius(other_object)) & 
                (distance >= abs(radius(object) - radius(other_object))))
 
-    } else if(class(other_object) == "polygon") {
-        stop("Intersection of a circle with a polygon has not been created yet")
-
-    } else {
+    } else if(inherits(other_object, "rectangle")) {
         # Rotate the circle and rectangle so that the rectangle has orientation
         # 0
         new_rect <- rotate(other_object, degrees = -orientation(other_object))
@@ -893,6 +890,9 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         }
 
         return(FALSE)
+
+    } else {
+        stop("Intersection of a circle with a polygon has not been created yet")
     }  
 })
 
