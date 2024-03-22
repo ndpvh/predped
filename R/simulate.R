@@ -158,7 +158,8 @@ add_agent <- function(object,
                        orientation = angle,
                        parameters = object@parameters[idx, -c(1,2)],
                        goals = goal_stack[-1],
-                       current_goal = goal_stack[[1]])
+                       current_goal = goal_stack[[1]],
+                       color = object@parameters[idx, "Color"])
 
     # Adjust the preferred and slowing speeds of the agents based on the 
     # time_step (in seconds): These speeds are per second
