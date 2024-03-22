@@ -52,7 +52,7 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
         # TO-DO: Warnings are still triggered even the arguments are not provided by user
         # This should not be triggered otherwise
         empty_cols <- which(colSums(shelf_distribution) == 0)
-        empty_rows <- which(rowSums(shelf_distribution) == 0)
+        empty_rows <- which(rowSums(shelf_distribution == 0) == 0)  # Fix here
         
         if (length(empty_cols) > 0) {
             num_columns <- num_columns - length(empty_cols)
@@ -61,11 +61,14 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
         }
         if (length(empty_rows) > 0) {
             num_rows <- num_rows - length(empty_rows)
-            shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ]
+            shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ] 
             warning(paste(length(empty_rows), "empty row(s) detected and omitted."))
         }
     }
 
+    # Ensure shelf_distribution is a matrix
+    shelf_distribution <- as.matrix(shelf_distribution)
+    
     # Assign values to object slots
     .Object@num_columns <- num_columns
     .Object@num_rows <- num_rows
@@ -74,47 +77,6 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
     .Object@rectangles <- list()
     
     return(.Object)
-})
-
-#' Retrieve coordinates of rectangles.
-#'
-#' This function generates coordinates of rectangles representing shelves within the Shelves object.
-#'
-#' TO-DO: Now it thinks the 2 shelves in the same slot has the same coordinates
-#' TO-DO: Fix this by adjusting the length and of the rectangle?
-#' 
-#' @param object A Shelves object containing information about shelf distribution.
-#' @param shelf_length Length of each shelf.
-#' @param shelf_width Width of each shelf.
-#' @param aisle_width Width of the aisle between shelves.
-#' @param ... Additional arguments.
-#' 
-#' @return The Shelves object with updated rectangles slot containing coordinates of shelves.
-#' 
-#' @export
-#' @name getCoordinates
-#' 
-setGeneric("getCoordinates", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
-    standardGeneric("getCoordinates")
-})
-
-setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
-    shelf_rectangles <- vector("list", length = sum(object@shelf_distribution))
-    index <- 1
-    for (row in 1:object@num_rows) {
-        for (col in 1:object@num_columns) {
-            if (object@shelf_distribution[row, col] > 0) {
-                for (shelf in 1:object@shelf_distribution[row, col]) {
-                    shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2,
-                                      (row - 1) * (shelf_length + aisle_width) + (shelf - 0.5) * shelf_length)
-                    shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
-                    index <- index + 1
-                }
-            }
-        }
-    }
-    object@rectangles <- shelf_rectangles  # Update rectangles slot with generated coordinates
-    return(object)
 })
 
 
@@ -174,9 +136,9 @@ print(shelves_2)
 
 
 # Example use
-shelf_distribution <- matrix(c(2, 2, 1,
-                               2, 1, 1,
-                               3, 3, 4), nrow = 3, byrow = TRUE)
+shelf_distribution <- matrix(c(1, 1, 1,
+                               1, 1, 1,
+                               1, 1, 1), nrow = 3, byrow = TRUE)
 
 shelves <- new("Shelves", shelf_distribution = shelf_distribution)
 shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
