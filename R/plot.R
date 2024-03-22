@@ -51,19 +51,21 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
   plt <- list(plot(circle(center = object@center, 
                           radius = object@radius), 
                    fill = NA,
+                   color = object@color,
                    ...),
               ggplot2::annotate("segment", 
                                 x = object@center[[1]], 
                                 y = object@center[[2]], 
                                 xend = object@center[[1]] + object@radius * cos(angle), 
                                 yend = object@center[[2]] + object@radius * sin(angle), 
+                                color = object@color,
                                 ...))
 
     if(plot_goal) {
         plt <- append(plt, 
                       ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
                                                        y = current_goal(object)@position[2]),
-                                          color = "salmon",
+                                          color = object@color,
                                           ...))
     }
 
