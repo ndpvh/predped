@@ -27,14 +27,14 @@ create_edges <- function(from,
         if(inherits(obj[[i]], "circle")) {
             new_obj[[i]] <- circle(center = center(obj[[i]]), 
                                    radius = radius(obj[[i]]) + space_between)
+        } else if(inherits(obj[[i]], "rectangle")) {
+            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
+                                      size = obj[[i]]@size + 2 * space_between)
         } else if(inherits(obj[[i]], "polygon")) {
             points <- add_nodes(obj[[i]], 
                                 space_between = space_between,
                                 only_corners = TRUE)
             new_obj[[i]] <- polygon(points = points)
-        } else if(inherits(obj[[i]], "rectangle")) {
-            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + 2 * space_between)
         } else {
             stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
@@ -78,23 +78,6 @@ create_edges <- function(from,
             idx <- idx + 1
         }
     }
-
-    ############################################################################
-    idx <- sapply(edges$from, 
-                  \(x) which(nodes$node_ID == x))
-    idy <- sapply(edges$to, 
-                  \(x) which(nodes$node_ID == x))
-
-    tmp_edges <- cbind(nodes$X[idx], 
-                       nodes$Y[idx],
-                       nodes$X[idy], 
-                       nodes$Y[idy]) |>
-        as.data.frame() |>
-        setNames(c("x", "y", "xend", "yend"))
-    print(plot(background) + 
-        ggplot2::geom_segment(ggplot2::aes(x = tmp_edges$x, y = tmp_edges$y, 
-                                           xend = tmp_edges$xend, yend = tmp_edges$yend)))
-    ############################################################################
 
     # Transform this list to a dataframe, as required by cppRouting
     from <- rbind(edges$from) |> t()
@@ -189,13 +172,13 @@ create_nodes <- function(from,
             new_obj[[i]] <- circle(center = center(obj[[i]]), 
                                    radius = radius(obj[[i]]) + space_between)
         } else if(inherits(obj[[i]], "polygon")) {
+            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
+                                      size = obj[[i]]@size + 2 * space_between)
+        } else if(inherits(obj[[i]], "rectangle")) {
             points <- add_nodes(obj[[i]], 
                                 space_between = space_between,
                                 only_corners = TRUE)
             new_obj[[i]] <- polygon(points = points)
-        } else if(inherits(obj[[i]], "rectangle")) {
-            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + 2 * space_between)
         } else {
             stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
         }
