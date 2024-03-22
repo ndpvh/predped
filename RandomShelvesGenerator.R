@@ -35,9 +35,9 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
         }
     }
 
-    if (is.null(shelf_distribution)) {
+        if (is.null(shelf_distribution)) {
         # Initialize the distribution
-        shelf_distribution <- matrix(0, nrow = num_rows, ncol = num_columns)
+            shelf_distribution <- matrix(0, nrow = num_rows, ncol = num_columns)
 
         # Randomly fill the shelves to each slot
         shelves_remaining <- total_shelves
@@ -48,25 +48,30 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
             shelves_remaining <- shelves_remaining - 1
         }
         
+        # Add debugging output
+        print(dim(shelf_distribution))
+        print(class(shelf_distribution))
+        print(shelf_distribution)
+
         # Adjust the number of columns and rows if there are empty columns or rows
         # TO-DO: Warnings are still triggered even the arguments are not provided by user
         # This should not be triggered otherwise
         empty_cols <- which(colSums(shelf_distribution) == 0)
-        empty_rows <- which(rowSums(shelf_distribution == 0) == 0)  # Fix here
+        empty_rows <- which(rowSums(shelf_distribution) == 0) 
         
-        if (length(empty_cols) > 0) {
+        if (!is.null(empty_rows) && length(empty_rows) > 0) { # to prevent rowSums error
+            num_rows <- num_rows - length(empty_rows)
+            shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ]  
+            warning(paste(length(empty_rows), "empty row(s) detected and omitted."))
+        }
+        if (!is.null(empty_cols) && length(empty_cols) > 0 && nrow(shelf_distribution) > 0) { # to prevent colSums error
             num_columns <- num_columns - length(empty_cols)
             shelf_distribution <- shelf_distribution[, colSums(shelf_distribution) != 0]
             warning(paste(length(empty_cols), "empty column(s) detected and omitted."))
         }
-        if (length(empty_rows) > 0) {
-            num_rows <- num_rows - length(empty_rows)
-            shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ] 
-            warning(paste(length(empty_rows), "empty row(s) detected and omitted."))
-        }
     }
 
-    # Ensure shelf_distribution is a matrix
+    # Force the shelf_distribution to be a matrix
     shelf_distribution <- as.matrix(shelf_distribution)
     
     # Assign values to object slots
@@ -143,3 +148,4 @@ shelf_distribution <- matrix(c(1, 1, 1,
 shelves <- new("Shelves", shelf_distribution = shelf_distribution)
 shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
 plotShelves(shelves_coordinates)
+
