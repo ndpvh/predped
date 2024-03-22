@@ -221,6 +221,12 @@ setMethod("find_path", "goal", function(object,
     graph <- cppRouting::makegraph(edges$edges, 
                                    directed = FALSE,
                                    coords = edges$nodes)
+
+    # Make a check of whether "agent" and "goal" are contained within the nodes.
+    # Might be deleted because of blocking, or because `make_graph` deletes them.
+    if(!all(c("agent", "goal") %in% graph$coords$node_ID)) {
+        return(matrix(nrow = 0, ncol = 2))
+    }
     
     # Use cppRouting to do the strategic planning in this function
     path_points <- cppRouting::get_path_pair(graph,

@@ -195,6 +195,12 @@ update_position <- function(agent,
         cell(agent) <- 0
         check <- matrix(TRUE, 11, 3)
 
+    # If the agent stopped their interaction, but still has to replan their path,
+    # just return them as being at standstill.
+    } else if(status(agent) == "replan") {
+        cell(agent) <- 0
+        speed(agent) <- standing_start
+                        
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
     # point). If not, let them reorient themselves towards their next goal.
@@ -424,12 +430,19 @@ update_goal <- function(agent,
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents[-agent_idx])
-            View(current_goal(agent))
-            View(agent)
+                                                  
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between)
+
+            # Quick check whether the path is clearly defined. If not, 
+            # then the agent will have to replan at a later time and 
+            # wait for now. 
+            if(nrow(current_goal(agent)@path) == 0) {
+                status(agent) <- "replan"
+                return(agent)
+            }
 
             # Turn to the new path point and slow down
             orientation(agent) <- m4ma::angle2(matrix(position(agent),
@@ -462,6 +475,14 @@ update_goal <- function(agent,
                                                           agent, 
                                                           updated_background,
                                                           space_between = space_between)
+
+                    # Quick check whether the path is clearly defined. If not, 
+                    # then the agent will have to replan at a later time and 
+                    # wait for now. 
+                    if(nrow(current_goal(agent)@path) == 0) {
+                        status(agent) <- "replan"
+                        return(agent)
+                    }
 
                     # Turn to the new path point and slow down
                     orientation(agent) <- m4ma::angle2(matrix(position(agent),
