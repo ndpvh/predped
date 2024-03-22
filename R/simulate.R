@@ -72,18 +72,32 @@ setMethod("simulate", "predped", function(object,
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
         # Check whether to add a pedestrian and, if so, initiate a new 
-        # agent
+        # agent. Things to consider are: whether it is time to add a new 
+        # pedestrian, whether we already reached the maximal number of agents,
+        # and whether there is any space to add the new pedestrian.
         if((i %in% add_agent_index) & (length(state$agents) < max_agents)) {
-            state$agents <- append(state$agents, 
-                                   add_agent(object,
-                                             object@setting,
-                                             goal_number[i],
-                                             goal_duration = goal_duration,
-                                             radius = radius, 
-                                             standing_start = standing_start,
-                                             close_enough = close_enough,
-                                             space_between = space_between,
-                                             time_step = time_step))
+            potential_agent <- add_agent(object,
+                                         object@setting,
+                                         goal_number[i],
+                                         goal_duration = goal_duration,
+                                         radius = radius, 
+                                         standing_start = standing_start,
+                                         close_enough = close_enough,
+                                         space_between = space_between,
+                                         time_step = time_step)
+            agent_in_cue <- TRUE
+        }
+
+        # Check whether there is any space to add the pedestrian. Otherwise
+        # will have to keep waiting in the cue.
+        if(agent_in_cue) {
+            agents_in_the_way <- sapply(state$agents, 
+                                       \(x) intersects(potential_agent, x))
+            agent_in_cue <- any(agents_in_the_way)
+
+            if(!agent_in_cue) {
+                state$agents <- append(state$agents, potential_agent)
+            }
         }
 
         # Provide feedback if wanted
