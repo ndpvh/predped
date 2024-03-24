@@ -13,7 +13,6 @@ Shelves <- setClass("Shelves", slots = list(num_columns = "numeric",
                                             total_shelves = "numeric",
                                             shelf_distribution = "matrix",
                                             rectangles = "list",
-                                            # should this be here?
                                             fill_slots = "logical"))
 
 setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_rows = NULL, total_shelves = NULL, shelf_distribution = NULL, fill_slots = FALSE, ...) {
