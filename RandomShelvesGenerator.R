@@ -58,7 +58,7 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
             shelf_distribution <- shelf_distribution[rowSums(shelf_distribution) != 0, ]  
             warning(paste(length(empty_rows), "empty row(s) detected and omitted."))
         }
-        if (!is.null(empty_cols) && length(empty_cols) > 0 && nrow(shelf_distribution) > 0) { # to prevent colSums error
+        if (!is.null(empty_cols) && !anyNA(empty_cols) && length(empty_cols) > 0 && nrow(shelf_distribution) > 0) { # to prevent colSums error
             num_columns <- num_columns - length(empty_cols)
             shelf_distribution <- shelf_distribution[, colSums(shelf_distribution) != 0]
             warning(paste(length(empty_cols), "empty column(s) detected and omitted."))
@@ -176,7 +176,7 @@ plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.
 }
 
 # Example use
-shelves <- new("Shelves", fill_slots = TRUE)
+shelves <- new("Shelves")
 print(shelves)
 shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
 plotShelves(shelves_coordinates)
