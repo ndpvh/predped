@@ -146,11 +146,6 @@ create_nodes <- function(from,
         }
     }
 
-    # nodes <- add_nodes(shp, 
-    #                    space_between = space_between,
-    #                    outside = FALSE,
-    #                    only_corners = TRUE)
-
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
     obj_nodes <- lapply(obj, 
@@ -161,6 +156,8 @@ create_nodes <- function(from,
     nodes <- rbind(do.call("rbind", nodes),
                    do.call("rbind", obj_nodes))
 
+    # print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes[,1], y = nodes[,2]), size = 4))
+
     # Check which nodes are contained within the environment and only retain 
     # those. Furthermore delete all nodes that fall within an object. For this,
     # we first create slightly bigger objects so that nodes close to each object
@@ -169,14 +166,22 @@ create_nodes <- function(from,
     new_obj <- list()
     for(i in seq_along(obj)) {
         if(inherits(obj[[i]], "circle")) {
+            # Extend the radius with space_between - 1e-4. Ensures that we don't
+            # delete route points that are `space_between` far from the circle
             new_obj[[i]] <- circle(center = center(obj[[i]]), 
-                                   radius = radius(obj[[i]]) + space_between)
-        } else if(inherits(obj[[i]], "polygon")) {
-            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + 2 * space_between)
+                                   radius = radius(obj[[i]]) + space_between - 1e-4)
         } else if(inherits(obj[[i]], "rectangle")) {
+            # Extend the size of the rectangle with the factor 
+            # sqrt{space_between^2 / 2}, as we do in the `add_nodes` function. 
+            # Again correct with factor 1e-4
+            extension <- sqrt(space_between^2 / 2)
+            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
+                                      size = obj[[i]]@size + 2 * (extension - 1e-4))
+        } else if(inherits(obj[[i]], "polygon")) {
+            # Simply find the nodes of the polygon and use these new nodes as 
+            # the points of the outer polygon.
             points <- add_nodes(obj[[i]], 
-                                space_between = space_between,
+                                space_between = space_between - 1e-4,
                                 only_corners = TRUE)
             new_obj[[i]] <- polygon(points = points)
         } else {
@@ -219,6 +224,9 @@ create_nodes <- function(from,
                               as.numeric(nodes[,1]), 
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
+
+    print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y), size = 4))
+    Sys.sleep(600)
 
     return(nodes)
 }
