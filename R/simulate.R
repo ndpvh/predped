@@ -92,7 +92,7 @@ setMethod("simulate", "predped", function(object,
         # will have to keep waiting in the cue.
         if(agent_in_cue) {
             agents_in_the_way <- sapply(state$agents, 
-                                       \(x) intersects(potential_agent, x))
+                                        \(x) intersects(potential_agent, x))
             agent_in_cue <- any(agents_in_the_way)
 
             if(!agent_in_cue) {
@@ -157,7 +157,7 @@ add_agent <- function(object,
 
     # Create this agents' goal stack
     goal_stack <- generate_goal_stack(goal_number, 
-                                      object@setting, 
+                                      background, 
                                       counter_generator = goal_duration)
 
     # Compute the agent's orientation: Perpendicular to the wall in which you 
