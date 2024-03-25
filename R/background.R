@@ -11,15 +11,13 @@
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
                                           entrance = "coordinate", 
-                                          exit = "coordinate",
-                                          entry_exit_width = "numeric"))
+                                          exit = "coordinate"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
                                                objects = list(),
                                                entrance = NULL,
                                                exit = NULL,
-                                               entry_exit_width = 0.4,
                                                same_exit = TRUE,
                                                ...) {
     # If uncommented, callNextMethod() will throw an error because of same_exit
@@ -44,7 +42,6 @@ setMethod("initialize", "background", function(.Object,
         exit <- rng_point(.Object@shape)
     }
     .Object@exit <- exit
-    .Object@entry_exit_width <- entry_exit_width
 
     return(.Object)
 })
