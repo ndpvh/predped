@@ -150,7 +150,7 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     # when making the path points: Given that the goal is part of the object, 
     # it is always unseen. With a slightly bigger object, this is not the case
     # anymore
-    new_points <- add_nodes(object, space_between = 1e-2)
+    new_points <- add_nodes(object, only_corners = TRUE, space_between = 1e-2)
     new_object <- polygon(points = new_points)
 
     co <- rng_point(new_object, 
