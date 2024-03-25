@@ -230,7 +230,7 @@ update_position <- function(agent,
             }
 
             status(agent) <- "move"
-            speed(agent) <- standing_start # Otherwise the agent will overshoot his goals when reorienting
+            # speed(agent) <- standing_start # Otherwise the agent will overshoot his goals when reorienting
         }
 
         # Define the centers of the options to move to
@@ -428,8 +428,8 @@ update_goal <- function(agent,
             agent_idx <- which(agent_ids == id(agent))
 
             updated_background <- background
-            objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents[-agent_idx])
+            # objects(updated_background) <- append(objects(updated_background), 
+            #                                       state$agents[-agent_idx])
                                                   
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
@@ -469,8 +469,8 @@ update_goal <- function(agent,
                     # goal. Add the other agents in objects to account for so you don't 
                     # take the same route.
                     updated_background <- background
-                    objects(updated_background) <- append(objects(updated_background), 
-                                                          state$agents)
+                    # objects(updated_background) <- append(objects(updated_background), 
+                    #                                       state$agents)
                     current_goal(agent)@path <- find_path(current_goal(agent), 
                                                           agent, 
                                                           updated_background,
@@ -569,9 +569,9 @@ update_goal <- function(agent,
             # one of the agents is blocking the access to the goal, and the agent
             # cannot start the interaction phase.
             goal_circle <- circle(center = current_goal(agent)@position,
-                                radius = radius(agent))
+                                  radius = radius(agent))
             blocking_agents <- sapply(state$agents[-agent_idx], 
-                                    \(x) intersects(goal_circle, x))
+                                      \(x) intersects(goal_circle, x))
 
             # If no agents are blocking access to the goal, allow the agent to move
             # again
@@ -609,6 +609,9 @@ update_goal <- function(agent,
                                                             nrow = 1, 
                                                             ncol = 2))
             }
+
+            return(agent)
+
         # If they are close_enough to the path point, then we can delete the 
         # path point they are currently at and let the agent reorient
         } else if(distance_path_point <= abs(close_enough - radius(agent))) {
@@ -616,6 +619,8 @@ update_goal <- function(agent,
             current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
                 matrix(ncol = 2)
             status(agent) <- "reorient"
+
+            return(agent)
         }
 
         # We need to allow for another option in goal handling: namely the case 
@@ -628,27 +633,40 @@ update_goal <- function(agent,
         # a circle around the current goal and checking whether another agent 
         # intersects this circle. If so, then we will let the agent wait.
         #
-        # Find out who the current agent is
-        agent_ids <- sapply(state$agents, id)
-        agent_idx <- which(agent_ids == id(agent))
+        # Only relevant if there is more than 1 agent and if the agent is 
+        # relatively close to the goal
+        goal_position <- current_goal(agent)@position
+        goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
+            (center(agent)[2] - goal_position[2])^2)
+        if((length(state$agents) > 1) & (goal_distance <= close_enough + 2 * radius(agent))) {
+            # Find out who the current agent 
+            agent_ids <- sapply(state$agents, id)
+            agent_idx <- which(agent_ids == id(agent))
 
-        # Delete him from the list and find out whether there is an intersection
-        goal_circle <- circle(center = current_goal(agent)@position,
-                            radius = radius(agent))
-        blocking_agents <- sapply(state$agents[-agent_idx], 
-                                \(x) intersects(goal_circle, x))
+            # Delete him from the list and find out whether there is an intersection
+            goal_circle <- circle(center = current_goal(agent)@position,
+                                  radius = radius(agent))
+            blocking_agents <- sapply(state$agents[-agent_idx], 
+                                      \(x) intersects(goal_circle, x))
 
-        # If another agent is blocking the goal, let the agent wait. Only invoke
-        # this the moment that the agent is actually in its last movement towards
-        # the goal (i.e., when the position of the current goal is also the 
-        # last path point)
-        if(any(blocking_agents) & (nrow(current_goal(agent)@path) == 1)) {
-            status(agent) <- "wait"
+            # If only one agent is blocking the goal, let the agent wait. Only invoke
+            # this the moment that the agent is actually in its last movement towards
+            # the goal (i.e., when the position of the current goal is also the 
+            # last path point)
+            if(any(blocking_agents) & (nrow(current_goal(agent)@path) == 1)) {
+                # Find out whether that agent is actually completing a goal or not.
+                # If not, then the agent will just continue business as usual.
+                idx <- Position(\(x) x == TRUE, blocking_agents)
+                if(status(state$agents[[idx]]) != "completing goal") {
+                    return(agent)
+                }
 
-            # Add the counter of the goal the other agent is finishing up as the 
-            # counter for how long this agent will wait around
-            idx <- Position(\(x) x == TRUE, blocking_agents)    # Returns first position to be TRUE
-            waiting_counter(agent) <- current_goal(state$agents[[idx]])@counter
+                # If the blocking agent is completing a goal, make the agent wait
+                # its turn. Give the other agent about two time steps to move away
+                # before scooping in.
+                status(agent) <- "wait"
+                waiting_counter(agent) <- current_goal(state$agents[[idx]])@counter + 2
+            }
         }
     }
 
