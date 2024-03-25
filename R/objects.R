@@ -851,54 +851,6 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return((distance <= radius(object) + radius(other_object)) & 
                (distance >= abs(radius(object) - radius(other_object))))
 
-    } else if(inherits(other_object, "rectangle")) {
-        # Rotate the circle and rectangle so that the rectangle has orientation
-        # 0
-        new_rect <- rotate(other_object, degrees = -orientation(other_object))
-        new_circ <- circle(center = rotate(center(object), 
-                                           radians = - pi * orientation(other_object) / 180,
-                                           center = center(other_object)),
-                           radius = radius(object))
-
-        # With the reoriented objects, we can now apply a simple rule on the 
-        # centers of the objects to determine whether they intersect
-        x1 <- center(new_circ)[1]
-        y1 <- center(new_circ)[2]
-
-        x2 <- center(new_rect)[1]
-        y2 <- center(new_rect)[2]
-
-        # Circle is far enough so that no intersection is possible
-        if((abs(x1 - x2) > abs(size(new_rect)[1] / 2 + radius(new_circ))) | 
-           (abs(y1 - y2) > abs(size(new_rect)[2] / 2 + radius(new_circ)))) {
-
-            return(FALSE)
-        }
-
-        # Circle is so close that intersection is not possible
-        if((abs(x1 - x2) < abs(size(new_rect)[1] / 2 - radius(new_circ))) & 
-           (abs(y1 - y2) < abs(size(new_rect)[2] / 2 - radius(new_circ)))) {
-
-            return(FALSE)
-        }
-
-        # Circle is, however, close enough so that intersection is guaranteed
-        if((abs(x1 - x2) <= size(new_rect)[1] / 2) | 
-           (abs(y1 - y2) <= size(new_rect)[2] / 2)) {
-
-            return(TRUE)
-        }
-
-        # Circle might also be at corners, so check whether the distance of the 
-        # circle to the corners of the rectangle are smaller than its radius
-        corner_distance <- (abs(x1 - x2) - size(new_rect)[1])^2 + 
-            (abs(y1 - y2) - size(new_rect)[2])^2
-        if(corner_distance <= radius(new_circ)^2) {
-            return(TRUE)
-        }
-
-        return(FALSE)
-
     } else {
         # Create the edges of the polygon
         points <- other_object@points
