@@ -34,14 +34,14 @@ setMethod("initialize", "background", function(.Object,
     if(is.null(entrance)) {
         entrance <- rng_point(.Object@shape)
     }
-    .Object@entrance <- entrance
+    .Object@entrance <- coordinate(entrance)
 
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
         exit <- rng_point(.Object@shape)
     }
-    .Object@exit <- exit
+    .Object@exit <- coordinate(exit)
 
     return(.Object)
 })
