@@ -123,7 +123,7 @@ create_nodes <- function(from,
     #
     # For this, we will several columns/rows of nodes that close in on the 
     # center of the figure. The algorithm used here is not ideal, but is better
-    # than nothing (especially for irregular polygons, this algorithm may fail)
+    # than nothing (especially for irregular polygons, this algorithm may fail) 
     shp <- shape(background)
 
     continue <- TRUE
