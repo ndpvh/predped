@@ -156,8 +156,6 @@ create_nodes <- function(from,
     nodes <- rbind(do.call("rbind", nodes),
                    do.call("rbind", obj_nodes))
 
-    # print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes[,1], y = nodes[,2]), size = 4))
-
     # Check which nodes are contained within the environment and only retain 
     # those. Furthermore delete all nodes that fall within an object. For this,
     # we first create slightly bigger objects so that nodes close to each object
@@ -224,9 +222,6 @@ create_nodes <- function(from,
                               as.numeric(nodes[,1]), 
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
-
-    print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y), size = 4))
-    Sys.sleep(600)
 
     return(nodes)
 }
