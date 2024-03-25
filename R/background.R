@@ -4,18 +4,21 @@
 #' defining the shape of the background.
 #' @slot objects A list of objects of a type that extends
 #' \code{\link[predped]{object-class}} defining the objects in the background.
+#' @slot entry_width A specification for the desired plotted entrance size.
 #'
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
-                                          entrance = "circle", 
-                                          exit = "circle"))
+                                          entrance = "coordinate", 
+                                          exit = "coordinate",
+                                          entry_exit_width = "numeric"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
                                                objects = list(),
                                                entrance = NULL,
                                                exit = NULL,
+                                               entry_exit_width = 0.4,
                                                same_exit = TRUE,
                                                ...) {
     # If uncommented, callNextMethod() will throw an error because of same_exit
@@ -30,20 +33,17 @@ setMethod("initialize", "background", function(.Object,
     }
 
     if(is.null(entrance)) {
-        rng_pnt <- rng_point(.Object@shape)
-        entrance <- circle(center = c(rng_pnt[1], rng_pnt[2]),
-                           radius = 0.2)
+        entrance <- rng_point(.Object@shape)
     }
     .Object@entrance <- entrance
 
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
-        rng_pnt <- rng_point(.Object@shape)
-        exit <- circle(center = c(rng_pnt[1], rng_pnt[2]),
-                       radius = 0.2)
+        exit <- rng_point(.Object@shape)
     }
     .Object@exit <- exit
+    .Object@entry_exit_width <- entry_exit_width
 
     return(.Object)
 })
