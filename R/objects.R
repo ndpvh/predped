@@ -677,9 +677,9 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
         return(intersects(other_object, object))
     } else if(inherits(other_object, "rectangle")) {
         new_poly <- polygon(points = other_object@points)
-        return(intersects(other_object, object))
-    } else {        
         return(intersects(new_poly, object))
+    } else {        
+        return(intersects(other_object, object))
     }
     
 })
@@ -907,19 +907,57 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         # First check: Do any of the points that determine the segment fall 
         # within the circle? If so, there is an intersection.
         inside <- sapply(seq_len(nrow(points)),
-                         \(x) in_object(object, points[x,]))
+                         \(x) in_object(object, points[x,], outside = FALSE))
+
         if(any(inside)) {
             return(TRUE)
         }
 
         # Second check: Use the formula for an intersection of a line with a 
-        # circle to determine whether the line itself intersects
-        distance <- (edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2
+        # circle to determine whether the line itself intersects. For this to 
+        # work, we need to offset the points of the edges with the center of 
+        # the circle.
+        #
+        # Once we found that there is an intersection, we can compute the point 
+        # at which the intersection happens and check whether it lies within the
+        # two provided points that make up the edge. If not, then there is no 
+        # actual intersection. 
+        edges[,c(1, 3)] <- edges[,c(1, 3)] - center(object)[1]
+        edges[,c(2, 4)] <- edges[,c(2, 4)] - center(object)[2]
+
+        dx <- edges[,3] - edges[,1]
+        dy <- edges[,4] - edges[,2]
+        distance <- dx^2 + dy^2
+
         D <- edges[,1] * edges[,4] - edges[,3] * edges[,2]
 
-        discriminant <- radius(object)^2 * distance - D
+        discriminant <- radius(object)^2 * distance - D^2
 
-        return(any(discriminant <= 0))
+        # Only retain those edges that might intersect with the circle
+        idx <- discriminant >= 0
+        edges <- edges[idx,]
+
+        dx <- dx[idx]
+        dy <- dy[idx]
+        D <- D[idx]
+        discriminant <- discriminant[idx]
+        
+        # Compute the different intersection points with the circle and check 
+        # whether these lie inbetween the segments of the polygon
+        co <- cbind(D * dy + sign(dy) * dx * sqrt(discriminant),
+                    -D * dx + abs(dy) * sqrt(discriminant),
+                    D * dy - sign(dy) * dx * sqrt(discriminant),
+                    -D * dx - abs(dy) * sqrt(discriminant)) / distance
+
+        edge_ranges <- cbind(matrixStats::rowRanges(edges[, c(1, 3)]),
+                             matrixStats::rowRanges(edges[, c(2, 4)]))
+
+        x_check_1 <- (co[,1] <= edge_ranges[,2]) & (co[,1] >= edge_ranges[,1])
+        y_check_1 <- (co[,2] <= edge_ranges[,4]) & (co[,2] >= edge_ranges[,3])
+        x_check_2 <- (co[,3] <= edge_ranges[,2]) & (co[,3] >= edge_ranges[,1])
+        y_check_2 <- (co[,4] <= edge_ranges[,4]) & (co[,4] >= edge_ranges[,3])
+
+        return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
     }  
 })
 
