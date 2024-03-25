@@ -183,7 +183,8 @@ update_position <- function(agent,
                                 matrix(ncol = 3),
                             standing_start = 0.05 * parameters(agent)[["sPref"]],
                             time_step = 0.5,
-                            report = TRUE
+                            report = TRUE,
+                            temperature = 1
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
@@ -193,7 +194,7 @@ update_position <- function(agent,
     # agent continue in peace
     if(status(agent) == "completing goal") { 
         cell(agent) <- 0
-        check <- matrix(TRUE, 11, 3)
+        check <- matrix(TRUE, nrow = 11, ncol = 3)
 
     # If the agent stopped their interaction, but still has to replan their path,
     # just return them as being at standstill.
@@ -266,7 +267,7 @@ update_position <- function(agent,
         }
 
         V <- V - max(V)
-        exp_V <- exp(V)
+        exp_V <- exp(temperature * V)
         Pr <- exp_V / sum(exp_V)
 
         # Apply the different options to the probabilities
@@ -289,16 +290,10 @@ update_position <- function(agent,
             speed(agent) <- standing_start
             status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
         } else {
-            position(agent) <- as.vector(m4ma::c_vd_rcpp(cells = cell,
-                                                         p1 = position(agent),
-                                                         v1 = speed(agent),
-                                                         a1 = orientation(agent),
-                                                         vels = velocities,
-                                                         angles = orientations,
-                                                         tStep = time_step))
+            position(agent) <- centers[cell,]
 
             # Update speed to be either higher than or equal to `standing_start`
-            acceleration <- velocities[m4ma::ringNum(cell)]
+            acceleration <- velocities[cell]
             speed(agent) <- pmax(speed(agent) * acceleration, 
                                  standing_start)
 
@@ -306,7 +301,7 @@ update_position <- function(agent,
             # orientation of the agent
             rel_orientation <- ifelse(orientations >= 180, 
                                       orientations - 360, 
-                                      orientations)[m4ma::coneNum(cell)]
+                                      orientations)[cell]
             orientation(agent) <- (orientation(agent) + rel_orientation) %% 360
         }
     }
