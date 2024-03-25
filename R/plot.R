@@ -114,10 +114,8 @@ setMethod("plot", "background", function(object, ...) {
     }
 
     # Convert entrance & exit to polygon coordinates
-    entrance <- to_polygon(circle(center = c(object@entrance[[1]], object@entrance[[2]]), 
-                                  radius = 0.2))
-    exit <- to_polygon(circle(center = c(object@exit[[1]], object@exit[[2]]), 
-                              radius = 0.2))
+    entrance <- to_polygon(object@entrance)
+    exit <- to_polygon(object@exit)
     
     # Check that polygon coordinates are in the background
     # If not, set those coorinates to NA                   

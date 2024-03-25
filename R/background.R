@@ -8,8 +8,8 @@
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
-                                          entrance = "coordinate", 
-                                          exit = "coordinate"))
+                                          entrance = "circle", 
+                                          exit = "circle"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
@@ -30,16 +30,20 @@ setMethod("initialize", "background", function(.Object,
     }
 
     if(is.null(entrance)) {
-        entrance <- rng_point(.Object@shape)
+        rng_pnt <- rng_point(.Object@shape)
+        entrance <- circle(center = c(rng_pnt[1], rng_pnt[2]),
+                           radius = 0.2)
     }
-    .Object@entrance <- coordinate(entrance)
+    .Object@entrance <- entrance
 
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
-        exit <- rng_point(.Object@shape)
+        rng_pnt <- rng_point(.Object@shape)
+        exit <- circle(center = c(rng_pnt[1], rng_pnt[2]),
+                       radius = 0.2)
     }
-    .Object@exit <- coordinate(exit)
+    .Object@exit <- exit
 
     return(.Object)
 })
