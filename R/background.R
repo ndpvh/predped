@@ -4,8 +4,9 @@
 #' defining the shape of the background.
 #' @slot objects A list of objects of a type that extends
 #' \code{\link[predped]{object-class}} defining the objects in the background.
-#' @slot entry_width A specification for the desired plotted entrance size.
-#'
+#' @slot entry_exit_width A specification for the desired entrance and exit size
+#' to be plotted when visualising the environment.
+#' 
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
