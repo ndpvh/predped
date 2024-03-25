@@ -86,7 +86,7 @@ setMethod("plot", "list", function(object, ...) {
 #'@rdname plot-method
 #'
 setMethod("plot", "background", function(object, 
-                                         entry_exit_width,
+                                         entry_exit_width = 0.4,
                                          ...) {
     # Not my preferred way of doing things: 
     #
