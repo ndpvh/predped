@@ -32,3 +32,4 @@ predped_in_action*.R
 predped_in_action*/
 .vscode/
 .DS_Store
+RCore/
