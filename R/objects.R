@@ -302,38 +302,26 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     # the location of the new coordinate
     find_location <- function(edge_1, edge_2) {
         # Compute the slopes created by the two lines
-        slope_1 <- (edge_1[2] - edge_1[4]) / (edge_1[1] - edge_1[3])
-        slope_2 <- (edge_2[2] - edge_2[4]) / (edge_2[1] - edge_2[3])
+        slope_1 <- (edge_1[4] - edge_1[2]) / (edge_1[3] - edge_1[1])
+        slope_2 <- (edge_2[4] - edge_2[2]) / (edge_2[3] - edge_2[1])
 
-        # Compute the angle between the edges. For this, we need to check 
-        # whether the slopes are finite or note
-        if(is.infinite(slope_2)) {
-            angle_2 <- 3 * pi / 2
-            angle_1 <- atan(slope_1)
-        } else if(is.infinite(slope_1)) {
-            angle_1 <- pi / 2
-            angle_2 <- atan(slope_2)
-        } else {
-            angle_1 <- atan(slope_1)
-            angle_2 <- atan(slope_2)
-        }
+        # Compute the angle between the edges. The slopes can be used for this 
+        # identification, but they do not allow us to differentiate between the 
+        # two potential angles that are pi radians apart. To differentiate 
+        # between the alternatives, we need to use the following rule of thumb:
+        #   - Slope 1: If the x-coordinate of the corner point (edge_1[3] or 
+        #     edge_2[1]) is greater than the x-coordinate of the other point that 
+        #     makes up the edge (edge_1[1]), then we should add pi to the angle
+        #     retrieved from atan (edge opens up to the left).
+        #   - Slope 2: Here, we add pi when the x-coordinate of the corner point 
+        #     is smaller than the x-coordinate of the other point of the edge
+        #     (edge again opens up to the left).
+        angle_1 <- atan(slope_1)
+        angle_1 <- ifelse(edge_1[3] >= edge_1[1], angle_1 + pi, angle_1)
 
-        # The first angle needs an additional transformation so that it starts 
-        # from pi (180 degrees): This is specific to the first edge only and 
-        # only under given conditions, namely: 
-        #   - whenever the angle is not fully opened to a side (i.e., 
-        #     when the x-coordinate of the angle-point is not enclosed by the two
-        #     x-coordinates of the other points that make up the angle)
-        check_1 <- edge_1[3] < edge_2[3] & edge_1[3] < edge_1[1]
-        check_2 <- edge_1[3] > edge_2[3] & edge_1[3] > edge_1[1]
-        if(!check_1 & !check_2) {
-            angle_1 <- pi + angle_1
-        }
+        angle_2 <- atan(slope_2)
+        angle_2 <- ifelse(edge_2[3] >= edge_2[1], angle_2, angle_2 + pi)
 
-        # Transform negative angles
-        angle_1 <- ifelse(angle_1 < 0, 2 * pi + angle_1, angle_1)
-        angle_2 <- ifelse(angle_2 < 0, 2 * pi + angle_2, angle_2)
-        
         # Define the actual angle at which the cosine and sine should be taken
         # and compute the point
         angle <- 0.5 * (angle_2 - angle_1) + angle_1
@@ -357,8 +345,28 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
         potential_nodes <- find_location(edges[i,], edges[i + 1,])
         idx <- sapply(1:2, 
                       \(x) in_object(object, potential_nodes[x,], outside = outside))
-        nodes[i,] <- potential_nodes[idx,]
+
+        # If none of the points is inside, get rid of them. If all of them are
+        # inside the object, choose the one closest or farthest from the other 
+        # corner that makes up the edge. 
+        if(!any(idx)) {
+            nodes[i,] <- NA
+        } else if(all(idx)) {
+            distances <- (potential_nodes[,1] - edges[i + 1, 3])^2 + 
+                (potential_nodes[,2] - edges[i + 1, 4])^2
+                
+            if(outside) {
+                nodes[i,] <- potential_nodes[which.max(distances),]
+            } else {
+                nodes[i,] <- potential_nodes[which.min(distances),]
+            }            
+        } else {
+            nodes[i,] <- potential_nodes[idx,]
+        }        
     }
+
+    # Delete NAs in the nodes
+    nodes <- nodes[!is.na(nodes[,1]),]
 
     # Return the nodes as is when you only want nodes to be created at the 
     # corners of the polygon
