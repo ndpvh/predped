@@ -900,7 +900,26 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return(FALSE)
 
     } else {
-        stop("Intersection of a circle with a polygon has not been created yet")
+        # Create the edges of the polygon
+        points <- other_object@points
+        edges <- cbind(points, points[c(2:nrow(points), 1),])
+
+        # First check: Do any of the points that determine the segment fall 
+        # within the circle? If so, there is an intersection.
+        inside <- sapply(seq_len(nrow(points)),
+                         \(x) in_object(object, points[x,]))
+        if(any(inside)) {
+            return(TRUE)
+        }
+
+        # Second check: Use the formula for an intersection of a line with a 
+        # circle to determine whether the line itself intersects
+        distance <- (edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2
+        D <- edges[,1] * edges[,4] - edges[,3] * edges[,2]
+
+        discriminant <- radius(object)^2 * distance - D
+
+        return(any(discriminant <= 0))
     }  
 })
 
