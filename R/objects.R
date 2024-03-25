@@ -885,12 +885,25 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
 
         discriminant <- radius(object)^2 * distance - D^2
 
-        # Only retain those edges that might intersect with the circle
+        # Check whether any of the edges are at risk of intersecting. If not, 
+        # we can safely say that the circle does not intersect with the polygon
         idx <- discriminant >= 0
+        if(!any(idx)) {
+            return(FALSE)
+        }
+
+        # If not, retain the points and other characteristics of the edges that 
+        # might intersect with the circle
         edges <- edges[idx,]
+        if(sum(idx) == 1) {
+            # If we only retain one row, we have to transform the edges to a 
+            # matrix again
+            edges <- matrix(edges, nrow = 1)
+        }
 
         dx <- dx[idx]
         dy <- dy[idx]
+        distance <- distance[idx]
         D <- D[idx]
         discriminant <- discriminant[idx]
         
@@ -901,8 +914,15 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
                     D * dy - sign(dy) * dx * sqrt(discriminant),
                     -D * dx - abs(dy) * sqrt(discriminant)) / distance
 
-        edge_ranges <- cbind(matrixStats::rowRanges(edges[, c(1, 3)]),
-                             matrixStats::rowRanges(edges[, c(2, 4)]))
+        # View(edges)
+
+        if(nrow(edges) == 1) {
+            edge_ranges <- c(range(edges[, c(1, 3)]), range(edges[, c(2, 4)])) |>
+                matrix(nrow = 1)
+        } else {
+            edge_ranges <- cbind(matrixStats::rowRanges(edges[, c(1, 3)]),
+                                 matrixStats::rowRanges(edges[, c(2, 4)]))
+        }
 
         x_check_1 <- (co[,1] <= edge_ranges[,2]) & (co[,1] >= edge_ranges[,1])
         y_check_1 <- (co[,2] <= edge_ranges[,4]) & (co[,2] >= edge_ranges[,3])
