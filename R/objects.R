@@ -914,8 +914,6 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
                     D * dy - sign(dy) * dx * sqrt(discriminant),
                     -D * dx - abs(dy) * sqrt(discriminant)) / distance
 
-        # View(edges)
-
         if(nrow(edges) == 1) {
             edge_ranges <- c(range(edges[, c(1, 3)]), range(edges[, c(2, 4)])) |>
                 matrix(nrow = 1)
