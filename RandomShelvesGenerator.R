@@ -94,8 +94,6 @@ setMethod("initialize", "Shelves", function(.Object, num_columns = NULL, num_row
 #'
 #' This function generates coordinates of rectangles representing shelves within the Shelves object.
 #'
-#' TO-DO: Now it thinks the 2 shelves in the same slot has the same coordinates
-#' TO-DO: Fix this by adjusting the length and of the rectangle?
 #' 
 #' @param object A Shelves object containing information about shelf distribution.
 #' @param shelf_length Length of each shelf.
@@ -142,7 +140,6 @@ setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_
     return(object)
 })
 
-
 #' Plot method for Shelves objects
 #' This method is only to visualize the changes in the code.
 #' 
@@ -152,7 +149,7 @@ setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_
 #' @param aisle_width Width of the aisle between shelves.
 #' @param aisle_color Color of the aisle.
 #' @param shelf_color Color of the shelves.
-#' @param ... Additional arguments passed to geom_rect.
+#' @param ... Additional arguments passed to geom_polygon.
 #' 
 #' 
 plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, 
@@ -181,12 +178,11 @@ plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.
   ggplot() +
     geom_rect(data = aisles_df, aes(xmin = x, xmax = x + width, ymin = y, ymax = y + height), 
               fill = aisle_color, color = NA) +
-    geom_rect(data = shelves_df, aes(xmin = x, xmax = x + width, ymin = y, ymax = y + height), 
-              fill = shelf_color, color = "black", ...) +
+    lapply(x@rectangles, function(rect) plot(rect, ...)) +
     coord_fixed() +
     theme_void()
 }
-
+           
 # Example use
 shelves <- new("Shelves")
 print(shelves)
