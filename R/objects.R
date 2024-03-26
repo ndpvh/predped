@@ -960,10 +960,10 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 
     # Combine with all previous information and return whatever the research 
     # wants
-    intersecting_segments[id_segments[idx]] <- TRUE
+    intersecting_segments[id_segments[idx], 2] <- TRUE
 
     if(return_all) {
-        return(intersecting_segments)
+        return(intersecting_segments[,2])
     } else {
         return(any(idx))
     }
