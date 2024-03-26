@@ -159,7 +159,7 @@ setGeneric("intersects", function(object, other_object) standardGeneric("interse
 #' @return Logical denoting whether the segments intersect with the object
 #' @export
 #' @name line_intersection-method
-setGeneric("line_intersection", function(object, segments) standardGeneric("line_intersection"))
+setGeneric("line_intersection", function(object, segments, ...) standardGeneric("line_intersection"))
 
 #' An S4 class to Represent Polygon Objects
 #'
@@ -875,15 +875,23 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
 
 #'@rdname line_intersection-method
 #'
-setMethod("line_intersection", signature(object = "circle"), function(object, segments) {
+setMethod("line_intersection", signature(object = "circle"), function(object, 
+                                                                      segments,
+                                                                      return_all = FALSE) {
+
+    intersecting_segments <- cbind(1:nrow(segments),
+                                   rep(FALSE, each = nrow(segments)))
+
     # First check: Do any of the points that determine the segment fall 
     # within the circle? If so, there is an intersection.
-    inside <- sapply(seq_len(nrow(segments)),
-                     \(x) in_object(object, segments[x,], outside = FALSE))
+    idx <- sapply(seq_len(nrow(segments)),
+                           \(x) in_object(object, segments[x,], outside = FALSE))
 
-    if(any(inside)) {
+    if(any(idx) & !return_all) {
         return(TRUE)
     }
+
+    intersecting_segments[idx] <- TRUE
 
     # Second check: Use the formula for an intersection of a line with a 
     # circle to determine whether the line itself intersects. For this to 
@@ -908,13 +916,14 @@ setMethod("line_intersection", signature(object = "circle"), function(object, se
     # Check whether any of the edges are at risk of intersecting. If not, 
     # we can safely say that the circle does not intersect with the polygon
     idx <- discriminant >= 0
-    if(!any(idx)) {
+    if(!any(idx) & !return_all) {
         return(FALSE)
     }
 
     # If not, retain the points and other characteristics of the edges that 
     # might intersect with the circle
     segments <- segments[idx,]
+    id_segments <- intersecting_segments[idx, 1]
     if(sum(idx) == 1) {
         # If we only retain one row, we have to transform the edges to a 
         # matrix again
@@ -947,7 +956,17 @@ setMethod("line_intersection", signature(object = "circle"), function(object, se
     x_check_2 <- (co[,3] <= ranges[,2]) & (co[,3] >= ranges[,1])
     y_check_2 <- (co[,4] <= ranges[,4]) & (co[,4] >= ranges[,3])
 
-    return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
+    idx <- (x_check_1 & y_check_1) | (x_check_2 & y_check_2)
+
+    # Combine with all previous information and return whatever the research 
+    # wants
+    intersecting_segments[id_segments[idx]] <- TRUE
+
+    if(return_all) {
+        return(intersecting_segments)
+    } else {
+        return(any(idx))
+    }
 })
 
 #' An S4 class to Represent Lines
