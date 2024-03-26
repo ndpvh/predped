@@ -18,8 +18,6 @@ create_edges <- function(from,
                          background, 
                          space_between = 0.5) {
 
-    start_time <- Sys.time()
-
     obj <- objects(background)
 
     # Make each of the objects in the background a bit bigger. This way, agents
@@ -33,9 +31,6 @@ create_edges <- function(from,
                           background, 
                           space_between = space_between)
 
-    
-
-
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
@@ -45,13 +40,13 @@ create_edges <- function(from,
     #   - Step 1: Find out which nodes are uniquely connectable to each other.
     #             First make all connections and then only retain the unique ones
     #             through identification in a triangular logical matrix
-    #   - Step 2: Find out which nodes are reachable from one another. In other 
+    #   - Step 2: Compute the distance between the nodes.
+    #   - Step 3: Find out which nodes are reachable from one another. In other 
     #             words, if I stand at node 1, can I see node 2? In this step, 
     #             we also immediately compute the distance from one node to 
     #             another.
 
     # Step 1
-    again_start <- Sys.time()
     n_nodes <- nrow(nodes)
     edges <- cbind(nodes[rep(seq_len(n_nodes), each = n_nodes),],
                    nodes[rep(seq_len(n_nodes), times = n_nodes),])
@@ -69,89 +64,11 @@ create_edges <- function(from,
     edges$cost <- (edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2
 
     # Step 3: Check which nodes can be seen at each location
-    idx <- sapply(seq_len(nrow(edges)),
-                  \(x) m4ma::seesGoal(as.numeric(edges[x, c("from_x", "from_y")]), 
-                                      as.numeric(edges[x, c("to_x", "to_y")]),
-                                      obj))
-    View(idx)
+    idx <- prune_edges(obj,
+                       as.matrix(edges[,c("from_x", "from_y", "to_x", "to_y")]))
+
+    # Only retain what you need
     edges <- edges[idx, c("from", "to", "cost")]
-
-    View(edges)
-
-
-
-    # edges <- cbind(ids, numeric(nrow(ids))) |>
-    #     as.data.frame() |>
-    #     setNames(c("from", "to", "cost"))
-    # for(i in seq_len(nrow(edges))) {
-    #     co_1 <- as.numeric(nodes[nodes$node_ID == ids$from[i], c("X", "Y")])
-    #     co_2 <- as.numeric(nodes[nodes$node_ID == ids$to[i], c("X", "Y")])
-
-    #     if(!m4ma::seesGoal(co_1, co_2, obj)) {
-    #         edges$cost[i] <- NA
-    #         next
-    #     }
-
-    #     # If they passed all the checks, then we can connect them to each
-    #     # other and compute the distance between both points. We have to save
-    #     # the rownames of the nodes in the dataframe
-    #     edges$cost[i] <- (co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2
-    # }
-
-    # # Only retain those edges that have a finite distance
-    # edges <- edges[!is.na(edges$cost),]
-
-
-    # edges <- list(from = list(), to = list(), cost = list())
-    # idx <- 1
-    # for(i in seq_len(nrow(nodes) - 1)) {
-    #     for(j in (i + 1):nrow(nodes)) {
-    #         co_1 <- as.numeric(nodes[i, c("X", "Y")])
-    #         co_2 <- as.numeric(nodes[j, c("X", "Y")])
-    #         ids <- c(nodes$node_ID[i], nodes$node_ID[j])
-
-    #         # Check if the nodes can be connected to each other: If occluded, 
-    #         # that means something is standing in the way
-    #         if(!m4ma::seesGoal(co_1, co_2, new_obj) & !any(ids %in% c("agent", "goal"))) {
-    #             next
-    #         }
-
-    #         if(!m4ma::seesGoal(co_1, co_2, obj)) {
-    #             next
-    #         }
-
-    #         # If they passed all the checks, then we can connect them to each
-    #         # other and compute the distance between both points. We have to save
-    #         # the rownames of the nodes in the dataframe
-    #         edges$from[[idx]] <- nodes$node_ID[i]
-    #         edges$to[[idx]] <- nodes$node_ID[j]
-    #         edges$cost[[idx]] <- sqrt((co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2)
-
-    #         idx <- idx + 1
-    #     }
-    # }
-
-    # # Transform this list to a dataframe, as required by cppRouting
-    # from <- rbind(edges$from) |> t()
-    # to <- rbind(edges$to) |> t()
-    # cost <- rbind(edges$cost) |> t()
-
-    # edges <- cbind.data.frame(from, 
-    #                           to, 
-    #                           as.numeric(cost)) |>
-    #     setNames(c("from", "to", "cost"))
-
-    ############################################################################
-    stop_time <- Sys.time()
-
-
-
-    print(stop_time - start_time)
-    print(plot(background) + 
-        ggplot2::geom_segment(ggplot2::aes(x = )))
-    Sys.sleep(600)
-    ############################################################################
-
     return(list(edges = edges, nodes = nodes))
 }
 
@@ -180,7 +97,7 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5) {
-    start_time <- Sys.time()
+                            
     # Create a matrix of coordinates close to the edge of the shape of the object.
     # These will serve as the first nodes of the network.
     #
@@ -208,27 +125,21 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
-    # new_obj <- lapply(obj, 
-    #                   \(x) enlarge_object(x, space_between = space_between))
+    new_obj <- lapply(obj, 
+                      \(x) enlarge_object(x, space_between = space_between))
 
-    # idx <- sapply(seq_len(nrow(nodes)), 
-    #               \(x) in_object(shp, nodes[x,], outside = TRUE))
-    # nodes[idx,] <- NA 
-
-    # idx <- sapply(seq_len(nrow(nodes)),
-    #               \(x) in_object())
-    # for(i in seq_len(nrow(nodes))) {
-    #     if(in_object(shp, nodes[i,], outside = TRUE)) {
-    #         nodes[i,] <- NA
-    #     } else {
-    #         for(j in seq_along(new_obj)) {
-    #             if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
-    #                 nodes[i,] <- NA
-    #                 break
-    #             }
-    #         } 
-    #     }
-    # }
+    for(i in seq_len(nrow(nodes))) {
+        if(in_object(shp, nodes[i,], outside = TRUE)) {
+            nodes[i,] <- NA
+        } else {
+            for(j in seq_along(new_obj)) {
+                if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
+                    nodes[i,] <- NA
+                    break
+                }
+            } 
+        }
+    }
 
     nodes <- nodes[!is.na(nodes[,1]),]
 
@@ -252,12 +163,6 @@ create_nodes <- function(from,
                               as.numeric(nodes[,1]), 
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
-
-    stop_time <- Sys.time()
-
-    # print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y), size = 4))
-    # print(stop_time - start_time)
-    # Sys.sleep(600)
 
     return(nodes)
 }
@@ -292,6 +197,45 @@ enlarge_object <- function(object,
     } else {
         stop(paste0("The object provided is not recognized: ", class(object)))
     }
+}
+
+# Make a vectorized alternative to m4ma::seesGoal that will loop over the objects
+# but looks at intersections in a vectorized manner
+prune_edges <- function(objects, segments) {
+    # Loop over the objects in the environment
+    all_intersections <- matrix(FALSE, nrow = nrow(segments), ncol = length(objects))
+    for(i in seq_along(objects)) {
+        # Dispatch based on the kind of object we are talking about
+        if(inherits(objects[[i]], "polygon")) {
+            # If there is an intersection with the points of the polygon/rectangle,
+            # then the agent cannot see the location we are talking about and 
+            # the function should return false
+            points <- objects[[i]]@points
+            edges <- cbind(points, points[c(2:nrow(points), 1),])
+            intersections <- line_line_intersection(segments, edges, return_all = TRUE)
+            
+            # Rework the intersections matrix so that it has the values for each
+            # of the segments of the polygon/rectangle in its columns. Then find
+            # out whether the segments intersect with any of the segments of the 
+            # polygon/rectangle by using rowSums, which should be equal to 0 if
+            # there are no intersections
+            intersections <- matrix(intersections, 
+                                    ncol = nrow(edges),
+                                    byrow = T)
+            all_intersections[,i] <- rowSums(intersections) > 0L
+
+        } else if(inherits(objects[[i]], "circle")) {
+            # Here we just use the line_intersections function that has been 
+            # designed for circles. 
+            all_intersections[,i] <- line_intersection(objects[[i]], 
+                                                       segments, 
+                                                       return_all = TRUE)
+        }
+    }
+
+    # I want to only retain those that do not intersect, meaning that the complete
+    # row should be FALSE
+    return(rowSums(all_intersections) == 0L)
 }
 
 
