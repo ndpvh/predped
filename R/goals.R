@@ -161,8 +161,8 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     not_okay <- TRUE
     while(not_okay) {
         co <- rng_point(new_object, 
-                    middle_edge = middle_edge, 
-                    forbidden = forbidden)
+                        middle_edge = middle_edge, 
+                        forbidden = forbidden)
 
         check <- sapply(obj,
                         \(x) in_object(x, co, outside = FALSE))
@@ -177,6 +177,7 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
 #'@rdname add_goal-method
 #'
 setMethod("add_goal", signature(object = "circle"), function(object, 
+                                                             background,
                                                              id = character(0),
                                                              counter = 5,
                                                              forbidden = NULL
@@ -191,8 +192,21 @@ setMethod("add_goal", signature(object = "circle"), function(object,
     new_object <- circle(center = center(object), 
                          radius = radius(object) + 1e-2)
 
-    co <- rng_point(new_object, 
-                    forbidden = forbidden)
+    # Generate a random goal and check whether or not this goal is not contained
+    # within another object within the environment
+    obj <- objects(background)
+    shp <- shape(background)
+    
+    not_okay <- TRUE
+    while(not_okay) {
+        co <- rng_point(new_object, 
+                        forbidden = forbidden)
+
+        check <- sapply(obj,
+                        \(x) in_object(x, co, outside = FALSE))
+        not_okay <- in_object(shp, co, outside = TRUE) | any(check)
+    }
+    
     return(goal(id = id,
                 position = coordinate(co), 
                 counter = counter))   
