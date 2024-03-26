@@ -154,13 +154,9 @@ line_line_intersection <- function(segments_1,
     u <- sign(u_max) * u
 
     intersection <- (0 < t) & (t <= abs(t_max)) & (0 < u) & (u <= abs(u_max))
-    
+
     if(return_all) {
-        return(cbind(rep(paste0("segment_1_", 1:n_1),
-                         times = n_2),
-                     rep(paste0("segment_2_", 1:n_2),
-                         each = n_1),
-                     intersection))
+        return(intersection)
     } else {
         return(any(intersection))
     }
