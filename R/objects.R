@@ -425,7 +425,9 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
     # Dispath based on the type of the other object
     if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
-    } else {
+    } else if(inherits(other_object, "line")) {
+        return(intersects(other_object, object))        
+    }else {
         # Extract the points of the objects and create the edges to be 
         # evaluated
         edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
@@ -678,7 +680,9 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
     } else if(inherits(other_object, "rectangle")) {
         new_poly <- polygon(points = other_object@points)
         return(intersects(new_poly, object))
-    } else {        
+    } else if(inherits(other_object, "line")) {
+        return(intersects(other_object, object))        
+    }else {        
         return(intersects(other_object, object))
     }
     
@@ -851,6 +855,9 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return((distance <= radius(object) + radius(other_object)) & 
                (distance >= abs(radius(object) - radius(other_object))))
 
+    } else if(inherits(other_object, "line")) {
+        return(intersects(other_object, object))
+
     } else {
         # Create the edges of the polygon
         points <- other_object@points
@@ -931,8 +938,168 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
     }  
 })
 
+#' An S4 class to Represent Lines
+#'
+#' Lines are used to determine intersections and to prevent pedestrians from 
+#' walking certain ways.
+#'
+#' @slot from A coordinate
+#' @slot to A coordinate
+#' 
+#'
+#' @export
+#' @name line
+polygon <- setClass("line", list(from = "coordinate", 
+                                 to = "coordinate", 
+                                 center = "coordinate",
+                                 orientation = "numeric",
+                                 size = "numeric",
+                                 blocks_path = "logical",
+                                 interactable = "logical"), contains = "object")
+
+setMethod("initialize", "line", function(.Object, 
+                                         from, 
+                                         to, 
+                                         id = NULL,
+                                         blocks_path = FALSE, 
+                                         interactable = FALSE,
+                                         ...) {
+    .Object <- callNextMethod(.Object, ...)
+
+    .Object@id <- if(length(id) == 0) paste("line", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
+    .Object@from <- coordinate(from)
+    .Object@to <- coordinate(to)
+    .Object@blocks_path <- blocks_path
+    .Object@interactable <- interactable
+
+    .Object@center <- coordinate(0.5 * c(to[1] - from[1], to[2] - from[2]))
+    .Object@orientation <- atan((from[2] - to[2]) / (from[1] - to[1]))
+    .Object@size <- sqrt((from[1] - to[1])^2 + (from[2] - to[2])^2)
+
+    return(.Object)
+})
+
+#'@rdname in_object-method
+#'
+setMethod("in_object", signature(object = "line"), function(object, x, outside = TRUE) {
+    # For a line, it does not matter whether a point is contained within the line.
+    # Therefore always return FALSE
+    return(FALSE)
+})
+
+#'@rdname rng_point-method
+#'
+setMethod("rng_point", signature(object = "line"), function(object,
+                                                            middle_edge = TRUE) {
+
+    if(middle_edge) {
+        return(as.numeric(center(object)))
+    } else {
+        a <- runif(1, 0, 1)
+        return(a * c(object@to[1] - object@from[1], object@to[2] - object@from[2]))
+    }
+})   
+
+#'@rdname add_nodes-method
+#'
+setMethod("add_nodes", signature(object = "line"), function(object, 
+                                                            ...) {
+    
+    # Should not add nodes to a line
+    return(NULL)
+})
+
+#'@rdname intersects-method
+#'
+setMethod("intersects", signature(object = "line"), function(object, other_object) {
+    # Dispath based on the type of the other object. If circle or polygon, then 
+    # we switch the two objects and dispatch to the `intersects` method of these
+    # two classes
+    if(inherits(other_object, "circle")) {
+        # Similar steps to the polygon one, but now for a single line
+
+        # Adjust the from and to so that the circle is centered at the origin
+        from <- object@from - center(circle)
+        to <- object@to - center(circle)
+
+        # First check: Do any of the points that determine the segment fall 
+        # within the circle? If so, there is an intersection.
+        if((from[1]^2 + from[2]^2 <= radius(circle)^2) | 
+           (to[1]^2 + to[2]^2 <= radius(circle)^2)) {
+            return(TRUE)
+        }
+
+        # Second check: Use the formula for an intersection of a line with a 
+        # circle to determine whether the line itself intersects. For this to 
+        # work, we need to offset the points of the edges with the center of 
+        # the circle.
+        #
+        # Once we found that there is an intersection, we can compute the point 
+        # at which the intersection happens and check whether it lies within the
+        # two provided points that make up the edge. If not, then there is no 
+        # actual intersection. 
+
+        dx <- to[1] - from[1]
+        dy <- to[2] - from[2]
+        distance <- dx^2 + dy^2
+
+        D <- from[1] * to[2] - from[2] * to[1]
+
+        discriminant <- radius(object)^2 * distance - D^2
+
+        # Check whether the line is at risk of intersecting. If not, 
+        # we can safely say that the circle does not intersect with the polygon
+        if(discriminant >= 0) {
+            return(FALSE)
+        }
+
+        # If not, compute the different intersection points with the circle and 
+        # check whether these lie inbetween the segments of the polygon
+        co <- c(D * dy + sign(dy) * dx * sqrt(discriminant),
+                -D * dx + abs(dy) * sqrt(discriminant),
+                D * dy - sign(dy) * dx * sqrt(discriminant),
+                -D * dx - abs(dy) * sqrt(discriminant)) / distance
+
+        x_range <- range(c(from[1], to[1]))
+        y_range <- range(c(from[2], to[2]))
+
+        x_check_1 <- (co[,1] <= x_range[2]) & (co[,1] >= x_range[1])
+        y_check_1 <- (co[,2] <= y_range[2]) & (co[,2] >= y_range[1])
+        x_check_2 <- (co[,3] <= x_range[2]) & (co[,3] >= x_range[1])
+        y_check_2 <- (co[,4] <= y_range[2]) & (co[,4] >= y_range[1])
+
+        return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
+
+    } else if(inherits(other_object, "line")) {
+        # This case can be handed to m4ma
+        return(m4ma::line.line.intersection(object@from,
+                                            object@to, 
+                                            other_object@from,
+                                            other_object@to,
+                                            interior.only = TRUE))
+
+    } else {
+        # Here, we will loop over all points that make up the edges of the polygon
+        # or rectangle and check whether they intersect with the 
+        # line.line.intersection function
+        edges <- cbind(other_object@points, 
+                       other_object@points[c(2:nrow(points), 1),])
+        idx <- sapply(seq_len(nrow(edges)),
+                      \(x) line.line.intersection(object@from, 
+                                                  object@to, 
+                                                  edges[x, 1:2], 
+                                                  edges[x, 3:4],
+                                                  interior.only = TRUE))
+
+        return(any(idx)) 
+    }  
+})
 
 
+
+
+
+################################################################################
 # Getters and setters
 
 #' @rdname object-class
@@ -982,6 +1149,15 @@ setMethod("size<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
+setMethod("size", signature(object = "line"), function(object) {
+    return(object@length)
+})
+
+setMethod("size<-", signature(object = "line"), function(object, value) {
+    object@length <- value
+    return(object)
+})
+
 #' @rdname object-class
 #' 
 #' @export 
@@ -998,6 +1174,8 @@ setMethod("center", signature(object = "polygon"), function(object) {
 
 setMethod("center<-", signature(object = "polygon"), function(object, value) {
     object@center <- value
+    object@points <- cbind(object@points[,1] + value[1], 
+                           object@points[,2] + value[2])
     return(object)
 })
 
@@ -1019,6 +1197,17 @@ setMethod("center<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
+setMethod("center", signature(object = "line"), function(object) {
+    return(object@center)
+})
+
+setMethod("center<-", signature(object = "line"), function(object, value) {
+    object@center <- value
+    object@from <- object@from + value 
+    object@to <- object@to + value
+    return(object)
+})
+
 #' @rdname object-class
 #' 
 #' @export 
@@ -1035,5 +1224,24 @@ setMethod("orientation", signature(object = "rectangle"), function(object) {
 
 setMethod("orientation<-", signature(object = "rectangle"), function(object, value) {
     object@orientation <- value
+    return(object)
+})
+
+setMethod("orientation", signature(object = "line"), function(object) {
+    return(object@orientation)
+})
+
+setMethod("orientation<-", signature(object = "line"), function(object, value) {
+    angle <- value - object@orientation
+    angle <- angle * pi / 180
+
+    object@from <- rotate(object@from,
+                          center = center(object),
+                          radians = angle)
+    object@to <- rotate(object@to,
+                        center = center(object),
+                        radians = angle)
+
+    object@orientation <- value    
     return(object)
 })
