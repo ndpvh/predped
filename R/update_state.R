@@ -428,8 +428,8 @@ update_goal <- function(agent,
             agent_idx <- which(agent_ids == id(agent))
 
             updated_background <- background
-            # objects(updated_background) <- append(objects(updated_background), 
-            #                                       state$agents[-agent_idx])
+            objects(updated_background) <- append(objects(updated_background), 
+                                                  state$agents[-agent_idx])
                                                   
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
@@ -584,6 +584,13 @@ update_goal <- function(agent,
     # Finally, it might also be that the agent is close to the goal and can 
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {
+        # Keep this in for debugging purposes
+        if(nrow(current_goal(agent)@path) == 0) {
+            View(current_goal(agent))
+            View(agent)
+            print(plot(background) + plot(state$agents))
+        }
+
         # Determine how far along the `path` they are
         distance_path_point <- m4ma::dist1(position(agent), 
                                            matrix(current_goal(agent)@path[1,], 
