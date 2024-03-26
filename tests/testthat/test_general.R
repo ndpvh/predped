@@ -29,7 +29,11 @@ testthat::test_that("Vectorized line-line intersection works", {
     tst3 <- rbind(c(-3, 2, 1, 5),
                   c(-4, -1, -4, -4),
                   c(7, -1, 10, -1))
+    tst4 <- rbind(c(-3, -5, -3, -8),
+                  c(6, -2, 9, -2),
+                  c(4, 4, 7, 7))
 
-    testthat::expect_true(predped::line_intersection(tst1, tst2))
-    testthat::expect_false(predped::line_intersection(tst1, tst3))
+    testthat::expect_true(predped::line_line_intersection(tst1, tst2))
+    testthat::expect_false(predped::line_line_intersection(tst1, tst3))
+    testthat::expect_false(predped::line_line_intersection(tst1, tst3)) # To change once figured out how to deal with this
 })
