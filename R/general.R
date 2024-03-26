@@ -104,17 +104,24 @@ perpendicular_orientation <- function(background) {
     return(angle)
 }
 
-# Undocumented function that will compute the vectorized intersection between
-# several segments and other segments.
-#
-# @param segments_1 Matrix with four columns denoting the x- and y-coordinates
-# that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
-# @param segments_2 Matrix of line segments that `segments_1` should be tested
-# with. Should have the same structure as `segments_1`
-#
-# @return Returns a logical denoting whether any of the segments in 
-line_intersection <- function(segments_1, 
-                              segments_2) {
+#' Compute the line-line intersection between several segments. Is a vectorized 
+#' function with minimal loss of time when the number of segments to test 
+#' increases.
+#'
+#' @param segments_1 Matrix with four columns denoting the x- and y-coordinates
+#' that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
+#' @param segments_2 Matrix of line segments that `segments_1` should be tested
+#' with. Should have the same structure as `segments_1`
+#' @param return_all Logical denoting whether it should return the intersection 
+#' of all segments to each other. If true, will include indicators of which segments
+#' were compared. Defaults to `FALSE`.
+#'
+#' @return Returns a logical denoting whether any of the segments in 
+#' 
+#' @export
+line_line_intersection <- function(segments_1, 
+                                   segments_2,
+                                   return_all = FALSE) {
 
     # Enlongen the two matrices of segments so that the intersection of each 
     # segment within the two matrices can be compared to each other. For this, 
@@ -138,11 +145,23 @@ line_intersection <- function(segments_1,
         (segments_1[,2] - segments_1[,4]) * (segments_2[,1] - segments_2[,3])
     u_max <- -t_max
 
-    # Do the test itself
+    # Do the test itself:
+    #
+    # Important limitation (and TO DO): End points are not regarded as intersecting.
+    # This is done because of some weird bugs with parallel lines that are 
+    # regarded as intersecting while not intersecting at all.
     t <- sign(t_max) * t
     u <- sign(u_max) * u
 
-    intersection <- (0 <= t) & (t <= abs(t_max)) & (0 <= u) & (u <= abs(u_max))
-
-    return(any(intersection))
+    intersection <- (0 < t) & (t <= abs(t_max)) & (0 < u) & (u <= abs(u_max))
+    
+    if(return_all) {
+        return(cbind(rep(paste0("segment_1_", 1:n_1),
+                         times = n_2),
+                     rep(paste0("segment_2_", 1:n_2),
+                         each = n_1),
+                     intersection))
+    } else {
+        return(any(intersection))
+    }
 }
