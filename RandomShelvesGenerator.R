@@ -115,21 +115,34 @@ setGeneric("getCoordinates", function(object, shelf_length = 1, shelf_width = 0.
 setMethod("getCoordinates", "Shelves", function(object, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5, ...) {
     shelf_rectangles <- vector("list", length = sum(object@shelf_distribution))
     index <- 1
+    prev_row_max_shelf <- 0  # Initialize previous row max shelf to 0
+    row_y_start <- 0  # Initialize starting y-coord to 0
+    
     for (row in 1:object@num_rows) {
-        for (col in 1:object@num_columns) {
-            if (object@shelf_distribution[row, col] > 0) {
-                for (shelf in 1:object@shelf_distribution[row, col]) {
-                    shelf_center <- c((col - 1) * (shelf_width + aisle_width) + shelf_width / 2,
-                                      (row - 1) * (shelf_length + aisle_width) + (shelf - 0.5) * shelf_length)
-                    shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
-                    index <- index + 1
+        max_shelf_nr_per_row <- max(object@shelf_distribution[row, ])
+        if (max_shelf_nr_per_row > 0) {
+            if (row > 1) {
+                row_y_start <- row_y_start + prev_row_max_shelf * (shelf_length + aisle_width)
+            }
+            prev_row_max_shelf <- max_shelf_nr_per_row  # Update previous row max shelf
+            for (col in 1:object@num_columns) {
+                num_shelves <- object@shelf_distribution[row, col]
+                if (num_shelves > 0) {
+                    col_x <- (col - 1) * (shelf_width + aisle_width) + shelf_width / 2
+                    for (shelf in 1:num_shelves) {
+                        shelf_center <- c(col_x, row_y_start + (shelf - 0.5) * shelf_length)
+                        shelf_rectangles[[index]] <- new("rectangle", center = shelf_center, size = c(shelf_width, shelf_length))
+                        index <- index + 1
+                    }
                 }
             }
         }
     }
-    object@rectangles <- shelf_rectangles  # Update rectangles slot with generated coordinates
+    
+    object@rectangles <- shelf_rectangles
     return(object)
 })
+
 
 #' Plot method for Shelves objects
 #' This method is only to visualize the changes in the code.
@@ -176,17 +189,19 @@ plotShelves <- function(x, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.
 }
 
 # Example use
-shelves <- new("Shelves")
+shelves <- new("Shelves", fill_slots = TRUE)
 print(shelves)
 shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
 plotShelves(shelves_coordinates)
 
-shelves_2 <- new("Shelves", num_columns = 3, num_rows = 3, total_shelves = 8, fill_slots = TRUE)
+shelves_2 <- new("Shelves", num_columns = 3, num_rows = 3, total_shelves = 12)
 print(shelves_2)
+shelves_coordinates <- getCoordinates(shelves_2, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
+plotShelves(shelves_coordinates)
                
-shelf_distribution <- matrix(c(1, 1, 1,
-                               0, 1, 1,
-                               1, 1, 1), nrow = 3, byrow = TRUE)
+shelf_distribution <- matrix(c(7, 2, 1,
+                               8, 10, 2,
+                               3, 5, 6), nrow = 2, byrow = TRUE)
 
 shelves <- new("Shelves", shelf_distribution = shelf_distribution)
 shelves_coordinates <- getCoordinates(shelves, shelf_length = 1, shelf_width = 0.5, aisle_width = 1.5)
