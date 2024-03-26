@@ -18,3 +18,18 @@ testthat::test_that("Finding a class in a list works", {
     testthat::expect_equal(length(circ), 1)
     testthat::expect_equal(length(empty), 0)
 })
+
+testthat::test_that("Vectorized line-line intersection works", {
+    tst1 <- rbind(c(1, 1, 4, 4), 
+                  c(3, -2, 6, -2),
+                  c(-3, -1, -3, -5))
+    tst2 <- rbind(c(1, 2, 5, 2),
+                  c(8, 3, 8, 6),
+                  c(3, -2, 3, -5))
+    tst3 <- rbind(c(-3, 2, 1, 5),
+                  c(-4, -1, -4, -4),
+                  c(7, -1, 10, -1))
+
+    testthat::expect_true(predped::line_intersection(tst1, tst2))
+    testthat::expect_false(predped::line_intersection(tst1, tst3))
+})
