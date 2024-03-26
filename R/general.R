@@ -104,3 +104,45 @@ perpendicular_orientation <- function(background) {
     return(angle)
 }
 
+# Undocumented function that will compute the vectorized intersection between
+# several segments and other segments.
+#
+# @param segments_1 Matrix with four columns denoting the x- and y-coordinates
+# that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
+# @param segments_2 Matrix of line segments that `segments_1` should be tested
+# with. Should have the same structure as `segments_1`
+#
+# @return Returns a logical denoting whether any of the segments in 
+line_intersection <- function(segments_1, 
+                              segments_2) {
+
+    # Enlongen the two matrices of segments so that the intersection of each 
+    # segment within the two matrices can be compared to each other. For this, 
+    # take the Kronecker product with a vector of ones
+    n_1 <- nrow(segments_1)
+    n_2 <- nrow(segments_2)
+
+    segments_1 <- segments_1 %x% rep(1, each = n_2)
+    segments_2 <- rep(1, each = n_1) %x% segments_2
+
+    # Compute the values of t, u and the values they can maximally take t_max, 
+    # u_max of the Bézier parametrization of the line segments. If 0 <= t <= t_max
+    # and 0 <= u <= u_max, then the intersection between two lines lies within the
+    # boundaries that make up that line. 
+    t <- (segments_1[,1] - segments_2[,1]) * (segments_2[,2] - segments_2[,4]) -
+        (segments_1[,2] - segments_2[,2]) * (segments_2[,1] - segments_2[,3])
+    u <- (segments_1[,1] - segments_1[,3]) * (segments_1[,2] - segments_2[,2]) -
+        (segments_1[,2] - segments_1[,4]) * (segments_1[,1] - segments_2[,1])
+    
+    t_max <- (segments_1[,1] - segments_1[,3]) * (segments_2[,2] - segments_2[,4]) -
+        (segments_1[,2] - segments_1[,4]) * (segments_2[,1] - segments_2[,3])
+    u_max <- -t_max
+
+    # Do the test itself
+    t <- sign(t_max) * t
+    u <- sign(u_max) * u
+
+    intersection <- (0 <= t) & (t <= abs(t_max)) & (0 <= u) & (u <= abs(u_max))
+
+    return(any(intersection))
+}
