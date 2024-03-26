@@ -402,9 +402,12 @@ update_goal <- function(agent,
     # agents are in the way. This is determined by the reroute parameter
     if(status(agent) == "replan") {
         # Check whether the agent can see the current goal.
-        seen <- sees_location(agent, 
-                              current_goal(agent)@position, 
-                              objects(background))
+        # seen <- sees_location(agent, 
+        #                       current_goal(agent)@position, 
+        #                       objects(background))
+        seen <- all(prune_edges(objects(background), 
+                                matrix(c(position(agent), current_goal(agent)@position),
+                                       nrow = 1)))
 
         # If the agent doesn't see their current goal, they have to reroute
         if(!seen) {
