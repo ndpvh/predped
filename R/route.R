@@ -18,27 +18,14 @@ create_edges <- function(from,
                          background, 
                          space_between = 0.5) {
 
+    start_time <- Sys.time()
+
     obj <- objects(background)
 
     # Make each of the objects in the background a bit bigger. This way, agents
     # cannot take shortcuts
-    new_obj <- list()
-    for(i in seq_along(obj)) {
-        if(inherits(obj[[i]], "circle")) {
-            new_obj[[i]] <- circle(center = center(obj[[i]]), 
-                                   radius = radius(obj[[i]]) + space_between)
-        } else if(inherits(obj[[i]], "rectangle")) {
-            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + 2 * space_between)
-        } else if(inherits(obj[[i]], "polygon")) {
-            points <- add_nodes(obj[[i]], 
-                                space_between = space_between,
-                                only_corners = TRUE)
-            new_obj[[i]] <- polygon(points = points)
-        } else {
-            stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
-        }
-    }
+    new_obj <- lapply(obj, 
+                      \(x) enlarge_object(x, space_between = space_between))
 
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
@@ -46,48 +33,124 @@ create_edges <- function(from,
                           background, 
                           space_between = space_between)
 
+    
+
+
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
     # the background.
-    edges <- list(from = list(), to = list(), cost = list())
-    idx <- 1
-    for(i in seq_len(nrow(nodes) - 1)) {
-        for(j in (i + 1):nrow(nodes)) {
-            co_1 <- as.numeric(nodes[i, c("X", "Y")])
-            co_2 <- as.numeric(nodes[j, c("X", "Y")])
-            ids <- c(nodes$node_ID[i], nodes$node_ID[j])
+    #
+    # Approach taken is to minimize the time it takes to do these computations:
+    #   - Step 1: Find out which nodes are uniquely connectable to each other.
+    #             First make all connections and then only retain the unique ones
+    #             through identification in a triangular logical matrix
+    #   - Step 2: Find out which nodes are reachable from one another. In other 
+    #             words, if I stand at node 1, can I see node 2? In this step, 
+    #             we also immediately compute the distance from one node to 
+    #             another.
 
-            # Check if the nodes can be connected to each other: If occluded, 
-            # that means something is standing in the way
-            if(!m4ma::seesGoal(co_1, co_2, new_obj) & !any(ids %in% c("agent", "goal"))) {
-                next
-            }
+    # Step 1
+    again_start <- Sys.time()
+    n_nodes <- nrow(nodes)
+    edges <- cbind(nodes[rep(seq_len(n_nodes), each = n_nodes),],
+                   nodes[rep(seq_len(n_nodes), times = n_nodes),])
+    to_remain <- matrix(0, nrow = n_nodes, ncol = n_nodes) |>
+        lower.tri() |>
+        as.vector()
+    edges <- edges[to_remain,] |>
+        as.data.frame() |>
+        setNames(c("from", "from_x", "from_y", 
+                   "to", "to_x", "to_y"))
 
-            if(!m4ma::seesGoal(co_1, co_2, obj)) {
-                next
-            }
+    # Step 2: Note, we use squared distances as the cost for efficiency purposes
+    # (taking the square root is computationally more expensive). Should not matter 
+    # to the results we get from the routing algorithm
+    edges$cost <- (edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2
 
-            # If they passed all the checks, then we can connect them to each
-            # other and compute the distance between both points. We have to save
-            # the rownames of the nodes in the dataframe
-            edges$from[[idx]] <- nodes$node_ID[i]
-            edges$to[[idx]] <- nodes$node_ID[j]
-            edges$cost[[idx]] <- sqrt((co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2)
+    # Step 3: Check which nodes can be seen at each location
+    idx <- sapply(seq_len(nrow(edges)),
+                  \(x) m4ma::seesGoal(as.numeric(edges[x, c("from_x", "from_y")]), 
+                                      as.numeric(edges[x, c("to_x", "to_y")]),
+                                      obj))
+    View(idx)
+    edges <- edges[idx, c("from", "to", "cost")]
 
-            idx <- idx + 1
-        }
-    }
+    View(edges)
 
-    # Transform this list to a dataframe, as required by cppRouting
-    from <- rbind(edges$from) |> t()
-    to <- rbind(edges$to) |> t()
-    cost <- rbind(edges$cost) |> t()
 
-    edges <- cbind.data.frame(from, 
-                              to, 
-                              as.numeric(cost)) |>
-        setNames(c("from", "to", "cost"))
+
+    # edges <- cbind(ids, numeric(nrow(ids))) |>
+    #     as.data.frame() |>
+    #     setNames(c("from", "to", "cost"))
+    # for(i in seq_len(nrow(edges))) {
+    #     co_1 <- as.numeric(nodes[nodes$node_ID == ids$from[i], c("X", "Y")])
+    #     co_2 <- as.numeric(nodes[nodes$node_ID == ids$to[i], c("X", "Y")])
+
+    #     if(!m4ma::seesGoal(co_1, co_2, obj)) {
+    #         edges$cost[i] <- NA
+    #         next
+    #     }
+
+    #     # If they passed all the checks, then we can connect them to each
+    #     # other and compute the distance between both points. We have to save
+    #     # the rownames of the nodes in the dataframe
+    #     edges$cost[i] <- (co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2
+    # }
+
+    # # Only retain those edges that have a finite distance
+    # edges <- edges[!is.na(edges$cost),]
+
+
+    # edges <- list(from = list(), to = list(), cost = list())
+    # idx <- 1
+    # for(i in seq_len(nrow(nodes) - 1)) {
+    #     for(j in (i + 1):nrow(nodes)) {
+    #         co_1 <- as.numeric(nodes[i, c("X", "Y")])
+    #         co_2 <- as.numeric(nodes[j, c("X", "Y")])
+    #         ids <- c(nodes$node_ID[i], nodes$node_ID[j])
+
+    #         # Check if the nodes can be connected to each other: If occluded, 
+    #         # that means something is standing in the way
+    #         if(!m4ma::seesGoal(co_1, co_2, new_obj) & !any(ids %in% c("agent", "goal"))) {
+    #             next
+    #         }
+
+    #         if(!m4ma::seesGoal(co_1, co_2, obj)) {
+    #             next
+    #         }
+
+    #         # If they passed all the checks, then we can connect them to each
+    #         # other and compute the distance between both points. We have to save
+    #         # the rownames of the nodes in the dataframe
+    #         edges$from[[idx]] <- nodes$node_ID[i]
+    #         edges$to[[idx]] <- nodes$node_ID[j]
+    #         edges$cost[[idx]] <- sqrt((co_1[1] - co_2[1])^2 + (co_1[2] - co_2[2])^2)
+
+    #         idx <- idx + 1
+    #     }
+    # }
+
+    # # Transform this list to a dataframe, as required by cppRouting
+    # from <- rbind(edges$from) |> t()
+    # to <- rbind(edges$to) |> t()
+    # cost <- rbind(edges$cost) |> t()
+
+    # edges <- cbind.data.frame(from, 
+    #                           to, 
+    #                           as.numeric(cost)) |>
+    #     setNames(c("from", "to", "cost"))
+
+    ############################################################################
+    stop_time <- Sys.time()
+
+
+
+    print(stop_time - start_time)
+    print(plot(background) + 
+        ggplot2::geom_segment(ggplot2::aes(x = )))
+    Sys.sleep(600)
+    ############################################################################
 
     return(list(edges = edges, nodes = nodes))
 }
@@ -117,7 +180,7 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5) {
-    
+    start_time <- Sys.time()
     # Create a matrix of coordinates close to the edge of the shape of the object.
     # These will serve as the first nodes of the network.
     #
@@ -126,25 +189,9 @@ create_nodes <- function(from,
     # than nothing (especially for irregular polygons, this algorithm may fail) 
     shp <- shape(background)
 
-    continue <- TRUE
-    iter <- 1
-    nodes <- list()
-    while(continue) {
-        new_nodes <- add_nodes(shp, 
-                               space_between = space_between * iter,
-                               outside = FALSE,
-                               only_corners = TRUE)
-        nodes[[iter]] <- new_nodes
-        iter <- iter + 1
-
-        # If the distance between the nodes is too small, we can break from the 
-        # loop
-        new_nodes <- cbind(new_nodes, new_nodes[c(2:nrow(new_nodes), 1),])
-        distances <- (new_nodes[,1] - new_nodes[,3])^2 + (new_nodes[,2] - new_nodes[,4])^2
-        if(min(distances) < space_between^2) {
-            continue <- FALSE
-        }
-    }
+    nodes <- add_nodes(shp, 
+                       space_between = space_between, 
+                       outside = FALSE)
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
@@ -153,7 +200,7 @@ create_nodes <- function(from,
                                        space_between = space_between,
                                        only_corners = TRUE))
 
-    nodes <- rbind(do.call("rbind", nodes),
+    nodes <- rbind(nodes,
                    do.call("rbind", obj_nodes))
 
     # Check which nodes are contained within the environment and only retain 
@@ -161,44 +208,27 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
-    new_obj <- list()
-    for(i in seq_along(obj)) {
-        if(inherits(obj[[i]], "circle")) {
-            # Extend the radius with space_between - 1e-4. Ensures that we don't
-            # delete route points that are `space_between` far from the circle
-            new_obj[[i]] <- circle(center = center(obj[[i]]), 
-                                   radius = radius(obj[[i]]) + space_between - 1e-4)
-        } else if(inherits(obj[[i]], "rectangle")) {
-            # Extend the size of the rectangle with the factor 
-            # sqrt{space_between^2 / 2}, as we do in the `add_nodes` function. 
-            # Again correct with factor 1e-4
-            extension <- sqrt(space_between^2 / 2)
-            new_obj[[i]] <- rectangle(center = center(obj[[i]]), 
-                                      size = obj[[i]]@size + 2 * (extension - 1e-4))
-        } else if(inherits(obj[[i]], "polygon")) {
-            # Simply find the nodes of the polygon and use these new nodes as 
-            # the points of the outer polygon.
-            points <- add_nodes(obj[[i]], 
-                                space_between = space_between - 1e-4,
-                                only_corners = TRUE)
-            new_obj[[i]] <- polygon(points = points)
-        } else {
-            stop(paste0("The object provided is not recognized: ", class(obj[[i]])))
-        }
-    }
+    # new_obj <- lapply(obj, 
+    #                   \(x) enlarge_object(x, space_between = space_between))
 
-    for(i in seq_len(nrow(nodes))) {
-        if(in_object(shp, nodes[i,])) {
-            nodes[i,] <- NA
-        } else {
-            for(j in seq_along(new_obj)) {
-                if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
-                    nodes[i,] <- NA
-                    break
-                }
-            } 
-        }
-    }
+    # idx <- sapply(seq_len(nrow(nodes)), 
+    #               \(x) in_object(shp, nodes[x,], outside = TRUE))
+    # nodes[idx,] <- NA 
+
+    # idx <- sapply(seq_len(nrow(nodes)),
+    #               \(x) in_object())
+    # for(i in seq_len(nrow(nodes))) {
+    #     if(in_object(shp, nodes[i,], outside = TRUE)) {
+    #         nodes[i,] <- NA
+    #     } else {
+    #         for(j in seq_along(new_obj)) {
+    #             if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
+    #                 nodes[i,] <- NA
+    #                 break
+    #             }
+    #         } 
+    #     }
+    # }
 
     nodes <- nodes[!is.na(nodes[,1]),]
 
@@ -223,8 +253,48 @@ create_nodes <- function(from,
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
 
+    stop_time <- Sys.time()
+
+    # print(plot(background) + ggplot2::geom_point(ggplot2::aes(x = nodes$X, y = nodes$Y), size = 4))
+    # print(stop_time - start_time)
+    # Sys.sleep(600)
+
     return(nodes)
 }
+
+# Utility function that will enlarge an object based on the spacing provided 
+# by the argument
+enlarge_object <- function(object, 
+                           space_between = 0.5) {
+    # Dispatch on the kind of object we are talking about
+    if(inherits(object, "circle")) {
+        # Extend the radius with space_between - 1e-4. Ensures that we don't
+        # delete route points that are `space_between` far from the circle
+        return(circle(center = center(object), 
+                      radius = radius(object) + space_between - 1e-4))
+
+    } else if(inherits(object, "rectangle")) {
+        # Extend the size of the rectangle with the factor 
+        # sqrt{space_between^2 / 2}, as we do in the `add_nodes` function. 
+        # Again correct with factor 1e-4
+        extension <- sqrt(space_between^2 / 2)
+        return(rectangle(center = center(object), 
+                         size = object@size + 2 * (extension - 1e-4)))
+
+    } else if(inherits(object, "polygon")) {
+        # Simply find the nodes of the polygon and use these new nodes as 
+        # the points of the outer polygon.
+        points <- add_nodes(object, 
+                            space_between = space_between - 1e-4,
+                            only_corners = TRUE)
+        return(polygon(points = points))
+
+    } else {
+        stop(paste0("The object provided is not recognized: ", class(object)))
+    }
+}
+
+
 
 
 
