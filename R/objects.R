@@ -139,7 +139,7 @@ setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
 #' @name add_nodes-method
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 
-#' Sample a Random Point on the Circumference
+#' Check whether an Object intersects with Other Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
 #' @param other_object Another object of type that extends \code{\link[predped]{object-class}}
@@ -149,6 +149,17 @@ setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 #' @export
 #' @name intersects-method
 setGeneric("intersects", function(object, other_object) standardGeneric("intersects"))
+
+#' Check whether an Object intersects with Line Segments
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param segments Matrix of size N x 4 containing the coordinates of the line 
+#' segments in order x_1, y_1, x_2, y_2.
+#'
+#' @return Logical denoting whether the segments intersect with the object
+#' @export
+#' @name line_intersection-method
+setGeneric("line_intersection", function(object, segments) standardGeneric("line_intersection"))
 
 #' An S4 class to Represent Polygon Objects
 #'
@@ -425,9 +436,9 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
     # Dispath based on the type of the other object
     if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
-    } else if(inherits(other_object, "line")) {
+    } else if(inherits(other_object, "segment")) {
         return(intersects(other_object, object))        
-    }else {
+    } else {
         # Extract the points of the objects and create the edges to be 
         # evaluated
         edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
@@ -436,28 +447,22 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
         edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
         edges_2 <- rbind(edges_2, edges_2[1,])
 
-        # Loop over each edge and evaluate whether they intersect. If so, end
-        # it then and there. If not, continue looping
-        idx <- cbind(rep(1:nrow(edges_1), each = nrow(edges_2)),
-                     rep(1:nrow(edges_2), times = nrow(edges_1)))
-        for(i in seq_len(nrow(idx))) {
-            tmp <- m4ma::line.line.intersection(edges_1[idx[i,1], 1:2],
-                                                edges_1[idx[i,1], 3:4], 
-                                                edges_2[idx[i,2], 1:2], 
-                                                edges_2[idx[i,2], 3:4],
-                                                interior.only = TRUE)
-            
-            if(all(is.infinite(tmp))) {
-                tmp <- c(NA, NA)
-            }
-
-            if(!any(is.na(tmp))) {
-                return(TRUE)
-            }
-        }
-
-        return(FALSE)
+        # Use the line_line_intersection function
+        return(line_line_intersection(edges_1, edges_2))
     }
+})
+
+#'@rdname line_intersection-method
+#'
+setMethod("line_intersection", signature(object = "polygon"), function(object, segments) {
+    
+    # Extract the points of the objects and create the edges to be 
+    # evaluated
+    edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+    edges <- rbind(edges, edges[1,])
+
+    # Use the line_line_intersection function
+    return(line_line_intersection(edges, segments))
 })
 
 #' An S4 Class to Represent Rectangle Objects
@@ -680,7 +685,7 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
     } else if(inherits(other_object, "rectangle")) {
         new_poly <- polygon(points = other_object@points)
         return(intersects(new_poly, object))
-    } else if(inherits(other_object, "line")) {
+    } else if(inherits(other_object, "segment")) {
         return(intersects(other_object, object))        
     }else {        
         return(intersects(other_object, object))
@@ -855,7 +860,7 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return((distance <= radius(object) + radius(other_object)) & 
                (distance >= abs(radius(object) - radius(other_object))))
 
-    } else if(inherits(other_object, "line")) {
+    } else if(inherits(other_object, "segment")) {
         return(intersects(other_object, object))
 
     } else {
@@ -863,79 +868,86 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         points <- other_object@points
         edges <- cbind(points, points[c(2:nrow(points), 1),])
 
-        # First check: Do any of the points that determine the segment fall 
-        # within the circle? If so, there is an intersection.
-        inside <- sapply(seq_len(nrow(points)),
-                         \(x) in_object(object, points[x,], outside = FALSE))
-
-        if(any(inside)) {
-            return(TRUE)
-        }
-
-        # Second check: Use the formula for an intersection of a line with a 
-        # circle to determine whether the line itself intersects. For this to 
-        # work, we need to offset the points of the edges with the center of 
-        # the circle.
-        #
-        # Once we found that there is an intersection, we can compute the point 
-        # at which the intersection happens and check whether it lies within the
-        # two provided points that make up the edge. If not, then there is no 
-        # actual intersection. 
-        edges[,c(1, 3)] <- edges[,c(1, 3)] - center(object)[1]
-        edges[,c(2, 4)] <- edges[,c(2, 4)] - center(object)[2]
-
-        dx <- edges[,3] - edges[,1]
-        dy <- edges[,4] - edges[,2]
-        distance <- dx^2 + dy^2
-
-        D <- edges[,1] * edges[,4] - edges[,3] * edges[,2]
-
-        discriminant <- radius(object)^2 * distance - D^2
-
-        # Check whether any of the edges are at risk of intersecting. If not, 
-        # we can safely say that the circle does not intersect with the polygon
-        idx <- discriminant >= 0
-        if(!any(idx)) {
-            return(FALSE)
-        }
-
-        # If not, retain the points and other characteristics of the edges that 
-        # might intersect with the circle
-        edges <- edges[idx,]
-        if(sum(idx) == 1) {
-            # If we only retain one row, we have to transform the edges to a 
-            # matrix again
-            edges <- matrix(edges, nrow = 1)
-        }
-
-        dx <- dx[idx]
-        dy <- dy[idx]
-        distance <- distance[idx]
-        D <- D[idx]
-        discriminant <- discriminant[idx]
-        
-        # Compute the different intersection points with the circle and check 
-        # whether these lie inbetween the segments of the polygon
-        co <- cbind(D * dy + sign(dy) * dx * sqrt(discriminant),
-                    -D * dx + abs(dy) * sqrt(discriminant),
-                    D * dy - sign(dy) * dx * sqrt(discriminant),
-                    -D * dx - abs(dy) * sqrt(discriminant)) / distance
-
-        if(nrow(edges) == 1) {
-            edge_ranges <- c(range(edges[, c(1, 3)]), range(edges[, c(2, 4)])) |>
-                matrix(nrow = 1)
-        } else {
-            edge_ranges <- cbind(matrixStats::rowRanges(edges[, c(1, 3)]),
-                                 matrixStats::rowRanges(edges[, c(2, 4)]))
-        }
-
-        x_check_1 <- (co[,1] <= edge_ranges[,2]) & (co[,1] >= edge_ranges[,1])
-        y_check_1 <- (co[,2] <= edge_ranges[,4]) & (co[,2] >= edge_ranges[,3])
-        x_check_2 <- (co[,3] <= edge_ranges[,2]) & (co[,3] >= edge_ranges[,1])
-        y_check_2 <- (co[,4] <= edge_ranges[,4]) & (co[,4] >= edge_ranges[,3])
-
-        return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
+        # Return the result of the general function circle_line_intersection
+        return(line_intersection(object, edges))        
     }  
+})
+
+#'@rdname line_intersection-method
+#'
+setMethod("line_intersection", signature(object = "circle"), function(object, segments) {
+    # First check: Do any of the points that determine the segment fall 
+    # within the circle? If so, there is an intersection.
+    inside <- sapply(seq_len(nrow(segments)),
+                     \(x) in_object(object, segments[x,], outside = FALSE))
+
+    if(any(inside)) {
+        return(TRUE)
+    }
+
+    # Second check: Use the formula for an intersection of a line with a 
+    # circle to determine whether the line itself intersects. For this to 
+    # work, we need to offset the points of the edges with the center of 
+    # the circle.
+    #
+    # Once we found that there is an intersection, we can compute the point 
+    # at which the intersection happens and check whether it lies within the
+    # two provided points that make up the edge. If not, then there is no 
+    # actual intersection. 
+    segments[,c(1, 3)] <- segments[,c(1, 3)] - center(object)[1]
+    segments[,c(2, 4)] <- segments[,c(2, 4)] - center(object)[2]
+
+    dx <- segments[,3] - segments[,1]
+    dy <- segments[,4] - segments[,2]
+    distance <- dx^2 + dy^2
+
+    D <- segments[,1] * segments[,4] - segments[,3] * segments[,2]
+
+    discriminant <- radius(object)^2 * distance - D^2
+
+    # Check whether any of the edges are at risk of intersecting. If not, 
+    # we can safely say that the circle does not intersect with the polygon
+    idx <- discriminant >= 0
+    if(!any(idx)) {
+        return(FALSE)
+    }
+
+    # If not, retain the points and other characteristics of the edges that 
+    # might intersect with the circle
+    segments <- segments[idx,]
+    if(sum(idx) == 1) {
+        # If we only retain one row, we have to transform the edges to a 
+        # matrix again
+        segments <- matrix(segments, nrow = 1)
+    }
+
+    dx <- dx[idx]
+    dy <- dy[idx]
+    distance <- distance[idx]
+    D <- D[idx]
+    discriminant <- discriminant[idx]
+    
+    # Compute the different intersection points with the circle and check 
+    # whether these lie inbetween the segments of the polygon
+    co <- cbind(D * dy + sign(dy) * dx * sqrt(discriminant),
+                -D * dx + abs(dy) * sqrt(discriminant),
+                D * dy - sign(dy) * dx * sqrt(discriminant),
+                -D * dx - abs(dy) * sqrt(discriminant)) / distance
+
+    if(nrow(segments) == 1) {
+        ranges <- c(range(segments[, c(1, 3)]), range(segments[, c(2, 4)])) |>
+            matrix(nrow = 1)
+    } else {
+        ranges <- cbind(matrixStats::rowRanges(segments[, c(1, 3)]),
+                        matrixStats::rowRanges(segments[, c(2, 4)]))
+    }
+
+    x_check_1 <- (co[,1] <= ranges[,2]) & (co[,1] >= ranges[,1])
+    y_check_1 <- (co[,2] <= ranges[,4]) & (co[,2] >= ranges[,3])
+    x_check_2 <- (co[,3] <= ranges[,2]) & (co[,3] >= ranges[,1])
+    y_check_2 <- (co[,4] <= ranges[,4]) & (co[,4] >= ranges[,3])
+
+    return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
 })
 
 #' An S4 class to Represent Lines
@@ -948,25 +960,25 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
 #' 
 #'
 #' @export
-#' @name line
-polygon <- setClass("line", list(from = "coordinate", 
-                                 to = "coordinate", 
-                                 center = "coordinate",
-                                 orientation = "numeric",
-                                 size = "numeric",
-                                 blocks_path = "logical",
-                                 interactable = "logical"), contains = "object")
+#' @name segment
+segment <- setClass("segment", list(id = "character", 
+                                    from = "coordinate", 
+                                    to = "coordinate", 
+                                    center = "coordinate",
+                                    orientation = "numeric",
+                                    size = "numeric",
+                                    blocks_path = "logical",
+                                    interactable = "logical"), contains = "object")
 
-setMethod("initialize", "line", function(.Object, 
-                                         from, 
-                                         to, 
-                                         id = NULL,
-                                         blocks_path = FALSE, 
-                                         interactable = FALSE,
-                                         ...) {
-    .Object <- callNextMethod(.Object, ...)
+setMethod("initialize", "segment", function(.Object, 
+                                            from, 
+                                            to, 
+                                            id = NULL,
+                                            blocks_path = FALSE, 
+                                            interactable = FALSE,
+                                            ...) {
 
-    .Object@id <- if(length(id) == 0) paste("line", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
+    .Object@id <- if(length(id) == 0) paste("segment", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@from <- coordinate(from)
     .Object@to <- coordinate(to)
     .Object@blocks_path <- blocks_path
@@ -981,7 +993,7 @@ setMethod("initialize", "line", function(.Object,
 
 #'@rdname in_object-method
 #'
-setMethod("in_object", signature(object = "line"), function(object, x, outside = TRUE) {
+setMethod("in_object", signature(object = "segment"), function(object, x, outside = TRUE) {
     # For a line, it does not matter whether a point is contained within the line.
     # Therefore always return FALSE
     return(FALSE)
@@ -989,7 +1001,7 @@ setMethod("in_object", signature(object = "line"), function(object, x, outside =
 
 #'@rdname rng_point-method
 #'
-setMethod("rng_point", signature(object = "line"), function(object,
+setMethod("rng_point", signature(object = "segment"), function(object,
                                                             middle_edge = TRUE) {
 
     if(middle_edge) {
@@ -1002,7 +1014,7 @@ setMethod("rng_point", signature(object = "line"), function(object,
 
 #'@rdname add_nodes-method
 #'
-setMethod("add_nodes", signature(object = "line"), function(object, 
+setMethod("add_nodes", signature(object = "segment"), function(object, 
                                                             ...) {
     
     # Should not add nodes to a line
@@ -1011,7 +1023,7 @@ setMethod("add_nodes", signature(object = "line"), function(object,
 
 #'@rdname intersects-method
 #'
-setMethod("intersects", signature(object = "line"), function(object, other_object) {
+setMethod("intersects", signature(object = "segment"), function(object, other_object) {
     # Dispath based on the type of the other object. If circle or polygon, then 
     # we switch the two objects and dispatch to the `intersects` method of these
     # two classes
@@ -1070,7 +1082,7 @@ setMethod("intersects", signature(object = "line"), function(object, other_objec
 
         return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
 
-    } else if(inherits(other_object, "line")) {
+    } else if(inherits(other_object, "segment")) {
         # This case can be handed to m4ma
         return(m4ma::line.line.intersection(object@from,
                                             object@to, 
@@ -1149,11 +1161,11 @@ setMethod("size<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-setMethod("size", signature(object = "line"), function(object) {
+setMethod("size", signature(object = "segment"), function(object) {
     return(object@length)
 })
 
-setMethod("size<-", signature(object = "line"), function(object, value) {
+setMethod("size<-", signature(object = "segment"), function(object, value) {
     object@length <- value
     return(object)
 })
@@ -1197,11 +1209,11 @@ setMethod("center<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-setMethod("center", signature(object = "line"), function(object) {
+setMethod("center", signature(object = "segment"), function(object) {
     return(object@center)
 })
 
-setMethod("center<-", signature(object = "line"), function(object, value) {
+setMethod("center<-", signature(object = "segment"), function(object, value) {
     object@center <- value
     object@from <- object@from + value 
     object@to <- object@to + value
@@ -1227,11 +1239,11 @@ setMethod("orientation<-", signature(object = "rectangle"), function(object, val
     return(object)
 })
 
-setMethod("orientation", signature(object = "line"), function(object) {
+setMethod("orientation", signature(object = "segment"), function(object) {
     return(object@orientation)
 })
 
-setMethod("orientation<-", signature(object = "line"), function(object, value) {
+setMethod("orientation<-", signature(object = "segment"), function(object, value) {
     angle <- value - object@orientation
     angle <- angle * pi / 180
 
