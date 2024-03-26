@@ -111,6 +111,7 @@ generate_goal_stack <- function(n,
     sampled_objects <- sample(potential_objects, n, replace = TRUE)
     goal_stack <- lapply(sampled_objects, 
                          \(x) add_goal(x, 
+                                       setting,
                                        id = character(0),
                                        counter = counter_generator(1)))
 
@@ -137,12 +138,11 @@ setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 #'@rdname add_goal-method
 #'
 setMethod("add_goal", signature(object = "polygon"), function(object, 
+                                                              background,
                                                               id = character(0),
                                                               counter = 5,
                                                               middle_edge = FALSE,
-                                                              forbidden = NULL
-
-){
+                                                              forbidden = NULL){
     # Create an ever so slightly bigger polygon
     #
     # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
@@ -153,9 +153,22 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     new_points <- add_nodes(object, only_corners = TRUE, space_between = 1e-2)
     new_object <- polygon(points = new_points)
 
-    co <- rng_point(new_object, 
+    # Generate a random goal and check whether or not this goal is not contained
+    # within another object within the environment
+    obj <- objects(background)
+    shp <- shape(background)
+
+    not_okay <- TRUE
+    while(not_okay) {
+        co <- rng_point(new_object, 
                     middle_edge = middle_edge, 
                     forbidden = forbidden)
+
+        check <- sapply(obj,
+                        \(x) in_object(x, co, outside = FALSE))
+        not_okay <- in_object(shp, co, outside = TRUE) | any(check)
+    }
+    
     return(goal(id = id,
                 position = coordinate(co), 
                 counter = counter))    
