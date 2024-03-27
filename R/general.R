@@ -15,37 +15,6 @@ find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
 }
 
-#' Separate agent and object
-#' 
-#' This function extracts agents and objects from a single `state` list.
-#' 
-#' @param state A list containing the current state of the simulation
-#' 
-#' @return Two lists containing the objects or the agents
-#' 
-#' @export separate_agent_object
-separate_agent_object <- function(state) {
-    # Identify the agents from the `state` list
-    agents <- find_class("agent", state)
-
-    # Identify the objects and delete the agents from this list
-    objects <- find_class("object", state) 
-    objects[[objects %in% agents]] <- NULL 
-
-    return(list("agents" = agents, 
-                "objects" = objects))
-}
-
-# Create a singular function for the unpacking for a given part of the list
-unpack_list <- function(index){
-    # Extract the wanted variable from the list across all agents. Then, 
-    # transpose the result and give the result row names
-    transposed <- apply(state, 2, function(x) x[[index]]) |>
-        t()
-    row.names(transposed) <- names
-    return(transposed)        
-}
-
 # Undocumented function because this is in no way a particularly beautiful 
 # function, nor is it meant to be the final way in which we do this.
 #
