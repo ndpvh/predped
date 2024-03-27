@@ -169,8 +169,9 @@ agents_between_goal <- function(agent,
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
         other_agents <- state$agents[-agent_idx]
-        agent_positions <- sapply(other_agents, position) |>
-            matrix(ncol = 2)
+        agent_positions <- lapply(other_agents, position)
+        agent_positions <- do.call("rbind", 
+                                   agent_positions)
     } else {
         agent_positions <- agent_predictions[-agent_idx,] |>
             matrix(ncol = 2)
