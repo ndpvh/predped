@@ -11,7 +11,7 @@ transform_mu <- function(parameters) {
     parameter_names <- c("Central", "NonCentral", "acc", "const", "dec")
 
     for(i in parameter_names) {
-        parameters[i] <- (1 - parameters[i])^(-1)
+        parameters[[i]] <- (1 - parameters[[i]])^(-1)
     }
 
     return(parameters)
@@ -44,11 +44,11 @@ transform_exponentiate <- function(parameters) {
     nest_parameters <- c("Central", "NonCentral", "acc", "const", "dec")
 
     for(i in utility_parameters){
-        parameters[i] <- exp(parameters[i])
+        parameters[[i]] <- exp(parameters[[i]])
     }
 
     for(i in nest_parameters){
-        parameters[i] <- pnorm(parameters[i])
+        parameters[[i]] <- pnorm(parameters[[i]])
     }
 
     return(parameters)

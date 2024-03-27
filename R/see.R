@@ -7,7 +7,7 @@
 #' @param state The list that contains the current state of the simulation
 #' @param P_n The goal to move to next
 #' @param agent_predictions The predicted trajectories of the other agents
-#' @param iInfo
+#' @param iInfo Not clear yet
 #' @param step The stepsize in the angles to be checked
 #'
 #' @return The angle that has the highest utility to move to
@@ -22,8 +22,8 @@ best_angle <- function(agent,
                        state,
                        agent_predictions,
                        background,
-                       vels,
-                       angles,
+                       velocities,
+                       orientations,
                     #    cores = 1,
                        step = 45) {
 
@@ -37,15 +37,13 @@ best_angle <- function(agent,
     for(i in seq_along(new_angles)){
         orientation(agent) <- new_angles[i]
         # Create centers based on the proposed angle
-        centers <- m4ma::c_vd_rcpp(
-            cells = 1:33,
-            p1 = position(agent),
-            v1 = speed(agent),
-            a1 = orientation(agent),
-            vels = vels,
-            angles = angles,
-            tStep = 0.5
-        )
+        centers <- m4ma::c_vd_rcpp(cells = 1:33,
+                                   p1 = position(agent),
+                                   v1 = speed(agent),
+                                   a1 = orientation(agent),
+                                   vels = velocities,
+                                   angles = orientations,
+                                   tStep = 0.5)
 
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)
@@ -59,7 +57,7 @@ best_angle <- function(agent,
     return(utility_angles[which.max(utility_angles[ ,1]), 2])
 }
 
-#' Can agent see an point in space
+#' Can agent see a point in space
 #'
 #' Determines whether an agent can see a point in space. Is an abstraction of the
 #' more specific functions that allowed agents to see goals (`seesGoal`) or
@@ -86,12 +84,12 @@ sees_location <- function(agent,
         intersects <- matrix(0, nrow = nrow(points) - 1, ncol = 2)
 
         # Loop over all different lines that are created by the polygon
-        for(j in 2:nrow(points)) {
-            intersects[j,] <- line.line.intersection(agent@position,
-                                                     co,
-                                                     points[j - 1,],
-                                                     points[j,],
-                                                     interior.only = TRUE)
+        for(j in seq_len(nrow(points) - 1)) {
+            intersects[j,] <- m4ma::line.line.intersection(position(agent),
+                                                           co,
+                                                           points[j,],
+                                                           points[j + 1,],
+                                                           interior.only = TRUE)
         }
 
         # Check if any intersection was found, and if so, return `FALSE` as the

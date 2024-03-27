@@ -16,7 +16,7 @@ testthat::test_that("Parameter exponentiation works", {
                       "acc" = pnorm(0), "const" = pnorm(0), "dec" = pnorm(0))
 
     transformed_parameters <- predped::transform_exponentiate(parameters)
-    testthat::expect_equal(reference, transformed_parameters)
+    testthat::expect_equal(transformed_parameters, reference)
 })
 
 testthat::test_that("Parameter logarithmizing works", {
@@ -46,5 +46,5 @@ testthat::test_that("Nest association parameter transformation works", {
                       "const" = 0.4^(-1), "dec" = 0.2^(-1))
 
     transformed_parameters <- predped::transform_mu(parameters)
-    testthat::expect_equal(reference, transformed_parameters)
+    testthat::expect_equal(transformed_parameters, reference)
 })

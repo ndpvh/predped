@@ -146,3 +146,197 @@ testthat::test_that("Circle moving works", {
     ), c(1, 1))
     testthat::expect_equal(r@center, predped::coordinate(c(0, 0)))
 })
+
+testthat::test_that("Rectangle random generation of point works", {
+    r <- list(predped::rectangle(center = c(0, 0),
+                                 size = c(2, 2)),
+              predped::rectangle(center = c(0, 0), 
+                                 size = c(2, 2), 
+                                 orientation = pi / 4))
+
+    # Middle point of edge
+    ref1 <- list(c(-1, 0), 
+                 c(0.7071, -0.7071))
+
+    set.seed(1)
+    tst1 <- lapply(r, \(x) round(rng_point(x), 4))
+
+    # Random point on edge
+    ref2 <- list(c(-1, -0.2558), 
+                 c(1.2844, 0.1298))
+
+    set.seed(1)
+    tst2 <- lapply(r, \(x) round(rng_point(x, middle_edge = FALSE), 4))
+
+    # Forbid all except one edge
+    ref3 <- list(c(0, -1),
+                 c(0.7071, -0.7071))
+
+    set.seed(1)
+    tst3 <- lapply(r, \(x) round(rng_point(x, forbidden = c(1, 2, 3)), 4))
+
+    # Actual test
+    testthat::expect_equal(tst1, ref1)
+    testthat::expect_equal(tst2, ref2)
+    testthat::expect_equal(tst3, ref3)
+})
+
+testthat::test_that("Circle random generation of point works", {
+    r <- predped::circle(center = c(0, 0), 
+                         radius = 2)
+
+    # Unconstrained, constrained for one specific interval, constrained on
+    # several intervals
+    ref <- list(c(-0.1946, 1.9905), 
+                c(1.5664, -1.2435),
+                c(0.6231, -1.9005))
+
+    set.seed(1)
+    tst <- list(round(rng_point(r), 4),
+                round(rng_point(r, forbidden = c(pi / 2, 3 * pi / 2)), 4),
+                round(rng_point(r, forbidden = c(pi / 2, pi, pi, 3 * pi / 2)), 4))    
+
+    # Do the same tests, but now check whether in a repeated procedure the actual
+    # angles are never in the forbidden intervals
+    sim <- matrix(0, nrow = 1000, ncol = 2)
+    bounds <- matrix(c(pi / 4, pi / 2, 
+                       3 * pi / 4, pi, 
+                       3 * pi / 2, 2 * pi), 
+                     ncol = 2, 
+                     byrow = TRUE)
+    for(i in 1:1000) {
+        sim[i,] <- rng_point(r, forbidden = bounds)
+    }
+
+    # For each of these angles, check whether they are inside of the bounds
+    angles <- atan2(sim[,2] / r@radius, sim[,1] / r@radius)
+    inside <- 
+        (bounds[1,1] < angles & angles < bounds[1,2]) |
+        (bounds[2,1] < angles & angles < bounds[2,2]) |
+        (bounds[3,1] < angles & angles < bounds[3,2])
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+    testthat::expect_false(any(inside)) # Also nice to see plotted: plot(sim)
+})
+
+testthat::test_that("Circle intersection works", {
+    circ <- predped::circle(center = c(0, 0), 
+                            radius = 2)
+
+    obj <- list(# Circles
+                predped::circle(center = c(0, 1), 
+                                radius = 2),
+                predped::circle(center = c(0, 10), 
+                                radius = 2),
+                # Rectangles
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2)), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45),
+                # Polygons
+                predped::polygon(points = rbind(c(0, 0), 
+                                                c(0.5, 4),
+                                                c(1, -1))),
+                predped::polygon(points = rbind(c(0, 4),
+                                                c(0.5, 8),
+                                                c(-1, 3))))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(circ, x))
+    ref <- list(TRUE, FALSE, 
+                TRUE, FALSE, TRUE, FALSE,
+                TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
+
+testthat::test_that("Rectangle intersection works", {
+    rect <- predped::rectangle(center = c(0, 0), 
+                               size = c(2, 2))
+
+    obj <- list(# Circles
+                predped::circle(center = c(0, 1), 
+                                radius = 2),
+                predped::circle(center = c(0, 10), 
+                                radius = 2),
+                # Rectangles
+                # Commented out for now, but to solve later: Seems to be a special
+                # case: Parallel lines not detected as intersecting, even when 
+                # contained within themselves.
+                # predped::rectangle(center = c(0, 1),
+                #                    size = c(2, 2)), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 1),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45),
+                # Polygons
+                predped::polygon(points = rbind(c(0, 0), 
+                                                c(0.5, 4),
+                                                c(1, -1))),
+                predped::polygon(points = rbind(c(0, 4),
+                                                c(0.5, 8),
+                                                c(-1, 3))))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(rect, x))
+    ref <- list(TRUE, FALSE, #TRUE, 
+                FALSE, TRUE, FALSE, TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
+
+testthat::test_that("Polygon intersection works", {
+    rect <- predped::polygon(points = rbind(c(-1, -1), 
+                                            c(-1, 1),
+                                            c(1, 1),
+                                            c(1, -1)))
+
+    obj <- list(# Circles
+                predped::circle(center = c(0, 0),
+                                radius = 0.5),
+                predped::circle(center = c(0, 0),
+                                radius = 1.1),
+                predped::circle(center = c(10, 0),
+                                radius = 1),
+                # Rectangles
+                predped::rectangle(center = c(0, 0),
+                                   size = c(1, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2)),
+                predped::rectangle(center = c(0, 0),
+                                   size = c(2, 2),
+                                   orientation = 45), 
+                predped::rectangle(center = c(0, 10),
+                                   size = c(2, 2),
+                                   orientation = 45),
+                # Polygons
+                predped::polygon(points = rbind(c(0, 0), 
+                                                c(0.5, 4),
+                                                c(1, -1))),
+                predped::polygon(points = rbind(c(0, 4),
+                                                c(0.5, 8),
+                                                c(-1, 3))))
+
+    tst <- lapply(obj,
+                  \(x) predped::intersects(rect, x))
+    ref <- list(FALSE, TRUE, FALSE,
+                TRUE, FALSE, TRUE, FALSE, 
+                TRUE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})

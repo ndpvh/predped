@@ -53,8 +53,13 @@ moving_options_agent <- function(agent, state, background, centers){
         }
     }
 
+    # Get the index of the agent in the state$agent list
+    agent_id <- sapply(state$agents, id)
+    agent_idx <- which(id(agent) == agent_id)
+
     # Use the `free_cells` function to get all free cells to which the agent
-    # might move and check whether it does not provide an error
+    # might move and check whether it does not provide an error. Also add a 
+    # function that checks the intersection of a circle with another object
     check <- m4ma::free_cells_rcpp(agent, background, centers)
 
     # errored_out <- check_try_error(check, "after `free_cells`")
@@ -68,9 +73,11 @@ moving_options_agent <- function(agent, state, background, centers){
     # of this function can overwrite the local `check` variable without any
     # issues
     if(!all(!check)){
-        # check <- overlap_with_object(agent, state, centers, check)
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check)
-        # Not sure why this is done, but I'll leave it in just to be certain
+        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
+        check <- overlap_with_objects(agent, background, centers, check)
+
+        # If something blocks the way in the previous column, then it should also 
+        # block the way on the columns
         check[!check[,3],2] <- FALSE
         check[!check[,2],1] <- FALSE
     }
@@ -88,10 +95,13 @@ moving_options_agent <- function(agent, state, background, centers){
 
         # Function to rewrite! New arguments are already provided to this one,
         # but not the original one
-        goal_list <- list(current_goal(agent))
+        # goal_position <- current_goal(agent)@position # This was the original one
+        goal_position <- current_goal(agent)@path[1,]
+        goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
         local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
+
         # Here, change `check` based on the results of the function. Importantly,
         # agent should still move even if it cannot see their goal (hence the
         # if-statement), otherwise the agent will get stuck
@@ -106,8 +116,20 @@ moving_options_agent <- function(agent, state, background, centers){
     # If there are still cells free, check whether there are cells in which another
     # agent is currently standing
     if(!all(!check)){
-        agent_idx <- match(id(agent), sapply(state$agents, id))
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
+        # Originally deleted the agent from the state$agent list. However, not 
+        # necessary anymore! The state$agents list already does not contain the 
+        # `agent` anymore
+        #
+        # Additional condition added: If there are not other agents, then we 
+        # don't need to do this check
+        if(length(state$agents[-agent_idx]) > 0) {
+            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
+        }
+
+        # If something blocks the way in the previous column, then it should also 
+        # block the way on the columns
+        check[!check[,3],2] <- FALSE
+        check[!check[,2],1] <- FALSE
     }
 
     # Finally, return the cells that are free to move to
@@ -120,305 +142,144 @@ setMethod("moving_options",
           "agent",
           moving_options_agent)
 
-#' Find cells that are not blocked
-#'
-#' This function checks whether all cells that the agent or the object can move
-#' to are currently in the room. Furthermore establish whether these same cells
-#' are not blocked by any other state.
-#'
-#' @param agent An agent's possibilities to be checked
-#' @param state A list of the current state in the simulation.
-#' @param centers A matrix containing the location of the centers of the cells
-#' an agent may move to in two dimensions (x and y)
-#'
-#' @return Logical indicating whether object is in the room and not blocked
-#' by any state.
-#
-# Replacement of `okObject`
-free_cells <- function(agent, state, centers) {
-    # Select the background from the current state
-    background <- find_class("background", state)
-
-    # Check whether the cells are all within the environment (currently defined
-    # by state[[1]])
-    check <- apply(centers, 1, \(x) in_object(background@shape, x, outside = FALSE))
-
-    # Check whether there are other state than only the environment in the
-    # state list. If so, then we need to adjust the `check` variable so that
-    # it accounts for blocking of some options due to state being in the way,
-    # for which we call the `blocked_cells` function
-    check <- ifelse(length(state) > 1,
-                    check & !blocked_cells(agent, state, centers),
-                    check)
-
-    # Transform the check back into a matrix that can be used for cell
-    return(matrix(check, ncol = 3))
-}
-
-# Check whether cells are blocked
-#
-# This checks whether a given potential cell to which the agent can move is in
-# reality blocked by an object.
-#
-# @param agent An agent's possibilities to be checked
-# @param state A list of the current state in the simulation.
-# @param centers A matrix of cell locations in two dimensions (x and y) for a
-# given agent.
-# @param check A vector of logicals that denotes which cells are fine and which
-# are not. Defaults to all cells being `FALSE`
-#
-# @returns A logical vector denoting whether the cells positions are deemed okay
-# or not
-#
-# TO DO:
-#   - Make sure that logical depends on the number of centers, not on a
-#     hard-coded value.
-#   - Make sure that centers itself depends on the provided angles, which again
-#     should not be hardcoded in there.
-#   - Make robust against the drop-argument being a different size than `idx`.
-#   - Test whether you can unreverse the logical that is given back, and
-#     unreverse it in the `free_cells` function as well (another reverse is
-#     found in `blocked_agent`).
-#
-# Replacement of `isBlocked`
-blocked_cells <- function(agent, state, centers, check = logical(33)) {
-    # Create a nested function that will check the line of side for each of the
-    # cells in center within a specific range
-    apply_check <- function(idx, drop = !logical(length(idx))){
-        # Create a `check` variable that will contain the cells that are visible
-        local_check <- logical(length(idx))
-
-        # Use the `drop` argument to determine which indices should stay.
-        # To adjust the code for both cases, make an `idy` that will go from
-        # `1:length(idx)`, allowing different indexing of the `check` and the
-        # actual `centers`
-        idy <- seq_along(idx)[drop]
-        idx <- idx[drop]
-
-        # Create the logical vector that will contain the blocking code and
-        # adjust it according to the results of `seesGoal`
-        local_check[idy] <- apply(centers[idx,, drop = FALSE], 1,
-                                  \(x) seesGoal(x, agent@position, state))
-
-        return(local_check)
-    }
-
-    # Determine the positions of the inner ring that can be used. Then do the
-    # same for the middle and outer ring using the results of the inner ring as
-    # a basis (if the inner ring is blocked, this block should proceed to )
-    check[23:33] <- apply_check(23:33)
-    check[12:22] <- apply_check(12:22, drop = check[23:33])
-    check[1:11] <- apply_check(1:11, drop = check[12:22])
-
-    # Question, why is this reversed?
-    return(!check)
-}
-
-#' Find cells for which body overlaps with an object
-#'
-#' This function checks whether the cells that an agent can move do not make
-#' the agent's body overlap with an object. In effect, this tests whether the
-#' size of an agent is not too big for the cells that the agent wants to move
-#' to.
-#'
-#' @param agent An agent to be checked
-#' @param state A list of the current state in the simulation.
-#' @param centers A matrix containing the location of the centers of the cells
-#' an agent may move to in two dimensions (x and y)
-#'
-#' @return Logical indicating whether object is in the room and not blocked
-#' by any state.
-#
-# TO DO:
-#   - Delete the extra check at the beginning of this function.
-#   - Allow for agent to become rectangle as well (see agent specifications):
-#     At this moment, still assumed to be circular.
-#   - Make more general so that overlap with agents is immediately covered as
-#     well (same generality TO DO exists for `object_intersection` and
-#     `intersection`)
-#
-# Replacement of `bodyObjectOK`
-overlap_with_object <- function(agent, state, centers, free) {
-    # Keeping this in here, but I believe it may be deleted afterwards, as this
-    # kind of check is already done in `blocked_agent`
-    if (!any(ok)) {
-        return(NULL)
-    }
-
-    # Create an output logical vector that will indicate whenever there is
-    # overlap between agent and object
-    overlap <- !logical(nrow(centers))
-
-    # For each of the state get all the lines with which the agent might
-    # intersect
-    object_lines <- lapply(state, object2lines)
-
-    # Check whether the overlap exists for the centers that can still be used.
-    # First apply the intersection function, then transform the result to a
-    # matrix and check for each row (for each object) whether any of the lines
-    # of the object intersected with the agent
-    free_centers <- centers[as.vector(free),, drop = FALSE]
-    overlap[free] <- lapply(object_lines,
-                            \(x) object_intersection(x,
-                                                     agent@size,
-                                                     free_centers)) |>
-        unlist() |>
-        matrix(nrow = sum(free)) |>
-        apply(1, any)
-
-    # If it doesn't overlap it is OK
-    return(matrix(!overlap, nrow = 11))
-}
-
-# Do agent and object lines intersect
-#
-# This checks on the lower level whether the lines of a given object intersect
-# with an agent whether a given potential cell to which the agent can move is in
-# reality blocked by an object.
-#
-# @param lines A list containing the lines of an object
-# @param radius A list of state in the surroundings that might hamper or aid
-# the agent.
-# @param centers A matrix of cell locations in two dimensions (x and y) that the
-# agent might move to. In practice, this is limited to only the cells that
-# remain after another check.
-#
-# @returns A logical vector denoting whether overlap was found (`TRUE`) or not
-# (`FALSE`)
-#
-# TO DO:
-#   - Replace this function to work with the state themselves, allowing
-#     more than one type of object (e.g., circular).
-#   - Make a more general function that just looks for overlap in a dependent
-#     object (y; agent or moveable object) and independent state (x; other
-#     agents or state).
-#
-# Replacement of `bodyObjectOverlap`
-object_intersection <- function(lines, radius, centers) {
-    # Get the angles of the lines
-    angles <- angle2(p1 = t(lines[, , "P1"]), p2 = t(lines[, , "P2"])) |>
-        (`+`) (90) |>
-        (`%%`) (180) |>
-        unique()
-
-    # dx and dy to move along line
-    x <- radius * sin(angles * pi / 180)
-    y <- radius * cos(angles * pi / 180)
-
-    # For each centre check for overlap
-    return(apply(centers, 1, \(points) intersection(points, x, y, lines)))
-}
-
-# Line to line intersection
-#
-# @params point A numeric denoting the center point
-# @params x A numeric denoting the deviation from this center point in the
-# x direction
-# @params y A numeric denoting the deviation from this center point in the
-# y direction
-# @params lines  A list containing the lines of an object
-#
-# @returns A logical that denotes whether the provided lines intersect (TRUE) or
-# not (FALSE)
-#
-# TO DO:
-#   - Just like for its original parent `object_intersection`, make this
-#     very general.
-intersection <- function(point, x, y, lines){
-    # Create the segments that you want to know the intersection of. This is
-    # just adding and subtracting x and y from the point that was provided. Then
-    # transform this to an three-dimensional array with a given format
-    xy <- rbind(x, y)
-    segments <- c(point - xy, point + xy) |>
-        array(dim = c(2, length(x), 2),
-              dimnames = list(c("x", "y"), NULL, c("P1", "P2")))
-
-
-    # For each of the segments, determine whether they intersect with the agent
-    intersect <- FALSE
-    for (j in seq_len(dim(segments)[2])){
-        intersect <- sapply(seq_len(dim(lines)[2]),
-                            \(i) function(i){
-                                intersect <- line.line.intersection(segments[,j,"P1"],
-                                                                    segments[,j,"P2"],
-                                                                    lines[,i,"P1"],
-                                                                    lines[,i,"P2"],
-                                                                    TRUE) |>
-                                    is.finite() |>
-                                    all()
-
-                                return(intersect)
-                            }) |>
-            any()
-    }
-
-    return(intersect)
-}
-
-# Is the cell OK or does body radius r positioned at centers overlap with
-# another body?
-okBodyBody <- function(n, state, centers, ok) {
-    if (!any(ok)) {
-        return(NULL)
-    }
-    d <- state$r[n] + state$r[-n]
-    out <- !logical(33)
-
-    # Any overlap?
-    out[ok] <- apply(centers[ok, , drop = FALSE], 1, function(x) {
-        any(dist1(matrix(x, nrow = 1), state$p[-n, , drop = FALSE]) < d)
-    })
-
-    # If it doesnt overlap it is OK
-    matrix(!out, nrow = 11)
-}
-
 # Number of pedestrians in the goal direction (goal cone or the cones on either
 # side of it).
 # returns number and if more than one attribute "ends" specifying blocking
 # profiles from current perspective
-nBlock <- function(n, state, r, usePredictedPos = FALSE) {
-    p1 <- state$p[n, , drop = FALSE]
-    P <- state$P[[n]][attr(state$P[[n]], "i"), 1:2, drop = FALSE]
+#
+# Deprecated?
+#
+# TO DO:
+#   - The purpose of `cone_set` is not entirely clear and might have to change if 
+#     we wish to consider more or less than 33 choices
+#   - There might be an easier, object-oriented way of finding out how many agents
+#     are blocking the goal
+#
+# Original function: `nBlock`
+agents_between_goal <- function(agent, 
+                                state, 
+                                agent_predictions = NULL) {
 
-    if (usePredictedPos) {
-        p2 <- predictPed(state$p, state$v, state$a, state$cell)[-n, , drop = FALSE]
+    # Get the index of the agent within the state$agents list
+    agent_id <- sapply(state$agents, id)
+    agent_idx <- which(id(agent) == agent_id)
+
+    # If no predicted positions are delivered to the function, we will use the 
+    # current positions to find out whether agents are standing inbetween `agent`
+    # and its goal. Otherwise, we will use the predicted positions.
+    if(is.null(agent_predictions)) {
+        other_agents <- state$agents[-agent_idx]
+        agent_positions <- sapply(other_agents, position) |>
+            matrix(ncol = 2)
     } else {
-        p2 <- state$p[-n, , drop = FALSE]
+        agent_positions <- agent_predictions[-agent_idx,] |>
+            matrix(ncol = 2)
     }
 
-    if (dim(p2)[1] == 0) {
+    # If there are no other agents to consider, we can safely exit the function
+    if(length(agent_positions) == 0) {
+        return(0)
+    }
+    colnames(agent_positions) <- c("x", "y")
+
+    # Create a cone from the agent to the goal location
+    goal_cone <- m4ma::Iangle(matrix(position(agent), 
+                                     nrow = 1, 
+                                     ncol = 2), 
+                              orientation(agent), 
+                              matrix(current_goal(agent)@position,
+                                     nrow = 1, 
+                                     ncol = 2))
+
+    if(is.na(goal_cone)) {
         return(0)
     }
 
-    goalCone <- Iangle(p1, state$a[n], P)
-    if (is.na(goalCone)) {
-        return(0)
-    }
-    coneSet <- c(goalCone - 1, goalCone, goalCone + 1)
-    coneSet <- coneSet[coneSet > 0 & coneSet < 12]
+    # The discrete cone bin in which the goal is contained is the same for each
+    # of the velicities. Furhermore retain only those goal cones that fall 
+    # within view of the agent.
+    cone_set <- c(goal_cone - 1, goal_cone, goal_cone + 1)
+    cone_set <- cone_set[cone_set > 0 & cone_set < 12]
 
-    ends <- estate(p1, p2, r)
-    endCones <- apply(ends, 3, function(x) {
-        Iangle(p1, state$a[n], x)
-    })
-    if (dim(ends)[1] == 1) {
-        endCones <- matrix(endCones, nrow = 1,
-                        dimnames = list(dimnames(p2)[1], NULL))
-    }
+    # Compute the end points of the orthogonal line segments to the line between
+    # the agent and the other agents with a width equal to the radius of the 
+    # agent. 
+    #
+    # These lines can be used to check the intersection with the cone drawn from 
+    # the agent to their goal. If there is such an intersection, we can assume 
+    # that agent is blocking the goal.
+    #
+    # Important note: Only extract the anticlockwise cone (`ac`), which is also 
+    # the direction that Iangle works in
+    ends <- m4ma::eObjects(matrix(position(agent),
+                                  nrow = 1, 
+                                  ncol = 2),
+                           agent_positions, 
+                           size(agent))$ac
 
-    blockers <- apply(endCones, 1, function(x) {
-        if (any(is.na(x))) {
-        FALSE
-        } else {
-        any(x %in% coneSet)
+    # Create several cones from the agent to these end points
+    end_cones <- apply(ends,
+                       1, 
+                       \(x) m4ma::Iangle(matrix(position(agent), ncol = 2), 
+                                         orientation(agent),
+                                         matrix(x, ncol = 2)))
+
+    # Check whether any of the coordinates fall inside of the cone_set
+    blocking <- sapply(end_cones, 
+                       function(x) {
+                           if(any(is.na(x))) {
+                               return(FALSE)
+                           } else {
+                               return(any(x %in% cone_set))
+                           }
+                       })
+
+    # Get the number of blocking agents
+    n_agents <- sum(blocking)
+
+    # Give them the names of the agents
+    # if(n_agents > 0) {
+    #     attr(n_agents, "ends") <- ends[names(blocking), , , drop = FALSE]
+    # }
+
+    return(n_agents)
+}
+
+# Temporary function to see if this one actually works
+overlap_with_objects <- function(agent, 
+                                 background, 
+                                 centers, 
+                                 check) {
+    
+    shp <- shape(background)
+    obj <- objects(background)
+
+    # Loop over the centers
+    for(i in seq_len(nrow(centers))) {
+        # If that center is already out of the running, continue
+        if(!check[i]) {
+            next
         }
-    })
 
-    blockers <- blockers[blockers]
-    nBlockers <- length(blockers)
-    if (nBlockers > 0) {
-        attr(nBlockers, "ends") <- ends[names(blockers), , , drop = FALSE]
+        # Create a temporary circle, and find out whether these are (a) contained 
+        # within the background and (b) not contained within any of the objects
+        circ <- circle(center = centers[i,], 
+                       radius = radius(agent))
+
+        # Check whether contained in background
+        if(intersects(circ, shp)) {
+            check[i] <- FALSE
+            next
+        }
+
+        # Check whether not contained within objects
+        local_check <- sapply(obj, 
+                              \(x) intersects(circ, x))
+
+        if(any(local_check)) {
+            check[i] <- FALSE
+        }
     }
-    return(nBlockers)
+
+    return(check)
 }
