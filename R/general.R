@@ -15,14 +15,19 @@ find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
 }
 
-# Undocumented function because this is in no way a particularly beautiful 
-# function, nor is it meant to be the final way in which we do this.
-#
-# It takes in the background as an object and computes the orientation the 
-# agent needs to walk in in order to walk perpendicular to the entrance they 
-# just came from.
-#
-# @param background Object of the background class.
+#' Find the perpendicular orientation
+#' 
+#' Finds the perpendicular or tangential orientation of a line starting from a 
+#' point on an edge of the background's shape and going inwards. The point on the 
+#' edge is chosen to be the entrance to the space. Is used to find in what 
+#' orientation the agents should be heading when entering the space.
+#' 
+#' @param background An object of class background
+#' 
+#' @return Numeric denoting the perpendicular orientation to the entrance of the 
+#' space in degrees
+#' 
+#' @export
 perpendicular_orientation <- function(background) {
     # Dispatch based on the shape of the background
     if(class(shape(background)) == "circle") {
