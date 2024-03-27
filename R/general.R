@@ -37,7 +37,6 @@ perpendicular_orientation <- function(background) {
         # then the angle + 180 (or angle + pi)
         co <- entrance(background) - center(shape(background))
         angle <- atan2(co[2], co[1]) + pi
-        angle <- angle * 180 / pi
     } else {
         # Find out where the entrance lies in the background
         # For this, we compute the sum of the distances between each of 
@@ -54,27 +53,30 @@ perpendicular_orientation <- function(background) {
         distances <- distances[,2] + distances[,3] - distances[,1]
 
         # Now that we know on which edge the entrance lies, we can compute the 
-        # perpendicular orientation to this edge. Approach computes the orientation 
-        # of the line defined by the entrance and the edge of the wall that contains 
-        # it and then either subtracts (clockwise == TRUE) or adds (clockwise == FALSE)
-        # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
-        # where slope is the slope of the edge
+        # perpendicular orientation to this edge. Approach uses the first point
+        # of the edge as the center of an imaginary circle, which has the second
+        # point of the edge on its circumference. We can then use atan2 again to
+        # find the angle of the slope in the same way as before. The perpendicular
+        # orientation is then defined as the found angle - pi / 2 (when moving
+        # clockwise) or + pi / 2 (when moving counterclockwise)
         edge <- as.numeric(edges[which.min(distances),])
-        slope <- (edge[2] - edge[4]) / (edge[1] - edge[3])
 
-        angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
-        if(background@shape@clock_wise) {
-            angle <- angle - 90
-        } else {
-            angle <- angle + 90
-        }
+        co <- edge[3:4] - edge[1:2]
+        angle <- atan2(co[2], co[1]) 
+        
+        angle <- ifelse(shape(background)@clock_wise, 
+                        angle - pi / 2, 
+                        angle + pi / 2)
     }
+    # Convert to degrees
+    angle <- angle * 180 / pi
 
     # If you have a negative angle, convert this to a positive one
     if(angle < 0) {
         angle <- angle + 360
     }
 
+    # If the angle is equal to 360, change to 0
     if(angle == 360) {
         angle <- 0
     }
