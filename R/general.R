@@ -63,13 +63,14 @@ perpendicular_orientation <- function(background) {
 
         co <- edge[3:4] - edge[1:2]
         angle <- atan2(co[2], co[1]) 
-        
+
         angle <- ifelse(shape(background)@clock_wise, 
                         angle - pi / 2, 
                         angle + pi / 2)
     }
     # Convert to degrees
     angle <- angle * 180 / pi
+    names(angle) <- NULL
 
     # If you have a negative angle, convert this to a positive one
     if(angle < 0) {
