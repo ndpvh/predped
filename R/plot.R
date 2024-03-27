@@ -94,8 +94,14 @@ setMethod("plot", "background", function(object,
     # with the agent when they get close to the sides of the grid. Changing the 
     # `expand` argument did not fix that, so we have to fix the limits of the 
     # plot manually. This is what I am doing here. 
-    xlims <- range(shape(object)@points[,1])
-    ylims <- range(shape(object)@points[,2])
+    if(inherits(shape(object), "circle")) {
+        circ <- shape(object)
+        xlims <- center(circ)[1] + c(-radius(circ), radius(circ))
+        ylims <- center(circ)[2] + c(-radius(circ), radius(circ))
+    } else {
+        xlims <- range(shape(object)@points[,1])
+        ylims <- range(shape(object)@points[,2])
+    }
 
     x_padding <- 0.05 * (xlims[2] - xlims[1])
     y_padding <- 0.05 * (ylims[2] - ylims[1])
