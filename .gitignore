@@ -16,10 +16,9 @@ analysis.R
 MinimalWorkingExample/
 minimal_working_example.R
 Train/
+inst/*
 
 *.drawio*
-
-man/
 
 tmp/
 *.txt
