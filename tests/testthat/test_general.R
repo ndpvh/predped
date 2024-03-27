@@ -19,6 +19,87 @@ testthat::test_that("Finding a class in a list works", {
     testthat::expect_equal(length(empty), 0)
 })
 
+testthat::test_that("Perpendicular orientation works", {
+    # For the polygon
+    points <- rbind(c(1, 2), 
+                    c(2, 1), 
+                    c(2, -1), 
+                    c(1, -2), 
+                    c(-1, -2), 
+                    c(-2, -1), 
+                    c(-2, 1), 
+                    c(-1, 2))
+
+    # Create the general shapes to be used
+    circ <- circle(center = c(0, 0), radius = 5)
+    rect <- rectangle(center = c(0, 0), size = c(10, 10))
+    rect_45 <- rectangle(center = c(0, 0), 
+                         size = c(4, 4),
+                         orientation = pi / 4)
+    poly <- polygon(points = points)
+
+    # Create the different settings all with different entrances
+    settings <- list(# Circles
+                     background(shape = circ,
+                                entrance = 5 * c(cos(pi), sin(pi))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(pi + pi/4), sin(pi + pi/4))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(pi + pi/2), sin(pi + pi/2))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(pi + 3*pi/4), sin(pi + 3*pi/4))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(2 * pi), sin(2 * pi))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(pi/4), sin(pi/4))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(pi/2), sin(pi/2))),
+                     background(shape = circ, 
+                                entrance = 5 * c(cos(3 * pi/4), sin(3 * pi/4))),
+                     # Rectangles
+                     background(shape = rect,
+                                entrance = c(-5, 0)),
+                     background(shape = rect_45, 
+                                entrance = c(-sqrt(2), -sqrt(2))),
+                     background(shape = rect,
+                                entrance = c(0, -5)),
+                     background(shape = rect_45, 
+                                entrance = c(sqrt(2), -sqrt(2))),
+                     background(shape = rect,
+                                entrance = c(5, 0)),
+                     background(shape = rect_45, 
+                                entrance = c(sqrt(2), sqrt(2))),
+                     background(shape = rect,
+                                entrance = c(0, 5)),
+                     background(shape = rect_45, 
+                                entrance = c(-sqrt(2), sqrt(2))),
+                     # Polygons
+                     background(shape = poly, 
+                                entrance = c(-2, 0)),
+                     background(shape = poly, 
+                                entrance = c(-1.5, -1.5)),
+                     background(shape = poly, 
+                                entrance = c(0, -2)),
+                     background(shape = poly, 
+                                entrance = c(1.5, -1.5)),
+                     background(shape = poly, 
+                                entrance = c(2, 0)),
+                     background(shape = poly, 
+                                entrance = c(1.5, 1.5)),
+                     background(shape = poly, 
+                                entrance = c(0, 2)),
+                     background(shape = poly, 
+                                entrance = c(-1.5, 1.5)))
+
+    tst <- lapply(settings, 
+                  \(x) predped::perpendicular_orientation(x))
+    ref <- list(0, 45, 90, 135, 180, 225, 270, 315,
+                0, 45, 90, 135, 180, 225, 270, 315,
+                0, 45, 90, 135, 180, 225, 270, 315)
+
+    testthat::expect_equal(tst, ref) # To change once figured out how to deal with this
+})
+
 testthat::test_that("Vectorized line-line intersection works", {
     tst1 <- rbind(c(1, 1, 4, 4), 
                   c(3, -2, 6, -2),
