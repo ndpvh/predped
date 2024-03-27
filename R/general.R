@@ -35,8 +35,8 @@ perpendicular_orientation <- function(background) {
         # derive the angle at which the entrance finds itself relative to the 
         # center of the circle. The perpendicular orientation to this angle is 
         # then the angle + 180 (or angle + pi)
-        co <- entrance(background)
-        angle <- atan2(co[1], co[2]) + pi
+        co <- entrance(background) - center(shape(background))
+        angle <- atan2(co[2], co[1]) + pi
         angle <- angle * 180 / pi
     } else {
         # Find out where the entrance lies in the background
@@ -49,8 +49,8 @@ perpendicular_orientation <- function(background) {
         points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
         distances <- cbind(sqrt((points[,1] - points[,3])^2 + (points[,2] - points[,4])^2),
-                        sqrt((points[,1] - co[1])^2 + (points[,2] - co[2])^2),
-                        sqrt((points[,3] - co[1])^2 + (points[,4] - co[2])^2))
+                           sqrt((points[,1] - co[1])^2 + (points[,2] - co[2])^2),
+                           sqrt((points[,3] - co[1])^2 + (points[,4] - co[2])^2))
         distances <- distances[,1] - distances[,2] - distances[,3]
 
         # Now that we know on which edge the entrance lies, we can compute the 
@@ -73,6 +73,10 @@ perpendicular_orientation <- function(background) {
     # If you have a negative angle, convert this to a positive one
     if(angle < 0) {
         angle <- angle + 360
+    }
+
+    if(angle == 360) {
+        angle <- 0
     }
 
     return(angle)
