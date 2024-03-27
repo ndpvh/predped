@@ -46,12 +46,12 @@ perpendicular_orientation <- function(background) {
         # entrance wall.
         co <- entrance(background)@.Data
         points <- shape(background)@points
-        points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
+        edges <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
-        distances <- cbind(sqrt((points[,1] - points[,3])^2 + (points[,2] - points[,4])^2),
-                           sqrt((points[,1] - co[1])^2 + (points[,2] - co[2])^2),
-                           sqrt((points[,3] - co[1])^2 + (points[,4] - co[2])^2))
-        distances <- distances[,1] - distances[,2] - distances[,3]
+        distances <- cbind(sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2),
+                           sqrt((edges[,1] - co[1])^2 + (edges[,2] - co[2])^2),
+                           sqrt((edges[,3] - co[1])^2 + (edges[,4] - co[2])^2))
+        distances <- distances[,2] + distances[,3] - distances[,1]
 
         # Now that we know on which edge the entrance lies, we can compute the 
         # perpendicular orientation to this edge. Approach computes the orientation 
@@ -59,7 +59,7 @@ perpendicular_orientation <- function(background) {
         # it and then either subtracts (clockwise == TRUE) or adds (clockwise == FALSE)
         # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
         # where slope is the slope of the edge
-        edge <- as.numeric(points[which.min(distances),])
+        edge <- as.numeric(edges[which.min(distances),])
         slope <- (edge[2] - edge[4]) / (edge[1] - edge[3])
 
         angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
