@@ -20,7 +20,7 @@
 #' @param goal_duration Integer or function that determines the duration of each 
 #' goal. Defaults to a function that draws `x` numbers from a normal distribution 
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
-#' @param ... Arguments passed on to the \code[predped]{update_state} function.
+#' @param ... Arguments passed on to the \code{\link[predped]{update_state}} function.
 #' 
 #' @export
 #

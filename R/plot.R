@@ -1,6 +1,6 @@
 #' Plot an Object.
 #'
-#' @param object An object of kind \code[predped]{object-class}
+#' @param object An object of kind \code{\link[predped]{object-class}}
 #' @param ... Additional arguments passed on to the geom used to plot the object.
 #'
 #' @return Either a geom or a ggplot
