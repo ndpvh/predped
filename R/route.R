@@ -106,9 +106,9 @@ create_nodes <- function(from,
     # than nothing (especially for irregular polygons, this algorithm may fail) 
     shp <- shape(background)
 
-    nodes <- add_nodes(shp, 
-                       space_between = space_between, 
-                       outside = FALSE)
+    # nodes <- add_nodes(shp, 
+    #                    space_between = space_between, 
+    #                    outside = FALSE)
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
@@ -117,8 +117,9 @@ create_nodes <- function(from,
                                        space_between = space_between,
                                        only_corners = TRUE))
 
-    nodes <- rbind(nodes,
-                   do.call("rbind", obj_nodes))
+    # nodes <- rbind(nodes,
+    #                do.call("rbind", obj_nodes))
+    nodes <- do.call("rbind", obj_nodes)
 
     # Check which nodes are contained within the environment and only retain 
     # those. Furthermore delete all nodes that fall within an object. For this,
@@ -236,6 +237,76 @@ prune_edges <- function(objects, segments) {
     # I want to only retain those that do not intersect, meaning that the complete
     # row should be FALSE
     return(rowSums(all_intersections) == 0L)
+}
+
+#' Adjust edges of graph to walk on
+#' 
+#' This function uses the background, goal position, and position of the agent
+#' to adjust a previously computed graph of possible routes along which the agent 
+#' can walk towards their goal. The output is then used to find the shortest path.
+#' 
+#' @param from Coordinate from which to start
+#' @param to Coordinate at which to end
+#' @param background The background/setting in which the agent is walking
+#' @param precomputed_edges Output of `create_edges` in which agent and goal 
+#' are removed
+#' 
+#' @return Matrix containing from, to, and the distance between these coordinates
+#' 
+#' @export 
+adjust_edges <- function(from, 
+                         to, 
+                         background, 
+                         precomputed_edges) {
+
+    obj <- objects(background)
+    nodes <- precomputed_edges$nodes
+    edges <- precomputed_edges$edges
+
+    from_to <- rbind(c("agent", as.numeric(from)), 
+                     c("goal", as.numeric(to))) |>
+        as.data.frame() |>
+        setNames(colnames(nodes))
+
+    from_to$X <- as.numeric(from_to$X)
+    from_to$Y <- as.numeric(from_to$Y)
+
+    # Add the from and to coordinates to the nodes
+    new_nodes <- rbind(nodes, from_to)
+
+    # Create new pathways that go from the agent and goal to all of the other 
+    # edges and bind them together with the already existing ones.
+    #
+    # Approach taken is to minimize the time it takes to do these computations:
+    #   - Step 1: Create the unique edges between agent, goal, and already 
+    #             existing nodes
+    #   - Step 2: Compute the distance between the nodes.
+    #   - Step 3: Find out which nodes are reachable from one another. In other 
+    #             words, if I stand at node 1, can I see node 2? In this step, 
+    #             we also immediately compute the distance from one node to 
+    #             another.
+
+    # Step 1
+    n_nodes <- nrow(nodes)
+    new_edges <- cbind(from_to[rep(seq_len(2), each = n_nodes),],
+                       nodes[rep(seq_len(n_nodes), times = 2),]) |>
+        as.data.frame() |>
+        setNames(c("from", "from_x", "from_y", 
+                   "to", "to_x", "to_y"))
+
+    # Step 2: Note, we use squared distances as the cost for efficiency purposes
+    # (taking the square root is computationally more expensive). Should not matter 
+    # to the results we get from the routing algorithm
+    new_edges$cost <- (new_edges$from_x - new_edges$to_x)^2 + (new_edges$from_y - new_edges$to_y)^2
+
+    # Step 3: Check which nodes can be seen at each location
+    idx <- prune_edges(obj,
+                       as.matrix(new_edges[,c("from_x", "from_y", "to_x", "to_y")]))
+
+    # Only retain what you need and bind it together with the precomputed variant
+    new_edges <- new_edges[idx, c("from", "to", "cost")]
+    new_edges <- rbind(edges, new_edges)
+    return(list(edges = new_edges, nodes = new_nodes))
 }
 
 

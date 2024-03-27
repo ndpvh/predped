@@ -196,7 +196,7 @@ setMethod("add_goal", signature(object = "circle"), function(object,
     # within another object within the environment
     obj <- objects(background)
     shp <- shape(background)
-    
+
     not_okay <- TRUE
     while(not_okay) {
         co <- rng_point(new_object, 
@@ -234,13 +234,21 @@ setMethod("find_path", "goal", function(object,
                                         agent,
                                         background,
                                         algorithm = "bi",
-                                        space_between = radius(agent)) {
+                                        space_between = radius(agent),
+                                        precomputed_edges = NULL) {
                                             
     # Create the edges that are taken in by `makegraph`
-    edges <- create_edges(position(agent),
-                          position(object), 
-                          background,
-                          space_between = space_between)
+    if(is.null(precomputed_edges)) {
+        edges <- create_edges(position(agent),
+                              position(object), 
+                              background,
+                              space_between = space_between)
+    } else {
+        edges <- adjust_edges(position(agent),
+                              position(object),
+                              background,
+                              precomputed_edges = precomputed_edges)
+    }
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
     # I put the directed argument to FALSE so that agents are free to decide on

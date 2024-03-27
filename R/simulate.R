@@ -43,6 +43,7 @@ setMethod("simulate", "predped", function(object,
                                           close_enough = 2 * radius,
                                           space_between = radius,
                                           time_step = 0.5,
+                                          precompute_edges = TRUE,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -61,6 +62,24 @@ setMethod("simulate", "predped", function(object,
     if(typeof(goal_duration) != "closure") {
         number <- goal_duration[1]
         goal_duration <- function(x) number
+    }
+
+    # If the edges need to be precomputed, do so already and delete the mock 
+    # position of agent and goal: These are the only dynamical components to 
+    # this recomputation
+    if(precompute_edges) {
+        print("Precomputing edges")
+        edges <- create_edges(c(0, 0), 
+                              c(0, 0), 
+                              object@setting,
+                              space_between = space_between)
+
+        edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+        edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+        edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
+    } else {
+        edges <- NULL
     }
 
     # Initialize the trace and state lists. The state will already contain the 
@@ -84,7 +103,8 @@ setMethod("simulate", "predped", function(object,
                                          standing_start = standing_start,
                                          close_enough = close_enough,
                                          space_between = space_between,
-                                         time_step = time_step)
+                                         time_step = time_step,
+                                         precomputed_edges = edges)
             agent_in_cue <- TRUE
         }
 
@@ -111,6 +131,7 @@ setMethod("simulate", "predped", function(object,
                               close_enough = close_enough,
                               space_between = space_between,
                               time_step = time_step,
+                              precomputed_edges = edges,
                               ...)
 
         # Check whether one of the pedestrians is waiting at the exit
@@ -150,7 +171,8 @@ add_agent <- function(object,
                       standing_start = 0.1,
                       close_enough = 2 * radius,
                       space_between = radius,
-                      time_step = 0.5) {
+                      time_step = 0.5,
+                      precomputed_edges = NULL) {
 
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
@@ -183,7 +205,8 @@ add_agent <- function(object,
     current_goal(tmp_agent)@path <- find_path(current_goal(tmp_agent), 
                                               tmp_agent, 
                                               background,
-                                              space_between = space_between)
+                                              space_between = space_between,
+                                              precomputed_edges = precomputed_edges)
     
     return(tmp_agent)
 }
