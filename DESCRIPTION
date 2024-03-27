@@ -1,0 +1,49 @@
+Package: predped
+Type: Package
+Title: Interface to Minds for Mobile Agents
+Version: 1.0
+Date: 2023-12-06
+Author: c(
+    person("Niels", 
+           "Vanhasbroeck", 
+           email = "niels.vanhasbroeck@gmail.com",
+           comment = c(ORCID = 0000-0002-7423-0090)), 
+    person("Malte", 
+           "Lüken"), 
+    person("Alexander",
+           "Anderson"), 
+    person("Ece",
+           "Yatıkçı"), 
+    person("Andrew",
+           "Heathcote", 
+           email = "ajheathcote@gmail.com"))
+Maintainer: Andrew Heathcote <ajheathcote@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Encoding: UTF-8
+Imports: 
+    methods,
+    m4ma
+RoxygenNote: 7.3.1
+Collate:
+    'objects.R'
+    'background.R'
+    'route.R'
+    'goals.R'
+    'agent.R'
+    'moving_options.R'
+    'collision.R'
+    'general.R'
+    'parameters.R'
+    'plot.R'
+    'see.R'
+    'update_state.R'
+    'utility_model.R'
+    'predped.R'
+    'simulate.R'
+Suggests: 
+    fs,
+    testthat (>= 3.0.0)
+Remotes:
+    m4ma/m4ma
+Config/testthat/edition: 3

@@ -15,5 +15,21 @@ MinimalWorkingExample/
 minimal_working_example.R
 Train/
 
+*.drawio*
+
+man/
+
 tmp/
-To Do.txt
+*.txt
+*.rtf
+*.zip
+
+R/*_depr.R
+
+R/geometry.R
+R/move_all.R
+predped_in_action*.R
+predped_in_action*/
+.vscode/
+.DS_Store
+RCore/

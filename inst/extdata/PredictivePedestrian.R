@@ -11,7 +11,7 @@ library(TSP)
 library(igraph)
 require(pdftools)
 require(magick)
-# devtools::install_github('m4ma/m4ma') or 
+# devtools::install_github('m4ma/m4ma') or
 # remotes::install_github('m4ma/m4ma') on SURF research cloud
 library(m4ma)
 
