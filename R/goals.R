@@ -50,6 +50,7 @@ setGeneric("interact", function(object) standardGeneric("interact"))
 setMethod("interact", "goal", function(object) 
 {
     if(object@counter <= 0) {
+        object@counter <- object@counter - 1
         object@done <- TRUE
         return(object)
     } else {
