@@ -497,6 +497,7 @@ setMethod("initialize", "rectangle", function(.Object,
                                               orientation = 0,
                                               moveable = FALSE,
                                               interactable = FALSE,
+                                              degrees = FALSE,
                                               ...
 ) {
     if (length(size) != 2) stop("Size vector must have length two (x and y)")
@@ -512,6 +513,10 @@ setMethod("initialize", "rectangle", function(.Object,
     upper <- center + size_half
 
     points <- matrix(c(lower, c(lower[1], upper[2]), upper, c(upper[1], lower[2])), 4, 2, byrow = TRUE)
+
+    if(degrees) {
+        orientation <- orientation * pi / 180
+    }
 
     if (orientation != 0) {
         points <- t(apply(points, 1, rotate, radians = orientation, center = center))
