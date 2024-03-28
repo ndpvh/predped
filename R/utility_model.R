@@ -228,119 +228,119 @@ utility <- function(agent,
     return(V_transformed)
 }
 
-#' Transform utility to probability
-#'
-#' Takes in the utility for each of the cells that an agent can decide on and
-#' transforms these utilities to probabilities. This quantifies the probability
-#' that an agent will move to a given cell in space.
-#'
-#' @param V Summed utility per candidate cell the agent might move to. Output of
-#' `utility`.
-#' @param muM Transformed nest assocation parameters that denote precision.
-#' Result of the `transform_mu` function. Defaults to `1` for each nest.
-#' @param nests Not clear yet
-#' @param alpha Not clear yet
-#'
-#' @export
-#
-# TO DO:
-#  - Nested functions in this function: Should we consider them separate?
-#  - The order of the arguments don't make sense to me: Would change them so
-#    that the defaults remain at the back
-#  - If I understand correctly, `between_nest` uses the individual probabilities
-#    of the `within_nest` function to compute the probabilities of the nests.
-#    If so, I would try to make this computation more general so that
-#    `within_nest` and `between_nest` are computed at once instead of twice
-#    in two separate functions
-pCNLs <- function(V,
-                  muM = rep(1, length(nests)),
-                  nests,
-                  alpha,
-                  mu = 1) {
+# #' Transform utility to probability
+# #'
+# #' Takes in the utility for each of the cells that an agent can decide on and
+# #' transforms these utilities to probabilities. This quantifies the probability
+# #' that an agent will move to a given cell in space.
+# #'
+# #' @param V Summed utility per candidate cell the agent might move to. Output of
+# #' `utility`.
+# #' @param muM Transformed nest assocation parameters that denote precision.
+# #' Result of the `transform_mu` function. Defaults to `1` for each nest.
+# #' @param nests Not clear yet
+# #' @param alpha Not clear yet
+# #'
+# #' @export
+# #
+# # TO DO:
+# #  - Nested functions in this function: Should we consider them separate?
+# #  - The order of the arguments don't make sense to me: Would change them so
+# #    that the defaults remain at the back
+# #  - If I understand correctly, `between_nest` uses the individual probabilities
+# #    of the `within_nest` function to compute the probabilities of the nests.
+# #    If so, I would try to make this computation more general so that
+# #    `within_nest` and `between_nest` are computed at once instead of twice
+# #    in two separate functions
+# pCNLs <- function(V,
+#                   muM = rep(1, length(nests)),
+#                   nests,
+#                   alpha,
+#                   mu = 1) {
 
-    # Create function to compute the probability of different alternatives
-    # within a nest
-    within_nest <- function(V, nests, alpha, muM) {
-        # Loop over the different nests to assess the probabilities of all
-        # alternatives within a single nest
-        for(i in seq_along(nests)) {
-            # Compute the probabilities
-            prob <- alpha[[i]] * exp(muM[i] * V[[i]])
+#     # Create function to compute the probability of different alternatives
+#     # within a nest
+#     within_nest <- function(V, nests, alpha, muM) {
+#         # Loop over the different nests to assess the probabilities of all
+#         # alternatives within a single nest
+#         for(i in seq_along(nests)) {
+#             # Compute the probabilities
+#             prob <- alpha[[i]] * exp(muM[i] * V[[i]])
 
-            # Check whether any of them are bad, and if so replace `prob` with
-            # either 1 or 0 depending on which ones are bad
-            if(any(prob == Inf)) {
-                prob <- ifelse(prob == Inf, 1, 0)
-            }
+#             # Check whether any of them are bad, and if so replace `prob` with
+#             # either 1 or 0 depending on which ones are bad
+#             if(any(prob == Inf)) {
+#                 prob <- ifelse(prob == Inf, 1, 0)
+#             }
 
-            # Scale the probabilities based on the total sum
-            if(all(prob == 0)) {
-                nests[[i]] <- prob
-            } else {
-                nests[[i]] <- prob / sum(prob)
-            }
-        }
+#             # Scale the probabilities based on the total sum
+#             if(all(prob == 0)) {
+#                 nests[[i]] <- prob
+#             } else {
+#                 nests[[i]] <- prob / sum(prob)
+#             }
+#         }
 
-        return(nests)
-    }
+#         return(nests)
+#     }
 
-    # Create a function to compute the probability of the nests themselves
-    between_nest <- function(V, nests, alpha, mu, muM) {
-        # Transform the precision parameter
-        mu <- mu / muM
+#     # Create a function to compute the probability of the nests themselves
+#     between_nest <- function(V, nests, alpha, mu, muM) {
+#         # Transform the precision parameter
+#         mu <- mu / muM
 
-        # Create probabilities for the different nests by summing the
-        # probabilities of all their alternatives
-        prob <- sapply(seq_along(nests),
-                       \(x) sum(alpha[[x]] * exp(muM[x] * V[[x]]))^mu_muM[x])
+#         # Create probabilities for the different nests by summing the
+#         # probabilities of all their alternatives
+#         prob <- sapply(seq_along(nests),
+#                        \(x) sum(alpha[[x]] * exp(muM[x] * V[[x]]))^mu_muM[x])
 
-        # Again check for any bad ones
-        if(any(prob) == Inf) {
-            prob <- ifelse(prob == Inf, 1, 0)
-        }
+#         # Again check for any bad ones
+#         if(any(prob) == Inf) {
+#             prob <- ifelse(prob == Inf, 1, 0)
+#         }
 
-        # Again normalize the probabilities
-        if(all(prob == 0)) {
-            prob <- prob
-        } else {
-            prob <- prob / sum(prob)
-        }
+#         # Again normalize the probabilities
+#         if(all(prob == 0)) {
+#             prob <- prob
+#         } else {
+#             prob <- prob / sum(prob)
+#         }
 
-        return(prob)
-    }
+#         return(prob)
+#     }
 
-    # Nest probabilities
-    if(any(unlist(nests) == 0)) {
-        nests <- lapply(nests, \(x) x + 1)
-    }
+#     # Nest probabilities
+#     if(any(unlist(nests) == 0)) {
+#         nests <- lapply(nests, \(x) x + 1)
+#     }
 
-    # Save all utilities of the different nests in a list
-    Vlist <- lapply(nests, \(x) V[x])
+#     # Save all utilities of the different nests in a list
+#     Vlist <- lapply(nests, \(x) V[x])
 
-    # Set largest V to zero to avoid numerical issues and apply this reduction
-    # to all other V's
-    upper_bound <- lapply(Vlist, max) |>
-        unlist() |>
-        max()
+#     # Set largest V to zero to avoid numerical issues and apply this reduction
+#     # to all other V's
+#     upper_bound <- lapply(Vlist, max) |>
+#         unlist() |>
+#         max()
 
-    Vlist <- lapply(Vlist, \(x) x - upper_bound)
+#     Vlist <- lapply(Vlist, \(x) x - upper_bound)
 
-    # Compute both kinds of probabilities and multiply to get a total
-    # probability for each of the alternatives
-    between <- between_nests(Vlist, nests, alpha, mu, muM)
-    within <- within_nests(Vlist, nests, alpha, muM)
+#     # Compute both kinds of probabilities and multiply to get a total
+#     # probability for each of the alternatives
+#     between <- between_nests(Vlist, nests, alpha, mu, muM)
+#     within <- within_nests(Vlist, nests, alpha, muM)
 
-    for(i in seq_along(nests)) {
-        within[[i]] <- within[[i]] * between[[i]]
-    }
+#     for(i in seq_along(nests)) {
+#         within[[i]] <- within[[i]] * between[[i]]
+#     }
 
-    # Sum the different probabilities for a single alternative
-    P <- V
-    idx <- unlist(nests)
-    within <- unlist(within)
-    for(i in seq_along(within)) {
-        P[i] <- sum(within[idx == i])
-    }
+#     # Sum the different probabilities for a single alternative
+#     P <- V
+#     idx <- unlist(nests)
+#     within <- unlist(within)
+#     for(i in seq_along(within)) {
+#         P[i] <- sum(within[idx == i])
+#     }
 
-    return(P)
-}
+#     return(P)
+# }
