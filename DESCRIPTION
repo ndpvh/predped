@@ -32,7 +32,6 @@ Collate:
     'goals.R'
     'agent.R'
     'moving_options.R'
-    'collision.R'
     'general.R'
     'parameters.R'
     'plot.R'
