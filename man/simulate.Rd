@@ -9,7 +9,7 @@ simulate(object, ...)
 \arguments{
 \item{object}{The `predped` model that you want to simulate}
 
-\item{...}{Arguments passed on to the \code[predped]{update_state} function.}
+\item{...}{Arguments passed on to the \code{\link[predped]{update_state}} function.}
 
 \item{max_agents}{Integer denoting the maximal number of agents that can be 
 present in the environment. Defaults to `20`.}

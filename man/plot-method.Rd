@@ -25,7 +25,7 @@ plot(object, ...)
 \S4method{plot}{background}(object, entry_exit_width = 0.4, ...)
 }
 \arguments{
-\item{object}{An object of kind \code[predped]{object-class}}
+\item{object}{An object of kind \code{\link[predped]{object-class}}}
 
 \item{...}{Additional arguments passed on to the geom used to plot the object.}
 }
