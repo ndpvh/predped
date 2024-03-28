@@ -560,6 +560,7 @@ setMethod("move", signature(object = "rectangle", target = "numeric"), function(
 #'
 #' @return The object moved to the target coordinates.
 #' @export
+#' @rdname rotate-method
 setMethod("rotate",
           signature(object = "rectangle"),
           function(object, degrees, radians) {
