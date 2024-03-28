@@ -23,7 +23,8 @@ License: What license is it under?
 Encoding: UTF-8
 Imports: 
     methods,
-    m4ma
+    m4ma,
+    ggplot2
 RoxygenNote: 7.3.1
 Collate:
     'objects.R'
