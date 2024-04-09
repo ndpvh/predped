@@ -562,8 +562,10 @@ update_goal <- function(agent,
                                        goals(agent))
                 current_goal(agent) <- goals(agent)[[2]]
                 goals(agent) <- goals(agent)[-2]
+                status(agent) <- "replan"
+            } else {
+                status(agent) <- "move"
             }
-            status(agent) <- "replan"
 
         # If the counter is not low enough yet, but the agent is still waiting, 
         # we can check whether other agents are still blocking his way
@@ -584,7 +586,7 @@ update_goal <- function(agent,
             # If no agents are blocking access to the goal, allow the agent to move
             # again
             if(!any(blocking_agents)) {
-                status(agent) <- "replan"
+                status(agent) <- "move"
             }
         }        
     }
