@@ -44,6 +44,7 @@ setMethod("simulate", "predped", function(object,
                                           space_between = radius,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
+                                          precompute_goal_paths = FALSE,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -93,7 +94,8 @@ setMethod("simulate", "predped", function(object,
         # Check whether to add a pedestrian and, if so, initiate a new 
         # agent. Things to consider are: whether it is time to add a new 
         # pedestrian, whether we already reached the maximal number of agents,
-        # and whether there is any space to add the new pedestrian.
+        # and whether there is any space to add the new pedestrian. If there is 
+        # already an agent waiting, don't create a new one.
         if((i %in% add_agent_index) & (length(state$agents) < max_agents)) {
             potential_agent <- add_agent(object,
                                          object@setting,
@@ -104,7 +106,8 @@ setMethod("simulate", "predped", function(object,
                                          close_enough = close_enough,
                                          space_between = space_between,
                                          time_step = time_step,
-                                         precomputed_edges = edges)
+                                         precomputed_edges = edges,
+                                         precompute_goal_paths = precompute_goal_paths)
             agent_in_cue <- TRUE
         }
 
@@ -172,7 +175,8 @@ add_agent <- function(object,
                       close_enough = 2 * radius,
                       space_between = radius,
                       time_step = 0.5,
-                      precomputed_edges = NULL) {
+                      precomputed_edges = NULL,
+                      precompute_goal_paths = TRUE) {
 
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
@@ -180,7 +184,9 @@ add_agent <- function(object,
     # Create this agents' goal stack
     goal_stack <- generate_goal_stack(goal_number, 
                                       background, 
-                                      counter_generator = goal_duration)
+                                      counter_generator = goal_duration,
+                                      precompute_goal_paths = precompute_goal_paths,
+                                      space_between = space_between)
 
     # Compute the agent's orientation: Perpendicular to the wall in which you 
     # have the entrance.

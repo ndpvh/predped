@@ -92,7 +92,10 @@ setMethod("replace", "goal", function(object,
 #' @export 
 generate_goal_stack <- function(n, 
                                 setting,
-                                counter_generator = \(x) rnorm(x, 10, 2)) {
+                                counter_generator = \(x) rnorm(x, 10, 2),
+                                precomputed_edges = NULL,
+                                precompute_goal_paths = TRUE,
+                                space_between = 0.5) {
     # Select the objects in the environment that can contain a goal
     potential_objects <- list()
     for(i in seq_along(setting@objects)) {
@@ -115,6 +118,26 @@ generate_goal_stack <- function(n,
                                        setting,
                                        id = character(0),
                                        counter = counter_generator(1)))
+
+    # If you don't want to or cannot precompute the goal paths, return the 
+    # goal stack as is
+    if(!precompute_goal_paths | length(goal_stack) == 1) {
+        return(goal_stack)
+    }
+
+    # If you want to precompute the goal paths, loop over the last n - 1 goals
+    # in the goal stack and find the path starting at the location of the 
+    # previous goal. The path of the first goal is computed in the `add_agent`
+    # function and does not need to be addressed here.
+    dummy <- agent(center = c(0, 0), radius = space_between)
+    for(i in 2:length(goal_stack)) {
+        position(dummy) <- position(goal_stack[[i - 1]])
+        goal_stack[[i]]@path <- find_path(goal_stack[[i]], 
+                                          dummy, 
+                                          setting,
+                                          space_between = space_between,
+                                          precomputed_edges = precomputed_edges)
+    }
 
     return(goal_stack)
 }
