@@ -95,7 +95,8 @@ generate_goal_stack <- function(n,
                                 counter_generator = \(x) rnorm(x, 10, 2),
                                 precomputed_edges = NULL,
                                 precompute_goal_paths = TRUE,
-                                space_between = 0.5) {
+                                space_between = 0.5,
+                                order_goal_stack = TRUE) {
     # Select the objects in the environment that can contain a goal
     potential_objects <- list()
     for(i in seq_along(setting@objects)) {
@@ -118,6 +119,23 @@ generate_goal_stack <- function(n,
                                        setting,
                                        id = character(0),
                                        counter = counter_generator(1)))
+
+    # If you want the goal stack to be ordered according to distance, do so
+    if(order_goal_stack) {
+        # Compute the distance starting from the entrance (through which the agent
+        # enters the space)
+        start <- entrance(setting)
+        distances <- sapply(goal_stack, 
+                            \(x) (start[1] - position(x)[1])^2 + (start[2] - position(x)[2])^2)
+        old <- sapply(goal_stack, \(x) x@id)
+        
+
+        # Sort the list of goals based on how close they are to the entrance
+        distances <- cbind(1:n, distances)
+        idx <- distances[order(distances[,2]), 1]
+
+        goal_stack <- goal_stack[idx]
+    }
 
     # If you don't want to or cannot precompute the goal paths, return the 
     # goal stack as is

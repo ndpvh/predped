@@ -45,6 +45,7 @@ setMethod("simulate", "predped", function(object,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
                                           precompute_goal_paths = FALSE,
+                                          order_goal_stack = TRUE,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -109,7 +110,8 @@ setMethod("simulate", "predped", function(object,
                                          space_between = space_between,
                                          time_step = time_step,
                                          precomputed_edges = edges,
-                                         precompute_goal_paths = precompute_goal_paths)
+                                         precompute_goal_paths = precompute_goal_paths,
+                                         order_goal_stack = order_goal_stack)
             agent_in_cue <- TRUE
         }
 
@@ -178,7 +180,8 @@ add_agent <- function(object,
                       space_between = radius,
                       time_step = 0.5,
                       precomputed_edges = NULL,
-                      precompute_goal_paths = TRUE) {
+                      precompute_goal_paths = TRUE,
+                      order_goal_stack = TRUE) {
 
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
@@ -188,7 +191,8 @@ add_agent <- function(object,
                                       background, 
                                       counter_generator = goal_duration,
                                       precompute_goal_paths = precompute_goal_paths,
-                                      space_between = space_between)
+                                      space_between = space_between,
+                                      order_goal_stack = order_goal_stack)
 
     # Compute the agent's orientation: Perpendicular to the wall in which you 
     # have the entrance.
