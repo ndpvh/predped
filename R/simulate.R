@@ -89,6 +89,8 @@ setMethod("simulate", "predped", function(object,
                   "agents" = list())
     trace <- list(state)
 
+    agent_in_cue <- FALSE
+    
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
         # Check whether to add a pedestrian and, if so, initiate a new 
@@ -96,7 +98,7 @@ setMethod("simulate", "predped", function(object,
         # pedestrian, whether we already reached the maximal number of agents,
         # and whether there is any space to add the new pedestrian. If there is 
         # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents)) {
+        if((i %in% add_agent_index) & (length(state$agents) < max_agents & !agent_in_cue)) {
             potential_agent <- add_agent(object,
                                          object@setting,
                                          goal_number[i],
