@@ -214,29 +214,27 @@ update_position <- function(agent,
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
     # point). If not, let them reorient themselves towards their next goal.
-    } else {
-        # If the agent stopped their interaction, check whether they already know
-        # where the next goal is. If they don't. let them reorient themselves to
-        # the next goal
-        if(status(agent) == "reorient") {
-            orientation(agent) <- best_angle(agent, 
-                                             state, 
-                                             agent_predictions, 
-                                             background, 
-                                             velocities, 
-                                             orientations)
+    } else if(status(agent) == "reorient") {
+        
+        orientation(agent) <- best_angle(agent, 
+                                            state, 
+                                            agent_predictions, 
+                                            background, 
+                                            velocities, 
+                                            orientations)
 
-            # Report the degress that the agent is reorienting to
-            turn <- paste("to", orientation(agent), "degrees")
-            if(report) {
-                paste(id(agent), "turning", turn, "\n") |>
-                    cat()
-            }
-
-            status(agent) <- "move"
-            # speed(agent) <- standing_start # Otherwise the agent will overshoot his goals when reorienting
+        # Report the degress that the agent is reorienting to
+        turn <- paste("to", orientation(agent), "degrees")
+        if(report) {
+            paste(id(agent), "turning", turn, "\n") |>
+                cat()
         }
 
+        status(agent) <- "move"
+
+    # If an agent is moving, then get the necessary centers and compute the 
+    # utility of moving to a given location
+    } else {
         # Define the centers of the options to move to
         centers <- m4ma::c_vd_rcpp(cells = 1:33,
                                    p1 = position(agent),
@@ -254,7 +252,7 @@ update_position <- function(agent,
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            status(agent) <- "replan" # Get errors when not leaving this in
+            status(agent) <- "reorient" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
             return(agent)
         }
@@ -265,7 +263,7 @@ update_position <- function(agent,
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start
-            status(agent) <- "replan"
+            status(agent) <- "reorient"
             cell(agent) <- 0
             return(agent)
         }
