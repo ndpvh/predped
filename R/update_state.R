@@ -44,6 +44,7 @@ update_state <- function(state,
                          close_enough = 0.5,
                          space_between = close_enough,
                          precomputed_edges = NULL,
+                         precompute_goal_paths = FALSE,
                          ...) {
 
     # Predict where the agents will be at their current velocity and angle. Is 
@@ -74,7 +75,8 @@ update_state <- function(state,
                              background,
                              close_enough = close_enough,
                              space_between = space_between,
-                             precomputed_edges = precomputed_edges) 
+                             precomputed_edges = precomputed_edges,
+                             precompute_goal_paths = precompute_goal_paths) 
 
         # Update the position of the agent
         agent <- update_position(agent, 
@@ -365,7 +367,8 @@ update_goal <- function(agent,
                         space_between = radius(agent),
                         report = FALSE,
                         interactive_report = FALSE,
-                        precomputed_edges = NULL) {  
+                        precomputed_edges = NULL,
+                        precompute_goal_paths = FALSE) {  
 
     # Make some placeholders for replanning and rerouting
     replan <- reroute <- FALSE
@@ -388,7 +391,12 @@ update_goal <- function(agent,
                                             position = exit(background))
             }
 
-            status(agent) <- "replan"
+            # Replan if the goal paths were not precomputed yet
+            if(!precompute_goal_paths) {
+                status(agent) <- "replan"
+            } else {
+                status(agent) <- "reorient"
+            }
 
             # Left in but commented out: Changed orientation when the agent 
             # would later reorient. Not sure why
