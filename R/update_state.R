@@ -79,12 +79,15 @@ update_state <- function(state,
                              precompute_goal_paths = precompute_goal_paths) 
 
         # Update the position of the agent
+        # start_time <- Sys.time()
         agent <- update_position(agent, 
                                  state,
                                  agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
                                  time_step = time_step,
                                  ...)  
+        # stop_time <- Sys.time()
+        # print(stop_time - start_time)
 
         # Update the agent himself
         state$agents[[i]] <- agent
@@ -198,7 +201,6 @@ update_position <- function(agent,
     # agent continue in peace
     if(status(agent) == "completing goal") { 
         cell(agent) <- 0
-        check <- matrix(TRUE, nrow = 11, ncol = 3)
 
     # If the agent stopped their interaction, but still has to replan their path,
     # just return them as being at standstill.
@@ -214,14 +216,13 @@ update_position <- function(agent,
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
     # point). If not, let them reorient themselves towards their next goal.
-    } else if(status(agent) == "reorient") {
-        
+    } else if(status(agent) == "reorient") {        
         orientation(agent) <- best_angle(agent, 
-                                            state, 
-                                            agent_predictions, 
-                                            background, 
-                                            velocities, 
-                                            orientations)
+                                         state, 
+                                         agent_predictions, 
+                                         background, 
+                                         velocities, 
+                                         orientations)
 
         # Report the degress that the agent is reorienting to
         turn <- paste("to", orientation(agent), "degrees")
@@ -291,6 +292,7 @@ update_position <- function(agent,
         if(cell == 0) {
             speed(agent) <- standing_start
             status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
+            
         } else {
             position(agent) <- centers[cell,]
 
