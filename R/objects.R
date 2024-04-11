@@ -753,9 +753,9 @@ setMethod("in_object", signature(object = "circle"), function(object, x, outside
     # If this distance is smaller than the radius, the point is within the 
     # circle.
     y <- center(object)
-    dist <- sqrt((x[1] - y[1])^2 + (x[2] - y[2])^2)
+    dist <- (x[1] - y[1])^2 + (x[2] - y[2])^2
 
-    check <- dist < radius(object)
+    check <- dist < radius(object)^2
     return(ifelse(outside, !check, check))
 })
 
