@@ -88,12 +88,19 @@ utility <- function(agent,
                                           agent_specs$position)
         }
 
-        # Required for utility helper functions
+        # Order the predictions according to the order of all specifications of 
+        # the agents.
+        agent_specs$predictions <- agent_specs$predictions[agent_specs$id,] |>
+            matrix(ncol = 2)
+
+        # Required for utility helper functions: Add names of the agents to their
+        # characteristics
         rownames(agent_specs$position) <- agent_specs$id
         names(agent_specs$size) <- agent_specs$id
         names(agent_specs$orientation) <- agent_specs$id
         names(agent_specs$speed) <- agent_specs$id
         names(agent_specs$group) <- agent_specs$id
+        rownames(agent_specs$predictions) <- agent_specs$id
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@path[1,],
@@ -127,7 +134,7 @@ utility <- function(agent,
             # transforms the matrix to a numerical vector. To ensure there are 
             # no problems, we transform to a matrix and reassign the id's  in 
             # the rows
-            predictions_minus_agent <- matrix(agent_predictions[-1,],
+            predictions_minus_agent <- matrix(agent_specs$predictions[-1,],
                                               ncol = 2)
             rownames(predictions_minus_agent) <- agent_specs$id[-1]
         }
@@ -135,7 +142,7 @@ utility <- function(agent,
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
-                                                 agent_specs$predictions,
+                                                 predictions_minus_agent,
                                                  agent_specs$size[-1],
                                                  objects(background))
 
