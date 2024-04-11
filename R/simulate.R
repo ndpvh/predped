@@ -46,7 +46,7 @@ setMethod("simulate", "predped", function(object,
                                           precompute_edges = TRUE,
                                           precompute_goal_paths = FALSE,
                                           order_goal_stack = TRUE,
-                                          precomputed_goals = NULL
+                                          precomputed_goals = NULL,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
