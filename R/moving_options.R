@@ -53,10 +53,6 @@ moving_options_agent <- function(agent, state, background, centers){
         }
     }
 
-    # Get the index of the agent in the state$agent list
-    agent_id <- sapply(state$agents, id)
-    agent_idx <- which(id(agent) == agent_id)
-
     # Use the `free_cells` function to get all free cells to which the agent
     # might move and check whether it does not provide an error. Also add a 
     # function that checks the intersection of a circle with another object
@@ -122,8 +118,8 @@ moving_options_agent <- function(agent, state, background, centers){
         #
         # Additional condition added: If there are not other agents, then we 
         # don't need to do this check
-        if(length(state$agents[-agent_idx]) > 0) {
-            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
+        if(length(state$agents) > 0) {
+            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
         }
 
         # If something blocks the way in the previous column, then it should also 
@@ -160,15 +156,11 @@ agents_between_goal <- function(agent,
                                 state, 
                                 agent_predictions = NULL) {
 
-    # Get the index of the agent within the state$agents list
-    agent_id <- sapply(state$agents, id)
-    agent_idx <- which(id(agent) == agent_id)
-
     # If no predicted positions are delivered to the function, we will use the 
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        other_agents <- state$agents[-agent_idx]
+        other_agents <- state$agents
         agent_positions <- lapply(other_agents, position)
         agent_positions <- do.call("rbind", 
                                    agent_positions)

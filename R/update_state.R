@@ -65,13 +65,16 @@ update_state <- function(state,
     # `update_agent` function
     for(i in seq_along(state$agents)) {
         # Extract the agent to-be-updated from the state list. Importantly, also
-        # removed from this state list, as it should not contain this one agent:
-        # Simulation is done relative to the agent to-be-updated
+        # remove the agent from this state list, as it should not contain this 
+        # one agent: Simulation is done relative to the agent to-be-updated
         agent <- state$agents[[i]]
+
+        tmp_state <- state
+        tmp_state$agents <- tmp_state$agents[-i]
 
         # Update the goals of the agent
         agent <- update_goal(agent, 
-                             state, 
+                             tmp_state, 
                              background,
                              close_enough = close_enough,
                              space_between = space_between,
@@ -81,13 +84,11 @@ update_state <- function(state,
         # Update the position of the agent
         # start_time <- Sys.time()
         agent <- update_position(agent, 
-                                 state,
+                                 tmp_state,
                                  agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
                                  time_step = time_step,
-                                 ...)  
-        # stop_time <- Sys.time()
-        # print(stop_time - start_time)
+                                 ...) 
 
         # Update the agent himself
         state$agents[[i]] <- agent
@@ -438,12 +439,9 @@ update_goal <- function(agent,
             # Given that you have to reroute, replan how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents[-agent_idx])
+                                                  state$agents)
                                                   
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
@@ -578,17 +576,13 @@ update_goal <- function(agent,
         # If the counter is not low enough yet, but the agent is still waiting, 
         # we can check whether other agents are still blocking his way
         } else {
-            # Find out who the current agent is
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
             # Draw a circle around the current goal of the agent and find out whether
             # any of the other agents intersects with this. If so, then we can assume
             # one of the agents is blocking the access to the goal, and the agent
             # cannot start the interaction phase.
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents[-agent_idx], 
+            blocking_agents <- sapply(state$agents, 
                                       \(x) intersects(goal_circle, x))
 
             # If no agents are blocking access to the goal, allow the agent to move
@@ -663,15 +657,11 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state$agents) > 1) & (goal_distance <= close_enough + 2 * radius(agent))) {
-            # Find out who the current agent 
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
-            # Delete him from the list and find out whether there is an intersection
+        if((length(state$agents) > 0) & (goal_distance <= close_enough + 2 * radius(agent))) {
+            # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents[-agent_idx], 
+            blocking_agents <- sapply(state$agents, 
                                       \(x) intersects(goal_circle, x))
 
             # If only one agent is blocking the goal, let the agent wait. Only invoke
