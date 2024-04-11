@@ -46,6 +46,7 @@ setMethod("simulate", "predped", function(object,
                                           precompute_edges = TRUE,
                                           precompute_goal_paths = FALSE,
                                           order_goal_stack = TRUE,
+                                          precomputed_goals = NULL
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -111,7 +112,8 @@ setMethod("simulate", "predped", function(object,
                                          time_step = time_step,
                                          precomputed_edges = edges,
                                          precompute_goal_paths = precompute_goal_paths,
-                                         order_goal_stack = order_goal_stack)
+                                         order_goal_stack = order_goal_stack,
+                                         precomputed_goals = precomputed_goals)
             agent_in_cue <- TRUE
         }
 
@@ -181,18 +183,24 @@ add_agent <- function(object,
                       time_step = 0.5,
                       precomputed_edges = NULL,
                       precompute_goal_paths = TRUE,
-                      order_goal_stack = TRUE) {
+                      order_goal_stack = TRUE,
+                      precomputed_goals = NULL) {
 
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
 
     # Create this agents' goal stack
-    goal_stack <- generate_goal_stack(goal_number, 
-                                      background, 
-                                      counter_generator = goal_duration,
-                                      precompute_goal_paths = precompute_goal_paths,
-                                      space_between = space_between,
-                                      order_goal_stack = order_goal_stack)
+    if(is.null(precomputed_goals)) {
+        goal_stack <- generate_goal_stack(goal_number, 
+                                          background, 
+                                          counter_generator = goal_duration,
+                                          precompute_goal_paths = precompute_goal_paths,
+                                          space_between = space_between,
+                                          order_goal_stack = order_goal_stack)
+    } else {
+        i <- sample(1:length(precomputed_goals), 1)
+        goal_stack <- precomputed_goals[[i]]
+    }
 
     # Compute the agent's orientation: Perpendicular to the wall in which you 
     # have the entrance.
