@@ -61,18 +61,32 @@ utility <- function(agent,
     # an agent-characteristic?
     if(!precomputed) {
         # Make the object-based arguments of predped compatible with the information
-        # needed by m4ma
-        agent_specs <- list(id = sapply(state$agents, id), 
-                            position = sapply(state$agents, position) |>
-                                t(), 
-                            size = sapply(state$agents, size) |>
+        # needed by m4ma. Importantly, this information should contain all 
+        # information on the agent of interest as well. To make everything a bit
+        # easier, we will add this information in the beginning of each vector 
+        # or matrix.
+        agent_specs <- list(id = c(id(agent), sapply(state$agents, id)) |>
+                                as.character(),
+                            size = c(size(agent), sapply(state$agents, size)) |>
                                 as.numeric(), 
-                            orientation = sapply(state$agents, orientation) |>
+                            orientation = c(orientation(agent), sapply(state$agents, orientation)) |>
                                 as.numeric(), 
-                            speed = sapply(state$agents, speed) |>
+                            speed = c(speed(agent), sapply(state$agents, speed)) |>
                                 as.numeric(), 
-                            group = sapply(state$agents, group),
+                            group = c(group(agent), sapply(state$agents, group)) |>
+                                as.numeric(),
                             predictions = agent_predictions)
+
+        # Separated because it gives an error the moment there are no other agents
+        # in the room (type error: the matrix is seen as a list instead)
+        agent_specs$position <- sapply(state$agents, position) |>
+            t()
+        if(length(agent_specs$position) == 0) {
+            agent_specs$position <- position(agent, return_matrix = TRUE)
+        } else {
+            agent_specs$position <- rbind(position(agent, return_matrix = TRUE), 
+                                          agent_specs$position)
+        }
 
         # Required for utility helper functions
         rownames(agent_specs$position) <- agent_specs$id
@@ -80,9 +94,6 @@ utility <- function(agent,
         names(agent_specs$orientation) <- agent_specs$id
         names(agent_specs$speed) <- agent_specs$id
         names(agent_specs$group) <- agent_specs$id
-
-        # Retrieve the index of the agent in question
-        agent_idx <- match(id(agent), agent_specs$id)
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@path[1,],
@@ -96,7 +107,7 @@ utility <- function(agent,
                                                       goal_position) / 90
 
         # Interpersonal distance between agent and other agents
-        interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
+        interpersonal_distance <- m4ma::predClose_rcpp(1, 
                                                        p1 = position(agent, return_matrix = TRUE), 
                                                        a1 = orientation(agent),
                                                        p2 = agent_specs$position, 
@@ -106,7 +117,7 @@ utility <- function(agent,
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
-        if(nrow(agent_predictions) == 1) {
+        if(nrow(agent_specs$predictions) == 1) {
             # When just deleting `agent_idx` from a single-row matrix, we get to 
             # a numeric, not a matrix. Therefore create empty matrix if there is
             # only 1 agent.
@@ -116,20 +127,20 @@ utility <- function(agent,
             # transforms the matrix to a numerical vector. To ensure there are 
             # no problems, we transform to a matrix and reassign the id's  in 
             # the rows
-            predictions_minus_agent <- matrix(agent_predictions[-agent_idx,],
+            predictions_minus_agent <- matrix(agent_predictions[-1,],
                                               ncol = 2)
-            rownames(predictions_minus_agent) <- agent_specs$id[-agent_idx]
+            rownames(predictions_minus_agent) <- agent_specs$id[-1]
         }
 
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
-                                                 predictions_minus_agent,
-                                                 agent_specs$size[-agent_idx],
+                                                 agent_specs$predictions,
+                                                 agent_specs$size[-1],
                                                  objects(background))
 
         # Follow the leader phenomenon
-        leaders <- m4ma::getLeaders_rcpp(agent_idx,
+        leaders <- m4ma::getLeaders_rcpp(1,
                                          agent_specs$position,
                                          agent_specs$orientation,
                                          agent_specs$speed,
@@ -137,10 +148,10 @@ utility <- function(agent,
                                          agent_specs$group,
                                          centers,
                                          objects(background))
-        leaders <- NULL
+        # leaders <- NULL
 
         # Walking besides a buddy
-        buddies <- m4ma::getBuddy_rcpp(agent_idx,
+        buddies <- m4ma::getBuddy_rcpp(1,
                                        agent_specs$position,
                                        agent_specs$speed,
                                        agent_specs$group,
@@ -150,24 +161,27 @@ utility <- function(agent,
                                        objects(background),
                                        pickBest = FALSE)
 
+    # Does not work at this moment, and so is left commented out
+    #
     # Subject based
-    } else if (subject) {
-        check <- state$check
-        goal_distance <- state$goal_distance[n]
-        direction_goal <- state$direction_goal
-        interpersonal_distance <- state$interpersonal_distance
-        blocked_angle <- state$blocked_angle
-        leaders <- state$leaders
-        buddies <- state$buddies
-    # Iteration based
-    } else {
-        check <- state$check[[n]]
-        goal_distance <- state$goal_distance[n]
-        direction_goal <- state$direction_goal[[n]]
-        interpersonal_distance <- state$interpersonal_distance[[n]]
-        blocked_angle <- state$blocked_angle[[n]]
-        leaders <- state$leaders[[n]]
-        buddies <- state$buddies[[n]]
+    # } else if (subject) {
+    #     check <- state$check
+    #     goal_distance <- state$goal_distance[n]
+    #     direction_goal <- state$direction_goal
+    #     interpersonal_distance <- state$interpersonal_distance
+    #     blocked_angle <- state$blocked_angle
+    #     leaders <- state$leaders
+    #     buddies <- state$buddies
+    # # Iteration based
+    # } else {
+    #     check <- state$check[[n]]
+    #     goal_distance <- state$goal_distance[n]
+    #     direction_goal <- state$direction_goal[[n]]
+    #     interpersonal_distance <- state$interpersonal_distance[[n]]
+    #     blocked_angle <- state$blocked_angle[[n]]
+    #     leaders <- state$leaders[[n]]
+    #     buddies <- state$buddies[[n]]
+    # }
     }
 
     # Compute the utilities and sum them up
@@ -190,15 +204,15 @@ utility <- function(agent,
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
         # they have been taken out to speed up the estimation
         # Get names of ingroup agents
-        agent_groups <- agent_specs$group[-agent_idx]
-        names_ingroup <- names(agent_groups[agent_groups == agent_specs$group[agent_idx]])
+        agent_groups <- agent_specs$group[-1]
+        names_ingroup <- names(agent_groups[agent_groups == agent_specs$group[1]])
 
         # Check if agent is part of in group
         is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
 
         # Check which cells have only positive distance
         check <- check & apply(interpersonal_distance, 2, function(x) {
-          all(x > 0)
+            all(x > 0)
         })
 
         V <- V + m4ma::idUtility_rcpp(
