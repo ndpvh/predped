@@ -160,6 +160,86 @@ generate_goal_stack <- function(n,
     return(goal_stack)
 }
 
+#' Simulate multiple goal stacks
+#' 
+#' Create multiple goal stacks that can be used in the simulation. Importantly, 
+#' everything is precomputed here, meaning that all paths towards the goals are
+#' already filled out in the simulation.
+#' 
+#' @param n Integer denoting the number of goal stacks to create
+#' @param setting List containing all objects in the environment/setting
+#' @param goal_number Integer, vector of integers, or function that determines 
+#' how many goals each of the agents should receive. Defaults to a function that 
+#' draws `x` numbers from a normal distribution with mean 10 and standard 
+#' deviation 2. 
+#' @param goal_duration Function that defines how the counter for each goal 
+#' should be generated. Defaults to a normal distribution with mean 10 and 
+#' standard deviation 2.
+#' @param space_between Numeric denoting the amount of space that is needed 
+#' between a path point and an object
+#' @param order_goal_stack Logical denoting whether to order the goal stack 
+#' based on distance.
+#' 
+#' @export 
+# TO DO:
+#   - Find a new name for this function: Not happy with how close it is to 
+#     generate_goal_stack
+simulate_goal_stack <- function(n, 
+                                setting,
+                                goal_number = \(x) rnorm(x, 10, 2), 
+                                goal_duration = \(x) rnorm(x, 10, 2),
+                                space_between = 0.5,
+                                order_goal_stack = TRUE) {
+
+    print("Precomputing goal stacks")
+
+    # Define the number of goals per goal-stack
+    goal_number <- draw_number(goal_number, n)
+
+    # If `goal_duration` is not a function, make it a function anyway (assumed
+    # by the `goal` class: To be changed)
+    if(typeof(goal_duration) != "closure") {
+        number <- goal_duration[1]
+        goal_duration <- function(x) number
+    }
+
+    # Precompute the edges so that this might already take a bit less time
+    edges <- create_edges(c(0, 0), 
+                          c(0, 0), 
+                          setting,
+                          space_between = space_between)
+    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
+    # Loop over the number of goal stacks to create
+    goal_stack <- list()
+    for(i in seq_len(n)) {
+        print(paste0("Generating goal stack ", i))
+
+        # Generate the complete goal stack and precompute all the paths to the 
+        # goals
+        goal_stack[[i]] <- generate_goal_stack(goal_number[i], 
+                                               setting,
+                                               counter_generator = goal_duration,
+                                               precomputed_edges = edges,
+                                               precompute_goal_paths = TRUE,
+                                               space_between = space_between,
+                                               order_goal_stack = order_goal_stack)
+
+        # The first goal within the goal stack does not have a path yet. Use the
+        # entrance as the position at which the agent starts
+        dummy <- agent(center = entrance(setting), radius = space_between)
+        goal_stack[[i]][[1]]@path <- find_path(goal_stack[[i]][[1]], 
+                                               dummy, 
+                                               setting,
+                                               space_between = space_between,
+                                               precomputed_edges = edges)
+    }
+
+    return(goal_stack)
+}
+
 #' Add a Goal to an Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
