@@ -14,7 +14,9 @@ add_agent(
   close_enough = 2 * radius,
   space_between = radius,
   time_step = 0.5,
-  precomputed_edges = NULL
+  precomputed_edges = NULL,
+  precompute_goal_paths = TRUE,
+  order_goal_stack = TRUE
 )
 }
 \arguments{

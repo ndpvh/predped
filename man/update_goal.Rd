@@ -13,7 +13,8 @@ update_goal(
   space_between = radius(agent),
   report = FALSE,
   interactive_report = FALSE,
-  precomputed_edges = NULL
+  precomputed_edges = NULL,
+  precompute_goal_paths = FALSE
 )
 }
 \arguments{

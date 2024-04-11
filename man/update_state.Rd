@@ -12,6 +12,7 @@ update_state(
   close_enough = 0.5,
   space_between = close_enough,
   precomputed_edges = NULL,
+  precompute_goal_paths = FALSE,
   ...
 )
 }
