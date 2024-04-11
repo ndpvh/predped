@@ -116,7 +116,7 @@ moving_options_agent <- function(agent, state, background, centers){
         # necessary anymore! The state$agents list already does not contain the 
         # `agent` anymore
         #
-        # Additional condition added: If there are not other agents, then we 
+        # Additional condition added: If there are no other agents, then we 
         # don't need to do this check
         if(length(state$agents) > 0) {
             check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
@@ -160,12 +160,11 @@ agents_between_goal <- function(agent,
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        other_agents <- state$agents
-        agent_positions <- lapply(other_agents, position)
+        agent_positions <- lapply(state$agents, position)
         agent_positions <- do.call("rbind", 
                                    agent_positions)
     } else {
-        agent_positions <- agent_predictions[-agent_idx,] |>
+        agent_positions <- agent_predictions[-id(agent),] |>
             matrix(ncol = 2)
     }
 
