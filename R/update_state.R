@@ -61,6 +61,12 @@ update_state <- function(state,
         t()
     rownames(agent_predictions) <- sapply(state$agents, id)
 
+    # Create agent-specifications. Are used in the utility-function and used to
+    # be created there. Moved it here to reduce computational cost (which increases
+    # exponentially with more agents)
+    agent_specs <- create_agent_specifications(state$agents, 
+                                               agent_predictions)
+
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
     for(i in seq_along(state$agents)) {
@@ -85,7 +91,7 @@ update_state <- function(state,
         # start_time <- Sys.time()
         agent <- update_position(agent, 
                                  tmp_state,
-                                 agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
+                                 agent_specs, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
                                  time_step = time_step,
                                  ...) 
@@ -128,6 +134,30 @@ predict_movement <- function(agent,
     return(co)
 }
 
+create_agent_specifications <- function(agent_list,
+                                        agent_predictions) {
+    # Make the object-based arguments of predped compatible with the information
+    # needed by m4ma. 
+    agent_specs <- list(id = as.character(sapply(agent_list, id)),
+                        size = as.numeric(sapply(agent_list, size)),
+                        position = t(sapply(agent_list, position)),
+                        orientation = as.numeric(sapply(agent_list, orientation)), 
+                        speed = as.numeric(sapply(agent_list, speed)), 
+                        group = as.numeric(sapply(agent_list, group)),
+                        predictions = agent_predictions)
+
+    # Required for utility helper functions: Add names of the agents to their
+    # characteristics
+    rownames(agent_specs$position) <- agent_specs$id
+    names(agent_specs$size) <- agent_specs$id
+    names(agent_specs$orientation) <- agent_specs$id
+    names(agent_specs$speed) <- agent_specs$id
+    names(agent_specs$group) <- agent_specs$id
+    rownames(agent_specs$predictions) <- agent_specs$id
+
+    return(agent_specs)
+}
+
 
 
 #' Move an Agent
@@ -165,7 +195,7 @@ predict_movement <- function(agent,
 #     everything becomes a lot clearer
 update_position <- function(agent,
                             state,
-                            agent_predictions,
+                            agent_specifications,
                             background,
                             nests = list(
                                 Central = c(0, 6, 17, 28),
@@ -220,7 +250,7 @@ update_position <- function(agent,
     } else if(status(agent) == "reorient") {        
         orientation(agent) <- best_angle(agent, 
                                          state, 
-                                         agent_predictions, 
+                                         agent_specifications, 
                                          background, 
                                          velocities, 
                                          orientations)
@@ -261,7 +291,12 @@ update_position <- function(agent,
 
         # Compute the utility of of each option and transform the utilities to
         # probabilities
-        V <- utility(agent, state, agent_predictions, centers, background, check)
+        V <- utility(agent, 
+                     state, 
+                     agent_specifications, 
+                     centers, 
+                     background, 
+                     check)
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start

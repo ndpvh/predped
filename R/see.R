@@ -20,7 +20,7 @@
 # Object-oriented replacement of the function `bestAngle`.
 best_angle <- function(agent,
                        state,
-                       agent_predictions,
+                       agent_specifications,
                        background,
                        velocities,
                        orientations,
@@ -49,7 +49,7 @@ best_angle <- function(agent,
         check <- moving_options(agent, state, background, centers)
 
         # Compute the utility of the proposed cells to move to
-        V <- utility(agent, state, agent_predictions, centers, background, check)[-1] # Omit utility for cell 0
+        V <- utility(agent, state, agent_specifications, centers, background, check)[-1] # Omit utility for cell 0
         utility_angles[i, ] <- c(max(V), orientation(agent))
     }
 

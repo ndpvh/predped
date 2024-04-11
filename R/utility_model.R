@@ -46,7 +46,7 @@
 #    deleted
 utility <- function(agent,
                     state,
-                    agent_predictions,
+                    agent_specifications,
                     centers,
                     background,
                     check,
@@ -60,47 +60,8 @@ utility <- function(agent,
     # have to think about how we will save this information. Maybe just make it
     # an agent-characteristic?
     if(!precomputed) {
-        # Make the object-based arguments of predped compatible with the information
-        # needed by m4ma. Importantly, this information should contain all 
-        # information on the agent of interest as well. To make everything a bit
-        # easier, we will add this information in the beginning of each vector 
-        # or matrix.
-        agent_specs <- list(id = c(id(agent), sapply(state$agents, id)) |>
-                                as.character(),
-                            size = c(size(agent), sapply(state$agents, size)) |>
-                                as.numeric(), 
-                            orientation = c(orientation(agent), sapply(state$agents, orientation)) |>
-                                as.numeric(), 
-                            speed = c(speed(agent), sapply(state$agents, speed)) |>
-                                as.numeric(), 
-                            group = c(group(agent), sapply(state$agents, group)) |>
-                                as.numeric(),
-                            predictions = agent_predictions)
-
-        # Separated because it gives an error the moment there are no other agents
-        # in the room (type error: the matrix is seen as a list instead)
-        agent_specs$position <- sapply(state$agents, position) |>
-            t()
-        if(length(agent_specs$position) == 0) {
-            agent_specs$position <- position(agent, return_matrix = TRUE)
-        } else {
-            agent_specs$position <- rbind(position(agent, return_matrix = TRUE), 
-                                          agent_specs$position)
-        }
-
-        # Order the predictions according to the order of all specifications of 
-        # the agents.
-        agent_specs$predictions <- agent_specs$predictions[agent_specs$id,] |>
-            matrix(ncol = 2)
-
-        # Required for utility helper functions: Add names of the agents to their
-        # characteristics
-        rownames(agent_specs$position) <- agent_specs$id
-        names(agent_specs$size) <- agent_specs$id
-        names(agent_specs$orientation) <- agent_specs$id
-        names(agent_specs$speed) <- agent_specs$id
-        names(agent_specs$group) <- agent_specs$id
-        rownames(agent_specs$predictions) <- agent_specs$id
+        # Get the index of all other agents in the agent_specifications
+        agent_idx <- seq_along(agent_specifications$id)[agent_specifications$id == id(agent)]
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@path[1,],
@@ -114,17 +75,17 @@ utility <- function(agent,
                                                       goal_position) / 90
 
         # Interpersonal distance between agent and other agents
-        interpersonal_distance <- m4ma::predClose_rcpp(1, 
+        interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
                                                        p1 = position(agent, return_matrix = TRUE), 
                                                        a1 = orientation(agent),
-                                                       p2 = agent_specs$position, 
-                                                       r = agent_specs$size, 
+                                                       p2 = agent_specifications$position, 
+                                                       r = agent_specifications$size, 
                                                        centres = centers, 
-                                                       p_pred = agent_specs$predictions, 
+                                                       p_pred = agent_specifications$predictions, 
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
-        if(nrow(agent_specs$predictions) == 1) {
+        if(nrow(agent_specifications$predictions) == 1) {
             # When just deleting `agent_idx` from a single-row matrix, we get to 
             # a numeric, not a matrix. Therefore create empty matrix if there is
             # only 1 agent.
@@ -134,36 +95,36 @@ utility <- function(agent,
             # transforms the matrix to a numerical vector. To ensure there are 
             # no problems, we transform to a matrix and reassign the id's  in 
             # the rows
-            predictions_minus_agent <- matrix(agent_specs$predictions[-1,],
+            predictions_minus_agent <- matrix(agent_specifications$predictions[-agent_idx,],
                                               ncol = 2)
-            rownames(predictions_minus_agent) <- agent_specs$id[-1]
+            rownames(predictions_minus_agent) <- agent_specifications$id[-agent_idx]
         }
 
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
                                                  predictions_minus_agent,
-                                                 agent_specs$size[-1],
+                                                 agent_specifications$size[-agent_idx],
                                                  objects(background))
 
         # Follow the leader phenomenon
-        leaders <- m4ma::getLeaders_rcpp(1,
-                                         agent_specs$position,
-                                         agent_specs$orientation,
-                                         agent_specs$speed,
+        leaders <- m4ma::getLeaders_rcpp(agent_idx,
+                                         agent_specifications$position,
+                                         agent_specifications$orientation,
+                                         agent_specifications$speed,
                                          goal_position,
-                                         agent_specs$group,
+                                         agent_specifications$group,
                                          centers,
                                          objects(background))
         # leaders <- NULL
 
         # Walking besides a buddy
-        buddies <- m4ma::getBuddy_rcpp(1,
-                                       agent_specs$position,
-                                       agent_specs$speed,
-                                       agent_specs$group,
-                                       agent_specs$orientation,
-                                       agent_specs$predictions,
+        buddies <- m4ma::getBuddy_rcpp(agent_idx,
+                                       agent_specifications$position,
+                                       agent_specifications$speed,
+                                       agent_specifications$group,
+                                       agent_specifications$orientation,
+                                       agent_specifications$predictions,
                                        centers,
                                        objects(background),
                                        pickBest = FALSE)
@@ -211,8 +172,8 @@ utility <- function(agent,
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
         # they have been taken out to speed up the estimation
         # Get names of ingroup agents
-        agent_groups <- agent_specs$group[-1]
-        names_ingroup <- names(agent_groups[agent_groups == agent_specs$group[1]])
+        agent_groups <- agent_specifications$group[-agent_idx]
+        names_ingroup <- names(agent_groups[agent_groups == agent_specifications$group[agent_idx]])
 
         # Check if agent is part of in group
         is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
