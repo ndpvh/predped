@@ -194,6 +194,7 @@ add_agent <- function(object,
         goal_stack <- generate_goal_stack(goal_number, 
                                           background, 
                                           counter_generator = goal_duration,
+                                          precomputed_edges = precomputed_edges,
                                           precompute_goal_paths = precompute_goal_paths,
                                           space_between = space_between,
                                           order_goal_stack = order_goal_stack)
