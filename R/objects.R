@@ -962,14 +962,20 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
                                    rep(FALSE, each = nrow(segments)))
 
     # First check: Do any of the points that determine the segment fall 
-    # within the circle? If so, there is an intersection.
-    idx <- in_object(object, segments, outside = FALSE)
-
-    if(any(idx) & !return_all) {
+    # within the circle? If so, there is an intersection. 
+    #
+    # Be careful, this is only true if only one of the points that make up the 
+    # segment falls within the circle: If this is not the case, then the segment
+    # might also just fall completely within the circle, which is fine for our
+    # purposes.
+    coords <- rbind(segments[,1:2], segments[nrow(segments), 3:4])
+    idx <- in_object(object, coords, outside = FALSE)
+    idy <- idx[1:(length(idx) - 1)] != idx[2:length(idx)] # Do the actual check: One point within, the other outside
+    if(any(idy) & !return_all) {
         return(TRUE)
     }
 
-    intersecting_segments[idx] <- TRUE
+    intersecting_segments[, 2] <- idx[1:(length(idx) - 1)]
 
     # Second check: Use the formula for an intersection of a line with a 
     # circle to determine whether the line itself intersects. For this to 
@@ -1147,7 +1153,6 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
         # at which the intersection happens and check whether it lies within the
         # two provided points that make up the edge. If not, then there is no 
         # actual intersection. 
-
         dx <- to[1] - from[1]
         dy <- to[2] - from[2]
         distance <- dx^2 + dy^2
@@ -1193,12 +1198,14 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
         # line.line.intersection function
         edges <- cbind(other_object@points, 
                        other_object@points[c(2:nrow(points), 1),])
-        idx <- sapply(seq_len(nrow(edges)),
-                      \(x) line.line.intersection(object@from, 
-                                                  object@to, 
-                                                  edges[x, 1:2], 
-                                                  edges[x, 3:4],
-                                                  interior.only = TRUE))
+        return(line_line_intersection(matrix(c(object@from, object@to), nrow = 1),
+                                      edges))
+        # idx <- sapply(seq_len(nrow(edges)),
+        #               \(x) line.line.intersection(object@from, 
+        #                                           object@to, 
+        #                                           edges[x, 1:2], 
+        #                                           edges[x, 3:4],
+        #                                           interior.only = TRUE))
 
         return(any(idx)) 
     }  
