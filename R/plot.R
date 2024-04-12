@@ -146,23 +146,13 @@ setMethod("plot", "background", function(object,
                               radius = (entry_exit_width / 2)))
     
     # Check that polygon coordinates are in the background
-    # If not, set those coorinates to NA                   
-    for (i in seq_len(nrow(entrance))) {
-      tst <- in_object(object@shape, entrance[i,])
-      if (tst) {
-        entrance[i,] <- NA
-      }
-    }
+    # If not, set those coorinates to NA   
+    idx <- in_object(object@shape, entrance, outside = FALSE)
+    idy <- in_object(object@shape, exit, outside = FALSE)
+
+    entrance <- entrance[idx,]    
+    exit <- exit[idy,] 
     
-    # Remove the NA values to make half moon shape
-    entrance <- na.omit(entrance)
-    for (i in seq_len(nrow(exit))) {
-      tst <- in_object(object@shape, exit[i,])
-      if (tst) {
-        exit[i,] <- NA
-      }
-    }
-    exit <- na.omit(exit)
     plt <- plt + plot(polygon(points = entrance), fill = NA, colour = "black")
     plt <- plt + plot(polygon(points = exit), fill = NA, colour = "black")
     return(plt)

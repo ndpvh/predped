@@ -410,8 +410,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     nodes <- matrix(0, nrow = nrow(edges) - 1, 2)
     for(i in seq_len(nrow(edges) - 1)) {
         potential_nodes <- find_location(edges[i,], edges[i + 1,])
-        idx <- sapply(1:2, 
-                      \(x) in_object(object, potential_nodes[x,], outside = outside))
+        idx <- in_object(object, potential_nodes, outside = outside)
 
         # If none of the points is inside, get rid of them. If all of them are
         # inside the object, choose the one closest or farthest from the other 
@@ -964,8 +963,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 
     # First check: Do any of the points that determine the segment fall 
     # within the circle? If so, there is an intersection.
-    idx <- sapply(seq_len(nrow(segments)),
-                           \(x) in_object(object, segments[x,], outside = FALSE))
+    idx <- in_object(object, segments, outside = FALSE)
 
     if(any(idx) & !return_all) {
         return(TRUE)

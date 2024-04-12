@@ -91,8 +91,6 @@ create_edges <- function(from,
 #' @export 
 #
 # TO DO:
-#   - Extend `in_object` to deal with matrices in a vectorized way and get rid 
-#     of the loop over nodes
 #   - Vectorize the creation of the diagonal nodes in rectangles and circles and
 #     find a way to vectorize this for polygons (i.e., get rid of the while loop)
 create_nodes <- function(from, 
@@ -145,20 +143,12 @@ create_nodes <- function(from,
     new_obj <- lapply(obj, 
                       \(x) enlarge_object(x, space_between = space_between))
 
-    for(i in seq_len(nrow(nodes))) {
-        if(in_object(shp, nodes[i,], outside = TRUE)) {
-            nodes[i,] <- NA
-        } else {
-            for(j in seq_along(new_obj)) {
-                if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
-                    nodes[i,] <- NA
-                    break
-                }
-            } 
-        }
+    to_delete <- in_object(shp, nodes, outside = TRUE)
+    for(i in seq_along(new_obj)) {
+        to_delete <- to_delete | in_object(new_obj[[i]], nodes, outside = FALSE)
     }
 
-    nodes <- nodes[!is.na(nodes[,1]),]
+    nodes <- nodes[!to_delete,]
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
