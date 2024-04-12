@@ -16,27 +16,29 @@ testthat::test_that("Number of pedestrians blocking view from goal works", {
     noblock_2 <- predped::agent(center = c(-2, -0.75) , radius = 0.2)
 
     # Try several combinations and see whether the correct number of blocking
-    # agents are derived
+    # agents are derived. `me` is not included in this list anymore, as the 
+    # `state$agents` list that gets passed down to this function only contains
+    # the other agents
     state_0a <- list(setting = mock_setting, 
-                     agents = list(me, noblock_1, noblock_2))
+                     agents = list(noblock_1, noblock_2))
     state_0b <- list(setting = mock_setting, 
-                     agents = list(me, noblock_1))
+                     agents = list(noblock_1))
     state_0c <- list(setting = mock_setting, 
-                     agents = list(me, noblock_2))
+                     agents = list(noblock_2))
 
     state_1a <- list(setting = mock_setting, 
-                     agents = list(me, block_1))
+                     agents = list(block_1))
     state_1b <- list(setting = mock_setting, 
-                     agents = list(me, noblock_1, block_1))
+                     agents = list(noblock_1, block_1))
     state_1c <- list(setting = mock_setting, 
-                     agents = list(me, noblock_2, block_2))
+                     agents = list(noblock_2, block_2))
 
     state_2a <- list(setting = mock_setting, 
-                     agents = list(me, block_1, block_2))
+                     agents = list(block_1, block_2))
     state_2b <- list(setting = mock_setting, 
-                     agents = list(me, block_1, noblock_1, block_2))
+                     agents = list(block_1, noblock_1, block_2))
     state_2c <- list(setting = mock_setting, 
-                     agents = list(me, block_2, noblock_2, block_2))
+                     agents = list(block_2, noblock_2, block_2))
 
     # Put them all in a list
     states <- list(state_0a, state_0b, state_0c,
