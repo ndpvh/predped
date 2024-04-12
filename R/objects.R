@@ -827,7 +827,10 @@ setMethod("in_object", signature(object = "circle"), function(object, x, outside
     dist <- (x[,1] - y[1])^2 + (x[,2] - y[2])^2
 
     check <- dist < radius(object)^2
-    return(ifelse(outside, !check, check))
+    if(outside) {
+        check <- !check
+    }
+    return(check)
 })
 
 #'@rdname rng_point-method
