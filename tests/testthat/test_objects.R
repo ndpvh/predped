@@ -24,7 +24,7 @@ testthat::test_that("Object is abstract base class", {
     testthat::expect_error(new("object"))
 })
 
-testthat::test_that("Polygon contains points works", {
+testthat::test_that("Polygon contains single point works", {
     # Shapes and points are chosen so that points are always contained within 
     # all shapes if they are in the object, or that they are to the left, right,
     # above, or below the shapes if not
@@ -51,6 +51,30 @@ testthat::test_that("Polygon contains points works", {
         testthat::expect_true(predped::in_object(i, points[3,], outside = TRUE))
         testthat::expect_true(predped::in_object(i, points[4,], outside = TRUE))
         testthat::expect_true(predped::in_object(i, points[5,], outside = TRUE))
+    }
+})
+
+testthat::test_that("Polygon contains multiple point works", {
+    # Shapes and points are chosen so that points are always contained within 
+    # all shapes if they are in the object, or that they are to the left, right,
+    # above, or below the shapes if not
+    shapes <- list(predped::polygon(points = rbind(c(0,0), c(0,1), c(1,1), c(1,0)),
+                                    clock_wise = TRUE),
+                   predped::polygon(points = rbind(c(0,0), c(-0.5, 1), c(1.5,1.5), c(1,-0.5)),
+                                    clock_wise = TRUE))
+    
+    points <- rbind(c(0.5, 0.5), c(-1, 0.5), c(2, 0.5), c(0.5, 2), c(0.5, -1))
+
+    # Inside
+    ref <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = FALSE), ref)
+    }
+
+    # Outside
+    ref <- !ref
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = TRUE), ref)
     }
 })
 
@@ -99,7 +123,7 @@ testthat::test_that("Rectangle rotation works", {
     testthat::expect_equal(r@points, ref)
 })
 
-testthat::test_that("Rectangle contains points works", {
+testthat::test_that("Rectangle contains single point works", {
     # Shapes and points are chosen so that points are always contained within 
     # all shapes if they are in the object, or that they are to the left, right,
     # above, or below the shapes if not
@@ -124,6 +148,28 @@ testthat::test_that("Rectangle contains points works", {
         testthat::expect_true(predped::in_object(i, points[3,], outside = TRUE))
         testthat::expect_true(predped::in_object(i, points[4,], outside = TRUE))
         testthat::expect_true(predped::in_object(i, points[5,], outside = TRUE))
+    }
+})
+
+testthat::test_that("Rectangle contains multiple points works", {
+    # Shapes and points are chosen so that points are always contained within 
+    # all shapes if they are in the object, or that they are to the left, right,
+    # above, or below the shapes if not
+    shapes <- list(predped::rectangle(center = c(0,0), size = c(1,1), orientation = 0),
+                   predped::rectangle(center = c(0,0), size = c(1,1), orientation = pi/2))
+    
+    points <- rbind(c(0, 0), c(-1, 0), c(1, 0), c(0, 1), c(0, -1))
+
+    # Inside
+    ref <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = FALSE), ref)
+    }
+
+    # Outside
+    ref <- !ref
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = TRUE), ref)
     }
 })
 
