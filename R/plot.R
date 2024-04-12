@@ -74,11 +74,29 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "list", function(object, ...) {
+setMethod("plot", "list", function(object, trace = FALSE, ...) {
+    # If the list in question is the trace, then we have to output the plots for
+    # each state in the simulation. This is a little more complicated than for 
+    # a simple list
     plt <- list()
-    for(i in seq_along(object)) {
-        plt <- append(plt, plot(object[[i]], ...))
+    if(trace) {
+        # Setting doesn't change, so can be saved immediately
+        base_plot <- predped::plot(object[[1]]$setting, fill = "grey", color = "black")
+        for(i in seq_along(object)) {
+            print(paste0("Making plot for iteration ", i))
+            plt[[i]] <- suppressWarnings(base_plot +
+                predped::plot(object[[i]]$agents, ...) +
+                ggplot2::labs(title = paste("iteration", i)))
+        }
+
+    # If it is not the trace, then we need to output the list of geom's that are
+    # created for each of the elements in the list
+    } else {
+        for(i in seq_along(object)) {
+            plt <- append(plt, plot(object[[i]], ...))
+        }        
     }
+
     return(plt)
 })
 
