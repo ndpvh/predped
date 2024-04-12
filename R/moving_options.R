@@ -69,7 +69,7 @@ moving_options_agent <- function(agent, state, background, centers){
     # of this function can overwrite the local `check` variable without any
     # issues
     if(!all(!check)){
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
+        # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
         check <- overlap_with_objects(agent, background, centers, check)
 
         # If something blocks the way in the previous column, then it should also 
