@@ -17,7 +17,7 @@ testthat::test_that("Coordinate initialization works", {
     testthat::expect_error(predped::coordinate(""))
 })
 
-testthat::test_that("Point rotation works", {
+testthat::test_that("Single point rotation works", {
     # Center is origin
     p <- predped::rotate(c(0, 1), radians = pi/2, center = c(0, 0))
 
@@ -29,8 +29,26 @@ testthat::test_that("Point rotation works", {
     testthat::expect_equal(p, predped::coordinate(c(0, 2)))
 })
 
+testthat::test_that("Multiple points rotation works", {
+    # Center is origin
+    X <- rbind(c(0, 1), c(1, 0))
+    p <- predped::rotate(X, radians = pi/2, center = c(0, 0))
+
+    testthat::expect_equal(p, rbind(c(-1, 0), c(0, 1)))
+
+    # Center is not origin
+    X <- rbind(c(2, 4), c(4, 2))
+    p <- predped::rotate(X, radians = pi/2, center = c(2, 2))
+
+    testthat::expect_equal(p, rbind(c(0, 2), c(2, 4)))
+})
+
 ################################################################################
 # POLYGONS
+
+# TO DO:
+#   - Make initialization test
+#   - Make `move` test
 
 testthat::test_that("Polygon contains single point works", {
     # Shapes and points are chosen so that points are always contained within 
@@ -323,6 +341,56 @@ testthat::test_that("Circle moving works", {
         moveable = FALSE
     ), c(1, 1))
     testthat::expect_equal(r@center, predped::coordinate(c(0, 0)))
+})
+
+testthat::test_that("Circle contains single point works", {
+    # Shapes and points are chosen so that points are always contained within 
+    # all shapes if they are in the object, or that they are to the left, right,
+    # above, or below the shapes if not
+    shapes <- list(predped::circle(center = c(0,0), radius = 2),
+                   predped::circle(center = c(1,0), radius = 2))
+    
+    points <- rbind(c(0.5, 0), c(-3, 0), c(3, 0), c(0, 4), c(0, -3))
+
+    # Inside
+    for(i in shapes) {
+        testthat::expect_true(predped::in_object(i, points[1,], outside = FALSE))
+        testthat::expect_false(predped::in_object(i, points[2,], outside = FALSE))
+        testthat::expect_false(predped::in_object(i, points[3,], outside = FALSE))
+        testthat::expect_false(predped::in_object(i, points[4,], outside = FALSE))
+        testthat::expect_false(predped::in_object(i, points[5,], outside = FALSE))
+    }
+
+    # Outside
+    for(i in shapes) {
+        testthat::expect_false(predped::in_object(i, points[1,], outside = TRUE))
+        testthat::expect_true(predped::in_object(i, points[2,], outside = TRUE))
+        testthat::expect_true(predped::in_object(i, points[3,], outside = TRUE))
+        testthat::expect_true(predped::in_object(i, points[4,], outside = TRUE))
+        testthat::expect_true(predped::in_object(i, points[5,], outside = TRUE))
+    }
+})
+
+testthat::test_that("Circle contains multiple points works", {
+    # Shapes and points are chosen so that points are always contained within 
+    # all shapes if they are in the object, or that they are to the left, right,
+    # above, or below the shapes if not
+    shapes <- list(predped::circle(center = c(0,0), radius = 2),
+                   predped::circle(center = c(1,0), radius = 2))
+    
+    points <- rbind(c(0.5, 0), c(-3, 0), c(3, 0), c(0, 4), c(0, -3))
+
+    # Inside
+    ref <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = FALSE), ref)
+    }
+
+    # Outside
+    ref <- !ref
+    for(i in shapes) {
+        testthat::expect_equal(predped::in_object(i, points, outside = TRUE), ref)
+    }
 })
 
 testthat::test_that("Circle random generation of point works", {
