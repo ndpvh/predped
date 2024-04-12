@@ -52,6 +52,55 @@ setMethod("rotate",
 
 setAs("numeric", "coordinate", function(from) new("coordinate", from))
 
+#' Rotate Multiple Points Around Center
+#'
+#' @param object A numeric vector of length two with the point coordinates.
+#' @param degrees A single numeric element indicating the degrees of rotation.
+#' @param center A numerical vector of length two with the x and y coordinates
+#' around which to rotate the point. Defaults to the origin (0, 0).
+#'
+#' @export
+setMethod("rotate",
+          signature(object = "matrix"),
+          function(object, radians, center = c(0, 0)) {
+              # Check whether the matrix has the correct dimensionality
+              if((nrow(object) != 2) & (ncol(object) != 2)) {
+                  stop("Point matrix should have x- and y-coordinates: Neither rows nor columns have 2 values.")
+              }
+
+              # Transpose the matrix if necessary (2 x N)
+              if(nrow(object) != 2) {
+                  transpose <- TRUE 
+                  object <- t(object)
+              } else {
+                  transpose <- FALSE
+              }
+
+              # Change coordinates to move around the origin
+              rep_center <- matrix(rep(center, times = ncol(object)), 
+                                   nrow = 2)
+              x_origin <- object - rep_center
+
+              # Rotate the point to a new position
+              M <- matrix(c(cos(radians), -sin(radians),
+                            sin(radians), cos(radians)),
+                          nrow = 2,
+                          ncol = 2,
+                          byrow = TRUE)
+
+              y_origin <- as.numeric(M %*% x_origin)
+
+              # Change coordinates back to the original center
+              y <- y_origin + rep_center
+
+              # If the matrix of rotated points should be transposed, do so. 
+              # Otherwise return as is.
+              if(transpose) {
+                  y <- t(y)
+              }
+              return(y)
+          })
+
 #' An S4 Abstract Base Class to Represent Objects
 #'
 #' @slot id A character giving the object a name.
@@ -216,7 +265,16 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # TO DO: Benchmark this code and check if less efficient than the specific
     # method for rectangle
 
-    counter <- 0
+    # If x is not a matrix, make it one. This will allow us to use `in_object`
+    # in a vectorized manner (taking in a matrix of coordinates)
+    if(!is.matrix(x)) {
+        x <- matrix(x, ncol = 2)
+    }
+
+    # Create a counter in which you will count the intersections you have with 
+    # the object. Should be a numeric of the same length as the number of points 
+    # in the matrix
+    counter <- numeric(nrow(x))
 
     # Extract the edges
     # A bit hacky now, but also put the first point of this matrix at the end
@@ -228,7 +286,7 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
         # y-coordinates of both points that make up the edge. If this is the case,
         # then moving the x coordinate to infinity would just yield no
         # intersections. Return TRUE if this is not the case.
-        check_1 <- (edges[i,2] > x[2]) != (edges[i + 1,2] > x[2])
+        check_1 <- (edges[i,2] > x[,2]) != (edges[i + 1,2] > x[,2])
 
         # Use a derived formula to find out for which value of the x coordinate
         # the imaginary horizontal line through the point `x` would intersect
@@ -236,19 +294,17 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
         # y = mx + b for the edge and then equation it to the equation y = x[2],
         # which represents the horizontal move from x[2] to infinity.
         slope <- (edges[i + 1,1] - edges[i,1]) / (edges[i + 1,2] - edges[i,2])
-        x_intersection <- edges[i,1] + slope * (x[2] - edges[i,2])
+        x_intersection <- edges[i,1] + slope * (x[,2] - edges[i,2])
 
         # Finally, check whether this intersection point lies further to the
         # right (towards infinity) than the initial value of the x coordinate.
         # If so, then the intersection indeed happens due to the move from the
         # x coordinate to infinity.
-        check_2 <- x[1] < x_intersection
+        check_2 <- x[,1] < x_intersection
 
         # If both checks are TRUE, then there is an intersection and we should
         # increase the counter
-        if(check_1 && check_2) {
-            counter <- counter + 1
-        }
+        counter[check_1 & check_2] <- counter[check_1 & check_2] + 1
     }
 
     # If outside == FALSE, return TRUE if you have an odd number of intersections.
@@ -585,18 +641,24 @@ setMethod("area", signature(object = "rectangle"), function(object) prod(object@
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "rectangle"), function(object, x, outside = TRUE) {
+    # If x is not a matrix, make it one. This will allow us to use `in_object`
+    # in a vectorized manner (taking in a matrix of coordinates)
+    if(!is.matrix(x)) {
+        x <- matrix(x, ncol = 2)
+    }
+
     # Rotate the rectangle and point in the same direction and around the same
     # center (the center of the rectangle)
     rect <- rotate(object, radians = -object@orientation)
-    x <- rotate(coordinate(x), center = object@center, radians = -object@orientation)
+    x <- rotate(x, center = object@center, radians = -object@orientation)
 
     # Determine the limits of the rectangle
     xlims <- range(rect@points[,1])
     ylims <- range(rect@points[,2])
 
     # Check whether the point lies inside of the rectangle
-    check <- (x[1] > xlims[1]) & (x[1] < xlims[2]) &
-             (x[2] > ylims[1]) & (x[2] < ylims[2])
+    check <- (x[,1] > xlims[1]) & (x[,1] < xlims[2]) &
+             (x[,2] > ylims[1]) & (x[,2] < ylims[2])
 
     return(ifelse(outside, !check, check)) # Important: Benchmark shows that the other algorithm is faster
 })
@@ -749,11 +811,17 @@ setMethod("to_polygon", signature(object = "circle"), function(object, length.ou
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "circle"), function(object, x, outside = TRUE) {
+    # If x is not a matrix, make it one. This will allow us to use `in_object`
+    # in a vectorized manner (taking in a matrix of coordinates)
+    if(!is.matrix(x)) {
+        x <- matrix(x, ncol = 2)
+    }
+
     # Compute the distance between the coordinate and the center of the circle.
     # If this distance is smaller than the radius, the point is within the 
     # circle.
     y <- center(object)
-    dist <- (x[1] - y[1])^2 + (x[2] - y[2])^2
+    dist <- (x[,1] - y[1])^2 + (x[,2] - y[2])^2
 
     check <- dist < radius(object)^2
     return(ifelse(outside, !check, check))
