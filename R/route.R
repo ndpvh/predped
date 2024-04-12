@@ -16,7 +16,8 @@
 create_edges <- function(from, 
                          to, 
                          background, 
-                         space_between = 0.5) {
+                         space_between = 0.5,
+                         many_options = FALSE) {
 
     obj <- objects(background)
 
@@ -29,7 +30,8 @@ create_edges <- function(from,
     nodes <- create_nodes(from, 
                           to, 
                           background, 
-                          space_between = space_between)
+                          space_between = space_between,
+                          many_options = many_options)
 
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
@@ -96,19 +98,30 @@ create_edges <- function(from,
 create_nodes <- function(from, 
                          to, 
                          background, 
-                         space_between = 0.5) {
+                         space_between = 0.5,
+                         many_options = FALSE) {
                             
-    # Create a matrix of coordinates close to the edge of the shape of the object.
-    # These will serve as the first nodes of the network.
-    #
-    # For this, we will several columns/rows of nodes that close in on the 
-    # center of the figure. The algorithm used here is not ideal, but is better
-    # than nothing (especially for irregular polygons, this algorithm may fail) 
+    # Create a matrix of coordinates that fill up the complete space. This will 
+    # allow agents to take whatever route to their destination 
     shp <- shape(background)
 
-    # nodes <- add_nodes(shp, 
-    #                    space_between = space_between, 
-    #                    outside = FALSE)
+    if(many_options) {
+        if(inherits(shp, "circle")) {
+            xlim <- center(shp)[,1] + c(-1, 1) * radius(shp)
+            ylim <- center(shp)[,2] + c(-1, 1) * radius(shp)
+        } else {
+            xlim <- range(shp@points[,1])
+            ylim <- range(shp@points[,2])
+        }
+        X <- seq(xlim[1] + space_between, 
+                 xlim[2] - space_between, 
+                 (xlim[2] - xlim[1] - 2 * space_between) / 20)
+        Y <- seq(ylim[1] + space_between, 
+                 ylim[2] - space_between,
+                 (ylim[2] - ylim[1] - 2 * space_between) / 20)
+        nodes <- cbind(rep(X, each = length(Y)),
+                       rep(Y, times = length(X)))
+    }
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
@@ -117,9 +130,12 @@ create_nodes <- function(from,
                                        space_between = space_between,
                                        only_corners = TRUE))
 
-    # nodes <- rbind(nodes,
-    #                do.call("rbind", obj_nodes))
-    nodes <- do.call("rbind", obj_nodes)
+    if(many_options) {
+        nodes <- rbind(nodes,
+                       do.call("rbind", obj_nodes))
+    } else {
+        nodes <- do.call("rbind", obj_nodes)
+    }
 
     # Check which nodes are contained within the environment and only retain 
     # those. Furthermore delete all nodes that fall within an object. For this,
