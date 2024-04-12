@@ -22,12 +22,15 @@ testthat::test_that("Generating goal stack for rectangles works", {
                                                                      interactable = TRUE)))
 
     set.seed(1)
+    # Generate goal stack and delete the created path towards it
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+    goal_stack[[2]]@path <- matrix(0, nrow = 2, ncol = 2)
 
+    # Original order switched due to the goals being ordered according to closeness
     ref <- list(goal(id = "goal oueiy", 
                      position = coordinate(c(1.01, -1.44)), 
                      busy = FALSE,
-                     counter = 5), 
+                     counter = 5),
                 goal(id = "goal tzlyw", 
                      position = coordinate(c(1.01, 0.95)), 
                      busy = FALSE, 
@@ -47,11 +50,12 @@ testthat::test_that("Generating goal stack for rectangles works", {
 
     set.seed(1)
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+    goal_stack[[2]]@path <- matrix(0, nrow = 2, ncol = 2)
 
     ref <- list(goal(id = "goal oueiy", 
                      position = coordinate(c(1.01, 0.56)), 
                      busy = FALSE,
-                     counter = 5), 
+                     counter = 5),
                 goal(id = "goal tzlyw", 
                      position = coordinate(c(1.01, 0.95)), 
                      busy = FALSE, 
@@ -86,6 +90,7 @@ testthat::test_that("Generating goal stack for circles works", {
 
     set.seed(1)
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+    goal_stack[[2]]@path <- matrix(0, nrow = 2, ncol = 2)
 
     ref <- list(goal(id = "goal rsauu", 
                      position = coordinate(c(-0.70, -1.73)), 
@@ -110,14 +115,15 @@ testthat::test_that("Generating goal stack for circles works", {
 
     set.seed(1)
     goal_stack <- predped::generate_goal_stack(2, setting, \(x) 5)
+    goal_stack[[2]]@path <- matrix(0, nrow = 2, ncol = 2)
 
-    ref <- list(goal(id = "goal rsauu", 
-                     position = coordinate(c(-0.70, 0.27)), 
-                     busy = FALSE,
-                     counter = 5), 
-                goal(id = "goal oueiy", 
+    ref <- list(goal(id = "goal oueiy", 
                      position = coordinate(c(0.93, 0.60)), 
                      busy = FALSE, 
+                     counter = 5),
+                goal(id = "goal rsauu", 
+                     position = coordinate(c(-0.70, 0.27)), 
+                     busy = FALSE,
                      counter = 5))
 
     testthat::expect_equal(goal_stack, ref, tolerance = 1e-2)
@@ -188,7 +194,7 @@ testthat::test_that("Goal replacement works", {
 
     updated_goal_stack[[1]] <- predped::replace(goal_stack[[1]], setting, \(x) 4)
 
-    testthat::expect_equal(updated_goal_stack[[1]]@position@.Data, c(-1.01, -1.45), tolerance = 1e-2)
+    testthat::expect_equal(updated_goal_stack[[1]]@position@.Data, c(0.53, -0.49), tolerance = 1e-2)
     testthat::expect_equal(updated_goal_stack[[1]]@counter, 4)
     testthat::expect_equal(goal_stack[[2]], updated_goal_stack[[2]])
     testthat::expect_equal(goal_stack[[3]], updated_goal_stack[[3]])
