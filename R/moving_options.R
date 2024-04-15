@@ -256,7 +256,8 @@ overlap_with_objects <- function(agent,
         } else {
             coords <- i@points
         }
-        segments <- cbind(coords, coords[c(2:nrow(coords), 1),])
+        segments <- rbind(segments,
+                          cbind(coords, coords[c(2:nrow(coords), 1),]))
     }
 
     # Loop over the centers
@@ -279,10 +280,8 @@ overlap_with_objects <- function(agent,
 
         # Check whether not contained within objects
         local_check <- line_intersection(circ, segments)
-        # local_check <- sapply(obj, 
-        #                       \(x) intersects(circ, x))
 
-        if(local_check) {
+        if(any(local_check)) {
             check[i] <- FALSE
         }
     }
