@@ -1011,8 +1011,8 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
         return(FALSE)
     }
 
-    # If not, retain the points and other characteristics of the edges that 
-    # might intersect with the circle
+    # If there are possible intersection, retain the points and other 
+    # characteristics of the edges that might intersect with the circle
     segments <- segments[idx,]
     id_segments <- intersecting_segments[idx, 1]
     if(sum(idx) == 1) {
@@ -1056,7 +1056,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
     if(return_all) {
         return(intersecting_segments[,2])
     } else {
-        return(any(idx))
+        return(any(intersecting_segments[,2]))
     }
 })
 
