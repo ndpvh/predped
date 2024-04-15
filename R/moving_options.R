@@ -249,15 +249,15 @@ overlap_with_objects <- function(agent,
     # Transform all background-objects into one big matrix of segments. This will
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.
-    coords <- matrix(0, nrow = 0, ncol = 2)
+    segments <- matrix(0, nrow = 0, ncol = 4)
     for(i in obj) {
-        if(inherits(obj, "circle")) {
-            coords <- rbind(coords, to_polygon(i, length.out = 25))
+        if(inherits(i, "circle")) {
+            coords <- to_polygon(i, length.out = 25)
         } else {
-            coords <- rbind(coords, i@points)
+            coords <- i@points
         }
+        segments <- cbind(coords, coords[c(2:nrow(coords), 1),])
     }
-    segments <- cbind(coords, coords[c(2:nrow(coords), 1),])
 
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
@@ -282,7 +282,7 @@ overlap_with_objects <- function(agent,
         # local_check <- sapply(obj, 
         #                       \(x) intersects(circ, x))
 
-        if(any(local_check)) {
+        if(local_check) {
             check[i] <- FALSE
         }
     }
