@@ -111,7 +111,7 @@ setMethod("plot", "list", function(object, trace = FALSE, ...) {
                     # Keep track of the location of the agent's goals. Furthermore
                     # add a segment that denotes the orientation of the agent
                     agent_goals <- current_goal(j)@position
-                    
+
                     angle <- j@orientation * 2 * pi / 360
                     agent_segments <- rbind(agent_segments, 
                                             c(center(j), 
@@ -152,7 +152,8 @@ setMethod("plot", "list", function(object, trace = FALSE, ...) {
                                                     color = color),
                                         ...) +
                     ggplot2::scale_color_manual(values = color_code) +
-                    ggplot2::labs(title = paste("iteration", i)))
+                    ggplot2::labs(title = paste("iteration", i)) +
+                    ggplot2::theme(legend.position = "none"))
             }
         }
 
