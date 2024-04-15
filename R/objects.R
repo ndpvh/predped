@@ -802,7 +802,14 @@ setMethod("area", signature(object = "circle"), function(object) pi*object@radiu
 #' @rdname to_polygon-method
 #' @export 
 setMethod("to_polygon", signature(object = "circle"), function(object, length.out = 100, ...) {
-    t <- seq(0, 2 * pi, length.out = length.out)
+    # Create a vector of angles around the circle, allowing us to sample points 
+    # at equidistant orientation on the circumference of the circle. Importantly, 
+    # we sample length.out + 1 points and then delete the last one so that we 
+    # don't end at the point 2 * pi twice: Gave a bug in the underlying code.
+    t <- seq(0, 2 * pi, length.out = length.out + 1)
+    t <- t[-length(t)]
+
+    # Create the points themselves
     cp <- as.matrix(data.frame(
         x = object@center[[1]] + object@radius * cos(t),
         y = object@center[[2]] + object@radius * sin(t)
