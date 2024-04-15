@@ -82,11 +82,78 @@ setMethod("plot", "list", function(object, trace = FALSE, ...) {
     if(trace) {
         # Setting doesn't change, so can be saved immediately
         base_plot <- predped::plot(object[[1]]$setting, fill = "grey", color = "black")
+
+        # Loop over each state
         for(i in seq_along(object)) {
             print(paste0("Making plot for iteration ", i))
-            plt[[i]] <- suppressWarnings(base_plot +
-                predped::plot(object[[i]]$agents, ...) +
-                ggplot2::labs(title = paste("iteration", i)))
+
+            # If there are currently no agents, then we just return the base_plot
+            if(length(object[[i]]$agents) == 0) {
+                plt[[i]] <- base_plot
+
+            # Otherwise, we will have to add the agents in the base_plot
+            } else {
+                # Transform the complete state to a collection of segments
+                segments <- matrix(0, nrow = 0, ncol = 5)
+                goals <- matrix(0, nrow = 0, ncol = 3)
+                color_code <- c()
+                for(j in object[[i]]$agents) {
+                    # Get coordinates of the agent themselves and turn into 
+                    # segments
+                    if(inherits(j, "circle")) {
+                        agent_coords <- to_polygon(j, length.out = 25)
+                    } else {
+                        agent_coords <- j@points
+                    }
+                    agent_segments <- cbind(agent_coords, 
+                                            agent_coords[c(2:nrow(agent_coords), 1),])
+
+                    # Keep track of the location of the agent's goals. Furthermore
+                    # add a segment that denotes the orientation of the agent
+                    agent_goals <- current_goal(j)@position
+                    
+                    angle <- j@orientation * 2 * pi / 360
+                    agent_segments <- rbind(agent_segments, 
+                                            c(center(j), 
+                                              center(j) + radius(j) * c(cos(angle), sin(angle))))
+
+                    # Add the color to the color code if it is not already in 
+                    # there
+                    if(!(j@color %in% color_code)) {
+                        color_code[j@color] <- j@color
+                    }
+
+                    # Add information on the color to the dataframes
+                    agent_segments <- cbind(agent_segments, j@color)
+                    agent_goals <- c(agent_goals, j@color)
+
+                    segments <- rbind(segments, agent_segments)
+                    goals <- rbind(goals, agent_goals)
+                }
+
+                # Once done, plot all this information as a collection of segments 
+                # and points
+                segments <- as.data.frame(segments) |>
+                    setNames(c("x", "y", "xend", "yend", "color"))
+                goals <- as.data.frame(goals) |>
+                    setNames(c("x", "y", "color"))
+
+                plt[[i]] <- suppressWarnings(base_plot +
+                    ggplot2::geom_segment(data = segments, 
+                                        ggplot2::aes(x = as.numeric(x), 
+                                                    y = as.numeric(y), 
+                                                    xend = as.numeric(xend),
+                                                    yend = as.numeric(yend),
+                                                    color = color),
+                                        ...) +
+                    ggplot2::geom_point(data = goals, 
+                                        ggplot2::aes(x = as.numeric(x), 
+                                                    y = as.numeric(y), 
+                                                    color = color),
+                                        ...) +
+                    ggplot2::scale_color_manual(values = color_code) +
+                    ggplot2::labs(title = paste("iteration", i)))
+            }
         }
 
     # If it is not the trace, then we need to output the list of geom's that are
