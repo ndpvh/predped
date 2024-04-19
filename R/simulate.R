@@ -60,6 +60,8 @@ setMethod("simulate", "predped", function(object,
 
     goal_number <- draw_number(goal_number, iterations)
 
+    max_agents <- draw_number(max_agents, iterations)
+
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
     if(typeof(goal_duration) != "closure") {
@@ -100,7 +102,7 @@ setMethod("simulate", "predped", function(object,
         # pedestrian, whether we already reached the maximal number of agents,
         # and whether there is any space to add the new pedestrian. If there is 
         # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents & !agent_in_cue)) {
+        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_cue)) {
             potential_agent <- add_agent(object,
                                          object@setting,
                                          goal_number[i],
