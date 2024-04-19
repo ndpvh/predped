@@ -284,7 +284,7 @@ update_position <- function(agent,
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            status(agent) <- "reorient" # Get errors when not leaving this in
+            status(agent) <- "replan" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
             return(agent)
         }
@@ -300,7 +300,7 @@ update_position <- function(agent,
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start
-            status(agent) <- "reorient"
+            status(agent) <- "replan"
             cell(agent) <- 0
             return(agent)
         }
