@@ -29,6 +29,8 @@
 #     some point, agents should be able to move things in the environment, meaning
 #     we should keep a trace of moveable objects as well (either list in 
 #     `setting` or a separate list as `moveable_objects`)
+#   - Make it possible to have a mix of ordered agents (ordering goal_stacks 
+#     beforehand) and chaotic agents (not ordering goal_stacks beforehand)
 setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 
 setMethod("simulate", "predped", function(object,
