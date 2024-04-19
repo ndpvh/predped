@@ -7,7 +7,7 @@
 update_position(
   agent,
   state,
-  agent_predictions,
+  agent_specifications,
   background,
   nests = list(Central = c(0, 6, 17, 28), NonCentral = c(0:33)[-c(6, 17, 28)], acc =
     c(1:11), const = c(12:22), dec = c(0, 23:33)),
@@ -30,9 +30,6 @@ update_position(
 \item{state}{The current state of affairs. Importantly, the agent in `agent`
 should not be present in that state}
 
-\item{agent_predictions}{A list containing the predictions of where each agent
-might move to}
-
 \item{background}{The setting in which agents are walking around}
 
 \item{velocities}{Matrix that contains the change in velocity per cell that 
@@ -48,6 +45,9 @@ resume walking after stopping. Defaults to `0.1`}
 
 \item{time_step}{Numeric denoting the time step taken between iterations in 
 seconds. Defaults to `0.5` or half a second.}
+
+\item{agent_predictions}{A list containing the predictions of where each agent
+might move to}
 }
 \value{
 Updated agent

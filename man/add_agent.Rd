@@ -16,7 +16,8 @@ add_agent(
   time_step = 0.5,
   precomputed_edges = NULL,
   precompute_goal_paths = TRUE,
-  order_goal_stack = TRUE
+  order_goal_stack = TRUE,
+  precomputed_goals = NULL
 )
 }
 \arguments{

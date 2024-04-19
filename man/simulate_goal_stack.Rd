@@ -8,7 +8,7 @@ simulate_goal_stack(
   n,
   setting,
   goal_number = function(x) rnorm(x, 10, 2),
-  counter_generator = function(x) rnorm(x, 10, 2),
+  goal_duration = function(x) rnorm(x, 10, 2),
   space_between = 0.5,
   order_goal_stack = TRUE
 )
@@ -23,7 +23,7 @@ how many goals each of the agents should receive. Defaults to a function that
 draws `x` numbers from a normal distribution with mean 10 and standard 
 deviation 2.}
 
-\item{counter_generator}{Function that defines how the counter for each goal 
+\item{goal_duration}{Function that defines how the counter for each goal 
 should be generated. Defaults to a normal distribution with mean 10 and 
 standard deviation 2.}
 

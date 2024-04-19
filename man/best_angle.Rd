@@ -7,7 +7,7 @@
 best_angle(
   agent,
   state,
-  agent_predictions,
+  agent_specifications,
   background,
   velocities,
   orientations,
@@ -19,11 +19,11 @@ best_angle(
 
 \item{state}{The list that contains the current state of the simulation}
 
-\item{agent_predictions}{The predicted trajectories of the other agents}
-
 \item{step}{The stepsize in the angles to be checked}
 
 \item{P_n}{The goal to move to next}
+
+\item{agent_predictions}{The predicted trajectories of the other agents}
 
 \item{iInfo}{Not clear yet}
 }

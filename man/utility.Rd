@@ -7,7 +7,7 @@
 utility(
   agent,
   state,
-  agent_predictions,
+  agent_specifications,
   centers,
   background,
   check,
@@ -19,8 +19,6 @@ utility(
 \item{agent}{The agent for whom to compute the utilities}
 
 \item{state}{A list with the current state of the simulation}
-
-\item{agent_predictions}{The predicted trajectories of the other agents}
 
 \item{centers}{The centers of all the positions the agent may move to}
 
@@ -34,6 +32,8 @@ the utilities have already been computed. Defaults to `FALSE`.}
 Defaults to `TRUE`.}
 
 \item{P_n}{The goal to move to next}
+
+\item{agent_predictions}{The predicted trajectories of the other agents}
 
 \item{iInfo}{Not clear yet}
 }
