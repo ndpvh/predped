@@ -951,8 +951,8 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
 
     } else {
         # Add nodes to the other object
-        other <- add_node(other_object, space_between = 1e-2)
-        return(in_object(object, other, outside = FALSE))
+        other <- add_nodes(other_object, space_between = 1e-2)
+        return(any(in_object(object, other, outside = FALSE)))
 
         # Commented out because of mistakes: Does not adequately find the 
         # intersection between a line segment and a circle, leading agents to 
