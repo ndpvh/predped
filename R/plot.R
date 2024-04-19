@@ -89,7 +89,8 @@ setMethod("plot", "list", function(object, trace = FALSE, ...) {
 
             # If there are currently no agents, then we just return the base_plot
             if(length(object[[i]]$agents) == 0) {
-                plt[[i]] <- base_plot
+                plt[[i]] <- base_plot + 
+                    ggplot2::labs(title = paste("iteration", i))
 
             # Otherwise, we will have to add the agents in the base_plot
             } else {
