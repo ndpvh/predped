@@ -950,12 +950,23 @@ setMethod("intersects", signature(object = "circle"), function(object, other_obj
         return(intersects(other_object, object))
 
     } else {
-        # Create the edges of the polygon
-        points <- other_object@points
-        edges <- cbind(points, points[c(2:nrow(points), 1),])
+        # Add nodes to the other object
+        other <- add_node(other_object, space_between = 1e-2)
+        return(in_object(object, other, outside = FALSE))
 
-        # Return the result of the general function circle_line_intersection
-        return(line_intersection(object, edges))        
+        # Commented out because of mistakes: Does not adequately find the 
+        # intersection between a line segment and a circle, leading agents to 
+        # walk through objects. This is unwanted behavior and therefore fix 
+        # above was implemented. 
+        #
+        # TO DO: Review this code.
+        #
+        # # Create the edges of the polygon
+        # points <- other_object@points
+        # edges <- cbind(points, points[c(2:nrow(points), 1),])
+
+        # # Return the result of the general function circle_line_intersection
+        # return(line_intersection(object, edges))        
     }  
 })
 
@@ -1051,7 +1062,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 
     # Combine with all previous information and return whatever the research 
     # wants
-    intersecting_segments[id_segments[idx], 2] <- TRUE
+    intersecting_segments[id_segments, 2] <- idx
 
     if(return_all) {
         return(intersecting_segments[,2])
