@@ -6,7 +6,6 @@
 \usage{
 add_agent(
   object,
-  background,
   goal_number,
   goal_duration = function(x) rnorm(x, 10, 2),
   radius = 0.2,
