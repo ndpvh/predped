@@ -71,6 +71,11 @@ create_edges <- function(from,
 
     # Only retain what you need
     edges <- edges[idx, c("from", "to", "cost")]
+
+    # For robustness, delete all edges that have NA values associated to them
+    idx <- !is.na(edges$from) & !is.na(edges$to) & !is.na(edges$cost)
+    edges <- edges[idx,]
+
     return(list(edges = edges, nodes = nodes))
 }
 
@@ -170,6 +175,10 @@ create_nodes <- function(from,
                               as.numeric(nodes[,1]), 
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
+
+    # For robustness, delete all nodes that have NA values associated to them
+    idx <- !is.na(nodes$node_ID) & !is.na(nodes$X) & !is.na(nodes$Y)
+    nodes <- nodes[idx,]
 
     return(nodes)
 }
