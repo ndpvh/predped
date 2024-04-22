@@ -251,12 +251,11 @@ overlap_with_objects <- function(agent,
     # an object, hopefully speeding up the search.
     segments <- matrix(0, nrow = 0, ncol = 4)
     for(i in obj) {
-        if(inherits(i, "circle")) {
-            coords <- to_polygon(i, length.out = 25)
-        } else {
-            coords <- i@points
-        }
         coords <- add_nodes(i, space_between = 1e-2)
+        segments <- rbind(segments,
+                          cbind(coords, coords[c(2:nrow(coords), 1),]))
+
+        coords <- add_nodes(i, space_between = 1e-2, outside = FALSE)
         segments <- rbind(segments,
                           cbind(coords, coords[c(2:nrow(coords), 1),]))
     }
