@@ -31,6 +31,8 @@
 #     `setting` or a separate list as `moveable_objects`)
 #   - Make it possible to have a mix of ordered agents (ordering goal_stacks 
 #     beforehand) and chaotic agents (not ordering goal_stacks beforehand)
+#   - At this moment, still assumed that agents are circular. Try to remove this
+#     assumption in functions and in its definition
 setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 
 setMethod("simulate", "predped", function(object,
@@ -348,7 +350,7 @@ create_initial_condition <- function(initial_number_agents,
                            initial_number_agents, 
                            " agents, only ", 
                            length(agents), 
-                           " agents will be used in the initial condition."))
+                           " agents will be used in the initial condition.\\n"))
                 stop <- TRUE
                 break
             }
@@ -362,19 +364,18 @@ create_initial_condition <- function(initial_number_agents,
 
             # Generate several alternative positions along this edge on which the 
             # agent can stand and bind them into a matrix
-            distance <- sqrt((co_2$X - co_1$X)^2 + (co_2$Y - co_1$Y)^2)
-            alternatives <- cbind(co_1$X + seq(0, 1, distance / radius) * (co_2$X - co_1$X),
-                                  co_1$Y + seq(0, 1, distance / radius) * (co_2$Y - co_1$Y))
+            alternatives <- cbind(co_1$X + seq(0, 1, radius) * (co_2$X - co_1$X),
+                                  co_1$Y + seq(0, 1, radius) * (co_2$Y - co_1$Y))
 
             # Check which position are accessible for the agent
-            check <- rep(TRUE, length(alternatives))
+            check <- rep(TRUE, each = nrow(alternatives))
             check <- overlap_with_objects(agent, 
                                           setting,
                                           alternatives, 
                                           check)
 
             if(any(check)) {
-                idx <- (1:nrow(alternatives))[check]
+                idx <- which(check)
                 idx <- sample(idx, 1)
                 
                 position(agent) <- alternatives[idx,]
