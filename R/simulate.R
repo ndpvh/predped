@@ -199,6 +199,11 @@ setMethod("simulate", "predped", function(object,
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
 #' 
 #' @export 
+#
+# TO DO
+#   - Allow for optional "position" and "orientation" arguments. Will make it 
+#     easier to create initial conditions, as goals are immediately computed 
+#     then
 add_agent <- function(object,
                       goal_number,
                       goal_duration = \(x) rnorm(x, 10, 2),
@@ -287,19 +292,18 @@ create_initial_condition <- function(initial_number_agents,
     setting <- object@setting
 
     # Extract the edges from the background. Will help in determining the locations
-    # at which the agents can be gathered
-    if(is.null(precomputed_edges)) {
-        edges <- create_edges(c(0, 0), 
-                              c(0, 0), 
-                              setting,
-                              space_between = space_between)
+    # at which the agents can be gathered. Importantly, dense network created so 
+    # that there are many potential positions for the agents, even when there 
+    # are not many objects in the environment
+    edges <- create_edges(c(0, 0), 
+                          c(0, 0), 
+                          setting,
+                          space_between = space_between,
+                          many_options = TRUE)
 
-        edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
-        edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
-        edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
-    } else {
-        edges <- precomputed_edges
-    }
+    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
 
     # Make sure you have enough goal-numbers for each of the agents
     goal_number <- draw_number(goal_number, initial_number_agents)
@@ -326,7 +330,7 @@ create_initial_condition <- function(initial_number_agents,
                            close_enough = close_enough,
                            space_between = space_between,
                            time_step = time_step,
-                           precomputed_edges = edges,
+                           precomputed_edges = precomputed_edges,
                            precompute_goal_paths = precompute_goal_paths,
                            order_goal_stack = order_goal_stack,
                            precomputed_goals = precomputed_goals)
@@ -358,13 +362,13 @@ create_initial_condition <- function(initial_number_agents,
 
             # Generate 11 alternative positions along this edge on which the 
             # agent can stand and bind them into a matrix
-            alternatives <- cbind(co_1[1] + seq(0, 1, 1 / 10) * (co_2[1] - co_1[1]),
-                                  co_1[2] + seq(0, 1, 1 / 10) * (co_2[2] - co_1[2]))
+            alternatives <- cbind(co_1$X + seq(0, 1, 1 / 10) * (co_2$X - co_1$X),
+                                  co_1$Y + seq(0, 1, 1 / 10) * (co_2$Y - co_1$Y))
 
             # Check which position are accessible for the agent
             check <- rep(TRUE, length(alternatives))
             check <- overlap_with_objects(agent, 
-                                          object@setting,
+                                          setting,
                                           alternatives, 
                                           check)
 
@@ -384,6 +388,10 @@ create_initial_condition <- function(initial_number_agents,
         # Change the orientation of the agent to be random
         orientation(agent) <- runif(1, 0, 360)
 
+        # Also make sure the agent first replans. Is due to how `add_agent` does
+        # things. Might be useful to change this at some point
+        status(agent) <- "replan"
+
         # If you need to stop, break out of the loop
         if(stop) {
             break
@@ -391,6 +399,9 @@ create_initial_condition <- function(initial_number_agents,
 
         # Put the agent in the `agents` list and continue
         agents[[i]] <- agent
+        setting$objects <- append(setting$objects, 
+                                  agent)
+                
     }    
     
     return(agents)
