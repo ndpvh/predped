@@ -39,6 +39,7 @@ setMethod("simulate", "predped", function(object,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
                                           radius = 0.2, 
                                           standing_start = 0.1,
+                                          initial_condition = NULL,
                                           goal_number = \(x) rnorm(x, 10, 2), 
                                           goal_duration = \(x) rnorm(x, 10, 2),
                                           precompute_goal_paths = FALSE,
@@ -91,8 +92,12 @@ setMethod("simulate", "predped", function(object,
 
     # Initialize the trace and state lists. The state will already contain the 
     # initial condition. The trace list also contains this state. 
-    state <- list("setting" = object@setting,
-                  "agents" = list())
+    if(is.null(initial_condition)) {
+        state <- list("setting" = object@setting,
+                      "agents" = list())
+    } else {
+        state <- initial_condition
+    }
     trace <- list(state)
 
     agent_in_cue <- FALSE
