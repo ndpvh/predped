@@ -304,6 +304,13 @@ create_initial_condition <- function(initial_number_agents,
     # Make sure you have enough goal-numbers for each of the agents
     goal_number <- draw_number(goal_number, initial_number_agents)
 
+    # If `goal_duration` is not a function, make it a function anyway (assumed
+    # by the `goal` class: To be changed)
+    if(typeof(goal_duration) != "closure") {
+        number <- goal_duration[1]
+        goal_duration <- function(x) number
+    }
+
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents, 
     # namely their location and their orientation, as `add_agent` assumes that
