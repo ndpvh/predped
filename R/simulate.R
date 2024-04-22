@@ -272,8 +272,16 @@ add_agent <- function(object,
 create_initial_condition <- function(initial_number_agents,
                                      object,
                                      goal_number,
+                                     goal_duration = \(x) rnorm(x, 10, 2),
+                                     radius = 0.2,
+                                     standing_start = 0.1,
+                                     close_enough = 2 * radius,
+                                     space_between = radius,
+                                     time_step = 0.5,
                                      precomputed_edges = NULL,
-                                     ...) {
+                                     precompute_goal_paths = TRUE,
+                                     order_goal_stack = TRUE,
+                                     precomputed_goals = NULL) {
 
     # Copy the setting
     setting <- object@setting
@@ -305,8 +313,16 @@ create_initial_condition <- function(initial_number_agents,
         # Initial agent to create
         agent <- add_agent(object, 
                            goal_number[i], 
+                           goal_duration = goal_duration,
+                           radius = radius,
+                           standing_start = standing_start,
+                           close_enough = close_enough,
+                           space_between = space_between,
+                           time_step = time_step,
                            precomputed_edges = edges,
-                           ...)
+                           precompute_goal_paths = precompute_goal_paths,
+                           order_goal_stack = order_goal_stack,
+                           precomputed_goals = precomputed_goals)
 
         # Choose a random edge on which the agent will stand and create the 
         # exact position.
