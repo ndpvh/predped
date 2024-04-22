@@ -360,10 +360,11 @@ create_initial_condition <- function(initial_number_agents,
             co_1 <- edges$nodes[edges$nodes$node_ID == edges$edges$from[idx], c("X", "Y")]
             co_2 <- edges$nodes[edges$nodes$node_ID == edges$edges$to[idx], c("X", "Y")]
 
-            # Generate 11 alternative positions along this edge on which the 
+            # Generate several alternative positions along this edge on which the 
             # agent can stand and bind them into a matrix
-            alternatives <- cbind(co_1$X + seq(0, 1, 1 / 10) * (co_2$X - co_1$X),
-                                  co_1$Y + seq(0, 1, 1 / 10) * (co_2$Y - co_1$Y))
+            distance <- sqrt((co_2$X - co_1$X)^2 + (co_2$Y - co_1$Y)^2)
+            alternatives <- cbind(co_1$X + seq(0, 1, distance / radius) * (co_2$X - co_1$X),
+                                  co_1$Y + seq(0, 1, distance / radius) * (co_2$Y - co_1$Y))
 
             # Check which position are accessible for the agent
             check <- rep(TRUE, length(alternatives))
@@ -399,7 +400,7 @@ create_initial_condition <- function(initial_number_agents,
 
         # Put the agent in the `agents` list and continue
         agents[[i]] <- agent
-        setting$objects <- append(setting$objects, 
+        setting@objects <- append(setting@objects, 
                                   agent)
                 
     }    
