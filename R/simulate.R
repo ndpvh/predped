@@ -293,20 +293,6 @@ create_initial_condition <- function(initial_number_agents,
     # Copy the setting
     setting <- object@setting
 
-    # Extract the edges from the background. Will help in determining the locations
-    # at which the agents can be gathered. Importantly, dense network created so 
-    # that there are many potential positions for the agents, even when there 
-    # are not many objects in the environment
-    edges <- create_edges(c(0, 0), 
-                          c(0, 0), 
-                          setting,
-                          space_between = space_between,
-                          many_options = TRUE)
-
-    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
-    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
-    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
-
     # Make sure you have enough goal-numbers for each of the agents
     goal_number <- draw_number(goal_number, initial_number_agents)
 
@@ -323,6 +309,20 @@ create_initial_condition <- function(initial_number_agents,
     # agents start at the entrance walking into the setting.
     agents <- list() ; stop <- FALSE
     for(i in seq_len(initial_number_agents)) {
+        # Extract the edges from the background. Will help in determining the locations
+        # at which the agents can be gathered. Importantly, dense network created so 
+        # that there are many potential positions for the agents, even when there 
+        # are not many objects in the environment
+        edges <- create_edges(c(0, 0), 
+                            c(0, 0), 
+                            setting,
+                            space_between = space_between,
+                            many_options = TRUE)
+
+        edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+        edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+        edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
         # Initial agent to create
         agent <- add_agent(object, 
                            goal_number[i], 
@@ -344,13 +344,13 @@ create_initial_condition <- function(initial_number_agents,
             # Check whether you overflow the number of iterations. If so, then 
             # we stop in our tracks, break out of the loop, and give a message 
             # on this
-            if(iter > 100) {
-                cat(paste0("Couldn't add new agent after 100 attempts. ", 
-                           "Instead of creating an initial condition with ", 
-                           initial_number_agents, 
-                           " agents, only ", 
-                           length(agents), 
-                           " agents will be used in the initial condition.\\n"))
+            if(iter > 10) {
+                message(paste0("Couldn't add new agent after 10 attempts. ", 
+                               "Instead of creating an initial condition with ", 
+                               initial_number_agents, 
+                               " agents, only ", 
+                               length(agents), 
+                               " agents will be used in the initial condition."))
                 stop <- TRUE
                 break
             }
@@ -401,9 +401,7 @@ create_initial_condition <- function(initial_number_agents,
 
         # Put the agent in the `agents` list and continue
         agents[[i]] <- agent
-        setting@objects <- append(setting@objects, 
-                                  agent)
-                
+        setting@objects <- append(setting@objects, agent)
     }    
     
     return(agents)
