@@ -141,6 +141,40 @@ testthat::test_that("Generating goal stack for circles works", {
     testthat::expect_error(goal(2, setting, \(x) 5))
 })
 
+# Simulating multiple goal stacks
+testthat::test_that("Simulating multiple goal stacks works", {
+    # All interactable objects
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(6, 6)),
+                                   objects = list(predped::rectangle(center = c(0, -1), 
+                                                                     size = c(2, 1),
+                                                                     interactable = TRUE),
+                                                  predped::circle(center = c(0, 1), 
+                                                                  radius = 1,
+                                                                  interactable = TRUE)))
+
+    set.seed(1)
+    goal_stacks <- predped::simulate_goal_stack(3, 
+                                                setting, 
+                                                goal_number = 1:3,
+                                                goal_duration = 5)
+    
+    tst_stack <- length(goal_stacks)
+    tst_number <- lapply(goal_stacks, 
+                         \(x) length(x))
+    tst_counter <- lapply(goal_stacks, 
+                          \(x) lapply(x, 
+                                      \(y) y@counter))
+
+    ref_stack <- 3
+    ref_number <- list(1, 2, 3)
+    ref_counter <- list(list(5), list(5, 5), list(5, 5, 5))
+
+    testthat::expect_equal(tst_stack, ref_stack)
+    testthat::expect_equal(tst_number, ref_number)
+    testthat::expect_equal(tst_counter, ref_counter)
+})
+
 # Interacting with a goal
 testthat::test_that("Goal interaction works", {
     ref <- c(1,1)
@@ -199,3 +233,43 @@ testthat::test_that("Goal replacement works", {
     testthat::expect_equal(goal_stack[[2]], updated_goal_stack[[2]])
     testthat::expect_equal(goal_stack[[3]], updated_goal_stack[[3]])
 })
+
+testthat::test_that("Goal getters work", {
+    tst <- predped::goal(id = "test",
+                         position = c(0, 0),
+                         path = matrix(0, nrow = 2, ncol = 2),
+                         busy = TRUE, 
+                         done = TRUE,
+                         counter = 5)
+
+    testthat::expect_equal(predped::id(tst), "test")
+    testthat::expect_equal(predped::position(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::path(tst), matrix(0, nrow = 2, ncol = 2))
+    testthat::expect_true(predped::busy(tst))
+    testthat::expect_true(predped::done(tst))
+    testthat::expect_equal(predped::counter(tst), 5)
+})
+
+testthat::test_that("Goal setters work", {
+    tst <- predped::goal(id = "test",
+                         position = c(0, 0),
+                         path = matrix(0, nrow = 2, ncol = 2),
+                         busy = TRUE, 
+                         done = TRUE,
+                         counter = 5)
+
+    predped::id(tst) <- "other goal"
+    predped::position(tst) <- c(1, 1)
+    predped::path(tst) <- matrix(1, nrow = 2, ncol = 2)
+    predped::busy(tst) <- FALSE
+    predped::done(tst) <- FALSE
+    predped::counter(tst) <- 4
+
+    testthat::expect_equal(predped::id(tst), "other goal")
+    testthat::expect_equal(predped::position(tst), predped::coordinate(c(1, 1)))
+    testthat::expect_equal(predped::path(tst), matrix(1, nrow = 2, ncol = 2))
+    testthat::expect_false(predped::busy(tst))
+    testthat::expect_false(predped::done(tst))
+    testthat::expect_equal(predped::counter(tst), 4)
+})
+
