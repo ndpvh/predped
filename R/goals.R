@@ -436,7 +436,7 @@ setMethod("position", "goal", function(object) {
 #' 
 #' @export
 setMethod("position<-", "goal", function(object, value) {
-    object@position <- value
+    object@position <- as(value, "coordinate")
     return(object)
 })
 
