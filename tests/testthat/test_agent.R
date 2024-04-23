@@ -17,7 +17,12 @@ testthat::test_that("Agent getters work", {
                           cell = 0, 
                           status = "wait",
                           color = "blue",
-                          waiting_counter = 5)
+                          waiting_counter = 5,
+                          current_goal = goal(id = "goal test", 
+                                              position = c(0, 0)),
+                          goals = list(goal(id = "new goal",
+                                            position = c(1, 0))),
+                          parameters = predped::params_archetypes[1,])
 
     testthat::expect_equal(as.character(predped::id(tst)), "test")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
@@ -31,19 +36,17 @@ testthat::test_that("Agent getters work", {
     testthat::expect_equal(as.character(predped::status(tst)), "wait")
     testthat::expect_equal(as.character(predped::color(tst)), "blue")
     testthat::expect_equal(as.numeric(predped::waiting_counter(tst)), 5)
+    testthat::expect_equal(predped::current_goal(tst), predped::goal(id = "goal test", 
+                                                                     position = c(0, 0)))
+    testthat::expect_equal(predped::goals(tst), list(predped::goal(id = "new goal", 
+                                                                   position = c(1, 0))))
+    testthat::expect_equal(predped::parameters(tst), predped::params_archetypes[1,])
 })
 
 testthat::test_that("Agent setters work", {
     tst <- predped::agent(id = "test",
                           center = c(0, 0), 
-                          radius = 0.2,
-                          orientation = 0, 
-                          speed = 0.1, 
-                          group = 1, 
-                          cell = 0, 
-                          status = "wait",
-                          color = "blue",
-                          waiting_counter = 5)
+                          radius = 0.2)
 
     # Agent-specific setters
     predped::id(tst) <- "other name"
@@ -54,6 +57,11 @@ testthat::test_that("Agent setters work", {
     predped::status(tst) <- "replan"
     predped::color(tst) <- "green"
     predped::waiting_counter(tst) <- 2
+    predped::current_goal(tst) <- predped::goal(id = "other goal", 
+                                                position = c(0, 0))
+    predped::goals(tst) <- list(predped::goal(id = "other new goal", 
+                                              position = c(1, 0)))
+    predped::parameters(tst) <- predped::params_archetypes[2,]
 
     testthat::expect_equal(as.character(predped::id(tst)), "other name")
     testthat::expect_equal(as.numeric(predped::orientation(tst)), 180)
@@ -63,6 +71,11 @@ testthat::test_that("Agent setters work", {
     testthat::expect_equal(as.character(predped::status(tst)), "replan")
     testthat::expect_equal(as.character(predped::color(tst)), "green")
     testthat::expect_equal(as.numeric(predped::waiting_counter(tst)), 2)
+    testthat::expect_equal(predped::current_goal(tst), predped::goal(id = "other goal",
+                                                                     position = c(0, 0)))
+    testthat::expect_equal(predped::goals(tst), list(predped::goal(id = "other new goal", 
+                                                                   position = c(1, 0))))
+    testthat::expect_equal(predped::parameters(tst), predped::params_archetypes[2,])
 
     # Shared setters for agents and circles
     predped::center(tst) <- c(1, 0)
