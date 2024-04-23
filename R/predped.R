@@ -123,7 +123,7 @@ setMethod("parameters", "predped", function(object) {
 #' @export
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
-    if(!all(archetypes %in% value)) {
+    if(!all(object@archetypes %in% value$Name)) {
         stop("Some archetypes not defined in the new parameters provided.")
     }
 
