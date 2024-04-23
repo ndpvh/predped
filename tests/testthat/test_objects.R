@@ -47,8 +47,14 @@ testthat::test_that("Multiple points rotation works", {
 # POLYGONS
 
 # TO DO:
-#   - Make initialization test
 #   - Make `move` test
+
+testthat::test_that("Polgyon initialization works", {
+    testthat::expect_no_error(predped::polygon(points = cbind(rep(1, 3), rep(0, 3))))
+
+    testthat::expect_error(predped::polygon(points = matrix(rep(1, 3), ncol = 1)))
+    testthat::expect_error(predped::polygon(points = cbind(rep(1, 3), rep(0, 3), rep(-1, 3))))
+})
 
 testthat::test_that("Polygon contains single point works", {
     # Shapes and points are chosen so that points are always contained within 
@@ -147,6 +153,26 @@ testthat::test_that("Polygon intersection works", {
     testthat::expect_equal(tst, ref)
 })
 
+testthat::test_that("Polygon line intersection works", {
+    rect <- predped::polygon(points = rbind(c(-1, -1), 
+                                            c(-1, 1),
+                                            c(1, 1),
+                                            c(1, -1)))
+
+    segments <- rbind(c(-2, -2, 2, 2),  
+                      c(-2, 2, 2, -2),
+                      c(-3, -3, -1.5, -1.5),
+                      c(-3, 3, -1.5, 1.5),
+                      c(0.5, 0.5, -0.5, -0.5))
+
+    tst <- lapply(1:nrow(segments), 
+                  \(x) predped::line_intersection(rect, matrix(segments[x,], nrow = 1)))
+    ref <- list(TRUE, TRUE, FALSE, FALSE, FALSE)
+
+    # Actual tests
+    testthat::expect_equal(tst, ref)
+})
+
 
 ################################################################################
 # RECTANGLES
@@ -155,6 +181,8 @@ testthat::test_that("Rectangle initialization works", {
     testthat::expect_no_error(predped::rectangle(center = c(0, 0), size = c(1, 1)))
     testthat::expect_error(predped::rectangle(center = c(0, 0), size = 1))
     testthat::expect_error(predped::rectangle(center = c(0, 0, 0), size = c(1, 1)))
+    testthat::expect_error(predped::rectangle(center = c(0, 0), size = c(-1, 1)))
+    testthat::expect_error(predped::rectangle(center = c(0, 0), size = c(1, 1), orientation = c(1, 1)))
 })
 
 testthat::test_that("Rectangle moving works", {
@@ -170,6 +198,18 @@ testthat::test_that("Rectangle moving works", {
         moveable = FALSE
     ), c(1, 1))
     testthat::expect_equal(r@center, predped::coordinate(c(0, 0)))
+})
+
+testthat::test_that("Rectangle area works", {
+    rect <- list(predped::rectangle(center = c(0, 0), size = c(1, 2)),
+                 predped::rectangle(center = c(0, 0), size = c(2, 2)),
+                 predped::rectangle(center = c(0, 0), size = c(2, 1)))
+
+    tst <- lapply(rect, 
+                  \(x) area(x))
+    ref <- list(2, 4, 2)
+
+    testthat::expect_equal(tst, ref)
 })
 
 testthat::test_that("Rectangle rotation works", {
@@ -328,6 +368,18 @@ testthat::test_that("Circle initialization works", {
     testthat::expect_error(predped::rectangle(center = c(0, 0), radius = c(0.5, 0.5)))
 })
 
+testthat::test_that("Circle area works", {
+    circ <- list(predped::circle(center = c(0, 0), radius = 1),
+                 predped::circle(center = c(0, 0), radius = 2),
+                 predped::circle(center = c(0, 0), radius = 3))
+
+    tst <- lapply(circ, 
+                  \(x) area(x))
+    ref <- list(pi, 2^2 * pi, 3^2 * pi)
+
+    testthat::expect_equal(tst, ref)
+})
+
 testthat::test_that("Circle moving works", {
     r <- predped::move(predped::circle(
         center = c(0, 0),
@@ -341,6 +393,34 @@ testthat::test_that("Circle moving works", {
         moveable = FALSE
     ), c(1, 1))
     testthat::expect_equal(r@center, predped::coordinate(c(0, 0)))
+})
+
+testthat::test_that("Circle transformation to polygon works", {
+    circ <- predped::circle(center = c(0, 0), radius = 1)
+
+    # Make case in which intersection is obvious, as all points should be on the 
+    # circle
+    coords <- predped::to_polygon(circ)
+    segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
+
+    tst_1 <- predped::line_intersection(circ, segments)
+
+    # Make cases in which intersection should not occur, as points are not on the 
+    # circle
+    circ_2 <- predped::circle(center = c(0, 0), radius = 1.01)
+    circ_3 <- predped::circle(center = c(0, 0), radius = 0.99)
+
+    coords <- predped::to_polygon(circ_2)
+    segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
+    tst_2 <- predped::line_intersection(circ, segments)
+
+    coords <- predped::to_polygon(circ_3)
+    segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
+    tst_3 <- predped::line_intersection(circ, segments)
+
+    testthat::expect_true(tst_1)
+    testthat::expect_false(tst_2)
+    testthat::expect_false(tst_3)
 })
 
 testthat::test_that("Circle contains single point works", {
@@ -468,4 +548,86 @@ testthat::test_that("Circle intersection works", {
 
     # Actual tests
     testthat::expect_equal(tst, ref)
+})
+
+
+
+################################################################################
+# GETTERS AND SETTERS
+
+testthat::test_that("Object getters work", {
+    # Polygon
+    tst <- predped::polygon(points = rbind(c(-1, -1),
+                                           c(-1, 1), 
+                                           c(1, 1),
+                                           c(1, -1)))
+
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+
+    # Rectangle
+    tst <- predped::rectangle(center = c(0, 0), 
+                              size = c(2, 2),
+                              orientation = pi)
+
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::size(tst), c(2, 2))
+    testthat::expect_equal(predped::orientation(tst), pi)
+
+    # Circle
+    tst <- predped::circle(center = c(0, 0), radius = 1)
+
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::size(tst), 1)
+    testthat::expect_equal(predped::radius(tst), 1)
+})
+
+testthat::test_that("Object setters work", {
+    # Polygon
+    tst <- predped::polygon(points = rbind(c(-1, -1),
+                                           c(-1, 1), 
+                                           c(1, 1),
+                                           c(1, -1)))
+
+    predped::center(tst) <- c(1, 1)
+
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
+    testthat::expect_equal(tst@points, rbind(c(0, 0), 
+                                             c(0, 2),
+                                             c(2, 2),
+                                             c(2, 0)))
+
+    # Rectangle
+    tst <- predped::rectangle(center = c(0, 0), 
+                              size = c(2, 2),
+                              orientation = pi)
+
+    predped::center(tst) <- c(1, 1)
+    predped::size(tst) <- c(1, 1)
+    predped::orientation(tst) <- 0
+
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
+    testthat::expect_equal(predped::size(tst), c(1, 1))
+    testthat::expect_equal(predped::orientation(tst), 0)
+
+    points <- tst@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, rbind(c(0.5, 0.5), 
+                                         c(0.5, 1.5),
+                                         c(1.5, 1.5),
+                                         c(1.5, 0.5)))
+
+    # Circle
+    tst <- predped::circle(center = c(0, 0), radius = 1)
+
+    predped::center(tst) <- c(1, 1)
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
+    
+    predped::radius(tst) <- 2
+    testthat::expect_equal(predped::size(tst), 2)
+    testthat::expect_equal(predped::radius(tst), 2)
+
+    predped::size(tst) <- 3
+    testthat::expect_equal(predped::size(tst), 3)
+    testthat::expect_equal(predped::radius(tst), 3)
 })
