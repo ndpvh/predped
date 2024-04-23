@@ -1,0 +1,83 @@
+testthat::test_that("Agent initialization works", {
+    testthat::expect_no_error(predped::agent(center = c(1, 1), 
+                                             orientation = 0,
+                                             radius = 0.2))
+
+    testthat::expect_error(predped::agent(center = c(1, 1, 1)))     # Invalid coordinate
+    testthat::expect_error(predped::agent(position = c(1, 1)))      # Invalid 
+})
+
+testthat::test_that("Agent getters work", {
+    tst <- predped::agent(id = "test",
+                          center = c(0, 0), 
+                          radius = 0.2,
+                          orientation = 0, 
+                          speed = 0.1, 
+                          group = 1, 
+                          cell = 0, 
+                          status = "wait",
+                          color = "blue",
+                          waiting_counter = 5)
+
+    testthat::expect_equal(as.character(predped::id(tst)), "test")
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::position(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::radius(tst), 0.2)
+    testthat::expect_equal(as.numeric(predped::size(tst)), 0.2)
+    testthat::expect_equal(as.numeric(predped::orientation(tst)), 0)
+    testthat::expect_equal(as.numeric(predped::speed(tst)), 0.1)
+    testthat::expect_equal(as.numeric(predped::group(tst)), 1)
+    testthat::expect_equal(as.numeric(predped::cell(tst)), 0)
+    testthat::expect_equal(as.character(predped::status(tst)), "wait")
+    testthat::expect_equal(as.character(predped::color(tst)), "blue")
+    testthat::expect_equal(as.numeric(predped::waiting_counter(tst)), 5)
+})
+
+testthat::test_that("Agent setters work", {
+    tst <- predped::agent(id = "test",
+                          center = c(0, 0), 
+                          radius = 0.2,
+                          orientation = 0, 
+                          speed = 0.1, 
+                          group = 1, 
+                          cell = 0, 
+                          status = "wait",
+                          color = "blue",
+                          waiting_counter = 5)
+
+    # Agent-specific setters
+    predped::id(tst) <- "other name"
+    predped::orientation(tst) <- 180
+    predped::speed(tst) <- 0.2
+    predped::group(tst) <- 0
+    predped::cell(tst) <- 1
+    predped::status(tst) <- "replan"
+    predped::color(tst) <- "green"
+    predped::waiting_counter(tst) <- 2
+
+    testthat::expect_equal(as.character(predped::id(tst)), "other name")
+    testthat::expect_equal(as.numeric(predped::orientation(tst)), 180)
+    testthat::expect_equal(as.numeric(predped::speed(tst)), 0.2)
+    testthat::expect_equal(as.numeric(predped::group(tst)), 0)
+    testthat::expect_equal(as.numeric(predped::cell(tst)), 1)
+    testthat::expect_equal(as.character(predped::status(tst)), "replan")
+    testthat::expect_equal(as.character(predped::color(tst)), "green")
+    testthat::expect_equal(as.numeric(predped::waiting_counter(tst)), 2)
+
+    # Shared setters for agents and circles
+    predped::center(tst) <- c(1, 0)
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 0)))
+    testthat::expect_equal(predped::position(tst), predped::coordinate(c(1, 0)))
+
+    predped::position(tst) <- c(0, 1)
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 1)))
+    testthat::expect_equal(predped::position(tst), predped::coordinate(c(0, 1)))
+
+    predped::radius(tst) <- 0.3
+    testthat::expect_equal(predped::radius(tst), 0.3)
+    testthat::expect_equal(as.numeric(predped::size(tst)), 0.3)
+
+    predped::size(tst) <- 0.4
+    testthat::expect_equal(predped::radius(tst), 0.4)
+    testthat::expect_equal(as.numeric(predped::size(tst)), 0.4)
+})
