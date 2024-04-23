@@ -81,7 +81,7 @@ setMethod("initialize", "predped", function(.Object,
 #'
 #' @export
 setMethod("id", "predped", function(object) {
-    return(setNames(object@id, object@id))
+    return(object@id)
 })
 
 #' @rdname predped-class
@@ -103,7 +103,7 @@ setGeneric("setting", function(object) standardGeneric("setting"))
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 
 setMethod("setting", "predped", function(object) {
-    return(setNames(object@setting, object@setting))
+    return(object@setting)
 })
 
 setMethod("setting<-", "predped", function(object, value) {
@@ -115,7 +115,7 @@ setMethod("setting<-", "predped", function(object, value) {
 #'
 #' @export
 setMethod("parameters", "predped", function(object) {
-    return(setNames(object@parameters, object@parameters))
+    return(object@parameters)
 })
 
 #' @rdname predped-class
@@ -142,7 +142,7 @@ setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
 
 setMethod("archetypes", "predped", function(object) {
-    return(setNames(object@archetypes, object@archetypes))
+    return(object@archetypes)
 })
 
 setMethod("archetypes<-", "predped", function(object, value) {
@@ -166,7 +166,7 @@ setGeneric("weights", function(object) standardGeneric("weights"))
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
 
 setMethod("weights", "predped", function(object) {
-    return(setNames(object@weights, object@weights))
+    return(object@weights)
 })
 
 setMethod("weights<-", "predped", function(object, value) {
