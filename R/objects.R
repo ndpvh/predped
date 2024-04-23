@@ -1271,6 +1271,12 @@ setMethod("size", signature(object = "rectangle"), function(object) {
 
 setMethod("size<-", signature(object = "rectangle"), function(object, value) {
     object@size <- value
+    points <- 0.5 * rbind(c(value[1], value[2]),
+                          c(value[1], -value[2]),
+                          c(-value[1], -value[2]),
+                          c(-value[1], value[2]))
+    object@points <- cbind(points[,1] + center(object)[1], 
+                           points[,2] + center(object)[2])
     return(object)
 })
 
@@ -1307,7 +1313,7 @@ setMethod("center", signature(object = "polygon"), function(object) {
 })
 
 setMethod("center<-", signature(object = "polygon"), function(object, value) {
-    object@center <- value
+    object@center <- as(value, "coordinate")
     object@points <- cbind(object@points[,1] + value[1], 
                            object@points[,2] + value[2])
     return(object)
@@ -1318,7 +1324,9 @@ setMethod("center", signature(object = "rectangle"), function(object) {
 })
 
 setMethod("center<-", signature(object = "rectangle"), function(object, value) {
-    object@center <- value
+    object@center <- as(value, "coordinate")
+    object@points <- cbind(object@points[,1] + value[1],
+                           object@points[,2] + value[2])
     return(object)
 })
 
@@ -1357,8 +1365,9 @@ setMethod("orientation", signature(object = "rectangle"), function(object) {
 })
 
 setMethod("orientation<-", signature(object = "rectangle"), function(object, value) {
+    original_value <- object@orientation
     object@orientation <- value
-    return(object)
+    return(rotate(object, radians = value - original_value))
 })
 
 setMethod("orientation", signature(object = "segment"), function(object) {
