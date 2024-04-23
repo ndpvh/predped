@@ -1367,7 +1367,10 @@ setMethod("orientation", signature(object = "rectangle"), function(object) {
 setMethod("orientation<-", signature(object = "rectangle"), function(object, value) {
     original_value <- object@orientation
     object@orientation <- value
-    return(rotate(object, radians = value - original_value))
+
+    rect <- rotate(object, radians = value - original_value)
+    object@points <- rect@points
+    return(object)
 })
 
 setMethod("orientation", signature(object = "segment"), function(object) {
