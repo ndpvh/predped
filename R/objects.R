@@ -1327,7 +1327,7 @@ setMethod("center", signature(object = "circle"), function(object) {
 })
 
 setMethod("center<-", signature(object = "circle"), function(object, value) {
-    object@center <- value
+    object@center <- as(value, "coordinate")
     return(object)
 })
 
