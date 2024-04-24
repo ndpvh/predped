@@ -210,6 +210,7 @@ add_agent <- function(object,
                       goal_number,
                       goal_duration = \(x) rnorm(x, 10, 2),
                       radius = 0.2,
+                      position = NULL,
                       standing_start = 0.1,
                       close_enough = 2 * radius,
                       space_between = radius,
@@ -231,6 +232,7 @@ add_agent <- function(object,
                                           background, 
                                           counter_generator = goal_duration,
                                           precomputed_edges = precomputed_edges,
+                                          agent_position = position,
                                           precompute_goal_paths = precompute_goal_paths,
                                           space_between = space_between,
                                           order_goal_stack = order_goal_stack)
@@ -239,13 +241,25 @@ add_agent <- function(object,
         goal_stack <- precomputed_goals[[i]]
     }
 
-    # Compute the agent's orientation: Perpendicular to the wall in which you 
-    # have the entrance.
-    angle <- perpendicular_orientation(background)
+    # Determine the agent's orientation. Either perpendicular to the wall in 
+    # the agent enters, or directed towards the current goal of the agent.
+    if(is.null(position)) {
+        angle <- perpendicular_orientation(background)
+    } else {
+        co_1 <- position
+        co_2 <- goal_stack[[1]]@position
 
-    # Create the agent themselves
-    starting_position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
-    tmp_agent <- agent(center = starting_position,
+        angle <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
+    }    
+
+    # Determine the position of the agent. Either this is at the entrance, or 
+    # this is at the specified location
+    if(is.null(position)) {
+        position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+    }
+    
+    # Create the agent itself
+    tmp_agent <- agent(center = position,
                        radius = radius,
                        speed = standing_start,
                        orientation = angle,
@@ -314,32 +328,19 @@ create_initial_condition <- function(initial_number_agents,
         # that there are many potential positions for the agents, even when there 
         # are not many objects in the environment
         edges <- create_edges(c(0, 0), 
-                            c(0, 0), 
-                            setting,
-                            space_between = space_between,
-                            many_options = TRUE)
+                              c(0, 0), 
+                              setting,
+                              space_between = space_between,
+                              many_options = TRUE)
 
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
         edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
         edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
 
-        # Initial agent to create
-        agent <- add_agent(object, 
-                           goal_number[i], 
-                           goal_duration = goal_duration,
-                           radius = radius,
-                           standing_start = standing_start,
-                           close_enough = close_enough,
-                           space_between = space_between,
-                           time_step = time_step,
-                           precomputed_edges = precomputed_edges,
-                           precompute_goal_paths = precompute_goal_paths,
-                           order_goal_stack = order_goal_stack,
-                           precomputed_goals = precomputed_goals)
-
         # Choose a random edge on which the agent will stand and create the 
         # exact position.
         success <- FALSE ; iter <- 0
+        position <- NULL
         while(!success) {
             # Check whether you overflow the number of iterations. If so, then 
             # we stop in our tracks, break out of the loop, and give a message 
@@ -368,8 +369,10 @@ create_initial_condition <- function(initial_number_agents,
                                   co_1$Y + seq(0, 1, radius) * (co_2$Y - co_1$Y))
 
             # Check which position are accessible for the agent
+            dummy <- agent(center = c(0, 0), radius = radius)
+
             check <- rep(TRUE, each = nrow(alternatives))
-            check <- overlap_with_objects(agent, 
+            check <- overlap_with_objects(dummy, 
                                           setting,
                                           alternatives, 
                                           check)
@@ -378,7 +381,7 @@ create_initial_condition <- function(initial_number_agents,
                 idx <- which(check)
                 idx <- sample(idx, 1)
                 
-                position(agent) <- alternatives[idx,]
+                position <- alternatives[idx,]
 
                 success <- TRUE
             }
@@ -387,12 +390,20 @@ create_initial_condition <- function(initial_number_agents,
             iter <- iter + 1
         }
 
-        # Change the orientation of the agent to be random
-        orientation(agent) <- runif(1, 0, 360)
-
-        # Also make sure the agent first replans. Is due to how `add_agent` does
-        # things. Might be useful to change this at some point
-        status(agent) <- "replan"
+        # Initial agent to create
+        new_agent <- add_agent(object, 
+                               goal_number[i], 
+                               goal_duration = goal_duration,
+                               radius = radius,
+                               position = position,
+                               standing_start = standing_start,
+                               close_enough = close_enough,
+                               space_between = space_between,
+                               time_step = time_step,
+                               precomputed_edges = precomputed_edges,
+                               precompute_goal_paths = precompute_goal_paths,
+                               order_goal_stack = order_goal_stack,
+                               precomputed_goals = precomputed_goals)
 
         # If you need to stop, break out of the loop
         if(stop) {
@@ -400,8 +411,8 @@ create_initial_condition <- function(initial_number_agents,
         }
 
         # Put the agent in the `agents` list and continue
-        agents[[i]] <- agent
-        setting@objects <- append(setting@objects, agent)
+        agents[[i]] <- new_agent
+        setting@objects <- append(setting@objects, new_agent)
     }    
     
     return(agents)

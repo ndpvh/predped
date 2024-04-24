@@ -93,6 +93,7 @@ setMethod("replace", "goal", function(object,
 generate_goal_stack <- function(n, 
                                 setting,
                                 counter_generator = \(x) rnorm(x, 10, 2),
+                                agent_position = NULL,
                                 precomputed_edges = NULL,
                                 precompute_goal_paths = TRUE,
                                 space_between = 0.5,
@@ -124,7 +125,12 @@ generate_goal_stack <- function(n,
     if(order_goal_stack) {
         # Compute the distance starting from the entrance (through which the agent
         # enters the space)
-        start <- entrance(setting)
+        if(is.null(agent_position)) {
+            start <- entrance(setting)
+        } else {
+            start <- agent_position
+        }
+
         distances <- sapply(goal_stack, 
                             \(x) (start[1] - position(x)[1])^2 + (start[2] - position(x)[2])^2)
         old <- sapply(goal_stack, \(x) x@id)
@@ -302,8 +308,8 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                                                              background,
                                                              id = character(0),
                                                              counter = 5,
-                                                             forbidden = NULL
-){
+                                                             forbidden = NULL){
+
     # Create an ever so slightly bigger circle
     #
     # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
