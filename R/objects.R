@@ -271,41 +271,43 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
         x <- matrix(x, ncol = 2)
     }
 
-    # Create a counter in which you will count the intersections you have with 
-    # the object. Should be a numeric of the same length as the number of points 
-    # in the matrix
-    counter <- numeric(nrow(x))
-
     # Extract the edges
-    # A bit hacky now, but also put the first point of this matrix at the end
-    # as well. This allows us to examine all edges
-    edges <- object@points
-    edges <- rbind(edges, edges[1,])
-    for(i in 1:(nrow(edges) - 1)) {
-        # Check whether the y-coordinate of the point is already above the
-        # y-coordinates of both points that make up the edge. If this is the case,
-        # then moving the x coordinate to infinity would just yield no
-        # intersections. Return TRUE if this is not the case.
-        check_1 <- (edges[i,2] > x[,2]) != (edges[i + 1,2] > x[,2])
+    coords <- object@points
+    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
 
-        # Use a derived formula to find out for which value of the x coordinate
-        # the imaginary horizontal line through the point `x` would intersect
-        # with the edge. This derivation is based on deriving the equation
-        # y = mx + b for the edge and then equation it to the equation y = x[2],
-        # which represents the horizontal move from x[2] to infinity.
-        slope <- (edges[i + 1,1] - edges[i,1]) / (edges[i + 1,2] - edges[i,2])
-        x_intersection <- edges[i,1] + slope * (x[,2] - edges[i,2])
+    # Enlongen the two matrices of segments so that the intersection of each 
+    # segment within the two matrices can be compared to each other. For this, 
+    # take the Kronecker product with a vector of ones
+    n_1 <- nrow(edges)
+    n_2 <- nrow(x)
 
-        # Finally, check whether this intersection point lies further to the
-        # right (towards infinity) than the initial value of the x coordinate.
-        # If so, then the intersection indeed happens due to the move from the
-        # x coordinate to infinity.
-        check_2 <- x[,1] < x_intersection
+    edges <- edges %x% rep(1, each = n_2)
+    x <- rep(1, each = n_1) %x% x
 
-        # If both checks are TRUE, then there is an intersection and we should
-        # increase the counter
-        counter[check_1 & check_2] <- counter[check_1 & check_2] + 1
-    }
+    # Check whether the y-coordinate of the points are above the y-coordinates 
+    # of the segments that make up the edges 
+    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
+
+    # Use a derived formula to find out for which value of the x coordinate
+    # the imaginary horizontal line through the point `x` would intersect
+    # with the edge. This derivation is based on deriving the equation
+    # y = mx + b for the edge and then equation it to the equation y = x[2],
+    # which represents the horizontal move from x[2] to infinity.
+    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
+    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
+
+    # Finally, check whether this intersection point lies further to the
+    # right (towards infinity) than the initial value of the x coordinate.
+    # If so, then the intersection indeed happens due to the move from the
+    # x coordinate to infinity.
+    check_2 <- x[,1] < x_intersection
+
+    # If both checks are TRUE, then there is an intersection. Determine how often
+    # this occurs in the data
+    counter <- matrix(check_1 & check_2, 
+                      nrow = n_2, 
+                      ncol = n_1) |>
+        rowSums()
 
     # If outside == FALSE, return TRUE if you have an odd number of intersections.
     # If outside == TRUE, return TRUE if you have an even number of intersections.
