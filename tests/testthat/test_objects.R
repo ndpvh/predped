@@ -54,6 +54,10 @@ testthat::test_that("Polgyon initialization works", {
 
     testthat::expect_error(predped::polygon(points = matrix(rep(1, 3), ncol = 1)))
     testthat::expect_error(predped::polygon(points = cbind(rep(1, 3), rep(0, 3), rep(-1, 3))))
+
+    # In response to bug in which the given id was not assigned to the object
+    poly <- predped::polygon(id = "test", points = cbind(rep(1, 3), rep(0, 3)))
+    testthat::expect_equal(poly@id, "test")
 })
 
 testthat::test_that("Polygon contains single point works", {
@@ -183,6 +187,10 @@ testthat::test_that("Rectangle initialization works", {
     testthat::expect_error(predped::rectangle(center = c(0, 0, 0), size = c(1, 1)))
     testthat::expect_error(predped::rectangle(center = c(0, 0), size = c(-1, 1)))
     testthat::expect_error(predped::rectangle(center = c(0, 0), size = c(1, 1), orientation = c(1, 1)))
+
+    # In response to bug in which the given id was not assigned to the object
+    rect <- predped::rectangle(id = "test", center = c(0, 0), size = c(1, 1))
+    testthat::expect_equal(rect@id, "test")
 })
 
 testthat::test_that("Rectangle moving works", {
@@ -366,6 +374,10 @@ testthat::test_that("Rectangle intersection works", {
 testthat::test_that("Circle initialization works", {
     testthat::expect_no_error(predped::circle(center = c(0, 0), radius = 0.5))
     testthat::expect_error(predped::rectangle(center = c(0, 0), radius = c(0.5, 0.5)))
+
+    # In response to bug in which the given id was not assigned to the object
+    circ <- predped::circle(id = "test", center = c(0, 0), radius = 0.5)
+    testthat::expect_equal(circ@id, "test")
 })
 
 testthat::test_that("Circle area works", {

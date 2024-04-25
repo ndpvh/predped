@@ -227,7 +227,7 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical", center = "numeric"), contains = "object")
 
 setMethod("initialize", "polygon", function(.Object, 
-                                            id = NULL,
+                                            id = character(0),
                                             clock_wise = TRUE, 
                                             moveable = FALSE, 
                                             interactable = FALSE,
@@ -549,19 +549,18 @@ rectangle <- setClass("rectangle", list(
 setMethod("initialize", "rectangle", function(.Object,
                                               center,
                                               size,
-                                              id = NULL,
+                                              id = character(0),
                                               clock_wise = TRUE,
                                               orientation = 0,
                                               moveable = FALSE,
                                               interactable = FALSE,
                                               degrees = FALSE,
-                                              ...
-) {
+                                              ...) {
+
     if (length(size) != 2) stop("Size vector must have length two (x and y)")
     if (any(size <= 0)) stop("Size vector must be positive")
     if (length(orientation) != 1) stop("Orientation must be a single element")
 
-    .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@center <- as(center, "coordinate")
 
     size_half <- size/2
@@ -585,6 +584,7 @@ setMethod("initialize", "rectangle", function(.Object,
 
     .Object <- callNextMethod(.Object, points = points, clock_wise = clock_wise)
 
+    .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@size <- size
     .Object@moveable <- moveable
     .Object@orientation <- orientation
@@ -773,13 +773,21 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 
-setMethod("initialize", "circle", function(.Object, id = NULL, moveable = FALSE, interactable = FALSE, ...) {
+setMethod("initialize", "circle", function(.Object, 
+                                           id = character(0), 
+                                           moveable = FALSE, 
+                                           interactable = FALSE, 
+                                           ...) {
+
     .Object <- callNextMethod(.Object, ...)
+
     .Object@id <- if(length(id) == 0) paste("object", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@center <- as(.Object@center, "coordinate")
     .Object@moveable <- moveable
     .Object@interactable <- interactable
+
     if (length(.Object@radius) != 1) stop("Slot 'radius' should be a single numeric value")
+
     return(.Object)
 })
 
@@ -1096,7 +1104,7 @@ segment <- setClass("segment", list(id = "character",
 setMethod("initialize", "segment", function(.Object, 
                                             from, 
                                             to, 
-                                            id = NULL,
+                                            id = character(0),
                                             blocks_path = FALSE, 
                                             interactable = FALSE,
                                             ...) {

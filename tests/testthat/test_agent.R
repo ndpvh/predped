@@ -5,6 +5,11 @@ testthat::test_that("Agent initialization works", {
 
     testthat::expect_error(predped::agent(center = c(1, 1, 1)))     # Invalid coordinate
     testthat::expect_error(predped::agent(position = c(1, 1)))      # Invalid 
+
+    # In response to bug in which the given id was not assigned to the objects,
+    # but it was to agents and goals
+    me <- predped::agent(id = "test", center = c(0, 0), radius = 0.2)
+    testthat::expect_equal(me@id, "test")
 })
 
 testthat::test_that("Agent getters work", {

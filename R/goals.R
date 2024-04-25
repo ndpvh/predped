@@ -24,8 +24,7 @@ setMethod("initialize", "goal", function(.Object,
                                          busy = FALSE,
                                          done = FALSE,
                                          counter = 5,
-                                         ...
-) {
+                                         ...) {
 
     .Object@id <- if(length(id) == 0) paste("goal", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@position <- coordinate(position)

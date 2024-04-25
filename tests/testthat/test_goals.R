@@ -7,6 +7,10 @@ testthat::test_that("Goal initialization works", {
     testthat::expect_no_error(predped::goal(position = ref))
     testthat::expect_equal(g@position, coordinate(ref))
     testthat::expect_equal(g@id, "goal ydgab")
+
+    # In response to bug in which the given id was not assigned to the object
+    todo <- predped::goal(id = "test", position = c(0, 0))
+    testthat::expect_equal(todo@id, "test")
 })
 
 # Creating goal stacks
