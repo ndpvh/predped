@@ -14,7 +14,7 @@ testthat::test_that("Perpendicular orientation making works", {
     ref <- list(0, 315, 0)
 
     tst <- lapply(settings, 
-                  \(x) perpendicular_orientation(x))
+                  \(x) perpendicular_orientation(shape(x), entrance(x)))
 
     testthat::expect_equal(tst, ref)
 })

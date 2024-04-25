@@ -25,29 +25,31 @@ find_class <- function(class_name, lst) {
 #' edge is chosen to be the entrance to the space. Is used to find in what 
 #' orientation the agents should be heading when entering the space.
 #' 
-#' @param background An object of class background
+#' @param object An object of class object
+#' @param co A vector of size 2 containing x and y coordinates for a location 
+#' from which to deduce the perpendicular orientation
 #' 
 #' @return Numeric denoting the perpendicular orientation to the entrance of the 
 #' space in degrees
 #' 
 #' @export
-perpendicular_orientation <- function(background) {
+perpendicular_orientation <- function(object, co) {
     # Dispatch based on the shape of the background
-    if(class(shape(background)) == "circle") {
+    if(inherits(object, "circle")) {
         # If the entrance lies on the circumference of the circle, we can easily
         # derive the angle at which the entrance finds itself relative to the 
         # center of the circle. The perpendicular orientation to this angle is 
         # then the angle + 180 (or angle + pi)
-        co <- entrance(background) - center(shape(background))
+        co <- co - center(object)
         angle <- atan2(co[2], co[1]) + pi
-    } else {
+
+    } else if(inherits(object, "polygon")) {
         # Find out where the entrance lies in the background
         # For this, we compute the sum of the distances between each of 
         # the points that make up an edge and the entrance point. The edge that has 
         # the distance closest to the actual size of the edge will be taken as the 
         # entrance wall.
-        co <- entrance(background)@.Data
-        points <- shape(background)@points
+        points <- object@points
         edges <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
         distances <- cbind(sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2),
@@ -67,7 +69,7 @@ perpendicular_orientation <- function(background) {
         co <- edge[3:4] - edge[1:2]
         angle <- atan2(co[2], co[1]) 
 
-        angle <- ifelse(shape(background)@clock_wise, 
+        angle <- ifelse(object@clock_wise, 
                         angle - pi / 2, 
                         angle + pi / 2)
     }

@@ -92,7 +92,7 @@ testthat::test_that("Perpendicular orientation works", {
                                 entrance = c(-1.5, 1.5)))
 
     tst <- lapply(settings, 
-                  \(x) predped::perpendicular_orientation(x))
+                  \(x) predped::perpendicular_orientation(shape(x), entrance(x)))
     ref <- list(0, 45, 90, 135, 180, 225, 270, 315,
                 0, 45, 90, 135, 180, 225, 270, 315,
                 0, 45, 90, 135, 180, 225, 270, 315)

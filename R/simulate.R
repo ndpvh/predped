@@ -244,7 +244,8 @@ add_agent <- function(object,
     # Determine the agent's orientation. Either perpendicular to the wall in 
     # the agent enters, or directed towards the current goal of the agent.
     if(is.null(position)) {
-        angle <- perpendicular_orientation(background)
+        angle <- perpendicular_orientation(shape(background),
+                                           entrance(background))
     } else {
         co_1 <- position
         co_2 <- goal_stack[[1]]@position
