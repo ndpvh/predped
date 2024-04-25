@@ -447,10 +447,6 @@ setMethod("position<-", "goal", function(object, value) {
 })
 
 
-setGeneric("id", function(object) standardGeneric("id"))
-
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
-
 #' @rdname goal-class
 #'
 #' @export

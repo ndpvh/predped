@@ -557,25 +557,31 @@ testthat::test_that("Circle intersection works", {
 
 testthat::test_that("Object getters work", {
     # Polygon
+    set.seed(1)
     tst <- predped::polygon(points = rbind(c(-1, -1),
                                            c(-1, 1), 
                                            c(1, 1),
                                            c(1, -1)))
 
+    testthat::expect_equal(predped::id(tst), "object ydgab")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
 
     # Rectangle
+    set.seed(1)
     tst <- predped::rectangle(center = c(0, 0), 
                               size = c(2, 2),
                               orientation = pi)
 
+    testthat::expect_equal(predped::id(tst), "object wknrs") # Why would this object have a different name?
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
     testthat::expect_equal(predped::size(tst), c(2, 2))
     testthat::expect_equal(predped::orientation(tst), pi)
 
     # Circle
+    set.seed(1)
     tst <- predped::circle(center = c(0, 0), radius = 1)
 
+    testthat::expect_equal(predped::id(tst), "object ydgab")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
     testthat::expect_equal(predped::size(tst), 1)
     testthat::expect_equal(predped::radius(tst), 1)
@@ -588,8 +594,10 @@ testthat::test_that("Object setters work", {
                                            c(1, 1),
                                            c(1, -1)))
 
+    predped::id(tst) <- "test"
     predped::center(tst) <- c(1, 1)
 
+    testthat::expect_equal(predped::id(tst), "test")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
     testthat::expect_equal(tst@points, rbind(c(0, 0), 
                                              c(0, 2),
@@ -601,10 +609,12 @@ testthat::test_that("Object setters work", {
                               size = c(2, 2),
                               orientation = pi)
 
+    predped::id(tst) <- "test"
     predped::center(tst) <- c(1, 1)
     predped::size(tst) <- c(1, 1)
     predped::orientation(tst) <- 0
 
+    testthat::expect_equal(predped::id(tst), "test")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
     testthat::expect_equal(predped::size(tst), c(1, 1))
     testthat::expect_equal(predped::orientation(tst), 0)
@@ -620,7 +630,10 @@ testthat::test_that("Object setters work", {
     # Circle
     tst <- predped::circle(center = c(0, 0), radius = 1)
 
+    predped::id(tst) <- "test"
     predped::center(tst) <- c(1, 1)
+
+    testthat::expect_equal(predped::id(tst), "test")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(1, 1)))
     
     predped::radius(tst) <- 2

@@ -1238,6 +1238,25 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
 ################################################################################
 # Getters and setters
 
+setGeneric("id", function(object) standardGeneric("id"))
+
+setGeneric("id<-", function(object, value) standardGeneric("id<-"))
+
+#' @rdname object-class
+#' 
+#' @export 
+setMethod("id", signature(object = "object"), function(object) {
+    return(object@id)
+})
+
+#' @rdname object-class
+#' 
+#' @export 
+setMethod("id<-", signature(object = "object"), function(object, value) {
+    object@id <- value
+    return(object)
+})
+
 #' @rdname object-class
 #' 
 #' @export 
