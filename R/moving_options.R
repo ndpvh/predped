@@ -35,7 +35,11 @@ setGeneric("moving_options", function(agent, ...){})
 #     errors
 #
 # Replacement of `get_ok`, which was nested within `move` in `pp_simulate.R`
-moving_options_agent <- function(agent, state, background, centers){
+moving_options_agent <- function(agent, 
+                                 state, 
+                                 background, 
+                                 centers){
+
     # Add the other agents to the background objects. This will allow us to 
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
@@ -43,8 +47,8 @@ moving_options_agent <- function(agent, state, background, centers){
                                       state$agents)
 
     # Use the `free_cells` function to get all free cells to which the agent
-    # might move and check whether it does not provide an error. Also add a 
-    # function that checks the intersection of a circle with another object
+    # might move. Specifically look at whether a cell lies within the background
+    # and whether the agent has a direct line of sight to that cell.
     check <- m4ma::free_cells_rcpp(agent, background, centers)
 
     # If there are still cells free, check whether an agent would intersect with
@@ -216,6 +220,10 @@ overlap_with_objects <- function(agent,
                           cbind(coords, coords[c(2:nrow(coords), 1),]))
     }
 
+    # Add the background to this
+    coords <- add_nodes(shp, space_between = 1e-2, outside = FALSE)
+    shape_segments <- cbind(coords, coords[c(2:nrow(coords), 1),])
+
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
         # If that center is already out of the running, continue
@@ -228,15 +236,20 @@ overlap_with_objects <- function(agent,
         circ <- circle(center = centers[i,], 
                        radius = radius(agent))
 
-        # Check whether contained in background
-        if(intersects(circ, shp)) {
+        # Check whether the background intersects with the circle in a more 
+        # time-saving kind of way (`intersects` takes quite a lot of time 
+        # apparently)
+        local_check <- in_object(circ,
+                                 shape_segments, 
+                                 outside = FALSE)
+        if(any(local_check)) {
             check[i] <- FALSE
             next
         }
 
         # Check whether not contained within objects
         local_check <- in_object(circ, 
-                                 rbind(segments[,1:2], segments[,3:4]), 
+                                 segments, 
                                  outside = FALSE)
 
         if(any(local_check)) {
