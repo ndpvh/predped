@@ -215,15 +215,12 @@ overlap_with_objects <- function(agent,
     coords_obj <- matrix(0, nrow = 0, ncol = 2)
     for(i in obj) {
         coords_obj <- rbind(coords_obj, 
-                            add_nodes(i, space_between = 1e-2))
-
-        coords_obj <- rbind(coords_obj, 
-                            add_nodes(i, space_between = 1e-2, outside = FALSE))
+                            nodes_on_circumference(i))
     }
 
     # Do the same for the background. Saves a lot of time, as the original 
     # function that was used (`intersects`) is quite time-inefficient.
-    coords_shp <- add_nodes(shp, space_between = 1e-2, outside = FALSE)
+    coords_shp <- nodes_on_circumference(shp)
 
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
@@ -250,4 +247,31 @@ overlap_with_objects <- function(agent,
     }
 
     return(check)
+}
+
+# Helper function to create dots on the circumference of objects, to be used for
+# overlap_with_object
+nodes_on_circumference <- function(object) {
+    if(inherits(object, "circle")) {
+        nodes <- to_polygon(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
+    } else {
+        corners <- object@points 
+        n <- nrow(corners)
+
+        x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
+        y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
+
+        len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / 5e-2))
+        len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / 5e-2))
+
+        len <- matrixStats::rowMaxs(cbind(len_x, len_y))
+
+        nodes <- cbind(unlist(multi_seq(x_changes[,1], 
+                                        x_changes[,2],
+                                        length.out = len)),
+                       unlist(multi_seq(y_changes[,1], 
+                                        y_changes[,2],
+                                        length.out = len)))
+    }
+    return(nodes)
 }
