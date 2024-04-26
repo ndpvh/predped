@@ -200,7 +200,7 @@ agents_between_goal <- function(agent,
 # Temporary function to see if this one actually works
 #
 # TO DO
-#   - Assumes the agent is a circle
+#   - Assumes the agent is a circle: Change this
 overlap_with_objects <- function(agent, 
                                  background, 
                                  centers, 
@@ -225,9 +225,6 @@ overlap_with_objects <- function(agent,
     # function that was used (`intersects`) is quite time-inefficient.
     coords_shp <- add_nodes(shp, space_between = 1e-2, outside = FALSE)
 
-    # Get the radius of the agent and square it
-    r <- radius(agent)^2
-
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
         # If that center is already out of the running, continue
@@ -235,21 +232,19 @@ overlap_with_objects <- function(agent,
             next
         }
 
-        # Correct the shape_segments for the center that is tested and check 
-        # whether any of the coordinates of the shape lies within radius distance
-        # of the origin
-        coords <- cbind(coords_shp[,1] - centers[i, 1],
-                        coords_shp[,2] - centers[i, 2])
-        if(any(coords[,1]^2 + coords[,2]^2 < r)) {
+        # Change the center of the agent
+        center(agent) <- centers[i,]
+
+        # First check whether there is an intersection with the shape of the 
+        # background
+        if(any(in_object(agent, coords_shp, outside = FALSE))) {
             check[i] <- FALSE
             next
         }
 
-        # If still contained within the background, then do the same for the 
-        # coordinates of the objects
-        coords <- cbind(coords_obj[,1] - centers[i, 1],
-                        coords_obj[,2] - centers[i, 2])
-        if(any(coords[,1]^2 + coords[,2]^2 < r)) {
+        # And now whether there is an intersection with the objects of the 
+        # background
+        if(any(in_object(agent, coords_obj, outside = FALSE))) {
             check[i] <- FALSE
         }
     }
