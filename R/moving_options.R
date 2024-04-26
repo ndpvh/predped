@@ -36,23 +36,6 @@ setGeneric("moving_options", function(agent, ...){})
 #
 # Replacement of `get_ok`, which was nested within `move` in `pp_simulate.R`
 moving_options_agent <- function(agent, state, background, centers){
-    # Create a local function that will be useful for debugging
-    check_try_error <- function(x, error_number){
-        e <- !all(!x) |>
-            try() |>
-            class()
-
-        if(e){
-            return(list(error_location = error_location,
-                        agent_id = id(agent),
-                        state = state,
-                        agent = agent,
-                        centers = centers))
-        } else {
-            return(NULL)
-        }
-    }
-
     # Add the other agents to the background objects. This will allow us to 
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
@@ -64,11 +47,6 @@ moving_options_agent <- function(agent, state, background, centers){
     # function that checks the intersection of a circle with another object
     check <- m4ma::free_cells_rcpp(agent, background, centers)
 
-    # errored_out <- check_try_error(check, "after `free_cells`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
-
     # If there are still cells free, check whether an agent would intersect with
     # an object if it were to move to a given cell. Given that the function
     # `overlap_with_object` only checks those cells that are free, the output
@@ -76,8 +54,6 @@ moving_options_agent <- function(agent, state, background, centers){
     # issues
     if(!all(!check)){
         # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
-
-        
         check <- overlap_with_objects(agent, background, centers, check)
 
         # If something blocks the way in the previous column, then it should also 
@@ -85,10 +61,6 @@ moving_options_agent <- function(agent, state, background, centers){
         check[!check[,3],2] <- FALSE
         check[!check[,2],1] <- FALSE
     }
-    # errored_out <- check_try_error(check, "after `overlap_with_objects`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
 
     # If there are still cells free, check whether the goal can still be seen
     # or whether an agent should re-plan
@@ -111,30 +83,6 @@ moving_options_agent <- function(agent, state, background, centers){
         # if-statement), otherwise the agent will get stuck
         check <- if(!all(!local_check)) local_check else !opposite_check
     }
-    
-    # errored_out <- check_try_error(check, "after `seesGoalOK`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
-
-    # If there are still cells free, check whether there are cells in which another
-    # agent is currently standing
-    # if(!all(!check)){
-    #     # Originally deleted the agent from the state$agent list. However, not 
-    #     # necessary anymore! The state$agents list already does not contain the 
-    #     # `agent` anymore
-    #     #
-    #     # Additional condition added: If there are no other agents, then we 
-    #     # don't need to do this check
-    #     if(length(state$agents) > 0) {
-    #         check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
-    #     }
-
-    #     # If something blocks the way in the previous column, then it should also 
-    #     # block the way on the columns
-    #     check[!check[,3],2] <- FALSE
-    #     check[!check[,2],1] <- FALSE
-    # }
 
     # Finally, return the cells that are free to move to
     return(check)
