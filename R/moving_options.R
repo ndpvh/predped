@@ -198,6 +198,9 @@ agents_between_goal <- function(agent,
 }
 
 # Temporary function to see if this one actually works
+#
+# TO DO
+#   - Assumes the agent is a circle
 overlap_with_objects <- function(agent, 
                                  background, 
                                  centers, 
@@ -209,20 +212,21 @@ overlap_with_objects <- function(agent,
     # Transform all background-objects into one big matrix of segments. This will
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.
-    segments <- matrix(0, nrow = 0, ncol = 4)
+    coords_obj <- matrix(0, nrow = 0, ncol = 2)
     for(i in obj) {
-        coords <- add_nodes(i, space_between = 1e-2)
-        segments <- rbind(segments,
-                          cbind(coords, coords[c(2:nrow(coords), 1),]))
+        coords_obj <- rbind(coords_obj, 
+                            add_nodes(i, space_between = 1e-2))
 
-        coords <- add_nodes(i, space_between = 1e-2, outside = FALSE)
-        segments <- rbind(segments,
-                          cbind(coords, coords[c(2:nrow(coords), 1),]))
+        coords_obj <- rbind(coords_obj, 
+                            add_nodes(i, space_between = 1e-2, outside = FALSE))
     }
 
-    # Add the background to this
-    coords <- add_nodes(shp, space_between = 1e-2, outside = FALSE)
-    shape_segments <- cbind(coords, coords[c(2:nrow(coords), 1),])
+    # Do the same for the background. Saves a lot of time, as the original 
+    # function that was used (`intersects`) is quite time-inefficient.
+    coords_shp <- add_nodes(shp, space_between = 1e-2, outside = FALSE)
+
+    # Get the radius of the agent and square it
+    r <- radius(agent)^2
 
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
@@ -231,28 +235,21 @@ overlap_with_objects <- function(agent,
             next
         }
 
-        # Create a temporary circle, and find out whether these are (a) contained 
-        # within the background and (b) not contained within any of the objects
-        circ <- circle(center = centers[i,], 
-                       radius = radius(agent))
-
-        # Check whether the background intersects with the circle in a more 
-        # time-saving kind of way (`intersects` takes quite a lot of time 
-        # apparently)
-        local_check <- in_object(circ,
-                                 shape_segments, 
-                                 outside = FALSE)
-        if(any(local_check)) {
+        # Correct the shape_segments for the center that is tested and check 
+        # whether any of the coordinates of the shape lies within radius distance
+        # of the origin
+        coords <- cbind(coords_shp[,1] - centers[i, 1],
+                        coords_shp[,2] - centers[i, 2])
+        if(any(coords[,1]^2 + coords[,2]^2 < r)) {
             check[i] <- FALSE
             next
         }
 
-        # Check whether not contained within objects
-        local_check <- in_object(circ, 
-                                 segments, 
-                                 outside = FALSE)
-
-        if(any(local_check)) {
+        # If still contained within the background, then do the same for the 
+        # coordinates of the objects
+        coords <- cbind(coords_obj[,1] - centers[i, 1],
+                        coords_obj[,2] - centers[i, 2])
+        if(any(coords[,1]^2 + coords[,2]^2 < r)) {
             check[i] <- FALSE
         }
     }
