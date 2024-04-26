@@ -99,12 +99,12 @@ my_model <- predped(id = "benchmark",
 # the final state of a previously created state in which 50 agents were walking
 # around in this environment.
 #
-# Running this shows that the simulation takes 9.7min, meaning about 12sec per 
+# Running this shows that the simulation takes 44sec, meaning about 880msec per 
 # iteration.
 initial_condition <- readRDS(file.path("benchmark", "benchmark_inx.Rds"))
 
 set.seed(1)
-Rprof(0.001)
+Rprof(interval = 0.001)
 trace <- predped::simulate(my_model,
                            max_agents = 50, 
                            initial_agents = initial_condition$agents,
@@ -119,7 +119,7 @@ summaryRprof()
 #      things that can go faster
 #    - Do the same for the routing algorithms; maybe there is something that 
 #      can make it faster!
-
+#    - Get radius into parameters again + make space_between agent-specific
 saveRDS(trace, file.path("benchmark", "benchmark_trace.Rds"))
 
 # To make a gif out of the trace, just use the following bits of code. In this 
@@ -129,8 +129,8 @@ saveRDS(trace, file.path("benchmark", "benchmark_trace.Rds"))
 #   - We create a list of different plots that lay out the trace
 #   - We then transform these plots to a gif using the `gifski` package
 #
-# Running this shows that the plotting takes 47sec.
-Rprof(0.001)
+# Running this shows that the plotting takes 57sec.
+Rprof(interval = 0.001)
 points <- shape(setting)@points
 poly_size <- c(max(points[,1] - min(points[,1])),
                max(points[,2] - min(points[,2])))
