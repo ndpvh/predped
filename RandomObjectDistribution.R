@@ -164,33 +164,33 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
         }
         object@objects <- rectangles
 
-      # method for the coordinates of the circles
-      } else if (object@object_shape == "circle") {
-          circles <- vector("list", length = sum(object@object_distribution))
-          index <- 1
-          row_y_start <- rep(0, object@num_rows)  # Initialize starting y-coordinate for each row
-  
-          for (row in 1:object@num_rows) {
-              max_nr_per_row <- max(object@object_distribution[row, ])
-              if (max_nr_per_row > 0) {
-                  if (row > 1) {
-                      # Calculate the starting y-coordinate for each subsequent row
-                      row_y_start[row] <- row_y_start[row - 1] + (max(object@object_distribution[row - 1, ]) * (2 * radius)) + aisle_width
-                  }
-                  for (col in 1:object@num_columns) {
-                      num_objects <- object@object_distribution[row, col]
-                      if (num_objects > 0) {
-                          col_x <- (col - 1) * (2 * radius + aisle_width) + radius
-                          for (obj in 1:num_objects) {
-                              obj_center <- c(col_x, row_y_start[row] + (obj - 0.5) * (2 * radius))
-                              circles[[index]] <- new("circle", center = obj_center, radius = radius)
-                              index <- index + 1
-                          }
-                      }
-                  }
-              }
-          }
-          object@objects <- circles
+    # method for the coordinates of the circles
+    } else if (object@object_shape == "circle") {
+        circles <- vector("list", length = sum(object@object_distribution))
+        index <- 1
+        row_y_start <- rep(0, object@num_rows)  # Initialize starting y-coordinate for each row
+
+        for (row in 1:object@num_rows) {
+            max_nr_per_row <- max(object@object_distribution[row, ])
+            if (max_nr_per_row > 0) {
+                if (row > 1) {
+                    # Calculate the starting y-coordinate for each subsequent row
+                    row_y_start[row] <- row_y_start[row - 1] + (max(object@object_distribution[row - 1, ]) * (2 * radius)) + aisle_width
+                }
+                for (col in 1:object@num_columns) {
+                    num_objects <- object@object_distribution[row, col]
+                    if (num_objects > 0) {
+                        col_x <- (col - 1) * (2 * radius + aisle_width) + radius
+                        for (obj in 1:num_objects) {
+                            obj_center <- c(col_x, row_y_start[row] + (obj - 0.5) * (2 * radius))
+                            circles[[index]] <- new("circle", center = obj_center, radius = radius)
+                            index <- index + 1
+                        }
+                    }
+                }
+            }
+        }
+        object@objects <- circles
 
       # method for the coordinates of the polygons
       } else if (object@object_shape == "polygon") {
@@ -198,7 +198,7 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
           polygon <- generate_random_polygon(num_edges = num_edges, edge_lengths = edge_lengths, equal_edges = equal_edges, ...)
           polygon_points <- polygon@points
 
-          # Get the height and width of the generated polygon
+          # The height and width of generated polygon
           polygon_height <- max(polygon_points[, "y"]) - min(polygon_points[, "y"])
           polygon_width <- max(polygon_points[, "x"]) - min(polygon_points[, "x"])
 
@@ -206,44 +206,64 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
           num_columns <- ncol(object@object_distribution)
           num_rows <- nrow(object@object_distribution)
           
-          # Coordinates list initialization
+          # Initialize a list for coordinates
           polygons <- vector("list", length = object@total_objects)
           index <- 1
 
           # Initialize the starting y-coordinate for each column
           column_start_y <- rep(0, num_columns)
 
+          # Maximum y-coordinate reached in a previous row
+          previous_row_max_y <- 0
+
           for (i in 1:num_rows) {
+            # For each new row, start with the maximum y-coordinate from the previous row
+            # plus the aisle width
+            if (i > 1) {
+              column_start_y <- rep(previous_row_max_y + aisle_width, num_columns)
+            }
+
+            # Maximum y-coordinate reached in the current row
+            current_row_max_y <- 0
+
             for (j in 1:num_columns) {
               num_polygons_in_slot <- object@object_distribution[i, j]
-              
-              # Calculate the displacement for each column on x-axis
-              displacement_x <- (j - 1) * (polygon_width + aisle_width)
-              
-              # Get the current y-coordinate start for this column
-              displacement_y <- column_start_y[j]
-              
-              for (k in 1:num_polygons_in_slot) {
-                polygon_coords <- polygon_points
 
-                # Update polygon coordinates
+              # Displacement for each column on the x-axis
+              displacement_x <- (j - 1) * (polygon_width + aisle_width)
+
+              # Starting y-coordinate for this column
+              displacement_y <- column_start_y[j]
+
+              for (k in 1:num_polygons_in_slot) {
+                # Update polygon coordinates for the current position
+                polygon_coords <- polygon_points
                 polygon_coords[, "x"] <- polygon_coords[, "x"] + displacement_x
                 polygon_coords[, "y"] <- polygon_coords[, "y"] + displacement_y
-                
+
                 # Update polygons list
                 polygons[[index]] <- polygon_coords
                 index <- index + 1
 
-                # Get the y-coordinate for the next polygon in the same slot
+                # Update the y-coordinate for the next polygon in the same slot
                 displacement_y <- displacement_y + polygon_height
+
+                # Update the current row's maximum y-coordinate
+                if (displacement_y > current_row_max_y) {
+                  current_row_max_y <- displacement_y
+                }
               }
-              
+
               # Update the starting y-coordinate for the next row in this column
-              column_start_y[j] <- displacement_y + aisle_width
+              column_start_y[j] <- displacement_y
             }
+
+            # Update the previous row's maximum y-coordinate for the next iteration
+            previous_row_max_y <- current_row_max_y
           }
-          
+
           object@objects <- polygons
+
 
     } else {
         stop("Unsupported object shape. Supported shapes are 'rectangle' and 'circle', and 'polygon'.")
