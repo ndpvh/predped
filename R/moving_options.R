@@ -53,6 +53,12 @@ moving_options_agent <- function(agent, state, background, centers){
         }
     }
 
+    # Add the other agents to the background objects. This will allow us to 
+    # immediately test whether cells are occupied by other agents instead of 
+    # doing this check only later.
+    objects(background) <- append(objects(background), 
+                                      state$agents)
+
     # Use the `free_cells` function to get all free cells to which the agent
     # might move and check whether it does not provide an error. Also add a 
     # function that checks the intersection of a circle with another object
@@ -70,6 +76,8 @@ moving_options_agent <- function(agent, state, background, centers){
     # issues
     if(!all(!check)){
         # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
+
+        
         check <- overlap_with_objects(agent, background, centers, check)
 
         # If something blocks the way in the previous column, then it should also 
@@ -111,22 +119,22 @@ moving_options_agent <- function(agent, state, background, centers){
 
     # If there are still cells free, check whether there are cells in which another
     # agent is currently standing
-    if(!all(!check)){
-        # Originally deleted the agent from the state$agent list. However, not 
-        # necessary anymore! The state$agents list already does not contain the 
-        # `agent` anymore
-        #
-        # Additional condition added: If there are no other agents, then we 
-        # don't need to do this check
-        if(length(state$agents) > 0) {
-            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
-        }
+    # if(!all(!check)){
+    #     # Originally deleted the agent from the state$agent list. However, not 
+    #     # necessary anymore! The state$agents list already does not contain the 
+    #     # `agent` anymore
+    #     #
+    #     # Additional condition added: If there are no other agents, then we 
+    #     # don't need to do this check
+    #     if(length(state$agents) > 0) {
+    #         check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents, check)
+    #     }
 
-        # If something blocks the way in the previous column, then it should also 
-        # block the way on the columns
-        check[!check[,3],2] <- FALSE
-        check[!check[,2],1] <- FALSE
-    }
+    #     # If something blocks the way in the previous column, then it should also 
+    #     # block the way on the columns
+    #     check[!check[,3],2] <- FALSE
+    #     check[!check[,2],1] <- FALSE
+    # }
 
     # Finally, return the cells that are free to move to
     return(check)
