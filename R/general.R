@@ -147,3 +147,6 @@ line_line_intersection <- function(segments_1,
         return(any(intersection))
     }
 }
+
+# Vectorized version of seq, used in `overlap_with_objects`
+multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "length.out"))
