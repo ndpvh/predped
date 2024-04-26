@@ -99,18 +99,26 @@ my_model <- predped(id = "benchmark",
 # the final state of a previously created state in which 50 agents were walking
 # around in this environment.
 #
-# Running this shows that the simulation takes 20min, meaning about 12sec per 
+# Running this shows that the simulation takes 9.7min, meaning about 12sec per 
 # iteration.
 initial_condition <- readRDS(file.path("benchmark", "benchmark_inx.Rds"))
 
-start_time <- Sys.time()
 set.seed(1)
+Rprof(0.001)
 trace <- predped::simulate(my_model,
                            max_agents = 50, 
                            initial_agents = initial_condition$agents,
                            iterations = 50,
                            report = FALSE)
-stop_time <- Sys.time()
+Rprof(NULL)
+summaryRprof()
+
+# TO DO
+#    - Vectorize `add_nodes`
+#    - Take look at best_angle and moving_options to see whether there are any 
+#      things that can go faster
+#    - Do the same for the routing algorithms; maybe there is something that 
+#      can make it faster!
 
 saveRDS(trace, file.path("benchmark", "benchmark_trace.Rds"))
 
@@ -121,8 +129,8 @@ saveRDS(trace, file.path("benchmark", "benchmark_trace.Rds"))
 #   - We create a list of different plots that lay out the trace
 #   - We then transform these plots to a gif using the `gifski` package
 #
-# Running this shows that the plotting takes Xmin.
-start_time <- Sys.time()
+# Running this shows that the plotting takes 47sec.
+Rprof(0.001)
 points <- shape(setting)@points
 poly_size <- c(max(points[,1] - min(points[,1])),
                max(points[,2] - min(points[,2])))
@@ -133,4 +141,5 @@ gifski::save_gif(lapply(plt, \(x) print(x)),
                  delay = 1/10, 
                  width = poly_size[1] * 200, 
                  height = poly_size[2] * 200)
-stop_time <- Sys.time()
+Rprof(NULL)
+summaryRprof()
