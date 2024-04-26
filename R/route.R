@@ -16,7 +16,8 @@
 create_edges <- function(from, 
                          to, 
                          background, 
-                         space_between = 0.5) {
+                         space_between = 0.5,
+                         many_options = FALSE) {
 
     obj <- objects(background)
 
@@ -29,7 +30,8 @@ create_edges <- function(from,
     nodes <- create_nodes(from, 
                           to, 
                           background, 
-                          space_between = space_between)
+                          space_between = space_between,
+                          many_options = many_options)
 
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
@@ -69,6 +71,11 @@ create_edges <- function(from,
 
     # Only retain what you need
     edges <- edges[idx, c("from", "to", "cost")]
+
+    # For robustness, delete all edges that have NA values associated to them
+    idx <- !is.na(edges$from) & !is.na(edges$to) & !is.na(edges$cost)
+    edges <- edges[idx,]
+
     return(list(edges = edges, nodes = nodes))
 }
 
@@ -89,26 +96,35 @@ create_edges <- function(from,
 #' @export 
 #
 # TO DO:
-#   - Extend `in_object` to deal with matrices in a vectorized way and get rid 
-#     of the loop over nodes
 #   - Vectorize the creation of the diagonal nodes in rectangles and circles and
 #     find a way to vectorize this for polygons (i.e., get rid of the while loop)
 create_nodes <- function(from, 
                          to, 
                          background, 
-                         space_between = 0.5) {
+                         space_between = 0.5,
+                         many_options = FALSE) {
                             
-    # Create a matrix of coordinates close to the edge of the shape of the object.
-    # These will serve as the first nodes of the network.
-    #
-    # For this, we will several columns/rows of nodes that close in on the 
-    # center of the figure. The algorithm used here is not ideal, but is better
-    # than nothing (especially for irregular polygons, this algorithm may fail) 
+    # Create a matrix of coordinates that fill up the complete space. This will 
+    # allow agents to take whatever route to their destination 
     shp <- shape(background)
 
-    # nodes <- add_nodes(shp, 
-    #                    space_between = space_between, 
-    #                    outside = FALSE)
+    if(many_options) {
+        if(inherits(shp, "circle")) {
+            xlim <- center(shp)[,1] + c(-1, 1) * radius(shp)
+            ylim <- center(shp)[,2] + c(-1, 1) * radius(shp)
+        } else {
+            xlim <- range(shp@points[,1])
+            ylim <- range(shp@points[,2])
+        }
+        X <- seq(xlim[1] + space_between, 
+                 xlim[2] - space_between, 
+                 (xlim[2] - xlim[1] - 2 * space_between) / 20)
+        Y <- seq(ylim[1] + space_between, 
+                 ylim[2] - space_between,
+                 (ylim[2] - ylim[1] - 2 * space_between) / 20)
+        nodes <- cbind(rep(X, each = length(Y)),
+                       rep(Y, times = length(X)))
+    }
 
     # Add nodes along the edges of each of the objects
     obj <- objects(background)
@@ -117,9 +133,12 @@ create_nodes <- function(from,
                                        space_between = space_between,
                                        only_corners = TRUE))
 
-    # nodes <- rbind(nodes,
-    #                do.call("rbind", obj_nodes))
-    nodes <- do.call("rbind", obj_nodes)
+    if(many_options) {
+        nodes <- rbind(nodes,
+                       do.call("rbind", obj_nodes))
+    } else {
+        nodes <- do.call("rbind", obj_nodes)
+    }
 
     # Check which nodes are contained within the environment and only retain 
     # those. Furthermore delete all nodes that fall within an object. For this,
@@ -129,20 +148,12 @@ create_nodes <- function(from,
     new_obj <- lapply(obj, 
                       \(x) enlarge_object(x, space_between = space_between))
 
-    for(i in seq_len(nrow(nodes))) {
-        if(in_object(shp, nodes[i,], outside = TRUE)) {
-            nodes[i,] <- NA
-        } else {
-            for(j in seq_along(new_obj)) {
-                if(in_object(new_obj[[j]], nodes[i,], outside = FALSE)) {
-                    nodes[i,] <- NA
-                    break
-                }
-            } 
-        }
+    to_delete <- in_object(shp, nodes, outside = TRUE)
+    for(i in seq_along(new_obj)) {
+        to_delete <- to_delete | in_object(new_obj[[i]], nodes, outside = FALSE)
     }
 
-    nodes <- nodes[!is.na(nodes[,1]),]
+    nodes <- nodes[!to_delete,]
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
@@ -164,6 +175,10 @@ create_nodes <- function(from,
                               as.numeric(nodes[,1]), 
                               as.numeric(nodes[,2])) |>
         setNames(c("node_ID", "X", "Y"))
+
+    # For robustness, delete all nodes that have NA values associated to them
+    idx <- !is.na(nodes$node_ID) & !is.na(nodes$X) & !is.na(nodes$Y)
+    nodes <- nodes[idx,]
 
     return(nodes)
 }
@@ -307,187 +322,4 @@ adjust_edges <- function(from,
     new_edges <- new_edges[idx, c("from", "to", "cost")]
     new_edges <- rbind(edges, new_edges)
     return(list(edges = new_edges, nodes = new_nodes))
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Takes ps, a matrix of xy cordinate columns, with named rows for entry (G0), 
-# exit ("Gend"), mustVisit goals (G1, G2, ...), path points (P1, P2, ...), 
-# objects (used to figure out which points can see each other with seesGoal), 
-# and returns cppRouting edges makegraph object with distances (optionally 
-# plots with iGraph)
-# makeGraph = FALSE returns raw (one way) point1, point2, 
-# distance connection matrix
-# oneWay specifies regions where flow is one way
-getEdges <- function(ps, objects, plotIt = FALSE, main = "", makeGraph = TRUE,
-                     oneWay = NULL, pointcol = "#92C5DE", 
-                     linkcol = "#969696") {
-  
-    # Matrix to store which points can be seen from each other and their distance
-    out <- matrix(nrow = 0, ncol = 3, 
-                    dimnames = list(NULL, c("from", "to", "dist")))
-    nams <- row.names(ps)
-    
-    # For each combination of points
-    for (i in 1:(dim(ps)[1] - 1)) {
-        for (j in (i + 1):dim(ps)[1]) {
-        # Check if there is a line of sight between points
-        if (seesGoal(as.numeric(ps[i, ]), as.numeric(ps[j, ]), objects)) {
-            # Compute distance between points
-            d <- sqrt(sum((ps[i, ] - ps[j, ])^2))
-            
-            # Check if point i is left of point j
-            left1 <- ps[i, 1] < ps[j, 1]
-            
-            # Create two entries LR and RL with distance
-            if (left1) {
-            LR <- c(nams[i], nams[j], d)
-            RL <- c(nams[j], nams[i], d)
-            } else {
-            RL <- c(nams[i], nams[j], d)
-            LR <- c(nams[j], nams[i], d)
-            }
-            
-            # Check if there are one-way directions
-            if (!is.null(oneWay)) {
-            inAisle <- passThrough(oneWay, p = as.numeric(ps[i, ]), 
-                                    P = as.numeric(ps[j, ]))
-            if (!any(inAisle)) {
-                badLR <- badRL <- FALSE 
-            } else {
-                badLR <- any(names(inAisle[inAisle]) == "<") 
-                badRL <- any(names(inAisle[inAisle]) == ">") 
-            }
-            } else { 
-            badLR <- badRL <- FALSE
-            }
-            if (badLR) {
-            LR <- NULL 
-            }
-            if (badRL) {
-            RL <- NULL 
-            }
-            out <- rbind(out, LR, RL)
-        }
-        }
-    }
-    
-    # Convert out to data frame and make distances numeric
-    out <- data.frame(out, stringsAsFactors = FALSE)
-    out$dist <- as.numeric(out$dist)
-    
-    # Make and plot graph
-    if (makeGraph) {
-        out <- makegraph(out, directed = TRUE,
-        coords = cbind.data.frame(node_ID = row.names(ps),X = ps$x, Y = ps$y))
-        if (plotIt) {
-        igr1 <- graph_from_data_frame(out$data)
-        plot.igraph(igr1, edge.arrow.size = .3, main = main, 
-                    vertex.color = pointcol,
-                    vertex.frame.color = pointcol,
-                    vertex.label.family = "Helvetica",
-                    vertex.label.cex = 1.2,
-                    edge.color = linkcol,
-                    edge.width = 1)
-        }
-    }
-    
-    return(out)
-}
-
-# Adds edges for new point P0 to existing edges object, except for any goals in 
-# bad
-addEdge <- function(P0, edges, objects, oneWay = NULL) {
-    out <- matrix(nrow = 0, ncol = 3, 
-                    dimnames = list(NULL, c("from", "to", "dist")))
-    ok <- substr(edges$dict$ref, 1, 1) != "G"
-    ps <- edges$coords[ok, -1]
-    nams <- edges$coords[ok, 1]
-    for (j in 1:dim(ps)[1]) {
-        if (seesGoal(P0, as.numeric(ps[j, ]), objects)) {
-        d <- sqrt(sum((P0 - ps[j, ])^2))
-        left1 <- P0[1] < ps[j, 1]
-        if (left1) {
-            LR <- c("P0", nams[j], d)
-            RL <- c(nams[j], "P0", d)
-        } else {
-            RL <- c("P0", nams[j], d)
-            LR <- c(nams[j], "P0", d)
-        }
-        if(!is.null(oneWay)) {
-            inAisle <- passThrough(oneWay, p = P0, P = as.numeric(ps[j, ]))
-            if (!any(inAisle)) {
-            badLR <- badRL <- FALSE 
-            } else {
-            badLR <- any(names(inAisle[inAisle]) == "<") 
-            badRL <- any(names(inAisle[inAisle]) == ">") 
-            }
-        } else {
-            badLR <- badRL <- FALSE
-        }
-        if (badLR) {
-            LR <- NULL 
-        }
-        if (badRL) {
-            RL <- NULL 
-        }
-        out <- rbind(out, LR, RL)
-        }
-    }
-    out <- data.frame(out, stringsAsFactors = FALSE)
-    row.names(out) <- NULL
-    out$dist <- as.numeric(out$dist)
-    edges$dict <- rbind(edges$dict, c(0, edges$nbnode)) 
-    edges$nbnode <- edges$nbnode + 1
-    edges$dict[edges$nbnode, 1] <- "P0"
-    edges$coords <- rbind(edges$coords, c(0, P0))
-    edges$coords[edges$nbnode, 1] <- "P0"
-    dict <- as.numeric(edges$dict[, 2])
-    names(dict) <- edges$dict[, 1]
-    out$to <- dict[out$to]
-    out$from <- dict[out$from]
-    edges$data <- rbind(edges$data, out)
-    
-    edges
-}
-
-# Remove edges that intersect blocker profiles
-removeEdges <- function(edges, nBlockers) {
-    
-    blocked <- function(P12, ends, coords) {
-        
-        isIntersect <- function(L2, P1, P2) {
-        any(is.finite(line.line.intersection(P1, P2, P3 = L2[, 1], P4 = L2[, 2], 
-                                            interior.only = TRUE)))
-        }
-        
-        any(apply(ends, 1, isIntersect,
-                P1 = as.numeric(coords[coords[, 1] == as.character(P12[1]),2:3]),
-                P2 = as.numeric(coords[coords[, 1] == as.character(P12[2]),2:3])))
-    }
-    
-    if (nBlockers == 0) {
-        return(edges) 
-    } else {
-        ends <- attr(nBlockers, "ends")
-        dict <- edges$dict
-        row.names(dict) <- dict[, 2]
-        data <- edges$data
-        data$from <- dict[as.character(data$from), "ref"]
-        data$to <- dict[as.character(data$to), "ref"]
-        edges$data <- edges$data[!apply(data, 1, blocked, ends = ends, 
-                                        coords = edges$coords), ]
-        return(edges)
-    }
 }

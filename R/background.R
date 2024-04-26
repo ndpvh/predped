@@ -87,7 +87,7 @@ setMethod("entrance", "background", function(object) {
 })
 
 setMethod("entrance<-", "background", function(object, value) {
-    object@entrance <- value
+    object@entrance <- as(value, "coordinate")
     return(object)
 })
 
@@ -102,6 +102,6 @@ setMethod("exit", "background", function(object) {
 })
 
 setMethod("exit<-", "background", function(object, value) {
-    object@exit <- value
+    object@exit <- as(value, "coordinate")
     return(object)
 })

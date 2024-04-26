@@ -20,7 +20,7 @@
 #' @param goal_duration Integer or function that determines the duration of each 
 #' goal. Defaults to a function that draws `x` numbers from a normal distribution 
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
-#' @param ... Arguments passed on to the \code[predped]{update_state} function.
+#' @param ... Arguments passed on to the \code{\link[predped]{update_state}} function.
 #' 
 #' @export
 #
@@ -29,16 +29,25 @@
 #     some point, agents should be able to move things in the environment, meaning
 #     we should keep a trace of moveable objects as well (either list in 
 #     `setting` or a separate list as `moveable_objects`)
+#   - Make it possible to have a mix of ordered agents (ordering goal_stacks 
+#     beforehand) and chaotic agents (not ordering goal_stacks beforehand)
+#   - At this moment, still assumed that agents are circular. Try to remove this
+#     assumption in functions and in its definition
 setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 
 setMethod("simulate", "predped", function(object,
                                           max_agents = 20,
                                           iterations = 1800,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
-                                          goal_number = \(x) rnorm(x, 10, 2), 
-                                          goal_duration = \(x) rnorm(x, 10, 2),
                                           radius = 0.2, 
                                           standing_start = 0.1,
+                                          initial_agents = NULL,
+                                          initial_number_agents = NULL,
+                                          goal_number = \(x) rnorm(x, 10, 2), 
+                                          goal_duration = \(x) rnorm(x, 10, 2),
+                                          precompute_goal_paths = FALSE,
+                                          order_goal_stack = TRUE,
+                                          precomputed_goals = NULL,
                                           print_iteration = TRUE,
                                           close_enough = 2 * radius,
                                           space_between = radius,
@@ -56,6 +65,8 @@ setMethod("simulate", "predped", function(object,
     add_agent_index <- add_agent_index[add_agent_index <= iterations]
 
     goal_number <- draw_number(goal_number, iterations)
+
+    max_agents <- draw_number(max_agents, iterations)
 
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
@@ -82,21 +93,45 @@ setMethod("simulate", "predped", function(object,
         edges <- NULL
     }
 
+    # If you want a number of agents to be there at the start, and you don't 
+    # have an initial condition yet, generate several agents that stand on 
+    # random positions in the environment.
+    if(is.null(initial_agents) & !is.null(initial_number_agents)) {
+        initial_agents <- create_initial_condition(initial_number_agents,
+                                                   object,
+                                                   goal_number[1:initial_number_agents],
+                                                   goal_duration = goal_duration,
+                                                   radius = radius, 
+                                                   standing_start = standing_start,
+                                                   close_enough = close_enough,
+                                                   space_between = space_between,
+                                                   time_step = time_step,
+                                                   precomputed_edges = edges,
+                                                   precompute_goal_paths = precompute_goal_paths,
+                                                   order_goal_stack = order_goal_stack,
+                                                   precomputed_goals = precomputed_goals)
+    }
+
     # Initialize the trace and state lists. The state will already contain the 
     # initial condition. The trace list also contains this state. 
-    state <- list("setting" = object@setting,
+    state <- list("setting" = object@setting, 
                   "agents" = list())
+    if(!is.null(initial_agents)) {
+        state$agents <- initial_agents
+    } 
     trace <- list(state)
 
+    agent_in_cue <- FALSE
+    
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
         # Check whether to add a pedestrian and, if so, initiate a new 
         # agent. Things to consider are: whether it is time to add a new 
         # pedestrian, whether we already reached the maximal number of agents,
-        # and whether there is any space to add the new pedestrian.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents)) {
+        # and whether there is any space to add the new pedestrian. If there is 
+        # already an agent waiting, don't create a new one.
+        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_cue)) {
             potential_agent <- add_agent(object,
-                                         object@setting,
                                          goal_number[i],
                                          goal_duration = goal_duration,
                                          radius = radius, 
@@ -104,7 +139,10 @@ setMethod("simulate", "predped", function(object,
                                          close_enough = close_enough,
                                          space_between = space_between,
                                          time_step = time_step,
-                                         precomputed_edges = edges)
+                                         precomputed_edges = edges,
+                                         precompute_goal_paths = precompute_goal_paths,
+                                         order_goal_stack = order_goal_stack,
+                                         precomputed_goals = precomputed_goals)
             agent_in_cue <- TRUE
         }
 
@@ -163,32 +201,66 @@ setMethod("simulate", "predped", function(object,
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
 #' 
 #' @export 
+#
+# TO DO
+#   - Allow for optional "position" and "orientation" arguments. Will make it 
+#     easier to create initial conditions, as goals are immediately computed 
+#     then
 add_agent <- function(object,
-                      background,
                       goal_number,
                       goal_duration = \(x) rnorm(x, 10, 2),
                       radius = 0.2,
+                      position = NULL,
                       standing_start = 0.1,
                       close_enough = 2 * radius,
                       space_between = radius,
                       time_step = 0.5,
-                      precomputed_edges = NULL) {
+                      precomputed_edges = NULL,
+                      precompute_goal_paths = TRUE,
+                      order_goal_stack = TRUE,
+                      precomputed_goals = NULL) {
+
+    # Extract the background from the `predped` model
+    background <- object@setting
 
     # Sample a random set of parameters from the `predped` class
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
 
     # Create this agents' goal stack
-    goal_stack <- generate_goal_stack(goal_number, 
-                                      background, 
-                                      counter_generator = goal_duration)
+    if(is.null(precomputed_goals)) {
+        goal_stack <- generate_goal_stack(goal_number, 
+                                          background, 
+                                          counter_generator = goal_duration,
+                                          precomputed_edges = precomputed_edges,
+                                          agent_position = position,
+                                          precompute_goal_paths = precompute_goal_paths,
+                                          space_between = space_between,
+                                          order_goal_stack = order_goal_stack)
+    } else {
+        i <- sample(1:length(precomputed_goals), 1)
+        goal_stack <- precomputed_goals[[i]]
+    }
 
-    # Compute the agent's orientation: Perpendicular to the wall in which you 
-    # have the entrance.
-    angle <- perpendicular_orientation(background)
+    # Determine the agent's orientation. Either perpendicular to the wall in 
+    # the agent enters, or directed towards the current goal of the agent.
+    if(is.null(position)) {
+        angle <- perpendicular_orientation(shape(background),
+                                           entrance(background))
+    } else {
+        co_1 <- position
+        co_2 <- goal_stack[[1]]@position
 
-    # Create the agent themselves
-    starting_position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
-    tmp_agent <- agent(center = starting_position,
+        angle <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
+    }    
+
+    # Determine the position of the agent. Either this is at the entrance, or 
+    # this is at the specified location
+    if(is.null(position)) {
+        position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+    }
+    
+    # Create the agent itself
+    tmp_agent <- agent(center = position,
                        radius = radius,
                        speed = standing_start,
                        orientation = angle,
@@ -209,6 +281,142 @@ add_agent <- function(object,
                                               precomputed_edges = precomputed_edges)
     
     return(tmp_agent)
+}
+
+#' Create an Initial Condition
+#' 
+#' Create a list that contains agents at random locations within the setting.
+#' 
+#' @param object The `predped` model that you want to simulate
+#' @param ... Documentation to write
+#' 
+#' @export 
+create_initial_condition <- function(initial_number_agents,
+                                     object,
+                                     goal_number,
+                                     goal_duration = \(x) rnorm(x, 10, 2),
+                                     radius = 0.2,
+                                     standing_start = 0.1,
+                                     close_enough = 2 * radius,
+                                     space_between = radius,
+                                     time_step = 0.5,
+                                     precomputed_edges = NULL,
+                                     precompute_goal_paths = TRUE,
+                                     order_goal_stack = TRUE,
+                                     precomputed_goals = NULL) {
+
+    # Copy the setting
+    setting <- object@setting
+
+    # Make sure you have enough goal-numbers for each of the agents
+    goal_number <- draw_number(goal_number, initial_number_agents)
+
+    # If `goal_duration` is not a function, make it a function anyway (assumed
+    # by the `goal` class: To be changed)
+    if(typeof(goal_duration) != "closure") {
+        number <- goal_duration[1]
+        goal_duration <- function(x) number
+    }
+
+    # Loop over the agents and use `add_agent` to create an initial agent. Note
+    # that we have to change some of the characteristics of these agents, 
+    # namely their location and their orientation, as `add_agent` assumes that
+    # agents start at the entrance walking into the setting.
+    agents <- list() ; stop <- FALSE
+    for(i in seq_len(initial_number_agents)) {
+        # Extract the edges from the background. Will help in determining the locations
+        # at which the agents can be gathered. Importantly, dense network created so 
+        # that there are many potential positions for the agents, even when there 
+        # are not many objects in the environment
+        edges <- create_edges(c(0, 0), 
+                              c(0, 0), 
+                              setting,
+                              space_between = space_between,
+                              many_options = TRUE)
+
+        edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+        edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+        edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
+        # Choose a random edge on which the agent will stand and create the 
+        # exact position.
+        success <- FALSE ; iter <- 0
+        position <- NULL
+        while(!success) {
+            # Check whether you overflow the number of iterations. If so, then 
+            # we stop in our tracks, break out of the loop, and give a message 
+            # on this
+            if(iter > 10) {
+                message(paste0("Couldn't add new agent after 10 attempts. ", 
+                               "Instead of creating an initial condition with ", 
+                               initial_number_agents, 
+                               " agents, only ", 
+                               length(agents), 
+                               " agents will be used in the initial condition."))
+                stop <- TRUE
+                break
+            }
+
+            # Sample a random edge on which the agent will stand
+            idx <- sample(1:nrow(edges$edges), 1)
+
+            # Get the coordinates of the two points that make up this edge
+            co_1 <- edges$nodes[edges$nodes$node_ID == edges$edges$from[idx], c("X", "Y")]
+            co_2 <- edges$nodes[edges$nodes$node_ID == edges$edges$to[idx], c("X", "Y")]
+
+            # Generate several alternative positions along this edge on which the 
+            # agent can stand and bind them into a matrix
+            alternatives <- cbind(co_1$X + seq(0, 1, radius) * (co_2$X - co_1$X),
+                                  co_1$Y + seq(0, 1, radius) * (co_2$Y - co_1$Y))
+
+            # Check which position are accessible for the agent
+            dummy <- agent(center = c(0, 0), radius = radius)
+
+            check <- rep(TRUE, each = nrow(alternatives))
+            check <- overlap_with_objects(dummy, 
+                                          setting,
+                                          alternatives, 
+                                          check)
+
+            if(any(check)) {
+                idx <- which(check)
+                idx <- sample(idx, 1)
+                
+                position <- alternatives[idx,]
+
+                success <- TRUE
+            }
+
+            # Increase the iteration number
+            iter <- iter + 1
+        }
+
+        # Initial agent to create
+        new_agent <- add_agent(object, 
+                               goal_number[i], 
+                               goal_duration = goal_duration,
+                               radius = radius,
+                               position = position,
+                               standing_start = standing_start,
+                               close_enough = close_enough,
+                               space_between = space_between,
+                               time_step = time_step,
+                               precomputed_edges = precomputed_edges,
+                               precompute_goal_paths = precompute_goal_paths,
+                               order_goal_stack = order_goal_stack,
+                               precomputed_goals = precomputed_goals)
+
+        # If you need to stop, break out of the loop
+        if(stop) {
+            break
+        }
+
+        # Put the agent in the `agents` list and continue
+        agents[[i]] <- new_agent
+        setting@objects <- append(setting@objects, new_agent)
+    }    
+    
+    return(agents)
 }
 
 # Undocumented function because this is in no way a particularly beautiful 

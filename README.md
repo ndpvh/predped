@@ -1,5 +1,11 @@
 # predped
-Using the m4ma package to estimate and simulate walking behavior.
+
+<!-- badges: start -->
+[![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
+[![coverage](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml)
+<!-- badges: end -->
+
+An R package that builds on the m4ma package to estimate and simulate walking behavior.
 
 ## Dependencies
 ```R

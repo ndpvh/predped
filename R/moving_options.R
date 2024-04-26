@@ -35,37 +35,21 @@ setGeneric("moving_options", function(agent, ...){})
 #     errors
 #
 # Replacement of `get_ok`, which was nested within `move` in `pp_simulate.R`
-moving_options_agent <- function(agent, state, background, centers){
-    # Create a local function that will be useful for debugging
-    check_try_error <- function(x, error_number){
-        e <- !all(!x) |>
-            try() |>
-            class()
+moving_options_agent <- function(agent, 
+                                 state, 
+                                 background, 
+                                 centers){
 
-        if(e){
-            return(list(error_location = error_location,
-                        agent_id = id(agent),
-                        state = state,
-                        agent = agent,
-                        centers = centers))
-        } else {
-            return(NULL)
-        }
-    }
-
-    # Get the index of the agent in the state$agent list
-    agent_id <- sapply(state$agents, id)
-    agent_idx <- which(id(agent) == agent_id)
+    # Add the other agents to the background objects. This will allow us to 
+    # immediately test whether cells are occupied by other agents instead of 
+    # doing this check only later.
+    objects(background) <- append(objects(background), 
+                                      state$agents)
 
     # Use the `free_cells` function to get all free cells to which the agent
-    # might move and check whether it does not provide an error. Also add a 
-    # function that checks the intersection of a circle with another object
+    # might move. Specifically look at whether a cell lies within the background
+    # and whether the agent has a direct line of sight to that cell.
     check <- m4ma::free_cells_rcpp(agent, background, centers)
-
-    # errored_out <- check_try_error(check, "after `free_cells`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
 
     # If there are still cells free, check whether an agent would intersect with
     # an object if it were to move to a given cell. Given that the function
@@ -73,7 +57,7 @@ moving_options_agent <- function(agent, state, background, centers){
     # of this function can overwrite the local `check` variable without any
     # issues
     if(!all(!check)){
-        check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
+        # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
         check <- overlap_with_objects(agent, background, centers, check)
 
         # If something blocks the way in the previous column, then it should also 
@@ -81,10 +65,6 @@ moving_options_agent <- function(agent, state, background, centers){
         check[!check[,3],2] <- FALSE
         check[!check[,2],1] <- FALSE
     }
-    # errored_out <- check_try_error(check, "after `overlap_with_objects`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
 
     # If there are still cells free, check whether the goal can still be seen
     # or whether an agent should re-plan
@@ -106,30 +86,6 @@ moving_options_agent <- function(agent, state, background, centers){
         # agent should still move even if it cannot see their goal (hence the
         # if-statement), otherwise the agent will get stuck
         check <- if(!all(!local_check)) local_check else !opposite_check
-    }
-    
-    # errored_out <- check_try_error(check, "after `seesGoalOK`")
-    # if(!is.null(errored_out)){
-    #     bad <<- errored_out
-    # }
-
-    # If there are still cells free, check whether there are cells in which another
-    # agent is currently standing
-    if(!all(!check)){
-        # Originally deleted the agent from the state$agent list. However, not 
-        # necessary anymore! The state$agents list already does not contain the 
-        # `agent` anymore
-        #
-        # Additional condition added: If there are not other agents, then we 
-        # don't need to do this check
-        if(length(state$agents[-agent_idx]) > 0) {
-            check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, state$agents[-agent_idx], check)
-        }
-
-        # If something blocks the way in the previous column, then it should also 
-        # block the way on the columns
-        check[!check[,3],2] <- FALSE
-        check[!check[,2],1] <- FALSE
     }
 
     # Finally, return the cells that are free to move to
@@ -160,19 +116,15 @@ agents_between_goal <- function(agent,
                                 state, 
                                 agent_predictions = NULL) {
 
-    # Get the index of the agent within the state$agents list
-    agent_id <- sapply(state$agents, id)
-    agent_idx <- which(id(agent) == agent_id)
-
     # If no predicted positions are delivered to the function, we will use the 
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        other_agents <- state$agents[-agent_idx]
-        agent_positions <- sapply(other_agents, position) |>
-            matrix(ncol = 2)
+        agent_positions <- lapply(state$agents, position)
+        agent_positions <- do.call("rbind", 
+                                   agent_positions)
     } else {
-        agent_positions <- agent_predictions[-agent_idx,] |>
+        agent_positions <- agent_predictions[-id(agent),] |>
             matrix(ncol = 2)
     }
 
@@ -246,6 +198,9 @@ agents_between_goal <- function(agent,
 }
 
 # Temporary function to see if this one actually works
+#
+# TO DO
+#   - Assumes the agent is a circle: Change this
 overlap_with_objects <- function(agent, 
                                  background, 
                                  centers, 
@@ -254,6 +209,19 @@ overlap_with_objects <- function(agent,
     shp <- shape(background)
     obj <- objects(background)
 
+    # Transform all background-objects into one big matrix of segments. This will
+    # allow us to vectorize the search for intersections between the agent and 
+    # an object, hopefully speeding up the search.
+    coords_obj <- matrix(0, nrow = 0, ncol = 2)
+    for(i in obj) {
+        coords_obj <- rbind(coords_obj, 
+                            nodes_on_circumference(i))
+    }
+
+    # Do the same for the background. Saves a lot of time, as the original 
+    # function that was used (`intersects`) is quite time-inefficient.
+    coords_shp <- nodes_on_circumference(shp)
+
     # Loop over the centers
     for(i in seq_len(nrow(centers))) {
         # If that center is already out of the running, continue
@@ -261,25 +229,50 @@ overlap_with_objects <- function(agent,
             next
         }
 
-        # Create a temporary circle, and find out whether these are (a) contained 
-        # within the background and (b) not contained within any of the objects
-        circ <- circle(center = centers[i,], 
-                       radius = radius(agent))
+        # Change the center of the agent
+        center(agent) <- centers[i,]
 
-        # Check whether contained in background
-        if(intersects(circ, shp)) {
+        # First check whether there is an intersection with the shape of the 
+        # background
+        if(any(in_object(agent, coords_shp, outside = FALSE))) {
             check[i] <- FALSE
             next
         }
 
-        # Check whether not contained within objects
-        local_check <- sapply(obj, 
-                              \(x) intersects(circ, x))
-
-        if(any(local_check)) {
+        # And now whether there is an intersection with the objects of the 
+        # background
+        if(any(in_object(agent, coords_obj, outside = FALSE))) {
             check[i] <- FALSE
         }
     }
 
     return(check)
+}
+
+# Helper function to create dots on the circumference of objects, to be used for
+# overlap_with_object
+nodes_on_circumference <- function(object) {
+    if(inherits(object, "circle")) {
+        nodes <- to_polygon(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
+    } else {
+        corners <- object@points 
+        n <- nrow(corners)
+
+        x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
+        y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
+
+        len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / 5e-2))
+        len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / 5e-2))
+
+        len <- matrixStats::rowMaxs(cbind(len_x, len_y))
+
+        nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
+                                                   x_changes[,2],
+                                                   length.out = len))),
+                       as.numeric(unlist(multi_seq(y_changes[,1], 
+                                                   y_changes[,2],
+                                                   length.out = len))))
+    }
+    
+    return(nodes)
 }

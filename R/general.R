@@ -1,3 +1,6 @@
+#' Typical Archetypes used for Simulation
+#' 
+#' @export
 params_archetypes <- read.csv(file.path("archetypes.csv"))
 
 #' Find all objects of a given class
@@ -15,90 +18,73 @@ find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
 }
 
-#' Separate agent and object
+#' Find the perpendicular orientation
 #' 
-#' This function extracts agents and objects from a single `state` list.
+#' Finds the perpendicular or tangential orientation of a line starting from a 
+#' point on an edge of the background's shape and going inwards. The point on the 
+#' edge is chosen to be the entrance to the space. Is used to find in what 
+#' orientation the agents should be heading when entering the space.
 #' 
-#' @param state A list containing the current state of the simulation
+#' @param object An object of class object
+#' @param co A vector of size 2 containing x and y coordinates for a location 
+#' from which to deduce the perpendicular orientation
 #' 
-#' @return Two lists containing the objects or the agents
+#' @return Numeric denoting the perpendicular orientation to the entrance of the 
+#' space in degrees
 #' 
-#' @export separate_agent_object
-separate_agent_object <- function(state) {
-    # Identify the agents from the `state` list
-    agents <- find_class("agent", state)
-
-    # Identify the objects and delete the agents from this list
-    objects <- find_class("object", state) 
-    objects[[objects %in% agents]] <- NULL 
-
-    return(list("agents" = agents, 
-                "objects" = objects))
-}
-
-# Create a singular function for the unpacking for a given part of the list
-unpack_list <- function(index){
-    # Extract the wanted variable from the list across all agents. Then, 
-    # transpose the result and give the result row names
-    transposed <- apply(state, 2, function(x) x[[index]]) |>
-        t()
-    row.names(transposed) <- names
-    return(transposed)        
-}
-
-# Undocumented function because this is in no way a particularly beautiful 
-# function, nor is it meant to be the final way in which we do this.
-#
-# It takes in the background as an object and computes the orientation the 
-# agent needs to walk in in order to walk perpendicular to the entrance they 
-# just came from.
-#
-# @param background Object of the background class.
-perpendicular_orientation <- function(background) {
+#' @export
+perpendicular_orientation <- function(object, co) {
     # Dispatch based on the shape of the background
-    if(class(shape(background)) == "circle") {
+    if(inherits(object, "circle")) {
         # If the entrance lies on the circumference of the circle, we can easily
         # derive the angle at which the entrance finds itself relative to the 
         # center of the circle. The perpendicular orientation to this angle is 
         # then the angle + 180 (or angle + pi)
-        co <- entrance(background)
-        angle <- atan2(co[1], co[2]) + pi
-        angle <- angle * 180 / pi
-    } else {
+        co <- co - center(object)
+        angle <- atan2(co[2], co[1]) + pi
+
+    } else if(inherits(object, "polygon")) {
         # Find out where the entrance lies in the background
         # For this, we compute the sum of the distances between each of 
         # the points that make up an edge and the entrance point. The edge that has 
         # the distance closest to the actual size of the edge will be taken as the 
         # entrance wall.
-        co <- entrance(background)@.Data
-        points <- shape(background)@points
-        points <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
+        points <- object@points
+        edges <- cbind(points, points[c(2:nrow(points), 1),]) # Make a 4-columned matrix with (x1, y1) and (x2, y2)
 
-        distances <- cbind(sqrt((points[,1] - points[,3])^2 + (points[,2] - points[,4])^2),
-                        sqrt((points[,1] - co[1])^2 + (points[,2] - co[2])^2),
-                        sqrt((points[,3] - co[1])^2 + (points[,4] - co[2])^2))
-        distances <- distances[,1] - distances[,2] - distances[,3]
+        distances <- cbind(sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2),
+                           sqrt((edges[,1] - co[1])^2 + (edges[,2] - co[2])^2),
+                           sqrt((edges[,3] - co[1])^2 + (edges[,4] - co[2])^2))
+        distances <- distances[,2] + distances[,3] - distances[,1]
 
         # Now that we know on which edge the entrance lies, we can compute the 
-        # perpendicular orientation to this edge. Approach computes the orientation 
-        # of the line defined by the entrance and the edge of the wall that contains 
-        # it and then either subtracts (clockwise == TRUE) or adds (clockwise == FALSE)
-        # 90 degrees from it. The formula to do this is simply tan^{-1} (slope), 
-        # where slope is the slope of the edge
-        edge <- as.numeric(points[which.min(distances),])
-        slope <- (edge[2] - edge[4]) / (edge[1] - edge[3])
+        # perpendicular orientation to this edge. Approach uses the first point
+        # of the edge as the center of an imaginary circle, which has the second
+        # point of the edge on its circumference. We can then use atan2 again to
+        # find the angle of the slope in the same way as before. The perpendicular
+        # orientation is then defined as the found angle - pi / 2 (when moving
+        # clockwise) or + pi / 2 (when moving counterclockwise)
+        edge <- as.numeric(edges[which.min(distances),])
 
-        angle <- atan(slope) * 180 / pi     # Conversion from radians to degrees
-        if(background@shape@clock_wise) {
-            angle <- angle - 90
-        } else {
-            angle <- angle + 90
-        }
+        co <- edge[3:4] - edge[1:2]
+        angle <- atan2(co[2], co[1]) 
+
+        angle <- ifelse(object@clock_wise, 
+                        angle - pi / 2, 
+                        angle + pi / 2)
     }
+    # Convert to degrees
+    angle <- angle * 180 / pi
+    names(angle) <- NULL
 
     # If you have a negative angle, convert this to a positive one
     if(angle < 0) {
         angle <- angle + 360
+    }
+
+    # If the angle is equal to 360, change to 0
+    if(angle == 360) {
+        angle <- 0
     }
 
     return(angle)
@@ -161,3 +147,6 @@ line_line_intersection <- function(segments_1,
         return(any(intersection))
     }
 }
+
+# Vectorized version of seq, used in `overlap_with_objects`
+multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "length.out"))

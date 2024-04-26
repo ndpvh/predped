@@ -1,6 +1,6 @@
 #' Plot an Object.
 #'
-#' @param object An object of kind \code[predped]{object-class}
+#' @param object An object of kind \code{\link[predped]{object-class}}
 #' @param ... Additional arguments passed on to the geom used to plot the object.
 #'
 #' @return Either a geom or a ggplot
@@ -74,11 +74,98 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "list", function(object, ...) {
+setMethod("plot", "list", function(object, trace = FALSE, ...) {
+    # If the list in question is the trace, then we have to output the plots for
+    # each state in the simulation. This is a little more complicated than for 
+    # a simple list
     plt <- list()
-    for(i in seq_along(object)) {
-        plt <- append(plt, plot(object[[i]], ...))
+    if(trace) {
+        # Setting doesn't change, so can be saved immediately
+        base_plot <- predped::plot(object[[1]]$setting, fill = "grey", color = "black")
+
+        # Loop over each state
+        for(i in seq_along(object)) {
+            print(paste0("Making plot for iteration ", i))
+
+            # If there are currently no agents, then we just return the base_plot
+            if(length(object[[i]]$agents) == 0) {
+                plt[[i]] <- base_plot + 
+                    ggplot2::labs(title = paste("iteration", i))
+
+            # Otherwise, we will have to add the agents in the base_plot
+            } else {
+                # Transform the complete state to a collection of segments
+                segments <- matrix(0, nrow = 0, ncol = 5)
+                goals <- matrix(0, nrow = 0, ncol = 3)
+                color_code <- c()
+                for(j in object[[i]]$agents) {
+                    # Get coordinates of the agent themselves and turn into 
+                    # segments
+                    if(inherits(j, "circle")) {
+                        agent_coords <- to_polygon(j, length.out = 25)
+                    } else {
+                        agent_coords <- j@points
+                    }
+                    agent_segments <- cbind(agent_coords, 
+                                            agent_coords[c(2:nrow(agent_coords), 1),])
+
+                    # Keep track of the location of the agent's goals. Furthermore
+                    # add a segment that denotes the orientation of the agent
+                    agent_goals <- current_goal(j)@position
+
+                    angle <- j@orientation * 2 * pi / 360
+                    agent_segments <- rbind(agent_segments, 
+                                            c(center(j), 
+                                              center(j) + radius(j) * c(cos(angle), sin(angle))))
+
+                    # Add the color to the color code if it is not already in 
+                    # there
+                    if(!(j@color %in% color_code)) {
+                        color_code[j@color] <- j@color
+                    }
+
+                    # Add information on the color to the dataframes
+                    agent_segments <- cbind(agent_segments, j@color)
+                    agent_goals <- c(agent_goals, j@color)
+
+                    segments <- rbind(segments, agent_segments)
+                    goals <- rbind(goals, agent_goals)
+                }
+
+                # Once done, plot all this information as a collection of segments 
+                # and points
+                segments <- as.data.frame(segments) |>
+                    setNames(c("x", "y", "xend", "yend", "color"))
+                goals <- as.data.frame(goals) |>
+                    setNames(c("x", "y", "color"))
+
+                plt[[i]] <- suppressWarnings(base_plot +
+                    ggplot2::geom_segment(data = segments, 
+                                        ggplot2::aes(x = as.numeric(x), 
+                                                    y = as.numeric(y), 
+                                                    xend = as.numeric(xend),
+                                                    yend = as.numeric(yend),
+                                                    color = color),
+                                        ...) +
+                    ggplot2::geom_point(data = goals, 
+                                        ggplot2::aes(x = as.numeric(x), 
+                                                    y = as.numeric(y), 
+                                                    color = color),
+                                        ...) +
+                    ggplot2::scale_color_manual(values = color_code) +
+                    ggplot2::labs(title = paste("iteration", i)) +
+                    ggplot2::theme(legend.position = "none"))
+            }
+        }
+
+    # If it is not the trace, then we need to output the list of geom's that are
+    # created for each of the elements in the list
+    } else {
+        for(i in seq_along(object)) {
+            plt <- append(plt, plot(object[[i]], ...))
+        }        
     }
+
     return(plt)
 })
 
@@ -94,8 +181,14 @@ setMethod("plot", "background", function(object,
     # with the agent when they get close to the sides of the grid. Changing the 
     # `expand` argument did not fix that, so we have to fix the limits of the 
     # plot manually. This is what I am doing here. 
-    xlims <- range(shape(object)@points[,1])
-    ylims <- range(shape(object)@points[,2])
+    if(inherits(shape(object), "circle")) {
+        circ <- shape(object)
+        xlims <- center(circ)[1] + c(-radius(circ), radius(circ))
+        ylims <- center(circ)[2] + c(-radius(circ), radius(circ))
+    } else {
+        xlims <- range(shape(object)@points[,1])
+        ylims <- range(shape(object)@points[,2])
+    }
 
     x_padding <- 0.05 * (xlims[2] - xlims[1])
     y_padding <- 0.05 * (ylims[2] - ylims[1])
@@ -122,23 +215,13 @@ setMethod("plot", "background", function(object,
                               radius = (entry_exit_width / 2)))
     
     # Check that polygon coordinates are in the background
-    # If not, set those coorinates to NA                   
-    for (i in seq_len(nrow(entrance))) {
-      tst <- in_object(object@shape, entrance[i,])
-      if (tst) {
-        entrance[i,] <- NA
-      }
-    }
+    # If not, set those coorinates to NA   
+    idx <- in_object(object@shape, entrance, outside = FALSE)
+    idy <- in_object(object@shape, exit, outside = FALSE)
+
+    entrance <- entrance[idx,]    
+    exit <- exit[idy,] 
     
-    # Remove the NA values to make half moon shape
-    entrance <- na.omit(entrance)
-    for (i in seq_len(nrow(exit))) {
-      tst <- in_object(object@shape, exit[i,])
-      if (tst) {
-        exit[i,] <- NA
-      }
-    }
-    exit <- na.omit(exit)
     plt <- plt + plot(polygon(points = entrance), fill = NA, colour = "black")
     plt <- plt + plot(polygon(points = exit), fill = NA, colour = "black")
     return(plt)
