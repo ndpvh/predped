@@ -266,12 +266,13 @@ nodes_on_circumference <- function(object) {
 
         len <- matrixStats::rowMaxs(cbind(len_x, len_y))
 
-        nodes <- cbind(unlist(multi_seq(x_changes[,1], 
-                                        x_changes[,2],
-                                        length.out = len)),
-                       unlist(multi_seq(y_changes[,1], 
-                                        y_changes[,2],
-                                        length.out = len)))
+        nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
+                                                   x_changes[,2],
+                                                   length.out = len))),
+                       as.numeric(unlist(multi_seq(y_changes[,1], 
+                                                   y_changes[,2],
+                                                   length.out = len))))
     }
+    
     return(nodes)
 }
