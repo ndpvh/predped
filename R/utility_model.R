@@ -219,7 +219,6 @@ utility <- function(agent,
     }
 
     if (!is.null(buddies)) {
-        View(p)
         V <- V + m4ma::wbUtility_rcpp(p[["a_buddy"]], 
                                       p[["b_buddy"]], 
                                       buddies[["buddies"]], 
