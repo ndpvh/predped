@@ -219,10 +219,9 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.05 * parameters(agent)[["sPref"]],
+                            standing_start = 0.05 * parameters(agent)[["preferred_speed"]],
                             time_step = 0.5,
-                            report = TRUE,
-                            temperature = 1
+                            report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
@@ -306,7 +305,7 @@ update_position <- function(agent,
         }
 
         V <- V - max(V)
-        exp_V <- exp(temperature * V)
+        exp_V <- exp(V)
         Pr <- exp_V / sum(exp_V)
 
         # Apply the different options to the probabilities
@@ -398,7 +397,7 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.05 * parameters(agent)[["sPref"]],
+                        standing_start = 0.05 * parameters(agent)[["preferred_speed"]],
                         close_enough = 2 * radius(agent),
                         space_between = radius(agent),
                         report = FALSE,
@@ -502,7 +501,7 @@ update_goal <- function(agent,
             speed(agent) <- standing_start
 
         } else {
-            reroute_param <- parameters(agent)$pReroute
+            reroute_param <- parameters(agent)$reroute
 
             if(is.finite(reroute_param)) {
                 # Compute the probability of rerouting based on the number of

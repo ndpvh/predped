@@ -159,14 +159,23 @@ utility <- function(agent,
 
     # Always check if utility data is NULL
     if (!is.null(goal_distance)) {
-        V <- V + m4ma::psUtility_rcpp(p[["aPS"]], p[["bPS"]], p[["sPref"]], p[["sSlow"]], speed(agent), goal_distance)
+        V <- V + m4ma::psUtility_rcpp(p[["a_preferred_speed"]], 
+                                      p[["b_preferred_speed"]], 
+                                      p[["preferred_speed"]], 
+                                      p[["slowing_time"]], 
+                                      speed(agent), 
+                                      goal_distance)
     }
 
     if (!is.null(direction_goal)) {
-        V <- V + m4ma::gaUtility_rcpp(p[["bGA"]], p[["aGA"]], direction_goal)
+        V <- V + m4ma::gaUtility_rcpp(p[["b_goal_direction"]], 
+                                      p[["a_goal_direction"]], 
+                                      direction_goal)
     }
 
-    V <- V + m4ma::caUtility_rcpp(p[["aCA"]], p[["bCA"]], p[["bCAlr"]])
+    V <- V + m4ma::caUtility_rcpp(p[["a_current_direction"]], 
+                                  p[["b_current_direction"]], 
+                                  p[["blr_current_direction"]])
 
     if (!is.null(interpersonal_distance)) {
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
@@ -183,29 +192,41 @@ utility <- function(agent,
             all(x > 0)
         })
 
-        V <- V + m4ma::idUtility_rcpp(
-            p[["bID"]], p[["dID"]], p[["aID"]], is_ingroup, check, interpersonal_distance, as.vector(ifelse(check, 0, -Inf)) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
-        )
+        V <- V + m4ma::idUtility_rcpp(p[["b_interpersonal"]], 
+                                      p[["d_interpersonal"]], 
+                                      p[["a_interpersonal"]], 
+                                      is_ingroup, 
+                                      check, 
+                                      interpersonal_distance, 
+                                      as.vector(ifelse(check, 0, -Inf))) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
     } else {
         V <- V + as.vector(ifelse(check, 0, -Inf))
     }
 
     if (!is.null(blocked_angle)) {
-        V <- V + m4ma::baUtility_rcpp(p[["aBA"]], p[["bBA"]],
+        V <- V + m4ma::baUtility_rcpp(p[["a_blocked"]], 
+                                      p[["b_blocked"]],
                                       pmax(blocked_angle, 0), # Make sure all angles are >= 0; this was previously done in baUtility()
-                                      as.integer(names(blocked_angle))-1)
+                                      as.integer(names(blocked_angle)) - 1)
     }
 
     if (!is.null(leaders)) {
-        V <- V + m4ma::flUtility_rcpp(p[["aFL"]], p[["bFL"]], p[["dFL"]], leaders[["leaders"]], leaders[["dists"]])
+        V <- V + m4ma::flUtility_rcpp(p[["a_leader"]], 
+                                      p[["b_leader"]], 
+                                      p[["d_leader"]], 
+                                      leaders[["leaders"]], 
+                                      leaders[["dists"]])
     }
 
     if (!is.null(buddies)) {
-        V <- V + m4ma::wbUtility_rcpp(p[["aWB"]], p[["bWB"]], buddies[["buddies"]], buddies[["dists"]])
+        View(p)
+        V <- V + m4ma::wbUtility_rcpp(p[["a_buddy"]], 
+                                      p[["b_buddy"]], 
+                                      buddies[["buddies"]], 
+                                      buddies[["dists"]])
     }
 
-    # Stop baseline (set by gwUtility) and scaling
-    V_transformed <- c(-p[["bS"]], V) / p[["rU"]]
+    V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
 
     return(V_transformed)
 }
