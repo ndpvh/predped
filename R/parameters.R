@@ -132,6 +132,11 @@ to_normal <- function(parameters) {
 #
 # Original function `toNatural`
 to_probit <- function(parameters) {
+    # If the parameters are numeric, transpose them to a matrix
+    if(!any(class(parameters) %in% "matrix")) {
+        parameters <- t(parameters)
+    }
+
     params <- list()
     for(i in utility_parameters){
         # Transform to the 0 - 1 scale
