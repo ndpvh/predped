@@ -224,7 +224,9 @@ add_agent <- function(object,
     idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
     color <- object@parameters$color[idx]
 
-    params <- draw_parameters(object@parameters[idx,],
+    params <- draw_parameters(1, 
+                              object@parameters[idx,],
+                              archetype = object@parameters$name[idx],
                               individual_differences = individual_differences)    
     radius <- params$radius   
 
