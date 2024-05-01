@@ -1,38 +1,33 @@
+################################################################################
+# VALUES
+################################################################################
+
+#' Typical Archetypes used for Simulation
+#' 
+#' @export
+params_archetypes <- read.csv(file.path("archetypes.csv"))
+params_sigma <- readRDS(file.path("archetypes_sigma.Rds"))
+params_bounds <- read.csv(file.path("parameter_bounds.csv"), 
+                          row.names = 1)
+
 # Vectors that define the parameters by name. Used in the functions defined here.
 # Not exported because not needed anywhere else.
-normal_parameters <- c("radius",
-                       "slowing_time",
-                       "preferred_speed",
-                       "reroute",
-                       "b_current_direction",
-                       "a_current_direction",
-                       "blr_current_direction",
-                       "b_goal_direction",
-                       "a_goal_direction",
-                       "b_blocked",
-                       "a_blocked",
-                       "b_interpersonal",
-                       "a_interpersonal",
-                       "d_interpersonal",
-                       "b_preferred_speed",
-                       "a_preferred_speed",
-                       "b_leader",
-                       "a_leader",
-                       "d_leader",
-                       "b_buddy",
-                       "a_buddy")
-
-log_parameters <- c("randomness",
-                    "stop_utility")
-
-utility_parameters <- c(normal_parameters, 
-                        log_parameters)
-
 nest_parameters <- c("central", 
                      "non_central", 
                      "acceleration", 
                      "constant_speed", 
                      "deceleration")
+
+utility_parameters <- colnames(params_archetypes)
+utility_parameters <- utility_parameters[!(utility_parameters %in% c("name", "color"))]
+
+
+
+
+
+################################################################################
+# FUNCTIONS
+################################################################################
 
 #' Draw parameters
 #' 
@@ -48,30 +43,132 @@ nest_parameters <- c("central",
 #' ommitted from this list 
 #' 
 #' @export  
-draw_parameters <- function(parameters, 
-                            individual_differences = TRUE) {
+draw_parameters <- function(n = 1,
+                            mean,
+                            Sigma = params_sigma[[archetype]],
+                            archetype = "BaselineEuropean",
+                            individual_differences = TRUE,
+                            transform_covariance = TRUE) {
 
     # Delete standard deviations from parameters and return if individual 
     # differences are not allowed
     if(!individual_differences) {
-        return(parameters[c(utility_parameters, nest_parameters)])
+        return(mean[utility_parameters])
+    }
+
+    # Make sure the order of the variables in Sigma is the same as for mean
+    mean <- mean[utility_parameters]
+    Sigma <- Sigma[utility_parameters, utility_parameters]
+
+    # Check whether the user already provided an actual covariance matrix, or 
+    # whether the user input corresponds to a mixed standard deviation - 
+    # correlation matrix
+    if(transform_covariance) {
+        Sigma <- to_covariance(Sigma)
     }
 
     # If individual differences are allowed, draw random parameters from the
-    # distribution specified for the agent
-    for(i in normal_parameters) {
-        parameters[[i]] <- rnorm(1, 
-                                 parameters[[i]], 
-                                 parameters[[paste0("sd_", i)]])
+    # distribution specified for the agent. Happens in the following steps
+    #
+    #   - Transform the parameters to the normal scale
+    #   - Draw a random parameter from a multivariate normal with as mean the
+    #     transformed parameters and as standard deviation those provided by 
+    #     the user.
+    #   - Transform the drawn parameters back to their usual scale
+    mean <- to_normal(mean) |>
+        t()
+    params <- MASS::mvrnorm(n, mean, Sigma)
+    params <- to_probit(params)
+
+    return(params[utility_parameters])
+}
+
+#' Transform to real axis
+#' 
+#' Use the probit (positive, bounded) definition of the parameters and transform
+#' them to a real (normal, unbounded) scale.
+#'
+#' @param parameters A named list containing the parameters for a given agent
+#'
+#' @return A named list containing the transformed parameters
+#'
+#' @export
+#
+# Original function `toReal`
+to_normal <- function(parameters) {
+    for(i in utility_parameters){
+        # Transform to 0 - 1 (probit) range
+        parameters[[i]] <- (parameters[[i]] - params_bounds[i,1]) / diff(as.numeric(params_bounds[i,]))
+
+        # Check whether the parameter indeed falls within this range. If not, 
+        # throw an error
+        if(parameters[[i]] < 0 | parameters[[i]] > 1) {
+            stop(paste0("Parameter ", 
+                        i,
+                        " does not fall within its bounds."))
+        }
+
+        # Transform to a value of a normal distribution
+        parameters[[i]] <- qnorm(parameters[[i]])
     }
 
-    for(i in log_parameters) {
-        parameters[[i]] <- rlnorm(1, 
-                                  log(parameters[[i]]),
-                                  parameters[[paste0("sd_", i)]])        
+    return(parameters[utility_parameters])
+}
+
+#' Transform to positive axis
+#' 
+#' Use the real (normal, unbounded) definition of the parameters and transform
+#' them to a positive (probit, bounded) scale.
+#'
+#' @param parameters A named list containing the parameters for a given agent
+#'
+#' @return A named list containing the transformed parameters
+#'
+#' @export
+#
+# TO DO:
+#  - parameter "bS" should be changed, as an exponentiation with a very high
+#    number becomes Inf (see tests)
+#
+# Original function `toNatural`
+to_probit <- function(parameters) {
+    params <- list()
+    for(i in utility_parameters){
+        # Transform to the 0 - 1 scale
+        params[[i]] <- pnorm(parameters[,i])
+
+        # Transform to the original bounds of the parameters
+        params[[i]] <- diff(as.numeric(params_bounds[i,])) * params[[i]] + params_bounds[i, 1]
     }
 
-    return(parameters[c(utility_parameters, nest_parameters)])
+    return(data.frame(params[utility_parameters]))
+}
+
+#' Transform user-inputted matrix to covariance matrix
+#' 
+#' Use the inputted matrix to construct the covariance matrix for the parameters.
+#' 
+#' @param X A d x d matrix containing the standard deviations of the parameters
+#' on the diagonal and the correlations between parameters off the diagonal.
+#' 
+#' @return Covariance matrix of the parameters
+#' 
+#' @export 
+to_covariance <- function(X) {
+    d <- nrow(X)
+
+    # Compute the covariance matrix in the following way:
+    #   - Create two matrices containing all standard deviations of a given 
+    #     dimension in their rows or columns.
+    #   - Adjust X so that it contains 1's on its diagonal
+    #   - Multiply X with these two matrices in an element-wise way, so that each
+    #     cell contains the covariance: COV(x, y) = COR(x, y) * SD(x) * SD(y)
+    SD <- diag(X) |>
+        rep(times = d) |>
+        matrix(nrow = d, ncol = d)
+    diag(X) <- 1
+
+    return(X * SD * t(SD))
 }
 
 #' Transform nest association to precision (mu)
@@ -93,73 +190,72 @@ transform_mu <- function(parameters) {
     return(parameters)
 }
 
-#' Exponentiate the parameters
-#'
-#' @param parameters A named list containing the parameters for a given agent
-#'
-#' @return A named list containing the transformed parameters
-#'
-#' @export transform_exponentiate
-#
-# TO DO:
-#  - parameter "bS" should be changed, as an exponentiation with a very high
-#    number becomes Inf (see tests)
-#
-# Original function `toNatural`
-transform_exponentiate <- function(parameters) {
-    for(i in utility_parameters){
-        parameters[[i]] <- exp(parameters[[i]])
-    }
+#' Plot prior parameter distributions
+#' 
+#' Use the provided means and covariance matrix to visualize the distribution of
+#' parameter values.
+#' 
+#' @param n Number of parameters to simulate. Defaults to `1000`.
+#' @param mean Named list or vector of parameter means 
+#' @param Sigma Covariance matrix for the parameters or mix of standard deviation
+#' - correlation matrix. Has a specific default for each archetype.
+#' @param archetype String denotign the archetype that is being used. Is used 
+#' to find the default `Sigma`. Defaults to `"BaselineEuropean"`
+#' @param individual_differences Whether individual differences should be 
+#' accounted for. If `FALSE`, return `mean`. Defaults to `TRUE`.
+#' @param transform_covariance Logical denoting whether to transform `Sigma`
+#' to a proper covariance matrix. Defaults to `TRUE`.
+#' 
+#' @return Printed histogram of the distribution of parameters under the 
+#' specifications.
+#' 
+#' @export
+plot_distribution <- function(...) {
 
-    for(i in nest_parameters){
-        parameters[[i]] <- pnorm(parameters[[i]])
-    }
+    # Simulate several parameters
+    parameters <- draw_parameters(...)
 
-    return(parameters)
+    # Loop over each of the parameters and create histograms of the distribution
+    # of these parameters
+    plt <- list()
+    suppressMessages(for(i in colnames(parameters)) {
+        # Transform parameter data to specific plotting data
+        plot_data <- parameters[,i] |>
+            as.data.frame() |>
+            setNames("X")
 
-    # Original implementation
-    #   gt1p was empty
-    #   negp was empty
-    #   posp contained `utility_parameters`
-    #   pp contained `nest_parameters`
-    #
-    # p[gt1p] <- exp(p[gt1p]) + 1
-    # p[negp] <- -exp(p[negp])
-    # p[posp] <- exp(p[posp])
-    # p[pp] <- pnorm(p[pp])
-    # p[!is.na(p)]
+        # Compute how much variation there is in the parameter
+        interval <- diff(range(plot_data$X))
+
+        # Create the general ggplot
+        plt[[i]] <- ggplot2::ggplot(data = plot_data,
+                                    ggplot2::aes(x = as.numeric(X))) +
+            ggplot2::geom_histogram(fill = "gray",
+                                    color = "black",
+                                    binwidth = ifelse(interval != 0, 
+                                                      interval / 16,
+                                                      1e-3)) +
+            ggplot2::labs(title = i,
+                          x = "",
+                          y = "Frequency") +
+            ggplot2::scale_x_continuous(labels = \(x) sprintf("%.2f", x)) +
+            # ggplot2::scale_x_continuous(labels = scales::scientific) +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = -45, 
+                                                               hjust = 0))
+
+        # If there is no variation in the parameters, we change the limits so 
+        # that it is nicer for the eye.
+        if(interval == 0) {
+            plt[[i]] <- plt[[i]] +
+                ggplot2::scale_x_continuous(limits = plot_data$X[1] + c(-1e-2, 1e-2),
+                                            #labels = scales::scientific,
+                                            labels = \(x) sprintf("%.2f", x))
+        }
+    })
+
+    # Bind plots together and return
+    return(ggpubr::ggarrange(plotlist = plt, 
+                             nrow = ceiling(sqrt(length(plt))),
+                             ncol = ceiling(sqrt(length(plt)))))
 }
-
-#' Take the logarithm of the parameters
-#'
-#' @param parameters A named list containing the parameters for a given agent
-#'
-#' @return A named list containing the transformed parameters
-#'
-#' @export transform_logarithmic
-#
-# Original function `toReal`
-transform_logarithmic <- function(parameters) {
-    for(i in utility_parameters){
-        parameters[[i]] <- log(parameters[[i]])
-    }
-
-    for(i in nest_parameters){
-        parameters[[i]] <- qnorm(parameters[[i]])
-    }
-
-    return(parameters)
-
-    # Original implementation
-    #   gt1p was empty
-    #   negp was empty
-    #   posp contained `utility_parameters`
-    #   pp contained `nest_parameters`
-    #
-    # p[gt1p] <-  log(p[gt1p] - 1)
-    # p[negp] <-  log(-p[negp])
-    # p[posp] <-  log(p[posp])
-    # p[pp] <- qnorm(p[pp])
-    # p[!is.na(p)]
-}
-
