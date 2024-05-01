@@ -793,9 +793,11 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
                                                               only_corners = FALSE,
                                                               outside = TRUE) {
     
-    
+    fraction <- object@radius / (object@radius + space_between)
+    angle <- acos(fraction)
+
     # Create the angles at which to put the nodes around the circle
-    angles <- seq(0, 2 * pi, pi / 4)
+    angles <- seq(0, 2 * pi, angle)
 
     # Create a matrix of locations based on the center of the object, the radius,
     # and the drawn angles and return. Importantly, radius is extended with a

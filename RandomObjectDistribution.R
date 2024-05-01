@@ -349,6 +349,62 @@ generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal
   return(polygon)
 }
 
+#' A helper function to extract outline coordinates
+#' According to their shape specific requirements
+#'
+#' This function generates coordinates from which a convex hull
+#' can be drawn around the outline of all the objects from
+#' the random distribution.
+#' This function is used within the `plotDistribution` plotting function.
+#'
+#' @param object A data structure containing coordinates of the objects,
+#'          obtained via the `getCoordinates` function applied to a RandomObjectDistribution object.
+#'
+#' @return A maxtrix with four columns, used to plot the outline in `plotDistribution`.
+#'
+#' @export
+#' @name generate_random_polygon
+#' 
+out_coords <- function(object) {
+
+    if (object@object_shape == "rectangle") {
+        
+        obj <- unlist(object@objects)
+        ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE))
+        ob <- do.call(rbind, ob)
+        ob <- unique(ob)
+        tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
+        hull <- tri.obj$chull
+        ob <- ob[hull,]
+        ob <- cbind(ob, ob[c(2:nrow(ob), 1),])
+    }
+    
+    else if (object@object_shape == "polygon") {
+        
+        obj <- object@objects
+        ob <- do.call(rbind, obj)
+        ob <- unique(ob)
+        tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
+        hull <- tri.obj$chull
+        ob <- ob[hull,]
+        ob <- cbind(ob, ob[c(2:nrow(ob), 1),])
+    }
+
+    else if (object@object_shape == "circle") {
+        
+        obj <- lapply(circle_coords@objects, \(x) unlist(x))
+        ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE, space_between = 0.2))
+        ob <- do.call(rbind, ob)
+        ob <- unique(ob)
+        tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
+        hull <- tri.obj$chull
+        ob <- ob[hull,]
+        ob <- cbind(ob, ob[c(2:nrow(ob), 1),])
+    }
+
+    return(ob)
+}
+
 #' Plotting function for visualizing random object distribution using the coordinates of objects.
 #'
 #' This function plots objects based on coordinates obtained from a RandomObjectDistribution object.
@@ -407,6 +463,12 @@ plotDistribution <- function(x, object_fill_color = "grey", object_border_color 
     for (geom in object_plots) {
       p <- p + geom
     }
+
+    # Draw the outline around all of the plotted geoms
+    pts <- out_coords(x)
+    p <- p + ggplot2::geom_segment(ggplot2::aes(
+                    x = as.numeric(pts[,1]), y = as.numeric(pts[,2]),
+                    xend = as.numeric(pts[,3]), yend = as.numeric(pts[,4])))
     
   } else {
     stop("Unsupported object shape. Supported shapes are 'rectangle', 'circle', and 'polygon'.")
