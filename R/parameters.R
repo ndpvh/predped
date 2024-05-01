@@ -77,8 +77,6 @@ draw_parameters <- function(n = 1,
     #   - Transform the drawn parameters back to their usual scale
     mean <- to_normal(mean) |>
         t()
-    View(mean)
-    View(Sigma)
     params <- MASS::mvrnorm(n, mean, Sigma)
     params <- to_probit(params)
 
@@ -114,11 +112,11 @@ to_normal <- function(parameters) {
         # by an arbitrarily small number to make sure there are no infinities in 
         # our generated parameters
         if(parameters[[i]] == 0) {
-            parameters[[i]] <- parameters[[i]] + 1e-15
+            parameters[[i]] <- parameters[[i]] + 1e-5
         }
 
         if(parameters[[i]] == 1) {
-            parameters[[i]] <- parameters[[i]] - 1e-15
+            parameters[[i]] <- parameters[[i]] - 1e-5
         }
 
         # Transform to a value of a normal distribution
@@ -153,6 +151,11 @@ to_probit <- function(parameters) {
     params <- list()
     for(i in utility_parameters){
         # Transform to the 0 - 1 scale
+        if(i == "radius") {
+            View(parameters[,i])
+            View(pnorm(parameters[,i]))
+            View(diff(as.numeric(params_bounds[i,])))
+        }
         params[[i]] <- pnorm(parameters[,i])
 
         # Transform to the original bounds of the parameters
