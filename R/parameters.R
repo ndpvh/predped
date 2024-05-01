@@ -151,11 +151,6 @@ to_probit <- function(parameters) {
     params <- list()
     for(i in utility_parameters){
         # Transform to the 0 - 1 scale
-        if(i == "radius") {
-            View(parameters[,i])
-            View(pnorm(parameters[,i]))
-            View(diff(as.numeric(params_bounds[i,])))
-        }
         params[[i]] <- pnorm(parameters[,i])
 
         # Transform to the original bounds of the parameters
