@@ -153,7 +153,7 @@ utility <- function(agent,
     }
 
     # Compute the utilities and sum them up
-    p <- transform_exponentiate(parameters(agent))
+    p <- to_normal(parameters(agent))
 
     V <- numeric(nrow(centers))
 
