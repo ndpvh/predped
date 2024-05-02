@@ -148,7 +148,9 @@ setMethod("simulate", "predped", function(object,
         # will have to keep waiting in the cue.
         if(agent_in_cue) {
             agents_in_the_way <- sapply(state$agents, 
-                                        \(x) intersects(potential_agent, x))
+                                        \(x) in_object(potential_agent, 
+                                                       to_polygon(x), 
+                                                       outside = FALSE))
             agent_in_cue <- any(agents_in_the_way)
 
             if(!agent_in_cue) {
