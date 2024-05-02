@@ -53,6 +53,7 @@ setMethod("simulate", "predped", function(object,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
                                           individual_differences = TRUE,
+                                          plot_live = FALSE,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -185,6 +186,16 @@ setMethod("simulate", "predped", function(object,
 
         # Save the new state in the trace
         trace[[i + 1]] <- state
+
+        # If you want to plot the result immediately, do so
+        if(plot_live) {
+            print(plot(list(state), 
+                       trace = TRUE, 
+                       linewidth = 1.5,
+                       print_progress = FALSE)[[1]])
+            # bringToTop(-1) # Do not lose focus on the console: Allows us to quit computation. Works in Windows only
+            Sys.sleep(0.1)
+        }
     }
     
     return(trace)
