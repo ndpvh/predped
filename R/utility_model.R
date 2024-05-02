@@ -153,7 +153,7 @@ utility <- function(agent,
     }
 
     # Compute the utilities and sum them up
-    p <- to_normal(parameters(agent))
+    p <- parameters(agent)
 
     V <- numeric(nrow(centers))
 
@@ -226,6 +226,15 @@ utility <- function(agent,
     }
 
     V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
+
+    # Robustness against NAs. Can sometimes occur when you have the difference
+    # between Inf - Inf = NA. Should not occur, but might inconvenience one 
+    # anyway.
+    if(any(is.na(V_transformed))) {
+        stop(paste0("NAs found in the utility. ", 
+                    "This might occur due to Inf in the parameters: ", 
+                    "Check whether parameter values are equal to the bounds. "))
+    }
 
     return(V_transformed)
 }
