@@ -74,7 +74,10 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
 
 #'@rdname plot-method
 #'
-setMethod("plot", "list", function(object, trace = FALSE, ...) {
+setMethod("plot", "list", function(object, 
+                                   trace = FALSE, 
+                                   print_progress = TRUE, 
+                                   ...) {
     # If the list in question is the trace, then we have to output the plots for
     # each state in the simulation. This is a little more complicated than for 
     # a simple list
@@ -85,7 +88,9 @@ setMethod("plot", "list", function(object, trace = FALSE, ...) {
 
         # Loop over each state
         for(i in seq_along(object)) {
-            print(paste0("Making plot for iteration ", i))
+            if(print_progress) {
+                print(paste0("Making plot for iteration ", i))
+            }
 
             # If there are currently no agents, then we just return the base_plot
             if(length(object[[i]]$agents) == 0) {
