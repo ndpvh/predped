@@ -75,10 +75,10 @@ draw_parameters <- function(n = 1,
     #     transformed parameters and as standard deviation those provided by 
     #     the user.
     #   - Transform the drawn parameters back to their usual scale
-    mean <- to_normal(mean) |>
+    mean <- to_unbounded(mean) |>
         t()
     params <- MASS::mvrnorm(n, mean, Sigma)
-    params <- to_probit(params)
+    params <- to_bounded(params)
 
     return(params[utility_parameters])
 }
@@ -95,7 +95,7 @@ draw_parameters <- function(n = 1,
 #' @export
 #
 # Original function `toReal`
-to_normal <- function(parameters) {
+to_unbounded <- function(parameters) {
     for(i in utility_parameters){
         # Transform to 0 - 1 (probit) range
         parameters[[i]] <- (parameters[[i]] - params_bounds[i,1]) / diff(as.numeric(params_bounds[i,]))
@@ -142,7 +142,7 @@ to_normal <- function(parameters) {
 #    number becomes Inf (see tests)
 #
 # Original function `toNatural`
-to_probit <- function(parameters) {
+to_bounded <- function(parameters) {
     # If the parameters are numeric, transpose them to a matrix
     if(!any(class(parameters) %in% "matrix")) {
         parameters <- t(parameters)
