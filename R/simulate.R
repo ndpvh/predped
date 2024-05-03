@@ -4,8 +4,8 @@
 #' model. 
 #' 
 #' @param object The `predped` model that you want to simulate
-#' @param max_agents Integer denoting the maximal number of agents that can be 
-#' present in the environment. Defaults to `20`.
+#' @param max_agents Integer, vector, or function that defines the maximal number
+#' of agents at each iteration in the simulation. Defaults to `20`.
 #' @param iterations Integer denoting the number of iterations to run the 
 #' simulation for. Defaults to `1800`, which corresponds to 15 minutes of 
 #' simulation (each iterations is 500 msec).
@@ -13,6 +13,15 @@
 #' after how many iterations an agent gets added to the environment. Defaults to 
 #' a function that draws `x` numbers from a normal distribution with mean 60 
 #' (30 sec) and standard deviation 15 (7.5 sec).
+#' @param standing_start Numeric denoting the speed of agents when they start 
+#' moving. Defaults to `0.1`.
+#' @param initial_agents List of agents with which to start the simulation. 
+#' Defaults to `NULL`, meaning the simulation should start with no agents in the
+#' room.
+#' @param initial_number_agents Integer denoting the number of agents that 
+#' the simulation should start out with. Defaults to `NULL`, meaning the
+#' simulation should start with no agents in the room. Ignored if `initial_agents`
+#' is provided.
 #' @param goal_number Integer, vector of integers, or function that determines 
 #' how many goals each of the agents should receive. Defaults to a function that 
 #' draws `x` numbers from a normal distribution with mean 10 and standard 
@@ -20,6 +29,33 @@
 #' @param goal_duration Integer or function that determines the duration of each 
 #' goal. Defaults to a function that draws `x` numbers from a normal distribution 
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
+#' @param precompute_goal_paths Logical denoting whether to precompute all path
+#' points beforehand. This means that the agent does not only preplan the way 
+#' towards their next goal, but also to all goals that follow. Defaults to 
+#' `FALSE`.
+#' @param order_goal_stack Logical denoting whether to order the goal stack based
+#' on the distance of the agent to the goal. Defaults to `TRUE`
+#' @param precomputed_goals List of goal stacks from which the agent can be 
+#' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
+#' in the simulation.
+#' @param close_enough Numeric denoting how close (in radii) the agent needs to 
+#' be to an object in order to interact with it. Defaults to `2`, meaning the 
+#' agent can interact with objects at `2 * radius(agent)` distance away.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents (in radii). Defaults to 
+#' `1`, meaning a space of `1 * radius(agent)` is left between an object and the
+#' path points agents use in their strategy.
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Defaults to `0.5`, or half a second.
+#' @param precompute_edges Logical denoting whether to precompute the path points
+#' on which agents can move. Defaults to `TRUE`.
+#' @param individual_differences Logical denoting whether variety on the parameters
+#' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param plot_live Logical denoting whether to plot each iteration while the 
+#' simulation is going on. Defaults to `FALSE`.
+#' @param plot_time Numeric denoting the amount of time (in seconds) to wait 
+#' between iterations, i.e., the time between updating the plot. Defaults to 
+#' `0.2`.
 #' @param ... Arguments passed on to the \code{\link[predped]{update_state}} function.
 #' 
 #' @export
@@ -216,11 +252,38 @@ setMethod("simulate", "predped", function(object,
 #' Add an Agent to the Simulation
 #' 
 #' @param object The `predped` model that you want to simulate
-#' @param goal_number Integer denoting the number of goals the agent should
-#' receive.
-#' @param goal_duration Function that determines the duration of each goal. 
-#' Defaults to a function that draws `x` numbers from a normal distribution 
+#' @param goal_number Integer, vector of integers, or function that determines 
+#' how many goals each of the agents should receive. Defaults to a function that 
+#' draws `x` numbers from a normal distribution with mean 10 and standard 
+#' deviation 2. 
+#' @param goal_duration Integer or function that determines the duration of each 
+#' goal. Defaults to a function that draws `x` numbers from a normal distribution 
 #' with mean 10 (5 sec) and standard deviation 2 (1 sec).
+#' @param position Vector denoting the position of the agent you wish to create.
+#' Defaults to `NULL`, meaning the agent's location will be at the entrance of 
+#' the room.
+#' @param standing_start Numeric denoting the speed of agents when they start 
+#' moving. Defaults to `0.1`.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents (in radii). Defaults to 
+#' `1`, meaning a space of `1 * radius(agent)` is left between an object and the
+#' path points agents use in their strategy.
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Defaults to `0.5`, or half a second.
+#' @param precomputed_edges List of nodes and edges that can be used by the 
+#' path-finding algorithms under the hood. Defaults to `NULL`, meaning edges 
+#' have not been precomputed.
+#' @param precompute_goal_paths Logical denoting whether to precompute all path
+#' points beforehand. This means that the agent does not only preplan the way 
+#' towards their next goal, but also to all goals that follow. Defaults to 
+#' `FALSE`.
+#' @param order_goal_stack Logical denoting whether to order the goal stack based
+#' on the distance of the agent to the goal. Defaults to `TRUE`
+#' @param precomputed_goals List of goal stacks from which the agent can be 
+#' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
+#' in the simulation.
+#' @param individual_differences Logical denoting whether variety on the parameters
+#' should be accounted for (even within archetypes). Defaults to `TRUE`.
 #' 
 #' @export 
 #
@@ -316,8 +379,36 @@ add_agent <- function(object,
 #' 
 #' Create a list that contains agents at random locations within the setting.
 #' 
+#' @param initial_number_agents Integer denoting the number of agents that 
+#' the simulation should start out with.
 #' @param object The `predped` model that you want to simulate
-#' @param ... Documentation to write
+#' @param goal_number Integer, vector of integers, or function that determines 
+#' how many goals each of the agents should receive. 
+#' @param goal_duration Integer or function that determines the duration of each 
+#' goal. Defaults to a function that draws `x` numbers from a normal distribution 
+#' with mean 10 (5 sec) and standard deviation 2 (1 sec).
+#' @param standing_start Numeric denoting the speed of agents when they start 
+#' moving. Defaults to `0.1`.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents (in radii). Defaults to 
+#' `1`, meaning a space of `1 * radius(agent)` is left between an object and the
+#' path points agents use in their strategy.
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Defaults to `0.5`, or half a second.
+#' @param precomputed_edges List of nodes and edges that can be used by the 
+#' path-finding algorithms under the hood. Defaults to `NULL`, meaning edges 
+#' have not been precomputed.
+#' @param precompute_goal_paths Logical denoting whether to precompute all path
+#' points beforehand. This means that the agent does not only preplan the way 
+#' towards their next goal, but also to all goals that follow. Defaults to 
+#' `FALSE`.
+#' @param order_goal_stack Logical denoting whether to order the goal stack based
+#' on the distance of the agent to the goal. Defaults to `TRUE`
+#' @param precomputed_goals List of goal stacks from which the agent can be 
+#' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
+#' in the simulation.
+#' @param individual_differences Logical denoting whether variety on the parameters
+#' should be accounted for (even within archetypes). Defaults to `TRUE`.
 #' 
 #' @export 
 create_initial_condition <- function(initial_number_agents,
