@@ -122,8 +122,8 @@ setMethod("initialize", "RandomObjectDistribution", function(.Object, num_column
 #' 
 #' @return The RandomObjectDistribution object with updated objects slot containing coordinates of objects.
 #' 
-#' @export
 #' @name getCoordinates
+#' @export
 #' 
 #' @examples
 #' rect_coords <- getCoordinates(rect_distribution, rectangle_length = 1, rectangle_width = 0.5, aisle_width = 1.5)
@@ -290,8 +290,8 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
 #'
 #' @return A polygon object with specified or randomly assigned edges and lengths.
 #'
-#' @export
 #' @name generate_random_polygon
+#' @export
 #' 
 generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal_edges = FALSE, ...) {
   if (is.null(num_edges)) {
@@ -362,8 +362,8 @@ generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal
 #'
 #' @return A maxtrix with four columns, used to plot the outline in `plotDistribution`.
 #'
+#' @name out_coords
 #' @export
-#' @name generate_random_polygon
 #' 
 out_coords <- function(object) {
 
@@ -420,8 +420,8 @@ out_coords <- function(object) {
 #' @return A ggplot object that visually represents the distribution of objects as defined and positioned
 #'         in the RandomObjectDistribution instance.
 #'
-#' @export
 #' @name plotDistribution
+#' @export
 #'
 #' @examples
 #' plotDistribution(rect_coords)
