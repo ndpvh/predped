@@ -53,6 +53,7 @@ setMethod("simulate", "predped", function(object,
                                           precompute_edges = TRUE,
                                           individual_differences = TRUE,
                                           plot_live = FALSE,
+                                          plot_time = 0.2,
                                           ...) {
 
     # Used to be an argument, but if `FALSE`, users have no way of terminating 
@@ -199,9 +200,9 @@ setMethod("simulate", "predped", function(object,
         # If you want to plot the result immediately, do so
         if(plot_live) {
             print(plot(list(state), 
-                       trace = TRUE, 
-                       linewidth = 1.5,
+                       trace = TRUE,
                        print_progress = FALSE)[[1]])
+            Sys.sleep(plot_time)
         }
     }
 
