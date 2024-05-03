@@ -244,7 +244,11 @@ setMethod("initialize", "polygon", function(.Object,
     .Object@interactable <- interactable
 
     points <- .Object@points
-    .Object@center <- coordinate(c(mean(points[,1]), mean(points[,2])))
+
+    range_x <- range(points[,1])
+    range_y <- range(points[,2])
+    .Object@center <- coordinate(c(min(range_x) + 0.5 * diff(range_x), 
+                                   min(range_y) + 0.5 * diff(range_y)))
 
     return(.Object)
 })
