@@ -47,7 +47,6 @@ setMethod("simulate", "predped", function(object,
                                           precompute_goal_paths = FALSE,
                                           order_goal_stack = TRUE,
                                           precomputed_goals = NULL,
-                                          print_iteration = TRUE,
                                           close_enough = 2,
                                           space_between = 1,
                                           time_step = 0.5,
@@ -55,6 +54,11 @@ setMethod("simulate", "predped", function(object,
                                           individual_differences = TRUE,
                                           plot_live = FALSE,
                                           ...) {
+
+    # Used to be an argument, but if `FALSE`, users have no way of terminating 
+    # the process without killing the terminal. Hence not included as an argument
+    # anymore.
+    print_iteration <- TRUE
 
     # Simulate the iterations after which agents should be added to the simulation
     # (`add_agent`) and the number of goals each agent should pursue (`goal_number`).
@@ -193,8 +197,6 @@ setMethod("simulate", "predped", function(object,
                        trace = TRUE, 
                        linewidth = 1.5,
                        print_progress = FALSE)[[1]])
-            # bringToTop(-1) # Do not lose focus on the console: Allows us to quit computation. Works in Windows only
-            Sys.sleep(0.1)
         }
     }
     
