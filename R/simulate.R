@@ -83,8 +83,13 @@ setMethod("simulate", "predped", function(object,
     # If the edges need to be precomputed, do so already and delete the mock 
     # position of agent and goal: These are the only dynamical components to 
     # this recomputation
+    if(print_iteration & precompute_edges) {
+        cat("\nPrecomputing edges")
+    } else if(print_iteration) {
+        cat("\n")
+    }
+
     if(precompute_edges) {
-        print("Precomputing edges")
         edges <- create_edges(c(0, 0), 
                               c(0, 0), 
                               object@setting,
@@ -165,7 +170,7 @@ setMethod("simulate", "predped", function(object,
 
         # Provide feedback if wanted
         if(print_iteration) {
-            print(paste0("Iteration: ", i, "; Number of agents: ", length(state$agents)))
+            cat(paste0("\rIteration: ", i, "; Number of agents: ", length(state$agents)))
         }
 
         # Update the current state
@@ -198,6 +203,10 @@ setMethod("simulate", "predped", function(object,
                        linewidth = 1.5,
                        print_progress = FALSE)[[1]])
         }
+    }
+
+    if(print_iteration) {
+        cat("\n")
     }
     
     return(trace)
