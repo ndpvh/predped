@@ -1346,8 +1346,8 @@ setMethod("center", signature(object = "polygon"), function(object) {
 
 setMethod("center<-", signature(object = "polygon"), function(object, value) {
     object@center <- as(value, "coordinate")
-    object@points <- cbind(object@points[,1] + value[1], 
-                           object@points[,2] + value[2])
+    object@points <- cbind(object@points[,1] + value[1] - center(object)[1], 
+                           object@points[,2] + value[2] - center(object)[2])
     return(object)
 })
 
