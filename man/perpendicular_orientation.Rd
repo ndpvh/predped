@@ -4,10 +4,13 @@
 \alias{perpendicular_orientation}
 \title{Find the perpendicular orientation}
 \usage{
-perpendicular_orientation(background)
+perpendicular_orientation(object, co)
 }
 \arguments{
-\item{background}{An object of class background}
+\item{object}{An object of class object}
+
+\item{co}{A vector of size 2 containing x and y coordinates for a location 
+from which to deduce the perpendicular orientation}
 }
 \value{
 Numeric denoting the perpendicular orientation to the entrance of the 

@@ -8,7 +8,7 @@ update_goal(
   agent,
   state,
   background,
-  standing_start = 0.05 * parameters(agent)[["sPref"]],
+  standing_start = 0.05 * parameters(agent)[["preferred_speed"]],
   close_enough = 2 * radius(agent),
   space_between = radius(agent),
   report = FALSE,
