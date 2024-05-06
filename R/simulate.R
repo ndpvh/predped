@@ -352,7 +352,7 @@ add_agent <- function(object,
     # Determine the position of the agent. Either this is at the entrance, or 
     # this is at the specified location
     if(is.null(position)) {
-        position <- background@entrance + radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+        position <- background@entrance + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
     }
     
     # Create the agent itself
