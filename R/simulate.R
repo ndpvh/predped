@@ -237,7 +237,8 @@ setMethod("simulate", "predped", function(object,
         if(plot_live) {
             print(plot(list(state), 
                        trace = TRUE,
-                       print_progress = FALSE)[[1]])
+                       print_progress = FALSE,
+                       iterations = i)[[1]])
             Sys.sleep(plot_time)
         }
     }
