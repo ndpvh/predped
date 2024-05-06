@@ -34,10 +34,23 @@ utility_parameters <- utility_parameters[!(utility_parameters %in% c("name", "co
 #' Use the mean parameter values and their standard deviations to draw generate
 #' parameters to be used in simulation.
 #' 
-#' @param parameters A named list containing the parameters for a given agent.
+#' @param n Integer denoting the number of parameters to draw. Defaults to `1`.
+#' @param mean A named list containing the mean for each of the parameters for 
+#' a given agent.
+#' @param Sigma Either a covariance matrix that defines the individual differences
+#' on each of the parameters (when `transform_covariance == FALSE`), or a matrix
+#' containing standard deviations for each of the parameters on its diagonal and
+#' correlations between the parameters on its off-diagonal (when 
+#' `transform_covariance == TRUE`). Default covariance matrices exist for each
+#' of the archetypes in `params_archetypes` and thus changes with the value of 
+#' `archetype`.
+#' @param archetype String denoting the archetype to be used for the covariance
+#' matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.
 #' @param individual_differences Logical denoting whether to use the standard 
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to `TRUE`.
+#' @param transform_covariance Logical denoting whether to transform `Sigma` to 
+#' a proper covariance matrix or not. Defaults to `TRUE`.
 #' 
 #' @return A names list containing the drawn parameters. Standard deviations are
 #' ommitted from this list 
@@ -211,16 +224,23 @@ transform_mu <- function(parameters) {
 #' Use the provided means and covariance matrix to visualize the distribution of
 #' parameter values.
 #' 
-#' @param n Number of parameters to simulate. Defaults to `1000`.
-#' @param mean Named list or vector of parameter means 
-#' @param Sigma Covariance matrix for the parameters or mix of standard deviation
-#' - correlation matrix. Has a specific default for each archetype.
-#' @param archetype String denotign the archetype that is being used. Is used 
-#' to find the default `Sigma`. Defaults to `"BaselineEuropean"`
-#' @param individual_differences Whether individual differences should be 
-#' accounted for. If `FALSE`, return `mean`. Defaults to `TRUE`.
-#' @param transform_covariance Logical denoting whether to transform `Sigma`
-#' to a proper covariance matrix. Defaults to `TRUE`.
+#' @param n Integer denoting the number of parameters to draw. Defaults to `1`.
+#' @param mean A named list containing the mean for each of the parameters for 
+#' a given agent.
+#' @param Sigma Either a covariance matrix that defines the individual differences
+#' on each of the parameters (when `transform_covariance == FALSE`), or a matrix
+#' containing standard deviations for each of the parameters on its diagonal and
+#' correlations between the parameters on its off-diagonal (when 
+#' `transform_covariance == TRUE`). Default covariance matrices exist for each
+#' of the archetypes in `params_archetypes` and thus changes with the value of 
+#' `archetype`.
+#' @param archetype String denoting the archetype to be used for the covariance
+#' matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.
+#' @param individual_differences Logical denoting whether to use the standard 
+#' deviations in the parameter list to create some variation in the parameters.
+#' Defaults to `TRUE`.
+#' @param transform_covariance Logical denoting whether to transform `Sigma` to 
+#' a proper covariance matrix or not. Defaults to `TRUE`.
 #' 
 #' @return Printed histogram of the distribution of parameters under the 
 #' specifications.
