@@ -169,7 +169,8 @@ setMethod("plot", "list", function(object,
             }
 
             plt[[i]] <- plt[[i]] +
-                ggplot2::labs(title = paste("iteration", iter))
+                ggplot2::labs(title = paste("iteration", iter)) +
+                ggplot2::theme(legend.position = "none")
         }
 
     # If it is not the trace, then we need to output the list of geom's that are
