@@ -174,7 +174,9 @@ setMethod("plot", "list", function(object,
         }        
     }
 
-    cat("\n")
+    if(print_progress) {
+        cat("\n")
+    }
 
     return(plt)
 })
