@@ -196,7 +196,7 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
       } else if (object@object_shape == "polygon") {
           # Generate one random polygon
           polygon <- generate_random_polygon(num_edges = num_edges, edge_lengths = edge_lengths, equal_edges = equal_edges, ...)
-          polygon_points <- polygon@points
+          polygon_points <- as.matrix(polygon)    #polygon@points
 
           # The height and width of generated polygon
           polygon_height <- max(polygon_points[, "y"]) - min(polygon_points[, "y"])
@@ -242,7 +242,7 @@ setMethod("getCoordinates", "RandomObjectDistribution", function(object, rectang
                 polygon_coords[, "y"] <- polygon_coords[, "y"] + displacement_y
 
                 # Update polygons list
-                polygons[[index]] <- polygon_coords
+                polygons[[index]] <- new("polygon", points = polygon_coords)
                 index <- index + 1
 
                 # Update the y-coordinate for the next polygon in the same slot
@@ -346,7 +346,7 @@ generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal
   # Create a polygon object
   polygon <- new("polygon", points = as.matrix(vertices_df), ...)
   
-  return(polygon)
+  return(vertices_df)
 }
 
 #' A helper function to extract outline coordinates
@@ -381,8 +381,9 @@ out_coords <- function(object) {
     
     else if (object@object_shape == "polygon") {
         
-        obj <- object@objects
-        ob <- do.call(rbind, obj)
+        obj <- lapply(object@objects, \(x) unlist(x))
+        ob <- lapply(obj, \(x) x@points)
+        ob <- do.call(rbind, ob)
         ob <- unique(ob)
         tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
         hull <- tri.obj$chull
@@ -448,12 +449,14 @@ plotDistribution <- function(x, object_fill_color = "grey", object_border_color 
         # Plot circles with given radius
         plot(object, fill = object_fill_color, color = object_border_color, ...)
 
-      } else if (is.matrix(object)) {
+      } else if (class(object)[1] == "polygon") { # is.matrix(object)
         # Object is a matrix when representing polygon points
         # Convert matrix to dataframe for plotting
-        df <- data.frame(x = object[, 1], y = object[, 2])
-        ggplot2::geom_polygon(data = df, ggplot2::aes(x = x, y = y),
-                              fill = object_fill_color, color = object_border_color, ...)
+        # df <- data.frame(x = object[, 1], y = object[, 2])
+        # ggplot2::geom_polygon(data = df, ggplot2::aes(x = x, y = y),
+                             # fill = object_fill_color, color = object_border_color, ...)
+        plot(object, fill = object_fill_color, color = object_border_color, ...)
+
       } else {
         stop("Unsupported object shape.")
       }
