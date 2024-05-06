@@ -84,8 +84,14 @@ setMethod("plot", "list", function(object,
     # a simple list
     plt <- list()
     if(trace) {
+        if(print_progress) {
+            cat("\n")
+        }
+        
         # Setting doesn't change, so can be saved immediately
-        base_plot <- predped::plot(object[[1]]$setting, fill = "grey", color = "black")
+        base_plot <- predped::plot(object[[1]]$setting, 
+                                   fill = "grey", 
+                                   color = "black")
 
         # Loop over each state
         for(i in seq_along(object)) {
@@ -97,8 +103,7 @@ setMethod("plot", "list", function(object,
 
             # If there are currently no agents, then we just return the base_plot
             if(length(object[[i]]$agents) == 0) {
-                plt[[i]] <- base_plot + 
-                    ggplot2::labs(title = paste("iteration", iter))
+                plt[[i]] <- base_plot
 
             # Otherwise, we will have to add the agents in the base_plot
             } else {
@@ -149,21 +154,22 @@ setMethod("plot", "list", function(object,
 
                 plt[[i]] <- suppressWarnings(base_plot +
                     ggplot2::geom_segment(data = segments, 
-                                        ggplot2::aes(x = as.numeric(x), 
-                                                    y = as.numeric(y), 
-                                                    xend = as.numeric(xend),
-                                                    yend = as.numeric(yend),
-                                                    color = color),
-                                        ...) +
+                                          ggplot2::aes(x = as.numeric(x), 
+                                                      y = as.numeric(y), 
+                                                      xend = as.numeric(xend),
+                                                      yend = as.numeric(yend),
+                                                      color = color),
+                                          ...) +
                     ggplot2::geom_point(data = goals, 
                                         ggplot2::aes(x = as.numeric(x), 
                                                     y = as.numeric(y), 
                                                     color = color),
                                         ...) +
-                    ggplot2::scale_color_manual(values = color_code) +
-                    ggplot2::labs(title = paste("iteration", iter)) +
-                    ggplot2::theme(legend.position = "none"))
+                    ggplot2::scale_color_manual(values = color_code)) 
             }
+
+            plt[[i]] <- plt[[i]] +
+                ggplot2::labs(title = paste("iteration", iter))
         }
 
     # If it is not the trace, then we need to output the list of geom's that are
