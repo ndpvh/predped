@@ -77,6 +77,7 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
 setMethod("plot", "list", function(object, 
                                    trace = FALSE, 
                                    print_progress = TRUE, 
+                                   iterations = NULL,
                                    ...) {
     # If the list in question is the trace, then we have to output the plots for
     # each state in the simulation. This is a little more complicated than for 
@@ -88,14 +89,16 @@ setMethod("plot", "list", function(object,
 
         # Loop over each state
         for(i in seq_along(object)) {
+            iter <- ifelse(is.null(iterations[i]), i, iterations[i])
+
             if(print_progress) {
-                print(paste0("Making plot for iteration ", i))
+                cat(paste0("\rMaking plot for iteration ", iter))
             }
 
             # If there are currently no agents, then we just return the base_plot
             if(length(object[[i]]$agents) == 0) {
                 plt[[i]] <- base_plot + 
-                    ggplot2::labs(title = paste("iteration", i))
+                    ggplot2::labs(title = paste("iteration", iter))
 
             # Otherwise, we will have to add the agents in the base_plot
             } else {
@@ -158,7 +161,7 @@ setMethod("plot", "list", function(object,
                                                     color = color),
                                         ...) +
                     ggplot2::scale_color_manual(values = color_code) +
-                    ggplot2::labs(title = paste("iteration", i)) +
+                    ggplot2::labs(title = paste("iteration", iter)) +
                     ggplot2::theme(legend.position = "none"))
             }
         }
@@ -170,6 +173,8 @@ setMethod("plot", "list", function(object,
             plt <- append(plt, plot(object[[i]], ...))
         }        
     }
+
+    cat("\n")
 
     return(plt)
 })
