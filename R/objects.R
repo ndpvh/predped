@@ -893,8 +893,31 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
                                                               outside = TRUE) {
     
     
+    # Number of default nodes depends on a small calculation we made. Specifically,
+    # if you have a circle of radius R and a point with a distance D between the 
+    # point and the circumference of the circle, then we can draw a tangential
+    # line to the circle which will define the next point that can be seen from 
+    # that location (which is what we usually use `add_nodes` for). 
+    #
+    # The angle at which we ensure that this is possible is defined as: 
+    #   \alpha = 2 * cos^ {-1}( \frac{R}{R + D} )
+    #
+    # Which we obtain through the application of Pythagoream theorem in the triangle
+    # defined by the center of the circle, the point outside of the circle, and 
+    # the point in which the tangential line intersects the circle. Then, we find
+    # the angle between the direction of the original point and the intersection
+    # point by computing the cosine of that angle. Taking the inverse then 
+    # eventually leads to the formula above.
+    #
+    # It is useful to note that the original solution to a symmetric other point
+    # involves doubling the original \alpha (as in the solution above). In our 
+    # implementation, we do not do so, thus having twice the needed number of 
+    # nodes added alongside the circle.
+    fraction <- radius(object) / (radius(object) + space_between) 
+    alpha <- acos(fraction)
+
     # Create the angles at which to put the nodes around the circle
-    angles <- seq(0, 2 * pi, pi / 4)
+    angles <- seq(0, 2 * pi, alpha)
 
     # Create a matrix of locations based on the center of the object, the radius,
     # and the drawn angles and return. Importantly, radius is extended with a
