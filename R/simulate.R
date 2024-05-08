@@ -372,6 +372,9 @@ add_agent <- function(object,
                                               background,
                                               space_between = space_between * radius,
                                               precomputed_edges = precomputed_edges)
+    # current_goal(tmp_agent)@path <- matrix(current_goal(tmp_agent)@position, 
+    #                                        nrow = 1, 
+    #                                        ncol = 2)
     
     return(tmp_agent)
 }

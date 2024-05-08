@@ -482,6 +482,9 @@ update_goal <- function(agent,
                                                   updated_background,
                                                   space_between = space_between,
                                                   precomputed_edges = precomputed_edges)
+            # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+            #                                    nrow = 1, 
+            #                                    ncol = 2)
 
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to replan at a later time and 
@@ -523,6 +526,9 @@ update_goal <- function(agent,
                                                           updated_background,
                                                           space_between = space_between,
                                                           precomputed_edges = precomputed_edges)
+                    # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+                    #                                    nrow = 1, 
+                    #                                    ncol = 2)
 
                     # Quick check whether the path is clearly defined. If not, 
                     # then the agent will have to replan at a later time and 
