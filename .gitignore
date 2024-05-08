@@ -33,3 +33,9 @@ predped_in_action*/
 .vscode/
 .DS_Store
 RCore/
+
+example_settings.R
+RandomSpaceGenerator.R
+S4_Environment_Class.R
+Combining Multiple Shape Blocks.R
+
