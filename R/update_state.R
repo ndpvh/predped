@@ -42,9 +42,12 @@ update_state <- function(state,
                          stay_stopped = TRUE, 
                          time_step = 0.5,
                          close_enough = 2,
-                         space_between = close_enough,
+                         space_between = 1.5,
+                         standing_start = 0.1,
                          precomputed_edges = NULL,
                          precompute_goal_paths = FALSE,
+                         report = FALSE,
+                         interactive_report = FALSE,
                          ...) {
 
     # Predict where the agents will be at their current velocity and angle. Is 
@@ -84,8 +87,11 @@ update_state <- function(state,
                              background,
                              close_enough = close_enough,
                              space_between = space_between,
+                             standing_start = standing_start,
                              precomputed_edges = precomputed_edges,
-                             precompute_goal_paths = precompute_goal_paths) 
+                             precompute_goal_paths = precompute_goal_paths,
+                             report = report, 
+                             interactive_report = interactive_report) 
 
         # Update the position of the agent
         # start_time <- Sys.time()
@@ -93,6 +99,8 @@ update_state <- function(state,
                                  tmp_state,
                                  agent_specs, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
+                                 standing_start = standing_start,
+                                 report = report,
                                  time_step = time_step,
                                  ...) 
 
@@ -219,13 +227,15 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.05 * parameters(agent)[["preferred_speed"]],
+                            standing_start = 0.1,
                             time_step = 0.5,
                             report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
                             ) {
+
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # If the agent is currently interacting with another object, just let the 
     # agent continue in peace
@@ -397,13 +407,17 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.05 * parameters(agent)[["preferred_speed"]],
-                        close_enough = 2 * radius(agent),
-                        space_between = 1.5 * radius(agent),
+                        standing_start = 0.1,
+                        close_enough = 2,
+                        space_between = 1.5,
                         report = FALSE,
                         interactive_report = FALSE,
                         precomputed_edges = NULL,
                         precompute_goal_paths = FALSE) {  
+
+    close_enough <- close_enough * radius(agent)
+    space_between <- space_between * radius(agent)
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # Make some placeholders for replanning and rerouting
     replan <- reroute <- FALSE
@@ -481,7 +495,8 @@ update_goal <- function(agent,
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
-                                                  precomputed_edges = precomputed_edges)
+                                                  precomputed_edges = NULL,
+                                                  many_options = TRUE)
             # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
             #                                    nrow = 1, 
             #                                    ncol = 2)
@@ -501,7 +516,7 @@ update_goal <- function(agent,
                                                matrix(current_goal(agent)@path[1,],
                                                       nrow = 1, 
                                                       ncol = 2))
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
 
         } else {
             reroute_param <- parameters(agent)$reroute
@@ -525,7 +540,8 @@ update_goal <- function(agent,
                                                           agent, 
                                                           updated_background,
                                                           space_between = space_between,
-                                                          precomputed_edges = precomputed_edges)
+                                                          precomputed_edges = NULL,
+                                                          many_options = TRUE)
                     # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
                     #                                    nrow = 1, 
                     #                                    ncol = 2)
