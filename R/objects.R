@@ -902,12 +902,10 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     # The angle at which we ensure that this is possible is defined as: 
     #   \alpha = 2 * cos^ {-1}( \frac{R}{R + D} )
     #
-    # Which we obtain through the application of Pythagoream theorem in the triangle
-    # defined by the center of the circle, the point outside of the circle, and 
-    # the point in which the tangential line intersects the circle. Then, we find
-    # the angle between the direction of the original point and the intersection
-    # point by computing the cosine of that angle. Taking the inverse then 
-    # eventually leads to the formula above.
+    # Which we obtain through computing the cosine of the angle \alpha between 
+    # the direction of the original point and the intersection point and then 
+    # taking its inverse and multiplying by two (creating the angle at which the 
+    # point symmetric to the intersection point should appear).
     #
     # It is useful to note that the original solution to a symmetric other point
     # involves doubling the original \alpha (as in the solution above). In our 
