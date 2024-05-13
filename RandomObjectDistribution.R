@@ -337,14 +337,11 @@ generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal
     vertices[i, 2] <- edge_lengths[i] * sin(angle)  
   }
   
-  # Close the polygon by duplicating the first vertex at the end
-  vertices <- rbind(vertices, vertices[1, ])
-  
   # Convert matrix to data frame
   vertices_df <- data.frame(x = vertices[, 1], y = vertices[, 2])
 
   # Create a polygon object
-  polygon <- new("polygon", points = as.matrix(vertices_df), ...)
+  # polygon <- new("polygon", points = as.matrix(vertices_df), ...)
   
   return(vertices_df)
 }
@@ -360,14 +357,16 @@ generate_random_polygon <- function(num_edges = NULL, edge_lengths = NULL, equal
 #' @param object A data structure containing coordinates of the objects,
 #'          obtained via the `getCoordinates` function applied to a RandomObjectDistribution object.
 #'
-#' @return A maxtrix with four columns, used to plot the outline in `plotDistribution`.
+#' @return A maxtrix with segments, used to plot the outline in `plotDistribution`.
 #'
 #' @name out_coords
 #' @export
 #' 
-out_coords <- function(object) {
 
-    if (object@object_shape == "rectangle") {
+setGeneric("out_coords", function(object, ...) standardGeneric("out_coords"))
+
+setMethod("out_coords", "RandomObjectDistribution", function(object) {
+  if (object@object_shape == "rectangle") {
         
         obj <- unlist(object@objects)
         ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE))
@@ -381,8 +380,8 @@ out_coords <- function(object) {
     
     else if (object@object_shape == "polygon") {
         
-        obj <- lapply(object@objects, \(x) unlist(x))
-        ob <- lapply(obj, \(x) x@points)
+        obj <- unlist(object@objects)
+        ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE))
         ob <- do.call(rbind, ob)
         ob <- unique(ob)
         tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
@@ -393,7 +392,7 @@ out_coords <- function(object) {
 
     else if (object@object_shape == "circle") {
         
-        obj <- lapply(circle_coords@objects, \(x) unlist(x))
+        obj <- unlist(object@objects)
         ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE, space_between = 0.2))
         ob <- do.call(rbind, ob)
         ob <- unique(ob)
@@ -404,7 +403,23 @@ out_coords <- function(object) {
     }
 
     return(ob)
-}
+})
+
+setMethod("out_coords", "list", function(object) {
+      
+      x <- object
+      obj <- lapply(x, \(x) unlist(x))
+      ob <- lapply(obj, \(x) add_nodes(x, only_corners = TRUE))
+      ob <- do.call(rbind, ob)
+      ob <- unique(ob)
+      tri.obj <- interp::tri.mesh(x = ob[,1], y = ob[,2], duplicate = "remove")
+      hull <- tri.obj$chull
+      ob <- ob[hull,]
+      ob <- cbind(ob, ob[c(2:nrow(ob), 1),])
+
+      return(ob)
+})
+
 
 #' Plotting function for visualizing random object distribution using the coordinates of objects.
 #'
@@ -430,11 +445,10 @@ out_coords <- function(object) {
 #' plotDistribution(poly_coords)
 #' 
 plotDistribution <- function(x, object_fill_color = "grey", object_border_color = "black", ...) {
-  
-  require(ggplot2)
+
   
   # Start a ggplot object with blank aesthetics
-  p <- ggplot() + geom_blank() + coord_fixed() + theme_void()
+  p <- ggplot2::ggplot() + ggplot2::geom_blank() + ggplot2::coord_fixed() + ggplot2::theme_void()
 
   # Add objects to the plot based on their shape
   if (x@object_shape == "rectangle" || x@object_shape == "circle" || x@object_shape == "polygon") {
@@ -449,12 +463,8 @@ plotDistribution <- function(x, object_fill_color = "grey", object_border_color 
         # Plot circles with given radius
         plot(object, fill = object_fill_color, color = object_border_color, ...)
 
-      } else if (class(object)[1] == "polygon") { # is.matrix(object)
-        # Object is a matrix when representing polygon points
-        # Convert matrix to dataframe for plotting
-        # df <- data.frame(x = object[, 1], y = object[, 2])
-        # ggplot2::geom_polygon(data = df, ggplot2::aes(x = x, y = y),
-                             # fill = object_fill_color, color = object_border_color, ...)
+      } else if (class(object)[1] == "polygon") {
+        # Plot polygons with given matrix of points
         plot(object, fill = object_fill_color, color = object_border_color, ...)
 
       } else {
