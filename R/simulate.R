@@ -161,6 +161,11 @@ setMethod("simulate", "predped", function(object,
                                                    order_goal_stack = order_goal_stack,
                                                    precomputed_goals = precomputed_goals,
                                                    individual_differences = individual_differences)
+
+        # First index deleted here so that agents don't immediately get added 
+        # to the environment when the initial condition is to be generated 
+        # (ensures only `initial_number_agents` are in the first state).
+        add_agent_index <- add_agent_index[-1]
     }
 
     # Initialize the trace and state lists. The state will already contain the 
