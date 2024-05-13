@@ -174,6 +174,7 @@ setMethod("simulate", "predped", function(object,
                   "agents" = list())
     if(!is.null(initial_agents)) {
         state$agents <- initial_agents
+        
     } else if(!is.null(initial_condition)) {
         if(!identical(initial_condition$setting, state$setting)) {
             stop(paste0("Setting in the `predped` model is not the same as the ",
