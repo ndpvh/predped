@@ -18,6 +18,9 @@
 #' @param initial_agents List of agents with which to start the simulation. 
 #' Defaults to `NULL`, meaning the simulation should start with no agents in the
 #' room.
+#' @param initial_condition State containing a setting and agents to start the 
+#' simulation from. Defaults to `NULL`, meaning the simulation will start with 
+#' no agents in the room.
 #' @param initial_number_agents Integer denoting the number of agents that 
 #' the simulation should start out with. Defaults to `NULL`, meaning the
 #' simulation should start with no agents in the room. Ignored if `initial_agents`
@@ -77,6 +80,7 @@ setMethod("simulate", "predped", function(object,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
                                           standing_start = 0.1,
                                           initial_agents = NULL,
+                                          initial_condition = NULL,
                                           initial_number_agents = NULL,
                                           goal_number = \(x) rnorm(x, 10, 2), 
                                           goal_duration = \(x) rnorm(x, 10, 2),
@@ -165,7 +169,16 @@ setMethod("simulate", "predped", function(object,
                   "agents" = list())
     if(!is.null(initial_agents)) {
         state$agents <- initial_agents
-    } 
+    } else if(!is.null(initial_condition)) {
+        if(!identical(initial_condition$setting, state$setting)) {
+            stop(paste0("Setting in the `predped` model is not the same as the ",
+                        "setting in the initial condition. ", 
+                        "Please make sure the initial condition is compatible ",
+                        "with your model."))
+        }
+
+        state$agents <- initial_condition$agents
+    }
     trace <- list(state)
 
     agent_in_cue <- FALSE
@@ -528,13 +541,13 @@ create_initial_condition <- function(initial_number_agents,
             # Increase the iteration number
             iter <- iter + 1
         }
-        position(agent) <- new_position
+        position(new_agent) <- new_position
 
         # Let the agent face the way of its goal
-        co_1 <- position(agent)
-        co_2 <- position(goal_stack[[1]])
+        co_1 <- position(new_agent)
+        co_2 <- current_goal(new_agent)@path[1,]
 
-        orientation(agent) <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
+        orientation(new_agent) <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
 
         # If you need to stop, break out of the loop
         if(stop) {
