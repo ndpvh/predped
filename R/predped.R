@@ -37,7 +37,7 @@ setMethod("initialize", "predped", function(.Object,
                                             id,
                                             setting, 
                                             parameters = params_archetypes,
-                                            archetypes = unique(params_archetypes$Name),
+                                            archetypes = unique(params_archetypes$name),
                                             weights = rep(1/length(archetypes), 
                                                           each = length(archetypes))
 ) {
@@ -51,7 +51,7 @@ setMethod("initialize", "predped", function(.Object,
         stop("Weights should add up to 1.")
     }
 
-    if(!all(archetypes %in% parameters$Name)) {
+    if(!all(archetypes %in% parameters$name)) {
         stop("Some archetypes cannot be found in the parameters list.")
     }
 
@@ -65,8 +65,8 @@ setMethod("initialize", "predped", function(.Object,
     # select only the archetypes from this vector, then we transform this into 
     # a numeric through factorization with `archetype` as its levels, and then 
     # transform this to a character again. 
-    parameters <- parameters[parameters$Name %in% archetypes,]
-    idx <- factor(parameters$Name, levels = archetypes)
+    parameters <- parameters[parameters$name %in% archetypes,]
+    idx <- factor(parameters$name, levels = archetypes)
     idx <- order(as.numeric(idx))
 
     .Object@parameters <- parameters[idx,] 
@@ -81,7 +81,7 @@ setMethod("initialize", "predped", function(.Object,
 #'
 #' @export
 setMethod("id", "predped", function(object) {
-    return(setNames(object@id, object@id))
+    return(object@id)
 })
 
 #' @rdname predped-class
@@ -103,7 +103,7 @@ setGeneric("setting", function(object) standardGeneric("setting"))
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 
 setMethod("setting", "predped", function(object) {
-    return(setNames(object@setting, object@setting))
+    return(object@setting)
 })
 
 setMethod("setting<-", "predped", function(object, value) {
@@ -115,7 +115,7 @@ setMethod("setting<-", "predped", function(object, value) {
 #'
 #' @export
 setMethod("parameters", "predped", function(object) {
-    return(setNames(object@parameters, object@parameters))
+    return(object@parameters)
 })
 
 #' @rdname predped-class
@@ -123,7 +123,7 @@ setMethod("parameters", "predped", function(object) {
 #' @export
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
-    if(!all(archetypes %in% value)) {
+    if(!all(object@archetypes %in% value$name)) {
         stop("Some archetypes not defined in the new parameters provided.")
     }
 
@@ -142,7 +142,7 @@ setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
 
 setMethod("archetypes", "predped", function(object) {
-    return(setNames(object@archetypes, object@archetypes))
+    return(object@archetypes)
 })
 
 setMethod("archetypes<-", "predped", function(object, value) {
@@ -166,7 +166,7 @@ setGeneric("weights", function(object) standardGeneric("weights"))
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
 
 setMethod("weights", "predped", function(object) {
-    return(setNames(object@weights, object@weights))
+    return(object@weights)
 })
 
 setMethod("weights<-", "predped", function(object, value) {
@@ -187,92 +187,3 @@ setMethod("show", "predped", function(object) {
 
     return(object) # object is returned invisibly
 })
-
-################################################################################
-# To examine later
-
-# ALEXANDER
-# setGeneric("simulate", function(gstack, p, pSD, group, types)
-#              standardGeneric("simulate"))
-
-
-# # The idea should shift to taking in a matrix object for parameters
-# # Setting agent_names to the rownames and individual parameters to columns
-# # This is achievable I believe
-
-# model_class <- setClass("model_class", list(
-#   parameters = "data.frame",
-#   setting = "list"
-# ))
-
-# new_model <- new("model_class", parameters = data, setting = list(0))
-
-# setMethod("initialize", "model_class",
-#           function(.Object, parameters, setting) {
-#             rownames(parameters) <- paste()
-#           })
-
-# setMethod("Rownames", "model_class")
-
-# library(tidyverse)
-# data <- tibble(names = c("Dave", "Gerald", "Jane", "James"), bBA = rnorm(4))
-# data <- as.data.frame(data)
-
-
-# n_mod <- new("model_class", parameters = data, setting = list(0))
-
-# rownames(data) <- data$names
-
-# # ECE
-# # add parameter transformation options to the model
-# setGeneric("TransformParams", function(.Object, transform) standardGeneric("TransformParams"))
-# setMethod("TransformParams", "AgentModel", function(.Object, transform) {
-#   # it can be "mu", "exponentiate", "logarithmic"
-#   if (transform == "mu") {
-#     .Object <- transform_mu(.Object)
-#   } else if (transform == "exponentiate") {
-#     .Object <- transform_exponentiate(.Object)
-#   } else if (transform == "logarithmic") {
-#     .Object <- transform_logarithmic(.Object)
-#   } else {
-#     warning("Invalid transformation method, the parameters remain the same.")
-#   }
-#   return(.Object)
-# })
-
-# # initialize simulation
-# setGeneric("InitialSim", function(.Object) standardGeneric("InitialSim"))
-# setMethod("InitialSim", "AgentModel", function(.Object) {
-#   # empty setting matrix for now
-#   .Object@setting <- matrix(0, nrow = 10, ncol = 10) 
-#   # empty list of agents
-#   .Object@agents <- list()
-
-#   return(.Object)
-# })
-
-# # set simulation method
-# setGeneric("simulate", function(.Object, numSteps) standardGeneric("simulate"))
-# setMethod("simulate", "AgentModel", function(.Object, numSteps) {
-#   for (i in 1:numSteps) {
-#     MoveAgents(.Object) # move agent
-#     RecordTrace(.Object) # save to trace
-#   }
-# })
-
-# # move agent method
-# setGeneric("MoveAgents", function(.Object) standardGeneric("MoveAgents"))
-# setMethod("MoveAgents", "AgentModel", function(.Object) {
-#   for (agent in .Object@agents) {
-#     move_agent(agent) # move function
-#   }
-# })
-
-# # save method
-# setGeneric("RecordTrace", function(.Object) standardGeneric("RecordTrace"))
-# setMethod("RecordTrace", "AgentModel", function(.Object) {
-#   # save current state of the setting and agents
-#   .Object$trace <- c(.Object$trace,
-#                      list(setting = .Object$setting,
-#                           agents = .Object$agents))
-# })

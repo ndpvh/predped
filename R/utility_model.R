@@ -46,7 +46,7 @@
 #    deleted
 utility <- function(agent,
                     state,
-                    agent_predictions,
+                    agent_specifications,
                     centers,
                     background,
                     check,
@@ -60,29 +60,8 @@ utility <- function(agent,
     # have to think about how we will save this information. Maybe just make it
     # an agent-characteristic?
     if(!precomputed) {
-        # Make the object-based arguments of predped compatible with the information
-        # needed by m4ma
-        agent_specs <- list(id = sapply(state$agents, id), 
-                            position = sapply(state$agents, position) |>
-                                t(), 
-                            size = sapply(state$agents, size) |>
-                                as.numeric(), 
-                            orientation = sapply(state$agents, orientation) |>
-                                as.numeric(), 
-                            speed = sapply(state$agents, speed) |>
-                                as.numeric(), 
-                            group = sapply(state$agents, group),
-                            predictions = agent_predictions)
-
-        # Required for utility helper functions
-        rownames(agent_specs$position) <- agent_specs$id
-        names(agent_specs$size) <- agent_specs$id
-        names(agent_specs$orientation) <- agent_specs$id
-        names(agent_specs$speed) <- agent_specs$id
-        names(agent_specs$group) <- agent_specs$id
-
-        # Retrieve the index of the agent in question
-        agent_idx <- match(id(agent), agent_specs$id)
+        # Get the index of all other agents in the agent_specifications
+        agent_idx <- seq_along(agent_specifications$id)[agent_specifications$id == id(agent)]
 
         # Preferred speed
         goal_position <- matrix(current_goal(agent)@path[1,],
@@ -99,14 +78,14 @@ utility <- function(agent,
         interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
                                                        p1 = position(agent, return_matrix = TRUE), 
                                                        a1 = orientation(agent),
-                                                       p2 = agent_specs$position, 
-                                                       r = agent_specs$size, 
+                                                       p2 = agent_specifications$position, 
+                                                       r = agent_specifications$size, 
                                                        centres = centers, 
-                                                       p_pred = agent_specs$predictions, 
+                                                       p_pred = agent_specifications$predictions, 
                                                        objects = objects(background))
 
         # Predict which directions might lead to collisions in the future
-        if(nrow(agent_predictions) == 1) {
+        if(nrow(agent_specifications$predictions) == 1) {
             # When just deleting `agent_idx` from a single-row matrix, we get to 
             # a numeric, not a matrix. Therefore create empty matrix if there is
             # only 1 agent.
@@ -116,231 +95,263 @@ utility <- function(agent,
             # transforms the matrix to a numerical vector. To ensure there are 
             # no problems, we transform to a matrix and reassign the id's  in 
             # the rows
-            predictions_minus_agent <- matrix(agent_predictions[-agent_idx,],
+            predictions_minus_agent <- matrix(agent_specifications$predictions[-agent_idx,],
                                               ncol = 2)
-            rownames(predictions_minus_agent) <- agent_specs$id[-agent_idx]
+            rownames(predictions_minus_agent) <- agent_specifications$id[-agent_idx]
         }
 
         blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
                                                  orientation(agent),
                                                  speed(agent),
                                                  predictions_minus_agent,
-                                                 agent_specs$size[-agent_idx],
+                                                 agent_specifications$size[-agent_idx],
                                                  objects(background))
 
         # Follow the leader phenomenon
         leaders <- m4ma::getLeaders_rcpp(agent_idx,
-                                         agent_specs$position,
-                                         agent_specs$orientation,
-                                         agent_specs$speed,
+                                         agent_specifications$position,
+                                         agent_specifications$orientation,
+                                         agent_specifications$speed,
                                          goal_position,
-                                         agent_specs$group,
+                                         agent_specifications$group,
                                          centers,
                                          objects(background))
-        leaders <- NULL
+        # leaders <- NULL
 
         # Walking besides a buddy
         buddies <- m4ma::getBuddy_rcpp(agent_idx,
-                                       agent_specs$position,
-                                       agent_specs$speed,
-                                       agent_specs$group,
-                                       agent_specs$orientation,
-                                       agent_specs$predictions,
+                                       agent_specifications$position,
+                                       agent_specifications$speed,
+                                       agent_specifications$group,
+                                       agent_specifications$orientation,
+                                       agent_specifications$predictions,
                                        centers,
                                        objects(background),
                                        pickBest = FALSE)
 
+    # Does not work at this moment, and so is left commented out
+    #
     # Subject based
-    } else if (subject) {
-        check <- state$check
-        goal_distance <- state$goal_distance[n]
-        direction_goal <- state$direction_goal
-        interpersonal_distance <- state$interpersonal_distance
-        blocked_angle <- state$blocked_angle
-        leaders <- state$leaders
-        buddies <- state$buddies
-    # Iteration based
-    } else {
-        check <- state$check[[n]]
-        goal_distance <- state$goal_distance[n]
-        direction_goal <- state$direction_goal[[n]]
-        interpersonal_distance <- state$interpersonal_distance[[n]]
-        blocked_angle <- state$blocked_angle[[n]]
-        leaders <- state$leaders[[n]]
-        buddies <- state$buddies[[n]]
+    # } else if (subject) {
+    #     check <- state$check
+    #     goal_distance <- state$goal_distance[n]
+    #     direction_goal <- state$direction_goal
+    #     interpersonal_distance <- state$interpersonal_distance
+    #     blocked_angle <- state$blocked_angle
+    #     leaders <- state$leaders
+    #     buddies <- state$buddies
+    # # Iteration based
+    # } else {
+    #     check <- state$check[[n]]
+    #     goal_distance <- state$goal_distance[n]
+    #     direction_goal <- state$direction_goal[[n]]
+    #     interpersonal_distance <- state$interpersonal_distance[[n]]
+    #     blocked_angle <- state$blocked_angle[[n]]
+    #     leaders <- state$leaders[[n]]
+    #     buddies <- state$buddies[[n]]
+    # }
     }
 
     # Compute the utilities and sum them up
-    p <- transform_exponentiate(parameters(agent))
+    p <- parameters(agent)
 
     V <- numeric(nrow(centers))
 
     # Always check if utility data is NULL
     if (!is.null(goal_distance)) {
-        V <- V + m4ma::psUtility_rcpp(p[["aPS"]], p[["bPS"]], p[["sPref"]], p[["sSlow"]], speed(agent), goal_distance)
+        V <- V + m4ma::psUtility_rcpp(p[["a_preferred_speed"]], 
+                                      p[["b_preferred_speed"]], 
+                                      p[["preferred_speed"]], 
+                                      p[["slowing_time"]], 
+                                      speed(agent), 
+                                      goal_distance)
     }
 
     if (!is.null(direction_goal)) {
-        V <- V + m4ma::gaUtility_rcpp(p[["bGA"]], p[["aGA"]], direction_goal)
+        V <- V + m4ma::gaUtility_rcpp(p[["b_goal_direction"]], 
+                                      p[["a_goal_direction"]], 
+                                      direction_goal)
     }
 
-    V <- V + m4ma::caUtility_rcpp(p[["aCA"]], p[["bCA"]], p[["bCAlr"]])
+    V <- V + m4ma::caUtility_rcpp(p[["a_current_direction"]], 
+                                  p[["b_current_direction"]], 
+                                  p[["blr_current_direction"]])
 
     if (!is.null(interpersonal_distance)) {
         # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
         # they have been taken out to speed up the estimation
         # Get names of ingroup agents
-        agent_groups <- agent_specs$group[-agent_idx]
-        names_ingroup <- names(agent_groups[agent_groups == agent_specs$group[agent_idx]])
+        agent_groups <- agent_specifications$group[-agent_idx]
+        names_ingroup <- names(agent_groups[agent_groups == agent_specifications$group[agent_idx]])
 
         # Check if agent is part of in group
         is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
 
         # Check which cells have only positive distance
         check <- check & apply(interpersonal_distance, 2, function(x) {
-          all(x > 0)
+            all(x > 0)
         })
 
-        V <- V + m4ma::idUtility_rcpp(
-            p[["bID"]], p[["dID"]], p[["aID"]], is_ingroup, check, interpersonal_distance, as.vector(ifelse(check, 0, -Inf)) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
-        )
+        V <- V + m4ma::idUtility_rcpp(p[["b_interpersonal"]], 
+                                      p[["d_interpersonal"]], 
+                                      p[["a_interpersonal"]], 
+                                      is_ingroup, 
+                                      check, 
+                                      interpersonal_distance, 
+                                      as.vector(ifelse(check, 0, -Inf))) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
     } else {
         V <- V + as.vector(ifelse(check, 0, -Inf))
     }
 
     if (!is.null(blocked_angle)) {
-        V <- V + m4ma::baUtility_rcpp(p[["aBA"]], p[["bBA"]],
+        V <- V + m4ma::baUtility_rcpp(p[["a_blocked"]], 
+                                      p[["b_blocked"]],
                                       pmax(blocked_angle, 0), # Make sure all angles are >= 0; this was previously done in baUtility()
-                                      as.integer(names(blocked_angle))-1)
+                                      as.integer(names(blocked_angle)) - 1)
     }
 
     if (!is.null(leaders)) {
-        V <- V + m4ma::flUtility_rcpp(p[["aFL"]], p[["bFL"]], p[["dFL"]], leaders[["leaders"]], leaders[["dists"]])
+        V <- V + m4ma::flUtility_rcpp(p[["a_leader"]], 
+                                      p[["b_leader"]], 
+                                      p[["d_leader"]], 
+                                      leaders[["leaders"]], 
+                                      leaders[["dists"]])
     }
 
     if (!is.null(buddies)) {
-        V <- V + m4ma::wbUtility_rcpp(p[["aWB"]], p[["bWB"]], buddies[["buddies"]], buddies[["dists"]])
+        V <- V + m4ma::wbUtility_rcpp(p[["a_buddy"]], 
+                                      p[["b_buddy"]], 
+                                      buddies[["buddies"]], 
+                                      buddies[["dists"]])
     }
 
-    # Stop baseline (set by gwUtility) and scaling
-    V_transformed <- c(-p[["bS"]], V) / p[["rU"]]
+    V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
+
+    # Robustness against NAs. Can sometimes occur when you have the difference
+    # between Inf - Inf = NA. Should not occur, but might inconvenience one 
+    # anyway.
+    if(any(is.na(V_transformed))) {
+        stop(paste0("NAs found in the utility. ", 
+                    "This might occur due to Inf in the parameters: ", 
+                    "Check whether parameter values are equal to the bounds. "))
+    }
 
     return(V_transformed)
 }
 
-#' Transform utility to probability
-#'
-#' Takes in the utility for each of the cells that an agent can decide on and
-#' transforms these utilities to probabilities. This quantifies the probability
-#' that an agent will move to a given cell in space.
-#'
-#' @param V Summed utility per candidate cell the agent might move to. Output of
-#' `utility`.
-#' @param muM Transformed nest assocation parameters that denote precision.
-#' Result of the `transform_mu` function. Defaults to `1` for each nest.
-#' @param nests Not clear yet
-#' @param alpha Not clear yet
-#'
-#' @export
-#
-# TO DO:
-#  - Nested functions in this function: Should we consider them separate?
-#  - The order of the arguments don't make sense to me: Would change them so
-#    that the defaults remain at the back
-#  - If I understand correctly, `between_nest` uses the individual probabilities
-#    of the `within_nest` function to compute the probabilities of the nests.
-#    If so, I would try to make this computation more general so that
-#    `within_nest` and `between_nest` are computed at once instead of twice
-#    in two separate functions
-pCNLs <- function(V,
-                  muM = rep(1, length(nests)),
-                  nests,
-                  alpha,
-                  mu = 1) {
+# #' Transform utility to probability
+# #'
+# #' Takes in the utility for each of the cells that an agent can decide on and
+# #' transforms these utilities to probabilities. This quantifies the probability
+# #' that an agent will move to a given cell in space.
+# #'
+# #' @param V Summed utility per candidate cell the agent might move to. Output of
+# #' `utility`.
+# #' @param muM Transformed nest assocation parameters that denote precision.
+# #' Result of the `transform_mu` function. Defaults to `1` for each nest.
+# #' @param nests Not clear yet
+# #' @param alpha Not clear yet
+# #'
+# #' @export
+# #
+# # TO DO:
+# #  - Nested functions in this function: Should we consider them separate?
+# #  - The order of the arguments don't make sense to me: Would change them so
+# #    that the defaults remain at the back
+# #  - If I understand correctly, `between_nest` uses the individual probabilities
+# #    of the `within_nest` function to compute the probabilities of the nests.
+# #    If so, I would try to make this computation more general so that
+# #    `within_nest` and `between_nest` are computed at once instead of twice
+# #    in two separate functions
+# pCNLs <- function(V,
+#                   muM = rep(1, length(nests)),
+#                   nests,
+#                   alpha,
+#                   mu = 1) {
 
-    # Create function to compute the probability of different alternatives
-    # within a nest
-    within_nest <- function(V, nests, alpha, muM) {
-        # Loop over the different nests to assess the probabilities of all
-        # alternatives within a single nest
-        for(i in seq_along(nests)) {
-            # Compute the probabilities
-            prob <- alpha[[i]] * exp(muM[i] * V[[i]])
+#     # Create function to compute the probability of different alternatives
+#     # within a nest
+#     within_nest <- function(V, nests, alpha, muM) {
+#         # Loop over the different nests to assess the probabilities of all
+#         # alternatives within a single nest
+#         for(i in seq_along(nests)) {
+#             # Compute the probabilities
+#             prob <- alpha[[i]] * exp(muM[i] * V[[i]])
 
-            # Check whether any of them are bad, and if so replace `prob` with
-            # either 1 or 0 depending on which ones are bad
-            if(any(prob == Inf)) {
-                prob <- ifelse(prob == Inf, 1, 0)
-            }
+#             # Check whether any of them are bad, and if so replace `prob` with
+#             # either 1 or 0 depending on which ones are bad
+#             if(any(prob == Inf)) {
+#                 prob <- ifelse(prob == Inf, 1, 0)
+#             }
 
-            # Scale the probabilities based on the total sum
-            if(all(prob == 0)) {
-                nests[[i]] <- prob
-            } else {
-                nests[[i]] <- prob / sum(prob)
-            }
-        }
+#             # Scale the probabilities based on the total sum
+#             if(all(prob == 0)) {
+#                 nests[[i]] <- prob
+#             } else {
+#                 nests[[i]] <- prob / sum(prob)
+#             }
+#         }
 
-        return(nests)
-    }
+#         return(nests)
+#     }
 
-    # Create a function to compute the probability of the nests themselves
-    between_nest <- function(V, nests, alpha, mu, muM) {
-        # Transform the precision parameter
-        mu <- mu / muM
+#     # Create a function to compute the probability of the nests themselves
+#     between_nest <- function(V, nests, alpha, mu, muM) {
+#         # Transform the precision parameter
+#         mu <- mu / muM
 
-        # Create probabilities for the different nests by summing the
-        # probabilities of all their alternatives
-        prob <- sapply(seq_along(nests),
-                       \(x) sum(alpha[[x]] * exp(muM[x] * V[[x]]))^mu_muM[x])
+#         # Create probabilities for the different nests by summing the
+#         # probabilities of all their alternatives
+#         prob <- sapply(seq_along(nests),
+#                        \(x) sum(alpha[[x]] * exp(muM[x] * V[[x]]))^mu_muM[x])
 
-        # Again check for any bad ones
-        if(any(prob) == Inf) {
-            prob <- ifelse(prob == Inf, 1, 0)
-        }
+#         # Again check for any bad ones
+#         if(any(prob) == Inf) {
+#             prob <- ifelse(prob == Inf, 1, 0)
+#         }
 
-        # Again normalize the probabilities
-        if(all(prob == 0)) {
-            prob <- prob
-        } else {
-            prob <- prob / sum(prob)
-        }
+#         # Again normalize the probabilities
+#         if(all(prob == 0)) {
+#             prob <- prob
+#         } else {
+#             prob <- prob / sum(prob)
+#         }
 
-        return(prob)
-    }
+#         return(prob)
+#     }
 
-    # Nest probabilities
-    if(any(unlist(nests) == 0)) {
-        nests <- lapply(nests, \(x) x + 1)
-    }
+#     # Nest probabilities
+#     if(any(unlist(nests) == 0)) {
+#         nests <- lapply(nests, \(x) x + 1)
+#     }
 
-    # Save all utilities of the different nests in a list
-    Vlist <- lapply(nests, \(x) V[x])
+#     # Save all utilities of the different nests in a list
+#     Vlist <- lapply(nests, \(x) V[x])
 
-    # Set largest V to zero to avoid numerical issues and apply this reduction
-    # to all other V's
-    upper_bound <- lapply(Vlist, max) |>
-        unlist() |>
-        max()
+#     # Set largest V to zero to avoid numerical issues and apply this reduction
+#     # to all other V's
+#     upper_bound <- lapply(Vlist, max) |>
+#         unlist() |>
+#         max()
 
-    Vlist <- lapply(Vlist, \(x) x - upper_bound)
+#     Vlist <- lapply(Vlist, \(x) x - upper_bound)
 
-    # Compute both kinds of probabilities and multiply to get a total
-    # probability for each of the alternatives
-    between <- between_nests(Vlist, nests, alpha, mu, muM)
-    within <- within_nests(Vlist, nests, alpha, muM)
+#     # Compute both kinds of probabilities and multiply to get a total
+#     # probability for each of the alternatives
+#     between <- between_nests(Vlist, nests, alpha, mu, muM)
+#     within <- within_nests(Vlist, nests, alpha, muM)
 
-    for(i in seq_along(nests)) {
-        within[[i]] <- within[[i]] * between[[i]]
-    }
+#     for(i in seq_along(nests)) {
+#         within[[i]] <- within[[i]] * between[[i]]
+#     }
 
-    # Sum the different probabilities for a single alternative
-    P <- V
-    idx <- unlist(nests)
-    within <- unlist(within)
-    for(i in seq_along(within)) {
-        P[i] <- sum(within[idx == i])
-    }
+#     # Sum the different probabilities for a single alternative
+#     P <- V
+#     idx <- unlist(nests)
+#     within <- unlist(within)
+#     for(i in seq_along(within)) {
+#         P[i] <- sum(within[idx == i])
+#     }
 
-    return(P)
-}
+#     return(P)
+# }

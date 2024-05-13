@@ -22,8 +22,10 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 Imports: 
+    matrixStats,
     methods,
-    m4ma
+    m4ma,
+    ggplot2
 RoxygenNote: 7.3.1
 Collate:
     'objects.R'
@@ -32,7 +34,6 @@ Collate:
     'goals.R'
     'agent.R'
     'moving_options.R'
-    'collision.R'
     'general.R'
     'parameters.R'
     'plot.R'

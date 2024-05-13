@@ -41,9 +41,13 @@ update_state <- function(state,
                          background,
                          stay_stopped = TRUE, 
                          time_step = 0.5,
-                         close_enough = 0.5,
-                         space_between = close_enough,
+                         close_enough = 2,
+                         space_between = 1.5,
+                         standing_start = 0.1,
                          precomputed_edges = NULL,
+                         precompute_goal_paths = FALSE,
+                         report = FALSE,
+                         interactive_report = FALSE,
                          ...) {
 
     # Predict where the agents will be at their current velocity and angle. Is 
@@ -60,29 +64,45 @@ update_state <- function(state,
         t()
     rownames(agent_predictions) <- sapply(state$agents, id)
 
+    # Create agent-specifications. Are used in the utility-function and used to
+    # be created there. Moved it here to reduce computational cost (which increases
+    # exponentially with more agents)
+    agent_specs <- create_agent_specifications(state$agents, 
+                                               agent_predictions)
+
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
     for(i in seq_along(state$agents)) {
         # Extract the agent to-be-updated from the state list. Importantly, also
-        # removed from this state list, as it should not contain this one agent:
-        # Simulation is done relative to the agent to-be-updated
+        # remove the agent from this state list, as it should not contain this 
+        # one agent: Simulation is done relative to the agent to-be-updated
         agent <- state$agents[[i]]
+
+        tmp_state <- state
+        tmp_state$agents <- tmp_state$agents[-i]
 
         # Update the goals of the agent
         agent <- update_goal(agent, 
-                             state, 
+                             tmp_state, 
                              background,
                              close_enough = close_enough,
                              space_between = space_between,
-                             precomputed_edges = precomputed_edges) 
+                             standing_start = standing_start,
+                             precomputed_edges = precomputed_edges,
+                             precompute_goal_paths = precompute_goal_paths,
+                             report = report, 
+                             interactive_report = interactive_report) 
 
         # Update the position of the agent
+        # start_time <- Sys.time()
         agent <- update_position(agent, 
-                                 state,
-                                 agent_predictions, # Keep all agents in here: predClose makes use of own prediction as well
+                                 tmp_state,
+                                 agent_specs, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
+                                 standing_start = standing_start,
+                                 report = report,
                                  time_step = time_step,
-                                 ...)  
+                                 ...) 
 
         # Update the agent himself
         state$agents[[i]] <- agent
@@ -122,6 +142,30 @@ predict_movement <- function(agent,
     return(co)
 }
 
+create_agent_specifications <- function(agent_list,
+                                        agent_predictions) {
+    # Make the object-based arguments of predped compatible with the information
+    # needed by m4ma. 
+    agent_specs <- list(id = as.character(sapply(agent_list, id)),
+                        size = as.numeric(sapply(agent_list, size)),
+                        position = t(sapply(agent_list, position)),
+                        orientation = as.numeric(sapply(agent_list, orientation)), 
+                        speed = as.numeric(sapply(agent_list, speed)), 
+                        group = as.numeric(sapply(agent_list, group)),
+                        predictions = agent_predictions)
+
+    # Required for utility helper functions: Add names of the agents to their
+    # characteristics
+    rownames(agent_specs$position) <- agent_specs$id
+    names(agent_specs$size) <- agent_specs$id
+    names(agent_specs$orientation) <- agent_specs$id
+    names(agent_specs$speed) <- agent_specs$id
+    names(agent_specs$group) <- agent_specs$id
+    rownames(agent_specs$predictions) <- agent_specs$id
+
+    return(agent_specs)
+}
+
 
 
 #' Move an Agent
@@ -159,7 +203,7 @@ predict_movement <- function(agent,
 #     everything becomes a lot clearer
 update_position <- function(agent,
                             state,
-                            agent_predictions,
+                            agent_specifications,
                             background,
                             nests = list(
                                 Central = c(0, 6, 17, 28),
@@ -183,20 +227,20 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.05 * parameters(agent)[["sPref"]],
+                            standing_start = 0.1,
                             time_step = 0.5,
-                            report = TRUE,
-                            temperature = 1
+                            report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
                             ) {
 
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
+
     # If the agent is currently interacting with another object, just let the 
     # agent continue in peace
     if(status(agent) == "completing goal") { 
         cell(agent) <- 0
-        check <- matrix(TRUE, nrow = 11, ncol = 3)
 
     # If the agent stopped their interaction, but still has to replan their path,
     # just return them as being at standstill.
@@ -212,29 +256,26 @@ update_position <- function(agent,
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
     # point). If not, let them reorient themselves towards their next goal.
-    } else {
-        # If the agent stopped their interaction, check whether they already know
-        # where the next goal is. If they don't. let them reorient themselves to
-        # the next goal
-        if(status(agent) == "reorient") {
-            orientation(agent) <- best_angle(agent, 
-                                             state, 
-                                             agent_predictions, 
-                                             background, 
-                                             velocities, 
-                                             orientations)
+    } else if(status(agent) == "reorient") {        
+        orientation(agent) <- best_angle(agent, 
+                                         state, 
+                                         agent_specifications, 
+                                         background, 
+                                         velocities, 
+                                         orientations)
 
-            # Report the degress that the agent is reorienting to
-            turn <- paste("to", orientation(agent), "degrees")
-            if(report) {
-                paste(id(agent), "turning", turn, "\n") |>
-                    cat()
-            }
-
-            status(agent) <- "move"
-            # speed(agent) <- standing_start # Otherwise the agent will overshoot his goals when reorienting
+        # Report the degress that the agent is reorienting to
+        turn <- paste("to", orientation(agent), "degrees")
+        if(report) {
+            paste(id(agent), "turning", turn, "\n") |>
+                cat()
         }
 
+        status(agent) <- "move"
+
+    # If an agent is moving, then get the necessary centers and compute the 
+    # utility of moving to a given location
+    } else {
         # Define the centers of the options to move to
         centers <- m4ma::c_vd_rcpp(cells = 1:33,
                                    p1 = position(agent),
@@ -259,7 +300,12 @@ update_position <- function(agent,
 
         # Compute the utility of of each option and transform the utilities to
         # probabilities
-        V <- utility(agent, state, agent_predictions, centers, background, check)
+        V <- utility(agent, 
+                     state, 
+                     agent_specifications, 
+                     centers, 
+                     background, 
+                     check)
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start
@@ -269,7 +315,7 @@ update_position <- function(agent,
         }
 
         V <- V - max(V)
-        exp_V <- exp(temperature * V)
+        exp_V <- exp(V)
         Pr <- exp_V / sum(exp_V)
 
         # Apply the different options to the probabilities
@@ -291,6 +337,7 @@ update_position <- function(agent,
         if(cell == 0) {
             speed(agent) <- standing_start
             status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
+            
         } else {
             position(agent) <- centers[cell,]
 
@@ -360,12 +407,17 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.05 * parameters(agent)[["sPref"]],
-                        close_enough = 2 * radius(agent),
-                        space_between = radius(agent),
+                        standing_start = 0.1,
+                        close_enough = 2,
+                        space_between = 1.5,
                         report = FALSE,
                         interactive_report = FALSE,
-                        precomputed_edges = NULL) {  
+                        precomputed_edges = NULL,
+                        precompute_goal_paths = FALSE) {  
+
+    close_enough <- close_enough * radius(agent)
+    space_between <- space_between * radius(agent)
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # Make some placeholders for replanning and rerouting
     replan <- reroute <- FALSE
@@ -388,7 +440,12 @@ update_goal <- function(agent,
                                             position = exit(background))
             }
 
-            status(agent) <- "replan"
+            # Replan if the goal paths were not precomputed yet
+            if(!precompute_goal_paths) {
+                status(agent) <- "replan"
+            } else {
+                status(agent) <- "reorient"
+            }
 
             # Left in but commented out: Changed orientation when the agent 
             # would later reorient. Not sure why
@@ -430,18 +487,19 @@ update_goal <- function(agent,
             # Given that you have to reroute, replan how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents[-agent_idx])
+                                                  state$agents)
                                                   
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
-                                                  precomputed_edges = precomputed_edges)
+                                                  precomputed_edges = NULL,
+                                                  many_options = TRUE)
+            # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+            #                                    nrow = 1, 
+            #                                    ncol = 2)
 
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to replan at a later time and 
@@ -458,10 +516,10 @@ update_goal <- function(agent,
                                                matrix(current_goal(agent)@path[1,],
                                                       nrow = 1, 
                                                       ncol = 2))
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
 
         } else {
-            reroute_param <- parameters(agent)$pReroute
+            reroute_param <- parameters(agent)$reroute
 
             if(is.finite(reroute_param)) {
                 # Compute the probability of rerouting based on the number of
@@ -482,7 +540,11 @@ update_goal <- function(agent,
                                                           agent, 
                                                           updated_background,
                                                           space_between = space_between,
-                                                          precomputed_edges = precomputed_edges)
+                                                          precomputed_edges = NULL,
+                                                          many_options = TRUE)
+                    # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+                    #                                    nrow = 1, 
+                    #                                    ncol = 2)
 
                     # Quick check whether the path is clearly defined. If not, 
                     # then the agent will have to replan at a later time and 
@@ -562,29 +624,27 @@ update_goal <- function(agent,
                                        goals(agent))
                 current_goal(agent) <- goals(agent)[[2]]
                 goals(agent) <- goals(agent)[-2]
+                status(agent) <- "replan"
+            } else {
+                status(agent) <- "move"
             }
-            status(agent) <- "replan"
 
         # If the counter is not low enough yet, but the agent is still waiting, 
         # we can check whether other agents are still blocking his way
         } else {
-            # Find out who the current agent is
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
             # Draw a circle around the current goal of the agent and find out whether
             # any of the other agents intersects with this. If so, then we can assume
             # one of the agents is blocking the access to the goal, and the agent
             # cannot start the interaction phase.
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents[-agent_idx], 
+            blocking_agents <- sapply(state$agents, 
                                       \(x) intersects(goal_circle, x))
 
             # If no agents are blocking access to the goal, allow the agent to move
             # again
             if(!any(blocking_agents)) {
-                status(agent) <- "replan"
+                status(agent) <- "move"
             }
         }        
     }
@@ -653,15 +713,11 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state$agents) > 1) & (goal_distance <= close_enough + 2 * radius(agent))) {
-            # Find out who the current agent 
-            agent_ids <- sapply(state$agents, id)
-            agent_idx <- which(agent_ids == id(agent))
-
-            # Delete him from the list and find out whether there is an intersection
+        if((length(state$agents) > 0) & (goal_distance <= close_enough + 2 * radius(agent))) {
+            # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents[-agent_idx], 
+            blocking_agents <- sapply(state$agents, 
                                       \(x) intersects(goal_circle, x))
 
             # If only one agent is blocking the goal, let the agent wait. Only invoke

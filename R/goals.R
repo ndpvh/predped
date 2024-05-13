@@ -24,8 +24,7 @@ setMethod("initialize", "goal", function(.Object,
                                          busy = FALSE,
                                          done = FALSE,
                                          counter = 5,
-                                         ...
-) {
+                                         ...) {
 
     .Object@id <- if(length(id) == 0) paste("goal", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@position <- coordinate(position)
@@ -50,6 +49,7 @@ setGeneric("interact", function(object) standardGeneric("interact"))
 setMethod("interact", "goal", function(object) 
 {
     if(object@counter <= 0) {
+        object@counter <- object@counter - 1
         object@done <- TRUE
         return(object)
     } else {
@@ -91,7 +91,12 @@ setMethod("replace", "goal", function(object,
 #' @export 
 generate_goal_stack <- function(n, 
                                 setting,
-                                counter_generator = \(x) rnorm(x, 10, 2)) {
+                                counter_generator = \(x) rnorm(x, 10, 2),
+                                agent_position = NULL,
+                                precomputed_edges = NULL,
+                                precompute_goal_paths = TRUE,
+                                space_between = 0.5,
+                                order_goal_stack = TRUE) {
     # Select the objects in the environment that can contain a goal
     potential_objects <- list()
     for(i in seq_along(setting@objects)) {
@@ -114,6 +119,128 @@ generate_goal_stack <- function(n,
                                        setting,
                                        id = character(0),
                                        counter = counter_generator(1)))
+
+    # If you want the goal stack to be ordered according to distance, do so
+    if(order_goal_stack) {
+        # Compute the distance starting from the entrance (through which the agent
+        # enters the space)
+        if(is.null(agent_position)) {
+            start <- entrance(setting)
+        } else {
+            start <- agent_position
+        }
+
+        distances <- sapply(goal_stack, 
+                            \(x) (start[1] - position(x)[1])^2 + (start[2] - position(x)[2])^2)
+        old <- sapply(goal_stack, \(x) x@id)
+        
+
+        # Sort the list of goals based on how close they are to the entrance
+        distances <- cbind(1:n, distances)
+        idx <- distances[order(distances[,2]), 1]
+
+        goal_stack <- goal_stack[idx]
+    }
+
+    # If you don't want to or cannot precompute the goal paths, return the 
+    # goal stack as is
+    if(!precompute_goal_paths | length(goal_stack) == 1) {
+        return(goal_stack)
+    }
+
+    # If you want to precompute the goal paths, loop over the last n - 1 goals
+    # in the goal stack and find the path starting at the location of the 
+    # previous goal. The path of the first goal is computed in the `add_agent`
+    # function and does not need to be addressed here.
+    dummy <- agent(center = c(0, 0), radius = space_between)
+    for(i in 2:length(goal_stack)) {
+        position(dummy) <- position(goal_stack[[i - 1]])
+        goal_stack[[i]]@path <- find_path(goal_stack[[i]], 
+                                          dummy, 
+                                          setting,
+                                          space_between = space_between,
+                                          precomputed_edges = precomputed_edges)
+    }
+
+    return(goal_stack)
+}
+
+#' Simulate multiple goal stacks
+#' 
+#' Create multiple goal stacks that can be used in the simulation. Importantly, 
+#' everything is precomputed here, meaning that all paths towards the goals are
+#' already filled out in the simulation.
+#' 
+#' @param n Integer denoting the number of goal stacks to create
+#' @param setting List containing all objects in the environment/setting
+#' @param goal_number Integer, vector of integers, or function that determines 
+#' how many goals each of the agents should receive. Defaults to a function that 
+#' draws `x` numbers from a normal distribution with mean 10 and standard 
+#' deviation 2. 
+#' @param goal_duration Function that defines how the counter for each goal 
+#' should be generated. Defaults to a normal distribution with mean 10 and 
+#' standard deviation 2.
+#' @param space_between Numeric denoting the amount of space that is needed 
+#' between a path point and an object
+#' @param order_goal_stack Logical denoting whether to order the goal stack 
+#' based on distance.
+#' 
+#' @export 
+# TO DO:
+#   - Find a new name for this function: Not happy with how close it is to 
+#     generate_goal_stack
+simulate_goal_stack <- function(n, 
+                                setting,
+                                goal_number = \(x) rnorm(x, 10, 2), 
+                                goal_duration = \(x) rnorm(x, 10, 2),
+                                space_between = 0.5,
+                                order_goal_stack = TRUE) {
+
+    print("Precomputing goal stacks")
+
+    # Define the number of goals per goal-stack
+    goal_number <- draw_number(goal_number, n)
+
+    # If `goal_duration` is not a function, make it a function anyway (assumed
+    # by the `goal` class: To be changed)
+    if(typeof(goal_duration) != "closure") {
+        number <- goal_duration[1]
+        goal_duration <- function(x) number
+    }
+
+    # Precompute the edges so that this might already take a bit less time
+    edges <- create_edges(c(0, 0), 
+                          c(0, 0), 
+                          setting,
+                          space_between = space_between)
+    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
+    # Loop over the number of goal stacks to create
+    goal_stack <- list()
+    for(i in seq_len(n)) {
+        print(paste0("Generating goal stack ", i))
+
+        # Generate the complete goal stack and precompute all the paths to the 
+        # goals
+        goal_stack[[i]] <- generate_goal_stack(goal_number[i], 
+                                               setting,
+                                               counter_generator = goal_duration,
+                                               precomputed_edges = edges,
+                                               precompute_goal_paths = TRUE,
+                                               space_between = space_between,
+                                               order_goal_stack = order_goal_stack)
+
+        # The first goal within the goal stack does not have a path yet. Use the
+        # entrance as the position at which the agent starts
+        dummy <- agent(center = entrance(setting), radius = space_between)
+        goal_stack[[i]][[1]]@path <- find_path(goal_stack[[i]][[1]], 
+                                               dummy, 
+                                               setting,
+                                               space_between = space_between,
+                                               precomputed_edges = edges)
+    }
 
     return(goal_stack)
 }
@@ -180,8 +307,8 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                                                              background,
                                                              id = character(0),
                                                              counter = 5,
-                                                             forbidden = NULL
-){
+                                                             forbidden = NULL){
+
     # Create an ever so slightly bigger circle
     #
     # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
@@ -235,14 +362,16 @@ setMethod("find_path", "goal", function(object,
                                         background,
                                         algorithm = "bi",
                                         space_between = radius(agent),
-                                        precomputed_edges = NULL) {
+                                        precomputed_edges = NULL,
+                                        many_options = FALSE) {
                                             
     # Create the edges that are taken in by `makegraph`
     if(is.null(precomputed_edges)) {
         edges <- create_edges(position(agent),
                               position(object), 
                               background,
-                              space_between = space_between)
+                              space_between = space_between,
+                              many_options = many_options)
     } else {
         edges <- adjust_edges(position(agent),
                               position(object),
@@ -285,8 +414,42 @@ setMethod("find_path", "goal", function(object,
     path_points <- path_points[-1, c("x", "y")] |>
         as.matrix()
 
+    # Check whether you can delete some of the path points to make it a bit more 
+    # concise. This only applies if there is more than one path point
+    if(nrow(path_points) > 1) {
+        # Set the original reference point to the position of the agent
+        ref <- position(agent)
+
+        # Loop over the path points starting at number 2 (number 1 being one 
+        # that is guaranteed to be seen)
+        for(i in 2:nrow(path_points)) {
+            # Check whether agents can see the next path point starting from 
+            # the reference point
+            seen <- all(prune_edges(objects(background), 
+                                    matrix(c(ref, path_points[i,]),
+                                           nrow = 1)))
+            
+            # If the path point is seen, you can just directly go to this path 
+            # point instead of making a stop in the intermediate one
+            if(seen) {
+                path_points[i - 1,] <- NA
+
+            # If the path point is not seen, that means the previous path point
+            # is a critical one, and will therefore serve as the new reference
+            } else {
+                ref <- path_points[i - 1,]
+            }
+        }
+
+        # Remove all unnecessary path points from the list
+        path_points <- matrix(path_points[!is.na(path_points[,1]),],
+                              ncol = 2)
+    }
+
+    # Some additional changes for convention
     rownames(path_points) <- NULL
-    colnames(path_points) <- c("x", "y")    
+    colnames(path_points) <- c("x", "y")
+    
 
     return(path_points)
 })
@@ -314,14 +477,10 @@ setMethod("position", "goal", function(object) {
 #' 
 #' @export
 setMethod("position<-", "goal", function(object, value) {
-    object@position <- value
+    object@position <- as(value, "coordinate")
     return(object)
 })
 
-
-setGeneric("id", function(object) standardGeneric("id"))
-
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 
 #' @rdname goal-class
 #'

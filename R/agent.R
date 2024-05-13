@@ -49,7 +49,7 @@ setMethod("initialize", "agent", function(.Object,
 ) {
     .Object <- callNextMethod(.Object, moveable = moveable, interactable = interactable, ...)
 
-    .Object@id <- if (length(id) == 0) paste(sample(letters, 5, replace = TRUE), collapse = "") else id
+    .Object@id <- if(length(id) == 0) paste(sample(letters, 5, replace = TRUE), collapse = "") else id
     .Object@speed <- speed
     .Object@orientation <- orientation
     .Object@group <- group

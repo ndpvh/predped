@@ -6,6 +6,9 @@
 /*/Figures/
 /*/Trace*
 /*/*/Trace*
+depr/
+*/depr 
+*/*/depr
 
 Diversity/
 DiversityAnalysis.R
@@ -14,10 +17,10 @@ analysis.R
 MinimalWorkingExample/
 minimal_working_example.R
 Train/
+inst/*
+parameters.R
 
 *.drawio*
-
-man/
 
 tmp/
 *.txt
@@ -28,8 +31,8 @@ R/*_depr.R
 
 R/geometry.R
 R/move_all.R
-predped_in_action*.R
-predped_in_action*/
+predped_in_action*
+performance_test*
 .vscode/
 .DS_Store
 RCore/
