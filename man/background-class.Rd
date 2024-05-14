@@ -4,32 +4,7 @@
 \name{background-class}
 \alias{background-class}
 \alias{background}
-\alias{shape}
-\alias{shape<-}
-\alias{objects}
-\alias{objects<-}
-\alias{entrance}
-\alias{entrance<-}
-\alias{exit}
-\alias{exit<-}
 \title{An S4 Class to Represent the Background}
-\usage{
-shape(object)
-
-shape(object) <- value
-
-objects(object)
-
-objects(object) <- value
-
-entrance(object)
-
-entrance(object) <- value
-
-exit(object)
-
-exit(object) <- value
-}
 \description{
 An S4 Class to Represent the Background
 }

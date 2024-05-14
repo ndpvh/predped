@@ -4,41 +4,7 @@
 \name{predped-class}
 \alias{predped-class}
 \alias{predped}
-\alias{id,predped-method}
-\alias{id<-,predped-method}
-\alias{setting}
-\alias{setting<-}
-\alias{parameters,predped-method}
-\alias{parameters<-,predped-method}
-\alias{archetypes}
-\alias{archetypes<-}
-\alias{weights}
-\alias{weights<-}
-\alias{show,predped-method}
 \title{An S4 Class to Represent the M4MA model.}
-\usage{
-\S4method{id}{predped}(object)
-
-\S4method{id}{predped}(object) <- value
-
-setting(object)
-
-setting(object) <- value
-
-\S4method{parameters}{predped}(object)
-
-\S4method{parameters}{predped}(object) <- value
-
-archetypes(object)
-
-archetypes(object) <- value
-
-weights(object, ...)
-
-weights(object) <- value
-
-\S4method{show}{predped}(object)
-}
 \description{
 The `predped` class defines the M4MA model that can be used to simulate 
 data from. It contains the setting in which the agents should walk around as 

@@ -21,7 +21,9 @@
 #' agent is doing at the moment. Can take on `"move"`, `"stop"`, `"reorient"`, 
 #' and `"exit"`
 #' 
-#' @seealso [object-class], [circle-class]
+#' @seealso \code{\link[predped]{object-class}},
+#' \code{\link[predped]{circle-class}},
+#' \code{\link[predped]{goal-class}}
 #' 
 #' @rdname agent-class
 #'
@@ -85,24 +87,15 @@ setMethod("show", "agent", function(object) {
 })
 
 
-#' @rdname agent-class
-#'
-#' @export
 setMethod("id", "agent", function(object) {
     return(setNames(object@id, object@id))
 })
 
-#' @rdname agent-class
-#'
-#' @export
 setMethod("id<-", "agent", function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname agent-class
-#' 
-#' @export
 setMethod("position", "agent", function(object, return_matrix = FALSE) {
     if (return_matrix) {
         return(matrix(object@center, nrow = 1, ncol = 2, dimnames = list(object@id, names(object@center))))
@@ -110,35 +103,28 @@ setMethod("position", "agent", function(object, return_matrix = FALSE) {
     return(object@center)
 })
 
-#' @rdname agent-class
-#' 
-#' @export
 setMethod("position<-", "agent", function(object, value) {
     object@center <- as(value, "coordinate")
     return(object)
 })
 
-#' @rdname agent-class
-#' 
-#' @export
 setMethod("size", "agent", function(object) {
     return(setNames(object@radius, object@id))
 })
 
-#' @rdname agent-class
-#'
-#' @export 
 setMethod("size<-", "agent", function(object, value) {
     object@radius <- value
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the speed-slot
+#' 
+#' @rdname speed-method
 #' 
 #' @export
 setGeneric("speed", function(object) standardGeneric("speed"))
 
-#' @rdname agent-class
+#' @rdname speed-method
 #' 
 #' @export
 setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
@@ -152,27 +138,23 @@ setMethod("speed<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
-#' 
-#' @export
 setMethod("orientation", "agent", function(object) {
     return(setNames(object@orientation, object@id))
 })
 
-#' @rdname agent-class
-#' 
-#' @export
 setMethod("orientation<-", "agent", function(object, value) {
     object@orientation <- value
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the group-slot
+#' 
+#' @rdname group-method
 #' 
 #' @export
 setGeneric("group", function(object) standardGeneric("group"))
 
-#' @rdname agent-class
+#' @rdname group-method
 #' 
 #' @export
 setGeneric("group<-", function(object, value) standardGeneric("group<-"))
@@ -186,12 +168,14 @@ setMethod("group<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the cell-slot
+#' 
+#' @rdname cell-method
 #' 
 #' @export
 setGeneric("cell", function(object) standardGeneric("cell"))
 
-#' @rdname agent-class
+#' @rdname cell-method
 #' 
 #' @export
 setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
@@ -205,12 +189,14 @@ setMethod("cell<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the status-slot
+#' 
+#' @rdname status-method
 #' 
 #' @export
 setGeneric("status", function(object) standardGeneric("status"))
 
-#' @rdname agent-class
+#' @rdname status-method
 #' 
 #' @export
 setGeneric("status<-", function(object, value) standardGeneric("status<-"))
@@ -225,12 +211,14 @@ setMethod("status<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the parameters-slot
+#' 
+#' @rdname parameters-method
 #' 
 #' @export
 setGeneric("parameters", function(object) standardGeneric("parameters"))
 
-#' @rdname agent-class
+#' @rdname parameters-method
 #' 
 #' @export
 setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
@@ -244,12 +232,14 @@ setMethod("parameters<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the goals-slot
+#' 
+#' @rdname goals-method
 #' 
 #' @export
 setGeneric("goals", function(object) standardGeneric("goals"))
 
-#' @rdname agent-class
+#' @rdname goals-method
 #' 
 #' @export
 setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
@@ -263,12 +253,14 @@ setMethod("goals<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the current_goal-slot
+#' 
+#' @rdname current_goal-method
 #' 
 #' @export
 setGeneric("current_goal", function(object) standardGeneric("current_goal"))
 
-#' @rdname agent-class
+#' @rdname current_goal-method
 #' 
 #' @export
 setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
@@ -282,12 +274,14 @@ setMethod("current_goal<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the color-slot
+#' 
+#' @rdname color-method
 #' 
 #' @export
 setGeneric("color", function(object) standardGeneric("color"))
 
-#' @rdname agent-class
+#' @rdname color-method
 #' 
 #' @export
 setGeneric("color<-", function(object, value) standardGeneric("color<-"))
@@ -301,12 +295,14 @@ setMethod("color<-", "agent", function(object, value) {
     return(object)
 })
 
-#' @rdname agent-class
+#' Getter/Setter for the waiting_counter-slot
+#' 
+#' @rdname waiting_counter-method
 #' 
 #' @export
 setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
 
-#' @rdname agent-class
+#' @rdname waiting_counter-method
 #' 
 #' @export
 setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))

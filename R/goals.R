@@ -460,51 +460,45 @@ setMethod("find_path", "goal", function(object,
 
 # Getters and setters
 
-#' @rdname goal-class
+#' Getter/Setter for the position-slot
+#' 
+#' @rdname position-method
+#' 
+#' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
-#' @rdname goal-class
+#' @rdname position-method
 #' 
 #' @export
 setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("position", "goal", function(object) {
     return(object@position)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("position<-", "goal", function(object, value) {
     object@position <- as(value, "coordinate")
     return(object)
 })
 
 
-#' @rdname goal-class
-#'
-#' @export
 setMethod("id", "goal", function(object) {
     return(object@id)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("id<-", "goal", function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the path-slot
+#' 
+#' @rdname path-method
 #' 
 #' @export
 setGeneric("path", function(object) standardGeneric("path"))
 
-#' @rdname goal-class
+#' @rdname path-method
 #' 
 #' @export
 setGeneric("path<-", function(object, value) standardGeneric("path<-"))
@@ -518,12 +512,14 @@ setMethod("path<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the counter-slot
+#' 
+#' @rdname counter-method
 #' 
 #' @export
 setGeneric("counter", function(object) standardGeneric("counter"))
 
-#' @rdname goal-class
+#' @rdname counter-method
 #' 
 #' @export
 setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
@@ -537,12 +533,14 @@ setMethod("counter<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the busy-slot
+#' 
+#' @rdname busy-method
 #' 
 #' @export
 setGeneric("busy", function(object) standardGeneric("busy"))
 
-#' @rdname goal-class
+#' @rdname busy-method
 #' 
 #' @export
 setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
@@ -556,24 +554,22 @@ setMethod("busy<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the done-slot
+#' 
+#' @rdname done-method
+#' 
+#' @export
 setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
 
-#' @rdname goal-class
+#' @rdname done-method
 #' 
 #' @export
 setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("done", "goal", function(object) {
     return(object@done)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("done<-", "goal", function(object, value) {
     object@done <- value
     return(object)

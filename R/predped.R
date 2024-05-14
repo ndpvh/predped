@@ -77,27 +77,23 @@ setMethod("initialize", "predped", function(.Object,
     return(.Object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("id", "predped", function(object) {
     return(object@id)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("id<-", "predped", function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the setting-slot
+#' 
+#' @rdname setting-method
 #'
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
-#' @rdname predped-class
+#' @rdname setting-method
 #'
 #' @export
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
@@ -111,16 +107,10 @@ setMethod("setting<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("parameters", "predped", function(object) {
     return(object@parameters)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
     if(!all(object@archetypes %in% value$name)) {
@@ -131,12 +121,14 @@ setMethod("parameters<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the archetypes-slot
+#' 
+#' @rdname archetypes-method
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 
-#' @rdname predped-class
+#' @rdname archetypes-method
 #'
 #' @export
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
@@ -155,12 +147,14 @@ setMethod("archetypes<-", "predped", function(object, value) {
                    weights = object@weights))
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the weights-slot
+#' 
+#' @rdname weights-method
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 
-#' @rdname predped-class
+#' @rdname weights-method
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
@@ -174,10 +168,6 @@ setMethod("weights<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
-#
 # TO DO: Beautify the output
 setMethod("show", "predped", function(object) {
     cat("Model object:\n")

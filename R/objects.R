@@ -235,7 +235,6 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 #' \code{\link[predped]{circle-class}}
 #'
 #' @export
-#' @name polygon
 polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical", center = "numeric"), contains = "object")
 
 setMethod("initialize", "polygon", function(.Object, 
@@ -552,7 +551,6 @@ setMethod("line_intersection", signature(object = "polygon"), function(object, s
 #' @family objects
 #'
 #' @export
-#' @name rectangle
 #
 # TO DO
 #   - Currently, orientation is in radians. Might need to change to degrees, as 
@@ -1291,31 +1289,35 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
 ################################################################################
 # Getters and setters
 
-setGeneric("id", function(object) standardGeneric("id"))
-
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
-
-#' @rdname object-class
+#' Getter/Setter for the id-slot
+#' 
+#' @rdname id-method
 #' 
 #' @export 
+setGeneric("id", function(object) standardGeneric("id"))
+
+#' @rdname id-method
+#' 
+#' @export 
+setGeneric("id<-", function(object, value) standardGeneric("id<-"))
+
 setMethod("id", signature(object = "object"), function(object) {
     return(object@id)
 })
 
-#' @rdname object-class
-#' 
-#' @export 
 setMethod("id<-", signature(object = "object"), function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the radius-slot
+#' 
+#' @rdname radius-method
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
 
-#' @rdname object-class
+#' @rdname radius-method
 #' 
 #' @export 
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
@@ -1329,12 +1331,14 @@ setMethod("radius<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the size-slot
+#' 
+#' @rdname size-method
 #' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
-#' @rdname object-class
+#' @rdname size-method
 #' 
 #' @export 
 setGeneric("size<-", function(object, value) standardGeneric("size<-"))
@@ -1372,12 +1376,14 @@ setMethod("size<-", signature(object = "segment"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the center-slot
+#' 
+#' @rdname center-method
 #' 
 #' @export 
 setGeneric("center", function(object) standardGeneric("center"))
 
-#' @rdname object-class
+#' @rdname center-method
 #' 
 #' @export 
 setGeneric("center<-", function(object, value) standardGeneric("center<-"))
@@ -1424,12 +1430,14 @@ setMethod("center<-", signature(object = "segment"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the orientation-slot
+#' 
+#' @rdname orientation-method
 #' 
 #' @export 
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
-#' @rdname object-class
+#' @rdname orientation-method
 #' 
 #' @export 
 setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))

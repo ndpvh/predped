@@ -3,38 +3,7 @@
 \docType{class}
 \name{object-class}
 \alias{object-class}
-\alias{id,object-method}
-\alias{id<-,object-method}
-\alias{radius}
-\alias{radius<-}
-\alias{size}
-\alias{size<-}
-\alias{center}
-\alias{center<-}
-\alias{orientation}
-\alias{orientation<-}
 \title{An S4 Abstract Base Class to Represent Objects}
-\usage{
-\S4method{id}{object}(object)
-
-\S4method{id}{object}(object) <- value
-
-radius(object)
-
-radius(object) <- value
-
-size(object)
-
-size(object) <- value
-
-center(object)
-
-center(object) <- value
-
-orientation(object)
-
-orientation(object) <- value
-}
 \description{
 An S4 Abstract Base Class to Represent Objects
 }

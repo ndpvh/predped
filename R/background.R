@@ -54,12 +54,14 @@ setMethod("initialize", "background", function(.Object,
     return(.Object)
 })
 
-#' @rdname background-class
+#' Getter/Setter for the shape-slot
+#' 
+#' @rdname shape-method
 #' 
 #' @export
 setGeneric("shape", function(object) standardGeneric("shape"))
 
-#' @rdname background-class
+#' @rdname shape-method
 #' 
 #' @export
 setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
@@ -73,12 +75,14 @@ setMethod("shape<-", "background", function(object, value) {
     return(object)
 })
 
-#' @rdname background-class
+#' Getter/Setter for the objects-slot
+#' 
+#' @rdname objects-method
 #' 
 #' @export
 setGeneric("objects", function(object) standardGeneric("objects"))
 
-#' @rdname background-class
+#' @rdname objects-method
 #' 
 #' @export
 setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
@@ -92,12 +96,14 @@ setMethod("objects<-", "background", function(object, value) {
     return(object)
 })
 
-#' @rdname background-class
+#' Getter/Setter for the entrance-slot
+#' 
+#' @rdname entrance-method
 #' 
 #' @export
 setGeneric("entrance", function(object) standardGeneric("entrance"))
 
-#' @rdname background-class
+#' @rdname entrance-method
 #' 
 #' @export
 setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
@@ -111,12 +117,14 @@ setMethod("entrance<-", "background", function(object, value) {
     return(object)
 })
 
-#' @rdname background-class
+#' Getter/Setter for the exit-slot
+#' 
+#' @rdname exit-method
 #' 
 #' @export
 setGeneric("exit", function(object) standardGeneric("exit"))
 
-#' @rdname background-class
+#' @rdname exit-method
 #' 
 #' @export
 setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
