@@ -23,6 +23,10 @@ Critically, and different from other pedestrian models, M4MA assigns each pedest
 
 ## How to use
 
+This package allows its users to simulate pedestrian behavior as expected by M4MA. Users can specify the environment, the characterstics the pedestrians, and the characteristics of the simulation itself (e.g., maximal number of agents, initial conditions,...), therefore allowing for a great variety of potential research questions that can be answered. For more information on the workflow of this package, see _Getting started_.
+
+An unofficial benchmark is available through the repository. This package depends heavily on the [```m4ma```](https://github.com/m4ma/m4ma) package.
+
 ## Installation
 
 One can install ```predped``` through ```devtools``` in the following way:
