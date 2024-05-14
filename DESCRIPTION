@@ -17,15 +17,8 @@ Author: c(
     person("Andrew",
            "Heathcote", 
            email = "ajheathcote@gmail.com"))
-Maintainer: c(
-    person("Niels", 
-           "Vanhasbroeck", 
-           email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090)), 
-    person("Andrew",
-           "Heathcote", 
-           email = "ajheathcote@gmail.com"))
-Description: More about what it does (maybe more than one line)
+Maintainer: Niels Vanhasbroeck (niels.vanhasbroeck@gmail.com)
+Description: Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of different kinds of simulation studies.
 License: GPL v3
 Encoding: UTF-8
 Imports: 
