@@ -17,9 +17,16 @@ Author: c(
     person("Andrew",
            "Heathcote", 
            email = "ajheathcote@gmail.com"))
-Maintainer: Andrew Heathcote <ajheathcote@gmail.com>
+Maintainer: c(
+    person("Niels", 
+           "Vanhasbroeck", 
+           email = "niels.vanhasbroeck@gmail.com",
+           comment = c(ORCID = 0000-0002-7423-0090)), 
+    person("Andrew",
+           "Heathcote", 
+           email = "ajheathcote@gmail.com"))
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: GPL v3
 Encoding: UTF-8
 Imports: 
     matrixStats,
