@@ -39,9 +39,9 @@ testthat::test_that("Predped getters work", {
     testthat::expect_equal(predped::weights(tst), c(0.5, 0.5))
 
     # Here, extra trick: We need to order the parameters that are retrieved
-    idx <- predped::params_archetypes$Name %in% c("Rushed", "BaselineEuropean")
+    idx <- predped::params_archetypes$name %in% c("Rushed", "BaselineEuropean")
     params <- predped::params_archetypes[idx,]
-    idx <- factor(params$Name, levels = c("Rushed", "BaselineEuropean"))
+    idx <- factor(params$name, levels = c("Rushed", "BaselineEuropean"))
     idx <- order(as.numeric(idx))
 
     testthat::expect_equal(predped::parameters(tst), params[idx,])
@@ -80,9 +80,9 @@ testthat::test_that("Predped setters work", {
     testthat::expect_equal(predped::weights(tst), c(0.25, 0.75))
 
     # Here, extra trick: We need to order the parameters that are retrieved
-    idx <- predped::params_archetypes$Name %in% c("BaselineEuropean", "DrunkAussie")
+    idx <- predped::params_archetypes$name %in% c("BaselineEuropean", "DrunkAussie")
     params <- predped::params_archetypes[idx,]
-    idx <- factor(params$Name, levels = c("BaselineEuropean", "DrunkAussie"))
+    idx <- factor(params$name, levels = c("BaselineEuropean", "DrunkAussie"))
     idx <- order(as.numeric(idx))
 
     testthat::expect_equal(predped::parameters(tst), params[idx,])
