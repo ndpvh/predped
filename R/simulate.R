@@ -440,7 +440,7 @@ create_initial_condition <- function(initial_number_agents,
                                      goal_number,
                                      goal_duration = \(x) rnorm(x, 10, 2),
                                      standing_start = 0.1,
-                                     space_between = 2,
+                                     space_between = 1,
                                      time_step = 0.5,
                                      precomputed_edges = NULL,
                                      precompute_goal_paths = TRUE,
@@ -493,6 +493,14 @@ create_initial_condition <- function(initial_number_agents,
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
         edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
         edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+
+        # Additional check to see if there are enough edges to place agents on
+        if(nrow(edges$edges) == 0) {
+            message(paste0("Couldn't add any new agents after ", 
+                           length(agents), 
+                           " due to crowdiness."))
+            break
+        }
 
         # Choose a random edge on which the agent will stand and create the 
         # exact position.
