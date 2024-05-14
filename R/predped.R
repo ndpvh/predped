@@ -48,7 +48,8 @@ setMethod("initialize", "predped", function(.Object,
     }
 
     if(sum(weights) != 1) {
-        stop("Weights should add up to 1.")
+        warning("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
+        weights <- weights / sum(weights)
     }
 
     if(!all(archetypes %in% parameters$name)) {
