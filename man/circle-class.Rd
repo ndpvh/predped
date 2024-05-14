@@ -23,7 +23,7 @@ An S4 Class to Represent Circle Objects
 
 Other objects: 
 \code{\link{object-class}},
-\code{\link{polygon}},
-\code{\link{rectangle}}
+\code{\link{polygon-class}},
+\code{\link{rectangle-class}}
 }
 \concept{objects}

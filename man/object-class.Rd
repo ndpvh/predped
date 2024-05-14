@@ -31,7 +31,7 @@ with.}
 
 Other objects: 
 \code{\link{circle-class}},
-\code{\link{polygon}},
-\code{\link{rectangle}}
+\code{\link{polygon-class}},
+\code{\link{rectangle-class}}
 }
 \concept{objects}

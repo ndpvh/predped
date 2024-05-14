@@ -38,5 +38,7 @@ and `"exit"`}
 }}
 
 \seealso{
-[object-class], [circle-class]
+\code{\link[predped]{object-class}},
+\code{\link[predped]{circle-class}},
+\code{\link[predped]{goal-class}}
 }
