@@ -110,7 +110,7 @@ The variable ```plots``` is a list containing a plot for each state in ```trace`
 
 ## Documentation
 
-The documentation of m4ma is build with ```roxygen2``` and currently only locally available. See ```?predped``` after installing the package.
+The documentation of m4ma is build with ```roxygen2``` and ```pkgdown``` and is currently only locally available.
 
 ## Contribute
 
