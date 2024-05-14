@@ -1,9 +1,8 @@
 <!-- badges: start --> 
 [![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
 [![coverage](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml)
+[![license: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
-
-ADD LICENSE BADGE!
 
 # predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
 
@@ -65,7 +64,7 @@ as well as many who worked with us temporarily (in alphabetical order):
 - [Alexander Anderson](https://github.com/Alexanderson31)
 - [Joris Goossen](https://github.com/JorisGoosen)
 - [Malte Lüken](https://github.com/maltelueken)
-- [Ece Yatikci](https://github.com/eceyatikci) 
+- [Ece Yatıkçı](https://github.com/eceyatikci) 
 
 ## See also
 
