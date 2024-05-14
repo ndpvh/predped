@@ -111,6 +111,12 @@ setMethod("rotate",
 #' @slot busy A logical indicating whether an agent is interacting with it.
 #' @slot interacted_with A logical indicating whether the object was interacted
 #' with.
+#' 
+#' @rdname object-class
+#' @family objects
+#' @seealso \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{polygon-class}}, 
+#' \code{\link[predped]{circle-class}}
 #'
 #' @export
 setClass("object", list(id = "character",
@@ -221,6 +227,12 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 #' x- and y-coordinates of the points.
 #' @slot clock_wise A single logical element indicating whether the points define
 #' the polygon clockwise (default) or counter-clockwise.
+#' 
+#' @rdname polygon-class
+#' @family objects
+#' @seealso \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{circle-class}}
 #'
 #' @export
 #' @name polygon
@@ -535,6 +547,9 @@ setMethod("line_intersection", signature(object = "polygon"), function(object, s
 #' @slot size A numeric vector of length two with the object width and height.
 #' @slot orientation A single numeric element indicating the orientation of the
 #' rectangle in radians.
+#' 
+#' @rdname rectangle-class
+#' @family objects
 #'
 #' @export
 #' @name rectangle
@@ -774,6 +789,12 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
 #' @slot center A numeric vector of length two indicating the center of the circle.
 #' @slot radius A numeric indicating the radius of the circle.
 #'
+#' @rdname circle-class
+#' @family objects
+#' @seealso \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{polygon-class}}
+#' 
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 

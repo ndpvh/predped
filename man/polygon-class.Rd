@@ -21,3 +21,14 @@ x- and y-coordinates of the points.}
 the polygon clockwise (default) or counter-clockwise.}
 }}
 
+\seealso{
+\code{\link[predped]{object-class}}, 
+\code{\link[predped]{rectangle-class}},
+\code{\link[predped]{circle-class}}
+
+Other objects: 
+\code{\link{circle-class}},
+\code{\link{object-class}},
+\code{\link{rectangle}}
+}
+\concept{objects}

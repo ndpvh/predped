@@ -16,3 +16,14 @@ An S4 Class to Represent Circle Objects
 \item{\code{radius}}{A numeric indicating the radius of the circle.}
 }}
 
+\seealso{
+\code{\link[predped]{object-class}}, 
+\code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{polygon-class}}
+
+Other objects: 
+\code{\link{object-class}},
+\code{\link{polygon}},
+\code{\link{rectangle}}
+}
+\concept{objects}

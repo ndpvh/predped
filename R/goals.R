@@ -8,6 +8,8 @@
 #' @slot busy A logical denoting whether it is currently being interacted with
 #' @slot counter An integer denoting the number of time steps the agent should 
 #' interact with the goal before moving on to the next one
+#' 
+#' @rdname goal-class
 #'
 #' @export
 goal <- setClass("goal", list(id = "character",

@@ -9,10 +9,13 @@ update_state(
   background,
   stay_stopped = TRUE,
   time_step = 0.5,
-  close_enough = 0.5,
-  space_between = close_enough,
+  close_enough = 2,
+  space_between = 1.5,
+  standing_start = 0.1,
   precomputed_edges = NULL,
   precompute_goal_paths = FALSE,
+  report = FALSE,
+  interactive_report = FALSE,
   ...
 )
 }
@@ -35,3 +38,9 @@ Function that is used in the simulation to update the current state. Loops
 over all the agents and updates both agent characteristics and the setting 
 in light of the agents actions to achieve their goals.
 }
+\seealso{
+Other updating-functions: 
+\code{\link{update_goal}()},
+\code{\link{update_position}()}
+}
+\concept{updating-functions}

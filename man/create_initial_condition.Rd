@@ -10,7 +10,7 @@ create_initial_condition(
   goal_number,
   goal_duration = function(x) rnorm(x, 10, 2),
   standing_start = 0.1,
-  space_between = 1,
+  space_between = 2,
   time_step = 0.5,
   precomputed_edges = NULL,
   precompute_goal_paths = TRUE,

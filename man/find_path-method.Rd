@@ -13,7 +13,8 @@ find_path(object, ...)
   background,
   algorithm = "bi",
   space_between = radius(agent),
-  precomputed_edges = NULL
+  precomputed_edges = NULL,
+  many_options = FALSE
 )
 }
 \arguments{

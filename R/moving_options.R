@@ -8,10 +8,11 @@
 #' state.
 #'
 #' @return list
-#'
-#' @export
+#' 
 #' @docType methods
 #' @rdname blocked-methods
+#'
+#' @export
 setGeneric("moving_options", function(agent, ...){})
 
 # Create the blocked_agent function.

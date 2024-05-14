@@ -116,3 +116,6 @@ agent is doing at the moment. Can take on `"move"`, `"stop"`, `"reorient"`,
 and `"exit"`}
 }}
 
+\seealso{
+[object-class], [circle-class]
+}

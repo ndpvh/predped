@@ -19,3 +19,10 @@ Rectangles are defined by \code{center}, \code{size}, and \code{orientation} (op
 rectangle in radians.}
 }}
 
+\seealso{
+Other objects: 
+\code{\link{circle-class}},
+\code{\link{object-class}},
+\code{\link{polygon}}
+}
+\concept{objects}

@@ -7,21 +7,28 @@
 plot_distribution(...)
 }
 \arguments{
-\item{n}{Number of parameters to simulate. Defaults to `1000`.}
+\item{n}{Integer denoting the number of parameters to draw. Defaults to `1`.}
 
-\item{mean}{Named list or vector of parameter means}
+\item{mean}{A named list containing the mean for each of the parameters for 
+a given agent.}
 
-\item{Sigma}{Covariance matrix for the parameters or mix of standard deviation
-- correlation matrix. Has a specific default for each archetype.}
+\item{Sigma}{Either a covariance matrix that defines the individual differences
+on each of the parameters (when `transform_covariance == FALSE`), or a matrix
+containing standard deviations for each of the parameters on its diagonal and
+correlations between the parameters on its off-diagonal (when 
+`transform_covariance == TRUE`). Default covariance matrices exist for each
+of the archetypes in `params_archetypes` and thus changes with the value of 
+`archetype`.}
 
-\item{archetype}{String denotign the archetype that is being used. Is used 
-to find the default `Sigma`. Defaults to `"BaselineEuropean"`}
+\item{archetype}{String denoting the archetype to be used for the covariance
+matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.}
 
-\item{individual_differences}{Whether individual differences should be 
-accounted for. If `FALSE`, return `mean`. Defaults to `TRUE`.}
+\item{individual_differences}{Logical denoting whether to use the standard 
+deviations in the parameter list to create some variation in the parameters.
+Defaults to `TRUE`.}
 
-\item{transform_covariance}{Logical denoting whether to transform `Sigma`
-to a proper covariance matrix. Defaults to `TRUE`.}
+\item{transform_covariance}{Logical denoting whether to transform `Sigma` to 
+a proper covariance matrix or not. Defaults to `TRUE`.}
 }
 \value{
 Printed histogram of the distribution of parameters under the 

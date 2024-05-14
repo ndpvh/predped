@@ -33,6 +33,8 @@
 #' seconds. Defaults to `0.5` or half a second.
 #' @param ... Arguments to be passed on to `update_agent`
 #' 
+#' @family updating-functions
+#' 
 #' @export 
 # 
 # TO DO
@@ -188,6 +190,8 @@ create_agent_specifications <- function(agent_list,
 #' seconds. Defaults to `0.5` or half a second.
 #' 
 #' @return Updated agent
+#' 
+#' @family updating-functions
 #' 
 #' @export
 #
@@ -391,6 +395,8 @@ update_position <- function(agent,
 #' should require user input. Defaults to `FALSE`
 #' 
 #' @return Updated agent
+#' 
+#' @family updating-functions
 #' 
 #' @export
 #

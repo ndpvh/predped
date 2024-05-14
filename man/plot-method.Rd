@@ -20,7 +20,7 @@ plot(object, ...)
 
 \S4method{plot}{agent}(object, plot_goal = TRUE, ...)
 
-\S4method{plot}{list}(object, trace = FALSE, print_progress = TRUE, ...)
+\S4method{plot}{list}(object, trace = FALSE, print_progress = TRUE, iterations = NULL, ...)
 
 \S4method{plot}{background}(object, entry_exit_width = 0.4, ...)
 }

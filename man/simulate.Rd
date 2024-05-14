@@ -30,6 +30,10 @@ moving. Defaults to `0.1`.}
 Defaults to `NULL`, meaning the simulation should start with no agents in the
 room.}
 
+\item{initial_condition}{State containing a setting and agents to start the 
+simulation from. Defaults to `NULL`, meaning the simulation will start with 
+no agents in the room.}
+
 \item{initial_number_agents}{Integer denoting the number of agents that 
 the simulation should start out with. Defaults to `NULL`, meaning the
 simulation should start with no agents in the room. Ignored if `initial_agents`

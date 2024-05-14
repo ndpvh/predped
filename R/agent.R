@@ -20,6 +20,10 @@
 #' @slot status A character that denotes the status of the agent, or what the 
 #' agent is doing at the moment. Can take on `"move"`, `"stop"`, `"reorient"`, 
 #' and `"exit"`
+#' 
+#' @seealso [object-class], [circle-class]
+#' 
+#' @rdname agent-class
 #'
 #' @export
 agent <- setClass("agent", list(id = "character",

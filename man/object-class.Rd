@@ -55,3 +55,14 @@ with.}
 with.}
 }}
 
+\seealso{
+\code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{polygon-class}}, 
+\code{\link[predped]{circle-class}}
+
+Other objects: 
+\code{\link{circle-class}},
+\code{\link{polygon}},
+\code{\link{rectangle}}
+}
+\concept{objects}
