@@ -1,8 +1,3 @@
-#' Typical Archetypes used for Simulation
-#' 
-#' @export
-params_archetypes <- read.csv(file.path("archetypes.csv"))
-
 #' Find all objects of a given class
 #' 
 #' This function is a simple utility function to extract all objects from a given 

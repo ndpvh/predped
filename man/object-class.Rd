@@ -3,32 +3,7 @@
 \docType{class}
 \name{object-class}
 \alias{object-class}
-\alias{radius}
-\alias{radius<-}
-\alias{size}
-\alias{size<-}
-\alias{center}
-\alias{center<-}
-\alias{orientation}
-\alias{orientation<-}
 \title{An S4 Abstract Base Class to Represent Objects}
-\usage{
-radius(object)
-
-radius(object) <- value
-
-size(object)
-
-size(object) <- value
-
-center(object)
-
-center(object) <- value
-
-orientation(object)
-
-orientation(object) <- value
-}
 \description{
 An S4 Abstract Base Class to Represent Objects
 }
@@ -49,3 +24,14 @@ with.}
 with.}
 }}
 
+\seealso{
+\code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{polygon-class}}, 
+\code{\link[predped]{circle-class}}
+
+Other objects: 
+\code{\link{circle-class}},
+\code{\link{polygon-class}},
+\code{\link{rectangle-class}}
+}
+\concept{objects}

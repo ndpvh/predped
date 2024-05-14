@@ -4,8 +4,16 @@
 #' defining the shape of the background.
 #' @slot objects A list of objects of a type that extends
 #' \code{\link[predped]{object-class}} defining the objects in the background.
-#' @slot entry_exit_width A specification for the desired entrance and exit size
-#' to be plotted when visualising the environment.
+#' @slot entrance A coordinate specifying the location of the entrance.
+#' @slot exit A coordinate specifying the location of the exit. Ignored if 
+#' `same_exit = TRUE`.
+#' 
+#' @seealso \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{polygon-class}}, 
+#' \code{\link[predped]{circle-class}}
+#' 
+#' @rdname background-class
 #' 
 #' @export
 background <- setClass("background", list(shape = "object", 
@@ -46,9 +54,15 @@ setMethod("initialize", "background", function(.Object,
     return(.Object)
 })
 
+#' Getter/Setter for the shape-slot
+#' 
+#' @rdname shape-method
+#' 
 #' @export
 setGeneric("shape", function(object) standardGeneric("shape"))
 
+#' @rdname shape-method
+#' 
 #' @export
 setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 
@@ -61,9 +75,15 @@ setMethod("shape<-", "background", function(object, value) {
     return(object)
 })
 
+#' Getter/Setter for the objects-slot
+#' 
+#' @rdname objects-method
+#' 
 #' @export
 setGeneric("objects", function(object) standardGeneric("objects"))
 
+#' @rdname objects-method
+#' 
 #' @export
 setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 
@@ -76,9 +96,15 @@ setMethod("objects<-", "background", function(object, value) {
     return(object)
 })
 
+#' Getter/Setter for the entrance-slot
+#' 
+#' @rdname entrance-method
+#' 
 #' @export
 setGeneric("entrance", function(object) standardGeneric("entrance"))
 
+#' @rdname entrance-method
+#' 
 #' @export
 setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 
@@ -91,9 +117,15 @@ setMethod("entrance<-", "background", function(object, value) {
     return(object)
 })
 
+#' Getter/Setter for the exit-slot
+#' 
+#' @rdname exit-method
+#' 
 #' @export
 setGeneric("exit", function(object) standardGeneric("exit"))
 
+#' @rdname exit-method
+#' 
 #' @export
 setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 

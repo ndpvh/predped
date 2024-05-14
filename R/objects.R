@@ -111,6 +111,12 @@ setMethod("rotate",
 #' @slot busy A logical indicating whether an agent is interacting with it.
 #' @slot interacted_with A logical indicating whether the object was interacted
 #' with.
+#' 
+#' @rdname object-class
+#' @family objects
+#' @seealso \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{polygon-class}}, 
+#' \code{\link[predped]{circle-class}}
 #'
 #' @export
 setClass("object", list(id = "character",
@@ -221,9 +227,14 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 #' x- and y-coordinates of the points.
 #' @slot clock_wise A single logical element indicating whether the points define
 #' the polygon clockwise (default) or counter-clockwise.
+#' 
+#' @rdname polygon-class
+#' @family objects
+#' @seealso \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{circle-class}}
 #'
 #' @export
-#' @name polygon
 polygon <- setClass("polygon", list(points = "matrix", clock_wise = "logical", center = "numeric"), contains = "object")
 
 setMethod("initialize", "polygon", function(.Object, 
@@ -244,7 +255,11 @@ setMethod("initialize", "polygon", function(.Object,
     .Object@interactable <- interactable
 
     points <- .Object@points
-    .Object@center <- coordinate(c(mean(points[,1]), mean(points[,2])))
+
+    range_x <- range(points[,1])
+    range_y <- range(points[,2])
+    .Object@center <- coordinate(c(min(range_x) + 0.5 * diff(range_x), 
+                                   min(range_y) + 0.5 * diff(range_y)))
 
     return(.Object)
 })
@@ -531,9 +546,11 @@ setMethod("line_intersection", signature(object = "polygon"), function(object, s
 #' @slot size A numeric vector of length two with the object width and height.
 #' @slot orientation A single numeric element indicating the orientation of the
 #' rectangle in radians.
+#' 
+#' @rdname rectangle-class
+#' @family objects
 #'
 #' @export
-#' @name rectangle
 #
 # TO DO
 #   - Currently, orientation is in radians. Might need to change to degrees, as 
@@ -770,6 +787,12 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
 #' @slot center A numeric vector of length two indicating the center of the circle.
 #' @slot radius A numeric indicating the radius of the circle.
 #'
+#' @rdname circle-class
+#' @family objects
+#' @seealso \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{polygon-class}}
+#' 
 #' @export
 circle <- setClass("circle", list(center = "numeric", radius = "numeric"), contains = c("object"))
 
@@ -889,8 +912,29 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
                                                               outside = TRUE) {
     
     
+    # Number of default nodes depends on a small calculation we made. Specifically,
+    # if you have a circle of radius R and a point with a distance D between the 
+    # point and the circumference of the circle, then we can draw a tangential
+    # line to the circle which will define the next point that can be seen from 
+    # that location (which is what we usually use `add_nodes` for). 
+    #
+    # The angle at which we ensure that this is possible is defined as: 
+    #   \alpha = 2 * cos^ {-1}( \frac{R}{R + D} )
+    #
+    # Which we obtain through computing the cosine of the angle \alpha between 
+    # the direction of the original point and the intersection point and then 
+    # taking its inverse and multiplying by two (creating the angle at which the 
+    # point symmetric to the intersection point should appear).
+    #
+    # It is useful to note that the original solution to a symmetric other point
+    # involves doubling the original \alpha (as in the solution above). In our 
+    # implementation, we do not do so, thus having twice the needed number of 
+    # nodes added alongside the circle.
+    fraction <- radius(object) / (radius(object) + space_between) 
+    alpha <- acos(fraction)
+
     # Create the angles at which to put the nodes around the circle
-    angles <- seq(0, 2 * pi, pi / 4)
+    angles <- seq(0, 2 * pi, alpha)
 
     # Create a matrix of locations based on the center of the object, the radius,
     # and the drawn angles and return. Importantly, radius is extended with a
@@ -1245,31 +1289,35 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
 ################################################################################
 # Getters and setters
 
-setGeneric("id", function(object) standardGeneric("id"))
-
-setGeneric("id<-", function(object, value) standardGeneric("id<-"))
-
-#' @rdname object-class
+#' Getter/Setter for the id-slot
+#' 
+#' @rdname id-method
 #' 
 #' @export 
+setGeneric("id", function(object) standardGeneric("id"))
+
+#' @rdname id-method
+#' 
+#' @export 
+setGeneric("id<-", function(object, value) standardGeneric("id<-"))
+
 setMethod("id", signature(object = "object"), function(object) {
     return(object@id)
 })
 
-#' @rdname object-class
-#' 
-#' @export 
 setMethod("id<-", signature(object = "object"), function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the radius-slot
+#' 
+#' @rdname radius-method
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
 
-#' @rdname object-class
+#' @rdname radius-method
 #' 
 #' @export 
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
@@ -1283,12 +1331,14 @@ setMethod("radius<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the size-slot
+#' 
+#' @rdname size-method
 #' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
-#' @rdname object-class
+#' @rdname size-method
 #' 
 #' @export 
 setGeneric("size<-", function(object, value) standardGeneric("size<-"))
@@ -1326,12 +1376,14 @@ setMethod("size<-", signature(object = "segment"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the center-slot
+#' 
+#' @rdname center-method
 #' 
 #' @export 
 setGeneric("center", function(object) standardGeneric("center"))
 
-#' @rdname object-class
+#' @rdname center-method
 #' 
 #' @export 
 setGeneric("center<-", function(object, value) standardGeneric("center<-"))
@@ -1341,9 +1393,9 @@ setMethod("center", signature(object = "polygon"), function(object) {
 })
 
 setMethod("center<-", signature(object = "polygon"), function(object, value) {
+    object@points <- cbind(object@points[,1] + value[1] - center(object)[1], 
+                           object@points[,2] + value[2] - center(object)[2])
     object@center <- as(value, "coordinate")
-    object@points <- cbind(object@points[,1] + value[1], 
-                           object@points[,2] + value[2])
     return(object)
 })
 
@@ -1378,12 +1430,14 @@ setMethod("center<-", signature(object = "segment"), function(object, value) {
     return(object)
 })
 
-#' @rdname object-class
+#' Getter/Setter for the orientation-slot
+#' 
+#' @rdname orientation-method
 #' 
 #' @export 
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
-#' @rdname object-class
+#' @rdname orientation-method
 #' 
 #' @export 
 setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))

@@ -8,6 +8,8 @@
 #' @slot busy A logical denoting whether it is currently being interacted with
 #' @slot counter An integer denoting the number of time steps the agent should 
 #' interact with the goal before moving on to the next one
+#' 
+#' @rdname goal-class
 #'
 #' @export
 goal <- setClass("goal", list(id = "character",
@@ -362,14 +364,16 @@ setMethod("find_path", "goal", function(object,
                                         background,
                                         algorithm = "bi",
                                         space_between = radius(agent),
-                                        precomputed_edges = NULL) {
+                                        precomputed_edges = NULL,
+                                        many_options = FALSE) {
                                             
     # Create the edges that are taken in by `makegraph`
     if(is.null(precomputed_edges)) {
         edges <- create_edges(position(agent),
                               position(object), 
                               background,
-                              space_between = space_between)
+                              space_between = space_between,
+                              many_options = many_options)
     } else {
         edges <- adjust_edges(position(agent),
                               position(object),
@@ -412,8 +416,42 @@ setMethod("find_path", "goal", function(object,
     path_points <- path_points[-1, c("x", "y")] |>
         as.matrix()
 
+    # Check whether you can delete some of the path points to make it a bit more 
+    # concise. This only applies if there is more than one path point
+    if(nrow(path_points) > 1) {
+        # Set the original reference point to the position of the agent
+        ref <- position(agent)
+
+        # Loop over the path points starting at number 2 (number 1 being one 
+        # that is guaranteed to be seen)
+        for(i in 2:nrow(path_points)) {
+            # Check whether agents can see the next path point starting from 
+            # the reference point
+            seen <- all(prune_edges(objects(background), 
+                                    matrix(c(ref, path_points[i,]),
+                                           nrow = 1)))
+            
+            # If the path point is seen, you can just directly go to this path 
+            # point instead of making a stop in the intermediate one
+            if(seen) {
+                path_points[i - 1,] <- NA
+
+            # If the path point is not seen, that means the previous path point
+            # is a critical one, and will therefore serve as the new reference
+            } else {
+                ref <- path_points[i - 1,]
+            }
+        }
+
+        # Remove all unnecessary path points from the list
+        path_points <- matrix(path_points[!is.na(path_points[,1]),],
+                              ncol = 2)
+    }
+
+    # Some additional changes for convention
     rownames(path_points) <- NULL
-    colnames(path_points) <- c("x", "y")    
+    colnames(path_points) <- c("x", "y")
+    
 
     return(path_points)
 })
@@ -422,51 +460,45 @@ setMethod("find_path", "goal", function(object,
 
 # Getters and setters
 
-#' @rdname goal-class
+#' Getter/Setter for the position-slot
+#' 
+#' @rdname position-method
+#' 
+#' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
-#' @rdname goal-class
+#' @rdname position-method
 #' 
 #' @export
 setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("position", "goal", function(object) {
     return(object@position)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("position<-", "goal", function(object, value) {
     object@position <- as(value, "coordinate")
     return(object)
 })
 
 
-#' @rdname goal-class
-#'
-#' @export
 setMethod("id", "goal", function(object) {
     return(object@id)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("id<-", "goal", function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the path-slot
+#' 
+#' @rdname path-method
 #' 
 #' @export
 setGeneric("path", function(object) standardGeneric("path"))
 
-#' @rdname goal-class
+#' @rdname path-method
 #' 
 #' @export
 setGeneric("path<-", function(object, value) standardGeneric("path<-"))
@@ -480,12 +512,14 @@ setMethod("path<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the counter-slot
+#' 
+#' @rdname counter-method
 #' 
 #' @export
 setGeneric("counter", function(object) standardGeneric("counter"))
 
-#' @rdname goal-class
+#' @rdname counter-method
 #' 
 #' @export
 setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
@@ -499,12 +533,14 @@ setMethod("counter<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the busy-slot
+#' 
+#' @rdname busy-method
 #' 
 #' @export
 setGeneric("busy", function(object) standardGeneric("busy"))
 
-#' @rdname goal-class
+#' @rdname busy-method
 #' 
 #' @export
 setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
@@ -518,24 +554,22 @@ setMethod("busy<-", "goal", function(object, value) {
     return(object)
 })
 
-#' @rdname goal-class
+#' Getter/Setter for the done-slot
+#' 
+#' @rdname done-method
+#' 
+#' @export
 setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
 
-#' @rdname goal-class
+#' @rdname done-method
 #' 
 #' @export
 setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("done", "goal", function(object) {
     return(object@done)
 })
 
-#' @rdname goal-class
-#' 
-#' @export
 setMethod("done<-", "goal", function(object, value) {
     object@done <- value
     return(object)

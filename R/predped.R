@@ -37,7 +37,7 @@ setMethod("initialize", "predped", function(.Object,
                                             id,
                                             setting, 
                                             parameters = params_archetypes,
-                                            archetypes = unique(params_archetypes$Name),
+                                            archetypes = unique(params_archetypes$name),
                                             weights = rep(1/length(archetypes), 
                                                           each = length(archetypes))
 ) {
@@ -48,10 +48,11 @@ setMethod("initialize", "predped", function(.Object,
     }
 
     if(sum(weights) != 1) {
-        stop("Weights should add up to 1.")
+        warning("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
+        weights <- weights / sum(weights)
     }
 
-    if(!all(archetypes %in% parameters$Name)) {
+    if(!all(archetypes %in% parameters$name)) {
         stop("Some archetypes cannot be found in the parameters list.")
     }
 
@@ -65,8 +66,8 @@ setMethod("initialize", "predped", function(.Object,
     # select only the archetypes from this vector, then we transform this into 
     # a numeric through factorization with `archetype` as its levels, and then 
     # transform this to a character again. 
-    parameters <- parameters[parameters$Name %in% archetypes,]
-    idx <- factor(parameters$Name, levels = archetypes)
+    parameters <- parameters[parameters$name %in% archetypes,]
+    idx <- factor(parameters$name, levels = archetypes)
     idx <- order(as.numeric(idx))
 
     .Object@parameters <- parameters[idx,] 
@@ -77,27 +78,23 @@ setMethod("initialize", "predped", function(.Object,
     return(.Object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("id", "predped", function(object) {
     return(object@id)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("id<-", "predped", function(object, value) {
     object@id <- value
     return(object)
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the setting-slot
+#' 
+#' @rdname setting-method
 #'
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
-#' @rdname predped-class
+#' @rdname setting-method
 #'
 #' @export
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
@@ -111,19 +108,13 @@ setMethod("setting<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("parameters", "predped", function(object) {
     return(object@parameters)
 })
 
-#' @rdname predped-class
-#'
-#' @export
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
-    if(!all(object@archetypes %in% value$Name)) {
+    if(!all(object@archetypes %in% value$name)) {
         stop("Some archetypes not defined in the new parameters provided.")
     }
 
@@ -131,12 +122,14 @@ setMethod("parameters<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the archetypes-slot
+#' 
+#' @rdname archetypes-method
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 
-#' @rdname predped-class
+#' @rdname archetypes-method
 #'
 #' @export
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
@@ -155,12 +148,14 @@ setMethod("archetypes<-", "predped", function(object, value) {
                    weights = object@weights))
 })
 
-#' @rdname predped-class
+#' Getter/Setter for the weights-slot
+#' 
+#' @rdname weights-method
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 
-#' @rdname predped-class
+#' @rdname weights-method
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
@@ -174,10 +169,6 @@ setMethod("weights<-", "predped", function(object, value) {
     return(object)
 })
 
-#' @rdname predped-class
-#'
-#' @export
-#
 # TO DO: Beautify the output
 setMethod("show", "predped", function(object) {
     cat("Model object:\n")

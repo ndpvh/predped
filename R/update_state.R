@@ -33,6 +33,8 @@
 #' seconds. Defaults to `0.5` or half a second.
 #' @param ... Arguments to be passed on to `update_agent`
 #' 
+#' @family updating-functions
+#' 
 #' @export 
 # 
 # TO DO
@@ -41,10 +43,13 @@ update_state <- function(state,
                          background,
                          stay_stopped = TRUE, 
                          time_step = 0.5,
-                         close_enough = 0.5,
-                         space_between = close_enough,
+                         close_enough = 2,
+                         space_between = 1.5,
+                         standing_start = 0.1,
                          precomputed_edges = NULL,
                          precompute_goal_paths = FALSE,
+                         report = FALSE,
+                         interactive_report = FALSE,
                          ...) {
 
     # Predict where the agents will be at their current velocity and angle. Is 
@@ -84,8 +89,11 @@ update_state <- function(state,
                              background,
                              close_enough = close_enough,
                              space_between = space_between,
+                             standing_start = standing_start,
                              precomputed_edges = precomputed_edges,
-                             precompute_goal_paths = precompute_goal_paths) 
+                             precompute_goal_paths = precompute_goal_paths,
+                             report = report, 
+                             interactive_report = interactive_report) 
 
         # Update the position of the agent
         # start_time <- Sys.time()
@@ -93,6 +101,8 @@ update_state <- function(state,
                                  tmp_state,
                                  agent_specs, # Keep all agents in here: predClose makes use of own prediction as well
                                  background,
+                                 standing_start = standing_start,
+                                 report = report,
                                  time_step = time_step,
                                  ...) 
 
@@ -181,6 +191,8 @@ create_agent_specifications <- function(agent_list,
 #' 
 #' @return Updated agent
 #' 
+#' @family updating-functions
+#' 
 #' @export
 #
 # TO DO
@@ -219,14 +231,15 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.05 * parameters(agent)[["sPref"]],
+                            standing_start = 0.1,
                             time_step = 0.5,
-                            report = TRUE,
-                            temperature = 1
+                            report = TRUE
                         #     plotGrid = FALSE,        # deprecated?
                         #     printChoice = FALSE,     # deprecated?                     
                         #     usebestAngle = FALSE     # deprecated?
                             ) {
+
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # If the agent is currently interacting with another object, just let the 
     # agent continue in peace
@@ -306,7 +319,7 @@ update_position <- function(agent,
         }
 
         V <- V - max(V)
-        exp_V <- exp(temperature * V)
+        exp_V <- exp(V)
         Pr <- exp_V / sum(exp_V)
 
         # Apply the different options to the probabilities
@@ -383,6 +396,8 @@ update_position <- function(agent,
 #' 
 #' @return Updated agent
 #' 
+#' @family updating-functions
+#' 
 #' @export
 #
 # TO DO
@@ -398,13 +413,17 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
-                        standing_start = 0.05 * parameters(agent)[["sPref"]],
-                        close_enough = 2 * radius(agent),
-                        space_between = radius(agent),
+                        standing_start = 0.1,
+                        close_enough = 2,
+                        space_between = 1.5,
                         report = FALSE,
                         interactive_report = FALSE,
                         precomputed_edges = NULL,
                         precompute_goal_paths = FALSE) {  
+
+    close_enough <- close_enough * radius(agent)
+    space_between <- space_between * radius(agent)
+    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # Make some placeholders for replanning and rerouting
     replan <- reroute <- FALSE
@@ -482,7 +501,11 @@ update_goal <- function(agent,
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
-                                                  precomputed_edges = precomputed_edges)
+                                                  precomputed_edges = NULL,
+                                                  many_options = TRUE)
+            # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+            #                                    nrow = 1, 
+            #                                    ncol = 2)
 
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to replan at a later time and 
@@ -499,10 +522,10 @@ update_goal <- function(agent,
                                                matrix(current_goal(agent)@path[1,],
                                                       nrow = 1, 
                                                       ncol = 2))
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
 
         } else {
-            reroute_param <- parameters(agent)$pReroute
+            reroute_param <- parameters(agent)$reroute
 
             if(is.finite(reroute_param)) {
                 # Compute the probability of rerouting based on the number of
@@ -523,7 +546,11 @@ update_goal <- function(agent,
                                                           agent, 
                                                           updated_background,
                                                           space_between = space_between,
-                                                          precomputed_edges = precomputed_edges)
+                                                          precomputed_edges = NULL,
+                                                          many_options = TRUE)
+                    # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
+                    #                                    nrow = 1, 
+                    #                                    ncol = 2)
 
                     # Quick check whether the path is clearly defined. If not, 
                     # then the agent will have to replan at a later time and 

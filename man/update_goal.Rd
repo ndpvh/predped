@@ -8,9 +8,9 @@ update_goal(
   agent,
   state,
   background,
-  standing_start = 0.05 * parameters(agent)[["sPref"]],
-  close_enough = 2 * radius(agent),
-  space_between = radius(agent),
+  standing_start = 0.1,
+  close_enough = 2,
+  space_between = 1.5,
   report = FALSE,
   interactive_report = FALSE,
   precomputed_edges = NULL,
@@ -43,3 +43,9 @@ Updated agent
 \description{
 Update the Goal of an Agent
 }
+\seealso{
+Other updating-functions: 
+\code{\link{update_position}()},
+\code{\link{update_state}()}
+}
+\concept{updating-functions}

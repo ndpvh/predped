@@ -110,8 +110,8 @@ create_nodes <- function(from,
 
     if(many_options) {
         if(inherits(shp, "circle")) {
-            xlim <- center(shp)[,1] + c(-1, 1) * radius(shp)
-            ylim <- center(shp)[,2] + c(-1, 1) * radius(shp)
+            xlim <- center(shp)[1] + c(-1, 1) * radius(shp)
+            ylim <- center(shp)[2] + c(-1, 1) * radius(shp)
         } else {
             xlim <- range(shp@points[,1])
             ylim <- range(shp@points[,2])

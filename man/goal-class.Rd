@@ -4,56 +4,7 @@
 \name{goal-class}
 \alias{goal-class}
 \alias{goal}
-\alias{position}
-\alias{position<-}
-\alias{position,goal-method}
-\alias{position<-,goal-method}
-\alias{id,goal-method}
-\alias{id<-,goal-method}
-\alias{path}
-\alias{path<-}
-\alias{counter}
-\alias{counter<-}
-\alias{busy}
-\alias{busy<-}
-\alias{done}
-\alias{done<-}
-\alias{done,goal-method}
-\alias{done<-,goal-method}
 \title{An S4 Class to Represent Goals}
-\usage{
-position(object, return_matrix = FALSE)
-
-position(object) <- value
-
-\S4method{position}{goal}(object)
-
-\S4method{position}{goal}(object) <- value
-
-\S4method{id}{goal}(object)
-
-\S4method{id}{goal}(object) <- value
-
-path(object)
-
-path(object) <- value
-
-counter(object)
-
-counter(object) <- value
-
-busy(object)
-
-busy(object) <- value
-
-done(object, return_matrix = FALSE)
-
-done(object) <- value
-
-\S4method{done}{goal}(object)
-
-\S4method{done}{goal}(object) <- value
-}
 \description{
 Defines the `goal` class, which contains all characteristics of a goal that 
 the agents can pursue.

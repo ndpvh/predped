@@ -8,6 +8,7 @@ generate_goal_stack(
   n,
   setting,
   counter_generator = function(x) rnorm(x, 10, 2),
+  agent_position = NULL,
   precomputed_edges = NULL,
   precompute_goal_paths = TRUE,
   space_between = 0.5,

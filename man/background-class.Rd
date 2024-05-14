@@ -17,7 +17,15 @@ defining the shape of the background.}
 \item{\code{objects}}{A list of objects of a type that extends
 \code{\link[predped]{object-class}} defining the objects in the background.}
 
-\item{\code{entry_exit_width}}{A specification for the desired entrance and exit size
-to be plotted when visualising the environment.}
+\item{\code{entrance}}{A coordinate specifying the location of the entrance.}
+
+\item{\code{exit}}{A coordinate specifying the location of the exit. Ignored if 
+`same_exit = TRUE`.}
 }}
 
+\seealso{
+\code{\link[predped]{object-class}}, 
+\code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{polygon-class}}, 
+\code{\link[predped]{circle-class}}
+}

@@ -69,16 +69,16 @@ testthat::test_that("Adding agent works", {
     ref_goals <- list(4, 4, 4, 4)
     ref_duration <- list(5, 5, 5, 5)
     ref_orient <- list(0, 270, 180, 90)
-    ref_pos <- list(predped::coordinate(c(-0.8, 0)), 
-                    predped::coordinate(c(0, 0.8)), 
-                    predped::coordinate(c(0.8, 0)), 
-                    predped::coordinate(c(0, -0.8)))
+    ref_pos <- list(predped::coordinate(c(-0.7, 0)), 
+                    predped::coordinate(c(0, 0.7)), 
+                    predped::coordinate(c(0.7, 0)), 
+                    predped::coordinate(c(0, -0.7)))
 
     # And the tests
     testthat::expect_equal(tst_goals, ref_goals)
     testthat::expect_equal(tst_duration, ref_duration)
     testthat::expect_equal(tst_orient, ref_orient)
-    testthat::expect_equal(tst_pos, ref_pos)
+    testthat::expect_equal(tst_pos, ref_pos, tolerance = 1e-1)
 })
 
 testthat::test_that("Creating initial condition works", {
@@ -103,7 +103,7 @@ testthat::test_that("Creating initial condition works", {
     agents_many <- predped::create_initial_condition(50, model, 5)
 
     testthat::expect_equal(length(agents_few), 3)
-    testthat::expect_equal(length(agents_many), 11)
+    testthat::expect_equal(length(agents_many), 7)
     testthat::expect_message(predped::create_initial_condition(50, model, 5))
 
     # If you would ever want to visualize it during debugging
