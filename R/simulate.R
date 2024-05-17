@@ -341,7 +341,7 @@ add_agent <- function(object,
 
     # Adjust the preferred speed of the agents based on the time_step 
     # (in seconds): These speeds are per second
-    params[["preferred_speed"]] <- params[["preferred_speed"]] * time_step 
+    # params[["preferred_speed"]] <- params[["preferred_speed"]] * time_step 
 
     # Create this agents' goal stack
     if(is.null(precomputed_goals)) {
