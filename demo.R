@@ -11,7 +11,7 @@
 ################################################################################
 
 # Load package
-devtools::load_all()
+library(predped)
 
 # Create a background in which we want to let the agents walk around. Contains 
 # several components:

@@ -35,3 +35,4 @@ performance_test*
 .vscode/
 .DS_Store
 RCore/
+demo/*
