@@ -202,6 +202,15 @@ agents_between_goal <- function(agent,
 #
 # TO DO
 #   - Assumes the agent is a circle: Change this
+#' Check whether an agent overlaps with an object
+#' 
+#' @param agent The agent for whom to compute the utilities
+#' @param background The setting in which agents are walking around
+#' @param centers The centers of all the positions the agent may move to
+#' @param check Boolean denoting the centers the agent can actually move to
+#' (which are not blocked)
+#' 
+#' @export
 overlap_with_objects <- function(agent, 
                                  background, 
                                  centers, 
