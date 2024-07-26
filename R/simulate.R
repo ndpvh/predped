@@ -187,7 +187,7 @@ setMethod("simulate", "predped", function(object,
     }
     trace <- list(state)
 
-    agent_in_cue <- FALSE
+    agent_in_queue <- FALSE
     
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
@@ -196,7 +196,7 @@ setMethod("simulate", "predped", function(object,
         # pedestrian, whether we already reached the maximal number of agents,
         # and whether there is any space to add the new pedestrian. If there is 
         # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_cue)) {
+        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_queue)) {
             potential_agent <- add_agent(object,
                                          goal_number[i],
                                          goal_duration = goal_duration,
@@ -208,19 +208,19 @@ setMethod("simulate", "predped", function(object,
                                          order_goal_stack = order_goal_stack,
                                          precomputed_goals = precomputed_goals,
                                          individual_differences = individual_differences)
-            agent_in_cue <- TRUE
+            agent_in_queue <- TRUE
         }
 
         # Check whether there is any space to add the pedestrian. Otherwise
         # will have to keep waiting in the cue.
-        if(agent_in_cue) {
+        if(agent_in_queue) {
             agents_in_the_way <- sapply(state$agents, 
                                         \(x) in_object(potential_agent, 
                                                        to_polygon(x), 
                                                        outside = FALSE))
-            agent_in_cue <- any(agents_in_the_way)
+            agent_in_queue <- any(agents_in_the_way)
 
-            if(!agent_in_cue) {
+            if(!agent_in_queue) {
                 state$agents <- append(state$agents, potential_agent)
             }
         }
