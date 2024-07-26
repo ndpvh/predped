@@ -129,6 +129,12 @@ utility <- function(agent,
                                        objects(background),
                                        pickBest = FALSE)
 
+        # Group Centroid Phenomenon                                       
+        distance_centroid <- get_group_centroid(agent_idx,
+                                                agent_specifications$position,
+                                                agent_specifications$group,
+                                                centers)
+
     # Does not work at this moment, and so is left commented out
     #
     # Subject based
@@ -223,6 +229,13 @@ utility <- function(agent,
                                       p[["b_buddy"]], 
                                       buddies[["buddies"]], 
                                       buddies[["dists"]])
+    }
+
+    if (!is.null(group_centroid)) {
+        V <- V + gc_utility(p[["a_group_centroid"]],
+                            p[["b_group_centroid"]],
+                            0.45,
+                            distance_centroid)
     }
 
     V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
