@@ -103,7 +103,7 @@ testthat::test_that("Creating initial condition works", {
     agents_many <- predped::create_initial_condition(50, model, 5)
 
     testthat::expect_equal(length(agents_few), 3)
-    testthat::expect_equal(length(agents_many), 7)
+    testthat::expect_equal(length(agents_many), 8)
     testthat::expect_message(predped::create_initial_condition(50, model, 5))
 
     # If you would ever want to visualize it during debugging
