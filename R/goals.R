@@ -224,6 +224,10 @@ simulate_goal_stack <- function(n,
     for(i in seq_len(n)) {
         print(paste0("Generating goal stack ", i))
 
+        # Create the entrance through which the agent will have to enter to 
+        # start the goal stack
+        entrance_idx <- sample(seq_len(nrow(setting@entrance)), 1)
+
         # Generate the complete goal stack and precompute all the paths to the 
         # goals
         goal_stack[[i]] <- generate_goal_stack(goal_number[i], 
@@ -236,7 +240,7 @@ simulate_goal_stack <- function(n,
 
         # The first goal within the goal stack does not have a path yet. Use the
         # entrance as the position at which the agent starts
-        dummy <- agent(center = entrance(setting), radius = space_between)
+        dummy <- agent(center = entrance(setting)[entrance_idx,], radius = space_between)
         goal_stack[[i]][[1]]@path <- find_path(goal_stack[[i]][[1]], 
                                                dummy, 
                                                setting,

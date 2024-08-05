@@ -442,8 +442,17 @@ update_goal <- function(agent,
                 current_goal(agent) <- goals(agent)[[1]]
                 goals(agent) <- goals(agent)[-1]
             } else {
+                # When there are multiple exits, use an algorithm to make the 
+                # agent decide which one to go to 
+                exits <- exit(background)
+                if(nrow(exits) > 1) {
+                    # Check which exit is closest to the current position
+                    distances <- (position(agent)[1] - exits[,1])^2 + (position(agent)[2] - exits[,2])^2
+                    exits <- exits[which.min(distances),]
+                } 
+                
                 current_goal(agent) <- goal(id = "goal exit",
-                                            position = exit(background))
+                                            position = as.numeric(exits))
             }
 
             # Replan if the goal paths were not precomputed yet

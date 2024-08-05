@@ -325,8 +325,12 @@ add_agent <- function(object,
                       precomputed_goals = NULL,
                       individual_differences = TRUE) {
 
-    # Extract the background from the `predped` model
+    # Extract the background from the `predped` model and determine where the 
+    # agent will enter the space
     background <- object@setting
+
+    idx <- sample(seq_len(nrow(background@entrance)), 1)
+    entrance_agent <- entrance(background)[idx, ]
 
     # Sample a random set of parameters from the `predped` class. From this, 
     # extract the needed information and add some individual differences
@@ -337,11 +341,7 @@ add_agent <- function(object,
                               object@parameters[idx,],
                               archetype = object@parameters$name[idx],
                               individual_differences = individual_differences)    
-    radius <- params$radius   
-
-    # Adjust the preferred speed of the agents based on the time_step 
-    # (in seconds): These speeds are per second
-    # params[["preferred_speed"]] <- params[["preferred_speed"]] * time_step 
+    radius <- params$radius
 
     # Create this agents' goal stack
     if(is.null(precomputed_goals)) {
@@ -362,7 +362,7 @@ add_agent <- function(object,
     # the agent enters, or directed towards the current goal of the agent.
     if(is.null(position)) {
         angle <- perpendicular_orientation(shape(background),
-                                           entrance(background))
+                                           entrance_agent)
     } else {
         co_1 <- position
         co_2 <- goal_stack[[1]]@position
@@ -373,7 +373,7 @@ add_agent <- function(object,
     # Determine the position of the agent. Either this is at the entrance, or 
     # this is at the specified location
     if(is.null(position)) {
-        position <- background@entrance + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+        position <- entrance_agent + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
     }
     
     # Create the agent itself
