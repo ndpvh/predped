@@ -110,3 +110,56 @@ testthat::test_that("Creating initial condition works", {
     # state <- list(agents = agents_many, setting = setting)
     # predped::plot(list(state), trace = TRUE)
 })
+
+testthat::test_that("Creating initial condition with groups works", {
+    # Create the model within which the agents should be simulated
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(10, 10)),
+                                   objects = list(predped::rectangle(center = c(0, 0), 
+                                                                     size = c(1, 1),
+                                                                     interactable = TRUE)),
+                                   entrance = c(-5, 0))
+
+    model <- predped::predped(id = "toy model", 
+                              setting = setting, 
+                              archetypes = "BaselineEuropean")
+
+    # Create an initial condition with 10 agents that each belong to a different 
+    # group (default)
+    set.seed(1)
+    agents_alone <- predped::create_initial_condition(10, model, 5)
+
+    # Create an initial condition with 10 agents that each go together in pairs.
+    # In one, we will test the function's ability to correct the weights
+    set.seed(1)
+    agents_pairs_1 <- predped::create_initial_condition(10, model, 5, group_size = matrix(c(2, 1), nrow = 1))
+    agents_pairs_2 <- predped::create_initial_condition(10, model, 5, group_size = matrix(c(2, 2), nrow = 1))
+
+    # Create an initial condition with 10 agents that might differ in their 
+    # group sizes. In one, we will test the function's ability to correct the weights
+    set.seed(1)
+    agents_more_1 <- predped::create_initial_condition(20, model, 5, group_size = matrix(c(1, 2, 3, 4, 0.25, 0.25, 0.25, 0.25), nrow = 4))
+    agents_more_2 <- predped::create_initial_condition(20, model, 5, group_size = matrix(c(1, 2, 3, 4, 1, 1, 1, 1), nrow = 4))
+
+    # For each of the initial conditions, find out which group the agents belong 
+    # to
+    tst_alone <- sapply(agents_alone, \(x) predped::group(x))
+    tst_pairs_1 <- sapply(agents_pairs_1, \(x) predped::group(x))
+    tst_pairs_2 <- sapply(agents_pairs_2, \(x) predped::group(x))
+    tst_more_1 <- sapply(agents_more_1, \(x) predped::group(x))
+    tst_more_2 <- sapply(agents_more_2, \(x) predped::group(x))
+
+    testthat::expect_equal(as.numeric(tst_alone), 1:10)
+    testthat::expect_equal(as.numeric(tst_pairs_1), rep(1:5, each = 2))
+    testthat::expect_equal(as.numeric(tst_pairs_2), rep(1:5, each = 2))
+    testthat::expect_equal(as.numeric(tst_more_1), c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 6, 7, 8, 8, 8, 8, 9))
+    testthat::expect_equal(as.numeric(tst_more_2), c(1, 1, 2, 2, 2, 3, 4, 4, 5, 5, 5, 6, 7, 7, 7, 8, 8, 8, 9, 9))
+
+    # Create an initial condition that will lead to an error
+    testthat::expect_error(predped::create_initial_condition(10, model, 5, group_size = matrix(c(1, Inf), nrow = 1)))
+    testthat::expect_error(predped::create_initial_condition(10, model, 5, group_size = matrix(c(1, NA), nrow = 1)))
+
+    # If you would ever want to visualize it during debugging
+    # state <- list(agents = agents_many, setting = setting)
+    # predped::plot(list(state), trace = TRUE)
+})
