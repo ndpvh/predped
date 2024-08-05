@@ -434,6 +434,10 @@ add_agent <- function(object,
 #' in the simulation.
 #' @param individual_differences Logical denoting whether variety on the parameters
 #' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param group_size Matrix of size n x 2 containing the group sizes you would 
+#' like to simulate (first column) and the probability of observing groups with 
+#' this size (second column). Defaults to a 100% probability of observing single 
+#' agents.
 #' 
 #' @export 
 create_initial_condition <- function(initial_number_agents,
@@ -447,7 +451,8 @@ create_initial_condition <- function(initial_number_agents,
                                      precompute_goal_paths = TRUE,
                                      order_goal_stack = TRUE,
                                      precomputed_goals = NULL,
-                                     individual_differences = TRUE) {
+                                     individual_differences = TRUE,
+                                     group_size = matrix(1, nrow = 1, ncol = 2)) {
 
     # Copy the setting
     setting <- object@setting
@@ -462,10 +467,35 @@ create_initial_condition <- function(initial_number_agents,
         goal_duration <- function(x) number
     }
 
+    # Check whether the weights in `group_size` sum to 1. If not, correct this
+    if(sum(group_size[,2]) != 1) {
+        group_size[,2] <- group_size[,2] / sum(group_size[,2])
+    }
+
+    if(!is.numeric(sum(group_size[,2])) | !is.finite(sum(group_size[,2]))) {
+        stop("Weights of the `group_size` are not numeric. Please adjust.")
+    }
+
+    # Use `group_size` to create the group memberships of all agents that are 
+    # going to be created. Here, we first simulate the group sizes that we 
+    # would like. Then, we create the indices at which group assignment should 
+    # change (i.e., if you start with a group of two, then the group number 
+    # should change after agent 2; see below)
+    if(nrow(group_size) == 1) {
+        groups <- rep(group_size[,1], initial_number_agents)
+    } else {
+        groups <- sample(group_size[,1], 
+                         initial_number_agents, 
+                         replace = TRUE,
+                         prob = group_size[,2])
+    }
+    group_indices <- cumsum(groups)
+
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents, 
     # namely their location and their orientation, as `add_agent` assumes that
     # agents start at the entrance walking into the setting.
+    group_number <- 1
     agents <- list() ; stop <- FALSE
     for(i in seq_len(initial_number_agents)) {
         # Initial agent to create
@@ -480,7 +510,13 @@ create_initial_condition <- function(initial_number_agents,
                                order_goal_stack = order_goal_stack,
                                precomputed_goals = precomputed_goals,
                                individual_differences = individual_differences)
-        group(new_agent) <- i
+        group(new_agent) <- group_number 
+
+        # Update the group number for the future if `i` is in the indices that 
+        # indicate a change in group membership
+        if(i %in% group_indices) {
+            group_number <- group_number + 1
+        }
 
         # Extract the edges from the background. Will help in determining the locations
         # at which the agents can be gathered. Importantly, dense network created so 
