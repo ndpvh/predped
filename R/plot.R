@@ -228,20 +228,24 @@ setMethod("plot", "background", function(object,
     }
 
     # Convert entrance & exit to polygon coordinates
-    entrance <- to_polygon(circle(center = c(object@entrance[1], object@entrance[2]), 
-                                  radius = (entry_exit_width / 2)))
-    exit <- to_polygon(circle(center = c(object@exit[1], object@exit[2]), 
-                              radius = (entry_exit_width / 2)))
+    entrance <- lapply(seq_len(nrow(object@entrance)), 
+                       \(i) to_polygon(circle(center = c(object@entrance[i, 1], object@entrance[i, 2]), 
+                                       radius = (entry_exit_width / 2))))
+    exit <- lapply(seq_len(nrow(object@exit)), 
+                   \(i) to_polygon(circle(center = c(object@exit[i, 1], object@exit[i, 2]), 
+                                   radius = (entry_exit_width / 2))))
     
     # Check that polygon coordinates are in the background
-    # If not, set those coorinates to NA   
-    idx <- in_object(object@shape, entrance, outside = FALSE)
-    idy <- in_object(object@shape, exit, outside = FALSE)
+    # If not, set those coorinates to NA
+    for(i in seq_along(entrance)) {
+        idx <- in_object(object@shape, entrance[[i]], outside = FALSE)
+        plt <- plt + plot(polygon(points = entrance[[i]][idx,]), fill = NA, colour = "black")
+    } 
 
-    entrance <- entrance[idx,]    
-    exit <- exit[idy,] 
+    for(i in seq_along(exit)) {
+        idx <- in_object(object@shape, exit[[i]], outside = FALSE)
+        plt <- plt + plot(polygon(points = exit[[i]][idx,]), fill = NA, colour = "black")
+    }
     
-    plt <- plt + plot(polygon(points = entrance), fill = NA, colour = "black")
-    plt <- plt + plot(polygon(points = exit), fill = NA, colour = "black")
     return(plt)
 })
