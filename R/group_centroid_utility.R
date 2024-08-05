@@ -1,14 +1,16 @@
-###### Necesarry Information to develop utility ######
+###### Necesarry Information to develop group centroid utility ######
 
 # Identification that all pedestrians belong to a social group in a given iteration
 # Positions of all group members, representing the group centroid in a given iteration
 # Euclidean distance of pedestrian_i to group centroid in a given iteration
 # Optimal distance of pedestrian_i to group centroid in a given iteration
 
-#' Group Centroid
+#' Distances to Group Centroid
 #'
 #' Get distances to group centroid for pedestrian `n`
-#'
+#' 
+#' @details Group centroid is calculated using the mean predicted (x & y)
+#'          coordinates of pedestrians belonging to the group of pedestrian `n`.
 #' @details Returns `NULL` if the pedestrian `n` does not belong to a pedestrian social group.
 #'
 #' @param agent_idx Integer scalar indexing the pedestrian in the state.
@@ -20,7 +22,7 @@
 #' @return Numeric vector `cell_dist` with distances from each cell center to the group centroid. 
 #'
 #' @export 
-get_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
+get_mean_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
    
     # First need to identify whether a pedestrian belongs to a social group
     inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
@@ -39,6 +41,42 @@ get_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
     return(m4ma::dist1_rcpp(centroid, centers))
 }
 
+#' Distances to Group Centroid
+#'
+#' Get distances to group centroid for pedestrian `n`
+#'
+#' @details Group centroid is calculated using the median predicted (x & y)
+#'          coordinates of pedestrians belonging to the group of pedestrian `n`.
+#' @details Returns `NULL` if the pedestrian `n` does not belong to a pedestrian social group.
+#'
+#' @param agent_idx Integer scalar indexing the pedestrian in the state.
+#' @param p_pred Numeric matrix with shape Nx2 (x & y) containing predicted positions
+#' of all pedestrians.
+#' @param agent_group Numeric vector with group membership indices of all pedestrians.
+#' @param centers Numeric matrix with shape (33x2) containing (x & y) for each cell centre.
+#'
+#' @return Numeric vector `cell_dist` with distances from each cell center to the group centroid. 
+#'
+#' @export 
+get_median_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
+   
+    # First need to identify whether a pedestrian belongs to a social group
+    inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    p_pred <- p_pred[inGroup, , drop = FALSE]
+    nped <- dim(p_pred)[1]
+    
+    if (nped == 0) {
+        return(NULL)    
+    }
+
+    # All of the positions of all in-group pedestrians need to be averaged
+    # Which represents the group centroid
+    centroid <- c(median(p_pred[,1]), median(p_pred[,2]))
+
+    # Euclidean distance for pedestrian_i is calculated for each cell
+    return(m4ma::dist1_rcpp(centroid, centers))
+}
+
 #' Group Centroid Utility
 #'
 #' @details Returns `empty numeric` if the pedestrian `n` does not belong to a pedestrian social group.
@@ -46,10 +84,9 @@ get_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
 #' @param a_gc Numeric scalar power parameter
 #' @param b_gc Numeric scalar steepness parameter
 #' @param optm_d Numeric scalar indicating optimal distance to group centroid.
-#' @param cell_dist Matrix with cells as columns, each column containing the distance from the cell
-#'                   to the predicted group centroid.
+#' @param cell_dist Numeric vector with the distance from the cell to the predicted group centroid.
 #' 
-#' @return Numeric vector `centroid_util` with group centroid utilities for each cell.
+#' @return Numeric vector `centroid_util` with group centroid utility for each cell.
 #' @export
 #'
 gc_utility <- function(a_gc, b_gc, optm_d, cell_dist) {
