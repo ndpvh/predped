@@ -18,8 +18,8 @@
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
-                                          entrance = "coordinate", 
-                                          exit = "coordinate"))
+                                          entrance = "matrix", 
+                                          exit = "matrix"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
@@ -31,25 +31,37 @@ setMethod("initialize", "background", function(.Object,
     # If uncommented, callNextMethod() will throw an error because of same_exit
     # not being a slot in the `background` class. Therefore manual assignment 
     # done in this piece of code
-    # .Object <- callNextMethod()
-
     .Object@shape <- shape 
     .Object@objects <- objects
     if (!all(sapply(.Object@objects, is, class2 = "object"))) {
         stop("All elements in slot 'objects' must be of type 'object'")
     }
 
+    # Entrances should either be provided or randomly generated. We furthermore
+    # need to transform the entrance to a matrix, allowing for multiple entrances
     if(is.null(entrance)) {
         entrance <- rng_point(.Object@shape)
     }
-    .Object@entrance <- coordinate(entrance)
 
+    if(!is.matrix(entrance)) {
+        entrance <- matrix(entrance, ncol = 2)
+    }
+
+    .Object@entrance <- entrance
+
+    # Exits are handled the same as entrances, with the exception that we may 
+    # also use the entrance as an exit whenever specified so.
     if(same_exit) {
         exit <- entrance
     } else if(is.null(exit)) {
         exit <- rng_point(.Object@shape)
     }
-    .Object@exit <- coordinate(exit)
+
+    if(!is.matrix(exit)) {
+        exit <- matrix(exit, ncol = 2)
+    }
+
+    .Object@exit <- exit
 
     return(.Object)
 })
@@ -113,7 +125,11 @@ setMethod("entrance", "background", function(object) {
 })
 
 setMethod("entrance<-", "background", function(object, value) {
-    object@entrance <- as(value, "coordinate")
+    if(!is.matrix(value)) {
+        value <- matrix(value, ncol = 2)
+    }
+
+    object@entrance <- value
     return(object)
 })
 
@@ -134,6 +150,10 @@ setMethod("exit", "background", function(object) {
 })
 
 setMethod("exit<-", "background", function(object, value) {
-    object@exit <- as(value, "coordinate")
+    if(!is.matrix(value)) {
+        value <- matrix(value, ncol = 2)
+    }
+
+    object@exit <- value
     return(object)
 })
