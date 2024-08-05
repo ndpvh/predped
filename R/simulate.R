@@ -208,6 +208,7 @@ setMethod("simulate", "predped", function(object,
                                          order_goal_stack = order_goal_stack,
                                          precomputed_goals = precomputed_goals,
                                          individual_differences = individual_differences)
+            group(potential_agent) <- length(state$agents) + 1
             agent_in_queue <- TRUE
         }
 
@@ -479,6 +480,7 @@ create_initial_condition <- function(initial_number_agents,
                                order_goal_stack = order_goal_stack,
                                precomputed_goals = precomputed_goals,
                                individual_differences = individual_differences)
+        group(new_agent) <- i
 
         # Extract the edges from the background. Will help in determining the locations
         # at which the agents can be gathered. Importantly, dense network created so 
