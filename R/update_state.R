@@ -484,34 +484,42 @@ update_goal <- function(agent,
                                 matrix(c(position(agent), current_goal(agent)@position),
                                        nrow = 1)))
 
-        # If the agent doesn't see their current goal, they have to reroute
+        # If the agent doesn't see their current goal, they have to reroute with
+        # a probability of 100%
         if(!seen) {
-            reroute <- TRUE
+            prob_rerouting <- 1
 
-            # If rerouting, check whether we should report on it, and whether 
-            # this report also needs user feedback
-            if(report) {
-                if(!interactive_report) {
-                    cat(paste(id(agent), "Cant see goal, re-routing\n"))
-                } else {
-                    readline(prompt = paste(id(agent),
-                                            "Cant see goal, re-routing, press [enter] to continue"))
-                }
+        # If they do see their goal, they only reroute with a given probability
+        # defined by their rerouting parameter and the number of people that 
+        # are in the way
+        } else {
+            reroute_param <- parameters(agent)$reroute
+
+            if(is.finite(reroute_param)) {
+                # Compute the probability of rerouting based on the number of
+                # agents that are standing inbetween the `agent` and their goal
+                blocking_agents <- agents_between_goal(agent, state)
+                prob_rerouting <- pnorm(blocking_agents - reroute_param)
+            } else {
+                prob_rerouting <- 0
             }
+        }
 
+        # Check whether you will replan on this move
+        if(runif(1) < prob_rerouting) {
             # Given that you have to reroute, replan how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents)
-                                                  
+
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
                                                   precomputed_edges = NULL,
-                                                  many_options = TRUE)
+                                                  many_options = FALSE)
             # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
             #                                    nrow = 1, 
             #                                    ncol = 2)
@@ -524,97 +532,22 @@ update_goal <- function(agent,
                 return(agent)
             }
 
-            # Turn to the new path point and slow down
-            orientation(agent) <- m4ma::angle2(matrix(position(agent),
-                                                      nrow = 1, 
-                                                      ncol = 2), 
-                                               matrix(current_goal(agent)@path[1,],
-                                                      nrow = 1, 
-                                                      ncol = 2))
-            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-
         } else {
-            reroute_param <- parameters(agent)$reroute
-
-            if(is.finite(reroute_param)) {
-                # Compute the probability of rerouting based on the number of
-                # agents that are standing inbetween the `agent` and their goal
-                blocking_agents <- agents_between_goal(agent, state)
-                prob_rerouting <- pnorm(blocking_agents - reroute_param)
-
-                # Draw a number and determine whether lower than prob_rerouting.
-                # If so, reroute
-                if(runif(1) < prob_rerouting) {
-                    # Given that you have to reroute, replan how you will get to your 
-                    # goal. Add the other agents in objects to account for so you don't 
-                    # take the same route.
-                    updated_background <- background
-                    # objects(updated_background) <- append(objects(updated_background), 
-                    #                                       state$agents)
-                    current_goal(agent)@path <- find_path(current_goal(agent), 
-                                                          agent, 
-                                                          updated_background,
-                                                          space_between = space_between,
-                                                          precomputed_edges = NULL,
-                                                          many_options = TRUE)
-                    # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
-                    #                                    nrow = 1, 
-                    #                                    ncol = 2)
-
-                    # Quick check whether the path is clearly defined. If not, 
-                    # then the agent will have to replan at a later time and 
-                    # wait for now. 
-                    if(nrow(current_goal(agent)@path) == 0) {
-                        status(agent) <- "replan"
-                        return(agent)
-                    }
-
-                    # Turn to the new path point and slow down
-                    orientation(agent) <- m4ma::angle2(matrix(position(agent),
-                                                              nrow = 1, 
-                                                              ncol = 2),
-                                                       matrix(current_goal(agent)@path[1,],
-                                                              nrow = 1, 
-                                                              ncol = 2))
-                    speed(agent) <- standing_start
-
-                    # If rerouting, check whether we should report on it, and whether 
-                    # this report also needs user feedback
-                    if(report) {
-                        statistics <- c(round(blocking_agents[1]),
-                                        round(prob_rerouting, 3))
-
-                        if(!interactive_report) {
-                            cat(paste0(id(agent), 
-                                       " replanning to avoid a crowd of ",
-                                        statistics[1],
-                                        " agents (prob = ",
-                                        statistics[2],
-                                        ")\n"))
-                        } else {
-                            readline(prompt = paste(id(agent), 
-                                                    " replanning to avoid a crowd of ",
-                                                     statistics[1],
-                                                     " agents (prob = ",
-                                                     statistics[2],
-                                                     ") press [enter] to continue"))
-                        }
-                    }
-
-                # If you don't need to reroute, but can go to the goal directly,
-                # then the `path` attribute just takes in the goal's location
-                } else {
-                    current_goal(agent)@path <- matrix(current_goal(agent)@position,
+            # If you don't need to reroute, but can go to the goal directly,
+            # then the `path` attribute just takes in the goal's location
+            current_goal(agent)@path <- matrix(current_goal(agent)@position,
                                                        ncol = 2)
-
-                    # I think this is a very weird report to include, as it might
-                    # be that there are just no agents in the way. Hence commented
-                    # out.              
-                    # if(report) cat(paste(id(agent),
-                    #                      ": Avoiding a crowd of ",np[1],", re-routing (p = ",np[2],") FAILED\n",sep=""))
-                }
-            }
         }
+
+        # Turn to the new path point and slow down
+        orientation(agent) <- m4ma::angle2(matrix(position(agent),
+                                                    nrow = 1, 
+                                                    ncol = 2), 
+                                            matrix(current_goal(agent)@path[1,],
+                                                    nrow = 1, 
+                                                    ncol = 2))
+        speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+
         # After replanning, put the status to "reorient" so that they will be
         # able to reorient in the next move
         status(agent) <- "reorient"
