@@ -227,7 +227,10 @@ enlarge_object <- function(object,
 }
 
 # Make a vectorized alternative to m4ma::seesGoal that will loop over the objects
-# but looks at intersections in a vectorized manner
+# but looks at intersections in a vectorized manner.
+#
+# NOTE: Tried a completely vectorized alternative, but this was not helpful. 
+# This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
     # Loop over the objects in the environment
     all_intersections <- matrix(FALSE, nrow = nrow(segments), ncol = length(objects))
