@@ -94,6 +94,7 @@ setMethod("simulate", "predped", function(object,
                                           individual_differences = TRUE,
                                           plot_live = FALSE,
                                           plot_time = 0.2,
+                                          group_size = matrix(1, nrow = 1, ncol = 2),
                                           ...) {
 
     # Used to be an argument, but if `FALSE`, users have no way of terminating 
@@ -160,7 +161,8 @@ setMethod("simulate", "predped", function(object,
                                                    precompute_goal_paths = precompute_goal_paths,
                                                    order_goal_stack = order_goal_stack,
                                                    precomputed_goals = precomputed_goals,
-                                                   individual_differences = individual_differences)
+                                                   individual_differences = individual_differences,
+                                                   group_size = group_size)
 
         # First index deleted here so that agents don't immediately get added 
         # to the environment when the initial condition is to be generated 
@@ -187,7 +189,7 @@ setMethod("simulate", "predped", function(object,
     }
     trace <- list(state)
 
-    agent_in_cue <- FALSE
+    agent_in_queue <- FALSE
     
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
@@ -196,33 +198,63 @@ setMethod("simulate", "predped", function(object,
         # pedestrian, whether we already reached the maximal number of agents,
         # and whether there is any space to add the new pedestrian. If there is 
         # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_cue)) {
-            potential_agent <- add_agent(object,
-                                         goal_number[i],
-                                         goal_duration = goal_duration,
-                                         standing_start = standing_start,
-                                         space_between = space_between,
-                                         time_step = time_step,
-                                         precomputed_edges = edges,
-                                         precompute_goal_paths = precompute_goal_paths,
-                                         order_goal_stack = order_goal_stack,
-                                         precomputed_goals = precomputed_goals,
-                                         individual_differences = individual_differences)
-            agent_in_cue <- TRUE
+        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_queue)) {
+            # Sample how many agents you would like to generate (if group, 
+            # generate them all together)
+            if(nrow(group_size) == 1) {
+                number_agents <- group_size[,1]
+            } else {
+                number_agents <- sample(group_size[,1], 1, replace = TRUE, prob = group_size[,2])
+            }
+
+            # Generate as many potential agents as you need to form a group of 
+            # size `number_agents`
+            potential_agent <- list()
+            for(j in 1:number_agents) {
+                potential_agent[[j]] <- add_agent(object,
+                                                  goal_number[i],
+                                                  goal_duration = goal_duration,
+                                                  standing_start = standing_start,
+                                                  space_between = space_between,
+                                                  time_step = time_step,
+                                                  precomputed_edges = edges,
+                                                  precompute_goal_paths = precompute_goal_paths,
+                                                  order_goal_stack = order_goal_stack,
+                                                  precomputed_goals = precomputed_goals,
+                                                  individual_differences = individual_differences)
+                group(potential_agent[[j]]) <- length(state$agents) + 1
+
+                # Once done, we need to provide all agents with the same set of 
+                # goals. Currently imposed so that a group of people that enter
+                # a space also want to achieve the same goals.
+                #
+                # Furthermore change position and orientation so that they all 
+                # come in in the same place
+                if(j != 1) {
+                    position(potential_agent[[j]]) <- position(potential_agent[[1]])
+                    orientation(potential_agent[[j]]) <- orientation(potential_agent[[1]])
+
+                    goals(potential_agent[[j]]) <- goals(potential_agent[[1]])
+                    current_goal(potential_agent[[j]]) <- current_goal(potential_agent[[1]])
+                }
+            }
+
+            agent_in_queue <- TRUE
         }
 
         # Check whether there is any space to add the pedestrian. Otherwise
         # will have to keep waiting in the cue.
-        if(agent_in_cue) {
+        if(agent_in_queue) {
             agents_in_the_way <- sapply(state$agents, 
-                                        \(x) in_object(potential_agent, 
+                                        \(x) in_object(potential_agent[[1]], 
                                                        to_polygon(x), 
                                                        outside = FALSE))
-            agent_in_cue <- any(agents_in_the_way)
-
-            if(!agent_in_cue) {
-                state$agents <- append(state$agents, potential_agent)
+            if(!any(agents_in_the_way)) {
+                state$agents <- append(state$agents, potential_agent[[1]])
+                potential_agent <- potential_agent[-1]
             }
+
+            agent_in_queue <- length(potential_agent) != 0
         }
 
         # Provide feedback if wanted
@@ -325,8 +357,12 @@ add_agent <- function(object,
                       precomputed_goals = NULL,
                       individual_differences = TRUE) {
 
-    # Extract the background from the `predped` model
+    # Extract the background from the `predped` model and determine where the 
+    # agent will enter the space
     background <- object@setting
+
+    idx <- sample(seq_len(nrow(background@entrance)), 1)
+    entrance_agent <- entrance(background)[idx, ]
 
     # Sample a random set of parameters from the `predped` class. From this, 
     # extract the needed information and add some individual differences
@@ -337,11 +373,7 @@ add_agent <- function(object,
                               object@parameters[idx,],
                               archetype = object@parameters$name[idx],
                               individual_differences = individual_differences)    
-    radius <- params$radius   
-
-    # Adjust the preferred speed of the agents based on the time_step 
-    # (in seconds): These speeds are per second
-    # params[["preferred_speed"]] <- params[["preferred_speed"]] * time_step 
+    radius <- params$radius
 
     # Create this agents' goal stack
     if(is.null(precomputed_goals)) {
@@ -362,7 +394,7 @@ add_agent <- function(object,
     # the agent enters, or directed towards the current goal of the agent.
     if(is.null(position)) {
         angle <- perpendicular_orientation(shape(background),
-                                           entrance(background))
+                                           entrance_agent)
     } else {
         co_1 <- position
         co_2 <- goal_stack[[1]]@position
@@ -373,7 +405,7 @@ add_agent <- function(object,
     # Determine the position of the agent. Either this is at the entrance, or 
     # this is at the specified location
     if(is.null(position)) {
-        position <- background@entrance + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+        position <- entrance_agent + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
     }
     
     # Create the agent itself
@@ -433,6 +465,10 @@ add_agent <- function(object,
 #' in the simulation.
 #' @param individual_differences Logical denoting whether variety on the parameters
 #' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param group_size Matrix of size n x 2 containing the group sizes you would 
+#' like to simulate (first column) and the probability of observing groups with 
+#' this size (second column). Defaults to a 100% probability of observing single 
+#' agents.
 #' 
 #' @export 
 create_initial_condition <- function(initial_number_agents,
@@ -446,7 +482,8 @@ create_initial_condition <- function(initial_number_agents,
                                      precompute_goal_paths = TRUE,
                                      order_goal_stack = TRUE,
                                      precomputed_goals = NULL,
-                                     individual_differences = TRUE) {
+                                     individual_differences = TRUE,
+                                     group_size = matrix(1, nrow = 1, ncol = 2)) {
 
     # Copy the setting
     setting <- object@setting
@@ -461,10 +498,35 @@ create_initial_condition <- function(initial_number_agents,
         goal_duration <- function(x) number
     }
 
+    # Check whether the weights in `group_size` sum to 1. If not, correct this
+    if(sum(group_size[,2]) != 1) {
+        group_size[,2] <- group_size[,2] / sum(group_size[,2])
+    }
+
+    if(!is.numeric(sum(group_size[,2])) | !is.finite(sum(group_size[,2]))) {
+        stop("Weights of the `group_size` are not numeric. Please adjust.")
+    }
+
+    # Use `group_size` to create the group memberships of all agents that are 
+    # going to be created. Here, we first simulate the group sizes that we 
+    # would like. Then, we create the indices at which group assignment should 
+    # change (i.e., if you start with a group of two, then the group number 
+    # should change after agent 2; see below)
+    if(nrow(group_size) == 1) {
+        groups <- rep(group_size[,1], initial_number_agents)
+    } else {
+        groups <- sample(group_size[,1], 
+                         initial_number_agents, 
+                         replace = TRUE,
+                         prob = group_size[,2])
+    }
+    group_indices <- cumsum(groups)
+
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents, 
     # namely their location and their orientation, as `add_agent` assumes that
     # agents start at the entrance walking into the setting.
+    group_number <- 1
     agents <- list() ; stop <- FALSE
     for(i in seq_len(initial_number_agents)) {
         # Initial agent to create
@@ -479,6 +541,13 @@ create_initial_condition <- function(initial_number_agents,
                                order_goal_stack = order_goal_stack,
                                precomputed_goals = precomputed_goals,
                                individual_differences = individual_differences)
+        group(new_agent) <- group_number 
+
+        # Update the group number for the future if `i` is in the indices that 
+        # indicate a change in group membership
+        if(i %in% group_indices) {
+            group_number <- group_number + 1
+        }
 
         # Extract the edges from the background. Will help in determining the locations
         # at which the agents can be gathered. Importantly, dense network created so 

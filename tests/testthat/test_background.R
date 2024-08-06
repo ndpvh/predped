@@ -15,11 +15,19 @@ testthat::test_that("Background initialization works", {
 
     testthat::expect_error(predped::background(shape = shp, objects = invalid_objects)) 
 
+    # Tests of single entrance and exit
     setting <- predped::background(shape = shp, objects = valid_objects, entrance = c(0, 1))
-    testthat::expect_equal(setting@exit, predped::coordinate(c(0, 1)))
+    testthat::expect_equal(setting@exit, matrix(c(0, 1), ncol = 2))
 
     setting <- predped::background(shape = shp, objects = valid_objects, exit = c(0, 1), same_exit = FALSE)
-    testthat::expect_equal(setting@exit, predped::coordinate(c(0, 1)))
+    testthat::expect_equal(setting@exit, matrix(c(0, 1), ncol = 2))
+
+    # Tests of multiple entrances and exits
+    setting <- predped::background(shape = shp, objects = valid_objects, entrance = c(0, 1, 1, 1))
+    testthat::expect_equal(setting@exit, matrix(c(0, 1, 1, 1), ncol = 2))
+
+    setting <- predped::background(shape = shp, objects = valid_objects, exit = c(0, 1, 1, 1), same_exit = FALSE)
+    testthat::expect_equal(setting@exit, matrix(c(0, 1, 1, 1), ncol = 2))
 })
 
 testthat::test_that("Background getters work", {
@@ -34,8 +42,8 @@ testthat::test_that("Background getters work", {
 
     testthat::expect_equal(predped::shape(setting), shp)
     testthat::expect_equal(predped::objects(setting), obj)
-    testthat::expect_equal(predped::entrance(setting), coordinate(c(1, 1)))
-    testthat::expect_equal(predped::exit(setting), coordinate(c(2, 1)))
+    testthat::expect_equal(predped::entrance(setting), matrix(c(1, 1), ncol = 2))
+    testthat::expect_equal(predped::exit(setting), matrix(c(2, 1), ncol = 2))
 })
 
 testthat::test_that("Background setters work", {
@@ -58,6 +66,6 @@ testthat::test_that("Background setters work", {
 
     testthat::expect_equal(predped::shape(setting), shp_2)
     testthat::expect_equal(predped::objects(setting), obj_2)
-    testthat::expect_equal(predped::entrance(setting), coordinate(c(2, 2)))
-    testthat::expect_equal(predped::exit(setting), coordinate(c(1, 2)))
+    testthat::expect_equal(predped::entrance(setting), matrix(c(2, 2), ncol = 2))
+    testthat::expect_equal(predped::exit(setting), matrix(c(1, 2), ncol = 2))
 })
