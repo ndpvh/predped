@@ -384,6 +384,11 @@ setMethod("find_path", "goal", function(object,
                               background,
                               precomputed_edges = precomputed_edges)
     }
+
+    # If edges is actually NULL, we need to return this 
+    if(is.null(edges)) {
+        return(NULL)
+    }
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
     # I put the directed argument to FALSE so that agents are free to decide on
