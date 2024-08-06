@@ -527,7 +527,7 @@ update_goal <- function(agent,
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to replan at a later time and 
             # wait for now. 
-            if(nrow(current_goal(agent)@path) == 0) {
+            if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
                 status(agent) <- "replan"
                 return(agent)
             }
@@ -601,7 +601,7 @@ update_goal <- function(agent,
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {
         # Keep this in for debugging purposes
-        if(nrow(current_goal(agent)@path) == 0) {
+        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
             View(current_goal(agent))
             View(agent)
             print(plot(background) + plot(state$agents))
