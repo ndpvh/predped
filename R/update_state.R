@@ -313,7 +313,7 @@ update_position <- function(agent,
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start
-            status(agent) <- "replan"
+            status(agent) <- "reorient"
             cell(agent) <- 0
             return(agent)
         }
@@ -536,16 +536,10 @@ update_goal <- function(agent,
             # If you don't need to reroute, but can go to the goal directly,
             # then the `path` attribute just takes in the goal's location
             current_goal(agent)@path <- matrix(current_goal(agent)@position,
-                                                       ncol = 2)
+                                               ncol = 2)
         }
 
         # Turn to the new path point and slow down
-        orientation(agent) <- m4ma::angle2(matrix(position(agent),
-                                                    nrow = 1, 
-                                                    ncol = 2), 
-                                            matrix(current_goal(agent)@path[1,],
-                                                    nrow = 1, 
-                                                    ncol = 2))
         speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
 
         # After replanning, put the status to "reorient" so that they will be
