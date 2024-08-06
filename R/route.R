@@ -33,6 +33,11 @@ create_edges <- function(from,
                           space_between = space_between,
                           many_options = many_options)
 
+    # If there are no nodes, then we will have to return NULL
+    if(is.null(nodes)) {
+        return(NULL)
+    }
+
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
@@ -154,6 +159,12 @@ create_nodes <- function(from,
     }
 
     nodes <- nodes[!to_delete,]
+
+    # Do a check of whether there are any nodes at all. If not, then we will have
+    # to return NULL and get on with it.
+    if(length(nodes) == 0) {
+        return(NULL)
+    }
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
