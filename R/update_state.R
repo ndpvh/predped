@@ -519,7 +519,7 @@ update_goal <- function(agent,
                                                   updated_background,
                                                   space_between = space_between,
                                                   precomputed_edges = NULL,
-                                                  many_options = FALSE)
+                                                  many_options = TRUE)
             # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
             #                                    nrow = 1, 
             #                                    ncol = 2)
@@ -676,15 +676,17 @@ update_goal <- function(agent,
                 # Find out whether that agent is actually completing a goal or not.
                 # If not, then the agent will just continue business as usual.
                 idx <- Position(\(x) x == TRUE, blocking_agents)
-                if(status(state$agents[[idx]]) != "completing goal") {
-                    return(agent)
-                }
 
-                # If the blocking agent is completing a goal, make the agent wait
-                # its turn. Give the other agent about two time steps to move away
-                # before scooping in.
+                # Check the status of all agents that are blocking the goal. If
+                # they are completing the goal, then the agent will have to wait
+                # its turn. If the blocking agent is not completing a goal, then 
+                # the agent will just have to wait until they move on.
+                stati <- lapply(state$agents[idx], \(x) c(status(x), current_goal(x)@counter))
+                stati <- do.call("rbind", stati)
+                stati[stati[,1] != "completing goal", 2] <- 0
+
                 status(agent) <- "wait"
-                waiting_counter(agent) <- current_goal(state$agents[[idx]])@counter + 2
+                waiting_counter(agent) <- max(as.numeric(stati[,2]) + 2)
             }
         }
     }
