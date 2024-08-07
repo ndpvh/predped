@@ -564,6 +564,8 @@ testthat::test_that("Circle intersection works", {
 
 
 
+
+
 ################################################################################
 # GETTERS AND SETTERS
 
@@ -638,6 +640,35 @@ testthat::test_that("Object setters work", {
                                          c(0.5, 1.5),
                                          c(1.5, 1.5),
                                          c(1.5, 0.5)))
+
+    # A tilted rectangle: Changing orientation and size
+    # All values here were mathematically derived
+    tst <- predped::rectangle(center = c(0, 0), 
+                              size = c(1, 1), 
+                              orientation = pi / 4)
+    tst_1 <- tst ; tst_2 <- tst
+
+    predped::orientation(tst_1) <- 0
+    testthat::expect_equal(tst_1@points, rbind(c(-0.5, -0.5), 
+                                               c(-0.5, 0.5), 
+                                               c(0.5, 0.5), 
+                                               c(0.5, -0.5)))
+
+    predped::size(tst_2) <- c(2, 2)
+    testthat::expect_equal(tst_2@points, 
+                           rbind(c(0, sqrt(8)), 
+                                 c(sqrt(8), 0), 
+                                 c(0, -sqrt(8)),
+                                 c(-sqrt(8), 0)),
+                           tolerance = 1e-4)
+
+    predped::size(tst_2) <- c(2, 1)
+    testthat::expect_equal(tst_2@points, 
+                           rbind(c(sqrt(0.125), sqrt(2) / 2 + sqrt(0.125)), 
+                                 c(sqrt(2) / 2 + sqrt(0.125), sqrt(0.125)),
+                                 c(-sqrt(0.125), -sqrt(2) / 2 - sqrt(0.125)),
+                                 c(-sqrt(2) / 2 - sqrt(0.125), -sqrt(0.125))),
+                           tolerance = 1e-4)
 
     # Circle
     tst <- predped::circle(center = c(0, 0), radius = 1)
