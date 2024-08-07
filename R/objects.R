@@ -631,19 +631,13 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
     # the corners of the new one, we will have to create an `extension` factor
     # based on the rule of Pythagoras, where we know that c^2 = `space_between`^2
     # and a^2 = b^2 = `extension`^2.
-    extension = sqrt(space_between^2 / 2)
-    
-    # Make the new rectangle and extract its points. Importantly, we need to 
-    # use 2 * `extension`, as we have two edges that need extending.
-    if(outside) {
-        new_size <- object@size + 2 * extension
-    } else {
-        new_size <- object@size - 2 * extension
-    }
+    extension <- sqrt(space_between^2 / 2)
 
     # Use the setter for the size of a rectangle to change its size. This setter
-    # will automatically change the corner points inside of the rectangle
-    size(object) <- new_size
+    # will automatically change the corner points inside of the rectangle.
+    #
+    # Importantly, the size of the rectangle changes with 2 times the extension
+    size(object) <- size(object) + ifelse(outside, 2, -2) * extension 
     
     # Return the nodes as is when you only want nodes to be created at the 
     # corners of the polygon
@@ -655,44 +649,45 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
     # amount of space between each of the now created nodes. For this, we will 
     # use logic that is the same as for polygons.
     nodes <- object@points
-    corner_nodes <- rbind(nodes, nodes[1,])
-    for(i in seq_len(nrow(corner_nodes) - 1)) {
-        # Get the slope and size of the line defined by the two nodes. If the 
-        # length of the line is smaller than `space_between`, we don't need to 
-        # put in some additional points
-        slope <- (corner_nodes[i,2] - corner_nodes[i + 1, 2]) / (corner_nodes[i,1] - corner_nodes[i + 1, 1])
-        size <- sqrt((corner_nodes[i,1] - corner_nodes[i + 1, 1])^2 + (corner_nodes[i,2] - corner_nodes[i + 1, 2])^2)
+    edges <- cbind(nodes, nodes[c(2:nrow(nodes), 1),])
 
-        if(size < space_between) {
-            next
-        }
+    # Define the number of times each of the lines defined by the edges should 
+    # be divided by
+    sizes <- sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2)
 
-        # Divide the line in equal pieces proportional to the amount of space 
-        # you have
-        number_points <- ceiling(size / space_between)
-        dist <- size / number_points
+    # Delete those sizes that are smaller than space_between
+    idx <- sizes > space_between 
+    sizes <- sizes[idx]
+    edges <- edges[idx,]
 
-        # Find the points on the line that correspond to each of the distances 
-        # and bind them to the `nodes` matrix. In order for this to work, we 
-        # should add the distances from a starting point to the end point by using
-        # the angle of the slope with a radius equal to the distance from the 
-        # starting point to the end point. The starting point is always defined 
-        # as that node for which x is minimal, except when the line drawn is 
-        # vertical, in which case the y-coordinate matters
-        angle <- atan(slope)
-        if(slope == -Inf) {
-            idx <- which.max(corner_nodes[i:(i + 1), 2])
-        } else if(slope == Inf) {
-            idx <- which.min(corner_nodes[i:(i + 1), 2])
+    # Get the spaces that should be left inbetween the next points on the grid
+    number_points <- ceiling(sizes / space_between)
+    distances <- sizes / number_points
+
+    # Find the points on the line that correspond to each of the distances 
+    # and bind them to the `nodes` matrix. In order for this to work, we 
+    # should add the distances from a starting point to the end point by using
+    # the angle of the slope with a radius equal to the distance from the 
+    # starting point to the end point. The starting point is always defined 
+    # as that node for which x is minimal, except when the line drawn is 
+    # vertical, in which case the y-coordinate matters
+    # slopes <- (edges[,2] - edges[,4]) / (edges[,1] - edges[,3])
+    slopes <- (edges[,4] - edges[,2]) / (edges[,3] - edges[,1])
+    angles <- atan(slopes)
+
+    # In the last step, we loop over these values to create the new nodes
+    new_nodes <- list()
+    for(i in seq_len(nrow(nodes))) {
+        if(slopes[i] == 0) {
+            idx <- c(1, 3)[which.min(edges[i, c(1, 3)])]
         } else {
-            idx <- which.min(corner_nodes[i:(i + 1), 1])
+            idx <- 1
         }
-        start <- corner_nodes[c(i:(i + 1))[idx],]
 
-        new_nodes <- cbind(start[1] + 1:(number_points - 1) * cos(angle) * dist,
-                           start[2] + 1:(number_points - 1) * sin(angle) * dist)
-        nodes <- rbind(nodes, new_nodes)        
+        new_nodes[[i]] <- cbind(1:(number_points[i] - 1) * cos(angles[i]) * distances[i] + edges[i, idx],
+                                1:(number_points[i] - 1) * sin(angles[i]) * distances[i] + edges[i, idx + 1])
     }
+    nodes <- rbind(nodes, do.call("rbind", new_nodes))
 
     return(nodes)
 })
