@@ -1287,8 +1287,13 @@ setMethod("size<-", signature(object = "rectangle"), function(object, value) {
                           c(value[1], -value[2]),
                           c(-value[1], -value[2]),
                           c(-value[1], value[2]))
-    object@points <- cbind(points[,1] + center(object)[1], 
-                           points[,2] + center(object)[2])
+    
+    alpha <- object@orientation
+    R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
+
+    points <- R %*% t(points)
+    object@points <- cbind(points[1,] + center(object)[1], 
+                           points[2,] + center(object)[2])
     return(object)
 })
 
