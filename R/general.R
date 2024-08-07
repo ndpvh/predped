@@ -104,40 +104,69 @@ line_line_intersection <- function(segments_1,
                                    segments_2,
                                    return_all = FALSE) {
 
-    # Enlongen the two matrices of segments so that the intersection of each 
-    # segment within the two matrices can be compared to each other. For this, 
-    # take the Kronecker product with a vector of ones
+    # Check which of the two sequences is shortest. Whichever is shortest will 
+    # go into the loop, the other will serve as the vectorized set of segments
     n_1 <- nrow(segments_1)
     n_2 <- nrow(segments_2)
-
-    segments_1 <- segments_1 %x% rep(1, each = n_2)
-    segments_2 <- rep(1, each = n_1) %x% segments_2
-
-    # Compute the values of t, u and the values they can maximally take t_max, 
-    # u_max of the Bézier parametrization of the line segments. If 0 <= t <= t_max
-    # and 0 <= u <= u_max, then the intersection between two lines lies within the
-    # boundaries that make up that line. 
-    t <- (segments_1[,1] - segments_2[,1]) * (segments_2[,2] - segments_2[,4]) -
-        (segments_1[,2] - segments_2[,2]) * (segments_2[,1] - segments_2[,3])
-    u <- (segments_1[,1] - segments_1[,3]) * (segments_1[,2] - segments_2[,2]) -
-        (segments_1[,2] - segments_1[,4]) * (segments_1[,1] - segments_2[,1])
     
-    t_max <- (segments_1[,1] - segments_1[,3]) * (segments_2[,2] - segments_2[,4]) -
-        (segments_1[,2] - segments_1[,4]) * (segments_2[,1] - segments_2[,3])
-    u_max <- -t_max
+    if(n_2 < n_1) {
+        looped <- segments_2 
+        vectored <- segments_1
+    } else {
+        looped <- segments_1 
+        vectored <- segments_2
+    }
+    n <- nrow(looped)
 
-    # Do the test itself:
-    #
-    # Important limitation (and TO DO): End points are not regarded as intersecting.
-    # This is done because of some weird bugs with parallel lines that are 
-    # regarded as intersecting while not intersecting at all.
-    t <- sign(t_max) * t
-    u <- sign(u_max) * u
+    intersection <- matrix(FALSE, nrow = nrow(vectored), ncol = n)
+    for(i in seq_len(n)) {
+        # Compute the values of t, u and the values they can maximally take t_max, 
+        # u_max of the Bézier parametrization of the line segments. If 0 <= t <= t_max
+        # and 0 <= u <= u_max, then the intersection between two lines lies within the
+        # boundaries that make up that line. 
+        t <- (looped[i,1] - vectored[,1]) * (vectored[,2] - vectored[,4]) -
+            (looped[i,2] - vectored[,2]) * (vectored[,1] - vectored[,3])
+        u <- (looped[i,1] - looped[i,3]) * (looped[i,2] - vectored[,2]) -
+            (looped[i,2] - looped[i,4]) * (looped[i,1] - vectored[,1])
+        
+        t_max <- (looped[i,1] - looped[i,3]) * (vectored[,2] - vectored[,4]) -
+            (looped[i,2] - looped[i,4]) * (vectored[,1] - vectored[,3])
+        u_max <- -t_max
 
-    intersection <- (0 < t) & (t <= abs(t_max)) & (0 < u) & (u <= abs(u_max))
+        # Do the test itself:
+        #
+        # Important limitation (and TO DO): End points are not regarded as intersecting.
+        # This is done because of some weird bugs with parallel lines that are 
+        # regarded as intersecting while not intersecting at all.
+        t <- sign(t_max) * t
+        u <- sign(u_max) * u
+
+        intersection[, i] <- Reduce("&", 
+                                    list(0 < t, 
+                                         t <= abs(t_max), 
+                                         0 < u, 
+                                         u <= abs(u_max)))
+    }
 
     if(return_all) {
-        return(intersection)
+        # Here, we need to be careful: We want to make sure that the logicals
+        # are ordered such that each element in segment_1 is repeated n_2 times
+        # and is linked to each element in segment_2. Per example, if segment_1
+        # consists of c(1, 2, 3) and segment_2 of c(4, 5), then we want the 
+        # resulting matrix to look like cbind(c(1, 1, 2, 2, 3, 3), c(4, 5, 4, 
+        # 5, 4, 5).
+        #
+        # This is automatically the case if the `looped` segments are equal to 
+        # `segments_1` and the `vectored` one is equal to `segments_2`. We can 
+        # therefore reduce this to a vector and return.
+        #
+        # If this is not the case, then we first need to transpose and then 
+        # transform it to a vector anyway.
+        if(n_2 < n_1) {
+            intersection <- t(intersection)
+        }
+
+        return(as.logical(intersection))
     } else {
         return(any(intersection))
     }
