@@ -148,7 +148,7 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' Check Whether a Point Lies Within an Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
-#' @param x A numeric vector of length two with x and y coordinates of the point.
+#' @param x A numeric vector or matrix with x and y coordinates of the point.
 #' @param outside A logical indicating whether to return \code{TRUE} if the point
 #' is outside the object.
 #'
@@ -267,71 +267,15 @@ setMethod("initialize", "polygon", function(.Object,
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "polygon"), function(object, x, outside = TRUE) {
-    # Use a Ray-casting algorithm to find out whether a point lies in a polygon.
-    # This algorithm checks whether a point lies within an arbitrary polygon by
-    # checking the even-odd-rule, which says that for any point (x,y) that lies
-    # within a polygon, the number of times it cross the boundaries of this
-    # polygon when x goes to infinity should be uneven/odd.
-    #
-    # This is not the most efficient algorithm, but it might be good to have
-    # as the default, but to specify other algorithms when possible (e.g., for
-    # rectangle, see below).
-    #
-    # TO DO: Benchmark this code and check if less efficient than the specific
-    # method for rectangle
-
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
 
-    # Extract the edges
-    coords <- object@points
-    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
-
-    # Enlongen the two matrices of segments so that the intersection of each 
-    # segment within the two matrices can be compared to each other. For this, 
-    # take the Kronecker product with a vector of ones
-    n_1 <- nrow(edges)
-    n_2 <- nrow(x)
-
-    edges <- edges %x% rep(1, each = n_2)
-    x <- rep(1, each = n_1) %x% x
-
-    # Check whether the y-coordinate of the points are above the y-coordinates 
-    # of the segments that make up the edges 
-    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
-
-    # Use a derived formula to find out for which value of the x coordinate
-    # the imaginary horizontal line through the point `x` would intersect
-    # with the edge. This derivation is based on deriving the equation
-    # y = mx + b for the edge and then equation it to the equation y = x[2],
-    # which represents the horizontal move from x[2] to infinity.
-    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
-    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
-
-    # Finally, check whether this intersection point lies further to the
-    # right (towards infinity) than the initial value of the x coordinate.
-    # If so, then the intersection indeed happens due to the move from the
-    # x coordinate to infinity.
-    check_2 <- x[,1] < x_intersection
-
-    # If both checks are TRUE, then there is an intersection. Determine how often
-    # this occurs in the data
-    counter <- matrix(check_1 & check_2, 
-                      nrow = n_2, 
-                      ncol = n_1) |>
-        rowSums()
-
-    # If outside == FALSE, return TRUE if you have an odd number of intersections.
-    # If outside == TRUE, return TRUE if you have an even number of intersections.
-    # otherwise
-    #
-    # In other words, return TRUE whenever the two booleans match (TRUE, TRUE ->
-    # even number of intersections when outside of the polygon; FALSE, FALSE ->
-    # odd number of intersections when inside of the polygon)
-    return((counter %% 2 == 0) == outside)
+    # Use the raycasting algorithm to determine whether the points in x are 
+    # contained in the polygon.
+    return(raycasting(object@points, x, outside = outside))
 })
 
 #'@rdname rng_point-method
@@ -665,23 +609,29 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
         x <- matrix(x, ncol = 2)
     }
 
-    # Rotate the rectangle and point in the same direction and around the same
-    # center (the center of the rectangle)
-    rect <- rotate(object, radians = -object@orientation)
-    x <- rotate(x, center = object@center, radians = -object@orientation)
+    # Use the raycasting algorithm to determine whether the points in x are 
+    # contained in the rectangle. Has been shown to be more efficient than doing the 
+    # proper calculations for rectangle. For legacy reasons, still kept commented
+    # in.
+    return(raycasting(object@points, x, outside = outside))
 
-    # Determine the limits of the rectangle
-    xlims <- range(rect@points[,1])
-    ylims <- range(rect@points[,2])
+    # # Rotate the rectangle and point in the same direction and around the same
+    # # center (the center of the rectangle)
+    # rect <- rotate(object, radians = -object@orientation)
+    # x <- rotate(x, center = object@center, radians = -object@orientation)
 
-    # Check whether the point lies inside of the rectangle
-    check <- (x[,1] > xlims[1]) & (x[,1] < xlims[2]) &
-             (x[,2] > ylims[1]) & (x[,2] < ylims[2])
+    # # Determine the limits of the rectangle
+    # xlims <- range(rect@points[,1])
+    # ylims <- range(rect@points[,2])
 
-    if(outside) {
-        check <- !check
-    }
-    return(check) # Important: Benchmark shows that the other algorithm is faster
+    # # Check whether the point lies inside of the rectangle
+    # check <- (x[,1] > xlims[1]) & (x[,1] < xlims[2]) &
+    #          (x[,2] > ylims[1]) & (x[,2] < ylims[2])
+
+    # if(outside) {
+    #     check <- !check
+    # }
+    # return(check) # Important: Benchmark shows that the other algorithm is faster
 })
 
 #'@rdname add_nodes-method
@@ -1473,3 +1423,81 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
     object@orientation <- value    
     return(object)
 })
+
+
+
+
+
+
+################################################################################
+# Additional utility functions
+
+#' Raycasting algorithm
+#' 
+#' This algorithm checks whether a point lies within an arbitrary polygon by
+#' checking the even-odd-rule, which says that for any point (x,y) that lies
+#' within a polygon, the number of times it cross the boundaries of this
+#' polygon when x goes to infinity should be uneven/odd.
+#'
+#' This is not the most efficient algorithm, but it might be good to have
+#' as the default, but to specify other algorithms when possible (e.g., for
+#' rectangle, see below).
+#' 
+#' @param coords Matrix of size n x 2 containing the coordinates of the corners
+#' of the object within which the points may or may not lie
+#' @param x Matrix of size m x 2 containing the coordinates of the points that 
+#' should be checked
+#' @param outside A logical indicating whether to return \code{TRUE} if the point
+#' is outside the object.
+#' 
+#' @return Logical vector denoting whether each point in `x` lies within or 
+#' outside of the object
+#' 
+#' @export
+raycasting <- function(coords, x, outside = TRUE) {
+    # Create the edges of the object based on its corner coordinates
+    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
+
+    # Enlongen the two matrices of segments so that the intersection of each 
+    # segment within the two matrices can be compared to each other. For this, 
+    # take the Kronecker product with a vector of ones
+    n_1 <- nrow(edges)
+    n_2 <- nrow(x)
+
+    edges <- edges %x% rep(1, each = n_2)
+    x <- rep(1, each = n_1) %x% x
+
+    # Check whether the y-coordinate of the points are above the y-coordinates 
+    # of the segments that make up the edges 
+    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
+
+    # Use a derived formula to find out for which value of the x coordinate
+    # the imaginary horizontal line through the point `x` would intersect
+    # with the edge. This derivation is based on deriving the equation
+    # y = mx + b for the edge and then equation it to the equation y = x[2],
+    # which represents the horizontal move from x[2] to infinity.
+    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
+    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
+
+    # Finally, check whether this intersection point lies further to the
+    # right (towards infinity) than the initial value of the x coordinate.
+    # If so, then the intersection indeed happens due to the move from the
+    # x coordinate to infinity.
+    check_2 <- x[,1] < x_intersection
+
+    # If both checks are TRUE, then there is an intersection. Determine how often
+    # this occurs in the data
+    counter <- matrix(check_1 & check_2, 
+                      nrow = n_2, 
+                      ncol = n_1) |>
+        rowSums()
+
+    # If outside == FALSE, return TRUE if you have an odd number of intersections.
+    # If outside == TRUE, return TRUE if you have an even number of intersections.
+    # otherwise
+    #
+    # In other words, return TRUE whenever the two booleans match (TRUE, TRUE ->
+    # even number of intersections when outside of the polygon; FALSE, FALSE ->
+    # odd number of intersections when inside of the polygon)
+    return((counter %% 2 == 0) == outside)
+}
