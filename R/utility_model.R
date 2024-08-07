@@ -130,10 +130,10 @@ utility <- function(agent,
                                        pickBest = FALSE)
 
         # Group Centroid Phenomenon                                       
-        distance_centroid <- get_group_centroid(agent_idx,
-                                                agent_specifications$position,
-                                                agent_specifications$group,
-                                                centers)
+        distance_centroid <- get_mean_group_centroid(agent_idx,
+                                                     agent_specifications$position,
+                                                     agent_specifications$group,
+                                                     centers)
 
     # Does not work at this moment, and so is left commented out
     #

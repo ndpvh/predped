@@ -6,7 +6,7 @@
 #' 
 #' @export
 params_archetypes <- read.csv(file.path("archetypes.csv"))
-params_sigma <- readRDS(file.path("archetypes_sigma.Rds"))
+params_sigma <- readRDS(file.path("social_group_sigma.Rds"))
 params_bounds <- read.csv(file.path("parameter_bounds.csv"), 
                           row.names = 1)
 

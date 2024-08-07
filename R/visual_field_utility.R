@@ -1,12 +1,3 @@
-###### Necessary information to develop visual field utility #######
-
-# 1) At any given time the visual field of a pedestrian is current_orientation +/- pi/2
-# 2) This visual field can extend by a maximum of +/- 3pi/4, subject to head rotation
-# 3) The pedestrian wants to minimise the angular difference to include another pedestrian 
-# belonging to the same pedestrian social group in their visual with respect to their original
-# visual field. 
-# The other pedestrian belonging to the social group of pedestrian_i is represented by point \(c_{j}\)
-
 #' Nearest Group Member of Pedestrian `n` in the visual of Pedestrian `n`.
 #'
 #' Find cells that minimise the absolute difference between heading angle of pedestrian `n` 

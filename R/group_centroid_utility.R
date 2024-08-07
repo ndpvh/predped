@@ -1,10 +1,3 @@
-###### Necesarry Information to develop group centroid utility ######
-
-# Identification that all pedestrians belong to a social group in a given iteration
-# Positions of all group members, representing the group centroid in a given iteration
-# Euclidean distance of pedestrian_i to group centroid in a given iteration
-# Optimal distance of pedestrian_i to group centroid in a given iteration
-
 #' Distances to Group Centroid
 #'
 #' Get distances to group centroid for pedestrian `n`
