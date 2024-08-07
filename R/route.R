@@ -150,13 +150,11 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
-    new_obj <- lapply(obj, 
-                      \(x) enlarge_object(x, space_between = space_between))
-
-    to_delete <- in_object(shp, nodes, outside = TRUE)
-    for(i in seq_along(new_obj)) {
-        to_delete <- to_delete | in_object(new_obj[[i]], nodes, outside = FALSE)
-    }
+    to_delete <- lapply(obj, 
+                        \(x) in_object(enlarge_object(x, space_between = space_between), 
+                                       nodes, 
+                                       outside = FALSE))
+    to_delete <- Reduce("|", to_delete) | in_object(shp, nodes, outside = TRUE)
 
     nodes <- nodes[!to_delete,]
 
