@@ -636,10 +636,10 @@ testthat::test_that("Object setters work", {
     points <- tst@points |>
         as.numeric() |>
         matrix(ncol = 2)
-    testthat::expect_equal(points, rbind(c(0.5, 0.5), 
-                                         c(0.5, 1.5),
-                                         c(1.5, 1.5),
-                                         c(1.5, 0.5)))
+    testthat::expect_equal(points, rbind(c(1.5, 1.5), 
+                                         c(1.5, 0.5),
+                                         c(0.5, 0.5),
+                                         c(0.5, 1.5)))
 
     # A tilted rectangle: Changing orientation and size
     # All values here were mathematically derived
@@ -649,21 +649,30 @@ testthat::test_that("Object setters work", {
     tst_1 <- tst ; tst_2 <- tst
 
     predped::orientation(tst_1) <- 0
-    testthat::expect_equal(tst_1@points, rbind(c(-0.5, -0.5), 
-                                               c(-0.5, 0.5), 
-                                               c(0.5, 0.5), 
-                                               c(0.5, -0.5)))
+    points <- tst_1@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, rbind(c(-0.5, -0.5), 
+                                         c(-0.5, 0.5), 
+                                         c(0.5, 0.5), 
+                                         c(0.5, -0.5)))
 
     predped::size(tst_2) <- c(2, 2)
-    testthat::expect_equal(tst_2@points, 
-                           rbind(c(0, sqrt(8)), 
-                                 c(sqrt(8), 0), 
-                                 c(0, -sqrt(8)),
-                                 c(-sqrt(8), 0)),
+    points <- tst_2@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, 
+                           rbind(c(0, sqrt(8) / 2), 
+                                 c(sqrt(8) / 2, 0), 
+                                 c(0, -sqrt(8) / 2),
+                                 c(-sqrt(8) / 2, 0)),
                            tolerance = 1e-4)
 
     predped::size(tst_2) <- c(2, 1)
-    testthat::expect_equal(tst_2@points, 
+    points <- tst_2@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, 
                            rbind(c(sqrt(0.125), sqrt(2) / 2 + sqrt(0.125)), 
                                  c(sqrt(2) / 2 + sqrt(0.125), sqrt(0.125)),
                                  c(-sqrt(0.125), -sqrt(2) / 2 - sqrt(0.125)),
