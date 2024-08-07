@@ -366,31 +366,15 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
     edges <- rbind(edges, edges[1,])
 
-    # Loop over the edges and do the necessary calculations. Immediately delete
-    # the points that are not on the outside of the polygon in question
-    nodes <- matrix(0, nrow = nrow(edges) - 1, 2)
-    for(i in seq_len(nrow(edges) - 1)) {
-        potential_nodes <- find_location(edges[i,], edges[i + 1,])
-        idx <- in_object(object, potential_nodes, outside = outside)
+    # Loop over the edges and do the necessary calculations. Then bind together
+    # all nodes into a matrix and check which ones fall inside (or outside) of 
+    # the object (to be deleted)
+    nodes <- lapply(seq_len(nrow(edges) - 1), 
+                    \(x) find_location(edges[x,], edges[x + 1,]))
+    nodes <- do.call("rbind", nodes)
 
-        # If none of the points is inside, get rid of them. If all of them are
-        # inside the object, choose the one closest or farthest from the other 
-        # corner that makes up the edge. 
-        if(!any(idx)) {
-            nodes[i,] <- NA
-        } else if(all(idx)) {
-            distances <- (potential_nodes[,1] - edges[i + 1, 3])^2 + 
-                (potential_nodes[,2] - edges[i + 1, 4])^2
-                
-            if(outside) {
-                nodes[i,] <- potential_nodes[which.max(distances),]
-            } else {
-                nodes[i,] <- potential_nodes[which.min(distances),]
-            }            
-        } else {
-            nodes[i,] <- potential_nodes[idx,]
-        }        
-    }
+    idx <- in_object(object, nodes, outside = outside)
+    nodes <- nodes[idx,]
 
     # Delete NAs in the nodes
     nodes <- nodes[!is.na(nodes[,1]),]
@@ -657,21 +641,21 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
         new_size <- object@size - 2 * extension
     }
 
-    rect <- rectangle(center = object@center, 
-                      orientation = object@orientation,
-                      size = new_size)
-
+    # Use the setter for the size of a rectangle to change its size. This setter
+    # will automatically change the corner points inside of the rectangle
+    size(object) <- new_size
+    
     # Return the nodes as is when you only want nodes to be created at the 
     # corners of the polygon
     if(only_corners) {
-        return(rect@points)
-    }
+        return(object@points)
+    } 
 
     # We need to add some additional spaces so that there is `space_between` 
     # amount of space between each of the now created nodes. For this, we will 
     # use logic that is the same as for polygons.
-    nodes <- rect@points
-    corner_nodes <- rbind(rect@points, rect@points[1,])
+    nodes <- object@points
+    corner_nodes <- rbind(nodes, nodes[1,])
     for(i in seq_len(nrow(corner_nodes) - 1)) {
         # Get the slope and size of the line defined by the two nodes. If the 
         # length of the line is smaller than `space_between`, we don't need to 
