@@ -175,14 +175,6 @@ setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_
 #' @name rng_point-method
 setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
 
-#' Convert a Cirlce with a Center and Radius to a Polygon
-#'
-#' @param object A circle parameters
-#' @return  Matrix with points necessary to draw the circle
-#' @export 
-#' @name to_polygon-method
-setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
-
 #' Add Nodes along an Object
 #'
 #' @param object An object 
@@ -769,24 +761,6 @@ setMethod("move", signature(object = "circle", target = "numeric"), function(obj
 #'@rdname area-method
 #'
 setMethod("area", signature(object = "circle"), function(object) pi*object@radius^2)
-
-#' @rdname to_polygon-method
-#' @export 
-setMethod("to_polygon", signature(object = "circle"), function(object, length.out = 100, ...) {
-    # Create a vector of angles around the circle, allowing us to sample points 
-    # at equidistant orientation on the circumference of the circle. Importantly, 
-    # we sample length.out + 1 points and then delete the last one so that we 
-    # don't end at the point 2 * pi twice: Gave a bug in the underlying code.
-    t <- seq(0, 2 * pi, length.out = length.out + 1)
-    t <- t[-length(t)]
-
-    # Create the points themselves
-    cp <- as.matrix(data.frame(
-        x = object@center[[1]] + object@radius * cos(t),
-        y = object@center[[2]] + object@radius * sin(t)
-    ))
-    return(cp)
-})
 
 #'@rdname in_object-method
 #'
@@ -1415,6 +1389,47 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
 
     object@orientation <- value    
     return(object)
+})
+
+#' Getter/Setter for the orientation-slot
+#' 
+#' @rdname points-method
+#' 
+#' @export 
+setGeneric("points", function(object, ...) standardGeneric("points"))
+
+#' @rdname points-method
+#' 
+#' @export 
+setGeneric("points<-", function(object, value) standardGeneric("points<-"))
+
+setMethod("points", signature(object = "rectangle"), function(object, ...) {
+    pts <- object@points 
+    dimnames(pts) <- NULL
+    return(pts)
+})
+
+setMethod("points", signature(object = "polygon"), function(object, ...) {
+    return(object@points)
+})
+
+setMethod("points<-", signature(object = "polygon"), function(object, value) {
+    object@points <- value 
+    return(object)
+})
+
+setMethod("points", signature(object = "circle"), function(object, length.out = 100, ...) {
+    # Create a vector of angles around the circle, allowing us to sample points 
+    # at equidistant orientation on the circumference of the circle. Importantly, 
+    # we sample length.out + 1 points and then delete the last one so that we 
+    # don't end at the point 2 * pi twice: Gave a bug in the underlying code.
+    angles <- seq(0, 2 * pi, length.out = length.out + 1)
+    angles <- angles[-length(angles)]
+
+    # Create the points themselves
+    return(matrix(c(object@center[1] + object@radius * cos(angles),
+                    object@center[2] + object@radius * sin(angles)), 
+                  ncol = 2))
 })
 
 

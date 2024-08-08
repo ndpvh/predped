@@ -115,7 +115,7 @@ setMethod("plot", "list", function(object,
                     # Get coordinates of the agent themselves and turn into 
                     # segments
                     if(inherits(j, "circle")) {
-                        agent_coords <- to_polygon(j, length.out = 25)
+                        agent_coords <- points(j, length.out = 25)
                     } else {
                         agent_coords <- j@points
                     }
@@ -229,10 +229,10 @@ setMethod("plot", "background", function(object,
 
     # Convert entrance & exit to polygon coordinates
     entrance <- lapply(seq_len(nrow(object@entrance)), 
-                       \(i) to_polygon(circle(center = c(object@entrance[i, 1], object@entrance[i, 2]), 
+                       \(i) points(circle(center = c(object@entrance[i, 1], object@entrance[i, 2]), 
                                        radius = (entry_exit_width / 2))))
     exit <- lapply(seq_len(nrow(object@exit)), 
-                   \(i) to_polygon(circle(center = c(object@exit[i, 1], object@exit[i, 2]), 
+                   \(i) points(circle(center = c(object@exit[i, 1], object@exit[i, 2]), 
                                    radius = (entry_exit_width / 2))))
     
     # Check that polygon coordinates are in the background
