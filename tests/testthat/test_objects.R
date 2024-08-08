@@ -412,7 +412,7 @@ testthat::test_that("Circle transformation to polygon works", {
 
     # Make case in which intersection is obvious, as all points should be on the 
     # circle
-    coords <- predped::to_polygon(circ)
+    coords <- predped::points(circ)
     segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
 
     tst_1 <- predped::line_intersection(circ, segments)
@@ -422,11 +422,11 @@ testthat::test_that("Circle transformation to polygon works", {
     circ_2 <- predped::circle(center = c(0, 0), radius = 1.01)
     circ_3 <- predped::circle(center = c(0, 0), radius = 0.99)
 
-    coords <- predped::to_polygon(circ_2)
+    coords <- predped::points(circ_2)
     segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
     tst_2 <- predped::line_intersection(circ, segments)
 
-    coords <- predped::to_polygon(circ_3)
+    coords <- predped::points(circ_3)
     segments <- cbind(coords, coords[c(2:nrow(coords), 1), ])
     tst_3 <- predped::line_intersection(circ, segments)
 
@@ -564,6 +564,8 @@ testthat::test_that("Circle intersection works", {
 
 
 
+
+
 ################################################################################
 # GETTERS AND SETTERS
 
@@ -577,6 +579,10 @@ testthat::test_that("Object getters work", {
 
     testthat::expect_equal(predped::id(tst), "object ydgab")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::points(tst), rbind(c(-1, -1),
+                                                       c(-1, 1), 
+                                                       c(1, 1),
+                                                       c(1, -1)))
 
     # Rectangle
     set.seed(1)
@@ -588,15 +594,22 @@ testthat::test_that("Object getters work", {
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
     testthat::expect_equal(predped::size(tst), c(2, 2))
     testthat::expect_equal(predped::orientation(tst), pi)
+    testthat::expect_equal(predped::points(tst), rbind(c(1, 1),
+                                                       c(1, -1), 
+                                                       c(-1, -1),
+                                                       c(-1, 1)))
 
     # Circle
     set.seed(1)
     tst <- predped::circle(center = c(0, 0), radius = 1)
+    angles <- seq(0, 2 * pi, length.out = 101)[1:100]
 
     testthat::expect_equal(predped::id(tst), "object ydgab")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
     testthat::expect_equal(predped::size(tst), 1)
     testthat::expect_equal(predped::radius(tst), 1)
+    testthat::expect_equal(as.matrix(predped::points(tst)), 
+                           matrix(c(cos(angles), sin(angles)), ncol = 2))
 })
 
 testthat::test_that("Object setters work", {
@@ -634,10 +647,48 @@ testthat::test_that("Object setters work", {
     points <- tst@points |>
         as.numeric() |>
         matrix(ncol = 2)
-    testthat::expect_equal(points, rbind(c(0.5, 0.5), 
-                                         c(0.5, 1.5),
-                                         c(1.5, 1.5),
-                                         c(1.5, 0.5)))
+    testthat::expect_equal(points, rbind(c(1.5, 1.5), 
+                                         c(1.5, 0.5),
+                                         c(0.5, 0.5),
+                                         c(0.5, 1.5)))
+
+    # A tilted rectangle: Changing orientation and size
+    # All values here were mathematically derived
+    tst <- predped::rectangle(center = c(0, 0), 
+                              size = c(1, 1), 
+                              orientation = pi / 4)
+    tst_1 <- tst ; tst_2 <- tst
+
+    predped::orientation(tst_1) <- 0
+    points <- tst_1@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, rbind(c(-0.5, -0.5), 
+                                         c(-0.5, 0.5), 
+                                         c(0.5, 0.5), 
+                                         c(0.5, -0.5)))
+
+    predped::size(tst_2) <- c(2, 2)
+    points <- tst_2@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, 
+                           rbind(c(0, sqrt(8) / 2), 
+                                 c(sqrt(8) / 2, 0), 
+                                 c(0, -sqrt(8) / 2),
+                                 c(-sqrt(8) / 2, 0)),
+                           tolerance = 1e-4)
+
+    predped::size(tst_2) <- c(2, 1)
+    points <- tst_2@points |>
+        as.numeric() |>
+        matrix(ncol = 2)
+    testthat::expect_equal(points, 
+                           rbind(c(sqrt(0.125), sqrt(2) / 2 + sqrt(0.125)), 
+                                 c(sqrt(2) / 2 + sqrt(0.125), sqrt(0.125)),
+                                 c(-sqrt(0.125), -sqrt(2) / 2 - sqrt(0.125)),
+                                 c(-sqrt(2) / 2 - sqrt(0.125), -sqrt(0.125))),
+                           tolerance = 1e-4)
 
     # Circle
     tst <- predped::circle(center = c(0, 0), radius = 1)

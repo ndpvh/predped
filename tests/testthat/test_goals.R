@@ -277,3 +277,28 @@ testthat::test_that("Goal setters work", {
     testthat::expect_equal(predped::counter(tst), 4)
 })
 
+testthat::test_that("Find path for empty room works", {
+    settings <- list(predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                                    size = c(1, 1)), 
+                                         objects = list()),
+                     predped::background(shape = predped::polygon(points = rbind(c(1, 1),    
+                                                                                 c(1, -1), 
+                                                                                 c(-1, -1), 
+                                                                                 c(-1, 1))), 
+                                         objects = list()),
+                     predped::background(shape = predped::circle(center = c(0, 0), 
+                                                                 radius = 1), 
+                                         objects = list()))
+
+    ref <- matrix(0, nrow = 1, ncol = 2)
+    colnames(ref) <- c("x", "y")
+
+    tst <- lapply(settings, 
+                  \(x) predped::find_path(predped::goal(position = c(0, 0)), 
+                                          predped::agent(center = c(1, 0), radius = 1),
+                                          x))
+    
+    testthat::expect_equal(tst[[1]], ref)
+    testthat::expect_equal(tst[[2]], ref)
+    testthat::expect_equal(tst[[3]], ref)
+})

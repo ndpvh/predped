@@ -313,7 +313,7 @@ update_position <- function(agent,
 
         if(!any(is.finite(V))) {
             speed(agent) <- standing_start
-            status(agent) <- "replan"
+            status(agent) <- "reorient"
             cell(agent) <- 0
             return(agent)
         }
@@ -484,28 +484,36 @@ update_goal <- function(agent,
                                 matrix(c(position(agent), current_goal(agent)@position),
                                        nrow = 1)))
 
-        # If the agent doesn't see their current goal, they have to reroute
+        # If the agent doesn't see their current goal, they have to reroute with
+        # a probability of 100%
         if(!seen) {
-            reroute <- TRUE
+            prob_rerouting <- 1
 
-            # If rerouting, check whether we should report on it, and whether 
-            # this report also needs user feedback
-            if(report) {
-                if(!interactive_report) {
-                    cat(paste(id(agent), "Cant see goal, re-routing\n"))
-                } else {
-                    readline(prompt = paste(id(agent),
-                                            "Cant see goal, re-routing, press [enter] to continue"))
-                }
+        # If they do see their goal, they only reroute with a given probability
+        # defined by their rerouting parameter and the number of people that 
+        # are in the way
+        } else {
+            reroute_param <- parameters(agent)$reroute
+
+            if(is.finite(reroute_param)) {
+                # Compute the probability of rerouting based on the number of
+                # agents that are standing inbetween the `agent` and their goal
+                blocking_agents <- agents_between_goal(agent, state)
+                prob_rerouting <- pnorm(blocking_agents - reroute_param)
+            } else {
+                prob_rerouting <- 0
             }
+        }
 
+        # Check whether you will replan on this move
+        if(runif(1) < prob_rerouting) {
             # Given that you have to reroute, replan how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents)
-                                                  
+
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
@@ -519,102 +527,21 @@ update_goal <- function(agent,
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to replan at a later time and 
             # wait for now. 
-            if(nrow(current_goal(agent)@path) == 0) {
+            if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
                 status(agent) <- "replan"
                 return(agent)
             }
 
-            # Turn to the new path point and slow down
-            orientation(agent) <- m4ma::angle2(matrix(position(agent),
-                                                      nrow = 1, 
-                                                      ncol = 2), 
-                                               matrix(current_goal(agent)@path[1,],
-                                                      nrow = 1, 
-                                                      ncol = 2))
-            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-
         } else {
-            reroute_param <- parameters(agent)$reroute
-
-            if(is.finite(reroute_param)) {
-                # Compute the probability of rerouting based on the number of
-                # agents that are standing inbetween the `agent` and their goal
-                blocking_agents <- agents_between_goal(agent, state)
-                prob_rerouting <- pnorm(blocking_agents - reroute_param)
-
-                # Draw a number and determine whether lower than prob_rerouting.
-                # If so, reroute
-                if(runif(1) < prob_rerouting) {
-                    # Given that you have to reroute, replan how you will get to your 
-                    # goal. Add the other agents in objects to account for so you don't 
-                    # take the same route.
-                    updated_background <- background
-                    # objects(updated_background) <- append(objects(updated_background), 
-                    #                                       state$agents)
-                    current_goal(agent)@path <- find_path(current_goal(agent), 
-                                                          agent, 
-                                                          updated_background,
-                                                          space_between = space_between,
-                                                          precomputed_edges = NULL,
-                                                          many_options = TRUE)
-                    # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
-                    #                                    nrow = 1, 
-                    #                                    ncol = 2)
-
-                    # Quick check whether the path is clearly defined. If not, 
-                    # then the agent will have to replan at a later time and 
-                    # wait for now. 
-                    if(nrow(current_goal(agent)@path) == 0) {
-                        status(agent) <- "replan"
-                        return(agent)
-                    }
-
-                    # Turn to the new path point and slow down
-                    orientation(agent) <- m4ma::angle2(matrix(position(agent),
-                                                              nrow = 1, 
-                                                              ncol = 2),
-                                                       matrix(current_goal(agent)@path[1,],
-                                                              nrow = 1, 
-                                                              ncol = 2))
-                    speed(agent) <- standing_start
-
-                    # If rerouting, check whether we should report on it, and whether 
-                    # this report also needs user feedback
-                    if(report) {
-                        statistics <- c(round(blocking_agents[1]),
-                                        round(prob_rerouting, 3))
-
-                        if(!interactive_report) {
-                            cat(paste0(id(agent), 
-                                       " replanning to avoid a crowd of ",
-                                        statistics[1],
-                                        " agents (prob = ",
-                                        statistics[2],
-                                        ")\n"))
-                        } else {
-                            readline(prompt = paste(id(agent), 
-                                                    " replanning to avoid a crowd of ",
-                                                     statistics[1],
-                                                     " agents (prob = ",
-                                                     statistics[2],
-                                                     ") press [enter] to continue"))
-                        }
-                    }
-
-                # If you don't need to reroute, but can go to the goal directly,
-                # then the `path` attribute just takes in the goal's location
-                } else {
-                    current_goal(agent)@path <- matrix(current_goal(agent)@position,
-                                                       ncol = 2)
-
-                    # I think this is a very weird report to include, as it might
-                    # be that there are just no agents in the way. Hence commented
-                    # out.              
-                    # if(report) cat(paste(id(agent),
-                    #                      ": Avoiding a crowd of ",np[1],", re-routing (p = ",np[2],") FAILED\n",sep=""))
-                }
-            }
+            # If you don't need to reroute, but can go to the goal directly,
+            # then the `path` attribute just takes in the goal's location
+            current_goal(agent)@path <- matrix(current_goal(agent)@position,
+                                               ncol = 2)
         }
+
+        # Turn to the new path point and slow down
+        speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+
         # After replanning, put the status to "reorient" so that they will be
         # able to reorient in the next move
         status(agent) <- "reorient"
@@ -668,7 +595,7 @@ update_goal <- function(agent,
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {
         # Keep this in for debugging purposes
-        if(nrow(current_goal(agent)@path) == 0) {
+        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
             View(current_goal(agent))
             View(agent)
             print(plot(background) + plot(state$agents))
@@ -743,15 +670,17 @@ update_goal <- function(agent,
                 # Find out whether that agent is actually completing a goal or not.
                 # If not, then the agent will just continue business as usual.
                 idx <- Position(\(x) x == TRUE, blocking_agents)
-                if(status(state$agents[[idx]]) != "completing goal") {
-                    return(agent)
-                }
 
-                # If the blocking agent is completing a goal, make the agent wait
-                # its turn. Give the other agent about two time steps to move away
-                # before scooping in.
+                # Check the status of all agents that are blocking the goal. If
+                # they are completing the goal, then the agent will have to wait
+                # its turn. If the blocking agent is not completing a goal, then 
+                # the agent will just have to wait until they move on.
+                stati <- lapply(state$agents[idx], \(x) c(status(x), current_goal(x)@counter))
+                stati <- do.call("rbind", stati)
+                stati[stati[,1] != "completing goal", 2] <- 0
+
                 status(agent) <- "wait"
-                waiting_counter(agent) <- current_goal(state$agents[[idx]])@counter + 2
+                waiting_counter(agent) <- max(as.numeric(stati[,2]) + 2)
             }
         }
     }

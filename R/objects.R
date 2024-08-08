@@ -148,7 +148,7 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' Check Whether a Point Lies Within an Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
-#' @param x A numeric vector of length two with x and y coordinates of the point.
+#' @param x A numeric vector or matrix with x and y coordinates of the point.
 #' @param outside A logical indicating whether to return \code{TRUE} if the point
 #' is outside the object.
 #'
@@ -174,14 +174,6 @@ setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_
 #' @export
 #' @name rng_point-method
 setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
-
-#' Convert a Cirlce with a Center and Radius to a Polygon
-#'
-#' @param object A circle parameters
-#' @return  Matrix with points necessary to draw the circle
-#' @export 
-#' @name to_polygon-method
-setGeneric("to_polygon", function(object, ...) standardGeneric("to_polygon"))
 
 #' Add Nodes along an Object
 #'
@@ -267,71 +259,15 @@ setMethod("initialize", "polygon", function(.Object,
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "polygon"), function(object, x, outside = TRUE) {
-    # Use a Ray-casting algorithm to find out whether a point lies in a polygon.
-    # This algorithm checks whether a point lies within an arbitrary polygon by
-    # checking the even-odd-rule, which says that for any point (x,y) that lies
-    # within a polygon, the number of times it cross the boundaries of this
-    # polygon when x goes to infinity should be uneven/odd.
-    #
-    # This is not the most efficient algorithm, but it might be good to have
-    # as the default, but to specify other algorithms when possible (e.g., for
-    # rectangle, see below).
-    #
-    # TO DO: Benchmark this code and check if less efficient than the specific
-    # method for rectangle
-
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
 
-    # Extract the edges
-    coords <- object@points
-    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
-
-    # Enlongen the two matrices of segments so that the intersection of each 
-    # segment within the two matrices can be compared to each other. For this, 
-    # take the Kronecker product with a vector of ones
-    n_1 <- nrow(edges)
-    n_2 <- nrow(x)
-
-    edges <- edges %x% rep(1, each = n_2)
-    x <- rep(1, each = n_1) %x% x
-
-    # Check whether the y-coordinate of the points are above the y-coordinates 
-    # of the segments that make up the edges 
-    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
-
-    # Use a derived formula to find out for which value of the x coordinate
-    # the imaginary horizontal line through the point `x` would intersect
-    # with the edge. This derivation is based on deriving the equation
-    # y = mx + b for the edge and then equation it to the equation y = x[2],
-    # which represents the horizontal move from x[2] to infinity.
-    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
-    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
-
-    # Finally, check whether this intersection point lies further to the
-    # right (towards infinity) than the initial value of the x coordinate.
-    # If so, then the intersection indeed happens due to the move from the
-    # x coordinate to infinity.
-    check_2 <- x[,1] < x_intersection
-
-    # If both checks are TRUE, then there is an intersection. Determine how often
-    # this occurs in the data
-    counter <- matrix(check_1 & check_2, 
-                      nrow = n_2, 
-                      ncol = n_1) |>
-        rowSums()
-
-    # If outside == FALSE, return TRUE if you have an odd number of intersections.
-    # If outside == TRUE, return TRUE if you have an even number of intersections.
-    # otherwise
-    #
-    # In other words, return TRUE whenever the two booleans match (TRUE, TRUE ->
-    # even number of intersections when outside of the polygon; FALSE, FALSE ->
-    # odd number of intersections when inside of the polygon)
-    return((counter %% 2 == 0) == outside)
+    # Use the raycasting algorithm to determine whether the points in x are 
+    # contained in the polygon.
+    return(raycasting(object@points, x, outside = outside))
 })
 
 #'@rdname rng_point-method
@@ -422,31 +358,15 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
     edges <- rbind(edges, edges[1,])
 
-    # Loop over the edges and do the necessary calculations. Immediately delete
-    # the points that are not on the outside of the polygon in question
-    nodes <- matrix(0, nrow = nrow(edges) - 1, 2)
-    for(i in seq_len(nrow(edges) - 1)) {
-        potential_nodes <- find_location(edges[i,], edges[i + 1,])
-        idx <- in_object(object, potential_nodes, outside = outside)
+    # Loop over the edges and do the necessary calculations. Then bind together
+    # all nodes into a matrix and check which ones fall inside (or outside) of 
+    # the object (to be deleted)
+    nodes <- lapply(seq_len(nrow(edges) - 1), 
+                    \(x) find_location(edges[x,], edges[x + 1,]))
+    nodes <- do.call("rbind", nodes)
 
-        # If none of the points is inside, get rid of them. If all of them are
-        # inside the object, choose the one closest or farthest from the other 
-        # corner that makes up the edge. 
-        if(!any(idx)) {
-            nodes[i,] <- NA
-        } else if(all(idx)) {
-            distances <- (potential_nodes[,1] - edges[i + 1, 3])^2 + 
-                (potential_nodes[,2] - edges[i + 1, 4])^2
-                
-            if(outside) {
-                nodes[i,] <- potential_nodes[which.max(distances),]
-            } else {
-                nodes[i,] <- potential_nodes[which.min(distances),]
-            }            
-        } else {
-            nodes[i,] <- potential_nodes[idx,]
-        }        
-    }
+    idx <- in_object(object, nodes, outside = outside)
+    nodes <- nodes[idx,]
 
     # Delete NAs in the nodes
     nodes <- nodes[!is.na(nodes[,1]),]
@@ -514,10 +434,7 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
         # Extract the points of the objects and create the edges to be 
         # evaluated
         edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
-        edges_1 <- rbind(edges_1, edges_1[1,])
-
         edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
-        edges_2 <- rbind(edges_2, edges_2[1,])
 
         # Use the line_line_intersection function
         return(line_line_intersection(edges_1, edges_2))
@@ -526,15 +443,25 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
 
 #'@rdname line_intersection-method
 #'
-setMethod("line_intersection", signature(object = "polygon"), function(object, segments) {
+setMethod("line_intersection", signature(object = "polygon"), function(object, segments, return_all = FALSE) {
     
     # Extract the points of the objects and create the edges to be 
     # evaluated
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
-    edges <- rbind(edges, edges[1,])
 
     # Use the line_line_intersection function
-    return(line_line_intersection(edges, segments))
+    intersections <- line_line_intersection(edges, segments, return_all = return_all)
+
+    # If you want to return all of the segments, then we need to rework the 
+    # vector to a matrix with the edges in its columns. Then we can take the 
+    # rowSums to indicate whether this edge has intersected with at least one of
+    # the segments
+    if(return_all) {
+        intersections <- matrix(intersections, ncol = nrow(edges))
+        return(rowSums(intersections) > 0L)
+    } else {
+        return(intersections)
+    }
 })
 
 #' An S4 Class to Represent Rectangle Objects
@@ -665,23 +592,29 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
         x <- matrix(x, ncol = 2)
     }
 
-    # Rotate the rectangle and point in the same direction and around the same
-    # center (the center of the rectangle)
-    rect <- rotate(object, radians = -object@orientation)
-    x <- rotate(x, center = object@center, radians = -object@orientation)
+    # Use the raycasting algorithm to determine whether the points in x are 
+    # contained in the rectangle. Has been shown to be more efficient than doing the 
+    # proper calculations for rectangle. For legacy reasons, still kept commented
+    # in.
+    return(raycasting(object@points, x, outside = outside))
 
-    # Determine the limits of the rectangle
-    xlims <- range(rect@points[,1])
-    ylims <- range(rect@points[,2])
+    # # Rotate the rectangle and point in the same direction and around the same
+    # # center (the center of the rectangle)
+    # rect <- rotate(object, radians = -object@orientation)
+    # x <- rotate(x, center = object@center, radians = -object@orientation)
 
-    # Check whether the point lies inside of the rectangle
-    check <- (x[,1] > xlims[1]) & (x[,1] < xlims[2]) &
-             (x[,2] > ylims[1]) & (x[,2] < ylims[2])
+    # # Determine the limits of the rectangle
+    # xlims <- range(rect@points[,1])
+    # ylims <- range(rect@points[,2])
 
-    if(outside) {
-        check <- !check
-    }
-    return(check) # Important: Benchmark shows that the other algorithm is faster
+    # # Check whether the point lies inside of the rectangle
+    # check <- (x[,1] > xlims[1]) & (x[,1] < xlims[2]) &
+    #          (x[,2] > ylims[1]) & (x[,2] < ylims[2])
+
+    # if(outside) {
+    #     check <- !check
+    # }
+    # return(check) # Important: Benchmark shows that the other algorithm is faster
 })
 
 #'@rdname add_nodes-method
@@ -697,68 +630,63 @@ setMethod("add_nodes", signature(object = "rectangle"), function(object,
     # the corners of the new one, we will have to create an `extension` factor
     # based on the rule of Pythagoras, where we know that c^2 = `space_between`^2
     # and a^2 = b^2 = `extension`^2.
-    extension = sqrt(space_between^2 / 2)
+    extension <- sqrt(space_between^2 / 2)
+
+    # Use the setter for the size of a rectangle to change its size. This setter
+    # will automatically change the corner points inside of the rectangle.
+    #
+    # Importantly, the size of the rectangle changes with 2 times the extension
+    size(object) <- size(object) + ifelse(outside, 2, -2) * extension 
     
-    # Make the new rectangle and extract its points. Importantly, we need to 
-    # use 2 * `extension`, as we have two edges that need extending.
-    if(outside) {
-        new_size <- object@size + 2 * extension
-    } else {
-        new_size <- object@size - 2 * extension
-    }
-
-    rect <- rectangle(center = object@center, 
-                      orientation = object@orientation,
-                      size = new_size)
-
     # Return the nodes as is when you only want nodes to be created at the 
     # corners of the polygon
     if(only_corners) {
-        return(rect@points)
-    }
+        return(object@points)
+    } 
 
     # We need to add some additional spaces so that there is `space_between` 
     # amount of space between each of the now created nodes. For this, we will 
     # use logic that is the same as for polygons.
-    nodes <- rect@points
-    corner_nodes <- rbind(rect@points, rect@points[1,])
-    for(i in seq_len(nrow(corner_nodes) - 1)) {
-        # Get the slope and size of the line defined by the two nodes. If the 
-        # length of the line is smaller than `space_between`, we don't need to 
-        # put in some additional points
-        slope <- (corner_nodes[i,2] - corner_nodes[i + 1, 2]) / (corner_nodes[i,1] - corner_nodes[i + 1, 1])
-        size <- sqrt((corner_nodes[i,1] - corner_nodes[i + 1, 1])^2 + (corner_nodes[i,2] - corner_nodes[i + 1, 2])^2)
+    nodes <- object@points
+    edges <- cbind(nodes, nodes[c(2:nrow(nodes), 1),])
 
-        if(size < space_between) {
-            next
-        }
+    # Define the number of times each of the lines defined by the edges should 
+    # be divided by
+    sizes <- sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2)
 
-        # Divide the line in equal pieces proportional to the amount of space 
-        # you have
-        number_points <- ceiling(size / space_between)
-        dist <- size / number_points
+    # Delete those sizes that are smaller than space_between
+    idx <- sizes > space_between 
+    sizes <- sizes[idx]
+    edges <- edges[idx,]
 
-        # Find the points on the line that correspond to each of the distances 
-        # and bind them to the `nodes` matrix. In order for this to work, we 
-        # should add the distances from a starting point to the end point by using
-        # the angle of the slope with a radius equal to the distance from the 
-        # starting point to the end point. The starting point is always defined 
-        # as that node for which x is minimal, except when the line drawn is 
-        # vertical, in which case the y-coordinate matters
-        angle <- atan(slope)
-        if(slope == -Inf) {
-            idx <- which.max(corner_nodes[i:(i + 1), 2])
-        } else if(slope == Inf) {
-            idx <- which.min(corner_nodes[i:(i + 1), 2])
+    # Get the spaces that should be left inbetween the next points on the grid
+    number_points <- ceiling(sizes / space_between)
+    distances <- sizes / number_points
+
+    # Find the points on the line that correspond to each of the distances 
+    # and bind them to the `nodes` matrix. In order for this to work, we 
+    # should add the distances from a starting point to the end point by using
+    # the angle of the slope with a radius equal to the distance from the 
+    # starting point to the end point. The starting point is always defined 
+    # as that node for which x is minimal, except when the line drawn is 
+    # vertical, in which case the y-coordinate matters
+    # slopes <- (edges[,2] - edges[,4]) / (edges[,1] - edges[,3])
+    slopes <- (edges[,4] - edges[,2]) / (edges[,3] - edges[,1])
+    angles <- atan(slopes)
+
+    # In the last step, we loop over these values to create the new nodes
+    new_nodes <- list()
+    for(i in seq_len(nrow(nodes))) {
+        if(slopes[i] == 0) {
+            idx <- c(1, 3)[which.min(edges[i, c(1, 3)])]
         } else {
-            idx <- which.min(corner_nodes[i:(i + 1), 1])
+            idx <- 1
         }
-        start <- corner_nodes[c(i:(i + 1))[idx],]
 
-        new_nodes <- cbind(start[1] + 1:(number_points - 1) * cos(angle) * dist,
-                           start[2] + 1:(number_points - 1) * sin(angle) * dist)
-        nodes <- rbind(nodes, new_nodes)        
+        new_nodes[[i]] <- cbind(1:(number_points[i] - 1) * cos(angles[i]) * distances[i] + edges[i, idx],
+                                1:(number_points[i] - 1) * sin(angles[i]) * distances[i] + edges[i, idx + 1])
     }
+    nodes <- rbind(nodes, do.call("rbind", new_nodes))
 
     return(nodes)
 })
@@ -771,15 +699,17 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
     # two classes
     if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
-    } else if(inherits(other_object, "rectangle")) {
-        new_poly <- polygon(points = other_object@points)
-        return(intersects(new_poly, object))
     } else if(inherits(other_object, "segment")) {
         return(intersects(other_object, object))        
     }else {        
-        return(intersects(other_object, object))
-    }
-    
+        # Extract the points of the objects and create the edges to be 
+        # evaluated
+        edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+        edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
+
+        # Use the line_line_intersection function
+        return(line_line_intersection(edges_1, edges_2))
+    }    
 })
 
 #' An S4 Class to Represent Circle Objects
@@ -831,24 +761,6 @@ setMethod("move", signature(object = "circle", target = "numeric"), function(obj
 #'@rdname area-method
 #'
 setMethod("area", signature(object = "circle"), function(object) pi*object@radius^2)
-
-#' @rdname to_polygon-method
-#' @export 
-setMethod("to_polygon", signature(object = "circle"), function(object, length.out = 100, ...) {
-    # Create a vector of angles around the circle, allowing us to sample points 
-    # at equidistant orientation on the circumference of the circle. Importantly, 
-    # we sample length.out + 1 points and then delete the last one so that we 
-    # don't end at the point 2 * pi twice: Gave a bug in the underlying code.
-    t <- seq(0, 2 * pi, length.out = length.out + 1)
-    t <- t[-length(t)]
-
-    # Create the points themselves
-    cp <- as.matrix(data.frame(
-        x = object@center[[1]] + object@radius * cos(t),
-        y = object@center[[2]] + object@radius * sin(t)
-    ))
-    return(cp)
-})
 
 #'@rdname in_object-method
 #'
@@ -1353,8 +1265,13 @@ setMethod("size<-", signature(object = "rectangle"), function(object, value) {
                           c(value[1], -value[2]),
                           c(-value[1], -value[2]),
                           c(-value[1], value[2]))
-    object@points <- cbind(points[,1] + center(object)[1], 
-                           points[,2] + center(object)[2])
+    
+    alpha <- object@orientation
+    R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
+
+    points <- R %*% t(points)
+    object@points <- cbind(points[1,] + center(object)[1], 
+                           points[2,] + center(object)[2])
     return(object)
 })
 
@@ -1473,3 +1390,122 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
     object@orientation <- value    
     return(object)
 })
+
+#' Getter/Setter for the orientation-slot
+#' 
+#' @rdname points-method
+#' 
+#' @export 
+setGeneric("points", function(object, ...) standardGeneric("points"))
+
+#' @rdname points-method
+#' 
+#' @export 
+setGeneric("points<-", function(object, value) standardGeneric("points<-"))
+
+setMethod("points", signature(object = "rectangle"), function(object, ...) {
+    pts <- object@points 
+    dimnames(pts) <- NULL
+    return(pts)
+})
+
+setMethod("points", signature(object = "polygon"), function(object, ...) {
+    return(object@points)
+})
+
+setMethod("points<-", signature(object = "polygon"), function(object, value) {
+    object@points <- value 
+    return(object)
+})
+
+setMethod("points", signature(object = "circle"), function(object, length.out = 100, ...) {
+    # Create a vector of angles around the circle, allowing us to sample points 
+    # at equidistant orientation on the circumference of the circle. Importantly, 
+    # we sample length.out + 1 points and then delete the last one so that we 
+    # don't end at the point 2 * pi twice: Gave a bug in the underlying code.
+    angles <- seq(0, 2 * pi, length.out = length.out + 1)
+    angles <- angles[-length(angles)]
+
+    # Create the points themselves
+    return(matrix(c(object@center[1] + object@radius * cos(angles),
+                    object@center[2] + object@radius * sin(angles)), 
+                  ncol = 2))
+})
+
+
+
+
+
+
+################################################################################
+# Additional utility functions
+
+#' Raycasting algorithm
+#' 
+#' This algorithm checks whether a point lies within an arbitrary polygon by
+#' checking the even-odd-rule, which says that for any point (x,y) that lies
+#' within a polygon, the number of times it cross the boundaries of this
+#' polygon when x goes to infinity should be uneven/odd.
+#'
+#' This is not the most efficient algorithm, but it might be good to have
+#' as the default, but to specify other algorithms when possible (e.g., for
+#' rectangle, see below).
+#' 
+#' @param coords Matrix of size n x 2 containing the coordinates of the corners
+#' of the object within which the points may or may not lie
+#' @param x Matrix of size m x 2 containing the coordinates of the points that 
+#' should be checked
+#' @param outside A logical indicating whether to return \code{TRUE} if the point
+#' is outside the object.
+#' 
+#' @return Logical vector denoting whether each point in `x` lies within or 
+#' outside of the object
+#' 
+#' @export
+raycasting <- function(coords, x, outside = TRUE) {
+    # Create the edges of the object based on its corner coordinates
+    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
+
+    # Enlongen the two matrices of segments so that the intersection of each 
+    # segment within the two matrices can be compared to each other. For this, 
+    # take the Kronecker product with a vector of ones
+    n_1 <- nrow(edges)
+    n_2 <- nrow(x)
+
+    edges <- edges %x% rep(1, each = n_2)
+    x <- rep(1, each = n_1) %x% x
+
+    # Check whether the y-coordinate of the points are above the y-coordinates 
+    # of the segments that make up the edges 
+    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
+
+    # Use a derived formula to find out for which value of the x coordinate
+    # the imaginary horizontal line through the point `x` would intersect
+    # with the edge. This derivation is based on deriving the equation
+    # y = mx + b for the edge and then equation it to the equation y = x[2],
+    # which represents the horizontal move from x[2] to infinity.
+    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
+    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
+
+    # Finally, check whether this intersection point lies further to the
+    # right (towards infinity) than the initial value of the x coordinate.
+    # If so, then the intersection indeed happens due to the move from the
+    # x coordinate to infinity.
+    check_2 <- x[,1] < x_intersection
+
+    # If both checks are TRUE, then there is an intersection. Determine how often
+    # this occurs in the data
+    counter <- matrix(check_1 & check_2, 
+                      nrow = n_2, 
+                      ncol = n_1) |>
+        rowSums()
+
+    # If outside == FALSE, return TRUE if you have an odd number of intersections.
+    # If outside == TRUE, return TRUE if you have an even number of intersections.
+    # otherwise
+    #
+    # In other words, return TRUE whenever the two booleans match (TRUE, TRUE ->
+    # even number of intersections when outside of the polygon; FALSE, FALSE ->
+    # odd number of intersections when inside of the polygon)
+    return((counter %% 2 == 0) == outside)
+}

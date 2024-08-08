@@ -263,7 +263,7 @@ overlap_with_objects <- function(agent,
 # overlap_with_object
 nodes_on_circumference <- function(object) {
     if(inherits(object, "circle")) {
-        nodes <- to_polygon(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
+        nodes <- points(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
     } else {
         corners <- object@points 
         n <- nrow(corners)

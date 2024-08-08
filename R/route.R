@@ -33,6 +33,11 @@ create_edges <- function(from,
                           space_between = space_between,
                           many_options = many_options)
 
+    # If there are no nodes, then we will have to return NULL
+    if(is.null(nodes)) {
+        return(NULL)
+    }
+
     # Now that we have the nodes, we can also create edges or pathways between 
     # them. Here, it is important to consider which edges are actually 
     # connectable, or specifically which one's are occluded by the objects in 
@@ -145,15 +150,19 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
-    new_obj <- lapply(obj, 
-                      \(x) enlarge_object(x, space_between = space_between))
-
-    to_delete <- in_object(shp, nodes, outside = TRUE)
-    for(i in seq_along(new_obj)) {
-        to_delete <- to_delete | in_object(new_obj[[i]], nodes, outside = FALSE)
-    }
+    to_delete <- lapply(obj, 
+                        \(x) in_object(enlarge_object(x, space_between = space_between), 
+                                       nodes, 
+                                       outside = FALSE))
+    to_delete <- Reduce("|", to_delete) | in_object(shp, nodes, outside = TRUE)
 
     nodes <- nodes[!to_delete,]
+
+    # Do a check of whether there are any nodes at all. If not, then we will have
+    # to return NULL and get on with it.
+    if(length(nodes) == 0) {
+        return(NULL)
+    }
 
     # Create node id's, as expected by `makegraph`
     ids <- paste0("node ", 1:nrow(nodes))
@@ -216,7 +225,10 @@ enlarge_object <- function(object,
 }
 
 # Make a vectorized alternative to m4ma::seesGoal that will loop over the objects
-# but looks at intersections in a vectorized manner
+# but looks at intersections in a vectorized manner.
+#
+# NOTE: Tried a completely vectorized alternative, but this was not helpful. 
+# This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
     # Loop over the objects in the environment
     all_intersections <- matrix(FALSE, nrow = nrow(segments), ncol = length(objects))

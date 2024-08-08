@@ -6,7 +6,7 @@
 \usage{
 draw_parameters(
   n = 1,
-  mean,
+  mean = params_archetypes[params_archetypes$name == archetype, ],
   Sigma = params_sigma[[archetype]],
   archetype = "BaselineEuropean",
   individual_differences = TRUE,

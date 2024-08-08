@@ -16,7 +16,8 @@ create_initial_condition(
   precompute_goal_paths = TRUE,
   order_goal_stack = TRUE,
   precomputed_goals = NULL,
-  individual_differences = TRUE
+  individual_differences = TRUE,
+  group_size = matrix(1, nrow = 1, ncol = 2)
 )
 }
 \arguments{
@@ -61,6 +62,11 @@ in the simulation.}
 
 \item{individual_differences}{Logical denoting whether variety on the parameters
 should be accounted for (even within archetypes). Defaults to `TRUE`.}
+
+\item{group_size}{Matrix of size n x 2 containing the group sizes you would 
+like to simulate (first column) and the probability of observing groups with 
+this size (second column). Defaults to a 100% probability of observing single 
+agents.}
 }
 \description{
 Create a list that contains agents at random locations within the setting.

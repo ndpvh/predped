@@ -8,7 +8,7 @@
 \usage{
 line_intersection(object, segments, ...)
 
-\S4method{line_intersection}{polygon}(object, segments)
+\S4method{line_intersection}{polygon}(object, segments, return_all = FALSE)
 
 \S4method{line_intersection}{circle}(object, segments, return_all = FALSE)
 }
