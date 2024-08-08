@@ -57,7 +57,7 @@ utility_parameters <- utility_parameters[!(utility_parameters %in% c("name", "co
 #' 
 #' @export  
 draw_parameters <- function(n = 1,
-                            mean,
+                            mean = params_archetypes[params_archetypes$name == archetype,],
                             Sigma = params_sigma[[archetype]],
                             archetype = "BaselineEuropean",
                             individual_differences = TRUE,
