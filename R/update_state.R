@@ -619,12 +619,11 @@ update_goal <- function(agent,
                 status(agent) <- "exit"
             } else {
                 status(agent) <- "completing goal"                    
-                orientation(agent) <- m4ma::angle2(matrix(position(agent), 
-                                                            nrow = 1, 
-                                                            ncol = 2),
-                                                    matrix(current_goal(agent)@position,
-                                                            nrow = 1, 
-                                                            ncol = 2))
+                
+                co_1 <- position(agent)
+                co_2 <- current_goal(agent)@position 
+
+                orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
             }
 
             return(agent)
