@@ -21,7 +21,7 @@ in_object(object, x, outside = TRUE)
 \arguments{
 \item{object}{An object of a type that extends \code{\link[predped]{object-class}}.}
 
-\item{x}{A numeric vector of length two with x and y coordinates of the point.}
+\item{x}{A numeric vector or matrix with x and y coordinates of the point.}
 
 \item{outside}{A logical indicating whether to return \code{TRUE} if the point
 is outside the object.}
