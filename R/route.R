@@ -21,11 +21,6 @@ create_edges <- function(from,
 
     obj <- objects(background)
 
-    # Make each of the objects in the background a bit bigger. This way, agents
-    # cannot take shortcuts
-    new_obj <- lapply(obj, 
-                      \(x) enlarge_object(x, space_between = space_between))
-
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
                           to, 
@@ -46,7 +41,10 @@ create_edges <- function(from,
     # Approach taken is to minimize the time it takes to do these computations:
     #   - Step 1: Find out which nodes are uniquely connectable to each other.
     #             First make all connections and then only retain the unique ones
-    #             through identification in a triangular logical matrix
+    #             through identification in a triangular logical matrix. 
+    #             Connections are made through a set of index matrices, of which 
+    #             one is the transpose of the other and each having the same 
+    #             index in either rows or columns.
     #   - Step 2: Compute the distance between the nodes.
     #   - Step 3: Find out which nodes are reachable from one another. In other 
     #             words, if I stand at node 1, can I see node 2? In this step, 
@@ -54,32 +52,34 @@ create_edges <- function(from,
     #             another.
 
     # Step 1
-    n_nodes <- nrow(nodes)
-    edges <- cbind(nodes[rep(seq_len(n_nodes), each = n_nodes),],
-                   nodes[rep(seq_len(n_nodes), times = n_nodes),])
-    to_remain <- matrix(0, nrow = n_nodes, ncol = n_nodes) |>
-        lower.tri() |>
-        as.vector()
-    edges <- edges[to_remain,] |>
-        as.data.frame() |>
-        setNames(c("from", "from_x", "from_y", 
-                   "to", "to_x", "to_y"))
+    n <- nrow(nodes)
+    idx <- matrix(1:n, nrow = n, ncol = n)
+    to_remain <- lower.tri(idx)
+
+    idx_1 <- t(idx)[to_remain]
+    idx_2 <- idx[to_remain]
+    segments <- cbind(nodes[idx_1, 2:3], 
+                      nodes[idx_2, 2:3])
+    ids <- cbind(nodes[idx_1, 1], 
+                 nodes[idx_2, 1])
 
     # Step 2: Note, we use squared distances as the cost for efficiency purposes
     # (taking the square root is computationally more expensive). Should not matter 
     # to the results we get from the routing algorithm
-    edges$cost <- (edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2
+    # cost <- (edges[,2] - edges[,5])^2 + (edges[,3] - edges[,6])^2
+    cost <- (segments[,1] - segments[,3])^2 + (segments[,2] - segments[,4])^2
 
     # Step 3: Check which nodes can be seen at each location
-    idx <- prune_edges(obj,
-                       as.matrix(edges[,c("from_x", "from_y", "to_x", "to_y")]))
+    idx <- prune_edges(obj, segments)
 
-    # Only retain what you need
-    edges <- edges[idx, c("from", "to", "cost")]
+    # Bind all information together and delete all edges that have NA values 
+    # associated to them (`prune_edges` returns NA whenever a segment is actually
+    # a point, but only if the object is a circle)
+    edges <- cbind(ids[idx,], cost[idx]) |>
+        as.data.frame() |>
+        setNames(c("from", "to", "cost"))
 
-    # For robustness, delete all edges that have NA values associated to them
-    idx <- !is.na(edges$from) & !is.na(edges$to) & !is.na(edges$cost)
-    edges <- edges[idx,]
+    edges <- edges[!is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3]),]
 
     return(list(edges = edges, nodes = nodes))
 }
@@ -230,40 +230,15 @@ enlarge_object <- function(object,
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
-    # Loop over the objects in the environment
-    all_intersections <- matrix(FALSE, nrow = nrow(segments), ncol = length(objects))
-    for(i in seq_along(objects)) {
-        # Dispatch based on the kind of object we are talking about
-        if(inherits(objects[[i]], "polygon")) {
-            # If there is an intersection with the points of the polygon/rectangle,
-            # then the agent cannot see the location we are talking about and 
-            # the function should return false
-            points <- objects[[i]]@points
-            edges <- cbind(points, points[c(2:nrow(points), 1),])
-            intersections <- line_line_intersection(segments, edges, return_all = TRUE)
-            
-            # Rework the intersections matrix so that it has the values for each
-            # of the segments of the polygon/rectangle in its columns. Then find
-            # out whether the segments intersect with any of the segments of the 
-            # polygon/rectangle by using rowSums, which should be equal to 0 if
-            # there are no intersections
-            intersections <- matrix(intersections, 
-                                    ncol = nrow(edges),
-                                    byrow = T)
-            all_intersections[,i] <- rowSums(intersections) > 0L
-
-        } else if(inherits(objects[[i]], "circle")) {
-            # Here we just use the line_intersections function that has been 
-            # designed for circles. 
-            all_intersections[,i] <- line_intersection(objects[[i]], 
-                                                       segments, 
-                                                       return_all = TRUE)
-        }
-    }
+    # Loop over the objects in the environment and check their intersections 
+    # with the lines in `segments`
+    all_intersections <- lapply(objects, 
+                                \(x) line_intersection(x, segments, return_all = TRUE))
 
     # I want to only retain those that do not intersect, meaning that the complete
-    # row should be FALSE
-    return(rowSums(all_intersections) == 0L)
+    # row should be FALSE. We therefore check whether any of the sides is TRUE and 
+    # then reverse the operation, so that none of them can be
+    return(!Reduce("|", all_intersections))
 }
 
 #' Adjust edges of graph to walk on
