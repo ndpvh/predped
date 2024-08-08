@@ -371,6 +371,16 @@ setMethod("find_path", "goal", function(object,
                                         precomputed_edges = NULL,
                                         many_options = FALSE) {
                                             
+    # If there are no objects in the environment, you can just make a direct 
+    # path between the agent and their goal
+    if(length(objects(background)) == 0) {
+        path_points <- matrix(position(object), nrow = 1)
+        rownames(path_points) <- NULL
+        colnames(path_points) <- c("x", "y")
+
+        return(path_points)
+    } 
+
     # Create the edges that are taken in by `makegraph`
     if(is.null(precomputed_edges)) {
         edges <- create_edges(position(agent),
