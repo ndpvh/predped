@@ -261,6 +261,10 @@ setMethod("initialize", "polygon", function(.Object,
 setMethod("in_object", signature(object = "polygon"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -588,6 +592,10 @@ setMethod("area", signature(object = "rectangle"), function(object) prod(object@
 setMethod("in_object", signature(object = "rectangle"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -767,6 +775,10 @@ setMethod("area", signature(object = "circle"), function(object) pi*object@radiu
 setMethod("in_object", signature(object = "circle"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -941,6 +953,10 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
                                                                       segments,
                                                                       return_all = FALSE) {
 
+    if(is.data.frame(segments)) {
+        segments <- as.matrix(segments)
+    }
+    
     intersecting_segments <- cbind(1:nrow(segments),
                                    rep(FALSE, each = nrow(segments)))
 
