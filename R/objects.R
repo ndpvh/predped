@@ -442,10 +442,7 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
         # Extract the points of the objects and create the edges to be 
         # evaluated
         edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
-        edges_1 <- rbind(edges_1, edges_1[1,])
-
         edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
-        edges_2 <- rbind(edges_2, edges_2[1,])
 
         # Use the line_line_intersection function
         return(line_line_intersection(edges_1, edges_2))
@@ -454,15 +451,25 @@ setMethod("intersects", signature(object = "polygon"), function(object, other_ob
 
 #'@rdname line_intersection-method
 #'
-setMethod("line_intersection", signature(object = "polygon"), function(object, segments) {
+setMethod("line_intersection", signature(object = "polygon"), function(object, segments, return_all = FALSE) {
     
     # Extract the points of the objects and create the edges to be 
     # evaluated
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
-    edges <- rbind(edges, edges[1,])
 
     # Use the line_line_intersection function
-    return(line_line_intersection(edges, segments))
+    intersections <- line_line_intersection(edges, segments, return_all = return_all)
+
+    # If you want to return all of the segments, then we need to rework the 
+    # vector to a matrix with the edges in its columns. Then we can take the 
+    # rowSums to indicate whether this edge has intersected with at least one of
+    # the segments
+    if(return_all) {
+        intersections <- matrix(intersections, ncol = nrow(edges))
+        return(rowSums(intersections) > 0L)
+    } else {
+        return(intersections)
+    }
 })
 
 #' An S4 Class to Represent Rectangle Objects
@@ -700,15 +707,17 @@ setMethod("intersects", signature(object = "rectangle"), function(object, other_
     # two classes
     if(inherits(other_object, "circle")) {
         return(intersects(other_object, object))
-    } else if(inherits(other_object, "rectangle")) {
-        new_poly <- polygon(points = other_object@points)
-        return(intersects(new_poly, object))
     } else if(inherits(other_object, "segment")) {
         return(intersects(other_object, object))        
     }else {        
-        return(intersects(other_object, object))
-    }
-    
+        # Extract the points of the objects and create the edges to be 
+        # evaluated
+        edges_1 <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+        edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
+
+        # Use the line_line_intersection function
+        return(line_line_intersection(edges_1, edges_2))
+    }    
 })
 
 #' An S4 Class to Represent Circle Objects
