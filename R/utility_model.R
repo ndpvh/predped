@@ -231,7 +231,7 @@ utility <- function(agent,
                                       buddies[["dists"]])
     }
 
-    if (!is.null(group_centroid)) {
+    if (!is.null(distance_centroid)) {
         V <- V + gc_utility(p[["a_group_centroid"]],
                             p[["b_group_centroid"]],
                             0.45,
