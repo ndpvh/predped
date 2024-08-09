@@ -514,12 +514,17 @@ update_goal <- function(agent,
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents)
 
+            # current_goal(agent)@path <- find_path(current_goal(agent), 
+            #                                       agent, 
+            #                                       updated_background,
+            #                                       space_between = space_between,
+            #                                       precomputed_edges = NULL,
+            #                                       many_options = TRUE)
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
-                                                  precomputed_edges = NULL,
-                                                  many_options = TRUE)
+                                                  precomputed_edges = precomputed_edges)
             # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
             #                                    nrow = 1, 
             #                                    ncol = 2)
