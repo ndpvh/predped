@@ -691,7 +691,7 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state$agents) > 0) & (goal_distance <= close_enough + 2 * radius(agent))) {
+        if((length(state$agents) > 0) & (goal_distance <= 2 * close_enough)) {
             # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
