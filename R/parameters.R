@@ -6,7 +6,15 @@
 #' 
 #' @export
 params_archetypes <- read.csv(file.path("archetypes.csv"))
+
+#' Typical Sigmas used for Simulation
+#'
+#' @export 
 params_sigma <- readRDS(file.path("social_group_sigma.Rds"))
+
+#' Typical Parameter Bounds used for Simulation
+#'
+#' @export
 params_bounds <- read.csv(file.path("parameter_bounds.csv"), 
                           row.names = 1)
 
