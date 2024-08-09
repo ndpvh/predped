@@ -639,40 +639,42 @@ update_goal <- function(agent,
                                                   ncol = 2))
 
         # Check whether they are "close enough" to the goal
-        if((distance_path_point <= close_enough) & (nrow(current_goal(agent)@path) == 1)) {
-            # If they are close enough to the goal, they can enter in an 
+        if((distance_path_point <= close_enough)) {
+            # If the next path point is actually their goal, they can enter in an 
             # interaction state.
             #
             # Check if the goal is the exit goal. If so, the interaction state
             # is not "completing goal" but rather "exit", allowing us to delete
             # the agent
-            if(current_goal(agent)@id == "goal exit") {
-                status(agent) <- "exit"
-            } else {
-                status(agent) <- "completing goal"                    
-                
-                co_1 <- position(agent)
-                co_2 <- current_goal(agent)@position 
+            if(nrow(current_goal(agent)@path) == 1) {
+                if(current_goal(agent)@id == "goal exit") {
+                    status(agent) <- "exit"
+                } else {
+                    status(agent) <- "completing goal"                    
 
-                orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
-            }
+                    co_1 <- position(agent)
+                    co_2 <- current_goal(agent)@position 
 
-            return(agent)
-        } 
-        
-        # Determine whether they can see the next path point. If so, then agents
-        # will move to that path point instead
-        if(nrow(current_goal(agent)@path) > 1) {
-            seen <- all(prune_edges(objects(background), 
-                                    matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                           nrow = 1)))
+                    orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+                }
 
-            if(seen) {
-                current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
-                    matrix(ncol = 2)
-                status(agent) <- "reorient"
-                
                 return(agent)
+
+            # If the next path point is not their goal, we have to do an 
+            # additional check of whether the agent can see the next path point.
+            # If so, the agent will move to that path point instead
+            } else {
+                seen <- all(prune_edges(objects(background), 
+                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                               nrow = 1)))
+
+                if(seen) {
+                    current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
+                        matrix(ncol = 2)
+                    status(agent) <- "reorient"
+
+                    return(agent)
+                }
             }
         }
 
