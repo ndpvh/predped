@@ -478,13 +478,15 @@ update_goal <- function(agent,
             current_goal(agent)@path <- matrix(current_goal(agent)@position, ncol = 2)
 
         # If they cannot see their current goal, they will have to plan their 
-        # route according to the path points in the environment
+        # route according to the path points in the environment. Given that we 
+        # don't add anything new in the environment, we can safely put 
+        # `reevaluate` to FALSE in this chunk of code
         } else {
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   background,
-                                                  space_between = space_between,
-                                                  precomputed_edges = precomputed_edges)
+                                                  precomputed_edges = precomputed_edges,
+                                                  reevaluate = FALSE)
         }
 
         # Quick check whether the path is clearly defined. If not, then the agent 
@@ -539,6 +541,11 @@ update_goal <- function(agent,
             # Given that you have to reroute, reroute how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
+            #
+            # Given that new things were added to the environment (i.e., the 
+            # other agents that this agent should account for when planning),
+            # we need to put `reevaluate` to TRUE so that old edges can be 
+            # deleted (if necessary)
             updated_background <- background
             objects(updated_background) <- append(objects(updated_background), 
                                                   state$agents)
@@ -553,7 +560,8 @@ update_goal <- function(agent,
                                                   agent, 
                                                   updated_background,
                                                   space_between = space_between,
-                                                  precomputed_edges = precomputed_edges)
+                                                  precomputed_edges = precomputed_edges,
+                                                  reevaluate = TRUE)
 
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to reroute at a later time and 

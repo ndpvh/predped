@@ -88,7 +88,7 @@ setMethod("simulate", "predped", function(object,
                                           order_goal_stack = TRUE,
                                           precomputed_goals = NULL,
                                           close_enough = 2,
-                                          space_between = 2,
+                                          space_between = 2.5,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
                                           individual_differences = TRUE,
@@ -135,7 +135,7 @@ setMethod("simulate", "predped", function(object,
         edges <- create_edges(c(0, 0), 
                               c(0, 0), 
                               object@setting,
-                              space_between = space_between * max(parameters(object)$radius),
+                              space_between = space_between * max(params_bounds["radius",]),
                               many_options = TRUE)
 
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
@@ -190,6 +190,8 @@ setMethod("simulate", "predped", function(object,
     trace <- list(state)
 
     agent_in_queue <- FALSE
+    rerouted <- 0
+    planned <- 0
     
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
@@ -247,7 +249,7 @@ setMethod("simulate", "predped", function(object,
         if(agent_in_queue) {
             agents_in_the_way <- sapply(state$agents, 
                                         \(x) in_object(potential_agent[[1]], 
-                                                       to_polygon(x), 
+                                                       points(x), 
                                                        outside = FALSE))
             if(!any(agents_in_the_way)) {
                 state$agents <- append(state$agents, potential_agent[[1]])
@@ -268,6 +270,7 @@ setMethod("simulate", "predped", function(object,
                               space_between = space_between,
                               time_step = time_step,
                               precomputed_edges = edges,
+                              standing_start = standing_start,
                               ...)
 
         # Check whether one of the pedestrians is waiting at the exit
@@ -275,6 +278,10 @@ setMethod("simulate", "predped", function(object,
         for(j in seq_along(state$agents)) {
             if(status(state$agents[[j]]) == "exit") {
                 idx <- c(idx, j)
+            } else if(status(state$agents[[j]]) == "plan") {
+                planned <- planned + 1
+            } else if(status(state$agents[[j]]) == "reroute") {
+                rerouted <- rerouted + 1
             }
         }
 
@@ -298,6 +305,9 @@ setMethod("simulate", "predped", function(object,
     if(print_iteration) {
         cat("\n")
     }
+
+    cat(paste0("A total of ", rerouted, " agents rerouted during this simulation.\n"))
+    cat(paste0("A total of ", planned, " agents planned during this simulation.\n"))
     
     return(trace)
 })
@@ -349,7 +359,7 @@ add_agent <- function(object,
                       goal_duration = \(x) rnorm(x, 10, 2),
                       position = NULL,
                       standing_start = 0.1,
-                      space_between = 2,
+                      space_between = 2.5,
                       time_step = 0.5,
                       precomputed_edges = NULL,
                       precompute_goal_paths = TRUE,
@@ -399,7 +409,7 @@ add_agent <- function(object,
         co_1 <- position
         co_2 <- goal_stack[[1]]@position
 
-        angle <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
+        angle <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
     }    
 
     # Determine the position of the agent. Either this is at the entrance, or 
@@ -418,12 +428,14 @@ add_agent <- function(object,
                        current_goal = goal_stack[[1]],
                        color = color)
 
-    # Create the path to walk on for the current goal and return the agent
+    # Create the path to walk on for the current goal and return the agent. Given 
+    # that nothing new is put in the environment, we can put `reevaluate` to 
+    # FALSE
     current_goal(tmp_agent)@path <- find_path(current_goal(tmp_agent), 
                                               tmp_agent, 
                                               background,
-                                              space_between = space_between * radius,
-                                              precomputed_edges = precomputed_edges)
+                                              precomputed_edges = precomputed_edges,
+                                              reevaluate = FALSE)
     # current_goal(tmp_agent)@path <- matrix(current_goal(tmp_agent)@position, 
     #                                        nrow = 1, 
     #                                        ncol = 2)
@@ -600,6 +612,11 @@ create_initial_condition <- function(initial_number_agents,
             # Generate several alternative positions along this edge on which the 
             # agent can stand and bind them into a matrix
             n_agents_fit <- sqrt((co_1$X - co_2$X)^2 + (co_1$Y - co_2$Y)^2) / size(new_agent)
+
+            if(any(is.na(n_agents_fit))) {
+                browser()
+            }
+            
             alternatives <- cbind(seq(co_1$X, co_2$X, length.out = floor(n_agents_fit)),
                                   seq(co_1$Y, co_2$Y, length.out = floor(n_agents_fit)))
 
@@ -630,7 +647,7 @@ create_initial_condition <- function(initial_number_agents,
         co_1 <- position(new_agent)
         co_2 <- current_goal(new_agent)@path[1,]
 
-        orientation(new_agent) <- atan2(co_1[2] - co_2[2], co_1[1] - co_2[1]) * 180 / pi
+        orientation(new_agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
 
         # If you need to stop, break out of the loop
         if(stop) {
