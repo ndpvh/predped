@@ -407,7 +407,7 @@ update_goal <- function(agent,
                         background,
                         standing_start = 0.1,
                         close_enough = 2,
-                        space_between = 1.5,
+                        space_between = 2.5,
                         report = FALSE,
                         interactive_report = FALSE,
                         precomputed_edges = NULL,
@@ -554,9 +554,6 @@ update_goal <- function(agent,
                                                   updated_background,
                                                   space_between = space_between,
                                                   precomputed_edges = precomputed_edges)
-            # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
-            #                                    nrow = 1, 
-            #                                    ncol = 2)
 
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to reroute at a later time and 
