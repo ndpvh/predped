@@ -108,13 +108,12 @@ adjust_edges <- function(from,
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
     if(!reevaluate) {
-        edges <- rbind(precomputed_edges$edges, edges$edges)
-        edges_with_coords <- rbind(edges_with_coords, edges$edges_with_coords)
+        edges$edges <- rbind(precomputed_edges$edges, edges$edges)
+        edges$edges_with_coords <- rbind(edges_with_coords, edges$edges_with_coords)
     }
 
-    return(list(edges = edges, 
-                nodes = new_nodes, 
-                edges_with_coords = edges_with_coords))
+    return(append(edges, 
+                  list(nodes = new_nodes)))
 }
 
 
