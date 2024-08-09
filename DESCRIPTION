@@ -26,12 +26,13 @@ Imports:
     methods,
     m4ma,
     ggplot2
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Collate:
     'objects.R'
     'background.R'
     'route.R'
     'goals.R'
+    'group_centroid_utility.R'
     'agent.R'
     'moving_options.R'
     'general.R'
@@ -39,6 +40,7 @@ Collate:
     'plot.R'
     'see.R'
     'update_state.R'
+    'visual_field_utility.R'
     'utility_model.R'
     'predped.R'
     'simulate.R'
