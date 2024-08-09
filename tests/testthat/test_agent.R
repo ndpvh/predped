@@ -59,7 +59,7 @@ testthat::test_that("Agent setters work", {
     predped::speed(tst) <- 0.2
     predped::group(tst) <- 0
     predped::cell(tst) <- 1
-    predped::status(tst) <- "replan"
+    predped::status(tst) <- "plan"
     predped::color(tst) <- "green"
     predped::waiting_counter(tst) <- 2
     predped::current_goal(tst) <- predped::goal(id = "other goal", 
@@ -73,7 +73,7 @@ testthat::test_that("Agent setters work", {
     testthat::expect_equal(as.numeric(predped::speed(tst)), 0.2)
     testthat::expect_equal(as.numeric(predped::group(tst)), 0)
     testthat::expect_equal(as.numeric(predped::cell(tst)), 1)
-    testthat::expect_equal(as.character(predped::status(tst)), "replan")
+    testthat::expect_equal(as.character(predped::status(tst)), "plan")
     testthat::expect_equal(as.character(predped::color(tst)), "green")
     testthat::expect_equal(as.numeric(predped::waiting_counter(tst)), 2)
     testthat::expect_equal(predped::current_goal(tst), predped::goal(id = "other goal",

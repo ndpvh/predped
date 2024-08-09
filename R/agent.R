@@ -206,7 +206,7 @@ setMethod("status", "agent", function(object) {
 })
 
 setMethod("status<-", "agent", function(object, value) {
-    stopifnot(value %in% c("move", "replan", "reorient", "completing goal", "exit", "wait"))
+    stopifnot(value %in% c("move", "plan", "reroute", "reorient", "completing goal", "exit", "wait"))
     object@status <- value
     return(object)
 })
