@@ -658,16 +658,22 @@ update_goal <- function(agent,
             }
 
             return(agent)
+        } 
+        
+        # Determine whether they can see the next path point. If so, then agents
+        # will move to that path point instead
+        if(nrow(current_goal(agent)@path) > 1) {
+            seen <- all(prune_edges(objects(background), 
+                                    matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                           nrow = 1)))
 
-        # If they are close_enough to the path point, then we can delete the 
-        # path point they are currently at and let the agent reorient
-        } else if(distance_path_point <= abs(close_enough - radius(agent))) {
-            # Keep it in matrix format, even if you only have 1 row left
-            current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
-                matrix(ncol = 2)
-            status(agent) <- "reorient"
-
-            return(agent)
+            if(seen) {
+                current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
+                    matrix(ncol = 2)
+                status(agent) <- "reorient"
+                
+                return(agent)
+            }
         }
 
         # We need to allow for another option in goal handling: namely the case 
