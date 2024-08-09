@@ -5,7 +5,7 @@
 \alias{params_archetypes}
 \title{Typical Archetypes used for Simulation}
 \format{
-An object of class \code{data.frame} with 14 rows and 30 columns.
+An object of class \code{data.frame} with 22 rows and 33 columns.
 }
 \usage{
 params_archetypes
