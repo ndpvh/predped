@@ -78,10 +78,15 @@ create_edges <- function(from,
     edges <- cbind(ids[idx,], cost[idx]) |>
         as.data.frame() |>
         setNames(c("from", "to", "cost"))
+    edges_with_coords <- cbind(ids[idx,], segments[idx,], cost[idx]) |>
+        as.data.frame() |>
+        setNames(c("from", "to", "from_x", "from_y", "to_x", "to_y", "cost"))
 
-    edges <- edges[!is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3]),]
+    idx <- !is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3])
 
-    return(list(edges = edges, nodes = nodes))
+    return(list(edges = edges[idx,], 
+                nodes = nodes, 
+                edges_with_coords = edges_with_coords[idx,]))
 }
 
 #' Create nodes of graph to walk on
@@ -259,21 +264,20 @@ prune_edges <- function(objects, segments) {
 adjust_edges <- function(from, 
                          to, 
                          background, 
-                         precomputed_edges) {
+                         precomputed_edges,
+                         reevaluate = FALSE) {
 
     obj <- objects(background)
     nodes <- precomputed_edges$nodes
     edges <- precomputed_edges$edges
+    edges_with_coords <- precomputed_edges$edges_with_coords
 
-    from_to <- rbind(c("agent", as.numeric(from)), 
-                     c("goal", as.numeric(to))) |>
-        as.data.frame() |>
-        setNames(colnames(nodes))
+    # Bind together the nodes that make up the agent and the goal
+    from_to <- data.frame(node_ID = c("agent", "goal"), 
+                          X = c(from[1], to[1]),
+                          Y = c(from[2], to[2]))
 
-    from_to$X <- as.numeric(from_to$X)
-    from_to$Y <- as.numeric(from_to$Y)
-
-    # Add the from and to coordinates to the nodes
+    # Add these to the already existing nodes
     new_nodes <- rbind(nodes, from_to)
 
     # Create new pathways that go from the agent and goal to all of the other 
@@ -289,24 +293,53 @@ adjust_edges <- function(from,
     #             another.
 
     # Step 1
-    n_nodes <- nrow(nodes)
-    new_edges <- cbind(from_to[rep(seq_len(2), each = n_nodes),],
-                       nodes[rep(seq_len(n_nodes), times = 2),]) |>
-        as.data.frame() |>
-        setNames(c("from", "from_x", "from_y", 
-                   "to", "to_x", "to_y"))
+    n <- nrow(nodes)
+    idx_1 <- as.numeric(matrix(1:n, nrow = n, ncol = 2))
+    idx_2 <- as.numeric(t(matrix(1:2, nrow = 2, ncol = n)))
+
+    segments <- cbind(nodes[idx_1, 2:3], 
+                      from_to[idx_2, 2:3])
+    ids <- cbind(nodes[idx_1, 1], 
+                 from_to[idx_2, 1])
+
+    # Bind these segments and ids together with those that are already present 
+    # in the precomputed edges. This step is necessary if we want to make sure 
+    # that all edges are reevaluated on their adequacy
+    if(reevaluate) {
+        segments <- rbind(segments, setNames(edges_with_coords[, 3:6], c("X", "Y", "X", "Y")))
+        ids <- rbind(ids, as.matrix(edges_with_coords[, 1:2]))
+    }
 
     # Step 2: Note, we use squared distances as the cost for efficiency purposes
     # (taking the square root is computationally more expensive). Should not matter 
     # to the results we get from the routing algorithm
-    new_edges$cost <- (new_edges$from_x - new_edges$to_x)^2 + (new_edges$from_y - new_edges$to_y)^2
+    # cost <- (edges[,2] - edges[,5])^2 + (edges[,3] - edges[,6])^2
+    cost <- (segments[,1] - segments[,3])^2 + (segments[,2] - segments[,4])^2
 
     # Step 3: Check which nodes can be seen at each location
-    idx <- prune_edges(obj,
-                       as.matrix(new_edges[,c("from_x", "from_y", "to_x", "to_y")]))
+    idx <- prune_edges(obj, segments)
 
-    # Only retain what you need and bind it together with the precomputed variant
-    new_edges <- new_edges[idx, c("from", "to", "cost")]
-    new_edges <- rbind(edges, new_edges)
-    return(list(edges = new_edges, nodes = new_nodes))
+    # Bind all information together
+    new_edges <- cbind(ids[idx,], cost[idx]) |>
+        as.data.frame() |>
+        setNames(c("from", "to", "cost"))
+    new_edges_with_coords <- cbind(ids[idx,], segments[idx,], cost[idx]) |>
+        as.data.frame() |>
+        setNames(c("from", "to", "from_x", "from_y", "to_x", "to_y", "cost"))
+
+    # If there hadn't been a reevaluation before, we need to bind these edges
+    # to the already computed ones
+    if(!reevaluate) {
+        new_edges <- rbind(edges, new_edges)
+        new_edges_with_coords <- rbind(edges_with_coords, new_edges_with_coords)
+    }
+
+    # Delete all edges that have NA values associated to them (`prune_edges` 
+    # returns NA whenever a segment is actually a point, but only if the object 
+    # is a circle)
+    idx <- !is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3])
+
+    return(list(edges = new_edges[idx,], 
+                nodes = new_nodes, 
+                edges_with_coords = new_edges_with_coords[idx,]))
 }
