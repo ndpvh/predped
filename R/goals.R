@@ -369,7 +369,8 @@ setMethod("find_path", "goal", function(object,
                                         algorithm = "bi",
                                         space_between = radius(agent),
                                         precomputed_edges = NULL,
-                                        many_options = FALSE) {
+                                        many_options = FALSE,
+                                        reevaluate = FALSE) {
                                             
     # If there are no objects in the environment, you can just make a direct 
     # path between the agent and their goal
@@ -392,7 +393,8 @@ setMethod("find_path", "goal", function(object,
         edges <- adjust_edges(position(agent),
                               position(object),
                               background,
-                              precomputed_edges = precomputed_edges)
+                              precomputed_edges = precomputed_edges,
+                              reevaluate = reevaluate)
     }
 
     # If edges is actually NULL, we need to return this 
