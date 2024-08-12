@@ -1,0 +1,40 @@
+---
+title: Benchmark for `predped` 
+author: Niels Vanhasbroeck
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r Load in package and create function for benchmark, include = FALSE, echo = FALSE, warning = FALSE}
+
+devtools::load_all()
+library(tidyverse)
+
+# Create the basic function to be used to investigate the benchmark
+test_times <- function(fx) {
+    times <- numeric(100)
+    for(i in seq_along(times)) {
+        start_time <- Sys.time()
+        fx()
+        stop_time <- Sys.time()
+        times[i] <- stop_time - start_time
+    }
+    return(quantile(times, probs = c(0.025, 0.5, 0.975)))
+}
+
+# Show numbers in scientific digits
+rnd <- function(x) {
+    return(format(x, scientific = TRUE, digits = 2))
+}
+
+set.seed(1)
+
+
+```
+
+```{r goals, child = "files/benchmark_goals.Rmd", warning = F}
+```
+
+```{r route, child = "files/benchmark_routing.Rmd", warning = F}
+```
+
+
