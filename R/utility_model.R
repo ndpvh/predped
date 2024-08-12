@@ -135,6 +135,14 @@ utility <- function(agent,
                                                      agent_specifications$group,
                                                      centers)
 
+        # Visual Field Phenomenon
+        buddies_in_vf <- get_angles_any_buddy(agent_idx,
+                                              agent_specifications$group,
+                                              agent_specifications$predictions,
+                                              orientation(agent),
+                                              centers,
+                                              position(agent))                                                     
+
     # Does not work at this moment, and so is left commented out
     #
     # Subject based
@@ -236,6 +244,11 @@ utility <- function(agent,
                             p[["b_group_centroid"]],
                             0.45,
                             distance_centroid)
+    }
+
+    if (!is.null(buddies_in_vf)) {
+        V <- V + vf_utility_discrete(p[["b_visual_field"]],
+                                     buddies_in_vf)
     }
 
     V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
