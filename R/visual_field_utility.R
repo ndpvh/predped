@@ -21,7 +21,6 @@ get_angles_closest_buddy <- function (agent_idx, agent_group, p_pred, orientatio
     
     # First need to identify whether a pedestrian belongs to a social group
     inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[-agent_idx]
     p_pred <- p_pred[inGroup, , drop = FALSE]
     nped <- dim(p_pred)[1]
     
@@ -72,7 +71,6 @@ get_angles_any_buddy <- function(agent_idx, agent_group, p_pred, orientation, ce
     
     # First need to identify whether a pedestrian belongs to a social group
     inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[-agent_idx]
     p_pred <- p_pred[inGroup, , drop = FALSE]
     nped <- dim(p_pred)[1]
     
