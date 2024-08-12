@@ -236,7 +236,7 @@ create_nodes <- function(from,
 #'             words, if I stand at node 1, can I see node 2?
 #' 
 #' @param ids A matrix of n x 2 identifying the nodes that are connected
-#' @param segmenets A matrix of n x 4 containing the (x, y) coordinates of the 
+#' @param segments A matrix of n x 4 containing the (x, y) coordinates of the 
 #' nodes in ids
 #' @param objects List of objects that are contained in the setting
 #' 
