@@ -131,7 +131,7 @@ utility <- function(agent,
 
         # Group Centroid Phenomenon                                       
         distance_centroid <- get_mean_group_centroid(agent_idx,
-                                                     agent_specifications$position,
+                                                     agent_specifications$predictions,
                                                      agent_specifications$group,
                                                      centers)
 
