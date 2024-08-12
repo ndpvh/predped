@@ -10,7 +10,7 @@ add_agent(
   goal_duration = function(x) rnorm(x, 10, 2),
   position = NULL,
   standing_start = 0.1,
-  space_between = 2,
+  space_between = 2.5,
   time_step = 0.5,
   precomputed_edges = NULL,
   precompute_goal_paths = TRUE,

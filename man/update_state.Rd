@@ -10,7 +10,7 @@ update_state(
   stay_stopped = TRUE,
   time_step = 0.5,
   close_enough = 2,
-  space_between = 1.5,
+  space_between = 2.5,
   standing_start = 0.1,
   precomputed_edges = NULL,
   precompute_goal_paths = FALSE,

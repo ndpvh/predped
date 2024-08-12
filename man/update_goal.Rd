@@ -10,7 +10,7 @@ update_goal(
   background,
   standing_start = 0.1,
   close_enough = 2,
-  space_between = 1.5,
+  space_between = 2.5,
   report = FALSE,
   interactive_report = FALSE,
   precomputed_edges = NULL,
