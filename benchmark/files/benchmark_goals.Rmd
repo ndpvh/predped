@@ -90,6 +90,67 @@ many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", 
 
 ```
 
+## add_goal
+
+```{r goals add_goal, echo = FALSE, results = "asis"}
+
+# Create all objects and peform the tests
+obj <- list(predped::rectangle(center = c(0, 0), size = c(1, 1)), 
+            predped::circle(center = c(0, 0), radius = 1),
+            predped::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))))
+
+r <- (\() predped:::add_goal(obj[[1]], setting, middle_edge = FALSE)) |>
+    test_times() |>
+    rnd()
+
+c <- (\() predped:::add_goal(obj[[2]], setting)) |>
+    test_times() |>
+    rnd()
+
+p <- (\() predped:::add_goal(obj[[3]], setting, middle_edge = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rm <- (\() predped:::add_goal(obj[[1]], setting, middle_edge = TRUE)) |>
+    test_times() |>
+    rnd()
+
+cm <- c(NA, NA, NA)
+
+pm <- (\() predped:::add_goal(obj[[3]], setting, middle_edge = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- cbind(c("middle\\_edge = FALSE", "middle\\_edge = TRUE"),
+             c(r[2], rm[2]),
+             c(paste0("[", r[1], ",", r[3], "]"), paste0("[", rm[1], ",", rm[3], "]")),
+             c(p[2], pm[2]),
+             c(paste0("[", p[1], ",", p[3], "]"), paste0("[", pm[1], ",", pm[3], "]")),
+             c(c[2], cm[2]),
+             c(paste0("[", c[1], ",", c[3], "]"), paste0("[", cm[1], ",", cm[3], "]")))
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the add\\_goal function. ", 
+                  "Benchmark is computed for each of the possible shapes in predped. ",
+                  "Additionally, the effect of setting a goal randomly on the object or taking the middle of ",
+                  "an edge is also examined (i.e., when middle_edge = TRUE or FALSE)")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
+    print()
+```
+
 ## find_path
 ```{r goals find_path, echo = FALSE, results = "asis"}
 
