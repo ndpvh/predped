@@ -75,6 +75,22 @@ adjust_edges <- function(from,
     nodes <- precomputed_edges$nodes
     edges_with_coords <- precomputed_edges$edges_with_coords
 
+    # Check which nodes to delete, given that they fall within the objects of 
+    # the background
+    if(reevaluate) {
+        to_delete <- lapply(objects(background), 
+                            \(x) in_object(x, nodes[,c("X", "Y")], outside = FALSE))
+        to_delete <- Reduce("|", to_delete)
+
+        nodes <- nodes[!to_delete,]
+
+        # Also delete these from edges_with_coords
+        names_nodes <- nodes$node_ID
+
+        to_delete <- (edges_with_coords$from %in% names_nodes) | (edges_with_coords$to %in% names_nodes)
+        edges_with_coords <- edges_with_coords[!to_delete, ]
+    }
+
     # Bind together the nodes that make up the agent and the goal
     from_to <- data.frame(node_ID = c("agent", "goal"), 
                           X = c(from[1], to[1]),
@@ -108,8 +124,8 @@ adjust_edges <- function(from,
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
     if(!reevaluate) {
-        edges$edges <- rbind(precomputed_edges$edges, edges$edges)
-        edges$edges_with_coords <- rbind(edges_with_coords, edges$edges_with_coords)
+        edges$edges <- rbind(edges$edges, precomputed_edges$edges)
+        edges$edges_with_coords <- rbind(edges$edges_with_coords, edges_with_coords)
     }
 
     return(append(edges, 
