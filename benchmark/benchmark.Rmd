@@ -28,6 +28,9 @@ rnd <- function(x) {
 
 ```
 
+```{r general, child = "files/benchmark_general.Rmd", warning = F}
+```
+
 ```{r goals, child = "files/benchmark_goals.Rmd", warning = F}
 ```
 
