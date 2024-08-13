@@ -26,9 +26,6 @@ rnd <- function(x) {
     return(format(x, scientific = TRUE, digits = 2))
 }
 
-set.seed(1)
-
-
 ```
 
 ```{r goals, child = "files/benchmark_goals.Rmd", warning = F}

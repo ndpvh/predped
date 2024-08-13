@@ -492,7 +492,7 @@ update_goal <- function(agent,
         # Quick check whether the path is clearly defined. If not, then the agent 
         # will have to reroute at a later time and wait for now. 
         if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-            status(agent) <- "reroute"
+            status(agent) <- "plan"
             return(agent)
         }
 
@@ -547,8 +547,9 @@ update_goal <- function(agent,
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
             updated_background <- background
+            agent_idx <- which(sapply(state$agents, id) == id(agent))
             objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents)
+                                                  state$agents[-agent_idx])
 
             # current_goal(agent)@path <- find_path(current_goal(agent), 
             #                                       agent, 
