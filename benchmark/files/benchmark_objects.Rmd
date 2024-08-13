@@ -256,6 +256,49 @@ tbl |>
     print()
 ```
 
+## nodes_on_circumference
+
+```{r moving_options nodes_on_circumference, echo = FALSE, results = "asis"}
+
+# Initialize the objects 
+obj <- list(predped:::rectangle(center = c(1, 2), size = c(1, 1)),
+            predped:::circle(center = c(1, 2), radius = 1),
+            predped:::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1)))) 
+
+# Test
+r <- (\() predped:::nodes_on_circumference(obj[[1]])) |>
+    test_times() |>
+    rnd() 
+c <- (\() predped:::nodes_on_circumference(obj[[2]])) |>
+    test_times() |>
+    rnd() 
+p <- (\() predped:::nodes_on_circumference(obj[[3]])) |>
+    test_times() |>
+    rnd() 
+
+# Create the table
+tbl <- c(r[2], c(paste0("[", r[1], ",", r[3], "]")), 
+         p[2], c(paste0("[", p[1], ",", p[3], "]")), 
+         c[2], c(paste0("[", c[1], ",", c[3], "]"))) |>
+    matrix(nrow = 1)
+colnames(tbl) <- NULL
+
+# Write the caption
+caption <- paste0("Benchmark for the nodes\\_on\\_circumference method for objects. ",
+                  "Distinctions are made between the different objects that are exported by predped.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
+    print()
+
+```
+
 ## rng_point 
 
 ```{r objects rng_point, echo = FALSE, results = "asis"}

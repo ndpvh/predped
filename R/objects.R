@@ -186,6 +186,17 @@ setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) s
 #' @name add_nodes-method
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 
+#' Add Nodes on the Circumference of an Object
+#'
+#' @param object An object 
+#' @param space_between Numeric denoting the amount of space that needs to be 
+#' left between the edge of the object and the node. Defaults to `5e-2`
+#' 
+#' @return  Matrix with points along the edges of the object
+#' @export 
+#' @name nodes_on_circumference-method
+setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("nodes_on_circumference"))
+
 #' Check whether an Object intersects with Other Object
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
@@ -421,6 +432,32 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
                            start[2] + 1:(number_points - 1) * sin(angle) * dist)
         nodes <- rbind(nodes, new_nodes)        
     }
+
+    return(nodes)
+})
+
+#'@rdname nodes_on_circumference-method
+#'
+setMethod("nodes_on_circumference", signature(object = "polygon"), function(object, 
+                                                                            space_between = 5e-2) {
+
+    corners <- object@points 
+    n <- nrow(corners)
+
+    x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
+    y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
+
+    len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / space_between))
+    len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / space_between))
+
+    len <- matrixStats::rowMaxs(cbind(len_x, len_y))
+
+    nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
+                                               x_changes[,2],
+                                               length.out = len))),
+                   as.numeric(unlist(multi_seq(y_changes[,1], 
+                                               y_changes[,2],
+                                               length.out = len))))
 
     return(nodes)
 })
@@ -900,6 +937,14 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
                    center(object)[2] + sin(angles) * adjusted_radius)
 
     return(nodes)
+})
+
+#'@rdname nodes_on_circumference-method
+#'
+setMethod("nodes_on_circumference", signature(object = "circle"), function(object, 
+                                                                           space_between = 5e-2) {
+
+    return(nodes <- points(object, length.out = ceiling(2 * pi * radius(object) / space_between)))
 })
 
 #'@rdname intersects-method

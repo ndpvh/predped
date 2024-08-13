@@ -259,30 +259,3 @@ overlap_with_objects <- function(agent,
     return(check)
 }
 
-# Helper function to create dots on the circumference of objects, to be used for
-# overlap_with_object
-nodes_on_circumference <- function(object) {
-    if(inherits(object, "circle")) {
-        nodes <- points(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
-    } else {
-        corners <- object@points 
-        n <- nrow(corners)
-
-        x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
-        y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
-
-        len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / 5e-2))
-        len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / 5e-2))
-
-        len <- matrixStats::rowMaxs(cbind(len_x, len_y))
-
-        nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
-                                                   x_changes[,2],
-                                                   length.out = len))),
-                       as.numeric(unlist(multi_seq(y_changes[,1], 
-                                                   y_changes[,2],
-                                                   length.out = len))))
-    }
-    
-    return(nodes)
-}
