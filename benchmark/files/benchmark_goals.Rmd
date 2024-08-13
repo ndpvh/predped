@@ -136,7 +136,7 @@ rownames(tbl) <- NULL
 caption <- paste0("Benchmark for the add\\_goal function. ", 
                   "Benchmark is computed for each of the possible shapes in predped. ",
                   "Additionally, the effect of setting a goal randomly on the object or taking the middle of ",
-                  "an edge is also examined (i.e., when middle_edge = TRUE or FALSE)")
+                  "an edge is also examined (i.e., when middle\\_edge = TRUE or FALSE)")
 
 # Print the table so that it can be printed in text
 tbl %>% 
