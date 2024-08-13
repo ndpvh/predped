@@ -1,3 +1,5 @@
+# goals.R
+
 ```{r setup goals, echo = FALSE}
 
 # Create setting
@@ -89,33 +91,191 @@ many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", 
 ```
 
 ## find_path
-```{r goals find_path, echo = FALSE}
+```{r goals find_path, echo = FALSE, results = "asis"}
 
 # Test `find_path`
-test_times(\() find_path(predped::goal(id = "goal exit", position = c(0, 13)),
-                         predped::agent(center = c(0.3, 0.5), 
-                                        radius = 0.25), 
-                         setting, 
-                         precomputed_edges = NULL,
-                         many_options = FALSE))
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13))
+my_agent <- predped::agent(center = c(0.3, 0.5), radius = 0.25)
 
-test_times(\() find_path(predped::goal(id = "goal exit", position = c(0, 13)),
-                         predped::agent(center = c(0.3, 0.5), 
-                                        radius = 0.25), 
-                         setting, 
-                         precomputed_edges = NULL,
-                         many_options = TRUE))
+fn <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = NULL,
+                              many_options = FALSE)) |>
+    test_times() |>
+    rnd()
 
-test_times(\() find_path(predped::goal(id = "goal exit", position = c(0, 13)),
-                         predped::agent(center = c(0.3, 0.5), 
-                                        radius = 0.25), 
-                         setting, 
-                         precomputed_edges = few_edges))
+mn <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = NULL,
+                              many_options = TRUE)) |>
+    test_times() |>
+    rnd()
 
-test_times(\() find_path(predped::goal(id = "goal exit", position = c(0, 13)),
-                         predped::agent(center = c(0.3, 0.5), 
-                                        radius = 0.25), 
-                         setting, 
-                         precomputed_edges = many_edges))
+fp <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = few_edges,
+                              reevaluate = FALSE)) |>
+    test_times() |>
+    rnd()
 
+mp <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = many_edges,
+                              reevaluate = FALSE)) |>
+    test_times() |>
+    rnd()
+
+fpr <- (\() predped::find_path(my_goal,
+                               my_agent, 
+                               setting, 
+                               precomputed_edges = few_edges,
+                               reevaluate = TRUE)) |>
+    test_times() |>
+    rnd()
+
+mpr <- (\() predped::find_path(my_goal,
+                               my_agent, 
+                               setting, 
+                               precomputed_edges = many_edges,
+                               reevaluate = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- cbind(c("Few edges", "Many edges"), 
+             c(fn[2], mn[2]), 
+             c(paste0("[", fn[1], ",", fn[3], "]"), paste0("[", mn[1], ",", mn[3], "]")), 
+             c(fp[2], mp[2]), 
+             c(paste0("[", fp[1], ",", fp[3], "]"), paste0("[", mp[1], ",", mp[3], "]")),
+             c(fpr[2], mpr[2]), 
+             c(paste0("[", fpr[1], ",", fpr[3], "]"), paste0("[", mpr[1], ",", mpr[3], "]")))
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the find\\_path function. ", 
+                  "A distinction is made between few and many edges, and between precomputed and no precomputed edges. ",
+                  "When edges are precomputed, we also distinguish between reevaluating the edges or not ", 
+                  "(i.e., reevaluate = TRUE or FALSE).")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 3, "reevaluate = FALSE" = 2, "reevaluate = TRUE" = 2)) %>% 
+    kableExtra::add_header_above(c(" " = 1, "not precomputed" = 2, "precomputed" = 4)) %>% 
+    print()
+
+```
+
+## generate_goal_stack
+
+```{r goals generate_goal_stack, echo = FALSE, results = "asis"}
+
+# Test 
+tbl <- (\() predped:::generate_goal_stack(10, setting, \(x) 10)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the generate\\_goal\\_stack function. ",
+                  "In this benchmark, we generate 10 goals in this goal stack.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## initialize
+
+```{r goals initialize, echo = FALSE, results = "asis"}
+
+# Test 
+tbl <- (\() predped:::goal(position = c(1, 2))) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the initialize or goal function, that is, for initializing a goal. ",
+                  "In this benchmark, we only provide a position to the goal.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## interact
+```{r goals interact, echo = FALSE, results = "asis"}
+
+# Test
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
+
+tbl <- (\() predped:::interact(my_goal)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the interact method for goals.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+```
+
+## replace 
+
+```{r goals replace, echo = FALSE, results = "asis"}
+
+# Test
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
+
+tbl <- (\() predped:::replace(my_goal, setting, \(x) 5)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the replace method for goals.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
 ```
