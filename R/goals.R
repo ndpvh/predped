@@ -313,6 +313,7 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                                                              background,
                                                              id = character(0),
                                                              counter = 5,
+                                                             middle_edge = FALSE,
                                                              forbidden = NULL){
 
     # Create an ever so slightly bigger circle
