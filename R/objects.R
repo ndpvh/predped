@@ -1104,7 +1104,7 @@ setMethod("in_object", signature(object = "segment"), function(object, x, outsid
 #'@rdname rng_point-method
 #'
 setMethod("rng_point", signature(object = "segment"), function(object,
-                                                            middle_edge = TRUE) {
+                                                               middle_edge = TRUE) {
 
     if(middle_edge) {
         return(as.numeric(center(object)))
