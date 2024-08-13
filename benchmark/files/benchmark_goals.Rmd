@@ -147,7 +147,7 @@ tbl %>%
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H" ) %>% 
-    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
     print()
 ```
 
