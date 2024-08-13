@@ -141,6 +141,8 @@ setMethod("simulate", "predped", function(object,
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
         edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
         edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+        edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$from %in% c("agent", "goal")),]
+        edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$to %in% c("agent", "goal")),]
 
     } else {
         edges <- NULL
