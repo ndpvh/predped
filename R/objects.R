@@ -1117,7 +1117,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #'@rdname add_nodes-method
 #'
 setMethod("add_nodes", signature(object = "segment"), function(object, 
-                                                            ...) {
+                                                               ...) {
     
     # Should not add nodes to a line
     return(NULL)
