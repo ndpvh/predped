@@ -1,0 +1,198 @@
+# moving_options.R 
+
+```{r moving_options setup, echo = FALSE}
+
+# Background
+setting <- predped::background(shape = predped::rectangle(center = c(20, 12.5),
+                                                          size = c(40, 25)), 
+                               objects = list(# Special shelves
+                                              predped::rectangle(center = c(20, 1.2 / 2), 
+                                                                 size = c(32, 1.2), 
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(38, 4),
+                                                                 size = c(1.2, 4),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(39.4, 7.5 + 8.75), 
+                                                                 size = c(1.2, 25 - 7.5), 
+                                                                 interactable = TRUE),
+                                              predped::polygon(points = rbind(c(0, 19.5),
+                                                                              c(0, 25),
+                                                                              c(16, 25),
+                                                                              c(16, 22.5),
+                                                                              c(1.2, 22.5),
+                                                                              c(1.2, 19.5)),
+                                                               interactable = TRUE),
+                                              predped::rectangle(center = c(1, 14.5),
+                                                                 size = c(2, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::polygon(points = rbind(c(0, 3.5), 
+                                                                              c(0, 11.6),
+                                                                              c(17, 11.6),
+                                                                              c(17, 10.4),
+                                                                              c(1.2, 10.4),
+                                                                              c(1.2, 3.5)),
+                                                               interactable = TRUE),
+                                              # Bottom left
+                                              predped::rectangle(center = c(12, 4),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12, 7),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              # Top left
+                                              predped::rectangle(center = c(12.5, 14),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12.5, 17),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12.5, 20),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              # Top right
+                                              predped::rectangle(center = c(29, 11),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 14),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 17),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 20),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 23),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              # Bottom right
+                                              predped::rectangle(center = c(27, 4),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(27, 7),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE)),
+                               entrance = c(0, 0.5),
+                               exit = c(0, 13),
+                               same_exit = FALSE)
+
+# Current agent
+current_agent <- predped::agent(center = c(1, 1), 
+                                radius = 0.25,
+                                goals = list(),
+                                current_goal = predped::goal(position = c(0, 13), 
+                                                             path = matrix(c(0, 13), nrow = 1)))
+agents <- lapply(seq_len(10), 
+                 \(x) predped::agent(center = runif(2, 1, 20), radius = 0.25))
+
+# State
+state <- list(setting = setting, agents = append(list(current_agent), agents))
+
+# Centers
+centers <- m4ma::c_vd_rcpp(1:33, 
+                           predped::position(current_agent),
+                           predped::speed(current_agent),
+                           predped::orientation(current_agent),
+                           vels = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
+                           angles = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 
+                                                 350, 340, 327.5, 310, 287.5), 
+                                               times = 3), 
+                                           ncol = 3))
+
+```
+
+## agents_between_goal
+
+```{r moving_options agents_between_goal, echo = FALSE, results = "asis"}
+
+# Test
+tbl <- (\() predped:::agents_between_goal(current_agent, state)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the agents\\_between\\_goal method. ", 
+                  "For this benchmark, there are 10 other agents in the room. ",
+                  "We don't make use of the agent predictions.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## nodes_on_circumference
+
+```{r moving_options nodes_on_circumference, echo = FALSE, results = "asis"}
+
+# Initialize the objects 
+obj <- list(predped:::rectangle(center = c(1, 2), size = c(1, 1)),
+            predped:::circle(center = c(1, 2), radius = 1),
+            predped:::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1)))) 
+
+# Test
+r <- (\() predped:::nodes_on_circumference(obj[[1]])) |>
+    test_times() |>
+    rnd() 
+c <- (\() predped:::nodes_on_circumference(obj[[2]])) |>
+    test_times() |>
+    rnd() 
+p <- (\() predped:::nodes_on_circumference(obj[[3]])) |>
+    test_times() |>
+    rnd() 
+
+# Create the table
+tbl <- c(r[2], c(paste0("[", r[1], ",", r[3], "]")), 
+         p[2], c(paste0("[", p[1], ",", p[3], "]")), 
+         c[2], c(paste0("[", c[1], ",", c[3], "]"))) |>
+    matrix(nrow = 1)
+colnames(tbl) <- NULL
+
+# Write the caption
+caption <- paste0("Benchmark for the nodes\\_on\\_circumference method for objects. ",
+                  "Distinctions are made between the different objects that are exported by predped.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
+    print()
+
+```
+
+## overlap_with_objects 
+
+```{r moving_options overlap_with_objects, echo = FALSE, results = "asis"}
+
+# Test
+check <- !logical(33)
+tbl <- (\() predped:::overlap_with_objects(current_agent, setting, centers, check)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the overlap\\_with\\_objects method.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
