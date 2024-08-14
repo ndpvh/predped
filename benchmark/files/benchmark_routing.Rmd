@@ -165,14 +165,6 @@ tbl %>%
     kableExtra::add_header_above(c(" " = 1, "reevaluate = TRUE" = 2, "reevaluate = FALSE" = 2)) %>% 
     print()
 
-
-kaka <- predped::adjust_edges(c(0.3, 0.5), 
-                                 c(0, 13), 
-                                 new_setting, 
-                                 new_objects = new_agents,
-                                 precomputed_edges = many_edges, 
-                                 reevaluate = TRUE)
-
 ```
 
 ## create_edges
