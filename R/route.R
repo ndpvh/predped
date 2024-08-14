@@ -82,7 +82,7 @@ adjust_edges <- function(from,
     # happens when new objects have been added to the environment: As long as 
     # nothing new is introduced in the environment, you should not reevaluate 
     # the nodes
-    if(!is.null(new_objects) | length(new_objects) != 0) {
+    if(!is.null(new_objects) & length(new_objects) != 0) {
         obj_nodes <- lapply(new_objects, 
                             \(x) add_nodes(x, 
                                            space_between = space_between, 
@@ -172,8 +172,6 @@ adjust_edges <- function(from,
         segments$ids <- rbind(segments$ids, 
                               as.matrix(edges_with_coords[, 1:2]))
     }
-
-    browser()
 
     # Check whether these edges don't pass through the objects in the background
     edges <- evaluate_edges(segments, obj)
