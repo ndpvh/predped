@@ -276,3 +276,64 @@ testthat::test_that("Adjusting edges works", {
     testthat::expect_equal(tst_2$edges, ref_2$edges)
     testthat::expect_equal(tst_2$edges_with_coords, ref_2$edges_with_coords)
 })
+
+testthat::test_that("Adjusting edges gives same output as creating edges", {
+    # Create precomputed_edges for a simple environment
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), size = c(2, 2)), 
+                                   objects = list(predped::circle(center = c(0, 0), radius = 0.5),
+                                                  predped::rectangle(center = c(-0.5, -0.5), size = c(0.5, 0.5)),
+                                                  predped::polygon(points = rbind(c(0.75, 0.75), c(0.75, 0.25), c(0.25, 0.25), c(0.25, 0.75)))),
+                                   entrance = c(0, -1))
+    spc <- 0.1
+
+    precomputed_edges <- predped::create_edges(c(-0.75, 0.75), 
+                                               c(0.75, -0.75), 
+                                               setting, 
+                                               space_between = spc, 
+                                               many_options = FALSE)
+    precomputed_edges$edges <- precomputed_edges$edges[!(precomputed_edges$edges$from %in% c("agent", "goal")),]
+    precomputed_edges$edges <- precomputed_edges$edges[!(precomputed_edges$edges$to %in% c("agent", "goal")),]
+    precomputed_edges$nodes <- precomputed_edges$nodes[!(precomputed_edges$nodes$node_ID %in% c("agent", "goal")),]
+    precomputed_edges$edges_with_coords <- precomputed_edges$edges_with_coords[!(precomputed_edges$edges_with_coords$from %in% c("agent", "goal")),]
+    precomputed_edges$edges_with_coords <- precomputed_edges$edges_with_coords[!(precomputed_edges$edges_with_coords$to %in% c("agent", "goal")),]
+
+    # The `create_edges` function needs a new environment, so provide it to them
+    additional_object <- list(predped::circle(center = c(0, 0.75), radius = 0.5))
+
+    new_setting <- setting 
+    objects(new_setting) <- append(objects(new_setting), additional_object)
+
+    # Create new edges with the create_edges and adjust_edges functions
+    ref <- predped::create_edges(c(-0.75, 0.75), 
+                                 c(0.75, -0.75), 
+                                 new_setting, 
+                                 space_between = spc, 
+                                 many_options = FALSE)
+
+    tst <- predped::adjust_edges(c(-0.75, 0.75),
+                                 c(0.75, -0.75),
+                                 setting, 
+                                 new_objects = additional_object,
+                                 space_between = spc,
+                                 precomputed_edges = precomputed_edges,
+                                 reevaluate = TRUE)
+
+    # Check whether both contain the same information, all of which is contained
+    # within edges_with_coords. Use the visual inspection below when interpreting
+    # the results, but use the costs defined in edges for the actual test
+    testthat::expect_equal(sort(as.numeric(tst$edges$cost)), 
+                           sort(as.numeric(ref$edges$cost)))
+
+    # If you want to visualize everything
+    # plot(new_setting) +
+    #     ggplot2::geom_segment(ggplot2::aes(x = ref$edges_with_coords$from_x, 
+    #                                        y = ref$edges_with_coords$from_y,
+    #                                        xend = ref$edges_with_coords$to_x, 
+    #                                        yend = ref$edges_with_coords$to_y),
+    #                           linewidth = 2) +
+    #     ggplot2::geom_segment(ggplot2::aes(x = tst$edges_with_coords$from_x, 
+    #                                        y = tst$edges_with_coords$from_y,
+    #                                        xend = tst$edges_with_coords$to_x, 
+    #                                        yend = tst$edges_with_coords$to_y),
+    #                           color = "red") 
+})
