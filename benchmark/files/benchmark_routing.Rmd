@@ -322,14 +322,14 @@ tbl %>%
 ```{r routing evaluate_edges, echo = FALSE, results = "asis"}
 
 # Test `create_edges`
-f <- (\() predped::evaluate_edges(list("ids" = few_edges$edges[, 1:2], 
-                                       "segments" = few_edges$edges_with_coords[, c(3:6)]), 
+segments <- subset(few_edges$edges_with_coords, select = -cost)
+f <- (\() predped::evaluate_edges(segments, 
                                   predped::objects(setting))) |>
     test_times() |>
     rnd()
 
-m <- (\() predped::evaluate_edges(list("ids" = many_edges$edges[, 1:2], 
-                                       "segments" = many_edges$edges_with_coords[, c(3:6)]), 
+segments <- subset(many_edges$edges_with_coords, select = -cost)
+m <- (\() predped::evaluate_edges(segments, 
                                   predped::objects(setting))) |>
     test_times() |>
     rnd()
