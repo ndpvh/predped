@@ -34,20 +34,11 @@ create_edges <- function(from,
     # Make the connection between all possible edges. Importantly, keep the id's
     # identifying the nodes and the segments that are created between each node 
     # separate. They will be bound together in `evaluate_edges`.
-    n <- nrow(nodes)
-    idx <- matrix(1:n, nrow = n, ncol = n)
-    to_remain <- lower.tri(idx)
-
-    idx_1 <- t(idx)[to_remain]
-    idx_2 <- idx[to_remain]
-    segments <- cbind(nodes[idx_1, 2:3], 
-                      nodes[idx_2, 2:3])
-    ids <- cbind(nodes[idx_1, 1], 
-                 nodes[idx_2, 1])
+    segments <- combine_nodes(nodes)
 
     # Check whether these edges don't pass through the objects in the background 
     # and return the required list of edges and nodes
-    return(append(evaluate_edges(ids, segments, objects(background)), 
+    return(append(evaluate_edges(segments, objects(background)), 
                   list(nodes = nodes)))
 }
 
@@ -68,58 +59,124 @@ create_edges <- function(from,
 #' @export 
 adjust_edges <- function(from, 
                          to, 
-                         background, 
+                         background,
                          precomputed_edges,
+                         new_objects = NULL,                          
+                         space_between = 0.5,
                          reevaluate = FALSE) {
 
     nodes <- precomputed_edges$nodes
     edges_with_coords <- precomputed_edges$edges_with_coords
 
-    # Check which nodes to delete, given that they fall within the objects of 
-    # the background
-    if(reevaluate) {
-        to_delete <- lapply(objects(background), 
-                            \(x) in_object(x, nodes[,c("X", "Y")], outside = FALSE))
-        to_delete <- Reduce("|", to_delete)
-
-        nodes <- nodes[!to_delete,]
-
-        # Also delete these from edges_with_coords
-        names_nodes <- nodes$node_ID
-
-        to_delete <- (edges_with_coords$from %in% names_nodes) | (edges_with_coords$to %in% names_nodes)
-        edges_with_coords <- edges_with_coords[!to_delete, ]
+    # Add the new objects to the background
+    if(is.null(new_objects)) {
+        new_objects <- list()
     }
+    obj <- append(objects(background), new_objects)
 
-    # Bind together the nodes that make up the agent and the goal
-    from_to <- data.frame(node_ID = c("agent", "goal"), 
-                          X = c(from[1], to[1]),
-                          Y = c(from[2], to[2]))
+    # Create new nodes based on the objects that are new to the setting. If none
+    # are present, then we can just bind the agent and goal nodes to the frame.
+    # Steps taken here are very similar to those taken in `create_nodes`
+    #
+    # Importantly, if you want to reevaluate the original nodes, this only 
+    # happens when new objects have been added to the environment: As long as 
+    # nothing new is introduced in the environment, you should not reevaluate 
+    # the nodes
+    if(!is.null(new_objects) | length(new_objects) != 0) {
+        obj_nodes <- lapply(new_objects, 
+                            \(x) add_nodes(x, 
+                                           space_between = space_between, 
+                                           only_corners = TRUE))
+        obj_nodes <- do.call("rbind", obj_nodes)
+
+        # Delete these nodes if they are already the same as those in `nodes`
+        to_delete <- sapply(seq_len(nrow(obj_nodes)), 
+                            \(i) any((obj_nodes[i,1] == nodes$X) & (obj_nodes[i,2] == nodes$Y)))
+        obj_nodes <- obj_nodes[!to_delete,]
+
+        # If you want to reevaluate the previous set of nodes, then immediately 
+        # do so in bulk (will make our lives easier)
+        if(reevaluate) {
+            # Keep an index that will tell us when the original nodes begin
+            node_idx <- nrow(obj_nodes) + 1
+            obj_nodes <- rbind(obj_nodes, as.matrix(nodes[,2:3]))
+        }
+
+        # Delete nodes based on whether they are occluded by an object and on 
+        # whether they are contained within the environment
+        to_delete <- lapply(obj, 
+                            \(x) in_object(enlarge_object(x, space_between = space_between),
+                                           obj_nodes, 
+                                           outside = FALSE))
+        to_delete <- Reduce("|", to_delete) | in_object(shape(background), obj_nodes, outside = TRUE)
+
+        # Before we delete this, we need to first handle the original nodes in 
+        # case of reevaluation, otherwise we lose which nodes to delete
+        if(reevaluate) {
+            # Delete the nodes that should be deleted
+            nodes <- nodes[!to_delete[node_idx:length(to_delete)],]
+            to_delete[node_idx:length(to_delete)] <- TRUE
+
+            # Also delete these nodes from `edges_with_coords`
+            names_nodes <- nodes$node_ID
+
+            idx <- (edges_with_coords$from %in% names_nodes) & (edges_with_coords$to %in% names_nodes)
+            edges_with_coords <- edges_with_coords[idx,]
+        }
+
+        # Once done, we can also delete the unnecessary nodes from obj_nodes. 
+        # Here, we only keep the new nodes, not the old, reevaluated ones
+        obj_nodes <- obj_nodes[!to_delete,]
+
+        # Bind these together with the agent and goal
+        if(!is.null(obj_nodes)) {
+            from_to <- data.frame(node_ID = c("agent", 
+                                              "goal", 
+                                              paste0("adjusted_nodes_", 1:nrow(obj_nodes))),
+                                  X = c(from[1], to[1], obj_nodes[,1]),
+                                  Y = c(from[2], to[2], obj_nodes[,2])) 
+        } else {
+            from_to <- data.frame(node_ID = c("agent", "goal"), 
+                              X = c(from[1], to[1]),
+                              Y = c(from[2], to[2]))
+        }
+
+    } else {
+        # Bind together the nodes that make up the agent and the goal
+        from_to <- data.frame(node_ID = c("agent", "goal"), 
+                              X = c(from[1], to[1]),
+                              Y = c(from[2], to[2]))
+    }    
 
     # Add these to the already existing nodes
     new_nodes <- rbind(nodes, from_to)
 
     # Create new pathways that go from the agent and goal to all of the other 
-    # edges
-    n <- nrow(nodes)
-    idx_1 <- as.numeric(matrix(1:n, nrow = n, ncol = 2))
-    idx_2 <- as.numeric(t(matrix(1:2, nrow = 2, ncol = n)))
+    # edges. First, we do this within the `obj_nodes` that we just created. 
+    # Afterwards, we do this for all the nodes in `from_to` to all of the old 
+    # nodes.
+    segments_1 <- combine_nodes(nodes, from_to)
+    segments_2 <- combine_nodes(from_to)
 
-    segments <- cbind(nodes[idx_1, 2:3], 
-                      from_to[idx_2, 2:3])
-    ids <- cbind(nodes[idx_1, 1], 
-                 from_to[idx_2, 1])
+    segments <- list("segments" = rbind(segments_1$segments, 
+                                        segments_2$segments), 
+                     "ids" = rbind(segments_1$ids, 
+                                   segments_2$ids))
 
     # Bind these segments and ids together with those that are already present 
     # in the precomputed edges. This step is necessary if we want to make sure 
     # that all edges are reevaluated on their adequacy
     if(reevaluate) {
-        segments <- rbind(segments, setNames(edges_with_coords[, 3:6], c("X", "Y", "X", "Y")))
-        ids <- rbind(ids, as.matrix(edges_with_coords[, 1:2]))
+        segments$segments <- rbind(segments$segments, 
+                                   setNames(edges_with_coords[, 3:6], c("X", "Y", "X", "Y")))
+        segments$ids <- rbind(segments$ids, 
+                              as.matrix(edges_with_coords[, 1:2]))
     }
 
+    browser()
+
     # Check whether these edges don't pass through the objects in the background
-    edges <- evaluate_edges(ids, segments, objects(background))
+    edges <- evaluate_edges(segments, obj)
 
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
@@ -251,18 +308,20 @@ create_nodes <- function(from,
 #'   - Step 2: Find out which nodes are reachable from one another. In other 
 #'             words, if I stand at node 1, can I see node 2?
 #' 
-#' @param ids A matrix of n x 2 identifying the nodes that are connected
-#' @param segments A matrix of n x 4 containing the (x, y) coordinates of the 
-#' nodes in ids
+#' @param segments Named list containing an n x 4 matrix of segments that make 
+#' up the edges (under key "semgents") and an n x 2 matrix of names for the 
+#' nodes that make up these edges (under key "ids").
 #' @param objects List of objects that are contained in the setting
 #' 
 #' @return List containing the nodes, edges, and edges together with their 
 #' coordinates
 #' 
 #' @export
-evaluate_edges <- function(ids, 
-                           segments, 
+evaluate_edges <- function(segments, 
                            objects) {
+
+    ids <- segments$ids 
+    segments <- segments$segments
 
     # Step 1: Note, we use squared distances as the cost for efficiency purposes
     # (taking the square root is computationally more expensive). Should not matter 
@@ -340,4 +399,43 @@ prune_edges <- function(objects, segments) {
     # row should be FALSE. We therefore check whether any of the sides is TRUE and 
     # then reverse the operation, so that none of them can be
     return(!Reduce("|", all_intersections))
+}
+
+# Make a function that takes in two vectors of nodes and will combine them 
+# into one. Importantly, nodes should be in the required format, meaning a 
+# data.frame with 3 columns, namely node_ID, X, and Y
+combine_nodes <- function(nodes_1, 
+                          nodes_2 = NULL) {
+
+    # If the second set of nodes is not NULL, we want to combine each node in 
+    # the one data.frame with all the nodes in the other. Otherwise, we want to 
+    # combine each node within the same data.frame with each other
+    if(!is.null(nodes_2)) {
+        # Get the sizes of each of the node matrices
+        n <- nrow(nodes_1)
+        k <- nrow(nodes_2)
+
+        # Create indices to be repeated. These indices define which member of node_1
+        # is connected to which member of node_2
+        idx_1 <- as.numeric(matrix(1:n, nrow = n, ncol = k))
+        idx_2 <- as.numeric(t(matrix(1:k, nrow = k, ncol = n)))
+
+        return(list("segments" = cbind(nodes_1[idx_1, c("X", "Y")], 
+                                       nodes_2[idx_2, c("X", "Y")]),
+                    "ids" = cbind(nodes_1$node_ID[idx_1], 
+                                  nodes_2$node_ID[idx_2])))
+
+    } else {
+        n <- nrow(nodes_1)
+        idx <- matrix(1:n, nrow = n, ncol = n)
+        to_remain <- lower.tri(idx)
+    
+        idx_1 <- t(idx)[to_remain]
+        idx_2 <- idx[to_remain]
+
+        return(list("segments" = cbind(nodes_1[idx_1, c("X", "Y")], 
+                                       nodes_1[idx_2, c("X", "Y")]),
+                    "ids" = cbind(nodes_1$node_ID[idx_1], 
+                                  nodes_1$node_ID[idx_2])))
+    }
 }

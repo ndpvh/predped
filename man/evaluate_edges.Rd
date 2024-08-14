@@ -4,13 +4,12 @@
 \alias{evaluate_edges}
 \title{Evaluate whether edges pass through objects}
 \usage{
-evaluate_edges(ids, segments, objects)
+evaluate_edges(segments, objects)
 }
 \arguments{
-\item{ids}{A matrix of n x 2 identifying the nodes that are connected}
-
-\item{segments}{A matrix of n x 4 containing the (x, y) coordinates of the 
-nodes in ids}
+\item{segments}{Named list containing an n x 4 matrix of segments that make 
+up the edges (under key "semgents") and an n x 2 matrix of names for the 
+nodes that make up these edges (under key "ids").}
 
 \item{objects}{List of objects that are contained in the setting}
 }

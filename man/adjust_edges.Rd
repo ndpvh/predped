@@ -4,7 +4,15 @@
 \alias{adjust_edges}
 \title{Adjust edges of graph to walk on}
 \usage{
-adjust_edges(from, to, background, precomputed_edges, reevaluate = FALSE)
+adjust_edges(
+  from,
+  to,
+  background,
+  precomputed_edges,
+  new_objects = NULL,
+  space_between = 0.5,
+  reevaluate = FALSE
+)
 }
 \arguments{
 \item{from}{Coordinate from which to start}
