@@ -94,17 +94,25 @@ many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", 
 ```{r routing adjust_edges, echo = FALSE, results = "asis"}
 
 # Test `adjust_edges`
+set.seed(1)
+new_agents <- lapply(1:10,
+                     \(x) predped::agent(center = runif(2, 1, 20), radius = 0.25))
+new_setting <- setting 
+objects(new_setting) <- append(objects(new_setting), new_agents)
+
 fr <- (\() predped::adjust_edges(c(0.3, 0.5), 
-                                c(0, 13), 
-                                setting, 
-                                precomputed_edges = few_edges, 
-                                reevaluate = TRUE)) |>
+                                 c(0, 13), 
+                                 new_setting, 
+                                 new_objects = new_agents,
+                                 precomputed_edges = few_edges, 
+                                 reevaluate = TRUE)) |>
     test_times() |>
     rnd()
 
 mr <- (\() predped::adjust_edges(c(0.3, 0.5), 
                                  c(0, 13), 
-                                 setting, 
+                                 new_setting, 
+                                 new_objects = new_agents,
                                  precomputed_edges = many_edges, 
                                  reevaluate = TRUE)) |>
     test_times() |>
@@ -112,7 +120,8 @@ mr <- (\() predped::adjust_edges(c(0.3, 0.5),
 
 fn <- (\() predped::adjust_edges(c(0.3, 0.5), 
                                  c(0, 13), 
-                                 setting, 
+                                 new_setting, 
+                                 new_objects = new_agents,
                                  precomputed_edges = few_edges, 
                                  reevaluate = FALSE)) |>
     test_times() |>
@@ -120,7 +129,8 @@ fn <- (\() predped::adjust_edges(c(0.3, 0.5),
 
 mn <- (\() predped::adjust_edges(c(0.3, 0.5), 
                                  c(0, 13), 
-                                 setting, 
+                                 new_setting, 
+                                 new_objects = new_agents,
                                  precomputed_edges = many_edges, 
                                  reevaluate = FALSE)) |>
     test_times() |>
@@ -140,7 +150,8 @@ caption <- paste0("Benchmark for the adjust\\_edges function. ",
                   "Options were to check whether the precomputed edges passed through objects or not ",
                   "(reevaluate = TRUE or FALSE resp.). ",
                   "Additionally, benchmark times are given for the case where you only have few edges ",
-                  "or many edges in the precomputed edges variable.")
+                  "or many edges in the precomputed edges variable. ",
+                  "For this benchmark, we added 10 agents to the environment ad random.")
 
 # Print the table so that it can be printed in text
 tbl %>% 
@@ -153,6 +164,14 @@ tbl %>%
                  position = "H" ) %>% 
     kableExtra::add_header_above(c(" " = 1, "reevaluate = TRUE" = 2, "reevaluate = FALSE" = 2)) %>% 
     print()
+
+
+kaka <- predped::adjust_edges(c(0.3, 0.5), 
+                                 c(0, 13), 
+                                 new_setting, 
+                                 new_objects = new_agents,
+                                 precomputed_edges = many_edges, 
+                                 reevaluate = TRUE)
 
 ```
 
@@ -174,29 +193,44 @@ m <- (\() predped::create_edges(c(0.3, 0.5),
     test_times() |>
     rnd()
 
+fa <- (\() predped::create_edges(c(0.3, 0.5), 
+                                 c(0, 13), 
+                                 new_setting, 
+                                 many_options = FALSE)) |>
+    test_times() |>
+    rnd()
+
+ma <- (\() predped::create_edges(c(0.3, 0.5), 
+                                 c(0, 13), 
+                                 new_setting, 
+                                 many_options = TRUE)) |>
+    test_times() |>
+    rnd()
+
 # Create a table displaying these results
-tbl <- c(f[2], 
-         paste0("[", f[1], ",", f[3], "]"), 
-         m[2], 
-         paste0("[", m[1], ",", m[3], "]")) %>% 
-    matrix(nrow = 1)
+tbl <- cbind(c("Few edges", "Many edges"),
+             c(f[2], m[2]),
+             c(paste0("[", f[1], ",", f[3], "]"), paste0("[", m[1], ",", m[3], "]")),
+             c(fa[2], ma[2]),
+             c(paste0("[", fa[1], ",", fa[3], "]"), paste0("[", ma[1], ",", ma[3], "]"))) 
 rownames(tbl) <- NULL
 
 
 # Define the caption for the table 
 caption <- paste0("Benchmark for the create\\_edges function. ", 
-                  "Benchmark is computed for few and many possible edges (many\\_options = FALSE or TRUE resp.).")
+                  "Benchmark is computed for few and many possible edges (many\\_options = FALSE or TRUE resp.). ",
+                  "For a comparison with `adjust\\_edges`, we run this once with and without 10 additional agents in the background.")
 
 # Print the table so that it can be printed in text
 tbl %>% 
     knitr::kable(format = "latex", 
-                 align = "lll",
+                 align = "llll",
                  caption = caption,
                  longtable = FALSE,
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H" ) %>% 
-    kableExtra::add_header_above(c("many\\_options = FALSE" = 2, "many\\_options = TRUE" = 2)) %>% 
+    kableExtra::add_header_above(c(" " = 1, "No additional agents" = 2, "Additional agents" = 2)) %>% 
     print()
 ```
 
@@ -250,14 +284,14 @@ tbl %>%
 ```{r routing evaluate_edges, echo = FALSE, results = "asis"}
 
 # Test `create_edges`
-f <- (\() predped::evaluate_edges(few_edges$edges[, 1:2], 
-                                  few_edges$edges_with_coords[, c(3:6)], 
+f <- (\() predped::evaluate_edges(list("ids" = few_edges$edges[, 1:2], 
+                                       "segments" = few_edges$edges_with_coords[, c(3:6)]), 
                                   predped::objects(setting))) |>
     test_times() |>
     rnd()
 
-m <- (\() predped::evaluate_edges(many_edges$edges[, 1:2], 
-                                  many_edges$edges_with_coords[, c(3:6)], 
+m <- (\() predped::evaluate_edges(list("ids" = many_edges$edges[, 1:2], 
+                                       "segments" = many_edges$edges_with_coords[, c(3:6)]), 
                                   predped::objects(setting))) |>
     test_times() |>
     rnd()
@@ -285,55 +319,6 @@ tbl %>%
                  escape = FALSE,  
                  position = "H" ) %>% 
     kableExtra::add_header_above(c("Few edges" = 2, "Many edges" = 2)) %>% 
-    print()
-```
-
-## enlarge_objects
-
-```{r routing enlarge_objects, echo = FALSE, results = "asis"}
-
-# Create all objects and peform the tests
-obj <- list(predped::rectangle(center = c(0, 0), size = c(1, 1)), 
-            predped::circle(center = c(0, 0), radius = 1),
-            predped::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))))
-
-r <- (\() predped:::enlarge_object(obj[[1]], space_between = 0.5)) |>
-    test_times() |>
-    rnd()
-
-c <- (\() predped:::enlarge_object(obj[[2]], space_between = 0.5)) |>
-    test_times() |>
-    rnd()
-
-p <- (\() predped:::enlarge_object(obj[[3]], space_between = 0.5)) |>
-    test_times() |>
-    rnd()
-
-# Create a table displaying these results
-tbl <- c(r[2], 
-         paste0("[", r[1], ",", r[3], "]"), 
-         p[2], 
-         paste0("[", p[1], ",", p[3], "]"), 
-         c[2], 
-         paste0("[", c[1], ",", c[3], "]")) %>% 
-    matrix(nrow = 1)
-rownames(tbl) <- NULL
-
-
-# Define the caption for the table 
-caption <- paste0("Benchmark for the enlarge\\_objects function. ", 
-                  "Benchmark is computed for each of the possible shapes in predped.")
-
-# Print the table so that it can be printed in text
-tbl %>% 
-    knitr::kable(format = "latex", 
-                 align = "llllll",
-                 caption = caption,
-                 longtable = FALSE,
-                 booktabs = TRUE,
-                 escape = FALSE,  
-                 position = "H" ) %>% 
-    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
     print()
 ```
 

@@ -158,6 +158,18 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' @name in_object-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
+#' Make an Object Larger
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param extension Numeric denoting the length with which to extend the object 
+#' in all directions.
+#'
+#' @return Enlarged object
+#' 
+#' @export
+#' @name enlarge-method
+setGeneric("enlarge", function(object, extension) standardGeneric("enlarge"))
+
 #' Sample a Random Point on the Circumference
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
@@ -283,6 +295,15 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # Use the raycasting algorithm to determine whether the points in x are 
     # contained in the polygon.
     return(raycasting(object@points, x, outside = outside))
+})
+
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "polygon"), function(object, extension) {
+    # Find the nodes of the polygon and use these new nodes as the points of 
+    # the enlarged polygon.
+    points(object) <- add_nodes(object, space_between = extension, only_corners = TRUE)
+    return(object)
 })
 
 #'@rdname rng_point-method
@@ -662,6 +683,15 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
     # return(check) # Important: Benchmark shows that the other algorithm is faster
 })
 
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "rectangle"), function(object, extension) {
+    # Extend the size of the rectangle with the factor sqrt{space_between^2 / 2}, 
+    # as we do in the `add_nodes` function.
+    size(object) <- size(object) + 2 * sqrt(extension^2 / 2)
+    return(object)
+})
+
 #'@rdname add_nodes-method
 #'
 setMethod("add_nodes", signature(object = "rectangle"), function(object, 
@@ -830,6 +860,14 @@ setMethod("in_object", signature(object = "circle"), function(object, x, outside
         check <- !check
     }
     return(check)
+})
+
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "circle"), function(object, extension) {
+    # Extend the radius with extension.
+    radius(object) <- radius(object) + extension
+    return(object)
 })
 
 #'@rdname rng_point-method

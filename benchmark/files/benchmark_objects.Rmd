@@ -58,6 +58,55 @@ tbl |>
 
 ```
 
+## enlarge
+
+```{r objects enlarge, echo = FALSE, results = "asis"}
+
+# Create all objects and peform the tests
+obj <- list(predped::rectangle(center = c(0, 0), size = c(1, 1)), 
+            predped::circle(center = c(0, 0), radius = 1),
+            predped::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))))
+
+r <- (\() predped:::enlarge(obj[[1]], 0.5)) |>
+    test_times() |>
+    rnd()
+
+c <- (\() predped:::enlarge(obj[[2]], 0.5)) |>
+    test_times() |>
+    rnd()
+
+p <- (\() predped:::enlarge(obj[[3]], 0.5)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- c(r[2], 
+         paste0("[", r[1], ",", r[3], "]"), 
+         p[2], 
+         paste0("[", p[1], ",", p[3], "]"), 
+         c[2], 
+         paste0("[", c[1], ",", c[3], "]")) %>% 
+    matrix(nrow = 1)
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the enlarge\\_objects function. ", 
+                  "Benchmark is computed for each of the possible shapes in predped.")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "llllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
+    print()
+```
+
 ## in_object
 
 ```{r objects in_object, echo = FALSE, results = "asis"}

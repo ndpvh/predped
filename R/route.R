@@ -83,16 +83,23 @@ adjust_edges <- function(from,
     # nothing new is introduced in the environment, you should not reevaluate 
     # the nodes
     if(!is.null(new_objects) & length(new_objects) != 0) {
+        start_time <- Sys.time()
+        # Create nodes for each of the new objects and bind them together
         obj_nodes <- lapply(new_objects, 
                             \(x) add_nodes(x, 
                                            space_between = space_between, 
                                            only_corners = TRUE))
         obj_nodes <- do.call("rbind", obj_nodes)
+        stop_time <- Sys.time()
+        print(stop_time - start_time)
 
         # Delete these nodes if they are already the same as those in `nodes`
-        to_delete <- sapply(seq_len(nrow(obj_nodes)), 
-                            \(i) any((obj_nodes[i,1] == nodes$X) & (obj_nodes[i,2] == nodes$Y)))
-        obj_nodes <- obj_nodes[!to_delete,]
+        # Commented out for performance, and assumed not to give any trouble if 
+        # some edges are duplicated.
+        #
+        # to_delete <- sapply(seq_len(nrow(obj_nodes)), 
+        #                     \(i) any((obj_nodes[i,1] == nodes$X) & (obj_nodes[i,2] == nodes$Y)))
+        # obj_nodes <- obj_nodes[!to_delete,]
 
         # If you want to reevaluate the previous set of nodes, then immediately 
         # do so in bulk (will make our lives easier)
@@ -104,18 +111,25 @@ adjust_edges <- function(from,
 
         # Delete nodes based on whether they are occluded by an object and on 
         # whether they are contained within the environment
+        start_time <- Sys.time()
+        extension <- space_between - 1e-4
         to_delete <- lapply(obj, 
-                            \(x) in_object(enlarge_object(x, space_between = space_between),
+                            \(x) in_object(enlarge(x, extension),
                                            obj_nodes, 
                                            outside = FALSE))
         to_delete <- Reduce("|", to_delete) | in_object(shape(background), obj_nodes, outside = TRUE)
+        stop_time <- Sys.time()
+        print(stop_time - start_time)
 
         # Before we delete this, we need to first handle the original nodes in 
         # case of reevaluation, otherwise we lose which nodes to delete
+        start_time <- Sys.time()
         if(reevaluate) {
+            n <- length(to_delete)
+
             # Delete the nodes that should be deleted
-            nodes <- nodes[!to_delete[node_idx:length(to_delete)],]
-            to_delete[node_idx:length(to_delete)] <- TRUE
+            nodes <- nodes[!to_delete[node_idx:n],]
+            to_delete[node_idx:n] <- TRUE
 
             # Also delete these nodes from `edges_with_coords`
             names_nodes <- nodes$node_ID
@@ -127,29 +141,20 @@ adjust_edges <- function(from,
         # Once done, we can also delete the unnecessary nodes from obj_nodes. 
         # Here, we only keep the new nodes, not the old, reevaluated ones
         obj_nodes <- obj_nodes[!to_delete,]
-
-        # Bind these together with the agent and goal
-        if(!is.null(obj_nodes)) {
-            from_to <- data.frame(node_ID = c("agent", 
-                                              "goal", 
-                                              paste0("adjusted_nodes_", 1:nrow(obj_nodes))),
-                                  X = c(from[1], to[1], obj_nodes[,1]),
-                                  Y = c(from[2], to[2], obj_nodes[,2])) 
-        } else {
-            from_to <- data.frame(node_ID = c("agent", "goal"), 
-                              X = c(from[1], to[1]),
-                              Y = c(from[2], to[2]))
-        }
-
+        stop_time <- Sys.time()
+        print(stop_time - start_time)
+        Sys.sleep(600)
     } else {
-        # Bind together the nodes that make up the agent and the goal
-        from_to <- data.frame(node_ID = c("agent", "goal"), 
-                              X = c(from[1], to[1]),
-                              Y = c(from[2], to[2]))
-    }    
+        obj_nodes <- matrix(0, nrow = 0, ncol = 2)
+    }
 
-    # Add these to the already existing nodes
-    new_nodes <- rbind(nodes, from_to)
+    # Now that we created new nodes, we should bind them together with the 
+    # positions of the agent and goals
+    from_to <- data.frame(node_ID = c("agent", 
+                                      "goal", 
+                                      paste0("adjusted_nodes_", 1:nrow(obj_nodes))[!logical(nrow(obj_nodes))]),
+                          X = c(from[1], to[1], obj_nodes[,1]),
+                          Y = c(from[2], to[2], obj_nodes[,2]))
 
     # Create new pathways that go from the agent and goal to all of the other 
     # edges. First, we do this within the `obj_nodes` that we just created. 
@@ -184,7 +189,7 @@ adjust_edges <- function(from,
     }
 
     return(append(edges, 
-                  list(nodes = new_nodes)))
+                  list(nodes = rbind(nodes, from_to))))
 }
 
 
@@ -253,8 +258,9 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
+    extension <- space_between - 1e-4
     to_delete <- lapply(obj, 
-                        \(x) in_object(enlarge_object(x, space_between = space_between), 
+                        \(x) in_object(enlarge(x, extension), 
                                        nodes, 
                                        outside = FALSE))
     to_delete <- Reduce("|", to_delete) | in_object(shp, nodes, outside = TRUE)
@@ -349,38 +355,6 @@ evaluate_edges <- function(segments,
 
 
 
-
-# Utility function that will enlarge an object based on the spacing provided 
-# by the argument
-enlarge_object <- function(object, 
-                           space_between = 0.5) {
-    # Dispatch on the kind of object we are talking about
-    if(inherits(object, "circle")) {
-        # Extend the radius with space_between - 1e-4. Ensures that we don't
-        # delete route points that are `space_between` far from the circle
-        return(circle(center = center(object), 
-                      radius = radius(object) + space_between - 1e-4))
-
-    } else if(inherits(object, "rectangle")) {
-        # Extend the size of the rectangle with the factor 
-        # sqrt{space_between^2 / 2}, as we do in the `add_nodes` function. 
-        # Again correct with factor 1e-4
-        extension <- sqrt(space_between^2 / 2)
-        return(rectangle(center = center(object), 
-                         size = object@size + 2 * (extension - 1e-4)))
-
-    } else if(inherits(object, "polygon")) {
-        # Simply find the nodes of the polygon and use these new nodes as 
-        # the points of the outer polygon.
-        points <- add_nodes(object, 
-                            space_between = space_between - 1e-4,
-                            only_corners = TRUE)
-        return(polygon(points = points))
-
-    } else {
-        stop(paste0("The object provided is not recognized: ", class(object)))
-    }
-}
 
 # Make a vectorized alternative to m4ma::seesGoal that will loop over the objects
 # but looks at intersections in a vectorized manner.
