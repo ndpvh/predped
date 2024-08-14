@@ -369,6 +369,7 @@ setMethod("find_path", "goal", function(object,
                                         background,
                                         algorithm = "bi",
                                         space_between = radius(agent),
+                                        new_objects = NULL,
                                         precomputed_edges = NULL,
                                         many_options = FALSE,
                                         reevaluate = FALSE) {
@@ -385,15 +386,25 @@ setMethod("find_path", "goal", function(object,
 
     # Create the edges that are taken in by `makegraph`
     if(is.null(precomputed_edges)) {
+        # If they are not precomputed, we should add the new objects to the 
+        # objects in the environment before we can make the path
+        if(!is.null(new_objects)) {
+            objects(background) <- append(objects(background), 
+                                          new_objects)
+        }
+
         edges <- create_edges(position(agent),
                               position(object), 
                               background,
                               space_between = space_between,
                               many_options = many_options)
     } else {
+        # If the edges are precomputed, adjust them to fit our current purpose
         edges <- adjust_edges(position(agent),
                               position(object),
                               background,
+                              space_between = space_between,
+                              new_objects = new_objects,
                               precomputed_edges = precomputed_edges,
                               reevaluate = reevaluate)
     }
