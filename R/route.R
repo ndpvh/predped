@@ -83,15 +83,12 @@ adjust_edges <- function(from,
     # nothing new is introduced in the environment, you should not reevaluate 
     # the nodes
     if(!is.null(new_objects) & length(new_objects) != 0) {
-        start_time <- Sys.time()
         # Create nodes for each of the new objects and bind them together
         obj_nodes <- lapply(new_objects, 
                             \(x) add_nodes(x, 
                                            space_between = space_between, 
                                            only_corners = TRUE))
         obj_nodes <- do.call("rbind", obj_nodes)
-        stop_time <- Sys.time()
-        print(stop_time - start_time)
 
         # Delete these nodes if they are already the same as those in `nodes`
         # Commented out for performance, and assumed not to give any trouble if 
@@ -111,19 +108,15 @@ adjust_edges <- function(from,
 
         # Delete nodes based on whether they are occluded by an object and on 
         # whether they are contained within the environment
-        start_time <- Sys.time()
         extension <- space_between - 1e-4
         to_delete <- lapply(obj, 
                             \(x) in_object(enlarge(x, extension),
                                            obj_nodes, 
                                            outside = FALSE))
         to_delete <- Reduce("|", to_delete) | in_object(shape(background), obj_nodes, outside = TRUE)
-        stop_time <- Sys.time()
-        print(stop_time - start_time)
 
         # Before we delete this, we need to first handle the original nodes in 
         # case of reevaluation, otherwise we lose which nodes to delete
-        start_time <- Sys.time()
         if(reevaluate) {
             n <- length(to_delete)
 
@@ -141,9 +134,6 @@ adjust_edges <- function(from,
         # Once done, we can also delete the unnecessary nodes from obj_nodes. 
         # Here, we only keep the new nodes, not the old, reevaluated ones
         obj_nodes <- obj_nodes[!to_delete,]
-        stop_time <- Sys.time()
-        print(stop_time - start_time)
-        Sys.sleep(600)
     } else {
         obj_nodes <- matrix(0, nrow = 0, ncol = 2)
     }
