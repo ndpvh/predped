@@ -546,11 +546,6 @@ update_goal <- function(agent,
             # other agents that this agent should account for when planning),
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
-            updated_background <- background
-            agent_idx <- which(sapply(state$agents, id) == id(agent))
-            objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents[-agent_idx])
-
             # current_goal(agent)@path <- find_path(current_goal(agent), 
             #                                       agent, 
             #                                       updated_background,
@@ -559,8 +554,9 @@ update_goal <- function(agent,
             #                                       many_options = TRUE)
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
-                                                  updated_background,
+                                                  background,
                                                   space_between = space_between,
+                                                  new_objects = state$agents,
                                                   precomputed_edges = precomputed_edges,
                                                   reevaluate = TRUE)
 
