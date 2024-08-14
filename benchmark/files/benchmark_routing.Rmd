@@ -91,6 +91,7 @@ many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", 
 ```
 
 ## adjust_edges
+
 ```{r routing adjust_edges, echo = FALSE, results = "asis"}
 
 # Test `adjust_edges`
@@ -163,6 +164,51 @@ tbl %>%
                  escape = FALSE,  
                  position = "H" ) %>% 
     kableExtra::add_header_above(c(" " = 1, "reevaluate = TRUE" = 2, "reevaluate = FALSE" = 2)) %>% 
+    print()
+
+```
+
+## combine_nodes
+
+```{r routing combine_nodes, echo = FALSE, results = "asis"}
+
+# Test 
+nodes <- data.frame(node_ID = paste0("node_", 1:100), 
+                    X = 1:100, 
+                    Y = 1:100)
+
+single <- (\() predped:::combine_nodes(nodes)) |>
+    test_times() |>
+    rnd()
+
+pair <- (\() predped:::combine_nodes(nodes, nodes)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- c(single[2], 
+         paste0("[", single[1], ",", single[3], "]"), 
+         pair[2],
+         paste0("[", pair[1], ",", pair[3], "]")) |>
+    matrix(nrow = 1)
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the combine\\_nodes function. ", 
+                  "Distinction is made between using a single or a pair of matrices. ",
+                  "For this benchmark, each matrix consisted of 100 nodes.")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c("1 matrix" = 2, "2 matrices" = 2)) %>% 
     print()
 
 ```
