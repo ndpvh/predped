@@ -24,6 +24,7 @@ tmp/
 *.txt
 *.rtf
 *.zip
+*.pdf
 
 R/*_depr.R
 
