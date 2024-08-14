@@ -150,22 +150,14 @@ adjust_edges <- function(from,
     # edges. First, we do this within the `obj_nodes` that we just created. 
     # Afterwards, we do this for all the nodes in `from_to` to all of the old 
     # nodes.
-    segments_1 <- combine_nodes(nodes, from_to)
-    segments_2 <- combine_nodes(from_to)
-
-    segments <- list("segments" = rbind(segments_1$segments, 
-                                        segments_2$segments), 
-                     "ids" = rbind(segments_1$ids, 
-                                   segments_2$ids))
+    segments <- rbind(combine_nodes(nodes, from_to), 
+                      combine_nodes(from_to))
 
     # Bind these segments and ids together with those that are already present 
     # in the precomputed edges. This step is necessary if we want to make sure 
     # that all edges are reevaluated on their adequacy
     if(reevaluate) {
-        segments$segments <- rbind(segments$segments, 
-                                   setNames(edges_with_coords[, 3:6], c("X", "Y", "X", "Y")))
-        segments$ids <- rbind(segments$ids, 
-                              as.matrix(edges_with_coords[, 1:2]))
+        segments <- rbind(segments, subset(edges_with_coords, select = -cost))
     }
 
     # Check whether these edges don't pass through the objects in the background
@@ -279,10 +271,9 @@ create_nodes <- function(from,
 
     # Now, transform the nodes to a dataframe as required by `makegraph` from
     # the cppRouting package
-    nodes <- cbind.data.frame(ids, 
-                              as.numeric(nodes[,1]), 
-                              as.numeric(nodes[,2])) |>
-        setNames(c("node_ID", "X", "Y"))
+    nodes <- cbind.data.frame(node_ID = ids, 
+                              X = as.numeric(nodes[,1]), 
+                              Y = as.numeric(nodes[,2]))
 
     # For robustness, delete all nodes that have NA values associated to them
     idx <- !is.na(nodes$node_ID) & !is.na(nodes$X) & !is.na(nodes$Y)
@@ -314,27 +305,20 @@ create_nodes <- function(from,
 evaluate_edges <- function(segments, 
                            objects) {
 
-    ids <- segments$ids 
-    segments <- segments$segments
-
     # Step 1: Note, we use squared distances as the cost for efficiency purposes
     # (taking the square root is computationally more expensive). Should not matter 
     # to the results we get from the routing algorithm
-    # cost <- (edges[,2] - edges[,5])^2 + (edges[,3] - edges[,6])^2
-    cost <- (segments[,1] - segments[,3])^2 + (segments[,2] - segments[,4])^2
+    cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
 
     # Step 2: Check which nodes can be seen at each location
-    idx <- prune_edges(objects, segments)
+    idx <- prune_edges(objects, segments[, c("from_x", "from_y", "to_x", "to_y")])
 
     # Bind all information together and delete all edges that have NA values 
     # associated to them (`prune_edges` returns NA whenever a segment is actually
     # a point, but only if the object is a circle)
-    edges <- cbind(ids[idx,], cost[idx]) |>
-        as.data.frame() |>
-        setNames(c("from", "to", "cost"))
-    edges_with_coords <- cbind(ids[idx,], segments[idx,], cost[idx]) |>
-        as.data.frame() |>
-        setNames(c("from", "to", "from_x", "from_y", "to_x", "to_y", "cost"))
+    edges_with_coords <- cbind(segments[idx,], 
+                               cost = cost[idx]) 
+    edges <- edges_with_coords[, c("from", "to", "cost")]
 
     idx <- !is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3])
 
@@ -379,13 +363,11 @@ combine_nodes <- function(nodes_1,
 
         # Create indices to be repeated. These indices define which member of node_1
         # is connected to which member of node_2
-        idx_1 <- as.numeric(matrix(1:n, nrow = n, ncol = k))
-        idx_2 <- as.numeric(t(matrix(1:k, nrow = k, ncol = n)))
+        idx_1 <- rep(1:n, each = k)
+        idx_2 <- rep(1:k, times = n)
 
-        return(list("segments" = cbind(nodes_1[idx_1, c("X", "Y")], 
-                                       nodes_2[idx_2, c("X", "Y")]),
-                    "ids" = cbind(nodes_1$node_ID[idx_1], 
-                                  nodes_2$node_ID[idx_2])))
+        return(cbind(nodes_1[idx_1,], nodes_2[idx_2,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
 
     } else {
         n <- nrow(nodes_1)
@@ -395,9 +377,7 @@ combine_nodes <- function(nodes_1,
         idx_1 <- t(idx)[to_remain]
         idx_2 <- idx[to_remain]
 
-        return(list("segments" = cbind(nodes_1[idx_1, c("X", "Y")], 
-                                       nodes_1[idx_2, c("X", "Y")]),
-                    "ids" = cbind(nodes_1$node_ID[idx_1], 
-                                  nodes_1$node_ID[idx_2])))
+        return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
     }
 }
