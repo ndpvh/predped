@@ -11,7 +11,7 @@ library(tidyverse)
 
 # Create the basic function to be used to investigate the benchmark
 test_times <- function(fx) {
-    times <- numeric(10)
+    times <- numeric(100)
     for(i in seq_along(times)) {
         start_time <- Sys.time()
         fx()
