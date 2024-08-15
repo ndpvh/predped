@@ -47,6 +47,7 @@ update_state <- function(state,
                          space_between = 2.5,
                          standing_start = 0.1,
                          precomputed_edges = NULL,
+                         many_options = FALSE,
                          precompute_goal_paths = FALSE,
                          report = FALSE,
                          interactive_report = FALSE,
@@ -91,6 +92,7 @@ update_state <- function(state,
                              space_between = space_between,
                              standing_start = standing_start,
                              precomputed_edges = precomputed_edges,
+                             many_options = many_options,
                              precompute_goal_paths = precompute_goal_paths,
                              report = report, 
                              interactive_report = interactive_report) 
@@ -411,6 +413,7 @@ update_goal <- function(agent,
                         report = FALSE,
                         interactive_report = FALSE,
                         precomputed_edges = NULL,
+                        many_options = FALSE,
                         precompute_goal_paths = FALSE) {  
 
     close_enough <- close_enough * radius(agent)
@@ -486,6 +489,7 @@ update_goal <- function(agent,
                                                   agent, 
                                                   background,
                                                   precomputed_edges = precomputed_edges,
+                                                  many_options = many_options,
                                                   reevaluate = FALSE)
         }
 
@@ -558,6 +562,7 @@ update_goal <- function(agent,
                                                   space_between = space_between,
                                                   new_objects = state$agents,
                                                   precomputed_edges = precomputed_edges,
+                                                  many_options = many_options,
                                                   reevaluate = TRUE)
 
             # Quick check whether the path is clearly defined. If not, 

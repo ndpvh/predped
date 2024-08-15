@@ -91,6 +91,7 @@ setMethod("simulate", "predped", function(object,
                                           space_between = 2.5,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
+                                          many_options = precompute_edges,
                                           individual_differences = TRUE,
                                           plot_live = FALSE,
                                           plot_time = 0.2,
@@ -136,7 +137,7 @@ setMethod("simulate", "predped", function(object,
                               c(0, 0), 
                               object@setting,
                               space_between = space_between * max(params_bounds["radius",]),
-                              many_options = TRUE)
+                              many_options = many_options)
 
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
         edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
@@ -273,6 +274,7 @@ setMethod("simulate", "predped", function(object,
                               time_step = time_step,
                               precomputed_edges = edges,
                               standing_start = standing_start,
+                              many_options = many_options,
                               ...)
 
         # Check whether one of the pedestrians is waiting at the exit
