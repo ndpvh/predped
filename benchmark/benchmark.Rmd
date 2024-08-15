@@ -10,8 +10,8 @@ devtools::load_all()
 library(tidyverse)
 
 # Create the basic function to be used to investigate the benchmark
-test_times <- function(fx) {
-    times <- numeric(200)
+test_times <- function(fx, n = 200) {
+    times <- numeric(n)
     for(i in seq_along(times)) {
         start_time <- Sys.time()
         fx()
@@ -41,6 +41,9 @@ rnd <- function(x) {
 ```
 
 ```{r route, child = "files/benchmark_routing.Rmd", warning = F}
+```
+
+```{r simulate, child = "files/benchmark_simulate.Rmd", warning = F}
 ```
 
 

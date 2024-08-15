@@ -1,9 +1,6 @@
 # simulate.R
 
-
-## simulate
-
-```{r setup simulate, echo = FALSE}
+```{r simulate setup, echo = FALSE}
 
 # Define the supermarket environment as the setting of choice. This environment
 # consists of a rectangular shape, several shelves, and a separate entrance and
@@ -91,63 +88,81 @@ my_model <- predped(id = "benchmark",
                     parameters = params_archetypes,
                     archetypes = "BaselineEuropean")
 
-# Benchmark the simulation.
-#
-# Here, we will start with 50 agents and try to keep the maximum to 50 agents.
-# We will use the default values for the simulation, which means that:
-#   - Goals and their duration are allowed to vary according to a normal 
-#     distribution with mean 10 and standard deviation 2
-#   - Goal stacks are ordered according to their distance to the entrance
-#   - Paths along which the agent can walk are precomputed beforehand
-#
-# To stop the startup costs (which are extensive: estimated 3min), we will use
-# the final state of a previously created state in which 50 agents were walking
-# around in this environment.
-#
-# Running this shows that the simulation takes 44sec, meaning about 880msec per 
-# iteration.
-initial_condition <- readRDS(file.path("benchmark", "benchmark_inx.Rds"))
+```
+
+## simulate 
+
+```{r simulate simulate, echo = TRUE, results = "asis"}
+
+# Load in the initial condition. This condition consists of 70 agents.
+initial_condition <- readRDS(file.path(".", "benchmark_inx.Rds"))
+
+# Test
+set.seed(1)
+p_m <- (\() predped::simulate(my_model, 
+                              max_agents = 70, 
+                              initial_agents = initial_condition$agents,
+                              iterations = 10, 
+                              precompute_edges = TRUE,
+                              many_options = TRUE)) |>
+    test_times(n = 10) |>
+    rnd()
 
 set.seed(1)
-Rprof(interval = 0.001)
-trace <- predped::simulate(my_model,
-                           max_agents = 50, 
-                           initial_agents = initial_condition$agents,
-                           iterations = 50,
-                           report = FALSE)
-Rprof(NULL)
-summaryRprof()
+np_m <- (\() predped::simulate(my_model, 
+                               max_agents = 70, 
+                               initial_agents = initial_condition$agents,
+                               iterations = 10, 
+                               precompute_edges = FALSE,
+                               many_options = TRUE)) |>
+    test_times(n = 10) |>
+    rnd()
 
-# TO DO
-#    - Vectorize `add_nodes`
-#    - Take look at best_angle and moving_options to see whether there are any 
-#      things that can go faster
-#    - Do the same for the routing algorithms; maybe there is something that 
-#      can make it faster!
-#    - Get radius into parameters again + make space_between agent-specific
-saveRDS(trace, file.path("benchmark", "benchmark_trace.Rds"))
+set.seed(1)
+p_f <- (\() predped::simulate(my_model, 
+                               max_agents = 70, 
+                               initial_agents = initial_condition$agents,
+                               iterations = 10, 
+                               precompute_edges = FALSE,
+                               many_options = FALSE)) |>
+    test_times(n = 10) |>
+    rnd()
 
-# To make a gif out of the trace, just use the following bits of code. In this 
-# code: 
-#   - We first extract information on the size of the environment. Is used later
-#     to determine the size of the figure
-#   - We create a list of different plots that lay out the trace
-#   - We then transform these plots to a gif using the `gifski` package
-#
-# Running this shows that the plotting takes 57sec.
-Rprof(interval = 0.001)
-points <- shape(setting)@points
-poly_size <- c(max(points[,1] - min(points[,1])),
-               max(points[,2] - min(points[,2])))
+set.seed(1)
+np_f <- (\() predped::simulate(my_model, 
+                               max_agents = 70, 
+                               initial_agents = initial_condition$agents,
+                               iterations = 10, 
+                               precompute_edges = FALSE,
+                               many_options = FALSE)) |>
+    test_times(n = 10) |>
+    rnd()
 
-plt <- plot(trace, trace = TRUE, linewidth = 2, size = 4)
-gifski::save_gif(lapply(plt, \(x) print(x)), 
-                 file.path("benchmark", "benchmark.gif"),
-                 delay = 1/10, 
-                 width = poly_size[1] * 200, 
-                 height = poly_size[2] * 200)
-Rprof(NULL)
-summaryRprof()
+# Create a table displaying these results
+tbl <- cbind(c("Few edges", "Many edges"), 
+             c(p_f[2], p_m[2]), 
+             c(paste0("[", p_f[1], ",", p_f[3], "]"), paste0("[", p_m[1], ",", p_m[3], "]")), 
+             c(np_f[2], np_m[2]), 
+             c(paste0("[", np_f[1], ",", np_f[3], "]"), paste0("[", np_m[1], ",", np_m[3], "]")))
+rownames(tbl) <- NULL
 
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the simulate function. ", 
+                  "We simulated 10 iterations of movement for 70 agents in the supermarket environment. ",
+                  "Distinction is made between precomputing edges or not and between having few or many edges. ",
+                  "Importantly, function only executed 10 times.")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Precomputed" = 2, "Not precomputed" = 2)) %>% 
+    print()
 
 ```
