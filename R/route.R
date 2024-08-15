@@ -150,8 +150,12 @@ adjust_edges <- function(from,
     # edges. First, we do this within the `obj_nodes` that we just created. 
     # Afterwards, we do this for all the nodes in `from_to` to all of the old 
     # nodes.
-    segments <- rbind(combine_nodes(nodes, from_to), 
-                      combine_nodes(from_to))
+    if(nrow(nodes) == 0) {
+        segments <- combine_nodes(from_to)
+    } else {
+        segments <- rbind(combine_nodes(nodes, from_to), 
+                          combine_nodes(from_to))
+    }
 
     # Bind these segments and ids together with those that are already present 
     # in the precomputed edges. This step is necessary if we want to make sure 
