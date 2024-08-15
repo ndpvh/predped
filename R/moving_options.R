@@ -238,16 +238,18 @@ overlap_with_objects <- function(agent,
     cutoff <- sqrt(cutoff) + radius(agent)
     distances <- sqrt((coords[,1] - agent_position[1])^2 + (coords[,2] - agent_position[2])^2)
 
-    coords <- coords[distances <= cutoff, ]
+    coords <- coords[distances <= cutoff, ] |>
+        matrix(ncol = 2)
 
     # Small check: If none of the objects is even within the same region, we 
     # can just return the check as is
-    if(nrow(coords) == 0) {
+    if(length(coords) == 0) {
         return(check)
     }
 
     # Loop over the centers
-    local_check <- matrix(TRUE, nrow = nrow(centers), ncol = nrow(coords))
+    tryCatch(local_check <- matrix(TRUE, nrow = nrow(centers), ncol = nrow(coords)),
+             error = function(e) {browser()})
     for(i in seq_len(nrow(centers))) {
         # If that center is already out of the running, we don't need to do 
         # an additional check
@@ -271,6 +273,10 @@ overlap_with_objects <- function(agent,
         }
     }
 
-    return(matrix(!(rowSums(local_check) > 0), ncol = 3))
+    if(is.null(ncol(check))) {
+        return(!(rowSums(local_check) > 0))
+    } else {
+        return(matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
+    }
 }
 
