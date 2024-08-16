@@ -216,6 +216,11 @@ overlap_with_objects <- function(agent,
                                  centers, 
                                  check) {
     
+    # If the centers are not provided, return an empty logical
+    if(length(centers) == 0) {
+        return(logical(0))
+    }
+
     # Transform all background-objects into one big matrix of segments. This will
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.

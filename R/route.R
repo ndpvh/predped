@@ -251,7 +251,8 @@ create_nodes <- function(from,
                                        outside = FALSE))
     to_delete <- Reduce("|", to_delete) | in_object(shp, nodes, outside = TRUE)
 
-    nodes <- nodes[!to_delete,]
+    nodes <- nodes[!to_delete,] |> 
+        matrix(ncol = 2)
 
     # Do a check of whether there are any nodes at all. If not, then we will have
     # to return NULL and get on with it.
