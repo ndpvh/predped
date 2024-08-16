@@ -410,9 +410,13 @@ setMethod("find_path", "goal", function(object,
     }
 
     # If edges is actually NULL, we need to return this 
+    # if(is.null(edges)) {
+    #     return(NULL)
+    # }
     if(is.null(edges)) {
-        return(NULL)
-    }
+        return(object@path)
+
+    } 
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
     # I put the directed argument to FALSE so that agents are free to decide on
@@ -424,7 +428,8 @@ setMethod("find_path", "goal", function(object,
     # Make a check of whether "agent" and "goal" are contained within the nodes.
     # Might be deleted because of blocking, or because `make_graph` deletes them.
     if(!all(c("agent", "goal") %in% graph$coords$node_ID)) {
-        return(matrix(nrow = 0, ncol = 2))
+        # return(matrix(nrow = 0, ncol = 2))
+        return(object@path)
     }
     
     # Use cppRouting to do the strategic planning in this function
@@ -483,8 +488,7 @@ setMethod("find_path", "goal", function(object,
 
     # Some additional changes for convention
     rownames(path_points) <- NULL
-    colnames(path_points) <- c("x", "y")
-    
+    colnames(path_points) <- c("x", "y")    
 
     return(path_points)
 })
