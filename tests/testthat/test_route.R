@@ -148,22 +148,24 @@ testthat::test_that("Evaluating which edges should be deleted works", {
                       c(-3, -3, 3, 3))  # Fully
     ids <- cbind(paste("node", 1:nrow(segments)), 
                  paste("agent", 1:nrow(segments)))
+    segments <- cbind.data.frame(ids[,1], segments[,1:2], ids[,2], segments[,3:4]) |>
+        setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y"))
 
     # Create a reference
-    cost <- (segments[,1] - segments[,3])^2 + (segments[,2] - segments[,4])^2
+    cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
     ref <- list(edges = data.frame(from = paste("node", 1:8), 
                                    to = paste("agent", 1:8), 
-                                   cost = as.character(cost[1:8])), 
+                                   cost = cost[1:8]), 
                 edges_with_coords = data.frame(from = paste("node", 1:8), 
+                                               from_x = segments$from_x[1:8],
+                                               from_y = segments$from_y[1:8],
                                                to = paste("agent", 1:8), 
-                                               from_x = as.character(segments[1:8, 1]),
-                                               from_y = as.character(segments[1:8, 2]),
-                                               to_x = as.character(segments[1:8, 3]),
-                                               to_y = as.character(segments[1:8, 4]),
-                                               cost = as.character(cost[1:8])))
+                                               to_x = segments$to_x[1:8],
+                                               to_y = segments$to_y[1:8],
+                                               cost = cost[1:8]))
 
     # Do the test
-    tst <- predped:::evaluate_edges(ids, segments, objects)
+    tst <- predped:::evaluate_edges(segments, objects)
 
     testthat::expect_equal(tst$edges, ref$edges)
     testthat::expect_equal(tst$edges_with_coords, ref$edges_with_coords)
@@ -177,20 +179,15 @@ testthat::test_that("Adjusting edges works", {
                     c(-2, 0), 
                     c(0, 2))
 
-    segments <- cbind(ids, ids[c(2:4, 1)], coords, coords[c(2:4, 1),]) |>
-        as.data.frame()
-    segments[,3] <- as.numeric(segments[,3])
-    segments[,4] <- as.numeric(segments[,4])
-    segments[,5] <- as.numeric(segments[,5])
-    segments[,6] <- as.numeric(segments[,6])
+    segments <- cbind.data.frame(ids, coords, ids[c(2:4, 1)], coords[c(2:4, 1),]) |>
+        setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y"))
 
-    cost <- (segments[,3] - segments[,5])^2 + (segments[,4] - segments[,6])^2
+    cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
 
     edges <- list(edges = data.frame(from = segments[,1], 
                                      to = segments[,2], 
                                      cost = cost), 
-                  edges_with_coords = setNames(cbind(segments, cost), 
-                                               c("from", "to", "from_x", "from_y", "to_x", "to_y", "cost")),
+                  edges_with_coords = cbind(segments, cost = cost),
                   nodes = data.frame(node_ID = ids, 
                                      X = coords[,1],
                                      Y = coords[,2]))
@@ -210,9 +207,9 @@ testthat::test_that("Adjusting edges works", {
                                            cost = c(4, 4))),
                   edges_with_coords = rbind(edges$edges_with_coords, 
                                             data.frame(from = c("node 3", "node 2"), 
-                                                       to = c("agent", "goal"), 
                                                        from_x = c(-2, 0), 
                                                        from_y = c(0, -2), 
+                                                       to = c("agent", "goal"), 
                                                        to_x = c(-2, 2), 
                                                        to_y = c(2, -2), 
                                                        cost = c(4, 4))),
@@ -225,9 +222,9 @@ testthat::test_that("Adjusting edges works", {
                                      to = c("agent", "goal", "node 3"), 
                                      cost = as.character(c(4, 4, 8))),
                   edges_with_coords = data.frame(from = c("node 3", "node 2", "node 2"), 
-                                                 to = c("agent", "goal", "node 3"), 
                                                  from_x = c(-2, 0, 0), 
                                                  from_y = c(0, -2, -2),
+                                                 to = c("agent", "goal", "node 3"), 
                                                  to_x = c(-2, 2, -2),
                                                  to_y = c(2, -2, 0),
                                                  cost = c(4, 4, 8)),
@@ -239,6 +236,23 @@ testthat::test_that("Adjusting edges works", {
     # Do the tests: With reevaluation and without
     tst_1 <- predped::adjust_edges(agent, goal, setting, precomputed_edges = edges, reevaluate = FALSE)
     tst_2 <- predped::adjust_edges(agent, goal, setting, precomputed_edges = edges, reevaluate = TRUE)
+
+    # Before evaluating, put all matrices in alphabetical order
+    tst_1 <- list(edges = dplyr::arrange(tst_1$edges, from, to),
+                  edges_with_coords = dplyr::arrange(tst_1$edges_with_coords, from, to),
+                  nodes = dplyr::arrange(tst_1$nodes, node_ID))
+
+    ref_1 <- list(edges = dplyr::arrange(ref_1$edges, from, to),
+                  edges_with_coords = dplyr::arrange(ref_1$edges_with_coords, from, to),
+                  nodes = dplyr::arrange(ref_1$nodes, node_ID))
+
+    tst_2 <- list(edges = dplyr::arrange(tst_2$edges, from, to),
+                  edges_with_coords = dplyr::arrange(tst_2$edges_with_coords, from, to),
+                  nodes = dplyr::arrange(tst_2$nodes, node_ID))
+
+    ref_2 <- list(edges = dplyr::arrange(ref_2$edges, from, to),
+                  edges_with_coords = dplyr::arrange(ref_2$edges_with_coords, from, to),
+                  nodes = dplyr::arrange(ref_2$nodes, node_ID))
 
     # For the evaluation, we are going to put them in matrix format with no 
     # dimension names. Makes things easier for us
