@@ -92,49 +92,49 @@ my_model <- predped(id = "benchmark",
 
 ## simulate 
 
-```{r simulate simulate, echo = TRUE, results = "asis"}
+```{r simulate simulate, echo = FALSE, results = "asis"}
 
 # Load in the initial condition. This condition consists of 70 agents.
 initial_condition <- readRDS(file.path(".", "benchmark_inx.Rds"))
 
 # Test
 set.seed(1)
-p_m <- (\() predped::simulate(my_model, 
-                              max_agents = 70, 
-                              initial_agents = initial_condition$agents,
-                              iterations = 10, 
-                              precompute_edges = TRUE,
-                              many_options = TRUE)) |>
+p_m <- (\() capture.output(predped::simulate(my_model, 
+                                             max_agents = 70, 
+                                             initial_agents = initial_condition$agents,
+                                             iterations = 10, 
+                                             precompute_edges = TRUE,
+                                             many_options = TRUE))) |>
     test_times(n = 10) |>
     rnd()
 
 set.seed(1)
-np_m <- (\() predped::simulate(my_model, 
-                               max_agents = 70, 
-                               initial_agents = initial_condition$agents,
-                               iterations = 10, 
-                               precompute_edges = FALSE,
-                               many_options = TRUE)) |>
+np_m <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = TRUE))) |>
     test_times(n = 10) |>
     rnd()
 
 set.seed(1)
-p_f <- (\() predped::simulate(my_model, 
-                               max_agents = 70, 
-                               initial_agents = initial_condition$agents,
-                               iterations = 10, 
-                               precompute_edges = FALSE,
-                               many_options = FALSE)) |>
+p_f <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = FALSE))) |>
     test_times(n = 10) |>
     rnd()
 
 set.seed(1)
-np_f <- (\() predped::simulate(my_model, 
-                               max_agents = 70, 
-                               initial_agents = initial_condition$agents,
-                               iterations = 10, 
-                               precompute_edges = FALSE,
-                               many_options = FALSE)) |>
+np_f <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = FALSE))) |>
     test_times(n = 10) |>
     rnd()
 
