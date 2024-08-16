@@ -44,9 +44,10 @@ update_state <- function(state,
                          stay_stopped = TRUE, 
                          time_step = 0.5,
                          close_enough = 2,
-                         space_between = 1.5,
+                         space_between = 2.5,
                          standing_start = 0.1,
                          precomputed_edges = NULL,
+                         many_options = FALSE,
                          precompute_goal_paths = FALSE,
                          report = FALSE,
                          interactive_report = FALSE,
@@ -91,6 +92,7 @@ update_state <- function(state,
                              space_between = space_between,
                              standing_start = standing_start,
                              precomputed_edges = precomputed_edges,
+                             many_options = many_options,
                              precompute_goal_paths = precompute_goal_paths,
                              report = report, 
                              interactive_report = interactive_report) 
@@ -241,19 +243,11 @@ update_position <- function(agent,
 
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
-    # If the agent is currently interacting with another object, just let the 
-    # agent continue in peace
-    if(status(agent) == "completing goal") { 
-        cell(agent) <- 0
-
-    # If the agent stopped their interaction, but still has to replan their path,
-    # just return them as being at standstill.
-    } else if(status(agent) == "replan") {
-        cell(agent) <- 0
-        speed(agent) <- standing_start
-
-    # If the agent is currently waiting, let him wait a bit longer
-    } else if(status(agent) == "wait") {
+    # Let the agent wait (cell = 0 and speed is slowest possible one) when the 
+    # agent is currently interacting with another object, when they are currently 
+    # rerouting, when they are currently planning a route to their goal, or when 
+    # they are waiting for another agent.
+    if(status(agent) %in% c("completing goal", "reroute", "plan", "wait")) { 
         cell(agent) <- 0
         speed(agent) <- standing_start
                         
@@ -292,12 +286,12 @@ update_position <- function(agent,
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)
         
-        # If there are no good options available, trigger a replanning of the 
+        # If there are no good options available, trigger a reroutening of the 
         # agent: This will create new path points and let the agent reorient. 
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start
-            status(agent) <- "replan" # Get errors when not leaving this in
+            status(agent) <- "reroute" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
             return(agent)
         }
@@ -415,18 +409,19 @@ update_goal <- function(agent,
                         background,
                         standing_start = 0.1,
                         close_enough = 2,
-                        space_between = 1.5,
+                        space_between = 2.5,
                         report = FALSE,
                         interactive_report = FALSE,
                         precomputed_edges = NULL,
+                        many_options = FALSE,
                         precompute_goal_paths = FALSE) {  
 
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
-    # Make some placeholders for replanning and rerouting
-    replan <- reroute <- FALSE
+    # Make some placeholders for reroutening and rerouting
+    reroute <- FALSE
 
     # Check what the status of the goal is
     if(status(agent) == "completing goal") {
@@ -457,7 +452,7 @@ update_goal <- function(agent,
 
             # Replan if the goal paths were not precomputed yet
             if(!precompute_goal_paths) {
-                status(agent) <- "replan"
+                status(agent) <- "plan"
             } else {
                 status(agent) <- "reorient"
             }
@@ -469,13 +464,53 @@ update_goal <- function(agent,
             #                                 drop = FALSE])
         }
     } 
+
+    # If the agent has to plan their route to the goal, then we have to find the 
+    # quickest path to the goals. Either the agent sees their goal, and can walk 
+    # directly towards it, or they cannot see their goal and they have to 
+    # actually plan their route.
+    if(status(agent) == "plan") {
+        # Check whether the agent can see the current goal.
+        seen <- all(prune_edges(objects(background), 
+                                matrix(c(position(agent), current_goal(agent)@position),
+                                       nrow = 1)))
+
+        # If the agent sees their goal, the path is just going to go directly 
+        # towards the goal
+        if(seen) {
+            current_goal(agent)@path <- matrix(current_goal(agent)@position, ncol = 2)
+
+        # If they cannot see their current goal, they will have to plan their 
+        # route according to the path points in the environment. Given that we 
+        # don't add anything new in the environment, we can safely put 
+        # `reevaluate` to FALSE in this chunk of code
+        } else {
+            current_goal(agent)@path <- find_path(current_goal(agent), 
+                                                  agent, 
+                                                  background,
+                                                  precomputed_edges = precomputed_edges,
+                                                  many_options = many_options,
+                                                  reevaluate = FALSE)
+        }
+
+        # Quick check whether the path is clearly defined. If not, then the agent 
+        # will have to reroute at a later time and wait for now. 
+        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
+            status(agent) <- "plan"
+            return(agent)
+        }
+
+        # After planning their next move, they need to reorient in order to move 
+        # to the first path point
+        status(agent) <- "reorient"
+    }
     
-    # If the agent has to replan, then we have to redefine path points. 
+    # If the agent has to reroute, then we have to redefine path points. 
     # Either the agent sees their goal, and can walk directly towards it, or 
     # they cannot see their goal and they have to plan their route. Importantly,
     # agents can still plan their path if they can see their goal, but other 
     # agents are in the way. This is determined by the reroute parameter
-    if(status(agent) == "replan") {
+    if(status(agent) == "reroute") {
         # Check whether the agent can see the current goal.
         # seen <- sees_location(agent, 
         #                       current_goal(agent)@position, 
@@ -505,30 +540,36 @@ update_goal <- function(agent,
             }
         }
 
-        # Check whether you will replan on this move
+        # Check whether you will reroute on this move
         if(runif(1) < prob_rerouting) {
-            # Given that you have to reroute, replan how you will get to your 
+            # Given that you have to reroute, reroute how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
             # take the same route.
-            updated_background <- background
-            objects(updated_background) <- append(objects(updated_background), 
-                                                  state$agents)
-
+            #
+            # Given that new things were added to the environment (i.e., the 
+            # other agents that this agent should account for when planning),
+            # we need to put `reevaluate` to TRUE so that old edges can be 
+            # deleted (if necessary)
+            # current_goal(agent)@path <- find_path(current_goal(agent), 
+            #                                       agent, 
+            #                                       updated_background,
+            #                                       space_between = space_between,
+            #                                       precomputed_edges = NULL,
+            #                                       many_options = TRUE)
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
-                                                  updated_background,
+                                                  background,
                                                   space_between = space_between,
-                                                  precomputed_edges = NULL,
-                                                  many_options = TRUE)
-            # current_goal(agent)@path <- matrix(current_goal(agent)@position, 
-            #                                    nrow = 1, 
-            #                                    ncol = 2)
+                                                  new_objects = state$agents,
+                                                  precomputed_edges = precomputed_edges,
+                                                  many_options = many_options,
+                                                  reevaluate = TRUE)
 
             # Quick check whether the path is clearly defined. If not, 
-            # then the agent will have to replan at a later time and 
+            # then the agent will have to reroute at a later time and 
             # wait for now. 
             if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-                status(agent) <- "replan"
+                status(agent) <- "reroute"
                 return(agent)
             }
 
@@ -542,21 +583,21 @@ update_goal <- function(agent,
         # Turn to the new path point and slow down
         speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
 
-        # After replanning, put the status to "reorient" so that they will be
+        # After reroutening, put the status to "reorient" so that they will be
         # able to reorient in the next move
         status(agent) <- "reorient"
     }
 
     # If the agent is currently waiting, check the following:
     #   - Check whether the counter is lower than 0. If so, then the agent will
-    #     not wait any longer, but rather replan.
+    #     not wait any longer, but rather reroute.
     #   - Check whether the agent blocking the way has left. If so, the agent 
     #     no longer has to wait around and can start moving again.
     if(status(agent) == "wait") {
         # Check the counter
         waiting_counter(agent) <- waiting_counter(agent) - 1
 
-        # If counter is low enough, the agent will have to replan his approach
+        # If counter is low enough, the agent will have to reroute his approach
         # to the goal. To make sure agents don't get stuck easily, let them 
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
@@ -566,7 +607,7 @@ update_goal <- function(agent,
                                        goals(agent))
                 current_goal(agent) <- goals(agent)[[2]]
                 goals(agent) <- goals(agent)[-2]
-                status(agent) <- "replan"
+                status(agent) <- "plan"
             } else {
                 status(agent) <- "move"
             }
@@ -608,41 +649,48 @@ update_goal <- function(agent,
                                                   ncol = 2))
 
         # Check whether they are "close enough" to the goal
-        if((distance_path_point <= close_enough) & (nrow(current_goal(agent)@path) == 1)) {
-            # If they are close enough to the goal, they can enter in an 
+        if((distance_path_point <= close_enough)) {
+            # If the next path point is actually their goal, they can enter in an 
             # interaction state.
             #
             # Check if the goal is the exit goal. If so, the interaction state
             # is not "completing goal" but rather "exit", allowing us to delete
             # the agent
-            if(current_goal(agent)@id == "goal exit") {
-                status(agent) <- "exit"
+            if(nrow(current_goal(agent)@path) == 1) {
+                if(current_goal(agent)@id == "goal exit") {
+                    status(agent) <- "exit"
+                } else {
+                    status(agent) <- "completing goal"                    
+
+                    co_1 <- position(agent)
+                    co_2 <- current_goal(agent)@position 
+
+                    orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+                }
+
+                return(agent)
+
+            # If the next path point is not their goal, we have to do an 
+            # additional check of whether the agent can see the next path point.
+            # If so, the agent will move to that path point instead
             } else {
-                status(agent) <- "completing goal"                    
-                orientation(agent) <- m4ma::angle2(matrix(position(agent), 
-                                                            nrow = 1, 
-                                                            ncol = 2),
-                                                    matrix(current_goal(agent)@position,
-                                                            nrow = 1, 
-                                                            ncol = 2))
+                seen <- all(prune_edges(objects(background), 
+                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                               nrow = 1)))
+
+                if(seen) {
+                    current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
+                        matrix(ncol = 2)
+                    status(agent) <- "reorient"
+
+                    return(agent)
+                }
             }
-
-            return(agent)
-
-        # If they are close_enough to the path point, then we can delete the 
-        # path point they are currently at and let the agent reorient
-        } else if(distance_path_point <= abs(close_enough - radius(agent))) {
-            # Keep it in matrix format, even if you only have 1 row left
-            current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
-                matrix(ncol = 2)
-            status(agent) <- "reorient"
-
-            return(agent)
         }
 
         # We need to allow for another option in goal handling: namely the case 
         # where another agent is blocking the access of the agent to their 
-        # current goal. To avoid the agent from constantly replanning, we will 
+        # current goal. To avoid the agent from constantly reroutening, we will 
         # use the status "wait" to indicate that they should be patient instead.
         #
         # To initiate "wait", we check whether any of the agents is currently 
@@ -655,7 +703,7 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state$agents) > 0) & (goal_distance <= close_enough + 2 * radius(agent))) {
+        if((length(state$agents) > 0) & (goal_distance <= 2 * close_enough)) {
             # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))

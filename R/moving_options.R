@@ -45,7 +45,7 @@ moving_options_agent <- function(agent,
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
     objects(background) <- append(objects(background), 
-                                      state$agents)
+                                  state$agents)
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
@@ -216,73 +216,72 @@ overlap_with_objects <- function(agent,
                                  centers, 
                                  check) {
     
-    shp <- shape(background)
-    obj <- objects(background)
+    # If the centers are not provided, return an empty logical
+    if(length(centers) == 0) {
+        return(logical(0))
+    }
 
     # Transform all background-objects into one big matrix of segments. This will
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.
-    coords_obj <- matrix(0, nrow = 0, ncol = 2)
-    for(i in obj) {
-        coords_obj <- rbind(coords_obj, 
-                            nodes_on_circumference(i))
-    }
+    coords <- lapply(objects(background), 
+                     \(x) nodes_on_circumference(x, space_between = 5e-2))
+    coords <- do.call("rbind", coords)
 
-    # Do the same for the background. Saves a lot of time, as the original 
-    # function that was used (`intersects`) is quite time-inefficient.
-    coords_shp <- nodes_on_circumference(shp)
+    # Do the same for the background and bind this together with the other 
+    # coordinates. Saves a lot of time, as the original function that was used 
+    # (`intersects`) is quite time-inefficient.
+    coords <- rbind(coords, 
+                    nodes_on_circumference(shape(background), 
+                                           space_between = 5e-2))
+
+    # Only retain those coordinates that are within a certain range around the 
+    # agent.
+    agent_position <- position(agent)
+
+    cutoff <- max(((centers[,1] - agent_position[1])^2 + (centers[,2] - agent_position[2])^2))
+    cutoff <- sqrt(cutoff) + radius(agent)
+    distances <- sqrt((coords[,1] - agent_position[1])^2 + (coords[,2] - agent_position[2])^2)
+
+    coords <- coords[distances <= cutoff, ] |>
+        matrix(ncol = 2)
+
+    # Small check: If none of the objects is even within the same region, we 
+    # can just return the check as is
+    if(length(coords) == 0) {
+        return(check)
+    }
 
     # Loop over the centers
+    tryCatch(local_check <- matrix(TRUE, nrow = nrow(centers), ncol = nrow(coords)),
+             error = function(e) {browser()})
     for(i in seq_len(nrow(centers))) {
-        # If that center is already out of the running, continue
+        # If that center is already out of the running, we don't need to do 
+        # an additional check
         if(!check[i]) {
-            next
-        }
+            local_check[i,] <- TRUE
 
-        # Change the center of the agent
-        center(agent) <- centers[i,]
+        # If the center is still in the running, we need to check whether the 
+        # coordinates of the objects lie within the agent's new potential 
+        # position.
+        } else {
+            # Change the center of the agent
+            center(agent) <- centers[i,]
 
-        # First check whether there is an intersection with the shape of the 
-        # background
-        if(any(in_object(agent, coords_shp, outside = FALSE))) {
-            check[i] <- FALSE
-            next
-        }
-
-        # And now whether there is an intersection with the objects of the 
-        # background
-        if(any(in_object(agent, coords_obj, outside = FALSE))) {
-            check[i] <- FALSE
+            # First check whether there is an intersection with the shape of the 
+            # background. Idea is that none of the coordinates should be within the 
+            # agent, in which case the `any` statement returns FALSE. However, the 
+            # check should read TRUE when one of the coordinates is interpreted as 
+            # being okay, hence the reversal of the logical.
+            # check[i] <- !any(in_object(agent, coords, outside = FALSE))
+            local_check[i,] <- in_object(agent, coords, outside = FALSE)
         }
     }
 
-    return(check)
-}
-
-# Helper function to create dots on the circumference of objects, to be used for
-# overlap_with_object
-nodes_on_circumference <- function(object) {
-    if(inherits(object, "circle")) {
-        nodes <- points(object, length.out = ceiling(2 * pi * radius(object) / 5e-2))
+    if(is.null(ncol(check))) {
+        return(!(rowSums(local_check) > 0))
     } else {
-        corners <- object@points 
-        n <- nrow(corners)
-
-        x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
-        y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
-
-        len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / 5e-2))
-        len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / 5e-2))
-
-        len <- matrixStats::rowMaxs(cbind(len_x, len_y))
-
-        nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
-                                                   x_changes[,2],
-                                                   length.out = len))),
-                       as.numeric(unlist(multi_seq(y_changes[,1], 
-                                                   y_changes[,2],
-                                                   length.out = len))))
+        return(matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
     }
-    
-    return(nodes)
 }
+

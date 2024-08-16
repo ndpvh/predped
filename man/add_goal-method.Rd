@@ -17,7 +17,14 @@ add_goal(object, ...)
   forbidden = NULL
 )
 
-\S4method{add_goal}{circle}(object, background, id = character(0), counter = 5, forbidden = NULL)
+\S4method{add_goal}{circle}(
+  object,
+  background,
+  id = character(0),
+  counter = 5,
+  middle_edge = FALSE,
+  forbidden = NULL
+)
 }
 \arguments{
 \item{object}{An object of a type that extends \code{\link[predped]{object-class}}.}

@@ -19,13 +19,6 @@ create_edges <- function(from,
                          space_between = 0.5,
                          many_options = FALSE) {
 
-    obj <- objects(background)
-
-    # Make each of the objects in the background a bit bigger. This way, agents
-    # cannot take shortcuts
-    new_obj <- lapply(obj, 
-                      \(x) enlarge_object(x, space_between = space_between))
-
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
                           to, 
@@ -38,51 +31,156 @@ create_edges <- function(from,
         return(NULL)
     }
 
-    # Now that we have the nodes, we can also create edges or pathways between 
-    # them. Here, it is important to consider which edges are actually 
-    # connectable, or specifically which one's are occluded by the objects in 
-    # the background.
-    #
-    # Approach taken is to minimize the time it takes to do these computations:
-    #   - Step 1: Find out which nodes are uniquely connectable to each other.
-    #             First make all connections and then only retain the unique ones
-    #             through identification in a triangular logical matrix
-    #   - Step 2: Compute the distance between the nodes.
-    #   - Step 3: Find out which nodes are reachable from one another. In other 
-    #             words, if I stand at node 1, can I see node 2? In this step, 
-    #             we also immediately compute the distance from one node to 
-    #             another.
+    # Make the connection between all possible edges. Importantly, keep the id's
+    # identifying the nodes and the segments that are created between each node 
+    # separate. They will be bound together in `evaluate_edges`.
+    segments <- combine_nodes(nodes)
 
-    # Step 1
-    n_nodes <- nrow(nodes)
-    edges <- cbind(nodes[rep(seq_len(n_nodes), each = n_nodes),],
-                   nodes[rep(seq_len(n_nodes), times = n_nodes),])
-    to_remain <- matrix(0, nrow = n_nodes, ncol = n_nodes) |>
-        lower.tri() |>
-        as.vector()
-    edges <- edges[to_remain,] |>
-        as.data.frame() |>
-        setNames(c("from", "from_x", "from_y", 
-                   "to", "to_x", "to_y"))
-
-    # Step 2: Note, we use squared distances as the cost for efficiency purposes
-    # (taking the square root is computationally more expensive). Should not matter 
-    # to the results we get from the routing algorithm
-    edges$cost <- (edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2
-
-    # Step 3: Check which nodes can be seen at each location
-    idx <- prune_edges(obj,
-                       as.matrix(edges[,c("from_x", "from_y", "to_x", "to_y")]))
-
-    # Only retain what you need
-    edges <- edges[idx, c("from", "to", "cost")]
-
-    # For robustness, delete all edges that have NA values associated to them
-    idx <- !is.na(edges$from) & !is.na(edges$to) & !is.na(edges$cost)
-    edges <- edges[idx,]
-
-    return(list(edges = edges, nodes = nodes))
+    # Check whether these edges don't pass through the objects in the background 
+    # and return the required list of edges and nodes
+    return(append(evaluate_edges(segments, objects(background)), 
+                  list(nodes = nodes)))
 }
+
+#' Adjust edges of graph to walk on
+#' 
+#' This function uses the background, goal position, and position of the agent
+#' to adjust a previously computed graph of possible routes along which the agent 
+#' can walk towards their goal. The output is then used to find the shortest path.
+#' 
+#' @param from Coordinate from which to start
+#' @param to Coordinate at which to end
+#' @param background The background/setting in which the agent is walking
+#' @param precomputed_edges Output of `create_edges` in which agent and goal 
+#' are removed
+#' 
+#' @return Matrix containing from, to, and the distance between these coordinates
+#' 
+#' @export 
+adjust_edges <- function(from, 
+                         to, 
+                         background,
+                         precomputed_edges,
+                         new_objects = NULL,                          
+                         space_between = 0.5,
+                         reevaluate = FALSE) {
+
+    nodes <- precomputed_edges$nodes
+    edges_with_coords <- precomputed_edges$edges_with_coords
+
+    # Add the new objects to the background
+    if(is.null(new_objects)) {
+        new_objects <- list()
+    }
+    obj <- append(objects(background), new_objects)
+
+    # Create new nodes based on the objects that are new to the setting. If none
+    # are present, then we can just bind the agent and goal nodes to the frame.
+    # Steps taken here are very similar to those taken in `create_nodes`
+    #
+    # Importantly, if you want to reevaluate the original nodes, this only 
+    # happens when new objects have been added to the environment: As long as 
+    # nothing new is introduced in the environment, you should not reevaluate 
+    # the nodes
+    if(!is.null(new_objects) & length(new_objects) != 0) {
+        # Create nodes for each of the new objects and bind them together
+        obj_nodes <- lapply(new_objects, 
+                            \(x) add_nodes(x, 
+                                           space_between = space_between, 
+                                           only_corners = TRUE))
+        obj_nodes <- do.call("rbind", obj_nodes)
+
+        # Delete these nodes if they are already the same as those in `nodes`
+        # Commented out for performance, and assumed not to give any trouble if 
+        # some edges are duplicated.
+        #
+        # to_delete <- sapply(seq_len(nrow(obj_nodes)), 
+        #                     \(i) any((obj_nodes[i,1] == nodes$X) & (obj_nodes[i,2] == nodes$Y)))
+        # obj_nodes <- obj_nodes[!to_delete,]
+
+        # If you want to reevaluate the previous set of nodes, then immediately 
+        # do so in bulk (will make our lives easier)
+        if(reevaluate) {
+            # Keep an index that will tell us when the original nodes begin
+            node_idx <- nrow(obj_nodes) + 1
+            obj_nodes <- rbind(obj_nodes, as.matrix(nodes[,2:3]))
+        }
+
+        # Delete nodes based on whether they are occluded by an object and on 
+        # whether they are contained within the environment
+        extension <- space_between - 1e-4
+        to_delete <- lapply(obj, 
+                            \(x) in_object(enlarge(x, extension),
+                                           obj_nodes, 
+                                           outside = FALSE))
+        to_delete <- Reduce("|", to_delete) | in_object(shape(background), obj_nodes, outside = TRUE)
+
+        # Before we delete this, we need to first handle the original nodes in 
+        # case of reevaluation, otherwise we lose which nodes to delete
+        if(reevaluate) {
+            n <- length(to_delete)
+
+            # Delete the nodes that should be deleted
+            nodes <- nodes[!to_delete[node_idx:n],]
+            to_delete[node_idx:n] <- TRUE
+
+            # Also delete these nodes from `edges_with_coords`
+            names_nodes <- nodes$node_ID
+
+            idx <- (edges_with_coords$from %in% names_nodes) & (edges_with_coords$to %in% names_nodes)
+            edges_with_coords <- edges_with_coords[idx,]
+        }
+
+        # Once done, we can also delete the unnecessary nodes from obj_nodes. 
+        # Here, we only keep the new nodes, not the old, reevaluated ones
+        obj_nodes <- obj_nodes[!to_delete,]
+    } else {
+        obj_nodes <- matrix(0, nrow = 0, ncol = 2)
+    }
+
+    # Now that we created new nodes, we should bind them together with the 
+    # positions of the agent and goals
+    from_to <- data.frame(node_ID = c("agent", 
+                                      "goal", 
+                                      paste0("adjusted_nodes_", 1:nrow(obj_nodes))[!logical(nrow(obj_nodes))]),
+                          X = c(from[1], to[1], obj_nodes[,1]),
+                          Y = c(from[2], to[2], obj_nodes[,2]))
+
+    # Create new pathways that go from the agent and goal to all of the other 
+    # edges. First, we do this within the `obj_nodes` that we just created. 
+    # Afterwards, we do this for all the nodes in `from_to` to all of the old 
+    # nodes.
+    if(nrow(nodes) == 0) {
+        segments <- combine_nodes(from_to)
+    } else {
+        segments <- rbind(combine_nodes(nodes, from_to), 
+                          combine_nodes(from_to))
+    }
+
+    # Bind these segments and ids together with those that are already present 
+    # in the precomputed edges. This step is necessary if we want to make sure 
+    # that all edges are reevaluated on their adequacy
+    if(reevaluate) {
+        segments <- rbind(segments, subset(edges_with_coords, select = -cost))
+    }
+
+    # Check whether these edges don't pass through the objects in the background
+    edges <- evaluate_edges(segments, obj)
+
+    # If there hadn't been a reevaluation before, we need to bind these edges
+    # to the already computed ones
+    if(!reevaluate) {
+        edges$edges <- rbind(edges$edges, precomputed_edges$edges)
+        edges$edges_with_coords <- rbind(edges$edges_with_coords, edges_with_coords)
+    }
+
+    return(append(edges, 
+                  list(nodes = rbind(nodes, from_to))))
+}
+
+
+
+
 
 #' Create nodes of graph to walk on
 #' 
@@ -99,10 +197,6 @@ create_edges <- function(from,
 #' @return Matrix containing from, to, and the distance between these coordinates
 #' 
 #' @export 
-#
-# TO DO:
-#   - Vectorize the creation of the diagonal nodes in rectangles and circles and
-#     find a way to vectorize this for polygons (i.e., get rid of the while loop)
 create_nodes <- function(from, 
                          to, 
                          background, 
@@ -150,13 +244,15 @@ create_nodes <- function(from,
     # we first create slightly bigger objects so that nodes close to each object
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
+    extension <- space_between - 1e-4
     to_delete <- lapply(obj, 
-                        \(x) in_object(enlarge_object(x, space_between = space_between), 
+                        \(x) in_object(enlarge(x, extension), 
                                        nodes, 
                                        outside = FALSE))
     to_delete <- Reduce("|", to_delete) | in_object(shp, nodes, outside = TRUE)
 
-    nodes <- nodes[!to_delete,]
+    nodes <- nodes[!to_delete,] |> 
+        matrix(ncol = 2)
 
     # Do a check of whether there are any nodes at all. If not, then we will have
     # to return NULL and get on with it.
@@ -180,10 +276,9 @@ create_nodes <- function(from,
 
     # Now, transform the nodes to a dataframe as required by `makegraph` from
     # the cppRouting package
-    nodes <- cbind.data.frame(ids, 
-                              as.numeric(nodes[,1]), 
-                              as.numeric(nodes[,2])) |>
-        setNames(c("node_ID", "X", "Y"))
+    nodes <- cbind.data.frame(node_ID = ids, 
+                              X = as.numeric(nodes[,1]), 
+                              Y = as.numeric(nodes[,2]))
 
     # For robustness, delete all nodes that have NA values associated to them
     idx <- !is.na(nodes$node_ID) & !is.na(nodes$X) & !is.na(nodes$Y)
@@ -192,37 +287,53 @@ create_nodes <- function(from,
     return(nodes)
 }
 
-# Utility function that will enlarge an object based on the spacing provided 
-# by the argument
-enlarge_object <- function(object, 
-                           space_between = 0.5) {
-    # Dispatch on the kind of object we are talking about
-    if(inherits(object, "circle")) {
-        # Extend the radius with space_between - 1e-4. Ensures that we don't
-        # delete route points that are `space_between` far from the circle
-        return(circle(center = center(object), 
-                      radius = radius(object) + space_between - 1e-4))
+#' Evaluate whether edges pass through objects
+#' 
+#' This function evaluates whether all connections between the nodes are actually 
+#' specified, or specifically which one's are occluded by the objects in 
+#' the background.
+#'
+#' Approach taken is to minimize the time it takes to do these computations:
+#'   - Step 1: Compute the distance between the nodes.
+#'   - Step 2: Find out which nodes are reachable from one another. In other 
+#'             words, if I stand at node 1, can I see node 2?
+#' 
+#' @param segments Named list containing an n x 4 matrix of segments that make 
+#' up the edges (under key "semgents") and an n x 2 matrix of names for the 
+#' nodes that make up these edges (under key "ids").
+#' @param objects List of objects that are contained in the setting
+#' 
+#' @return List containing the nodes, edges, and edges together with their 
+#' coordinates
+#' 
+#' @export
+evaluate_edges <- function(segments, 
+                           objects) {
 
-    } else if(inherits(object, "rectangle")) {
-        # Extend the size of the rectangle with the factor 
-        # sqrt{space_between^2 / 2}, as we do in the `add_nodes` function. 
-        # Again correct with factor 1e-4
-        extension <- sqrt(space_between^2 / 2)
-        return(rectangle(center = center(object), 
-                         size = object@size + 2 * (extension - 1e-4)))
+    # Step 1: Note, we use squared distances as the cost for efficiency purposes
+    # (taking the square root is computationally more expensive). Should not matter 
+    # to the results we get from the routing algorithm
+    cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
 
-    } else if(inherits(object, "polygon")) {
-        # Simply find the nodes of the polygon and use these new nodes as 
-        # the points of the outer polygon.
-        points <- add_nodes(object, 
-                            space_between = space_between - 1e-4,
-                            only_corners = TRUE)
-        return(polygon(points = points))
+    # Step 2: Check which nodes can be seen at each location
+    idx <- prune_edges(objects, segments[, c("from_x", "from_y", "to_x", "to_y")])
 
-    } else {
-        stop(paste0("The object provided is not recognized: ", class(object)))
-    }
+    # Bind all information together and delete all edges that have NA values 
+    # associated to them (`prune_edges` returns NA whenever a segment is actually
+    # a point, but only if the object is a circle)
+    edges_with_coords <- cbind(segments[idx,], 
+                               cost = cost[idx]) 
+    edges <- edges_with_coords[, c("from", "to", "cost")]
+
+    idx <- !is.na(edges[,1]) & !is.na(edges[,2]) & !is.na(edges[,3])
+
+    return(list(edges = edges[idx,], 
+                edges_with_coords = edges_with_coords[idx,]))
 }
+
+
+
+
 
 # Make a vectorized alternative to m4ma::seesGoal that will loop over the objects
 # but looks at intersections in a vectorized manner.
@@ -230,108 +341,48 @@ enlarge_object <- function(object,
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
-    # Loop over the objects in the environment
-    all_intersections <- matrix(FALSE, nrow = nrow(segments), ncol = length(objects))
-    for(i in seq_along(objects)) {
-        # Dispatch based on the kind of object we are talking about
-        if(inherits(objects[[i]], "polygon")) {
-            # If there is an intersection with the points of the polygon/rectangle,
-            # then the agent cannot see the location we are talking about and 
-            # the function should return false
-            points <- objects[[i]]@points
-            edges <- cbind(points, points[c(2:nrow(points), 1),])
-            intersections <- line_line_intersection(segments, edges, return_all = TRUE)
-            
-            # Rework the intersections matrix so that it has the values for each
-            # of the segments of the polygon/rectangle in its columns. Then find
-            # out whether the segments intersect with any of the segments of the 
-            # polygon/rectangle by using rowSums, which should be equal to 0 if
-            # there are no intersections
-            intersections <- matrix(intersections, 
-                                    ncol = nrow(edges),
-                                    byrow = T)
-            all_intersections[,i] <- rowSums(intersections) > 0L
-
-        } else if(inherits(objects[[i]], "circle")) {
-            # Here we just use the line_intersections function that has been 
-            # designed for circles. 
-            all_intersections[,i] <- line_intersection(objects[[i]], 
-                                                       segments, 
-                                                       return_all = TRUE)
-        }
-    }
+    # Loop over the objects in the environment and check their intersections 
+    # with the lines in `segments`
+    all_intersections <- lapply(objects, 
+                                \(x) line_intersection(x, segments, return_all = TRUE))
 
     # I want to only retain those that do not intersect, meaning that the complete
-    # row should be FALSE
-    return(rowSums(all_intersections) == 0L)
+    # row should be FALSE. We therefore check whether any of the sides is TRUE and 
+    # then reverse the operation, so that none of them can be
+    return(!Reduce("|", all_intersections))
 }
 
-#' Adjust edges of graph to walk on
-#' 
-#' This function uses the background, goal position, and position of the agent
-#' to adjust a previously computed graph of possible routes along which the agent 
-#' can walk towards their goal. The output is then used to find the shortest path.
-#' 
-#' @param from Coordinate from which to start
-#' @param to Coordinate at which to end
-#' @param background The background/setting in which the agent is walking
-#' @param precomputed_edges Output of `create_edges` in which agent and goal 
-#' are removed
-#' 
-#' @return Matrix containing from, to, and the distance between these coordinates
-#' 
-#' @export 
-adjust_edges <- function(from, 
-                         to, 
-                         background, 
-                         precomputed_edges) {
+# Make a function that takes in two vectors of nodes and will combine them 
+# into one. Importantly, nodes should be in the required format, meaning a 
+# data.frame with 3 columns, namely node_ID, X, and Y
+combine_nodes <- function(nodes_1, 
+                          nodes_2 = NULL) {
 
-    obj <- objects(background)
-    nodes <- precomputed_edges$nodes
-    edges <- precomputed_edges$edges
+    # If the second set of nodes is not NULL, we want to combine each node in 
+    # the one data.frame with all the nodes in the other. Otherwise, we want to 
+    # combine each node within the same data.frame with each other
+    if(!is.null(nodes_2)) {
+        # Get the sizes of each of the node matrices
+        n <- nrow(nodes_1)
+        k <- nrow(nodes_2)
 
-    from_to <- rbind(c("agent", as.numeric(from)), 
-                     c("goal", as.numeric(to))) |>
-        as.data.frame() |>
-        setNames(colnames(nodes))
+        # Create indices to be repeated. These indices define which member of node_1
+        # is connected to which member of node_2
+        idx_1 <- rep(1:n, each = k)
+        idx_2 <- rep(1:k, times = n)
 
-    from_to$X <- as.numeric(from_to$X)
-    from_to$Y <- as.numeric(from_to$Y)
+        return(cbind(nodes_1[idx_1,], nodes_2[idx_2,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
 
-    # Add the from and to coordinates to the nodes
-    new_nodes <- rbind(nodes, from_to)
+    } else {
+        n <- nrow(nodes_1)
+        idx <- matrix(1:n, nrow = n, ncol = n)
+        to_remain <- lower.tri(idx)
+    
+        idx_1 <- t(idx)[to_remain]
+        idx_2 <- idx[to_remain]
 
-    # Create new pathways that go from the agent and goal to all of the other 
-    # edges and bind them together with the already existing ones.
-    #
-    # Approach taken is to minimize the time it takes to do these computations:
-    #   - Step 1: Create the unique edges between agent, goal, and already 
-    #             existing nodes
-    #   - Step 2: Compute the distance between the nodes.
-    #   - Step 3: Find out which nodes are reachable from one another. In other 
-    #             words, if I stand at node 1, can I see node 2? In this step, 
-    #             we also immediately compute the distance from one node to 
-    #             another.
-
-    # Step 1
-    n_nodes <- nrow(nodes)
-    new_edges <- cbind(from_to[rep(seq_len(2), each = n_nodes),],
-                       nodes[rep(seq_len(n_nodes), times = 2),]) |>
-        as.data.frame() |>
-        setNames(c("from", "from_x", "from_y", 
-                   "to", "to_x", "to_y"))
-
-    # Step 2: Note, we use squared distances as the cost for efficiency purposes
-    # (taking the square root is computationally more expensive). Should not matter 
-    # to the results we get from the routing algorithm
-    new_edges$cost <- (new_edges$from_x - new_edges$to_x)^2 + (new_edges$from_y - new_edges$to_y)^2
-
-    # Step 3: Check which nodes can be seen at each location
-    idx <- prune_edges(obj,
-                       as.matrix(new_edges[,c("from_x", "from_y", "to_x", "to_y")]))
-
-    # Only retain what you need and bind it together with the precomputed variant
-    new_edges <- new_edges[idx, c("from", "to", "cost")]
-    new_edges <- rbind(edges, new_edges)
-    return(list(edges = new_edges, nodes = new_nodes))
+        return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
+    }
 }

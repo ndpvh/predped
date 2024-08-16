@@ -313,6 +313,7 @@ setMethod("add_goal", signature(object = "circle"), function(object,
                                                              background,
                                                              id = character(0),
                                                              counter = 5,
+                                                             middle_edge = FALSE,
                                                              forbidden = NULL){
 
     # Create an ever so slightly bigger circle
@@ -368,8 +369,10 @@ setMethod("find_path", "goal", function(object,
                                         background,
                                         algorithm = "bi",
                                         space_between = radius(agent),
+                                        new_objects = NULL,
                                         precomputed_edges = NULL,
-                                        many_options = FALSE) {
+                                        many_options = FALSE,
+                                        reevaluate = FALSE) {
                                             
     # If there are no objects in the environment, you can just make a direct 
     # path between the agent and their goal
@@ -383,21 +386,32 @@ setMethod("find_path", "goal", function(object,
 
     # Create the edges that are taken in by `makegraph`
     if(is.null(precomputed_edges)) {
+        # If they are not precomputed, we should add the new objects to the 
+        # objects in the environment before we can make the path
+        if(!is.null(new_objects)) {
+            objects(background) <- append(objects(background), 
+                                          new_objects)
+        }
+
         edges <- create_edges(position(agent),
                               position(object), 
                               background,
                               space_between = space_between,
                               many_options = many_options)
     } else {
+        # If the edges are precomputed, adjust them to fit our current purpose
         edges <- adjust_edges(position(agent),
                               position(object),
                               background,
-                              precomputed_edges = precomputed_edges)
+                              space_between = space_between,
+                              new_objects = new_objects,
+                              precomputed_edges = precomputed_edges,
+                              reevaluate = reevaluate)
     }
 
     # If edges is actually NULL, we need to return this 
     if(is.null(edges)) {
-        return(NULL)
+        return(matrix(nrow = 0, ncol = 2))
     }
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
@@ -469,8 +483,7 @@ setMethod("find_path", "goal", function(object,
 
     # Some additional changes for convention
     rownames(path_points) <- NULL
-    colnames(path_points) <- c("x", "y")
-    
+    colnames(path_points) <- c("x", "y")    
 
     return(path_points)
 })

@@ -1,0 +1,168 @@
+# simulate.R
+
+```{r simulate setup, echo = FALSE}
+
+# Define the supermarket environment as the setting of choice. This environment
+# consists of a rectangular shape, several shelves, and a separate entrance and
+# exit. All values are in meters.
+setting <- background(shape = rectangle(center = c(20, 12.5),
+                                        size = c(40, 25)), 
+                      objects = list(# Special shelves
+                                     rectangle(center = c(20, 1.2 / 2), 
+                                               size = c(32, 1.2), 
+                                               interactable = TRUE),
+                                     rectangle(center = c(38, 4),
+                                               size = c(1.2, 4),
+                                               interactable = TRUE),
+                                     rectangle(center = c(39.4, 7.5 + 8.75), 
+                                               size = c(1.2, 25 - 7.5), 
+                                               interactable = TRUE),
+                                     polygon(points = rbind(c(0, 19.5),
+                                                            c(0, 25),
+                                                            c(16, 25),
+                                                            c(16, 22.5),
+                                                            c(1.2, 22.5),
+                                                            c(1.2, 19.5)),
+                                             interactable = TRUE),
+                                     rectangle(center = c(1, 14.5),
+                                               size = c(2, 1.2),
+                                               interactable = TRUE),
+                                     polygon(points = rbind(c(0, 3.5), 
+                                                            c(0, 11.6),
+                                                            c(17, 11.6),
+                                                            c(17, 10.4),
+                                                            c(1.2, 10.4),
+                                                            c(1.2, 3.5)),
+                                             interactable = TRUE),
+                                     # Bottom left
+                                     rectangle(center = c(12, 4),
+                                               size = c(12, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(12, 7),
+                                               size = c(12, 1.2),
+                                               interactable = TRUE),
+                                     # Top left
+                                     rectangle(center = c(12.5, 14),
+                                               size = c(13, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(12.5, 17),
+                                               size = c(13, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(12.5, 20),
+                                               size = c(13, 1.2),
+                                               interactable = TRUE),
+                                     # Top right
+                                     rectangle(center = c(29, 11),
+                                               size = c(14, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(29, 14),
+                                               size = c(14, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(29, 17),
+                                               size = c(14, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(29, 20),
+                                               size = c(14, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(29, 23),
+                                               size = c(14, 1.2),
+                                               interactable = TRUE),
+                                     # Bottom right
+                                     rectangle(center = c(27, 4),
+                                               size = c(12, 1.2),
+                                               interactable = TRUE),
+                                     rectangle(center = c(27, 7),
+                                               size = c(12, 1.2),
+                                               interactable = TRUE)),
+                      entrance = c(0, 0.5),
+                      exit = c(0, 13),
+                      same_exit = FALSE)
+
+# Define the model that we want to run. Here, we define the setting, a dataframe
+# that contains the parameters of the model, which of these "agent archetypes"
+# to use, and how many of each should be used.
+#
+# Given that we want to benchmark, I'll only use "BaselineEuropean"s
+my_model <- predped(id = "benchmark", 
+                    setting = setting, 
+                    parameters = params_archetypes,
+                    archetypes = "BaselineEuropean")
+
+```
+
+## simulate 
+
+```{r simulate simulate, echo = FALSE, results = "asis"}
+
+# Load in the initial condition. This condition consists of 70 agents.
+initial_condition <- readRDS(file.path(".", "benchmark_inx.Rds"))
+
+# Test
+set.seed(1)
+p_m <- (\() capture.output(predped::simulate(my_model, 
+                                             max_agents = 70, 
+                                             initial_agents = initial_condition$agents,
+                                             iterations = 10, 
+                                             precompute_edges = TRUE,
+                                             many_options = TRUE))) |>
+    test_times(n = 10) |>
+    rnd()
+
+set.seed(1)
+np_m <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = TRUE))) |>
+    test_times(n = 10) |>
+    rnd()
+
+set.seed(1)
+p_f <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = FALSE))) |>
+    test_times(n = 10) |>
+    rnd()
+
+set.seed(1)
+np_f <- (\() capture.output(predped::simulate(my_model, 
+                                              max_agents = 70, 
+                                              initial_agents = initial_condition$agents,
+                                              iterations = 10, 
+                                              precompute_edges = FALSE,
+                                              many_options = FALSE))) |>
+    test_times(n = 10) |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- cbind(c("Few edges", "Many edges"), 
+             c(p_f[2], p_m[2]), 
+             c(paste0("[", p_f[1], ",", p_f[3], "]"), paste0("[", p_m[1], ",", p_m[3], "]")), 
+             c(np_f[2], np_m[2]), 
+             c(paste0("[", np_f[1], ",", np_f[3], "]"), paste0("[", np_m[1], ",", np_m[3], "]")))
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the simulate function. ", 
+                  "We simulated 10 iterations of movement for 70 agents in the supermarket environment. ",
+                  "Distinction is made between precomputing edges or not and between having few or many edges. ",
+                  "Importantly, function only executed 10 times.")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Precomputed" = 2, "Not precomputed" = 2)) %>% 
+    print()
+
+```

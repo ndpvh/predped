@@ -562,6 +562,27 @@ testthat::test_that("Circle intersection works", {
     testthat::expect_equal(tst, ref)
 })
 
+testthat::test_that("Enlarging object works", {
+    # Create a list of objects
+    objects <- list(predped::circle(center = c(0, 0), 
+                                    radius = 1), 
+                    predped::rectangle(center = c(2, 2), 
+                                       size = c(1, 1)), 
+                    predped::polygon(points = rbind(c(-2.5, -1.5), 
+                                                    c(-1.5, -1.5),
+                                                    c(-1.5, -2.5), 
+                                                    c(-2.5, -2.5))))
+
+    # Do the test
+    larger_objects <- lapply(objects, 
+                             \(x) predped:::enlarge(x, 1))
+
+    testthat::expect_equal(radius(larger_objects[[1]]), 2, tolerance = 1e-2)
+    testthat::expect_equal(size(larger_objects[[2]]), rep(1 + 2 * 0.707, 2), tolerance = 1e-2)
+    testthat::expect_equal(diff(range(larger_objects[[3]]@points[,1])), 1 + 2 * 0.707, tolerance = 1e-2)
+    testthat::expect_equal(diff(range(larger_objects[[3]]@points[,2])), 1 + 2 * 0.707, tolerance = 1e-2)
+})
+
 
 
 

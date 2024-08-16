@@ -103,7 +103,7 @@ testthat::test_that("Creating initial condition works", {
     agents_many <- predped::create_initial_condition(50, model, 5)
 
     testthat::expect_equal(length(agents_few), 3)
-    testthat::expect_equal(length(agents_many), 8)
+    testthat::expect_equal(length(agents_many), 7)
     testthat::expect_message(predped::create_initial_condition(50, model, 5))
 
     # If you would ever want to visualize it during debugging
@@ -153,7 +153,7 @@ testthat::test_that("Creating initial condition with groups works", {
     testthat::expect_equal(as.numeric(tst_pairs_1), rep(1:5, each = 2))
     testthat::expect_equal(as.numeric(tst_pairs_2), rep(1:5, each = 2))
     testthat::expect_equal(as.numeric(tst_more_1), c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 6, 7, 8, 8, 8, 8, 9))
-    testthat::expect_equal(as.numeric(tst_more_2), c(1, 1, 2, 2, 2, 3, 4, 4, 5, 5, 5, 6, 7, 7, 7, 8, 8, 8, 9, 9))
+    testthat::expect_equal(as.numeric(tst_more_2), c(1, 2, 2, 2, 2, 3, 4, 4, 5, 5, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10))
 
     # Create an initial condition that will lead to an error
     testthat::expect_error(predped::create_initial_condition(10, model, 5, group_size = matrix(c(1, Inf), nrow = 1)))

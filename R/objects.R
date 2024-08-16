@@ -158,6 +158,18 @@ setGeneric("area", function(object) standardGeneric("area"))
 #' @name in_object-method
 setGeneric("in_object", function(object, x, outside = TRUE) standardGeneric("in_object"))
 
+#' Make an Object Larger
+#'
+#' @param object An object of a type that extends \code{\link[predped]{object-class}}.
+#' @param extension Numeric denoting the length with which to extend the object 
+#' in all directions.
+#'
+#' @return Enlarged object
+#' 
+#' @export
+#' @name enlarge-method
+setGeneric("enlarge", function(object, extension) standardGeneric("enlarge"))
+
 #' Sample a Random Point on the Circumference
 #'
 #' @param object An object of a type that extends \code{\link[predped]{object-class}}.
@@ -185,6 +197,17 @@ setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) s
 #' @export 
 #' @name add_nodes-method
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
+
+#' Add Nodes on the Circumference of an Object
+#'
+#' @param object An object 
+#' @param space_between Numeric denoting the amount of space that needs to be 
+#' left between the edge of the object and the node. Defaults to `5e-2`
+#' 
+#' @return  Matrix with points along the edges of the object
+#' @export 
+#' @name nodes_on_circumference-method
+setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("nodes_on_circumference"))
 
 #' Check whether an Object intersects with Other Object
 #'
@@ -261,6 +284,10 @@ setMethod("initialize", "polygon", function(.Object,
 setMethod("in_object", signature(object = "polygon"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -268,6 +295,15 @@ setMethod("in_object", signature(object = "polygon"), function(object, x, outsid
     # Use the raycasting algorithm to determine whether the points in x are 
     # contained in the polygon.
     return(raycasting(object@points, x, outside = outside))
+})
+
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "polygon"), function(object, extension) {
+    # Find the nodes of the polygon and use these new nodes as the points of 
+    # the enlarged polygon.
+    points(object) <- add_nodes(object, space_between = extension, only_corners = TRUE)
+    return(object)
 })
 
 #'@rdname rng_point-method
@@ -417,6 +453,32 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
                            start[2] + 1:(number_points - 1) * sin(angle) * dist)
         nodes <- rbind(nodes, new_nodes)        
     }
+
+    return(nodes)
+})
+
+#'@rdname nodes_on_circumference-method
+#'
+setMethod("nodes_on_circumference", signature(object = "polygon"), function(object, 
+                                                                            space_between = 5e-2) {
+
+    corners <- object@points 
+    n <- nrow(corners)
+
+    x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
+    y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
+
+    len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / space_between))
+    len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / space_between))
+
+    len <- matrixStats::rowMaxs(cbind(len_x, len_y))
+
+    nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
+                                               x_changes[,2],
+                                               length.out = len))),
+                   as.numeric(unlist(multi_seq(y_changes[,1], 
+                                               y_changes[,2],
+                                               length.out = len))))
 
     return(nodes)
 })
@@ -588,6 +650,10 @@ setMethod("area", signature(object = "rectangle"), function(object) prod(object@
 setMethod("in_object", signature(object = "rectangle"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -615,6 +681,15 @@ setMethod("in_object", signature(object = "rectangle"), function(object, x, outs
     #     check <- !check
     # }
     # return(check) # Important: Benchmark shows that the other algorithm is faster
+})
+
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "rectangle"), function(object, extension) {
+    # Extend the size of the rectangle with the factor sqrt{space_between^2 / 2}, 
+    # as we do in the `add_nodes` function.
+    size(object) <- size(object) + 2 * sqrt(extension^2 / 2)
+    return(object)
 })
 
 #'@rdname add_nodes-method
@@ -767,6 +842,10 @@ setMethod("area", signature(object = "circle"), function(object) pi*object@radiu
 setMethod("in_object", signature(object = "circle"), function(object, x, outside = TRUE) {
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
     }
@@ -781,6 +860,14 @@ setMethod("in_object", signature(object = "circle"), function(object, x, outside
         check <- !check
     }
     return(check)
+})
+
+#'@rdname enlarge-method
+#'
+setMethod("enlarge", signature(object = "circle"), function(object, extension) {
+    # Extend the radius with extension.
+    radius(object) <- radius(object) + extension
+    return(object)
 })
 
 #'@rdname rng_point-method
@@ -890,6 +977,14 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     return(nodes)
 })
 
+#'@rdname nodes_on_circumference-method
+#'
+setMethod("nodes_on_circumference", signature(object = "circle"), function(object, 
+                                                                           space_between = 5e-2) {
+
+    return(nodes <- points(object, length.out = ceiling(2 * pi * radius(object) / space_between)))
+})
+
 #'@rdname intersects-method
 #'
 setMethod("intersects", signature(object = "circle"), function(object, other_object) {
@@ -941,6 +1036,10 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
                                                                       segments,
                                                                       return_all = FALSE) {
 
+    if(is.data.frame(segments)) {
+        segments <- as.matrix(segments)
+    }
+    
     intersecting_segments <- cbind(1:nrow(segments),
                                    rep(FALSE, each = nrow(segments)))
 
@@ -1088,7 +1187,7 @@ setMethod("in_object", signature(object = "segment"), function(object, x, outsid
 #'@rdname rng_point-method
 #'
 setMethod("rng_point", signature(object = "segment"), function(object,
-                                                            middle_edge = TRUE) {
+                                                               middle_edge = TRUE) {
 
     if(middle_edge) {
         return(as.numeric(center(object)))
@@ -1101,7 +1200,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #'@rdname add_nodes-method
 #'
 setMethod("add_nodes", signature(object = "segment"), function(object, 
-                                                            ...) {
+                                                               ...) {
     
     # Should not add nodes to a line
     return(NULL)

@@ -1,0 +1,342 @@
+# goals.R
+
+```{r setup goals, echo = FALSE}
+
+# Create setting
+setting <- predped::background(shape = predped::rectangle(center = c(20, 12.5),
+                                                          size = c(40, 25)), 
+                               objects = list(# Special shelves
+                                              predped::rectangle(center = c(20, 1.2 / 2), 
+                                                                 size = c(32, 1.2), 
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(38, 4),
+                                                                 size = c(1.2, 4),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(39.4, 7.5 + 8.75), 
+                                                                 size = c(1.2, 25 - 7.5), 
+                                                                 interactable = TRUE),
+                                              predped::polygon(points = rbind(c(0, 19.5),
+                                                                              c(0, 25),
+                                                                              c(16, 25),
+                                                                              c(16, 22.5),
+                                                                              c(1.2, 22.5),
+                                                                              c(1.2, 19.5)),
+                                                               interactable = TRUE),
+                                              predped::rectangle(center = c(1, 14.5),
+                                                                 size = c(2, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::polygon(points = rbind(c(0, 3.5), 
+                                                                              c(0, 11.6),
+                                                                              c(17, 11.6),
+                                                                              c(17, 10.4),
+                                                                              c(1.2, 10.4),
+                                                                              c(1.2, 3.5)),
+                                                               interactable = TRUE),
+                                              # Bottom left
+                                              predped::rectangle(center = c(12, 4),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12, 7),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              # Top left
+                                              predped::rectangle(center = c(12.5, 14),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12.5, 17),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(12.5, 20),
+                                                                 size = c(13, 1.2),
+                                                                 interactable = TRUE),
+                                              # Top right
+                                              predped::rectangle(center = c(29, 11),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 14),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 17),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 20),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(29, 23),
+                                                                 size = c(14, 1.2),
+                                                                 interactable = TRUE),
+                                              # Bottom right
+                                              predped::rectangle(center = c(27, 4),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE),
+                                              predped::rectangle(center = c(27, 7),
+                                                                 size = c(12, 1.2),
+                                                                 interactable = TRUE)),
+                               entrance = c(0, 0.5),
+                               exit = c(0, 13),
+                               same_exit = FALSE)
+
+# Precompute some edges
+few_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = FALSE)
+many_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = TRUE)
+
+few_edges$edges <- few_edges$edges[!(few_edges$edges$from %in% c("agent", "goal")),]
+few_edges$edges <- few_edges$edges[!(few_edges$edges$to %in% c("agent", "goal")),]
+few_edges$nodes <- few_edges$nodes[!(few_edges$nodes$node_ID %in% c("agent", "goal")),]
+
+many_edges$edges <- many_edges$edges[!(many_edges$edges$from %in% c("agent", "goal")),]
+many_edges$edges <- many_edges$edges[!(many_edges$edges$to %in% c("agent", "goal")),]
+many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", "goal")),]
+
+```
+
+## add_goal
+
+```{r goals add_goal, echo = FALSE, results = "asis"}
+
+# Create all objects and peform the tests
+obj <- list(predped::rectangle(center = c(0, 0), size = c(1, 1)), 
+            predped::circle(center = c(0, 0), radius = 1),
+            predped::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))))
+
+r <- (\() predped:::add_goal(obj[[1]], setting, middle_edge = FALSE)) |>
+    test_times() |>
+    rnd()
+
+c <- (\() predped:::add_goal(obj[[2]], setting)) |>
+    test_times() |>
+    rnd()
+
+p <- (\() predped:::add_goal(obj[[3]], setting, middle_edge = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rm <- (\() predped:::add_goal(obj[[1]], setting, middle_edge = TRUE)) |>
+    test_times() |>
+    rnd()
+
+cm <- c(NA, NA, NA)
+
+pm <- (\() predped:::add_goal(obj[[3]], setting, middle_edge = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- cbind(c("middle\\_edge = FALSE", "middle\\_edge = TRUE"),
+             c(r[2], rm[2]),
+             c(paste0("[", r[1], ",", r[3], "]"), paste0("[", rm[1], ",", rm[3], "]")),
+             c(p[2], pm[2]),
+             c(paste0("[", p[1], ",", p[3], "]"), paste0("[", pm[1], ",", pm[3], "]")),
+             c(c[2], cm[2]),
+             c(paste0("[", c[1], ",", c[3], "]"), paste0("[", cm[1], ",", cm[3], "]")))
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the add\\_goal function. ", 
+                  "Benchmark is computed for each of the possible shapes in predped. ",
+                  "Additionally, the effect of setting a goal randomly on the object or taking the middle of ",
+                  "an edge is also examined (i.e., when middle\\_edge = TRUE or FALSE)")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) %>% 
+    print()
+```
+
+## find_path
+```{r goals find_path, echo = FALSE, results = "asis"}
+
+# Test `find_path`
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13))
+my_agent <- predped::agent(center = c(0.3, 0.5), radius = 0.25)
+
+fn <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = NULL,
+                              many_options = FALSE)) |>
+    test_times() |>
+    rnd()
+
+mn <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = NULL,
+                              many_options = TRUE)) |>
+    test_times() |>
+    rnd()
+
+fp <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = few_edges,
+                              reevaluate = FALSE)) |>
+    test_times() |>
+    rnd()
+
+mp <- (\() predped::find_path(my_goal,
+                              my_agent, 
+                              setting, 
+                              precomputed_edges = many_edges,
+                              reevaluate = FALSE)) |>
+    test_times() |>
+    rnd()
+
+fpr <- (\() predped::find_path(my_goal,
+                               my_agent, 
+                               setting, 
+                               precomputed_edges = few_edges,
+                               reevaluate = TRUE)) |>
+    test_times() |>
+    rnd()
+
+mpr <- (\() predped::find_path(my_goal,
+                               my_agent, 
+                               setting, 
+                               precomputed_edges = many_edges,
+                               reevaluate = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- cbind(c("Few edges", "Many edges"), 
+             c(fn[2], mn[2]), 
+             c(paste0("[", fn[1], ",", fn[3], "]"), paste0("[", mn[1], ",", mn[3], "]")), 
+             c(fp[2], mp[2]), 
+             c(paste0("[", fp[1], ",", fp[3], "]"), paste0("[", mp[1], ",", mp[3], "]")),
+             c(fpr[2], mpr[2]), 
+             c(paste0("[", fpr[1], ",", fpr[3], "]"), paste0("[", mpr[1], ",", mpr[3], "]")))
+rownames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the find\\_path function. ", 
+                  "A distinction is made between few and many edges, and between precomputed and no precomputed edges. ",
+                  "When edges are precomputed, we also distinguish between reevaluating the edges or not ", 
+                  "(i.e., reevaluate = TRUE or FALSE).")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 3, "reevaluate = FALSE" = 2, "reevaluate = TRUE" = 2)) %>% 
+    kableExtra::add_header_above(c(" " = 1, "not precomputed" = 2, "precomputed" = 4)) %>% 
+    print()
+
+```
+
+## generate_goal_stack
+
+```{r goals generate_goal_stack, echo = FALSE, results = "asis"}
+
+# Test 
+tbl <- (\() predped:::generate_goal_stack(10, setting, \(x) 10)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the generate\\_goal\\_stack function. ",
+                  "In this benchmark, we generate 10 goals in this goal stack.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## initialize
+
+```{r goals initialize, echo = FALSE, results = "asis"}
+
+# Test 
+tbl <- (\() predped:::goal(position = c(1, 2))) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the initialize or goal function, that is, for initializing a goal. ",
+                  "In this benchmark, we only provide a position to the goal.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## interact
+```{r goals interact, echo = FALSE, results = "asis"}
+
+# Test
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
+
+tbl <- (\() predped:::interact(my_goal)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the interact method for goals.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+```
+
+## replace 
+
+```{r goals replace, echo = FALSE, results = "asis"}
+
+# Test
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
+
+tbl <- (\() predped:::replace(my_goal, setting, \(x) 5)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the replace method for goals.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+```
