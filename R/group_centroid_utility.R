@@ -78,11 +78,12 @@ get_median_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
 #' @param b_gc Numeric scalar steepness parameter
 #' @param optm_d Numeric scalar indicating optimal distance to group centroid.
 #' @param cell_dist Numeric vector with the distance from the cell to the predicted group centroid.
+#' @param stop_utility ...
 #' 
 #' @return Numeric vector `centroid_util` with group centroid utility for each cell.
 #' @export
 #'
-gc_utility <- function(a_gc, b_gc, optm_d, cell_dist) {
+gc_utility <- function(a_gc, b_gc, optm_d, cell_dist, stop_utility) {
     
     if (is.null(cell_dist)) {
         return(numeric(33))
@@ -92,6 +93,10 @@ gc_utility <- function(a_gc, b_gc, optm_d, cell_dist) {
     centroid_util <- -sapply(cell_dist, 
                                 \(x) ifelse(x < optm_d, 0, b_gc * (x - optm_d)^a_gc))
 
+    if (all(centroid_util < stop_utility)) {
+        return(numeric(33))
+    }
+    
     # return the utility
     return(centroid_util)
 }

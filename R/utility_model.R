@@ -243,7 +243,8 @@ utility <- function(agent,
         V <- V + gc_utility(p[["a_group_centroid"]],
                             p[["b_group_centroid"]],
                             0.45,
-                            distance_centroid)
+                            distance_centroid,
+                            -p[["stop_utility"]])
     }
 
     if (!is.null(buddies_in_vf)) {

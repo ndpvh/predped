@@ -71,6 +71,7 @@ get_angles_any_buddy <- function(agent_idx, agent_group, p_pred, orientation, ce
     
     # First need to identify whether a pedestrian belongs to a social group
     inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    p_pred <- p_pred[-agent_idx, , drop = FALSE]
     p_pred <- p_pred[inGroup, , drop = FALSE]
     nped <- dim(p_pred)[1]
     
@@ -91,13 +92,13 @@ get_angles_any_buddy <- function(agent_idx, agent_group, p_pred, orientation, ce
     rel_angles <- ifelse(rel_angles < 0, rel_angles + 2*pi, rel_angles)
     
     # Index which angles are maximal
-    idx <- numeric(nrow(rel_angles))
+    minimal_angle <- numeric(nrow(rel_angles))
     for (i in seq_len(nrow(rel_angles))) {
-        max_values <- max(cos(rel_angles[i,]))
-        idx[i] <- max_values[1]
+        idx <- which.max(cos(rel_angles[i,]))
+        minimal_angle[i] <- rel_angles[i, idx]
     }
 
-    return(rel_angles[, max(idx)])
+    return(minimal_angle)
 }
 
 
@@ -174,7 +175,7 @@ vf_utility_discrete <- function(b_vf, rel_angles) {
     # Calculate visual field utility
     # If in visual field: disutility = 0
     # If not in visual field: disutility = b*-1
-    visual_field_utility <- -sapply(rel_angle, 
+    visual_field_utility <- -sapply(rel_angles, 
                                     \(x) ifelse(x > 3*pi/4 & x < 5*pi/4, b_vf * 1, 0))
 
     # Return the visual field utility
