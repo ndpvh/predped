@@ -420,6 +420,8 @@ update_goal <- function(agent,
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
+    obj <- objects(background)
+
     # Make some placeholders for reroutening and rerouting
     reroute <- FALSE
 
@@ -471,9 +473,13 @@ update_goal <- function(agent,
     # actually plan their route.
     if(status(agent) == "plan") {
         # Check whether the agent can see the current goal.
-        seen <- all(prune_edges(objects(background), 
-                                matrix(c(position(agent), current_goal(agent)@position),
-                                       nrow = 1)))
+        if(length(obj) == 0) {
+            seen <- TRUE 
+        } else {
+            seen <- all(prune_edges(obj, 
+                                    matrix(c(position(agent), current_goal(agent)@position),
+                                           nrow = 1)))
+        }
 
         # If the agent sees their goal, the path is just going to go directly 
         # towards the goal
@@ -514,10 +520,14 @@ update_goal <- function(agent,
         # Check whether the agent can see the current goal.
         # seen <- sees_location(agent, 
         #                       current_goal(agent)@position, 
-        #                       objects(background))
-        seen <- all(prune_edges(objects(background), 
-                                matrix(c(position(agent), current_goal(agent)@position),
-                                       nrow = 1)))
+        #                       obj)
+        if(length(obj) == 0) {
+            seen <- TRUE
+        } else {
+            seen <- all(prune_edges(obj, 
+                                    matrix(c(position(agent), current_goal(agent)@position),
+                                           nrow = 1)))
+        }
 
         # If the agent doesn't see their current goal, they have to reroute with
         # a probability of 100%
@@ -674,9 +684,13 @@ update_goal <- function(agent,
             # additional check of whether the agent can see the next path point.
             # If so, the agent will move to that path point instead
             } else {
-                seen <- all(prune_edges(objects(background), 
-                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                               nrow = 1)))
+                if(length(obj) == 0) {
+                    seen <- TRUE
+                } else {
+                    seen <- all(prune_edges(obj, 
+                                            matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                                   nrow = 1)))
+                }
 
                 if(seen) {
                     current_goal(agent)@path <- current_goal(agent)@path[-1,] |>

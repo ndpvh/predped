@@ -460,9 +460,14 @@ setMethod("find_path", "goal", function(object,
         for(i in 2:nrow(path_points)) {
             # Check whether agents can see the next path point starting from 
             # the reference point
-            seen <- all(prune_edges(objects(background), 
-                                    matrix(c(ref, path_points[i,]),
-                                           nrow = 1)))
+            obj <- objects(background)
+            if(length(obj) == 0) {
+                seen <- TRUE
+            } else {
+                seen <- all(prune_edges(objects(background), 
+                                        matrix(c(ref, path_points[i,]),
+                                               nrow = 1)))
+            }
             
             # If the path point is seen, you can just directly go to this path 
             # point instead of making a stop in the intermediate one

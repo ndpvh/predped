@@ -133,7 +133,8 @@ adjust_edges <- function(from,
 
         # Once done, we can also delete the unnecessary nodes from obj_nodes. 
         # Here, we only keep the new nodes, not the old, reevaluated ones
-        obj_nodes <- obj_nodes[!to_delete,]
+        obj_nodes <- obj_nodes[!to_delete,] #|>
+            # matrix(ncol = 2)
     } else {
         obj_nodes <- matrix(0, nrow = 0, ncol = 2)
     }
@@ -316,7 +317,11 @@ evaluate_edges <- function(segments,
     cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
 
     # Step 2: Check which nodes can be seen at each location
-    idx <- prune_edges(objects, segments[, c("from_x", "from_y", "to_x", "to_y")])
+    if(length(objects) == 0) {
+        idx <- rep(TRUE, nrow(segments))
+    } else {
+        idx <- prune_edges(objects, segments[, c("from_x", "from_y", "to_x", "to_y")])
+    }
 
     # Bind all information together and delete all edges that have NA values 
     # associated to them (`prune_edges` returns NA whenever a segment is actually
