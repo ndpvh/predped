@@ -68,6 +68,9 @@ adjust_edges <- function(from,
     nodes <- precomputed_edges$nodes
     edges_with_coords <- precomputed_edges$edges_with_coords
 
+    # Make a placeholder for obj_nodes 
+    obj_nodes <- NULL
+
     # Add the new objects to the background
     if(is.null(new_objects)) {
         new_objects <- list()
@@ -133,11 +136,15 @@ adjust_edges <- function(from,
 
         # Once done, we can also delete the unnecessary nodes from obj_nodes. 
         # Here, we only keep the new nodes, not the old, reevaluated ones
-        obj_nodes <- obj_nodes[!to_delete,] #|>
-            # matrix(ncol = 2)
-    } else {
+        obj_nodes <- obj_nodes[!to_delete,]
+    } 
+
+    
+    if(is.null(obj_nodes)) {
         obj_nodes <- matrix(0, nrow = 0, ncol = 2)
     }
+
+    tryCatch(1:nrow(obj_nodes), error = function(e) {browser()})
 
     # Now that we created new nodes, we should bind them together with the 
     # positions of the agent and goals
