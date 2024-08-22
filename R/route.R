@@ -136,7 +136,12 @@ adjust_edges <- function(from,
 
         # Once done, we can also delete the unnecessary nodes from obj_nodes. 
         # Here, we only keep the new nodes, not the old, reevaluated ones
-        obj_nodes <- obj_nodes[!to_delete,]
+        obj_nodes <- obj_nodes[!to_delete,] |>
+            matrix(ncol = 2)
+    }
+
+    if(is.null(obj_nodes) | any(is.na(obj_nodes))) {
+        obj_nodes <- matrix(nrow = 0, ncol = 2)
     }
 
     # Now that we created new nodes, we should bind them together with the 
