@@ -130,10 +130,14 @@ utility <- function(agent,
                                        pickBest = FALSE)
 
         # Group Centroid Phenomenon                                       
-        distance_centroid <- get_mean_group_centroid(agent_idx,
-                                                     agent_specifications$predictions,
-                                                     agent_specifications$group,
-                                                     centers)
+        inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
+        p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
+        nped <- dim(p_pred)[1]
+    
+        
+        distance_centroid <- get_mean_group_centroid(p_pred,
+                                                     centers,
+                                                     nped)
 
         # Visual Field Phenomenon
         buddies_in_vf <- get_angles_any_buddy(agent_idx,
@@ -242,9 +246,10 @@ utility <- function(agent,
     if (!is.null(distance_centroid)) {
         V <- V + gc_utility(p[["a_group_centroid"]],
                             p[["b_group_centroid"]],
-                            0.45,
+                            radius(agent),
                             distance_centroid,
-                            -p[["stop_utility"]])
+                            -p[["stop_utility"]],
+                            nped)
     }
 
     if (!is.null(buddies_in_vf)) {
