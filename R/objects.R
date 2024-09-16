@@ -1140,38 +1140,37 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 #' Lines are used to determine intersections and to prevent pedestrians from 
 #' walking certain ways.
 #'
-#' @slot from A coordinate
-#' @slot to A coordinate
-#' 
+#' @slot id Character denoting the id of the segment
+#' @slot from Numeric vector denoting where the segment starts
+#' @slot to Numeric vector denoting where the segment stops
+#' @slot center Numeric vector denoting the center of the segment
+#' @slot orientation Numeric denoting the orientation of the segment in radians
+#' @slot interactable Logical denoting whether the segment can be interacted 
+#' with. Defaults to `FALSE`.
 #'
 #' @export
 #' @name segment
 segment <- setClass("segment", list(id = "character", 
-                                    from = "coordinate", 
-                                    to = "coordinate", 
-                                    center = "coordinate",
+                                    from = "numeric", 
+                                    to = "numeric", 
+                                    center = "numeric",
                                     orientation = "numeric",
-                                    size = "numeric",
-                                    blocks_path = "logical",
                                     interactable = "logical"), contains = "object")
 
 setMethod("initialize", "segment", function(.Object, 
                                             from, 
                                             to, 
-                                            id = character(0),
-                                            blocks_path = FALSE, 
+                                            id = character(0), 
                                             interactable = FALSE,
                                             ...) {
 
     .Object@id <- if(length(id) == 0) paste("segment", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
-    .Object@from <- coordinate(from)
-    .Object@to <- coordinate(to)
-    .Object@blocks_path <- blocks_path
+    .Object@from <- from
+    .Object@to <- from
     .Object@interactable <- interactable
 
-    .Object@center <- coordinate(0.5 * c(to[1] - from[1], to[2] - from[2]))
-    .Object@orientation <- atan((from[2] - to[2]) / (from[1] - to[1]))
-    .Object@size <- sqrt((from[1] - to[1])^2 + (from[2] - to[2])^2)
+    .Object@center <- 0.5 * c(to[1] - from[1], to[2] - from[2])
+    .Object@orientation <- atan2(to[2] - from[2], to[1] - from[1])
 
     return(.Object)
 })
@@ -1282,12 +1281,6 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
                        other_object@points[c(2:nrow(points), 1),])
         return(line_line_intersection(matrix(c(object@from, object@to), nrow = 1),
                                       edges))
-        # idx <- sapply(seq_len(nrow(edges)),
-        #               \(x) line.line.intersection(object@from, 
-        #                                           object@to, 
-        #                                           edges[x, 1:2], 
-        #                                           edges[x, 3:4],
-        #                                           interior.only = TRUE))
 
         return(any(idx)) 
     }  
@@ -1383,15 +1376,6 @@ setMethod("size<-", signature(object = "circle"), function(object, value) {
     return(object)
 })
 
-setMethod("size", signature(object = "segment"), function(object) {
-    return(object@length)
-})
-
-setMethod("size<-", signature(object = "segment"), function(object, value) {
-    object@length <- value
-    return(object)
-})
-
 #' Getter/Setter for the center-slot
 #' 
 #' @rdname center-method
@@ -1477,16 +1461,12 @@ setMethod("orientation", signature(object = "segment"), function(object) {
 
 setMethod("orientation<-", signature(object = "segment"), function(object, value) {
     angle <- value - object@orientation
-    angle <- angle * pi / 180
+    object@orientation <- value   
 
-    object@from <- rotate(object@from,
-                          center = center(object),
-                          radians = angle)
-    object@to <- rotate(object@to,
-                        center = center(object),
-                        radians = angle)
+    R <- matrix(c(cos(angle), sin(angle), -sin(angle), cos(angle)), nrow = 2, ncol = 2)
+    object@from <- R %*% object@from
+    object@to <- R %*% object@to
 
-    object@orientation <- value    
     return(object)
 })
 
@@ -1529,6 +1509,17 @@ setMethod("points", signature(object = "circle"), function(object, length.out = 
     return(matrix(c(object@center[1] + object@radius * cos(angles),
                     object@center[2] + object@radius * sin(angles)), 
                   ncol = 2))
+})
+
+setMethod("points", signature(object = "segment"), function(object, ...) {
+    return(matrix(c(object@from, object@to), nrow = 2, ncol = 2))
+})
+
+setMethod("points<-", signature(object = "segment"), function(object, value) {
+    object@from <- value[1,]
+    object@to <- value[2,]
+
+    return(object)
 })
 
 
