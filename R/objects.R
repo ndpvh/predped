@@ -1169,7 +1169,7 @@ setMethod("initialize", "segment", function(.Object,
     .Object@to <- to
     .Object@interactable <- interactable
 
-    .Object@center <- 0.5 * c(to[1] - from[1], to[2] - from[2])
+    .Object@center <- from + 0.5 * c(to[1] - from[1], to[2] - from[2])
     .Object@orientation <- atan2(to[2] - from[2], to[1] - from[1])
 
     return(.Object)
@@ -1192,7 +1192,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
         return(as.numeric(center(object)))
     } else {
         a <- runif(1, 0, 1)
-        return(a * c(object@to[1] - object@from[1], object@to[2] - object@from[2]))
+        return(object@from + a * c(object@to[1] - object@from[1], object@to[2] - object@from[2]))
     }
 })   
 
@@ -1424,9 +1424,13 @@ setMethod("center", signature(object = "segment"), function(object) {
 })
 
 setMethod("center<-", signature(object = "segment"), function(object, value) {
+    diff <- object@center - value
+
+    object@from <- object@from + diff 
+    object@to <- object@to + diff
+
     object@center <- value
-    object@from <- object@from + value 
-    object@to <- object@to + value
+    
     return(object)
 })
 
