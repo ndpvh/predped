@@ -1154,6 +1154,7 @@ segment <- setClass("segment", list(id = "character",
                                     from = "numeric", 
                                     to = "numeric", 
                                     center = "numeric",
+                                    size = "numeric",
                                     orientation = "numeric",
                                     interactable = "logical"), contains = "object")
 
@@ -1171,6 +1172,7 @@ setMethod("initialize", "segment", function(.Object,
 
     .Object@center <- from + 0.5 * c(to[1] - from[1], to[2] - from[2])
     .Object@orientation <- atan2(to[2] - from[2], to[1] - from[1])
+    .Object@size <- sqrt(sum((from - to)^2))
 
     return(.Object)
 })
@@ -1212,58 +1214,17 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
     # we switch the two objects and dispatch to the `intersects` method of these
     # two classes
     if(inherits(other_object, "circle")) {
-        # Similar steps to the polygon one, but now for a single line
-
-        # Adjust the from and to so that the circle is centered at the origin
-        from <- object@from - center(circle)
-        to <- object@to - center(circle)
-
-        # First check: Do any of the points that determine the segment fall 
-        # within the circle? If so, there is an intersection.
-        if((from[1]^2 + from[2]^2 <= radius(circle)^2) | 
-           (to[1]^2 + to[2]^2 <= radius(circle)^2)) {
-            return(TRUE)
-        }
-
-        # Second check: Use the formula for an intersection of a line with a 
-        # circle to determine whether the line itself intersects. For this to 
-        # work, we need to offset the points of the edges with the center of 
-        # the circle.
+        # Originally, this made use of some very difficult calculations. However, 
+        # when trying to maximize speed and simplicity, it might be more 
+        # instrumental to use an approximate method. 
         #
-        # Once we found that there is an intersection, we can compute the point 
-        # at which the intersection happens and check whether it lies within the
-        # two provided points that make up the edge. If not, then there is no 
-        # actual intersection. 
-        dx <- to[1] - from[1]
-        dy <- to[2] - from[2]
-        distance <- dx^2 + dy^2
+        # We add equidistant points to the segment and then check whether these 
+        # are contained within the agent
+        by <- (object@size / 5e-2)^(-1)
+        steps <- matrix(seq(0, 1, by = by), ncol = 1) 
+        coords <- rep(object@from, each = length(steps)) + steps %*% matrix(object@to - object@from, nrow = 1)
 
-        D <- from[1] * to[2] - from[2] * to[1]
-
-        discriminant <- radius(object)^2 * distance - D^2
-
-        # Check whether the line is at risk of intersecting. If not, 
-        # we can safely say that the circle does not intersect with the polygon
-        if(discriminant >= 0) {
-            return(FALSE)
-        }
-
-        # If not, compute the different intersection points with the circle and 
-        # check whether these lie inbetween the segments of the polygon
-        co <- c(D * dy + sign(dy) * dx * sqrt(discriminant),
-                -D * dx + abs(dy) * sqrt(discriminant),
-                D * dy - sign(dy) * dx * sqrt(discriminant),
-                -D * dx - abs(dy) * sqrt(discriminant)) / distance
-
-        x_range <- range(c(from[1], to[1]))
-        y_range <- range(c(from[2], to[2]))
-
-        x_check_1 <- (co[,1] <= x_range[2]) & (co[,1] >= x_range[1])
-        y_check_1 <- (co[,2] <= y_range[2]) & (co[,2] >= y_range[1])
-        x_check_2 <- (co[,3] <= x_range[2]) & (co[,3] >= x_range[1])
-        y_check_2 <- (co[,4] <= y_range[2]) & (co[,4] >= y_range[1])
-
-        return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
+        return(any(in_object(other_object, coords, outside = FALSE)))
 
     } else if(inherits(other_object, "segment")) {
         # This case can be handed to m4ma
@@ -1373,6 +1334,19 @@ setMethod("size", signature(object = "circle"), function(object) {
 
 setMethod("size<-", signature(object = "circle"), function(object, value) {
     object@radius <- value
+    return(object)
+})
+
+setMethod("size", signature(object = "segment"), function(object) {
+    return(object@size)
+})
+
+setMethod("size<-", signature(object = "segment"), function(object, value) {
+    # Assumption: The `from` coordinate remains the same. Then we can use an 
+    # imaginary circle to get the new coordinate of `to`
+    angle <- orientation(object)
+    object@to <- object@from + value * c(cos(angle), sin(angle))
+    object@size <- value
     return(object)
 })
 
