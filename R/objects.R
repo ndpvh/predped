@@ -1470,7 +1470,7 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
     return(object)
 })
 
-#' Getter/Setter for the orientation-slot
+#' Getter/Setter for the points-slot
 #' 
 #' @rdname points-method
 #' 
@@ -1519,6 +1519,48 @@ setMethod("points<-", signature(object = "segment"), function(object, value) {
     object@from <- value[1,]
     object@to <- value[2,]
 
+    return(object)
+})
+
+#' Getter/Setter for the from-slot
+#' 
+#' @rdname from-method
+#' 
+#' @export 
+setGeneric("from", function(object, ...) standardGeneric("from"))
+
+#' @rdname from-method
+#' 
+#' @export 
+setGeneric("from<-", function(object, value) standardGeneric("from<-"))
+
+setMethod("from", signature(object = "segment"), function(object, ...) {
+    return(object@from)
+})
+
+setMethod("from<-", signature(object = "segment"), function(object, value) {
+    object@from <- value
+    return(object)
+})
+
+#' Getter/Setter for the to-slot
+#' 
+#' @rdname to-method
+#' 
+#' @export 
+setGeneric("to", function(object, ...) standardGeneric("to"))
+
+#' @rdname to-method
+#' 
+#' @export 
+setGeneric("to<-", function(object, value) standardGeneric("to<-"))
+
+setMethod("to", signature(object = "segment"), function(object, ...) {
+    return(object@to)
+})
+
+setMethod("to<-", signature(object = "segment"), function(object, value) {
+    object@to <- value
     return(object)
 })
 
