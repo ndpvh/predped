@@ -18,12 +18,14 @@
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
+                                          limited_access = "list",
                                           entrance = "matrix", 
                                           exit = "matrix"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
                                                objects = list(),
+                                               limited_access = list(),
                                                entrance = NULL,
                                                exit = NULL,
                                                same_exit = TRUE,
@@ -33,8 +35,20 @@ setMethod("initialize", "background", function(.Object,
     # done in this piece of code
     .Object@shape <- shape 
     .Object@objects <- objects
-    if (!all(sapply(.Object@objects, is, class2 = "object"))) {
+    .Object@limited_access <- limited_access
+
+    # Some checks on the objects
+    if(!all(sapply(.Object@objects, is, class2 = "object"))) {
         stop("All elements in slot 'objects' must be of type 'object'")
+    }
+
+    if(any(sapply(.Object@objects, is, class2 = "segment"))) {
+        stop(paste0("None of the elements in slot 'objects' can be of type `segment`. ",
+                    "Please add these to the slot `limited_access`."))
+    }
+
+    if(!all(sapply(.Object@limited_access, is, class2 = "segment"))) {
+        stop("All elements in slot 'limited_access' must be of type 'segment'")
     }
 
     # Entrances should either be provided or randomly generated. We furthermore
@@ -105,6 +119,27 @@ setMethod("objects", "background", function(object) {
 
 setMethod("objects<-", "background", function(object, value) {
     object@objects <- value
+    return(object)
+})
+
+#' Getter/Setter for the limited_access-slot
+#' 
+#' @rdname limited_access-method
+#' 
+#' @export
+setGeneric("limited_access", function(object) standardGeneric("limited_access"))
+
+#' @rdname limited_access-method
+#' 
+#' @export
+setGeneric("limited_access<-", function(object, value) standardGeneric("limited_access<-"))
+
+setMethod("limited_access", "background", function(object) {
+    return(object@limited_access)
+})
+
+setMethod("limited_access<-", "background", function(object, value) {
+    object@limited_access <- value
     return(object)
 })
 
