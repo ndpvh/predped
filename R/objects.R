@@ -1512,7 +1512,7 @@ setMethod("points", signature(object = "circle"), function(object, length.out = 
 })
 
 setMethod("points", signature(object = "segment"), function(object, ...) {
-    return(matrix(c(object@from, object@to), nrow = 2, ncol = 2))
+    return(rbind(object@from, object@to))
 })
 
 setMethod("points<-", signature(object = "segment"), function(object, value) {
