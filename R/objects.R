@@ -1166,7 +1166,7 @@ setMethod("initialize", "segment", function(.Object,
 
     .Object@id <- if(length(id) == 0) paste("segment", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
     .Object@from <- from
-    .Object@to <- from
+    .Object@to <- to
     .Object@interactable <- interactable
 
     .Object@center <- 0.5 * c(to[1] - from[1], to[2] - from[2])
