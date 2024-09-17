@@ -85,15 +85,41 @@ setMethod("initialize", "background", function(.Object,
 #' @rdname limit_access-method
 #' 
 #' @export 
-setGeneric("limit_access", function(object, agent) standardGeneric("limit_access"))
+setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
 
-setMethod("limit_access", signature(object = "background"), function(object, agent) {
+setMethod("limit_access", 
+          signature(object = "background"), 
+          function(object, 
+                   x,
+                   return_list = FALSE) {
+
     # Check whether there are any segments that might limit the access of agents
     # in the first place. If not, we can return the background directly
     possible_blockages <- limited_access(object)
 
     if(length(possible_blockages) == 0) {
-        return(object)
+        if(return_list) {
+            return(list())
+        } else {
+            return(object)
+        }
+    }
+
+    # Create a checking function that will differ for agent vs coordinates. The 
+    # idea of the check is that if the agent intersects the segment (or if a 
+    # coordinate is contained in it), we need to delete the segment from the list, 
+    # as we want it to be non-walkthrough only when you are fully at one side of 
+    # the line.
+    #
+    # Creating this function is a bit silly, but it does help maintain everything
+    # within this one `limit_access` function instead of creating two separate 
+    # functions that do almost the same thing
+    if(inherits(x, "object")) {
+        check <- \(y) intersects(y, x)
+        co <- center(x)
+    } else {
+        check <- \(y) in_object(y, x, outside = FALSE)
+        co <- as.numeric(x)
     }
 
     # Instantiate a list that will contain all of the instances in which the 
@@ -103,17 +129,15 @@ setMethod("limit_access", signature(object = "background"), function(object, age
 
     # Loop over all possible access limitations
     for(i in seq_len(length(possible_blockages))) {
-        # First check whether the agent intersects the segment of choice. 
-        # If so, we need to delete it from the list anyway (we only want it 
-        # to be non-walkthrough once they passed this bound already)
-        if(intersects(possible_blockages[[i]], agent)) {
+        # Do the check
+        if(check(possible_blockages[[i]])) {
             next
         }
 
         # Compute the relative angle of the agent compared to the start of 
         # the segment and subtract the orientation of the line.
-        angle <- atan2(center(agent)[2] - from(possible_blockages[[i]])[2],
-                       center(agent)[1] - from(possible_blockages[[i]])[1])
+        angle <- atan2(co[2] - from(possible_blockages[[i]])[2],
+                       co[1] - from(possible_blockages[[i]])[1])
         angle <- angle - orientation(possible_blockages[[i]])
 
         # Compute the sine of the angle and flag the segment as being non-
@@ -133,6 +157,12 @@ setMethod("limit_access", signature(object = "background"), function(object, age
             not_accessible[[f]] <- polygon(points = rbind(coords, new_coords))
             f <- f + 1
         }
+    }
+
+    # If the user wants to return the list of none-accessible objects, provide 
+    # it to them
+    if(return_list) {
+        return(not_accessible)
     }
 
     # Once done, we can add these polygons to the objects in the background
