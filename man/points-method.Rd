@@ -3,12 +3,12 @@
 \name{points}
 \alias{points}
 \alias{points<-}
-\title{Getter/Setter for the orientation-slot}
+\title{Getter/Setter for the points-slot}
 \usage{
 points(object, ...)
 
 points(object) <- value
 }
 \description{
-Getter/Setter for the orientation-slot
+Getter/Setter for the points-slot
 }

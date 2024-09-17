@@ -11,7 +11,7 @@ find_path(object, ...)
   object,
   agent,
   background,
-  algorithm = "bi",
+  algorithm = "Dijkstra",
   space_between = radius(agent),
   new_objects = NULL,
   precomputed_edges = NULL,

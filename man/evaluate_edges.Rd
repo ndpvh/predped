@@ -4,7 +4,7 @@
 \alias{evaluate_edges}
 \title{Evaluate whether edges pass through objects}
 \usage{
-evaluate_edges(segments, objects)
+evaluate_edges(segments, background)
 }
 \arguments{
 \item{segments}{Named list containing an n x 4 matrix of segments that make 

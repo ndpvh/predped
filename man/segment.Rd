@@ -11,8 +11,17 @@ walking certain ways.
 \section{Slots}{
 
 \describe{
-\item{\code{from}}{A coordinate}
+\item{\code{id}}{Character denoting the id of the segment}
 
-\item{\code{to}}{A coordinate}
+\item{\code{from}}{Numeric vector denoting where the segment starts}
+
+\item{\code{to}}{Numeric vector denoting where the segment stops}
+
+\item{\code{center}}{Numeric vector denoting the center of the segment}
+
+\item{\code{orientation}}{Numeric denoting the orientation of the segment in radians}
+
+\item{\code{interactable}}{Logical denoting whether the segment can be interacted 
+with. Defaults to `FALSE`.}
 }}
 
