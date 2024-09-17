@@ -38,7 +38,7 @@ create_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background 
     # and return the required list of edges and nodes
-    return(append(evaluate_edges(segments, objects(background)), 
+    return(append(evaluate_edges(segments, background), 
                   list(nodes = nodes)))
 }
 
@@ -171,7 +171,8 @@ adjust_edges <- function(from,
     }
 
     # Check whether these edges don't pass through the objects in the background
-    edges <- evaluate_edges(segments, obj)
+    objects(background) <- obj
+    edges <- evaluate_edges(segments, background)
 
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
@@ -314,7 +315,10 @@ create_nodes <- function(from,
 #' 
 #' @export
 evaluate_edges <- function(segments, 
-                           objects) {
+                           background) {
+
+    obj <- objects(background)
+    lim <- limited_access(background)
 
     # Step 1: Note, we use squared distances as the cost for efficiency purposes
     # (taking the square root is computationally more expensive). Should not matter 
@@ -322,10 +326,30 @@ evaluate_edges <- function(segments,
     cost <- (segments$from_x - segments$to_x)^2 + (segments$from_y - segments$to_y)^2
 
     # Step 2: Check which nodes can be seen at each location
-    if(length(objects) == 0) {
+    if(length(obj) == 0) {
         idx <- rep(TRUE, nrow(segments))
     } else {
-        idx <- prune_edges(objects, segments[, c("from_x", "from_y", "to_x", "to_y")])
+        idx <- prune_edges(obj, segments[, c("from_x", "from_y", "to_x", "to_y")])
+    }
+
+    # Step 3: If there is limited access, we need to account for this. Unfortunately, 
+    # this can only be assessed for each node separately, which thus necessitates
+    # a loop.
+    if(length(lim) != 0) {
+        for(i in seq_along(idx)) {
+            # If this index has already been put to FALSE, we can skip it
+            if(!idx[i]) {
+                next
+            }
+
+            # Create a new objects list for the `from` node
+            obj <- limit_access(background, 
+                                segments[i, c("from_x", "from_y")], 
+                                return_list = TRUE)
+
+            # Do the check
+            idx[i] <- prune_edges(obj, segments[i, c("from_x", "from_y", "to_x", "to_y")])
+        }
     }
 
     # Bind all information together and delete all edges that have NA values 
@@ -389,8 +413,8 @@ combine_nodes <- function(nodes_1,
         nodes <- rbind(nodes_1[idx_1,], nodes_2[idx_2,])
         idx <- c(length(idx_1) + seq_along(idx_2), seq_along(idx_1))
 
-        return(cbind(nodes, nodes[idx,]) |>
-            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
+        result <- cbind(nodes, nodes[idx,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y"))
 
     } else {
         n <- nrow(nodes_1)
@@ -399,9 +423,12 @@ combine_nodes <- function(nodes_1,
         idx_1 <- as.numeric(t(idx))
         idx_2 <- as.numeric(idx)
 
-        return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
-            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
+        result <- cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
+            setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y"))
     }
+
+    # Finally, delete all nodes that are connected to themselves
+    return(result[result$from != result$to, ])
 
 
     # ORIGINAL IMPLEMENTATION: Only unique combinations, as the algorithm 

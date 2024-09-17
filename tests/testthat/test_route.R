@@ -119,6 +119,9 @@ testthat::test_that("Evaluating which edges should be deleted works", {
                                                     c(-1.5, -1.5),
                                                     c(-1.5, -2.5), 
                                                     c(-2.5, -2.5))))
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(10, 10)), 
+                                   objects = objects)
 
     # Create the segments to evaluate
     segments <- rbind(# No intersections
@@ -165,7 +168,7 @@ testthat::test_that("Evaluating which edges should be deleted works", {
                                                cost = cost[1:8]))
 
     # Do the test
-    tst <- predped:::evaluate_edges(segments, objects)
+    tst <- predped:::evaluate_edges(segments, setting)
 
     testthat::expect_equal(tst$edges, ref$edges)
     testthat::expect_equal(tst$edges_with_coords, ref$edges_with_coords)
@@ -329,4 +332,97 @@ testthat::test_that("Adjusting edges gives same output as creating edges", {
     #                                        xend = tst$edges_with_coords$to_x, 
     #                                        yend = tst$edges_with_coords$to_y),
     #                           color = "red") 
+})
+
+testthat::test_that("Creating edges with one-directional flow works", {
+    # Create an environment in which some access is limited
+    setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                              size = c(2, 2)), 
+                                   objects = list(predped::rectangle(center = c(0, 0), 
+                                                                     size = c(1, 1))),
+                                   limited_access = list(predped::segment(from = c(-1, 0.5), 
+                                                                          to = c(-0.5, 0.5)),
+                                                         predped::segment(from = c(0.5, 1), 
+                                                                          to = c(0.5, 0.5)),
+                                                         predped::segment(from = c(1, -0.5), 
+                                                                          to = c(0.5, -0.5)),
+                                                         predped::segment(from = c(-0.5, -1), 
+                                                                          to = c(-0.5, -0.5))),
+                                   entrance = c(-1, 0))
+    spc <- 0.1
+
+    # Create the reference (originally done on a piece of paper)
+    ref <- list(edges = data.frame(from = c("agent", "agent", "goal", "goal", 
+                                            "node 1", "node 1", "node 2", "node 3",
+                                            "node 3", "node 4"), 
+                                   to = c("node 3", "node 4", "node 1", "node 2",
+                                          "node 2", "goal", "node 3", "agent", 
+                                          "node 4", "node 1"), 
+                                   cost = c(0.3579, 0.3579, 0.3579, 0.3579, 
+                                            1.3028, 0.3579, 1.3028, 0.3579, 
+                                            1.3028, 1.3028)),
+                edges_with_coords = data.frame(from = c("agent", "agent", "goal", "goal", 
+                                                        "node 1", "node 1", "node 2", "node 3",
+                                                        "node 3", "node 4"), 
+                                               from_x = c(-0.75, -0.75, 0.75, 0.75, 
+                                                          0.5707, 0.5707, 0.5707, -0.5707,
+                                                          -0.5707, -0.5707),
+                                               from_y = c(0, 0, 0, 0, 
+                                                          0.5707, 0.5707, -0.5707, -0.5707,
+                                                          -0.5707, 0.5707),
+                                               to = c("node 3", "node 4", "node 1", "node 2",
+                                                      "node 2", "goal", "node 3", "agent", 
+                                                      "node 4", "node 1"), 
+                                               to_x = c(-0.5707, -0.5707, 0.5707, 0.5707, 
+                                                        0.5707, 0.75, -0.5707, -0.75, 
+                                                        -0.5707, 0.5707),
+                                               to_y = c(-0.5707, 0.5707, 0.5707, -0.5707, 
+                                                        -0.5707, 0, -0.5707, 0, 
+                                                        0.5707, 0.5707),
+                                               cost = c(0.3579, 0.3579, 0.3579, 0.3579, 
+                                                        1.3028, 0.3579, 1.3028, 0.3579, 
+                                                        1.3028, 1.3028)),
+                nodes = data.frame(node_ID = c("agent", "goal", "node 1", "node 2",
+                                               "node 3", "node 4"),
+                                   X = c(-0.75, 0.75, 0.5707, 0.5707, 
+                                         -0.5707, -0.5707),
+                                   Y = c(0, 0, 0.5707, -0.5707, 
+                                         -0.5707, 0.5707)))
+
+    # Compute the edges
+    tst <- predped::create_edges(c(-0.75, 0), 
+                                 c(0.75, 0),
+                                 setting,
+                                 space_between = spc,
+                                 many_options = FALSE)
+
+    # Put in alphabetical order
+    ref<- list(edges = dplyr::arrange(ref$edges, from, to),
+               edges_with_coords = dplyr::arrange(ref$edges_with_coords, from, to),
+               nodes = dplyr::arrange(ref$nodes, node_ID))
+    tst <- list(edges = dplyr::arrange(tst$edges, from, to),
+                edges_with_coords = dplyr::arrange(tst$edges_with_coords, from, to),
+                nodes = dplyr::arrange(tst$nodes, node_ID))
+
+    # For the evaluation, we are going to put them in matrix format with no 
+    # dimension names. Makes things easier for us. For the tst, also round the 
+    # values
+    tst$edges <- dplyr::mutate(tst$edges, 
+                               cost = round(cost, 4))
+    tst$nodes <- dplyr::mutate(tst$nodes, 
+                               X = round(X, 4), 
+                               Y = round(Y, 4))
+    tst$edges_with_coords <- dplyr::mutate(tst$edges_with_coords, 
+                                           from_x = round(from_x, 4), 
+                                           from_y = round(from_y, 4), 
+                                           to_x = round(to_x, 4), 
+                                           to_y = round(to_y, 4),
+                                           cost = round(cost, 4))
+
+    ref <- lapply(ref, \(x) { x <- as.matrix(x) ; dimnames(x) <- NULL ; x }) 
+    tst <- lapply(tst, \(x) { x <- as.matrix(x) ; dimnames(x) <- NULL ; x })
+
+    testthat::expect_equal(tst$nodes, ref$nodes, tolerance = 1e-3)
+    testthat::expect_equal(tst$edges, ref$edges, tolerance = 1e-3)
+    testthat::expect_equal(tst$edges_with_coords, ref$edges_with_coords, tolerance = 1e-3)
 })
