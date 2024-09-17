@@ -50,50 +50,7 @@ moving_options_agent <- function(agent,
     # If there are any roads that the agents cannot walk into, check which of the 
     # roads the agent can and cannot walk into. Account for this in the background
     # objects
-    if(length(background@limited_access) != 0) {
-        # Get all objects that may limit the accessibility for the agents. 
-        # Also instantiate another list that contains all of the instances in 
-        # which this is indeed the case
-        to_test <- limited_access(background)
-        not_accessible <- list() ; f <- 1
-
-        for(i in seq_len(length(to_test))) {
-            # First check whether the agent intersects the segment of choice. 
-            # If so, we need to delete it from the list anyway (we only want it 
-            # to be non-walkthrough once they passed this bound already)
-            if(intersects(to_test[[i]], agent)) {
-                next
-            }
-
-            # Compute the relative angle of the agent compared to the start of 
-            # the segment and subtract the orientation of the line.
-            angle <- atan2(center(agent)[2] - from(to_test[[i]])[2],
-                           center(agent)[1] - from(to_test[[i]])[1])
-            angle <- angle - orientation(to_test[[i]])
-
-            # Compute the sine of the angle and flag the segment as being non-
-            # accessible if the sine is positive (i.e., when the angles are 
-            # between 0 and pi)
-            if(sin(angle) < pi & sin(angle) > 0) {
-                # If this is indeed the case, we will create a very small 
-                # polygon that cannot be passed through by the agent in all of 
-                # the underlying functions. This polygon is then added to the 
-                # list of not_accessible items
-                coords <- points(to_test[[i]])
-
-                alpha <- orientation(to_test[[i]]) + pi / 2
-                R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
-                new_coords <- coords[2:1,] + rep(R %*% c(1e-2, 0), each = 2)
-
-                not_accessible[[f]] <- polygon(points = rbind(coords, new_coords))
-                f <- f + 1
-            }
-        }
-
-        # Once done, we can add these polygons to the objects in the background
-        objects(background) <- append(objects(background), 
-                                      not_accessible)
-    }
+    background <- limit_access(background, agent)
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background

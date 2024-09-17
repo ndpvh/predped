@@ -80,6 +80,67 @@ setMethod("initialize", "background", function(.Object,
     return(.Object)
 })
 
+#' Add the limited_access to objects
+#' 
+#' @rdname limit_access-method
+#' 
+#' @export 
+setGeneric("limit_access", function(object, agent) standardGeneric("limit_access"))
+
+setMethod("limit_access", signature(object = "background"), function(object, agent) {
+    # Check whether there are any segments that might limit the access of agents
+    # in the first place. If not, we can return the background directly
+    possible_blockages <- limited_access(object)
+
+    if(length(possible_blockages) == 0) {
+        return(object)
+    }
+
+    # Instantiate a list that will contain all of the instances in which the 
+    # access is actually limited
+    not_accessible <- list()
+    f <- 1
+
+    # Loop over all possible access limitations
+    for(i in seq_len(length(possible_blockages))) {
+        # First check whether the agent intersects the segment of choice. 
+        # If so, we need to delete it from the list anyway (we only want it 
+        # to be non-walkthrough once they passed this bound already)
+        if(intersects(possible_blockages[[i]], agent)) {
+            next
+        }
+
+        # Compute the relative angle of the agent compared to the start of 
+        # the segment and subtract the orientation of the line.
+        angle <- atan2(center(agent)[2] - from(possible_blockages[[i]])[2],
+                       center(agent)[1] - from(possible_blockages[[i]])[1])
+        angle <- angle - orientation(possible_blockages[[i]])
+
+        # Compute the sine of the angle and flag the segment as being non-
+        # accessible if the sine is positive (i.e., when the angles are 
+        # between 0 and pi)
+        if(sin(angle) < pi & sin(angle) > 0) {
+            # If this is indeed the case, we will create a very small 
+            # polygon that cannot be passed through by the agent in all of 
+            # the underlying functions. This polygon is then added to the 
+            # list of not_accessible items
+            coords <- points(possible_blockages[[i]])
+
+            alpha <- orientation(possible_blockages[[i]]) + pi / 2
+            R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
+            new_coords <- coords[2:1,] + rep(R %*% c(1e-2, 0), each = 2)
+
+            not_accessible[[f]] <- polygon(points = rbind(coords, new_coords))
+            f <- f + 1
+        }
+    }
+
+    # Once done, we can add these polygons to the objects in the background
+    objects(object) <- append(objects(object), 
+                              not_accessible)
+    return(object)
+})
+
 #' Getter/Setter for the shape-slot
 #' 
 #' @rdname shape-method
