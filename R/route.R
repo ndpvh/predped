@@ -368,11 +368,11 @@ prune_edges <- function(objects, segments) {
 combine_nodes <- function(nodes_1, 
                           nodes_2 = NULL) {
 
-    # If the second set of nodes is not NULL, we want to combine each node in 
-    # the one data.frame with all the nodes in the other. Otherwise, we want to 
-    # combine each node within the same data.frame with each other
+    # If the second set of nodes is not NULL, we need to combine the nodes in 
+    # one data.frame with the nodes of the other. Otherwise, we combine the nodes
+    # within the one data.frame with each other.
     if(!is.null(nodes_2)) {
-        # Get the sizes of each of the node matrices
+        # Get the size of each of the data.frames
         n <- nrow(nodes_1)
         k <- nrow(nodes_2)
 
@@ -381,18 +381,58 @@ combine_nodes <- function(nodes_1,
         idx_1 <- rep(1:n, each = k)
         idx_2 <- rep(1:k, times = n)
 
-        return(cbind(nodes_1[idx_1,], nodes_2[idx_2,]) |>
+        # Create a new nodes matrix that contains all nodes in order. We then use
+        # the absolute indices that refer to those nodes of the first matrix and 
+        # those of the second matrix to bind them together in one cbind. Is 
+        # faster than simply doing two rbinds and one cbind, and therefore used 
+        # here (despite decreased understandability)
+        nodes <- rbind(nodes_1[idx_1,], nodes_2[idx_2,])
+        idx <- c(length(idx_1) + seq_along(idx_2), seq_along(idx_1))
+
+        return(cbind(nodes, nodes[idx,]) |>
             setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
 
     } else {
         n <- nrow(nodes_1)
         idx <- matrix(1:n, nrow = n, ncol = n)
-        to_remain <- lower.tri(idx)
-    
-        idx_1 <- t(idx)[to_remain]
-        idx_2 <- idx[to_remain]
+
+        idx_1 <- as.numeric(t(idx))
+        idx_2 <- as.numeric(idx)
 
         return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
             setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
     }
+
+
+    # ORIGINAL IMPLEMENTATION: Only unique combinations, as the algorithm 
+    # was bi-directional. Changed with the change to uni-directional 
+    # algorithm, but kept in here for legacy purposes. 
+        
+    # # If the second set of nodes is not NULL, we want to combine each node in 
+    # # the one data.frame with all the nodes in the other. Otherwise, we want to 
+    # # combine each node within the same data.frame with each other
+    # if(!is.null(nodes_2)) {
+    #     # Get the sizes of each of the node matrices
+    #     n <- nrow(nodes_1)
+    #     k <- nrow(nodes_2)
+
+    #     # Create indices to be repeated. These indices define which member of node_1
+    #     # is connected to which member of node_2
+    #     idx_1 <- rep(1:n, each = k)
+    #     idx_2 <- rep(1:k, times = n)
+
+    #     return(cbind(nodes_1[idx_1,], nodes_2[idx_2,]) |>
+    #         setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
+
+    # } else {
+    #     n <- nrow(nodes_1)
+    #     idx <- matrix(1:n, nrow = n, ncol = n)
+    #     to_remain <- lower.tri(idx)
+    
+    #     idx_1 <- t(idx)[to_remain]
+    #     idx_2 <- idx[to_remain]
+
+    #     return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
+    #         setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
+    # }
 }

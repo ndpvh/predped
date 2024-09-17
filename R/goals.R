@@ -367,7 +367,7 @@ setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
 setMethod("find_path", "goal", function(object, 
                                         agent,
                                         background,
-                                        algorithm = "bi",
+                                        algorithm = "Dijkstra",
                                         space_between = radius(agent),
                                         new_objects = NULL,
                                         precomputed_edges = NULL,
@@ -415,10 +415,10 @@ setMethod("find_path", "goal", function(object,
     }
     
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
-    # I put the directed argument to FALSE so that agents are free to decide on
-    # their own which way to go (otherwise, order of nodes matters)
+    # I put the directed argument to TRUE as the order of the nodes in the edges
+    # matters
     graph <- cppRouting::makegraph(edges$edges, 
-                                   directed = FALSE,
+                                   directed = TRUE,
                                    coords = edges$nodes)
 
     # Make a check of whether "agent" and "goal" are contained within the nodes.
