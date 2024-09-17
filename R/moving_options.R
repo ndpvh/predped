@@ -47,11 +47,6 @@ moving_options_agent <- function(agent,
     objects(background) <- append(objects(background), 
                                   state$agents)
 
-    # If there are any roads that the agents cannot walk into, check which of the 
-    # roads the agent can and cannot walk into. Account for this in the background
-    # objects
-    background <- limit_access(background, agent)
-
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
     # and whether the agent has a direct line of sight to that cell.
