@@ -69,3 +69,74 @@ testthat::test_that("Background setters work", {
     testthat::expect_equal(predped::entrance(setting), matrix(c(2, 2), ncol = 2))
     testthat::expect_equal(predped::exit(setting), matrix(c(1, 2), ncol = 2))
 })
+
+testthat::test_that("Limit access works", {
+    # Create settings and agents
+    setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
+                                                              size = c(2, 2)),
+                                   objects = list(),
+                                   limited_access = list(segment(from = c(-1, 0), 
+                                                                 to = c(1, 0))), 
+                                   entrance = predped::coordinate(c(-1, 0)))
+
+    all_agents <- list(# Above the segment, should be blocked
+                       predped::agent(center = c(-0.5, 0.5), 
+                                      radius = 0.2),
+                       predped::agent(center = c(0.5, 0.5), 
+                                      radius = 0.2),
+                       # Below the segment, should not be blocked
+                       predped::agent(center = c(-0.5, -0.5), 
+                                      radius = 0.2),
+                       predped::agent(center = c(0.5, -0.5), 
+                                      radius = 0.2),
+                       # On the segment, should not be blocked
+                       predped::agent(center = c(-0.5, 0), 
+                                      radius = 0.2),
+                       predped::agent(center = c(0.5, 0), 
+                                      radius = 0.2))
+
+    # Apply the test. In this test, we first limit the access of the agents and 
+    # then check whether the corresponding polygon can be found in the list of 
+    # objects for those agents for whom it is relevant.
+    poly <- rbind(c(-1, 0), 
+                  c(1, 0), 
+                  c(1, 0.01), 
+                  c(-1, 0.01))
+    tst <- sapply(all_agents, 
+                  function(x) {
+                      new_setting <- limit_access(setting, x)
+                      return(any(sapply(objects(new_setting), 
+                                        \(x) (points(x) == poly) & inherits(x, "polygon"))))
+                  })
+
+    ref <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
+
+    testthat::expect_equal(tst, ref)
+
+    # Let's reverse the line in the setting, which should make it so that the 
+    # agents below the segment are blocked and those above are not
+    setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
+                                                              size = c(2, 2)),
+                                   objects = list(),
+                                   limited_access = list(segment(from = c(1, 0), 
+                                                                 to = c(-1, 0))), 
+                                   entrance = predped::coordinate(c(-1, 0)))
+
+    # Apply the test. In this test, we first limit the access of the agents and 
+    # then check whether the corresponding polygon can be found in the list of 
+    # objects for those agents for whom it is relevant.
+    poly <- rbind(c(-1, 0), 
+                  c(1, 0), 
+                  c(1, -0.01), 
+                  c(-1, -0.01))
+    tst <- sapply(all_agents, 
+                  function(x) {
+                      new_setting <- limit_access(setting, x)
+                      return(any(sapply(objects(new_setting), 
+                                        \(x) (points(x) == poly) & inherits(x, "polygon"))))
+                  })
+
+    ref <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
+
+    testthat::expect_equal(tst, ref)
+})
