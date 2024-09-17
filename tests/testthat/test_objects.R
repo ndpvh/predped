@@ -562,6 +562,70 @@ testthat::test_that("Circle intersection works", {
     testthat::expect_equal(tst, ref)
 })
 
+################################################################################
+# SEGMENTS
+
+testthat::test_that("Segment initialization works", {
+    testthat::expect_no_error(predped::segment(from = c(0, 0), to = c(0, 0)))
+    testthat::expect_error(predped::segment(from = c(0, 0)))
+    testthat::expect_error(predped::segment(to = c(0, 0)))
+})
+
+testthat::test_that("Segment contains single point works", {
+    # Create the shapes and the points to be evaluated
+    shapes <- list(predped::segment(from = c(0, 0), to = c(1, 1)),
+                   predped::segment(from = c(0, 0), to = c(1, 0)),
+                   predped::segment(from = c(0, 0), to = c(0, 1)))
+    
+    points <- rbind(c(0.5, 0.5), c(0.5, 0), c(0, 0.5), c(2, 2), c(2, 0), c(0, 2))
+
+    # Inside
+    ref <- list(c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+                c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE), 
+                c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE))
+    tst <- lapply(shapes, 
+                  \(x) sapply(seq_len(nrow(points)), 
+                              \(i) predped::in_object(x, points[i,], outside = FALSE)))
+                              
+    testthat::expect_equal(tst, ref)
+
+    # Outside
+    ref <- lapply(ref, \(x) !x)
+    tst <- lapply(shapes, 
+                  \(x) sapply(seq_len(nrow(points)), 
+                              \(i) predped::in_object(x, points[i,], outside = TRUE)))
+                              
+    testthat::expect_equal(tst, ref)
+})
+
+testthat::test_that("Segment contains multiple points works", {
+    # Create the shapes and the points to be evaluated
+    shapes <- list(predped::segment(from = c(0, 0), to = c(1, 1)),
+                   predped::segment(from = c(0, 0), to = c(1, 0)),
+                   predped::segment(from = c(0, 0), to = c(0, 1)))
+    
+    points <- rbind(c(0.5, 0.5), c(0.5, 0), c(0, 0.5), c(2, 2), c(2, 0), c(0, 2))
+
+    # Inside
+    ref <- list(c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+                c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE), 
+                c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE))
+    tst <- lapply(shapes, 
+                  \(x) predped::in_object(x, points, outside = FALSE))
+                              
+    testthat::expect_equal(tst, ref)
+
+    # Outside
+    ref <- lapply(ref, \(x) !x)
+    tst <- lapply(shapes, 
+                  \(x) predped::in_object(x, points, outside = TRUE))
+                              
+    testthat::expect_equal(tst, ref)
+})
+
+################################################################################
+# OTHER
+
 testthat::test_that("Enlarging object works", {
     # Create a list of objects
     objects <- list(predped::circle(center = c(0, 0), 

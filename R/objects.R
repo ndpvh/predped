@@ -1180,9 +1180,29 @@ setMethod("initialize", "segment", function(.Object,
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "segment"), function(object, x, outside = TRUE) {
-    # For a line, it does not matter whether a point is contained within the line.
-    # Therefore always return FALSE
-    return(FALSE)
+    # If x is not a matrix, make it one. This will allow us to use `in_object`
+    # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
+    if(!is.matrix(x)) {
+        x <- matrix(x, ncol = 2)
+    }
+
+    # For a point to be contained in a line, we need to verify that the distance
+    # of the point to the start and end of the segment equals the distance from 
+    # start to end (that is the size of the segment).
+    distance_1 <- sqrt((from(object)[1] - x[,1])^2 + (from(object)[2] - x[,2])^2)
+    distance_2 <- sqrt((to(object)[1] - x[,1])^2 + (to(object)[2] - x[,2])^2)
+
+    check <- (distance_1 + distance_2) == size(object)
+
+    if(outside) {
+        return(!check)
+    } else {
+        return(check)
+    }
 })
 
 #'@rdname rng_point-method
