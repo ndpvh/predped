@@ -1,7 +1,34 @@
 #' Plot an Object.
 #'
 #' @param object An object of kind \code{\link[predped]{object-class}}
-#' @param ... Additional arguments passed on to the geom used to plot the object.
+#' @param agent.linewidth Thickness of the line with which to plot the agent. 
+#' Defaults to 1.
+#' @param plot_goal Logical denoting whether to plot the position of the current
+#' goal of the agent together with the agent. Defaults to `TRUE`.
+#' @param goal.size Thickness of the point that denotes the goal position. 
+#' Defaults to 1.
+#' @param entry.width Radius of the entrances and exits to be plotted with the 
+#' background. Defaults to 0.3,
+#' @param shape.fill Fill of the shape of the background. Defaults to "white".
+#' @param shape.color Color of circumference of the shape of the background. 
+#' Defaults to "black".
+#' @param shape.linewidth Thickness of the circumference of the shape of the 
+#' background. Also concerns the thickness of the line of the entrances and 
+#' exits. Defaults to 1.
+#' @param object.fill Fill of the objects contained in the background. Defaults 
+#' to "grey".
+#' @param object.color Color of the circumference of the objects contained in 
+#' the background. Defaults to "black".
+#' @param object.linewidth Thickness of the circumference of the objects contained
+#' in the background. Defaults to 1.
+#' @param plot.title.size Size of the plot title. Defaults to 10.
+#' @param plot.title.hjust Position of the plot title. Defaults to 0.5, or the 
+#' middle of the plot.
+#' @param axis.title.size Size of the axis title. Defaults to 10.
+#' @param axis.text.size Size of the axis text. Defaults to 8.
+#' @param dark_mode Logical that can toggle the default colorpallette of predped's 
+#' dark mode. Defaults to `FALSE`.
+#' @param ... Additional ggplot arguments passed on to the geom for the objects.
 #'
 #' @return Either a geom or a ggplot
 #' @export
@@ -10,67 +37,53 @@ setGeneric("plot", function(object, ...) standardGeneric("plot"))
 
 #'@rdname plot-method
 #'
-setMethod("plot", "circle", function(object, ...) {
-  # Create circle point from center x,y and radius r
-  t <- seq(0, 2 * pi, length.out = 100)
-  cp <- as.matrix(data.frame(
-    x = object@center[[1]] + object@radius * cos(t),
-    y = object@center[[2]] + object@radius * sin(t)
-  ))
-  
-  # Plot circle using geom_polygon
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = cp[, 1], y = cp[, 2]),
-    ...
-  )
-})
-
-
-#'@rdname plot-method
-#'
-setMethod("plot", "rectangle", function(object, ...) {
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = object@points[,1], y = object@points[,2]),
-    ... 
-  )
+setMethod("plot", "object", function(object, ...) {
+  # Extract the points of the object
+  pts <- points(object)
+  return(ggplot2::annotate("polygon", 
+                           x = pts[,1], 
+                           y = pts[,2], 
+                           ...))
 })
 
 #'@rdname plot-method
 #'
-setMethod("plot", "polygon", function(object, ...) {
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = object@points[, 1], y = object@points[, 2]), 
-    ...
-  )
-})
-
-#'@rdname plot-method
-#'
-setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
+setMethod("plot", "agent", function(object, 
+                                    plot_goal = TRUE,
+                                    agent.linewidth = 1,
+                                    goal.size = 1,
+                                    ...) {
     # Determine the orientation of the agent to be plotted
     angle <- object@orientation * 2 * pi / 360
 
-    # Plot a circle with the 
-    plt <- list(plot(circle(center = object@center, 
-                            radius = object@radius), 
-                    fill = NA,
-                    color = object@color,
-                    ...),
-                ggplot2::annotate("segment", 
-                                    x = object@center[[1]], 
-                                    y = object@center[[2]], 
-                                    xend = object@center[[1]] + object@radius * cos(angle), 
-                                    yend = object@center[[2]] + object@radius * sin(angle), 
-                                    color = object@color,
-                                    ...))
+    # Extract the points of the agent and plot those here. The reason why we 
+    # use points here is to ensure that the agent can take on all shapes that 
+    # they want
+    pts <- points(object)
+    half <- ifelse(inherits(object, "circle"), size(object), 0.5 * size(object)[1])
 
-        if(plot_goal) {
-            plt <- append(plt, 
-                        ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
-                                                        y = current_goal(object)@position[2]),
-                                            color = object@color,
-                                            ...))
-        }
+    plt <- list(ggplot2::annotate("polygon", 
+                                  x = pts[,1], 
+                                  y = pts[,2], 
+                                  color = object@color,
+                                  fill = NA,
+                                  linewidth = agent.linewidth),
+                ggplot2::annotate("segment", 
+                                  x = object@center[[1]], 
+                                  y = object@center[[2]], 
+                                  xend = object@center[[1]] + half * cos(angle), 
+                                  yend = object@center[[2]] + half * sin(angle), 
+                                  color = object@color,
+                                  linewidth = agent.linewidth))
+
+    # If the agent's goal should be plotted as well, then do so
+    if(plot_goal) {
+        plt <- append(plt, 
+                      ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
+                                                       y = current_goal(object)@position[2]),
+                                          color = object@color,
+                                          size = goal.size))
+    }
 
     return(plt)
 })
@@ -78,80 +91,90 @@ setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
 #'@rdname plot-method
 #'
 setMethod("plot", "background", function(object, 
-                                         entry_exit_width = 0.4,
+                                         entry.width = 0.3,
                                          shape.fill = "white",
+                                         shape.color = "black",
+                                         shape.linewidth = 1,
                                          object.fill = "grey",
                                          object.color = "black",
+                                         object.linewidth = 1,
+                                         dark_mode = FALSE,
                                          ...) {
-    # Not my preferred way of doing things: 
-    #
-    # When making gifs out of the plots we create, the boundaries move around 
-    # with the agent when they get close to the sides of the grid. Changing the 
-    # `expand` argument did not fix that, so we have to fix the limits of the 
-    # plot manually. This is what I am doing here. 
-    if(inherits(shape(object), "circle")) {
-        circ <- shape(object)
-        xlims <- center(circ)[1] + c(-radius(circ), radius(circ))
-        ylims <- center(circ)[2] + c(-radius(circ), radius(circ))
-    } else {
-        xlims <- range(shape(object)@points[,1])
-        ylims <- range(shape(object)@points[,2])
+
+    # If you want to toggle the default dark mode, then change the default colors
+    if(dark_mode) {
+        shape.fill <- "black"
+        shape.color <- "white"
+        object.fill <- "black"
+        object.color <- "white"
     }
 
-    x_padding <- 0.05 * (xlims[2] - xlims[1])
-    y_padding <- 0.05 * (ylims[2] - ylims[1])
+    # Create some limits to prevent the limits of the plot changing across 
+    # iterations.
+    pts <- points(object@shape)
+    limits <- rbind(range(pts[,1]), range(pts[,2]))
 
-    plt <- ggplot2::ggplot() + 
+    # Make the entries into a matrix of segments that can be added to the plot.
+    # This is done in several steps.
+    
+    # Step 1: Bind together the entrances and exits: all they need to be handled 
+    # in the same way
+    entries <- rbind(entrance(object), exit(object))
+
+    # Step 2: Loop over these entries, convert them to points, and only retain 
+    # those that fall into the shape of the background. Then transform them to 
+    # a segment structure (x0, y0, x, y)
+    segments <- list()
+    for(i in seq_len(nrow(entries))) {
+        pts <- points(predped::circle(center = entries[i,], radius = entry.width))
+        pts <- pts[predped::in_object(shape(object), pts, outside = FALSE),]
+
+        segments[[i]] <- cbind(pts[2:nrow(pts) - 1,], pts[2:nrow(pts),])
+    }
+
+    # Step 3: Bind together these segments
+    segments <- do.call("rbind", segments)
+
+    # Finally, with all elements in place, we can now create the plot itself
+    return(ggplot2::ggplot() + 
         # Plot the shape and objects of the environment
         predped::plot(shape(object), 
-                      fill = shape.fill) +
+                      fill = shape.fill, 
+                      color = shape.color) +
         predped::plot(objects(object), 
                       fill = object.fill, 
                       color = object.color,
+                      linewidth = object.linewidth,
                       ...) +
-        # Other things to make the plot beautiful
-        ggplot2::coord_fixed() +
-        ggplot2::scale_x_continuous(limits = c(xlims[1] - x_padding, xlims[2] + x_padding)) +
-        ggplot2::scale_y_continuous(limits = c(ylims[1] - y_padding, ylims[2] + y_padding)) +
-        ggplot2::labs(x = "x", y = "y") +
+        # Plot the entrances and exits
+        ggplot2::annotate("segment", 
+                          x = segments[,1], 
+                          y = segments[,2], 
+                          xend = segments[,3], 
+                          yend = segments[,4], 
+                          color = shape.color,
+                          linewidth = shape.linewidth) +
+        # Things related to the general look of the plot
+        ggplot2::scale_x_continuous(limits = limits[1,]) +
+        ggplot2::scale_y_continuous(limits = limits[2,]) +
+        ggplot2::labs(x = "x", 
+                      y = "y") +
         ggplot2::theme(panel.background = ggplot2::element_rect(fill = "black"),
                        panel.grid.major = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank()) 
-
-    # for (i in seq_along(objects(object))) {
-    #     plt <- plt + plot(objects(object)[[i]], ...)
-    # }
-
-    # Convert entrance & exit to polygon coordinates
-    entrance <- lapply(seq_len(nrow(object@entrance)), 
-                       \(i) points(circle(center = c(object@entrance[i, 1], object@entrance[i, 2]), 
-                                       radius = (entry_exit_width / 2))))
-    exit <- lapply(seq_len(nrow(object@exit)), 
-                   \(i) points(circle(center = c(object@exit[i, 1], object@exit[i, 2]), 
-                                   radius = (entry_exit_width / 2))))
-    
-    # Check that polygon coordinates are in the background
-    # If not, set those coorinates to NA
-    for(i in seq_along(entrance)) {
-        idx <- in_object(object@shape, entrance[[i]], outside = FALSE)
-        plt <- plt + plot(polygon(points = entrance[[i]][idx,]), fill = NA, colour = "black")
-    } 
-
-    for(i in seq_along(exit)) {
-        idx <- in_object(object@shape, exit[[i]], outside = FALSE)
-        plt <- plt + plot(polygon(points = exit[[i]][idx,]), fill = NA, colour = "black")
-    }
-    
-    return(plt)
+                       panel.grid.minor = ggplot2::element_blank()) +
+        ggplot2::coord_fixed())
 })
 
 #' @rdname plot-method
 #' 
 setMethod("plot", "state", function(object, 
+                                    agent.linewidth = 1, 
+                                    goal.size = 1,
                                     plot_goal = TRUE,
                                     plot.title.size = 10,
                                     plot.title.hjust = 0.5,
                                     axis.title.size = 10,
+                                    axis.text.size = 8,
                                     ...) {
 
     # Create the plot for the setting, which will serve as the basis of 
@@ -166,12 +189,15 @@ setMethod("plot", "state", function(object,
     return(base_plot + 
         predped::plot(agents(object), 
                       plot_goal = plot_goal,
+                      agent.linewidth = agent.linewidth,
+                      goal.size = goal.size,
                       ...) +
         ggplot2::labs(title = paste("iteration", object@iteration)) +
         ggplot2::theme(legend.position = "none",
                        plot.title = ggplot2::element_text(size = plot.title.size,
                                                           hjust = plot.title.hjust),
-                       axis.title = ggplot2::element_text(size = axis.title.size)))                
+                       axis.title = ggplot2::element_text(size = axis.title.size),
+                       axis.text = ggplot2::element_text(size = axis.text.size)))                
 })
 
 #'@rdname plot-method
