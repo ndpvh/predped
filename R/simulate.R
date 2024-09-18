@@ -277,6 +277,7 @@ setMethod("simulate", "predped", function(object,
                               standing_start = standing_start,
                               many_options = many_options,
                               ...)
+        iteration(state) <- iteration(state) + 1
 
         # Check whether one of the pedestrians is waiting at the exit
         idx <- c()
