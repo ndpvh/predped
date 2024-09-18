@@ -175,20 +175,21 @@ setMethod("simulate", "predped", function(object,
 
     # Initialize the trace and state lists. The state will already contain the 
     # initial condition. The trace list also contains this state. 
-    state <- list("setting" = object@setting, 
-                  "agents" = list())
+    state <- predped::state(iteration = 0, 
+                            setting = object@setting, 
+                            agents = list())
     if(!is.null(initial_agents)) {
-        state$agents <- initial_agents
+        agents(state) <- initial_agents
         
     } else if(!is.null(initial_condition)) {
-        if(!identical(initial_condition$setting, state$setting)) {
+        if(!identical(initial_condition$setting, state@setting)) {
             stop(paste0("Setting in the `predped` model is not the same as the ",
                         "setting in the initial condition. ", 
                         "Please make sure the initial condition is compatible ",
                         "with your model."))
         }
 
-        state$agents <- initial_condition$agents
+        agents(state) <- initial_condition$agents
     }
     trace <- list(state)
 
@@ -203,7 +204,7 @@ setMethod("simulate", "predped", function(object,
         # pedestrian, whether we already reached the maximal number of agents,
         # and whether there is any space to add the new pedestrian. If there is 
         # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state$agents) < max_agents[i] & !agent_in_queue)) {
+        if((i %in% add_agent_index) & (length(state@agents) < max_agents[i] & !agent_in_queue)) {
             # Sample how many agents you would like to generate (if group, 
             # generate them all together)
             if(nrow(group_size) == 1) {
@@ -227,7 +228,7 @@ setMethod("simulate", "predped", function(object,
                                                   order_goal_stack = order_goal_stack,
                                                   precomputed_goals = precomputed_goals,
                                                   individual_differences = individual_differences)
-                group(potential_agent[[j]]) <- length(state$agents) + 1
+                group(potential_agent[[j]]) <- length(state@agents) + 1
 
                 # Once done, we need to provide all agents with the same set of 
                 # goals. Currently imposed so that a group of people that enter
@@ -250,12 +251,12 @@ setMethod("simulate", "predped", function(object,
         # Check whether there is any space to add the pedestrian. Otherwise
         # will have to keep waiting in the cue.
         if(agent_in_queue) {
-            agents_in_the_way <- sapply(state$agents, 
+            agents_in_the_way <- sapply(state@agents, 
                                         \(x) in_object(potential_agent[[1]], 
                                                        points(x), 
                                                        outside = FALSE))
             if(!any(agents_in_the_way)) {
-                state$agents <- append(state$agents, potential_agent[[1]])
+                agents(state) <- append(agents(state), potential_agent[[1]])
                 potential_agent <- potential_agent[-1]
             }
 
@@ -264,7 +265,7 @@ setMethod("simulate", "predped", function(object,
 
         # Provide feedback if wanted
         if(print_iteration) {
-            cat(paste0("\rIteration: ", i, "; Number of agents: ", length(state$agents)))
+            cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(state))))
         }
 
         # Update the current state
@@ -279,18 +280,14 @@ setMethod("simulate", "predped", function(object,
 
         # Check whether one of the pedestrians is waiting at the exit
         idx <- c()
-        for(j in seq_along(state$agents)) {
-            if(status(state$agents[[j]]) == "exit") {
+        for(j in seq_along(agents(state))) {
+            if(status(state@agents[[j]]) == "exit") {
                 idx <- c(idx, j)
-            } else if(status(state$agents[[j]]) == "plan") {
-                planned <- planned + 1
-            } else if(status(state$agents[[j]]) == "reroute") {
-                rerouted <- rerouted + 1
             }
         }
 
         if(length(idx) != 0) {
-            state$agents <- state$agents[-idx]
+            agents(state) <- state@agents[-idx]
         }
 
         # Save the new state in the trace
@@ -309,9 +306,6 @@ setMethod("simulate", "predped", function(object,
     if(print_iteration) {
         cat("\n")
     }
-
-    cat(paste0("A total of ", rerouted, " agents rerouted during this simulation.\n"))
-    cat(paste0("A total of ", planned, " agents planned during this simulation.\n"))
     
     return(trace)
 })

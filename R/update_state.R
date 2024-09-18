@@ -59,30 +59,30 @@ update_state <- function(state,
     #
     # In order for this to work with m4ma, we need to transform it to a matrix 
     # and provide it rownames that are equal to the id's of the agents
-    agent_predictions <- lapply(state$agents, 
+    agent_predictions <- lapply(state@agents, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,
                                                       time_step = time_step))
     agent_predictions <- sapply(agent_predictions, \(x) x) |>
         t()
-    rownames(agent_predictions) <- sapply(state$agents, id)
+    rownames(agent_predictions) <- sapply(state@agents, id)
 
     # Create agent-specifications. Are used in the utility-function and used to
     # be created there. Moved it here to reduce computational cost (which increases
     # exponentially with more agents)
-    agent_specs <- create_agent_specifications(state$agents, 
+    agent_specs <- create_agent_specifications(state@agents, 
                                                agent_predictions)
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
-    for(i in seq_along(state$agents)) {
+    for(i in seq_along(state@agents)) {
         # Extract the agent to-be-updated from the state list. Importantly, also
         # remove the agent from this state list, as it should not contain this 
         # one agent: Simulation is done relative to the agent to-be-updated
-        agent <- state$agents[[i]]
+        agent <- state@agents[[i]]
 
         tmp_state <- state
-        tmp_state$agents <- tmp_state$agents[-i]
+        tmp_state@agents <- tmp_state@agents[-i]
 
         # Update the goals of the agent
         agent <- update_goal(agent, 
@@ -109,7 +109,7 @@ update_state <- function(state,
                                  ...) 
 
         # Update the agent himself
-        state$agents[[i]] <- agent
+        state@agents[[i]] <- agent
     }
 
     return(state)
@@ -571,7 +571,7 @@ update_goal <- function(agent,
                                                   agent, 
                                                   background,
                                                   space_between = space_between,
-                                                  new_objects = state$agents,
+                                                  new_objects = agents(state),
                                                   precomputed_edges = precomputed_edges,
                                                   many_options = many_options,
                                                   reevaluate = TRUE)
@@ -632,7 +632,7 @@ update_goal <- function(agent,
             # cannot start the interaction phase.
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents, 
+            blocking_agents <- sapply(agents(state), 
                                       \(x) intersects(goal_circle, x))
 
             # If no agents are blocking access to the goal, allow the agent to move
@@ -647,11 +647,11 @@ update_goal <- function(agent,
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {
         # Keep this in for debugging purposes
-        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-            View(current_goal(agent))
-            View(agent)
-            print(plot(background) + plot(state$agents))
-        }
+        # if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
+        #     View(current_goal(agent))
+        #     View(agent)
+        #     print(plot(state))
+        # }
 
         # Determine how far along the `path` they are
         distance_path_point <- m4ma::dist1(position(agent), 
@@ -718,11 +718,11 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state$agents) > 0) & (goal_distance <= 2 * close_enough)) {
+        if((length(state@agents) > 0) & (goal_distance <= 2 * close_enough)) {
             # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
-            blocking_agents <- sapply(state$agents, 
+            blocking_agents <- sapply(state@agents, 
                                       \(x) intersects(goal_circle, x))
 
             # If only one agent is blocking the goal, let the agent wait. Only invoke
@@ -738,7 +738,7 @@ update_goal <- function(agent,
                 # they are completing the goal, then the agent will have to wait
                 # its turn. If the blocking agent is not completing a goal, then 
                 # the agent will just have to wait until they move on.
-                stati <- lapply(state$agents[idx], \(x) c(status(x), current_goal(x)@counter))
+                stati <- lapply(state@agents[idx], \(x) c(status(x), current_goal(x)@counter))
                 stati <- do.call("rbind", stati)
                 stati[stati[,1] != "completing goal", 2] <- 0
 
