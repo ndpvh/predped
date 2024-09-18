@@ -34,6 +34,7 @@ Collate:
     'route.R'
     'goals.R'
     'agent.R'
+    'state.R'
     'moving_options.R'
     'general.R'
     'parameters.R'
