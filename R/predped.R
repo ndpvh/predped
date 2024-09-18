@@ -87,18 +87,6 @@ setMethod("id<-", "predped", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the setting-slot
-#' 
-#' @rdname setting-method
-#'
-#' @export
-setGeneric("setting", function(object) standardGeneric("setting"))
-
-#' @rdname setting-method
-#'
-#' @export
-setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
-
 setMethod("setting", "predped", function(object) {
     return(object@setting)
 })
