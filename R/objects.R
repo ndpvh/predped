@@ -1140,38 +1140,39 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 #' Lines are used to determine intersections and to prevent pedestrians from 
 #' walking certain ways.
 #'
-#' @slot from A coordinate
-#' @slot to A coordinate
-#' 
+#' @slot id Character denoting the id of the segment
+#' @slot from Numeric vector denoting where the segment starts
+#' @slot to Numeric vector denoting where the segment stops
+#' @slot center Numeric vector denoting the center of the segment
+#' @slot orientation Numeric denoting the orientation of the segment in radians
+#' @slot interactable Logical denoting whether the segment can be interacted 
+#' with. Defaults to `FALSE`.
 #'
 #' @export
 #' @name segment
 segment <- setClass("segment", list(id = "character", 
-                                    from = "coordinate", 
-                                    to = "coordinate", 
-                                    center = "coordinate",
-                                    orientation = "numeric",
+                                    from = "numeric", 
+                                    to = "numeric", 
+                                    center = "numeric",
                                     size = "numeric",
-                                    blocks_path = "logical",
+                                    orientation = "numeric",
                                     interactable = "logical"), contains = "object")
 
 setMethod("initialize", "segment", function(.Object, 
                                             from, 
                                             to, 
-                                            id = character(0),
-                                            blocks_path = FALSE, 
+                                            id = character(0), 
                                             interactable = FALSE,
                                             ...) {
 
     .Object@id <- if(length(id) == 0) paste("segment", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id
-    .Object@from <- coordinate(from)
-    .Object@to <- coordinate(to)
-    .Object@blocks_path <- blocks_path
+    .Object@from <- from
+    .Object@to <- to
     .Object@interactable <- interactable
 
-    .Object@center <- coordinate(0.5 * c(to[1] - from[1], to[2] - from[2]))
-    .Object@orientation <- atan((from[2] - to[2]) / (from[1] - to[1]))
-    .Object@size <- sqrt((from[1] - to[1])^2 + (from[2] - to[2])^2)
+    .Object@center <- from + 0.5 * c(to[1] - from[1], to[2] - from[2])
+    .Object@orientation <- atan2(to[2] - from[2], to[1] - from[1])
+    .Object@size <- sqrt(sum((from - to)^2))
 
     return(.Object)
 })
@@ -1179,9 +1180,29 @@ setMethod("initialize", "segment", function(.Object,
 #'@rdname in_object-method
 #'
 setMethod("in_object", signature(object = "segment"), function(object, x, outside = TRUE) {
-    # For a line, it does not matter whether a point is contained within the line.
-    # Therefore always return FALSE
-    return(FALSE)
+    # If x is not a matrix, make it one. This will allow us to use `in_object`
+    # in a vectorized manner (taking in a matrix of coordinates)
+    if(is.data.frame(x)) {
+        x <- as.matrix(x)
+    }
+    
+    if(!is.matrix(x)) {
+        x <- matrix(x, ncol = 2)
+    }
+
+    # For a point to be contained in a line, we need to verify that the distance
+    # of the point to the start and end of the segment equals the distance from 
+    # start to end (that is the size of the segment).
+    distance_1 <- sqrt((from(object)[1] - x[,1])^2 + (from(object)[2] - x[,2])^2)
+    distance_2 <- sqrt((to(object)[1] - x[,1])^2 + (to(object)[2] - x[,2])^2)
+
+    check <- (distance_1 + distance_2) == size(object)
+
+    if(outside) {
+        return(!check)
+    } else {
+        return(check)
+    }
 })
 
 #'@rdname rng_point-method
@@ -1193,7 +1214,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
         return(as.numeric(center(object)))
     } else {
         a <- runif(1, 0, 1)
-        return(a * c(object@to[1] - object@from[1], object@to[2] - object@from[2]))
+        return(object@from + a * c(object@to[1] - object@from[1], object@to[2] - object@from[2]))
     }
 })   
 
@@ -1213,58 +1234,17 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
     # we switch the two objects and dispatch to the `intersects` method of these
     # two classes
     if(inherits(other_object, "circle")) {
-        # Similar steps to the polygon one, but now for a single line
-
-        # Adjust the from and to so that the circle is centered at the origin
-        from <- object@from - center(circle)
-        to <- object@to - center(circle)
-
-        # First check: Do any of the points that determine the segment fall 
-        # within the circle? If so, there is an intersection.
-        if((from[1]^2 + from[2]^2 <= radius(circle)^2) | 
-           (to[1]^2 + to[2]^2 <= radius(circle)^2)) {
-            return(TRUE)
-        }
-
-        # Second check: Use the formula for an intersection of a line with a 
-        # circle to determine whether the line itself intersects. For this to 
-        # work, we need to offset the points of the edges with the center of 
-        # the circle.
+        # Originally, this made use of some very difficult calculations. However, 
+        # when trying to maximize speed and simplicity, it might be more 
+        # instrumental to use an approximate method. 
         #
-        # Once we found that there is an intersection, we can compute the point 
-        # at which the intersection happens and check whether it lies within the
-        # two provided points that make up the edge. If not, then there is no 
-        # actual intersection. 
-        dx <- to[1] - from[1]
-        dy <- to[2] - from[2]
-        distance <- dx^2 + dy^2
+        # We add equidistant points to the segment and then check whether these 
+        # are contained within the agent
+        by <- (object@size / 5e-2)^(-1)
+        steps <- matrix(seq(0, 1, by = by), ncol = 1) 
+        coords <- rep(object@from, each = length(steps)) + steps %*% matrix(object@to - object@from, nrow = 1)
 
-        D <- from[1] * to[2] - from[2] * to[1]
-
-        discriminant <- radius(object)^2 * distance - D^2
-
-        # Check whether the line is at risk of intersecting. If not, 
-        # we can safely say that the circle does not intersect with the polygon
-        if(discriminant >= 0) {
-            return(FALSE)
-        }
-
-        # If not, compute the different intersection points with the circle and 
-        # check whether these lie inbetween the segments of the polygon
-        co <- c(D * dy + sign(dy) * dx * sqrt(discriminant),
-                -D * dx + abs(dy) * sqrt(discriminant),
-                D * dy - sign(dy) * dx * sqrt(discriminant),
-                -D * dx - abs(dy) * sqrt(discriminant)) / distance
-
-        x_range <- range(c(from[1], to[1]))
-        y_range <- range(c(from[2], to[2]))
-
-        x_check_1 <- (co[,1] <= x_range[2]) & (co[,1] >= x_range[1])
-        y_check_1 <- (co[,2] <= y_range[2]) & (co[,2] >= y_range[1])
-        x_check_2 <- (co[,3] <= x_range[2]) & (co[,3] >= x_range[1])
-        y_check_2 <- (co[,4] <= y_range[2]) & (co[,4] >= y_range[1])
-
-        return(any((x_check_1 & y_check_1) | (x_check_2 & y_check_2)))
+        return(any(in_object(other_object, coords, outside = FALSE)))
 
     } else if(inherits(other_object, "segment")) {
         # This case can be handed to m4ma
@@ -1282,12 +1262,6 @@ setMethod("intersects", signature(object = "segment"), function(object, other_ob
                        other_object@points[c(2:nrow(points), 1),])
         return(line_line_intersection(matrix(c(object@from, object@to), nrow = 1),
                                       edges))
-        # idx <- sapply(seq_len(nrow(edges)),
-        #               \(x) line.line.intersection(object@from, 
-        #                                           object@to, 
-        #                                           edges[x, 1:2], 
-        #                                           edges[x, 3:4],
-        #                                           interior.only = TRUE))
 
         return(any(idx)) 
     }  
@@ -1384,11 +1358,15 @@ setMethod("size<-", signature(object = "circle"), function(object, value) {
 })
 
 setMethod("size", signature(object = "segment"), function(object) {
-    return(object@length)
+    return(object@size)
 })
 
 setMethod("size<-", signature(object = "segment"), function(object, value) {
-    object@length <- value
+    # Assumption: The `from` coordinate remains the same. Then we can use an 
+    # imaginary circle to get the new coordinate of `to`
+    angle <- orientation(object)
+    object@to <- object@from + value * c(cos(angle), sin(angle))
+    object@size <- value
     return(object)
 })
 
@@ -1440,9 +1418,13 @@ setMethod("center", signature(object = "segment"), function(object) {
 })
 
 setMethod("center<-", signature(object = "segment"), function(object, value) {
+    diff <- object@center - value
+
+    object@from <- object@from + diff 
+    object@to <- object@to + diff
+
     object@center <- value
-    object@from <- object@from + value 
-    object@to <- object@to + value
+    
     return(object)
 })
 
@@ -1477,20 +1459,16 @@ setMethod("orientation", signature(object = "segment"), function(object) {
 
 setMethod("orientation<-", signature(object = "segment"), function(object, value) {
     angle <- value - object@orientation
-    angle <- angle * pi / 180
+    object@orientation <- value   
 
-    object@from <- rotate(object@from,
-                          center = center(object),
-                          radians = angle)
-    object@to <- rotate(object@to,
-                        center = center(object),
-                        radians = angle)
+    R <- matrix(c(cos(angle), sin(angle), -sin(angle), cos(angle)), nrow = 2, ncol = 2)
+    object@from <- R %*% object@from
+    object@to <- R %*% object@to
 
-    object@orientation <- value    
     return(object)
 })
 
-#' Getter/Setter for the orientation-slot
+#' Getter/Setter for the points-slot
 #' 
 #' @rdname points-method
 #' 
@@ -1529,6 +1507,59 @@ setMethod("points", signature(object = "circle"), function(object, length.out = 
     return(matrix(c(object@center[1] + object@radius * cos(angles),
                     object@center[2] + object@radius * sin(angles)), 
                   ncol = 2))
+})
+
+setMethod("points", signature(object = "segment"), function(object, ...) {
+    return(rbind(object@from, object@to))
+})
+
+setMethod("points<-", signature(object = "segment"), function(object, value) {
+    object@from <- value[1,]
+    object@to <- value[2,]
+
+    return(object)
+})
+
+#' Getter/Setter for the from-slot
+#' 
+#' @rdname from-method
+#' 
+#' @export 
+setGeneric("from", function(object, ...) standardGeneric("from"))
+
+#' @rdname from-method
+#' 
+#' @export 
+setGeneric("from<-", function(object, value) standardGeneric("from<-"))
+
+setMethod("from", signature(object = "segment"), function(object, ...) {
+    return(object@from)
+})
+
+setMethod("from<-", signature(object = "segment"), function(object, value) {
+    object@from <- value
+    return(object)
+})
+
+#' Getter/Setter for the to-slot
+#' 
+#' @rdname to-method
+#' 
+#' @export 
+setGeneric("to", function(object, ...) standardGeneric("to"))
+
+#' @rdname to-method
+#' 
+#' @export 
+setGeneric("to<-", function(object, value) standardGeneric("to<-"))
+
+setMethod("to", signature(object = "segment"), function(object, ...) {
+    return(object@to)
+})
+
+setMethod("to<-", signature(object = "segment"), function(object, value) {
+    object@to <- value
+    return(object)
 })
 
 

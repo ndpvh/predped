@@ -18,12 +18,14 @@
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
+                                          limited_access = "list",
                                           entrance = "matrix", 
                                           exit = "matrix"))
 
 setMethod("initialize", "background", function(.Object, 
                                                shape,
                                                objects = list(),
+                                               limited_access = list(),
                                                entrance = NULL,
                                                exit = NULL,
                                                same_exit = TRUE,
@@ -33,8 +35,20 @@ setMethod("initialize", "background", function(.Object,
     # done in this piece of code
     .Object@shape <- shape 
     .Object@objects <- objects
-    if (!all(sapply(.Object@objects, is, class2 = "object"))) {
+    .Object@limited_access <- limited_access
+
+    # Some checks on the objects
+    if(!all(sapply(.Object@objects, is, class2 = "object"))) {
         stop("All elements in slot 'objects' must be of type 'object'")
+    }
+
+    if(any(sapply(.Object@objects, is, class2 = "segment"))) {
+        stop(paste0("None of the elements in slot 'objects' can be of type `segment`. ",
+                    "Please add these to the slot `limited_access`."))
+    }
+
+    if(!all(sapply(.Object@limited_access, is, class2 = "segment"))) {
+        stop("All elements in slot 'limited_access' must be of type 'segment'")
     }
 
     # Entrances should either be provided or randomly generated. We furthermore
@@ -64,6 +78,97 @@ setMethod("initialize", "background", function(.Object,
     .Object@exit <- exit
 
     return(.Object)
+})
+
+#' Add the limited_access to objects
+#' 
+#' @rdname limit_access-method
+#' 
+#' @export 
+setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
+
+setMethod("limit_access", 
+          signature(object = "background"), 
+          function(object, 
+                   x,
+                   return_list = FALSE) {
+
+    # Check whether there are any segments that might limit the access of agents
+    # in the first place. If not, we can return the background directly
+    possible_blockages <- limited_access(object)
+
+    if(length(possible_blockages) == 0) {
+        if(return_list) {
+            return(list())
+        } else {
+            return(object)
+        }
+    }
+
+    # Create a checking function that will differ for agent vs coordinates. The 
+    # idea of the check is that if the agent intersects the segment (or if a 
+    # coordinate is contained in it), we need to delete the segment from the list, 
+    # as we want it to be non-walkthrough only when you are fully at one side of 
+    # the line.
+    #
+    # Creating this function is a bit silly, but it does help maintain everything
+    # within this one `limit_access` function instead of creating two separate 
+    # functions that do almost the same thing
+    if(inherits(x, "object")) {
+        check <- \(y) intersects(y, x)
+        co <- center(x)
+    } else {
+        check <- \(y) in_object(y, x, outside = FALSE)
+        co <- as.numeric(x)
+    }
+
+    # Instantiate a list that will contain all of the instances in which the 
+    # access is actually limited
+    not_accessible <- list()
+    f <- 1
+
+    # Loop over all possible access limitations
+    for(i in seq_len(length(possible_blockages))) {
+        # Do the check
+        if(check(possible_blockages[[i]])) {
+            next
+        }
+
+        # Compute the relative angle of the agent compared to the start of 
+        # the segment and subtract the orientation of the line.
+        angle <- atan2(co[2] - from(possible_blockages[[i]])[2],
+                       co[1] - from(possible_blockages[[i]])[1])
+        angle <- angle - orientation(possible_blockages[[i]])
+
+        # Compute the sine of the angle and flag the segment as being non-
+        # accessible if the sine is positive (i.e., when the angles are 
+        # between 0 and pi)
+        if(sin(angle) < pi & sin(angle) > 0) {
+            # If this is indeed the case, we will create a very small 
+            # polygon that cannot be passed through by the agent in all of 
+            # the underlying functions. This polygon is then added to the 
+            # list of not_accessible items
+            coords <- points(possible_blockages[[i]])
+
+            alpha <- orientation(possible_blockages[[i]]) + pi / 2
+            R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
+            new_coords <- coords[2:1,] + rep(R %*% c(1e-2, 0), each = 2)
+
+            not_accessible[[f]] <- polygon(points = rbind(coords, new_coords))
+            f <- f + 1
+        }
+    }
+
+    # If the user wants to return the list of none-accessible objects, provide 
+    # it to them
+    if(return_list) {
+        return(not_accessible)
+    }
+
+    # Once done, we can add these polygons to the objects in the background
+    objects(object) <- append(objects(object), 
+                              not_accessible)
+    return(object)
 })
 
 #' Getter/Setter for the shape-slot
@@ -105,6 +210,27 @@ setMethod("objects", "background", function(object) {
 
 setMethod("objects<-", "background", function(object, value) {
     object@objects <- value
+    return(object)
+})
+
+#' Getter/Setter for the limited_access-slot
+#' 
+#' @rdname limited_access-method
+#' 
+#' @export
+setGeneric("limited_access", function(object) standardGeneric("limited_access"))
+
+#' @rdname limited_access-method
+#' 
+#' @export
+setGeneric("limited_access<-", function(object, value) standardGeneric("limited_access<-"))
+
+setMethod("limited_access", "background", function(object) {
+    return(object@limited_access)
+})
+
+setMethod("limited_access<-", "background", function(object, value) {
+    object@limited_access <- value
     return(object)
 })
 

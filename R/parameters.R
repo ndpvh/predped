@@ -2,6 +2,12 @@
 # VALUES
 ################################################################################
 
+# setwd('/Users/nielsvanhasbroeck/Broncode/predpedgui/build/Qt_6_7_2_for_macOS-Debug');
+# con <- DBI::dbConnect(RSQLite::SQLite(), dbname = 'predped.sqlite');
+# PedestrianDefinitionsql <- tbl(con, 'PedestrianDefinition');
+# 'sql table is called: PedestrianDefinitionsql'
+# PedestrianDefinition <- PedestrianDefinitionsql %>% collect()
+
 #' Typical Archetypes used for Simulation
 #' 
 #' @export
