@@ -19,6 +19,7 @@
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
                                           limited_access = "list",
+                                          precomputed_limited_access = "list",
                                           entrance = "matrix", 
                                           exit = "matrix"))
 
@@ -50,6 +51,12 @@ setMethod("initialize", "background", function(.Object,
     if(!all(sapply(.Object@limited_access, is, class2 = "segment"))) {
         stop("All elements in slot 'limited_access' must be of type 'segment'")
     }
+
+    # If they make it through, then we should create a precomputed limited_access
+    # list. This will contain all the shapes that will be added to the `objects`
+    # if they block the access for an agent.
+    .Object@precomputed_limited_access <- lapply(limited_access, 
+                                                 compute_limited_access)
 
     # Entrances should either be provided or randomly generated. We furthermore
     # need to transform the entrance to a matrix, allowing for multiple entrances
@@ -87,11 +94,9 @@ setMethod("initialize", "background", function(.Object,
 #' @export 
 setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
 
-setMethod("limit_access", 
-          signature(object = "background"), 
-          function(object, 
-                   x,
-                   return_list = FALSE) {
+setMethod("limit_access", "background", function(object, 
+                                                 x,
+                                                 return_list = FALSE) {
 
     # Check whether there are any segments that might limit the access of agents
     # in the first place. If not, we can return the background directly
@@ -122,54 +127,46 @@ setMethod("limit_access",
         co <- as.numeric(x)
     }
 
-    # Instantiate a list that will contain all of the instances in which the 
-    # access is actually limited
-    not_accessible <- list()
-    f <- 1
-
     # Loop over all possible access limitations
-    for(i in seq_len(length(possible_blockages))) {
-        # Do the check
-        if(check(possible_blockages[[i]])) {
-            next
-        }
+    idx <- sapply(possible_blockages, 
+                  function(x) {
+                      # Compute the relative angle of the agent compared to the start of 
+                      # the segment and subtract the orientation of the line.
+                      angle <- atan2(co[2] - from(x)[2],
+                                     co[1] - from(x)[1])
+                      angle <- angle - orientation(x)
 
-        # Compute the relative angle of the agent compared to the start of 
-        # the segment and subtract the orientation of the line.
-        angle <- atan2(co[2] - from(possible_blockages[[i]])[2],
-                       co[1] - from(possible_blockages[[i]])[1])
-        angle <- angle - orientation(possible_blockages[[i]])
-
-        # Compute the sine of the angle and flag the segment as being non-
-        # accessible if the sine is positive (i.e., when the angles are 
-        # between 0 and pi)
-        if(sin(angle) < pi & sin(angle) > 0) {
-            # If this is indeed the case, we will create a very small 
-            # polygon that cannot be passed through by the agent in all of 
-            # the underlying functions. This polygon is then added to the 
-            # list of not_accessible items
-            coords <- points(possible_blockages[[i]])
-
-            alpha <- orientation(possible_blockages[[i]]) + pi / 2
-            R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
-            new_coords <- coords[2:1,] + rep(R %*% c(1e-2, 0), each = 2)
-
-            not_accessible[[f]] <- polygon(points = rbind(coords, new_coords))
-            f <- f + 1
-        }
-    }
+                      # Return a logical denoting whether this one blocks or not
+                      return(!check(x) & sin(angle) < pi & sin(angle) > 0)
+                  })
 
     # If the user wants to return the list of none-accessible objects, provide 
     # it to them
     if(return_list) {
-        return(not_accessible)
+        return(object@precomputed_limited_access[idx])
     }
 
     # Once done, we can add these polygons to the objects in the background
     objects(object) <- append(objects(object), 
-                              not_accessible)
+                              object@precomputed_limited_access[idx])
     return(object)
 })
+
+#' Transform the limited_access segments to polygons
+#' 
+#' @param segment Object of the class `segment`
+#' 
+#' @export 
+compute_limited_access <- function(segment) {
+    coords <- points(segment)   
+                   
+    alpha <- orientation(segment) + pi / 2
+    R <- c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)) |>
+       matrix(nrow = 2, ncol = 2)
+    new_coords <- coords[2:1,] + rep(R %*% c(1e-2, 0), each = 2)
+
+    return(polygon(points = rbind(coords, new_coords)))
+}
 
 #' Getter/Setter for the shape-slot
 #' 
@@ -231,6 +228,9 @@ setMethod("limited_access", "background", function(object) {
 
 setMethod("limited_access<-", "background", function(object, value) {
     object@limited_access <- value
+    object@precomputed_limited_access <- lapply(value, 
+                                                compute_limited_access)
+
     return(object)
 })
 
