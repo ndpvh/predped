@@ -293,12 +293,14 @@ setMethod("simulate", "state", function(object,
 
     # Check whether one of the pedestrians is waiting at the exit and delete them
     # from the agent-list
-    exiting <- sapply(agents(object), 
-                      \(x) status(x) == "exit")
-    idx <- seq_len(length(exiting))[exiting]
-
-    if(length(idx) != 0) {
-        agents(object) <- agents(object)[-idx]
+    if(length(agents(object)) != 0) {
+        exiting <- sapply(agents(object), 
+                          \(x) status(x) == "exit")
+        idx <- seq_along(exiting)[exiting]
+    
+        if(length(idx) != 0) {
+            agents(object) <- agents(object)[-idx]
+        }
     }
 
     # If you want to plot the result immediately, do so
