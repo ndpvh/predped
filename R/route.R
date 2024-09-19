@@ -355,7 +355,10 @@ evaluate_edges <- function(segments,
         # there is an intersection with any of the objects by reducing over the 
         # second dimension in this matrix and checking whether any of the edges 
         # crosses one of the segments (or-statement)
-        idx <- rowSums(idy & intersections) != 0
+        #
+        # Importantly, we need to reverse this statement, as the AND statement 
+        # says which edges we should delete
+        idx <- !as.logical(rowSums(idy & intersections) != 0)
     }
 
     # Bind all information together and delete all edges that have NA values 
