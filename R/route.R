@@ -463,3 +463,40 @@ combine_nodes <- function(nodes_1,
     #         setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
     # }
 }
+
+#' Compute the edges within a given setting
+#' 
+#' This function uses `create_edges` and then deletes agent and goal positions 
+#' from the resulting graph. The output can then be used as precomputed edges, 
+#' increasing the speed of searching for a route. 
+#' 
+#' @param background Background for which to compute the edges
+#' @param space_between Space to keep between nodes and objects in the 
+#' environment. Defaults to 2.5 times the maximal possible radius that the agents
+#' can be.
+#' @param many_options Logical denoting whether to create more than the minimal
+#' number of nodes, allowing more flexibility in the agents. Defaults to `TRUE`.
+#' 
+#' @return List containing edges, edges_with_coords, and nodes
+#' 
+#' @export 
+compute_edges <- function(background, 
+                          space_between = 2.5 * max(params_bounds["radius",]),
+                          many_options = TRUE) {
+    # Create the edges themselves with mock-positions of agent and goal
+    edges <- create_edges(c(0, 0), 
+                          c(0, 0), 
+                          background,
+                          space_between = space_between,
+                          many_options = many_options)
+
+    # Delete agent and goal positions from these edges, as these should be 
+    # dynamic. 
+    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+    edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$from %in% c("agent", "goal")),]
+    edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$to %in% c("agent", "goal")),]
+
+    return(edges)
+}
