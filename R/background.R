@@ -94,17 +94,15 @@ setMethod("initialize", "background", function(.Object,
 #' @export 
 setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
 
-setMethod("limit_access", "background", function(object, 
-                                                 x,
-                                                 return_list = FALSE) {
+setMethod("limit_access", "background", function(object, x) {
 
     # Check whether there are any segments that might limit the access of agents
     # in the first place. If not, we can return the background directly
     possible_blockages <- limited_access(object)
 
     if(length(possible_blockages) == 0) {
-        if(return_list) {
-            return(list())
+        if(return_indices) {
+            return(logical(0))
         } else {
             return(object)
         }
@@ -120,35 +118,54 @@ setMethod("limit_access", "background", function(object,
     # within this one `limit_access` function instead of creating two separate 
     # functions that do almost the same thing
     if(inherits(x, "object")) {
+        # If we are looking at an agent, then we will just have one set of 
+        # coordinates
         check <- \(y) intersects(y, x)
-        co <- center(x)
+        co <- matrix(center(x), nrow = 1)
+
     } else {
+        # If we are looking at a set of coordinates, then we want to allow for 
+        # multiple coordinates to be related to a different set of objects that 
+        # they might pass through. 
+        #
+        # Limits the looping that we have to do in the one use-case that we use 
+        # coordinates in (being in `evaluate_edges`)
         check <- \(y) in_object(y, x, outside = FALSE)
-        co <- as.numeric(x)
+        if(length(x) == 2) {
+            co <- matrix(ncol = 2)
+        } else {
+            co <- as.matrix(x)
+        }
+        return_indices <- TRUE
     }
 
     # Loop over all possible access limitations
-    idx <- sapply(possible_blockages, 
-                  function(x) {
+    return(sapply(possible_blockages, 
+                  function(y) {
                       # Compute the relative angle of the agent compared to the start of 
                       # the segment and subtract the orientation of the line.
-                      angle <- atan2(co[2] - from(x)[2],
-                                     co[1] - from(x)[1])
-                      angle <- angle - orientation(x)
+                      angle <- atan2(co[,2] - from(y)[2],
+                                     co[,1] - from(y)[1])
+                      angle <- angle - orientation(y)
 
                       # Return a logical denoting whether this one blocks or not
-                      return(!check(x) & sin(angle) < pi & sin(angle) > 0)
-                  })
+                      return(!check(y) & sin(angle) < pi & sin(angle) > 0)
+                  }))
+    
+    # If the user wants to return the raw indices linking coordinate to the 
+    # segments that need to be accounted for, do so
+    if(return_indices) {
+        return(idx)
+    }
 
     # If the user wants to return the list of none-accessible objects, provide 
     # it to them
-    if(return_list) {
-        return(object@precomputed_limited_access[idx])
-    }
-
+    # if(return_list) {
+    #     return(object@precomputed_limited_access[idx])
+    # }
+    
     # Once done, we can add these polygons to the objects in the background
-    objects(object) <- append(objects(object), 
-                              object@precomputed_limited_access[idx])
+    
     return(object)
 })
 
