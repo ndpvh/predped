@@ -305,9 +305,9 @@ create_nodes <- function(from,
 #'   - Step 2: Find out which nodes are reachable from one another. In other 
 #'             words, if I stand at node 1, can I see node 2?
 #' 
-#' @param segments Named list containing an n x 4 matrix of segments that make 
-#' up the edges (under key "semgents") and an n x 2 matrix of names for the 
-#' nodes that make up these edges (under key "ids").
+#' @param segments Named matrix or data.frame containing the ids of the nodes 
+#' under column names "from" and "to", and their coordinates under "from_x", 
+#' "from_y", "to_x", and "to_y"
 #' @param objects List of objects that are contained in the setting
 #' 
 #' @return List containing the nodes, edges, and edges together with their 
@@ -346,6 +346,10 @@ evaluate_edges <- function(segments,
             obj <- limit_access(background, 
                                 segments[i, c("from_x", "from_y")], 
                                 return_list = TRUE)
+
+            if(length(obj) == 0) {
+                next
+            }
 
             # Do the check
             idx[i] <- prune_edges(obj, segments[i, c("from_x", "from_y", "to_x", "to_y")])
