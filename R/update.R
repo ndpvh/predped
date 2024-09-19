@@ -1,24 +1,4 @@
-# ' Move an object
-# '
-# ' Move an object around the space. This function changes the positions and/or
-# ' orientation of the provided object. For the class `agent`, this involves a
-# ' computation of the utility of a given movement. For other classes, this
-# ' involves checking whether an agent is interacting with the object before it
-# ' can move.
-# '
-# ' @param object The object of which the position should be moved.
-# ' @param ... Additional arguments that can differ for agents or environmental
-# ' objects.
-# '
-# ' @return The provided object with a changed position and/or orientation
-# '
-# ' @export
-# ' @docType methods
-# ' @rdname move-methods
-# setGeneric("move", function(object, ...){})
-
-
-#' Update the current State
+#' Update the Current State
 #' 
 #' Function that is used in the simulation to update the current state. Loops
 #' over all the agents and updates both agent characteristics and the setting 
@@ -39,19 +19,24 @@
 # 
 # TO DO
 #   - Also update objects when they are moveable and used. To see how we do it
-update_state <- function(state, 
-                         background,
-                         stay_stopped = TRUE, 
-                         time_step = 0.5,
-                         close_enough = 2,
-                         space_between = 2.5,
-                         standing_start = 0.1,
-                         precomputed_edges = NULL,
-                         many_options = FALSE,
-                         precompute_goal_paths = FALSE,
-                         report = FALSE,
-                         interactive_report = FALSE,
-                         ...) {
+setGeneric("update", function(object, ...) standardGeneric("update"))
+
+setMethod("update", "state", function(object,
+                                      stay_stopped = TRUE, 
+                                      time_step = 0.5,
+                                      close_enough = 2,
+                                      space_between = 2.5,
+                                      standing_start = 0.1,
+                                      precomputed_edges = NULL,
+                                      many_options = FALSE,
+                                      precompute_goal_paths = FALSE,
+                                      report = FALSE,
+                                      interactive_report = FALSE,
+                                      ...) {
+
+    # Extract the components of the state
+    agent_list <- agents(object)
+    background <- setting(object)
 
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
@@ -59,30 +44,30 @@ update_state <- function(state,
     #
     # In order for this to work with m4ma, we need to transform it to a matrix 
     # and provide it rownames that are equal to the id's of the agents
-    agent_predictions <- lapply(state@agents, 
+    agent_predictions <- lapply(agent_list, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,
                                                       time_step = time_step))
     agent_predictions <- sapply(agent_predictions, \(x) x) |>
         t()
-    rownames(agent_predictions) <- sapply(state@agents, id)
+    rownames(agent_predictions) <- sapply(agent_list, id)
 
     # Create agent-specifications. Are used in the utility-function and used to
     # be created there. Moved it here to reduce computational cost (which increases
     # exponentially with more agents)
-    agent_specs <- create_agent_specifications(state@agents, 
+    agent_specs <- create_agent_specifications(agent_list, 
                                                agent_predictions)
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
-    for(i in seq_along(state@agents)) {
+    for(i in seq_along(agent_list)) {
         # Extract the agent to-be-updated from the state list. Importantly, also
         # remove the agent from this state list, as it should not contain this 
         # one agent: Simulation is done relative to the agent to-be-updated
-        agent <- state@agents[[i]]
+        agent <- agent_list[[i]]
 
-        tmp_state <- state
-        tmp_state@agents <- tmp_state@agents[-i]
+        tmp_state <- object
+        agents(tmp_state) <- agent_list[-i]
 
         # Update the goals of the agent
         agent <- update_goal(agent, 
@@ -109,68 +94,14 @@ update_state <- function(state,
                                  ...) 
 
         # Update the agent himself
-        state@agents[[i]] <- agent
+        agent_list[[i]] <- agent
     }
 
-    return(state)
-}
+    # Update the state
+    agents(object) <- agent_list
 
-#' Predict agent's movement
-#' 
-#' Use an agents' current speed and orientation to determine where the agent might 
-#' end up in the next step. This information is used by other agents' in the 
-#' simulation to determine where (not) to go to if they want to avoid collisions.
-#' 
-#' @param agent The agent in consideration
-#' @param stay_stopped Logical denoting whether agents will predict other agents 
-#' who have stopped to remain immobile. Defaults to `TRUE`.
-#' @param time_step Numeric denoting the time step taken between iterations in 
-#' seconds. Defaults to `0.5` or half a second.
-#' 
-#' @export
-predict_movement <- function(agent, 
-                             stay_stopped = TRUE,
-                             time_step = 0.5) {
-    
-    # Compute the coordinate where the agents will end up when moving at the 
-    # same speed in the same direction. Different when an agent is currently 
-    # stopped vs when they are actively moving. Also different depending on 
-    # whether this is considered in the first place.
-    if(stay_stopped & agent@status == "stop") {
-        co <- position(agent)
-    } else {
-        crossed_distance <- m4ma::scaleVel(agent@speed, tStep = time_step) * m4ma::aTOd(agent@orientation)
-        co <- coordinate(position(agent) + crossed_distance)
-    }    
-
-    return(co)
-}
-
-create_agent_specifications <- function(agent_list,
-                                        agent_predictions) {
-    # Make the object-based arguments of predped compatible with the information
-    # needed by m4ma. 
-    agent_specs <- list(id = as.character(sapply(agent_list, id)),
-                        size = as.numeric(sapply(agent_list, size)),
-                        position = t(sapply(agent_list, position)),
-                        orientation = as.numeric(sapply(agent_list, orientation)), 
-                        speed = as.numeric(sapply(agent_list, speed)), 
-                        group = as.numeric(sapply(agent_list, group)),
-                        predictions = agent_predictions)
-
-    # Required for utility helper functions: Add names of the agents to their
-    # characteristics
-    rownames(agent_specs$position) <- agent_specs$id
-    names(agent_specs$size) <- agent_specs$id
-    names(agent_specs$orientation) <- agent_specs$id
-    names(agent_specs$speed) <- agent_specs$id
-    names(agent_specs$group) <- agent_specs$id
-    rownames(agent_specs$predictions) <- agent_specs$id
-
-    return(agent_specs)
-}
-
-
+    return(object)
+})
 
 #' Move an Agent
 #' 
@@ -749,4 +680,63 @@ update_goal <- function(agent,
     }
 
     return(agent)
+}
+
+
+
+
+
+#' Predict agent's movement
+#' 
+#' Use an agents' current speed and orientation to determine where the agent might 
+#' end up in the next step. This information is used by other agents' in the 
+#' simulation to determine where (not) to go to if they want to avoid collisions.
+#' 
+#' @param agent The agent in consideration
+#' @param stay_stopped Logical denoting whether agents will predict other agents 
+#' who have stopped to remain immobile. Defaults to `TRUE`.
+#' @param time_step Numeric denoting the time step taken between iterations in 
+#' seconds. Defaults to `0.5` or half a second.
+#' 
+#' @export
+predict_movement <- function(agent, 
+                             stay_stopped = TRUE,
+                             time_step = 0.5) {
+    
+    # Compute the coordinate where the agents will end up when moving at the 
+    # same speed in the same direction. Different when an agent is currently 
+    # stopped vs when they are actively moving. Also different depending on 
+    # whether this is considered in the first place.
+    if(stay_stopped & agent@status == "stop") {
+        co <- position(agent)
+    } else {
+        crossed_distance <- m4ma::scaleVel(agent@speed, tStep = time_step) * m4ma::aTOd(agent@orientation)
+        co <- coordinate(position(agent) + crossed_distance)
+    }    
+
+    return(co)
+}
+
+create_agent_specifications <- function(agent_list,
+                                        agent_predictions) {
+    # Make the object-based arguments of predped compatible with the information
+    # needed by m4ma. 
+    agent_specs <- list(id = as.character(sapply(agent_list, id)),
+                        size = as.numeric(sapply(agent_list, size)),
+                        position = t(sapply(agent_list, position)),
+                        orientation = as.numeric(sapply(agent_list, orientation)), 
+                        speed = as.numeric(sapply(agent_list, speed)), 
+                        group = as.numeric(sapply(agent_list, group)),
+                        predictions = agent_predictions)
+
+    # Required for utility helper functions: Add names of the agents to their
+    # characteristics
+    rownames(agent_specs$position) <- agent_specs$id
+    names(agent_specs$size) <- agent_specs$id
+    names(agent_specs$orientation) <- agent_specs$id
+    names(agent_specs$speed) <- agent_specs$id
+    names(agent_specs$group) <- agent_specs$id
+    rownames(agent_specs$predictions) <- agent_specs$id
+
+    return(agent_specs)
 }
