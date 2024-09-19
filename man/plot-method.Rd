@@ -2,32 +2,92 @@
 % Please edit documentation in R/plot.R
 \name{plot-method}
 \alias{plot-method}
-\alias{plot,circle-method}
-\alias{plot,rectangle-method}
-\alias{plot,polygon-method}
+\alias{plot,object-method}
 \alias{plot,agent-method}
-\alias{plot,list-method}
 \alias{plot,background-method}
+\alias{plot,state-method}
+\alias{plot,list-method}
 \title{Plot an Object.}
 \usage{
 plot(object, ...)
 
-\S4method{plot}{circle}(object, ...)
+\S4method{plot}{object}(object, ...)
 
-\S4method{plot}{rectangle}(object, ...)
+\S4method{plot}{agent}(object, plot_goal = TRUE, agent.linewidth = 1, goal.size = 1, ...)
 
-\S4method{plot}{polygon}(object, ...)
+\S4method{plot}{background}(
+  object,
+  entry.width = 0.3,
+  shape.fill = "white",
+  shape.color = "black",
+  shape.linewidth = 1,
+  object.fill = "grey",
+  object.color = "black",
+  object.linewidth = 1,
+  dark_mode = FALSE,
+  ...
+)
 
-\S4method{plot}{agent}(object, plot_goal = TRUE, ...)
+\S4method{plot}{state}(
+  object,
+  agent.linewidth = 1,
+  goal.size = 1,
+  plot_goal = TRUE,
+  plot.title.size = 10,
+  plot.title.hjust = 0.5,
+  axis.title.size = 10,
+  axis.text.size = 8,
+  ...
+)
 
-\S4method{plot}{list}(object, trace = FALSE, print_progress = TRUE, iterations = NULL, ...)
-
-\S4method{plot}{background}(object, entry_exit_width = 0.4, ...)
+\S4method{plot}{list}(object, ...)
 }
 \arguments{
 \item{object}{An object of kind \code{\link[predped]{object-class}}}
 
-\item{...}{Additional arguments passed on to the geom used to plot the object.}
+\item{...}{Additional ggplot arguments passed on to the geom for the objects.}
+
+\item{plot_goal}{Logical denoting whether to plot the position of the current
+goal of the agent together with the agent. Defaults to `TRUE`.}
+
+\item{agent.linewidth}{Thickness of the line with which to plot the agent. 
+Defaults to 1.}
+
+\item{goal.size}{Thickness of the point that denotes the goal position. 
+Defaults to 1.}
+
+\item{entry.width}{Radius of the entrances and exits to be plotted with the 
+background. Defaults to 0.3,}
+
+\item{shape.fill}{Fill of the shape of the background. Defaults to "white".}
+
+\item{shape.color}{Color of circumference of the shape of the background. 
+Defaults to "black".}
+
+\item{shape.linewidth}{Thickness of the circumference of the shape of the 
+background. Also concerns the thickness of the line of the entrances and 
+exits. Defaults to 1.}
+
+\item{object.fill}{Fill of the objects contained in the background. Defaults 
+to "grey".}
+
+\item{object.color}{Color of the circumference of the objects contained in 
+the background. Defaults to "black".}
+
+\item{object.linewidth}{Thickness of the circumference of the objects contained
+in the background. Defaults to 1.}
+
+\item{dark_mode}{Logical that can toggle the default colorpallette of predped's 
+dark mode. Defaults to `FALSE`.}
+
+\item{plot.title.size}{Size of the plot title. Defaults to 10.}
+
+\item{plot.title.hjust}{Position of the plot title. Defaults to 0.5, or the 
+middle of the plot.}
+
+\item{axis.title.size}{Size of the axis title. Defaults to 10.}
+
+\item{axis.text.size}{Size of the axis text. Defaults to 8.}
 }
 \value{
 Either a geom or a ggplot

@@ -40,7 +40,7 @@ Collate:
     'parameters.R'
     'plot.R'
     'see.R'
-    'update_state.R'
+    'update.R'
     'utility_model.R'
     'predped.R'
     'simulate.R'
