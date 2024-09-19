@@ -101,7 +101,7 @@ tbl <- c(c[2],
 colnames(tbl) <- NULL
 
 # Caption
-caption <- paste0("Benchmark for the limit\_access function for background. ",
+caption <- paste0("Benchmark for the limit\\_access function for background. ",
                   "In this benchmark, we use 10 rectangular objects, a rectangular ", 
                   "shape, and 10 segments that limit access. ", 
                   "Each of these segments is blocked from the perspective of the ",

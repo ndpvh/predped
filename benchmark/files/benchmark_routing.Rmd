@@ -241,6 +241,7 @@ tbl <- rbind(c("No limits",
                ml[2], 
                paste0("[", ml[1], ",", ml[3], "]")))
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 
 # Define the caption for the table 
@@ -301,6 +302,7 @@ tbl <- cbind(c("Few edges", "Many edges"),
              c(fa[2], ma[2]),
              c(paste0("[", fa[1], ",", fa[3], "]"), paste0("[", ma[1], ",", ma[3], "]"))) 
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 
 # Define the caption for the table 
@@ -380,7 +382,7 @@ fn <- (\() predped::evaluate_edges(segments, setting)) |>
     rnd()
 
 fl <- (\() predped::evaluate_edges(segments, lim_setting)) |>
-    test_times(n = 10) |>
+    test_times() |>
     rnd()
 
 segments <- subset(many_edges$edges_with_coords, select = -cost)
@@ -389,7 +391,7 @@ mn <- (\() predped::evaluate_edges(segments, setting)) |>
     rnd()
 
 ml <- (\() predped::evaluate_edges(segments, lim_setting)) |>
-    test_times(n = 10) |>
+    test_times() |>
     rnd()
 
 # Create a table displaying these results
@@ -404,6 +406,7 @@ tbl <- rbind(c("No limits",
                ml[2], 
                paste0("[", ml[1], ",", ml[3], "]")))
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 
 # Define the caption for the table 
