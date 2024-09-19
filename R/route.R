@@ -332,28 +332,31 @@ evaluate_edges <- function(segments,
         idx <- prune_edges(obj, segments[, c("from_x", "from_y", "to_x", "to_y")])
     }
 
-    # Step 3: If there is limited access, we need to account for this. Unfortunately, 
+    # Step 3: Do an intermediate update of the segments based on the current 
+    # results
+    segments <- segments[idx,]
+    cost <- cost[idx]
+
+    # Step 4: If there is limited access, we need to account for this. Unfortunately, 
     # this can only be assessed for each node separately, which thus necessitates
     # a loop.
     if(length(lim) != 0) {
-        for(i in seq_along(idx)) {
-            # If this index has already been put to FALSE, we can skip it
-            if(!idx[i]) {
-                next
-            }
+        # Get the indices indicating which coordinates should account for which 
+        # of the segments
+        idy <- limit_access(background, 
+                            segments[, c("from_x", "from_y")])
 
-            # Create a new objects list for the `from` node
-            obj <- limit_access(background, 
-                                segments[i, c("from_x", "from_y")], 
-                                return_list = TRUE)
+        # Loop over the limited access and look at the interactions between 
+        # these and the edges 
+        intersections <- sapply(background@precomputed_limited_access, 
+                                \(x) line_intersection(x, segments[, c("from_x", "from_y", "to_x", "to_y")], return_all = TRUE))
 
-            if(length(obj) == 0) {
-                next
-            }
-
-            # Do the check
-            idx[i] <- prune_edges(obj, segments[i, c("from_x", "from_y", "to_x", "to_y")])
-        }
+        # First check whether the intersections matter, which amounts to having 
+        # a TRUE in both idy and in intersections. Then, we can check whether 
+        # there is an intersection with any of the objects by reducing over the 
+        # second dimension in this matrix and checking whether any of the edges 
+        # crosses one of the segments (or-statement)
+        idx <- rowSums(idy & intersections) != 0
     }
 
     # Bind all information together and delete all edges that have NA values 
@@ -379,6 +382,11 @@ evaluate_edges <- function(segments,
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
+    # If there are no objects, then there can be no intersections
+    if(length(objects) == 0) {
+        return(rep(TRUE, nrow(segments)))
+    }
+
     # Loop over the objects in the environment and check their intersections 
     # with the lines in `segments`
     all_intersections <- lapply(objects, 
