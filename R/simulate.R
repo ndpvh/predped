@@ -133,18 +133,9 @@ setMethod("simulate", "predped", function(object,
     }
 
     if(precompute_edges) {
-        edges <- create_edges(c(0, 0), 
-                              c(0, 0), 
-                              object@setting,
-                              space_between = space_between * max(params_bounds["radius",]),
-                              many_options = many_options)
-
-        edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
-        edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
-        edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
-        edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$from %in% c("agent", "goal")),]
-        edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$to %in% c("agent", "goal")),]
-
+        edges <- compute_edges(object@setting, 
+                               space_between = space_between * max(params_bounds["radius",]), 
+                               many_options = many_options)
     } else {
         edges <- NULL
     }
@@ -269,14 +260,13 @@ setMethod("simulate", "predped", function(object,
         }
 
         # Update the current state
-        state <- update_state(state, 
-                              object@setting, 
-                              space_between = space_between,
-                              time_step = time_step,
-                              precomputed_edges = edges,
-                              standing_start = standing_start,
-                              many_options = many_options,
-                              ...)
+        state <- update(state, 
+                        space_between = space_between,
+                        time_step = time_step,
+                        precomputed_edges = edges,
+                        standing_start = standing_start,
+                        many_options = many_options,
+                        ...)
         iteration(state) <- iteration(state) + 1
 
         # Check whether one of the pedestrians is waiting at the exit
@@ -310,6 +300,13 @@ setMethod("simulate", "predped", function(object,
     
     return(trace)
 })
+
+# Make an alias for `update` in `simulate`
+#' Alias for `update` 
+#'
+#' @rdname simulate-method
+#' 
+setMethod("simulate", "state", function(object, ...) update(object, ...))
 
 #' Add an Agent to the Simulation
 #' 
