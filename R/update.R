@@ -173,7 +173,10 @@ update_position <- function(agent,
                             ) {
 
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
-    background <- limit_access(background, agent)
+
+    idx <- limit_access(background, agent)
+    objects(background) <- append(objects(background), 
+                                  background@precomputed_limited_access[idx])
 
     # Let the agent wait (cell = 0 and speed is slowest possible one) when the 
     # agent is currently interacting with another object, when they are currently 
