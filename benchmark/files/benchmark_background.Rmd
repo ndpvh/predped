@@ -84,33 +84,24 @@ co <- c(0, -0.5)
 my_agent <- predped::agent(center = co, radius = 0.2)
 
 # Test 
-cl <- (\() predped:::limit_access(setting, co, return_list = TRUE)) |>
+c <- (\() predped:::limit_access(setting, co)) |>
     test_times() |>
-    rnd() 
-
-co <- (\() predped:::limit_access(setting, co, return_list = FALSE)) |>
-    test_times() |>
-    rnd() 
+    rnd()
     
-al <- (\() predped:::limit_access(setting, my_agent, return_list = TRUE)) |>
-    test_times() |>
-    rnd() 
-
-ao <- (\() predped:::limit_access(setting, my_agent, return_list = FALSE)) |>
+a <- (\() predped:::limit_access(setting, my_agent)) |>
     test_times() |>
     rnd() 
 
 # Create the table
-tbl <- rbind(c("List returned",
-               cl[2], c(paste0("[", cl[1], ",", cl[3], "]")), 
-               al[2], c(paste0("[", al[1], ",", al[3], "]"))), 
-             c("Object returned",
-               co[2], c(paste0("[", co[1], ",", co[3], "]")), 
-               ao[2], c(paste0("[", ao[1], ",", ao[3], "]")))) 
+tbl <- c(c[2], 
+         paste0("[", c[1], ",", c[3], "]"), 
+         a[2], 
+         paste0("[", a[1], ",", a[3], "]")) |>
+    matrix(nrow = 1)
 colnames(tbl) <- NULL
 
 # Caption
-caption <- paste0("Benchmark for the initialize function for background. ",
+caption <- paste0("Benchmark for the limit\_access function for background. ",
                   "In this benchmark, we use 10 rectangular objects, a rectangular ", 
                   "shape, and 10 segments that limit access. ", 
                   "Each of these segments is blocked from the perspective of the ",
@@ -124,7 +115,7 @@ tbl |>
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H") |>
-    kableExtra::add_header_above(c(" " = 1, "Coordinate" = 2, "Agent" = 2)) |>
+    kableExtra::add_header_above(c("Coordinate" = 2, "Agent" = 2)) |>
     print()
 
 ```
