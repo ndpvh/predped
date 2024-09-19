@@ -332,15 +332,14 @@ evaluate_edges <- function(segments,
         idx <- prune_edges(obj, segments[, c("from_x", "from_y", "to_x", "to_y")])
     }
 
-    # Step 3: Do an intermediate update of the segments based on the current 
-    # results
-    segments <- segments[idx,]
-    cost <- cost[idx]
-
-    # Step 4: If there is limited access, we need to account for this. Unfortunately, 
+    # Step 3: If there is limited access, we need to account for this. Unfortunately, 
     # this can only be assessed for each node separately, which thus necessitates
     # a loop.
     if(length(lim) != 0) {
+        # Do an intermediate update of the segments based on the current results
+        segments <- segments[idx,]
+        cost <- cost[idx]
+
         # Get the indices indicating which coordinates should account for which 
         # of the segments
         idy <- limit_access(background, 
