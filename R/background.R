@@ -101,11 +101,7 @@ setMethod("limit_access", "background", function(object, x) {
     possible_blockages <- limited_access(object)
 
     if(length(possible_blockages) == 0) {
-        if(return_indices) {
-            return(logical(0))
-        } else {
-            return(object)
-        }
+        return(logical(0))
     }
 
     # Create a checking function that will differ for agent vs coordinates. The 
@@ -120,8 +116,8 @@ setMethod("limit_access", "background", function(object, x) {
     if(inherits(x, "object")) {
         # If we are looking at an agent, then we will just have one set of 
         # coordinates
-        check <- \(y) intersects(y, x)
         co <- matrix(center(x), nrow = 1)
+        check <- \(y) intersects(y, x)
 
     } else {
         # If we are looking at a set of coordinates, then we want to allow for 
@@ -130,13 +126,13 @@ setMethod("limit_access", "background", function(object, x) {
         #
         # Limits the looping that we have to do in the one use-case that we use 
         # coordinates in (being in `evaluate_edges`)
-        check <- \(y) in_object(y, x, outside = FALSE)
-        if(length(x) == 2) {
+        if(is.null(ncol(x))) {
             co <- matrix(ncol = 2)
         } else {
             co <- as.matrix(x)
         }
-        return_indices <- TRUE
+
+        check <- \(y) in_object(y, co, outside = FALSE)
     }
 
     # Loop over all possible access limitations
@@ -151,22 +147,6 @@ setMethod("limit_access", "background", function(object, x) {
                       # Return a logical denoting whether this one blocks or not
                       return(!check(y) & sin(angle) < pi & sin(angle) > 0)
                   }))
-    
-    # If the user wants to return the raw indices linking coordinate to the 
-    # segments that need to be accounted for, do so
-    if(return_indices) {
-        return(idx)
-    }
-
-    # If the user wants to return the list of none-accessible objects, provide 
-    # it to them
-    # if(return_list) {
-    #     return(object@precomputed_limited_access[idx])
-    # }
-    
-    # Once done, we can add these polygons to the objects in the background
-    
-    return(object)
 })
 
 #' Transform the limited_access segments to polygons
@@ -175,8 +155,15 @@ setMethod("limit_access", "background", function(object, x) {
 #' 
 #' @export 
 compute_limited_access <- function(segment) {
+    # Get the coordinates of the segment
     coords <- points(segment)   
                    
+    # Find out with which set of coordinates you can create a rectangle starting
+    # from the coordinates of the segment itself. Done through rotation so that 
+    # the rectangle itself is 1e-2 wide.
+    #
+    # Instead of object-class `rectangle`, we use `polygon` here as the typical
+    # functions are a bit more efficient for this object.
     alpha <- orientation(segment) + pi / 2
     R <- c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)) |>
        matrix(nrow = 2, ncol = 2)
