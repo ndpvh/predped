@@ -142,21 +142,21 @@ update_position <- function(agent,
                             state,
                             agent_specifications,
                             background,
-                            nests = list(
-                                Central = c(0, 6, 17, 28),
-                                NonCentral = c(0:33)[-c(6, 17, 28)],
-                                acc = c(1:11),
-                                const = c(12:22),
-                                dec = c(0, 23:33)
-                            ),
-                            alpha = list(
-                                Central = rep(1/3, 4),
-                                NonCentral = c(1/3, rep(0.5, 4), 1/3, rep(0.5, 9), 1/3,
-                                               rep(0.5, 9), 1/3, rep(0.5, 5)),
-                                acc = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
-                                const = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
-                                dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5, 5))
-                            ),
+                            # nests = list(
+                            #     Central = c(0, 6, 17, 28),
+                            #     NonCentral = c(0:33)[-c(6, 17, 28)],
+                            #     acc = c(1:11),
+                            #     const = c(12:22),
+                            #     dec = c(0, 23:33)
+                            # ),
+                            # alpha = list(
+                            #     Central = rep(1/3, 4),
+                            #     NonCentral = c(1/3, rep(0.5, 4), 1/3, rep(0.5, 9), 1/3,
+                            #                    rep(0.5, 9), 1/3, rep(0.5, 5)),
+                            #     acc = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
+                            #     const = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)),
+                            #     dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5, 5))
+                            # ),
                             velocities = c(1.5, 1, 0.5) |>
                                rep(each = 11) |>
                                matrix(ncol = 3),

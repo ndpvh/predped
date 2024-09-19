@@ -59,7 +59,7 @@
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait 
 #' between iterations, i.e., the time between updating the plot. Defaults to 
 #' `0.2`.
-#' @param ... Arguments passed on to the \code{\link[predped]{update_state}} function.
+#' @param ... Arguments passed on to the \code{\link[predped]{update}} function.
 #' 
 #' @export
 #
@@ -93,15 +93,8 @@ setMethod("simulate", "predped", function(object,
                                           precompute_edges = TRUE,
                                           many_options = precompute_edges,
                                           individual_differences = TRUE,
-                                          plot_live = FALSE,
-                                          plot_time = 0.2,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
                                           ...) {
-
-    # Used to be an argument, but if `FALSE`, users have no way of terminating 
-    # the process without killing the terminal. Hence not included as an argument
-    # anymore.
-    print_iteration <- TRUE
 
     # Simulate the iterations after which agents should be added to the simulation
     # (`add_agent`) and the number of goals each agent should pursue (`goal_number`).
@@ -126,13 +119,8 @@ setMethod("simulate", "predped", function(object,
     # If the edges need to be precomputed, do so already and delete the mock 
     # position of agent and goal: These are the only dynamical components to 
     # this recomputation
-    if(print_iteration & precompute_edges) {
-        cat("\nPrecomputing edges")
-    } else if(print_iteration) {
-        cat("\n")
-    }
-
     if(precompute_edges) {
+        cat("\nPrecomputing edges")
         edges <- compute_edges(object@setting, 
                                space_between = space_between * max(params_bounds["radius",]), 
                                many_options = many_options)
@@ -182,135 +170,221 @@ setMethod("simulate", "predped", function(object,
 
         agents(state) <- initial_condition$agents
     }
-    trace <- list(state)
-
-    agent_in_queue <- FALSE
-    rerouted <- 0
-    planned <- 0
+    trace <- list(state)    
     
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
-        # Check whether to add a pedestrian and, if so, initiate a new 
-        # agent. Things to consider are: whether it is time to add a new 
-        # pedestrian, whether we already reached the maximal number of agents,
-        # and whether there is any space to add the new pedestrian. If there is 
-        # already an agent waiting, don't create a new one.
-        if((i %in% add_agent_index) & (length(state@agents) < max_agents[i] & !agent_in_queue)) {
-            # Sample how many agents you would like to generate (if group, 
-            # generate them all together)
-            if(nrow(group_size) == 1) {
-                number_agents <- group_size[,1]
-            } else {
-                number_agents <- sample(group_size[,1], 1, replace = TRUE, prob = group_size[,2])
-            }
-
-            # Generate as many potential agents as you need to form a group of 
-            # size `number_agents`
-            potential_agent <- list()
-            for(j in 1:number_agents) {
-                potential_agent[[j]] <- add_agent(object,
-                                                  goal_number[i],
-                                                  goal_duration = goal_duration,
-                                                  standing_start = standing_start,
-                                                  space_between = space_between,
-                                                  time_step = time_step,
-                                                  precomputed_edges = edges,
-                                                  precompute_goal_paths = precompute_goal_paths,
-                                                  order_goal_stack = order_goal_stack,
-                                                  precomputed_goals = precomputed_goals,
-                                                  individual_differences = individual_differences)
-                group(potential_agent[[j]]) <- length(state@agents) + 1
-
-                # Once done, we need to provide all agents with the same set of 
-                # goals. Currently imposed so that a group of people that enter
-                # a space also want to achieve the same goals.
-                #
-                # Furthermore change position and orientation so that they all 
-                # come in in the same place
-                if(j != 1) {
-                    position(potential_agent[[j]]) <- position(potential_agent[[1]])
-                    orientation(potential_agent[[j]]) <- orientation(potential_agent[[1]])
-
-                    goals(potential_agent[[j]]) <- goals(potential_agent[[1]])
-                    current_goal(potential_agent[[j]]) <- current_goal(potential_agent[[1]])
-                }
-            }
-
-            agent_in_queue <- TRUE
-        }
-
-        # Check whether there is any space to add the pedestrian. Otherwise
-        # will have to keep waiting in the cue.
-        if(agent_in_queue) {
-            agents_in_the_way <- sapply(state@agents, 
-                                        \(x) in_object(potential_agent[[1]], 
-                                                       points(x), 
-                                                       outside = FALSE))
-            if(!any(agents_in_the_way)) {
-                agents(state) <- append(agents(state), potential_agent[[1]])
-                potential_agent <- potential_agent[-1]
-            }
-
-            agent_in_queue <- length(potential_agent) != 0
-        }
-
-        # Provide feedback if wanted
-        if(print_iteration) {
-            cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(state))))
-        }
-
-        # Update the current state
-        state <- update(state, 
-                        space_between = space_between,
-                        time_step = time_step,
-                        precomputed_edges = edges,
-                        standing_start = standing_start,
-                        many_options = many_options,
-                        ...)
-        iteration(state) <- iteration(state) + 1
-
-        # Check whether one of the pedestrians is waiting at the exit
-        idx <- c()
-        for(j in seq_along(agents(state))) {
-            if(status(state@agents[[j]]) == "exit") {
-                idx <- c(idx, j)
-            }
-        }
-
-        if(length(idx) != 0) {
-            agents(state) <- state@agents[-idx]
-        }
-
-        # Save the new state in the trace
-        trace[[i + 1]] <- state
-
-        # If you want to plot the result immediately, do so
-        if(plot_live) {
-            print(plot(list(state), 
-                       trace = TRUE,
-                       print_progress = FALSE,
-                       iterations = i)[[1]])
-            Sys.sleep(plot_time)
-        }
+        trace[[i + 1]] <- simulate(trace[[i]],
+                                   object,
+                                   add_agent = (i %in% add_agent_index) & (length(agents(trace[[i]])) < max_agents[i]),
+                                   group_size = group_size,
+                                   goal_number = goal_number[i],
+                                   time_step = time_step,
+                                   close_enough = close_enough,
+                                   space_between = space_between,
+                                   standing_start = standing_start,
+                                   precomputed_edges = edges,
+                                   many_options = many_options,
+                                   precompute_goal_paths = precompute_goal_paths,
+                                   ...)
     }
 
-    if(print_iteration) {
-        cat("\n")
-    }
+    cat("\n")
     
     return(trace)
 })
 
-# Make an alias for `update` in `simulate`
-#' Alias for `update` 
+#' Simulate the next State
 #'
 #' @rdname simulate-method
 #' 
-setMethod("simulate", "state", function(object, ...) update(object, ...))
+setMethod("simulate", "state", function(object, 
+                                        model,
+                                        add_agent = FALSE,
+                                        group_size = matrix(c(1, 1), nrow = 1),
+                                        goal_number = 5,
+                                        stay_stopped = TRUE, 
+                                        time_step = 0.5,
+                                        close_enough = 2,
+                                        space_between = 2.5,
+                                        standing_start = 0.1,
+                                        precomputed_edges = NULL,
+                                        many_options = FALSE,
+                                        precompute_goal_paths = FALSE,
+                                        report = FALSE,
+                                        interactive_report = FALSE,
+                                        velocities = c(1.5, 1, 0.5) |>
+                                           rep(each = 11) |>
+                                           matrix(ncol = 3),
+                                        orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                                         350, 340, 327.5, 310, 287.5) |>
+                                            rep(times = 3) |>
+                                            matrix(ncol = 3),
+                                        plot_live = FALSE,
+                                        plot_time = 0.2,
+                                        ...) {
 
-#' Add an Agent to the Simulation
+    # Retrieve and update the iteration number in the state
+    i <- iteration(object) + 1
+    iteration(object) <- i
+
+    # Check whether to add a pedestrian and, if so, initiate a new 
+    # agent. Things to consider are: whether it is time to add a new 
+    # pedestrian, whether we already reached the maximal number of agents,
+    # and whether there is any space to add the new pedestrian. If there is 
+    # already an agent waiting, don't create a new one.
+    # if((i %in% add_agent_index) & (length(state@agents) < max_agents[i] & !agent_in_queue)) {
+    agents_in_queue <- length(potential_agents(object)) != 0
+    if(add_agent & !agents_in_queue) {
+        # Sample how many agents you would like to generate (if group, 
+        # generate them all together)
+        if(nrow(group_size) == 1) {
+            number_agents <- group_size[,1]
+        } else {
+            number_agents <- sample(group_size[,1], 1, replace = TRUE, prob = group_size[,2])
+        }
+
+        # Actually add this group and communicate that these agents are waiting
+        # to enter the space.
+        potential_agents(object) <- add_group(model, 
+                                              number_agents = number_agents,
+                                              group_number = i,
+                                              goal_number = goal_number,
+                                              time_step = time_step,
+                                              ...)
+        agents_in_queue <- TRUE
+    }
+
+    # Check whether agents are waiting to enter the space. If so, then we 
+    # first check whether there is any space to add the pedestrians. Otherwise
+    # they will have to keep waiting in the queue
+    if(agents_in_queue) {
+        agent_to_add <- potential_agents(object)[[1]]
+
+        pts <- points(agent_to_add)
+        agents_in_the_way <- sapply(agents(object), 
+                                    \(x) in_object(x, 
+                                                   pts, 
+                                                   outside = FALSE))
+
+        if(!any(agents_in_the_way)) {
+            agents(object) <- append(agents(object), agent_to_add)
+            potential_agents(object) <- potential_agents(object)[-1]
+        }
+    }
+
+    # Print iteration number and number of agents in the space
+    cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(object))))
+
+    # Update the current state
+    object <- update(object, 
+                     stay_stopped = stay_stopped, 
+                     time_step = time_step,
+                     close_enough = close_enough,
+                     space_between = space_between,
+                     standing_start = standing_start,
+                     precomputed_edges = precomputed_edges,
+                     many_options = many_options,
+                     precompute_goal_paths = precompute_goal_paths,
+                     report = report,
+                     interactive_report = interactive_report,
+                     velocities = velocities,
+                     orientations = orientations)
+
+    # Check whether one of the pedestrians is waiting at the exit and delete them
+    # from the agent-list
+    exiting <- sapply(agents(object), 
+                      \(x) status(x) == "exit")
+    idx <- seq_len(length(exiting))[exiting]
+
+    if(length(idx) != 0) {
+        agents(object) <- agents(object)[-idx]
+    }
+
+    # If you want to plot the result immediately, do so
+    if(plot_live) {
+        print(plot(object, print_progress = FALSE))
+        Sys.sleep(plot_time)
+    }
+
+    return(object)
+})
+
+
+
+
+
+#' Add a Group of Agents to the Simulation
 #' 
 #' @param object The `predped` model that you want to simulate
+#' @param number_agents The number of agents to add. Defaults to `1`.
+#' @param standing_start Numeric denoting the speed of agents when they start 
+#' moving. Defaults to `0.1`.
+#' @param individual_differences Logical denoting whether variety on the parameters
+#' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param ... Additional arguments passed on to `add_agent`
+#' 
+#' @export 
+#
+# TO DO
+#   - Allow for optional "position" and "orientation" arguments. Will make it 
+#     easier to create initial conditions, as goals are immediately computed 
+#     then
+add_group <- function(model,
+                      goal_number = 5,
+                      number_agents = 1,
+                      standing_start = 0.1,
+                      individual_differences = TRUE,
+                      ...) {
+
+    agents <- list()
+
+    # Generate a single agent who will serve as the basis for all other 
+    # agents (imposed so that all agents in a group share the same goals and 
+    # enter the space at the same location).
+    agents[[1]] <- add_agent(model,
+                             goal_number,
+                             standing_start = standing_start,
+                             individual_differences = individual_differences,
+                             ...)
+
+    # If only one agent needed, we will return it immediately
+    if(number_agents == 1) {
+        return(agents)
+    }
+
+    # Otherwise, we should loop over all other agents and change their 
+    # parameter values (and color) so that each agent is unique. 
+    #
+    # First, draw the parameters for each of the new agents
+    model_parameters <- parameters(model) 
+    idx <- sample(1:nrow(model_parameters), 
+                  number_agents - 1, 
+                  prob = model@weights)
+    
+    # Loop over these agents
+    for(i in 2:number_agents) {
+        # Create a temporary agent as a copy of the first simulated agent
+        tmp_agent <- agents[[1]]
+
+        # Change this temporary agent's characterstics based on simulated
+        # parameters
+        params <- draw_parameters(1, 
+                                  model_parameters[idx,],
+                                  archetype = model_parameters$name[idx],
+                                  individual_differences = individual_differences) 
+        radius(tmp_agent) <- params$radius 
+        color(tmp_agent) <- params$color
+        speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
+
+        # Add the agent to the list
+        agents[[i]] <- tmp_agent
+    }
+}
+                        
+#' Add an Agent to the Simulation
+#' 
+#' @param model The `predped` model that you want to simulate
 #' @param goal_number Integer, vector of integers, or function that determines 
 #' how many goals each of the agents should receive. Defaults to a function that 
 #' draws `x` numbers from a normal distribution with mean 10 and standard 
@@ -343,6 +417,8 @@ setMethod("simulate", "state", function(object, ...) update(object, ...))
 #' in the simulation.
 #' @param individual_differences Logical denoting whether variety on the parameters
 #' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param group_number The number of the group to which the agent belongs. 
+#' Defaults to `1`.
 #' 
 #' @export 
 #
@@ -350,10 +426,11 @@ setMethod("simulate", "state", function(object, ...) update(object, ...))
 #   - Allow for optional "position" and "orientation" arguments. Will make it 
 #     easier to create initial conditions, as goals are immediately computed 
 #     then
-add_agent <- function(object,
+add_agent <- function(model,
                       goal_number,
                       goal_duration = \(x) rnorm(x, 10, 2),
                       position = NULL,
+                      group_number = 1,
                       standing_start = 0.1,
                       space_between = 2.5,
                       time_step = 0.5,
@@ -365,19 +442,19 @@ add_agent <- function(object,
 
     # Extract the background from the `predped` model and determine where the 
     # agent will enter the space
-    background <- object@setting
+    background <- model@setting
 
     idx <- sample(seq_len(nrow(background@entrance)), 1)
     entrance_agent <- entrance(background)[idx, ]
 
     # Sample a random set of parameters from the `predped` class. From this, 
     # extract the needed information and add some individual differences
-    idx <- sample(1:nrow(object@parameters), 1, prob = object@weights)
-    color <- object@parameters$color[idx]
+    idx <- sample(1:nrow(model@parameters), 1, prob = model@weights)
+    color <- model@parameters$color[idx]
 
     params <- draw_parameters(1, 
-                              object@parameters[idx,],
-                              archetype = object@parameters$name[idx],
+                              model@parameters[idx,],
+                              archetype = model@parameters$name[idx],
                               individual_differences = individual_differences)    
     radius <- params$radius
 
@@ -411,7 +488,7 @@ add_agent <- function(object,
     # Determine the position of the agent. Either this is at the entrance, or 
     # this is at the specified location
     if(is.null(position)) {
-        position <- entrance_agent + 1.05 * radius * c(cos(angle * pi / 180), sin(angle * pi / 180))
+        position <- entrance_agent + 1.025 * max(params_bounds["radius",]) * c(cos(angle * pi / 180), sin(angle * pi / 180))
     }
     
     # Create the agent itself
@@ -422,7 +499,8 @@ add_agent <- function(object,
                        parameters = params,
                        goals = goal_stack[-1],
                        current_goal = goal_stack[[1]],
-                       color = color)
+                       color = color,
+                       group = group_number)
 
     # Create the path to walk on for the current goal and return the agent. Given 
     # that nothing new is put in the environment, we can put `reevaluate` to 

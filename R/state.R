@@ -9,21 +9,28 @@
 #' @export
 state <- setClass("state", list(iteration = "numeric", 
                                 setting = "background",
-                                agents = "list"))
+                                agents = "list",
+                                potential_agents = "list"))
 
 setMethod("initialize", "state", function(.Object, 
                                           iteration,
                                           setting, 
-                                          agents = list()) {
+                                          agents = list(),
+                                          potential_agents = list()) {
 
     # Some checks on the objects
     if(length(agents) != 0 & !all(sapply(agents, is, class2 = "agent"))) {
         stop("All elements in the list for slot 'agents' must be of type 'agent'")
     }
 
+    if(length(agents) != 0 & !all(sapply(potential_agents, is, class2 = "agent"))) {
+        stop("All elements in the list for slot 'potential_agents' must be of type 'agent'")
+    }
+
     .Object@iteration <- floor(iteration)
     .Object@setting <- setting
     .Object@agents <- agents
+    .Object@potential_agents <- agents
 
     return(.Object)
 })
@@ -98,5 +105,31 @@ setMethod("agents<-", "state", function(object, value) {
     }
 
     object@agents <- value
+    return(object)
+})
+
+#' Getter/Setter for the potential_agents-slot
+#' 
+#' @rdname potential_agents-method
+#' 
+#' @export
+setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
+
+#' @rdname potential_agents-method
+#' 
+#' @export
+setGeneric("potential_agents<-", function(object, value) standardGeneric("potential_agents<-"))
+
+setMethod("potential_agents", "state", function(object) {
+    return(object@potential_agents)
+})
+
+setMethod("potential_agents<-", "state", function(object, value) {
+    # Check
+    if(length(value) != 0 & !all(sapply(value, is, class2 = "agent"))) {
+        stop("All elements in the list for slot 'potential_agents' must be of type 'agent'")
+    }
+
+    object@potential_agents <- value
     return(object)
 })
