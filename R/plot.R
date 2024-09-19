@@ -178,7 +178,13 @@ setMethod("plot", "state", function(object,
                                     ...) {
 
     # Create the plot for the setting, which will serve as the basis of 
-    base_plot <- predped::plot(setting(object), ...)
+    base_plot <- predped::plot(setting(object), ...) +
+        ggplot2::labs(title = paste("iteration", object@iteration)) +
+        ggplot2::theme(legend.position = "none",
+                       plot.title = ggplot2::element_text(size = plot.title.size,
+                                                          hjust = plot.title.hjust),
+                       axis.title = ggplot2::element_text(size = axis.title.size),
+                       axis.text = ggplot2::element_text(size = axis.text.size))
 
     # If there are currently no agents, then we just return the base_plot
     if(length(object@agents) == 0) {
@@ -191,13 +197,7 @@ setMethod("plot", "state", function(object,
                       plot_goal = plot_goal,
                       agent.linewidth = agent.linewidth,
                       goal.size = goal.size,
-                      ...) +
-        ggplot2::labs(title = paste("iteration", object@iteration)) +
-        ggplot2::theme(legend.position = "none",
-                       plot.title = ggplot2::element_text(size = plot.title.size,
-                                                          hjust = plot.title.hjust),
-                       axis.title = ggplot2::element_text(size = axis.title.size),
-                       axis.text = ggplot2::element_text(size = axis.text.size)))                
+                      ...))            
 })
 
 #'@rdname plot-method
