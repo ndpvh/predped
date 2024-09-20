@@ -2,54 +2,80 @@
 # VALUES
 ################################################################################
 
-# setwd('/Users/nielsvanhasbroeck/Broncode/predpedgui/build/Qt_6_7_2_for_macOS-Debug');
-# Read in the parameters from the database instead of from local csv files. 
-# Currently only supported for the mean values, not for the standard deviations.
-#
-# Importantly, at some point the GUI should be integrated with predped itself or 
-# hosted on a server so that the location of the database doesn't depend on the 
-# user.
-#
-# We do two checks here. First, we make sure that the database exists. If not, 
-# then we cannot read the connection anyway. Afterwards, we also check whether 
-# the required table exists. If either of these conditions is not satisfied, we 
-# read in the csv-files that are present in the current project.
-database_location <- file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug", "predped.sqlite")
-if(file.exists(database_location)) {
-    # Create the connection
-    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = database_location)
-
-    # Check whether the necessary table can be retrieved from the location
-    if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
-        db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
-            dplyr::collect()
-    } 
-}
-
-if(!exists("db_loaded_parameters")) {
-    warning(paste0("Could not read in the parameters from the database. ", 
-                   "Reading them in from a csv-file."))
-    db_loaded_parameters <- read.csv(file.path("archetypes.csv"))
-}
-
-#' Typical Archetypes used for Simulation
+#' Load tables of all parameters
+#' 
+#' Read in the different parameters from either a database or from local csv-
+#' files. Only reads in data from database (a) when a database is provided, (b) 
+#' when that database exists and (c) when that database contains the required 
+#' table. If either of these conditions is not satisfied, we read in the 
+#' csv files that are present in predped.
+#' 
+#' Currently only supported for the mean values, not for the standard deviations.
+#' 
+#' @param x Character denoting the name of the database without the extension. 
+#' Currently only the database "predped" is supported. Defaults to `NULL`, 
+#' triggering reading in the csv-files. 
+#' @param path_to_database File path that leads to the location of the database 
+#' in x. Allows some greater flexibility for users. Defaults to the location for 
+#' Niels.
+#' 
+#' @return List of parameter values contained in "params_archetypes" (means), 
+#' "params_sigma" (standard deviations), and "params_bounds" (the bounds of the 
+#' parameters).
 #' 
 #' @export
-params_archetypes <- db_loaded_parameters
-params_sigma <- readRDS(file.path("archetypes_sigma.Rds"))
-params_bounds <- read.csv(file.path("parameter_bounds.csv"), 
-                          row.names = 1)
+#
+# TO DO: At some point the GUI should be integrated with predped itself or 
+# hosted on a server so that the location of the database doesn't depend on the 
+# user.
+load_parameters <- function(x = NULL,
+                            path_to_database = file.path("..",
+                                                         "predpedgui",
+                                                         "build", 
+                                                         "Qt_6_7_2_for_macOS-Debug")) {
 
-# Vectors that define the parameters by name. Used in the functions defined here.
-# Not exported because not needed anywhere else.
-nest_parameters <- c("central", 
-                     "non_central", 
-                     "acceleration", 
-                     "constant_speed", 
-                     "deceleration")
+    # If the provided database is not NULL, we can try to access it
+    if(!is.null(x)) {
+        # Define the location of the database, assuming that the GUI is located 
+        # somewhere close to predped
+        database_location <- file.path(path_to_database, 
+                                       paste0(x, ".sqlite"))
+        if(file.exists(database_location)) {
+            # Create the connection
+            con <- DBI::dbConnect(RSQLite::SQLite(), dbname = database_location)
+    
+            # Check whether the necessary table can be retrieved from the location
+            if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
+                db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
+                    dplyr::collect()
+            } 
+        }
+    }
 
-utility_parameters <- colnames(params_archetypes)
-utility_parameters <- utility_parameters[!(utility_parameters %in% c("name", "color"))]
+    if(!exists("db_loaded_parameters")) {
+        message(paste0("Could not read in the parameters from the database. ", 
+                       "Reading them in from a csv-file."))
+        db_loaded_parameters <- read.csv(file.path("archetypes.csv"))
+    }
+
+    return(list("params_archetypes" = db_loaded_parameters,
+                "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
+                "params_bounds" = read.csv(file.path("parameter_bounds.csv"), 
+                                           row.names = 1)))
+}
+
+# Silent function that extracts the names of the utility_parameters. Is needed
+# for the other functions in this file to work. Takes in the `params_archetypes`
+utility_parameters <- function(x) {
+    nest_parameters <- c("central", 
+                         "non_central", 
+                         "acceleration", 
+                         "constant_speed", 
+                         "deceleration")
+    
+    params <- colnames(x)
+    return(params[!(params %in% c("name", "color", "id", "weight"))])
+}
 
 
 
@@ -87,21 +113,52 @@ utility_parameters <- utility_parameters[!(utility_parameters %in% c("name", "co
 #' 
 #' @export  
 draw_parameters <- function(n = 1,
-                            mean = params_archetypes[params_archetypes$name == archetype,],
-                            Sigma = params_sigma[[archetype]],
+                            database = NULL,
+                            path_to_database = file.path("..",
+                                                         "predpedgui",
+                                                         "build", 
+                                                         "Qt_6_7_2_for_macOS-Debug"),
                             archetype = "BaselineEuropean",
+                            mean = NULL,
+                            Sigma = NULL,
+                            bounds = NULL,
                             individual_differences = TRUE,
                             transform_covariance = TRUE) {
+
+    # If the parameters are already defined, then we can just use those instead 
+    # of reading in the complete database. Use-cases are different. The 
+    # arguments `mean`, `Sigma`, and `bounds` will typically be provided within 
+    # a simulation, while the arguments `database` and `path_to_database` will 
+    # typically be used whenever one is trying to visualize the distributions of 
+    # potential parameters.
+    #
+    # Importantly, parameters only read in whenever `mean` is NULL: When `Sigma`
+    # and/or `bounds` are NULL, we will just not allow individual differences
+    if(is.null(mean)) {
+        # Load the parameters
+        params <- load_parameters(x = database, path_to_database = path_to_database)
+    
+        mean <- params[["params_archetypes"]] |>
+            dplyr::filter(name %in% archetype)
+        Sigma <- params[["params_sigma"]][[archetype]]
+        bounds <- params[["params_bounds"]]
+
+    } else if(is.null(Sigma) | is.null(bounds)) {
+        individual_differences <- FALSE
+    }
+
+    # Extract the names of the utility parameters
+    u_params <- utility_parameters(mean)
 
     # Delete standard deviations from parameters and return if individual 
     # differences are not allowed
     if(!individual_differences) {
-        return(mean[utility_parameters])
+        return(mean[u_params])
     }
 
     # Make sure the order of the variables in Sigma is the same as for mean
-    mean <- mean[utility_parameters]
-    Sigma <- Sigma[utility_parameters, utility_parameters]
+    mean <- mean[u_params]
+    Sigma <- Sigma[u_params, u_params]
 
     # Check whether the user already provided an actual covariance matrix, or 
     # whether the user input corresponds to a mixed standard deviation - 
@@ -118,12 +175,12 @@ draw_parameters <- function(n = 1,
     #     transformed parameters and as standard deviation those provided by 
     #     the user.
     #   - Transform the drawn parameters back to their usual scale
-    mean <- to_unbounded(mean) |>
+    mean <- to_unbounded(mean, bounds) |>
         t()
     params <- MASS::mvrnorm(n, mean, Sigma)
-    params <- to_bounded(params)
+    params <- to_bounded(params, bounds)
 
-    return(params[utility_parameters])
+    return(params[u_params])
 }
 
 #' Transform to real axis
@@ -138,10 +195,15 @@ draw_parameters <- function(n = 1,
 #' @export
 #
 # Original function `toReal`
-to_unbounded <- function(parameters) {
-    for(i in utility_parameters){
+to_unbounded <- function(parameters, 
+                         bounds) {
+    # Extract the utility parameters
+    u_params <- utility_parameters(parameters)
+
+    # Loop over them
+    for(i in u_params){
         # Transform to 0 - 1 (probit) range
-        parameters[[i]] <- (parameters[[i]] - params_bounds[i,1]) / diff(as.numeric(params_bounds[i,]))
+        parameters[[i]] <- (parameters[[i]] - bounds[i,1]) / diff(as.numeric(bounds[i,]))
 
         # Check whether the parameter indeed falls within this range. If not, 
         # throw an error
@@ -166,7 +228,7 @@ to_unbounded <- function(parameters) {
         parameters[[i]] <- qnorm(parameters[[i]])
     }
 
-    return(parameters[utility_parameters])
+    return(parameters[u_params])
 }
 
 #' Transform to positive axis
@@ -185,22 +247,27 @@ to_unbounded <- function(parameters) {
 #    number becomes Inf (see tests)
 #
 # Original function `toNatural`
-to_bounded <- function(parameters) {
+to_bounded <- function(parameters, 
+                       bounds) {
     # If the parameters are numeric, transpose them to a matrix
     if(!any(class(parameters) %in% "matrix")) {
         parameters <- t(parameters)
     }
 
+    # Extract the utility parameters
+    u_params <- utility_parameters(parameters)
+
+    # Loop over the parameters
     params <- list()
-    for(i in utility_parameters){
+    for(i in u_params){
         # Transform to the 0 - 1 scale
         params[[i]] <- pnorm(parameters[,i])
 
         # Transform to the original bounds of the parameters
-        params[[i]] <- diff(as.numeric(params_bounds[i,])) * params[[i]] + params_bounds[i, 1]
+        params[[i]] <- diff(as.numeric(bounds[i,])) * params[[i]] + bounds[i, 1]
     }
 
-    return(data.frame(params[utility_parameters]))
+    return(data.frame(params[u_params]))
 }
 
 #' Transform user-inputted matrix to covariance matrix
@@ -240,7 +307,11 @@ to_covariance <- function(X) {
 #
 # Original function `getmuM`
 transform_mu <- function(parameters) {
-    parameter_names <- nest_parameters
+    parameter_names <- c("central", 
+                         "non_central", 
+                         "acceleration", 
+                         "constant_speed", 
+                         "deceleration")
 
     for(i in parameter_names) {
         parameters[[i]] <- (1 - parameters[[i]])^(-1)
