@@ -122,7 +122,7 @@ setMethod("simulate", "predped", function(object,
     if(precompute_edges) {
         cat("\nPrecomputing edges")
         edges <- compute_edges(object@setting, 
-                               space_between = space_between * max(params_bounds["radius",]), 
+                               space_between = space_between * max(params_from_csv[["params_bounds"]]["radius",]), 
                                many_options = many_options)
     } else {
         edges <- NULL
@@ -359,8 +359,8 @@ add_group <- function(model,
     # parameter values (and color) so that each agent is unique. 
     #
     # First, draw the parameters for each of the new agents
-    model_parameters <- parameters(model) 
-    idx <- sample(1:nrow(model_parameters), 
+    model_parameters <- parameters(model)
+    idx <- sample(model@archetypes, 
                   number_agents - 1, 
                   prob = model@weights)
     
@@ -372,8 +372,10 @@ add_group <- function(model,
         # Change this temporary agent's characterstics based on simulated
         # parameters
         params <- draw_parameters(1, 
-                                  model_parameters[idx,],
-                                  archetype = model_parameters$name[idx],
+                                  mean = dplyr::filter(model_parameters[["params_archetypes"]], name == idx[i]),
+                                  Sigma = model_parameters[["params_sigma"]][[idx[i]]],
+                                  bounds = model_parameters[["params_bounds"]],
+                                  archetype = idx[i],
                                   individual_differences = individual_differences) 
         radius(tmp_agent) <- params$radius 
         color(tmp_agent) <- params$color
@@ -451,13 +453,17 @@ add_agent <- function(model,
 
     # Sample a random set of parameters from the `predped` class. From this, 
     # extract the needed information and add some individual differences
-    idx <- sample(1:nrow(model@parameters), 1, prob = model@weights)
-    color <- model@parameters$color[idx]
+    idx <- sample(model@archetypes, 1, prob = model@weights)
+
+    params <- parameters(model)
+    color <- dplyr::filter(params[["params_archetypes"]], name == idx)$color
 
     params <- draw_parameters(1, 
-                              model@parameters[idx,],
-                              archetype = model@parameters$name[idx],
-                              individual_differences = individual_differences)    
+                              mean = dplyr::filter(params[["params_archetypes"]], name == idx),
+                              Sigma = params[["params_sigma"]][[idx]], 
+                              bounds = params[["params_bounds"]], 
+                              archetype = idx,
+                              individual_differences = individual_differences) 
     radius <- params$radius
 
     # Create this agents' goal stack
@@ -490,7 +496,7 @@ add_agent <- function(model,
     # Determine the position of the agent. Either this is at the entrance, or 
     # this is at the specified location
     if(is.null(position)) {
-        position <- entrance_agent + 1.025 * max(params_bounds["radius",]) * c(cos(angle * pi / 180), sin(angle * pi / 180))
+        position <- entrance_agent + 1.025 * max(params_from_csv[["params_bounds"]]["radius",]) * c(cos(angle * pi / 180), sin(angle * pi / 180))
     }
     
     # Create the agent itself
