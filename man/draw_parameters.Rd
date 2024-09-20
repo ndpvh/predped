@@ -6,15 +6,21 @@
 \usage{
 draw_parameters(
   n = 1,
-  mean = params_archetypes[params_archetypes$name == archetype, ],
-  Sigma = params_sigma[[archetype]],
+  database = NULL,
+  path_to_database = file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug"),
   archetype = "BaselineEuropean",
+  mean = NULL,
+  Sigma = NULL,
+  bounds = NULL,
   individual_differences = TRUE,
   transform_covariance = TRUE
 )
 }
 \arguments{
 \item{n}{Integer denoting the number of parameters to draw. Defaults to `1`.}
+
+\item{archetype}{String denoting the archetype to be used for the covariance
+matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.}
 
 \item{mean}{A named list containing the mean for each of the parameters for 
 a given agent.}
@@ -26,9 +32,6 @@ correlations between the parameters on its off-diagonal (when
 `transform_covariance == TRUE`). Default covariance matrices exist for each
 of the archetypes in `params_archetypes` and thus changes with the value of 
 `archetype`.}
-
-\item{archetype}{String denoting the archetype to be used for the covariance
-matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.}
 
 \item{individual_differences}{Logical denoting whether to use the standard 
 deviations in the parameter list to create some variation in the parameters.

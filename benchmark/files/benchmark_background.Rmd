@@ -1,0 +1,121 @@
+# background.R
+
+## compute_limited_access
+
+```{r background compute_limited_access, echo = FALSE, results = "asis"}
+
+# Test 
+segments <- predped::segment(from = c(0, 0), to = c(1, 1))
+tbl <- (\() predped:::compute_limited_access(segments)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the compute\\_limited\\_access function. ")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## initialize
+
+```{r background initialize, echo = FALSE, results = "asis"}
+
+# Make the potential background objects
+shp <- predped::rectangle(center = c(0, 0), size = c(2, 2))
+obj <- lapply(1:10, \(x) predped::rectangle(center = c(0, 0), size = c(1, 1)))
+la <- lapply(1:10, \(x) predped::segment(from = c(-1, -1), to = c(1, 1)))
+
+# Test 
+aa <- (\() predped:::background(shape = shp, objects = obj)) |>
+    test_times() |>
+    rnd() 
+    
+na <- (\() predped:::background(shape = shp, objects = obj, limited_access = la)) |>
+    test_times() |>
+    rnd() 
+
+# Create the table
+tbl <- c(aa[2], c(paste0("[", aa[1], ",", aa[3], "]")), 
+         na[2], c(paste0("[", na[1], ",", na[3], "]"))) |>
+    matrix(nrow = 1)
+colnames(tbl) <- NULL
+
+# Caption
+caption <- paste0("Benchmark for the initialize function for background. ",
+                  "In this benchmark, we use 10 rectangular objects, a rectangular ", 
+                  "shape and, when specified, 10 segments that limit access.")
+
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H") |>
+    kableExtra::add_header_above(c("Without segments" = 2, "With segments" = 2)) |>
+    print()
+
+```
+
+## limit_access
+
+```{r background limit_access, echo = FALSE, results = "asis"}
+
+# Make the potential background objects
+shp <- predped::rectangle(center = c(0, 0), size = c(2, 2))
+obj <- lapply(1:10, \(x) predped::rectangle(center = c(0, 0), size = c(1, 1)))
+la <- lapply(1:10, \(x) predped::segment(from = c(-1, -1), to = c(1, 1)))
+
+setting <- predped::background(shape = shp, objects = obj, limited_access = la)
+
+# Initialize the agent and coordinate to be compared with
+co <- c(0, -0.5)
+my_agent <- predped::agent(center = co, radius = 0.2)
+
+# Test 
+c <- (\() predped:::limit_access(setting, co)) |>
+    test_times() |>
+    rnd()
+    
+a <- (\() predped:::limit_access(setting, my_agent)) |>
+    test_times() |>
+    rnd() 
+
+# Create the table
+tbl <- c(c[2], 
+         paste0("[", c[1], ",", c[3], "]"), 
+         a[2], 
+         paste0("[", a[1], ",", a[3], "]")) |>
+    matrix(nrow = 1)
+colnames(tbl) <- NULL
+
+# Caption
+caption <- paste0("Benchmark for the limit\\_access function for background. ",
+                  "In this benchmark, we use 10 rectangular objects, a rectangular ", 
+                  "shape, and 10 segments that limit access. ", 
+                  "Each of these segments is blocked from the perspective of the ",
+                  "agent or the coordinate.")
+
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H") |>
+    kableExtra::add_header_above(c("Coordinate" = 2, "Agent" = 2)) |>
+    print()
+
+```

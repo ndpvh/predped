@@ -86,7 +86,9 @@ agents <- lapply(seq_len(10),
                  \(x) predped::agent(center = runif(2, 1, 20), radius = 0.25))
 
 # State
-state <- list(setting = setting, agents = append(list(current_agent), agents))
+my_state <- predped::state(iteration = 0, 
+                           setting = setting, 
+                           agents = append(list(current_agent), agents))
 
 # Centers
 centers <- m4ma::c_vd_rcpp(1:33, 
@@ -106,7 +108,7 @@ centers <- m4ma::c_vd_rcpp(1:33,
 ```{r moving_options agents_between_goal, echo = FALSE, results = "asis"}
 
 # Test
-tbl <- (\() predped:::agents_between_goal(current_agent, state)) |>
+tbl <- (\() predped:::agents_between_goal(current_agent, my_state)) |>
     test_times() |>
     rnd() |>
     matrix(nrow = 1)

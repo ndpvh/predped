@@ -45,7 +45,7 @@ moving_options_agent <- function(agent,
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
     objects(background) <- append(objects(background), 
-                                  state$agents)
+                                  agents(state))
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
@@ -121,7 +121,7 @@ agents_between_goal <- function(agent,
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        agent_positions <- lapply(state$agents, position)
+        agent_positions <- lapply(agents(state), position)
         agent_positions <- do.call("rbind", 
                                    agent_positions)
     } else {

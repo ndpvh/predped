@@ -305,9 +305,9 @@ create_nodes <- function(from,
 #'   - Step 2: Find out which nodes are reachable from one another. In other 
 #'             words, if I stand at node 1, can I see node 2?
 #' 
-#' @param segments Named list containing an n x 4 matrix of segments that make 
-#' up the edges (under key "semgents") and an n x 2 matrix of names for the 
-#' nodes that make up these edges (under key "ids").
+#' @param segments Named matrix or data.frame containing the ids of the nodes 
+#' under column names "from" and "to", and their coordinates under "from_x", 
+#' "from_y", "to_x", and "to_y"
 #' @param objects List of objects that are contained in the setting
 #' 
 #' @return List containing the nodes, edges, and edges together with their 
@@ -336,20 +336,29 @@ evaluate_edges <- function(segments,
     # this can only be assessed for each node separately, which thus necessitates
     # a loop.
     if(length(lim) != 0) {
-        for(i in seq_along(idx)) {
-            # If this index has already been put to FALSE, we can skip it
-            if(!idx[i]) {
-                next
-            }
+        # Do an intermediate update of the segments based on the current results
+        segments <- segments[idx,]
+        cost <- cost[idx]
 
-            # Create a new objects list for the `from` node
-            obj <- limit_access(background, 
-                                segments[i, c("from_x", "from_y")], 
-                                return_list = TRUE)
+        # Get the indices indicating which coordinates should account for which 
+        # of the segments
+        idy <- limit_access(background, 
+                            segments[, c("from_x", "from_y")])
 
-            # Do the check
-            idx[i] <- prune_edges(obj, segments[i, c("from_x", "from_y", "to_x", "to_y")])
-        }
+        # Loop over the limited access and look at the interactions between 
+        # these and the edges 
+        intersections <- sapply(background@precomputed_limited_access, 
+                                \(x) line_intersection(x, segments[, c("from_x", "from_y", "to_x", "to_y")], return_all = TRUE))
+
+        # First check whether the intersections matter, which amounts to having 
+        # a TRUE in both idy and in intersections. Then, we can check whether 
+        # there is an intersection with any of the objects by reducing over the 
+        # second dimension in this matrix and checking whether any of the edges 
+        # crosses one of the segments (or-statement)
+        #
+        # Importantly, we need to reverse this statement, as the AND statement 
+        # says which edges we should delete
+        idx <- !as.logical(rowSums(idy & intersections) != 0)
     }
 
     # Bind all information together and delete all edges that have NA values 
@@ -375,6 +384,11 @@ evaluate_edges <- function(segments,
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
 prune_edges <- function(objects, segments) {
+    # If there are no objects, then there can be no intersections
+    if(length(objects) == 0) {
+        return(rep(TRUE, nrow(segments)))
+    }
+
     # Loop over the objects in the environment and check their intersections 
     # with the lines in `segments`
     all_intersections <- lapply(objects, 
@@ -462,4 +476,41 @@ combine_nodes <- function(nodes_1,
     #     return(cbind(nodes_1[idx_1,], nodes_1[idx_2,]) |>
     #         setNames(c("from", "from_x", "from_y", "to", "to_x", "to_y")))
     # }
+}
+
+#' Compute the edges within a given setting
+#' 
+#' This function uses `create_edges` and then deletes agent and goal positions 
+#' from the resulting graph. The output can then be used as precomputed edges, 
+#' increasing the speed of searching for a route. 
+#' 
+#' @param background Background for which to compute the edges
+#' @param space_between Space to keep between nodes and objects in the 
+#' environment. Defaults to 2.5 times the maximal possible radius that the agents
+#' can be.
+#' @param many_options Logical denoting whether to create more than the minimal
+#' number of nodes, allowing more flexibility in the agents. Defaults to `TRUE`.
+#' 
+#' @return List containing edges, edges_with_coords, and nodes
+#' 
+#' @export 
+compute_edges <- function(background, 
+                          space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius",]),
+                          many_options = TRUE) {
+    # Create the edges themselves with mock-positions of agent and goal
+    edges <- create_edges(c(0, 0), 
+                          c(0, 0), 
+                          background,
+                          space_between = space_between,
+                          many_options = many_options)
+
+    # Delete agent and goal positions from these edges, as these should be 
+    # dynamic. 
+    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
+    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
+    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+    edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$from %in% c("agent", "goal")),]
+    edges$edges_with_coords <- edges$edges_with_coords[!(edges$edges_with_coords$to %in% c("agent", "goal")),]
+
+    return(edges)
 }

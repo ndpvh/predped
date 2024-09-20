@@ -19,26 +19,35 @@ testthat::test_that("Number of pedestrians blocking view from goal works", {
     # agents are derived. `me` is not included in this list anymore, as the 
     # `state$agents` list that gets passed down to this function only contains
     # the other agents
-    state_0a <- list(setting = mock_setting, 
-                     agents = list(noblock_1, noblock_2))
-    state_0b <- list(setting = mock_setting, 
-                     agents = list(noblock_1))
-    state_0c <- list(setting = mock_setting, 
-                     agents = list(noblock_2))
+    state_0a <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(noblock_1, noblock_2))
+    state_0b <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(noblock_1))
+    state_0c <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(noblock_2))
 
-    state_1a <- list(setting = mock_setting, 
-                     agents = list(block_1))
-    state_1b <- list(setting = mock_setting, 
-                     agents = list(noblock_1, block_1))
-    state_1c <- list(setting = mock_setting, 
-                     agents = list(noblock_2, block_2))
+    state_1a <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(block_1))
+    state_1b <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(noblock_1, block_1))
+    state_1c <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(noblock_2, block_2))
 
-    state_2a <- list(setting = mock_setting, 
-                     agents = list(block_1, block_2))
-    state_2b <- list(setting = mock_setting, 
-                     agents = list(block_1, noblock_1, block_2))
-    state_2c <- list(setting = mock_setting, 
-                     agents = list(block_2, noblock_2, block_2))
+    state_2a <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(block_1, block_2))
+    state_2b <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(block_1, noblock_1, block_2))
+    state_2c <- predped::state(iteration = 1, 
+                               setting = mock_setting, 
+                               agents = list(block_2, noblock_2, block_2))
 
     # Put them all in a list
     states <- list(state_0a, state_0b, state_0c,
@@ -87,8 +96,9 @@ testthat::test_that("Identifying moving options works", {
                            c(-4, 0.75))
 
     tst <- predped::moving_options(me, 
-                                   list(setting = setting, 
-                                        agents = list()),
+                                   predped::state(iteration = 1, 
+                                                  setting = setting, 
+                                                  agents = list()),
                                    setting,
                                    centers)[1:9]
 
@@ -137,8 +147,9 @@ testthat::test_that("Identifying moving options with other agents around works",
                            c(-4, 0.75))
 
     tst <- predped::moving_options(me, 
-                                   list(setting = setting, 
-                                        agents = others),
+                                   predped::state(iteration = 1, 
+                                                  setting = setting, 
+                                                  agents = others),
                                    setting,
                                    centers)[1:9]
 

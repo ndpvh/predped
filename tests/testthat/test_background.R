@@ -98,17 +98,8 @@ testthat::test_that("Limit access for an agent works", {
     # Apply the test. In this test, we first limit the access of the agents and 
     # then check whether the corresponding polygon can be found in the list of 
     # objects for those agents for whom it is relevant.
-    poly <- rbind(c(-1, 0), 
-                  c(1, 0), 
-                  c(1, 0.01), 
-                  c(-1, 0.01))
     tst <- sapply(all_agents, 
-                  function(x) {
-                      new_setting <- predped::limit_access(setting, x)
-                      return(any(sapply(objects(new_setting), 
-                                        \(y) (predped::points(y) == poly) & inherits(y, "polygon"))))
-                  })
-
+                  \(x) predped::limit_access(setting, x))
     ref <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
 
     testthat::expect_equal(tst, ref)
@@ -125,32 +116,28 @@ testthat::test_that("Limit access for an agent works", {
     # Apply the test. In this test, we first limit the access of the agents and 
     # then check whether the corresponding polygon can be found in the list of 
     # objects for those agents for whom it is relevant.
-    poly <- rbind(c(-1, 0), 
-                  c(1, 0), 
-                  c(1, -0.01), 
-                  c(-1, -0.01))
     tst <- sapply(all_agents, 
-                  function(x) {
-                      new_setting <- predped::limit_access(setting, x)
-                      return(any(sapply(objects(new_setting), 
-                                        \(y) (predped::points(y) == poly) & inherits(y, "polygon"))))
-                  })
-
+                  \(x) predped::limit_access(setting, x))
     ref <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 
     testthat::expect_equal(tst, ref)
 })
 
 testthat::test_that("Limit access for a coordinate works", {
-    # Create settings and agents
+    # Create settings and agents. Here, we can immediately add two segments to 
+    # the  `limited_access` and test all coordinates against it simultaneously. 
+    # The results will be the same as in the previous test, but now the two 
+    # references will be two columns in one matrix
     setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
                                                               size = c(2, 2)),
                                    objects = list(),
                                    limited_access = list(segment(from = c(-1, 0), 
-                                                                 to = c(1, 0))), 
+                                                                 to = c(1, 0)), 
+                                                         segment(from = c(1, 0), 
+                                                                 to = c(-1, 0))), 
                                    entrance = predped::coordinate(c(-1, 0)))
 
-    pts <- list(# Above the segment, should be blocked
+    pts <- rbind(# Above the segment, should be blocked
                 c(-0.5, 0.5), 
                 c(0.5, 0.5), 
                 # Below the segment, should not be blocked
@@ -163,45 +150,9 @@ testthat::test_that("Limit access for a coordinate works", {
     # Apply the test. In this test, we first limit the access of the agents and 
     # then check whether the corresponding polygon can be found in the list of 
     # objects for those agents for whom it is relevant.
-    poly <- rbind(c(-1, 0), 
-                  c(1, 0), 
-                  c(1, 0.01), 
-                  c(-1, 0.01))
-    tst <- sapply(pts, 
-                  function(x) {
-                      new_setting <- predped::limit_access(setting, x)
-                      return(any(sapply(objects(new_setting), 
-                                        \(y) (predped::points(y) == poly) & inherits(y, "polygon"))))
-                  })
-
-    ref <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
-
-    testthat::expect_equal(tst, ref)
-
-    # Let's reverse the line in the setting, which should make it so that the 
-    # agents below the segment are blocked and those above are not
-    setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
-                                                              size = c(2, 2)),
-                                   objects = list(),
-                                   limited_access = list(segment(from = c(1, 0), 
-                                                                 to = c(-1, 0))), 
-                                   entrance = predped::coordinate(c(-1, 0)))
-
-    # Apply the test. In this test, we first limit the access of the agents and 
-    # then check whether the corresponding polygon can be found in the list of 
-    # objects for those agents for whom it is relevant.
-    poly <- rbind(c(-1, 0), 
-                  c(1, 0), 
-                  c(1, -0.01), 
-                  c(-1, -0.01))
-    tst <- sapply(pts, 
-                  function(x) {
-                      new_setting <- predped::limit_access(setting, x)
-                      return(any(sapply(objects(new_setting), 
-                                        \(y) (predped::points(y) == poly) & inherits(y, "polygon"))))
-                  })
-
-    ref <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
+    tst <- predped::limit_access(setting, pts)
+    ref <- cbind(c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE), 
+                 c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE))
 
     testthat::expect_equal(tst, ref)
 })

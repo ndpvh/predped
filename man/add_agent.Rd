@@ -5,10 +5,11 @@
 \title{Add an Agent to the Simulation}
 \usage{
 add_agent(
-  object,
+  model,
   goal_number,
   goal_duration = function(x) rnorm(x, 10, 2),
   position = NULL,
+  group_number = 1,
   standing_start = 0.1,
   space_between = 2.5,
   time_step = 0.5,
@@ -20,7 +21,7 @@ add_agent(
 )
 }
 \arguments{
-\item{object}{The `predped` model that you want to simulate}
+\item{model}{The `predped` model that you want to simulate}
 
 \item{goal_number}{Integer, vector of integers, or function that determines 
 how many goals each of the agents should receive. Defaults to a function that 
@@ -34,6 +35,9 @@ with mean 10 (5 sec) and standard deviation 2 (1 sec).}
 \item{position}{Vector denoting the position of the agent you wish to create.
 Defaults to `NULL`, meaning the agent's location will be at the entrance of 
 the room.}
+
+\item{group_number}{The number of the group to which the agent belongs. 
+Defaults to `1`.}
 
 \item{standing_start}{Numeric denoting the speed of agents when they start 
 moving. Defaults to `0.1`.}

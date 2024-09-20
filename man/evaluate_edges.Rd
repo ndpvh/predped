@@ -7,9 +7,9 @@
 evaluate_edges(segments, background)
 }
 \arguments{
-\item{segments}{Named list containing an n x 4 matrix of segments that make 
-up the edges (under key "semgents") and an n x 2 matrix of names for the 
-nodes that make up these edges (under key "ids").}
+\item{segments}{Named matrix or data.frame containing the ids of the nodes 
+under column names "from" and "to", and their coordinates under "from_x", 
+"from_y", "to_x", and "to_y"}
 
 \item{objects}{List of objects that are contained in the setting}
 }

@@ -4,7 +4,7 @@
 \alias{to_bounded}
 \title{Transform to positive axis}
 \usage{
-to_bounded(parameters)
+to_bounded(parameters, bounds)
 }
 \arguments{
 \item{parameters}{A named list containing the parameters for a given agent}
