@@ -29,51 +29,92 @@
 #' @export
 predped <- setClass("predped", list(id = "character",
                                     setting = "background",
-                                    parameters = "data.frame",
+                                    parameters = "list",
                                     archetypes = "character",
                                     weights = "numeric"))
 
 setMethod("initialize", "predped", function(.Object,
-                                            id,
                                             setting, 
-                                            parameters = params_archetypes,
-                                            archetypes = unique(params_archetypes$name),
-                                            weights = rep(1/length(archetypes), 
-                                                          each = length(archetypes))
-) {
+                                            id = character(0),
+                                            database = NULL, 
+                                            path_to_database = file.path("..",
+                                                                         "predpedgui",
+                                                                         "build", 
+                                                                         "Qt_6_7_2_for_macOS-Debug"),
+                                            archetypes = NULL,
+                                            weights = NULL) {
 
-    # Check arguments
+    # If not provided, create an id for the model
+    .Object@id <- if(length(id) == 0) paste("model", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id 
+
+    # Load the parameters
+    params <- load_parameters(x = database, 
+                              path_to_database = path_to_database)
+
+    # If archetypes are not provided, switch to the the default of including 
+    # everyone 
+    if(is.null(archetypes)) {
+        archetypes <- params[["params_archetypes"]]$name
+    }
+
+    # First check imposed: When not all provided archetypes are known, we cannot
+    # proceed
+    if(!all(archetypes %in% params[["params_archetypes"]]$name)) {
+        stop("Some archetypes cannot be found in the parameters list.")
+    }
+
+    # Now that the archetypes are known, we can delete those archetypes that 
+    # don't really matter
+    params[["params_archetypes"]] <- dplyr::filter(params[["params_archetypes"]], 
+                                                   name %in% archetypes)
+    params[["params_sigma"]] <- params[["params_sigma"]][archetypes]
+
+    # If the weights are not provided, then we have several possbilities. First, 
+    # we take the weights as defined in the data.frame of the parameters. If 
+    # these are not defined, then we switch to the default of having everyone 
+    # being equally likely to be put in the simulation. 
+    #
+    # Whenever weights is provided, this takes priority: When weights are 
+    # defined in the parameter data.frame, these are overrided by the ones 
+    # provided in this initialization function.
+    if(is.null(weights) & !is.null(params[["params_archetypes"]]$weight)) {
+        weights <- params[["params_archetypes"]]$weight
+    } else if(is.null(weights)) {
+        weights <- rep(1 / length(archetypes), each = length(archetypes))
+    }
+
+    # Second check imposed: From now on, the number of archetypes and weights 
+    # should be equal
     if(length(archetypes) != length(weights)) {
         stop("Number of `archetypes` should be equal to number of weights.")
     }
 
+    # Check whether some of the weights are 0. If so, then we want to delete 
+    # these archetypes from the complete list.
+    idx <- weights != 0
+    weights <- weights[idx]
+    archetypes <- archetypes[idx]
+
+    # A final check concerns whether the weights add up to 1. If not, then we 
+    # simply reweight so that they do
     if(sum(weights) != 1) {
-        warning("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
+        message("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
         weights <- weights / sum(weights)
     }
 
-    if(!all(archetypes %in% parameters$name)) {
-        stop("Some archetypes cannot be found in the parameters list.")
-    }
-
-    .Object@id <- id 
-    .Object@setting <- setting
-
-    # Select only those parameters that matter for the simulation: Based on the 
-    # `archetypes` argument. 
+    # Finally, we switch the order in the parameters data.frame to match the 
+    # order in `archetypes`. 
     #
-    # To make sure we get to the same order as the one in `archetypes`, we first 
-    # select only the archetypes from this vector, then we transform this into 
-    # a numeric through factorization with `archetype` as its levels, and then 
-    # transform this to a character again. 
-    parameters <- parameters[parameters$name %in% archetypes,]
-    idx <- factor(parameters$name, levels = archetypes)
+    # First, we transform the archetypes into a numeric through factorization 
+    # with `archetype` as its levels and then transform this to a character again. 
+    idx <- factor(params[["params_archetypes"]]$name, levels = archetypes)
     idx <- order(as.numeric(idx))
+    params[["params_archetypes"]] <- params[["params_archetypes"]][idx,]
 
-    .Object@parameters <- parameters[idx,] 
-
+    .Object@setting <- setting
     .Object@archetypes <- archetypes
     .Object@weights <- weights
+    .Object@parameters <- params
     
     return(.Object)
 })
@@ -102,7 +143,8 @@ setMethod("parameters", "predped", function(object) {
 
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
-    if(!all(object@archetypes %in% value$name)) {
+    if(!all(object@archetypes %in% value[["params_archetypes"]]$name) |
+       !all(object@archetypes %in% names(value[["params_sigma"]]))) {
         stop("Some archetypes not defined in the new parameters provided.")
     }
 
@@ -127,13 +169,21 @@ setMethod("archetypes", "predped", function(object) {
 })
 
 setMethod("archetypes<-", "predped", function(object, value) {
-    # Given that parameters and weights are both dependent on archetypes, 
-    # reinitialize the object to accommodate the change 
-    return(predped(object@id, 
-                   object@setting, 
-                   parameters = object@parameters, 
-                   archetypes = value, 
-                   weights = object@weights))
+    # Throw an error if you don't have the parameters for the provided 
+    # archetypes in your data.frame already
+    if(!all(value %in% object@parameters[["params_archetypes"]]$name) | 
+       !all(value %in% names(object@parameters[["params_sigma"]]))) {
+        stop(paste0("Parameters for the provided archetype cannot be found. ", 
+                    "Consider creating a new predped model."))
+    }
+
+    # Change both the archetypes and the weights, as both are affected by the 
+    # change. As you don't know which weights should be coupled to the new 
+    # archetypes, you just assume that each should be equally weighted
+    object@archetypes <- value
+    object@weights <- rep(1 / length(value), length(value))
+
+    return(object)
 })
 
 #' Getter/Setter for the weights-slot
@@ -153,6 +203,10 @@ setMethod("weights", "predped", function(object) {
 })
 
 setMethod("weights<-", "predped", function(object, value) {
+    if(length(value) != length(object@weights)) {
+        stop("Provided weights should be of equal size as the provided archetypes.")
+    }
+
     object@weights <- value
     return(object)
 })
@@ -162,7 +216,7 @@ setMethod("show", "predped", function(object) {
     cat("Model object:\n")
     cat("ID:", object@id, "\n")
     cat("Parameters: \n")
-    cat(write.table(object@parameters), "\n")
+    cat(write.table(object[["params_archetypes"]]@parameters), "\n")
 
     return(object) # object is returned invisibly
 })
