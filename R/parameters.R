@@ -2,6 +2,14 @@
 # VALUES
 ################################################################################
 
+#' Default parameter list that comes with predped
+#' 
+#' @export
+params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv")),
+                        "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
+                        "params_bounds" = read.csv(file.path("parameter_bounds.csv"), 
+                                                   row.names = 1))
+
 #' Load tables of all parameters
 #' 
 #' Read in the different parameters from either a database or from local csv-
@@ -53,15 +61,18 @@ load_parameters <- function(x = NULL,
     }
 
     if(!exists("db_loaded_parameters")) {
-        message(paste0("Could not read in the parameters from the database. ", 
-                       "Reading them in from a csv-file."))
-        db_loaded_parameters <- read.csv(file.path("archetypes.csv"))
+        # Only provide this message whenever it is unexpected that the table is 
+        # not found
+        if(!is.null(x)) {
+            message(paste0("Could not read in the parameters from the database. ", 
+                           "Reading them in from a csv-file instead."))
+        }
+
+        return(params_from_csv)
     }
 
-    return(list("params_archetypes" = db_loaded_parameters,
-                "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
-                "params_bounds" = read.csv(file.path("parameter_bounds.csv"), 
-                                           row.names = 1)))
+    params_from_csv[["params_archetypes"]] <- db_loaded_parameters
+    return(params_from_csv)
 }
 
 # Silent function that extracts the names of the utility_parameters. Is needed
@@ -132,9 +143,9 @@ draw_parameters <- function(n = 1,
     # typically be used whenever one is trying to visualize the distributions of 
     # potential parameters.
     #
-    # Importantly, parameters only read in whenever `mean` is NULL: When `Sigma`
-    # and/or `bounds` are NULL, we will just not allow individual differences
-    if(is.null(mean)) {
+    # Importantly, parameters only read in whenever `mean` is NULL or when `Sigma`
+    # and/or `bounds` are NULL and you want individual 
+    if((is.null(mean)) | ((is.null(Sigma) | is.null(bounds)) & individual_differences)) {
         # Load the parameters
         params <- load_parameters(x = database, path_to_database = path_to_database)
     
@@ -143,8 +154,6 @@ draw_parameters <- function(n = 1,
         Sigma <- params[["params_sigma"]][[archetype]]
         bounds <- params[["params_bounds"]]
 
-    } else if(is.null(Sigma) | is.null(bounds)) {
-        individual_differences <- FALSE
     }
 
     # Extract the names of the utility parameters
