@@ -48,8 +48,8 @@ testthat::test_that("Adding agent works", {
 
     # Create the predped models necessary for `add_agent` to work
     models <- lapply(1:length(settings), 
-                     \(x) predped::predped(id = paste0("model", x), 
-                                           setting = settings[[x]],
+                     \(x) predped::predped(settings[[x]], 
+                                           id = paste0("model", x), 
                                            archetypes = "BaselineEuropean"))
 
     # Create an agent for each setting
@@ -90,9 +90,7 @@ testthat::test_that("Creating initial condition works", {
                                                                      interactable = TRUE)),
                                    entrance = c(-1, 0))
 
-    model <- predped::predped(id = "toy model", 
-                              setting = setting, 
-                              archetypes = "BaselineEuropean")
+    model <- predped::predped(setting, archetypes = "BaselineEuropean")
 
     # Create an initial condition with 3 agents within this environment
     set.seed(1)
@@ -120,9 +118,7 @@ testthat::test_that("Creating initial condition with groups works", {
                                                                      interactable = TRUE)),
                                    entrance = c(-5, 0))
 
-    model <- predped::predped(id = "toy model", 
-                              setting = setting, 
-                              archetypes = "BaselineEuropean")
+    model <- predped::predped(setting, archetypes = "BaselineEuropean")
 
     # Create an initial condition with 10 agents that each belong to a different 
     # group (default)
