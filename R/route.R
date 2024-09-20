@@ -495,7 +495,7 @@ combine_nodes <- function(nodes_1,
 #' 
 #' @export 
 compute_edges <- function(background, 
-                          space_between = 2.5 * max(params_bounds["radius",]),
+                          space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius",]),
                           many_options = TRUE) {
     # Create the edges themselves with mock-positions of agent and goal
     edges <- create_edges(c(0, 0), 
