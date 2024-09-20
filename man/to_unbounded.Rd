@@ -4,7 +4,7 @@
 \alias{to_unbounded}
 \title{Transform to real axis}
 \usage{
-to_unbounded(parameters)
+to_unbounded(parameters, bounds)
 }
 \arguments{
 \item{parameters}{A named list containing the parameters for a given agent}

@@ -9,12 +9,6 @@ update_position(
   state,
   agent_specifications,
   background,
-  nests = list(Central = c(0, 6, 17, 28), NonCentral = c(0:33)[-c(6, 17, 28)], acc =
-    c(1:11), const = c(12:22), dec = c(0, 23:33)),
-  alpha = list(Central = rep(1/3, 4), NonCentral = c(1/3, rep(0.5, 4), 1/3, rep(0.5, 9),
-    1/3, rep(0.5, 9), 1/3, rep(0.5, 5)), acc = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)), const
-    = c(rep(0.5, 4), 1, 1/3, rep(0.5, 5)), dec = c(1/3, rep(0.5, 4), 1, 1/3, rep(0.5,
-    5))),
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
