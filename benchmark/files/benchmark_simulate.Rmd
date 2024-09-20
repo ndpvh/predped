@@ -83,9 +83,8 @@ setting <- background(shape = rectangle(center = c(20, 12.5),
 # to use, and how many of each should be used.
 #
 # Given that we want to benchmark, I'll only use "BaselineEuropean"s
-my_model <- predped(id = "benchmark", 
-                    setting = setting, 
-                    parameters = params_archetypes,
+my_model <- predped(setting, 
+                    id = "benchmark",
                     archetypes = "BaselineEuropean")
 
 ```
