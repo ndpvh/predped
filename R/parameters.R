@@ -3,15 +3,39 @@
 ################################################################################
 
 # setwd('/Users/nielsvanhasbroeck/Broncode/predpedgui/build/Qt_6_7_2_for_macOS-Debug');
-# con <- DBI::dbConnect(RSQLite::SQLite(), dbname = 'predped.sqlite');
-# PedestrianDefinitionsql <- tbl(con, 'PedestrianDefinition');
-# 'sql table is called: PedestrianDefinitionsql'
-# PedestrianDefinition <- PedestrianDefinitionsql %>% collect()
+# Read in the parameters from the database instead of from local csv files. 
+# Currently only supported for the mean values, not for the standard deviations.
+#
+# Importantly, at some point the GUI should be integrated with predped itself or 
+# hosted on a server so that the location of the database doesn't depend on the 
+# user.
+#
+# We do two checks here. First, we make sure that the database exists. If not, 
+# then we cannot read the connection anyway. Afterwards, we also check whether 
+# the required table exists. If either of these conditions is not satisfied, we 
+# read in the csv-files that are present in the current project.
+database_location <- file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug", "predped.sqlite")
+if(file.exists(database_location)) {
+    # Create the connection
+    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = database_location)
+
+    # Check whether the necessary table can be retrieved from the location
+    if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
+        db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
+            dplyr::collect()
+    } 
+}
+
+if(!exists("db_loaded_parameters")) {
+    warning(paste0("Could not read in the parameters from the database. ", 
+                   "Reading them in from a csv-file."))
+    db_loaded_parameters <- read.csv(file.path("archetypes.csv"))
+}
 
 #' Typical Archetypes used for Simulation
 #' 
 #' @export
-params_archetypes <- read.csv(file.path("archetypes.csv"))
+params_archetypes <- db_loaded_parameters
 params_sigma <- readRDS(file.path("archetypes_sigma.Rds"))
 params_bounds <- read.csv(file.path("parameter_bounds.csv"), 
                           row.names = 1)
