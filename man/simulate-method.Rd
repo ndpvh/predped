@@ -16,7 +16,7 @@
   space_between = 2.5,
   standing_start = 0.1,
   precomputed_edges = NULL,
-  many_options = FALSE,
+  many_nodes = FALSE,
   precompute_goal_paths = FALSE,
   report = FALSE,
   interactive_report = FALSE,

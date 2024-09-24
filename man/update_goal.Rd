@@ -14,7 +14,7 @@ update_goal(
   report = FALSE,
   interactive_report = FALSE,
   precomputed_edges = NULL,
-  many_options = FALSE,
+  many_nodes = FALSE,
   precompute_goal_paths = FALSE
 )
 }

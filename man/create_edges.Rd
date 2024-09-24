@@ -4,7 +4,7 @@
 \alias{create_edges}
 \title{Create edges of graph to walk on}
 \usage{
-create_edges(from, to, background, space_between = 0.5, many_options = FALSE)
+create_edges(from, to, background, space_between = 0.5, many_nodes = FALSE)
 }
 \arguments{
 \item{from}{Coordinate from which to start}

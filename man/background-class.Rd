@@ -44,6 +44,12 @@ y-coordinate.}
 \code{\link[predped]{circle-class}}, 
 \code{\link[predped]{object-class}}, 
 \code{\link[predped]{polygon-class}}, 
-\code{\link[predped]{rectangle-class}}
-\code{\link[predped]{segment-class}}
+\code{\link[predped]{rectangle-class}},
+\code{\link[predped]{segment-class}},
+\code{\link[predped]{entrance-method}},
+\code{\link[predped]{exit-method}},
+\code{\link[predped]{limited_access-method}},
+\code{\link[predped]{objects-method}},
+\code{\link[predped]{shape-method}},
+\code{\link[predped]{initialize-background}},
 }

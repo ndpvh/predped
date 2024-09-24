@@ -7,7 +7,7 @@
 compute_edges(
   background,
   space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius", ]),
-  many_options = TRUE
+  many_nodes = TRUE
 )
 }
 \arguments{
@@ -17,7 +17,7 @@ compute_edges(
 environment. Defaults to 2.5 times the maximal possible radius that the agents
 can be.}
 
-\item{many_options}{Logical denoting whether to create more than the minimal
+\item{many_nodes}{Logical denoting whether to create more than the minimal
 number of nodes, allowing more flexibility in the agents. Defaults to `TRUE`.}
 }
 \value{

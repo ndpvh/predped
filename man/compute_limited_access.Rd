@@ -2,7 +2,7 @@
 % Please edit documentation in R/background.R
 \name{compute_limited_access}
 \alias{compute_limited_access}
-\title{Transform \code{segments}s to \code{polygon}s}
+\title{Transform \code{segment}s to \code{polygon}s}
 \usage{
 compute_limited_access(segment)
 }
