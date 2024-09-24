@@ -3,12 +3,30 @@
 \name{color}
 \alias{color}
 \alias{color<-}
-\title{Getter/Setter for the color-slot}
+\title{Getter/Setter for the \code{color}-slot}
 \usage{
 color(object)
 
 color(object) <- value
 }
 \description{
-Getter/Setter for the color-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  color = "black")
+
+# Access the color slot for the agent
+color(my_agent)
+
+# Change the color slot for the agent
+color(my_agent) <- "blue"
+color(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{goal-class}}
 }

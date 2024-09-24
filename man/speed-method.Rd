@@ -3,12 +3,29 @@
 \name{speed}
 \alias{speed}
 \alias{speed<-}
-\title{Getter/Setter for the speed-slot}
+\title{Getter/Setter for the \code{speed}-slot}
 \usage{
 speed(object)
 
 speed(object) <- value
 }
 \description{
-Getter/Setter for the speed-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  speed = 1)
+
+# Access the speed slot for the agent
+speed(my_agent)
+
+# Change the speed slot for the agent
+speed(my_agent) <- 2
+speed(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}}
 }

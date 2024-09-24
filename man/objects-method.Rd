@@ -3,12 +3,34 @@
 \name{objects}
 \alias{objects}
 \alias{objects<-}
-\title{Getter/Setter for the objects-slot}
+\title{Getter/Setter for the \code{objects}-slot}
 \usage{
 objects(object)
 
 objects(object) <- value
 }
 \description{
-Getter/Setter for the objects-slot
+Works for \code{\link[predped]{background-class}}.
+}
+\examples{
+# Initialize background
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(circle(center = c(0, 0), 
+                                                  radius = 0.5)),
+                            limited_access = list(segment(from = c(-1, -1), 
+                                                          to = c(1, 1))), 
+                            entrance = c(-1, 0), 
+                            exit = c(1, 0)) 
+
+# Access the objects slot for the background
+objects(my_background)
+
+# Change the objects slot for the background
+#
+# Note that the exit is blocked by the new object, which will lead to errors 
+# if run in a simulation
+objects(my_background) <- list(circle(center = c(1, 0), radius = 0.5))
+objects(my_background)
+
 }

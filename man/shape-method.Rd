@@ -3,12 +3,31 @@
 \name{shape}
 \alias{shape}
 \alias{shape<-}
-\title{Getter/Setter for the shape-slot}
+\title{Getter/Setter for the \code{shape}-slot}
 \usage{
 shape(object)
 
 shape(object) <- value
 }
 \description{
-Getter/Setter for the shape-slot
+Works for \code{\link[predped]{background-class}}.
+}
+\examples{
+# Initialize background
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(circle(center = c(0, 0), 
+                                                  radius = 0.5)),
+                            limited_access = list(segment(from = c(-1, -1), 
+                                                          to = c(1, 1))), 
+                            entrance = c(-1, 0), 
+                            exit = c(1, 0)) 
+
+# Access the shape slot for the background
+shape(my_background)
+
+# Change the shape slot for the background
+shape(my_background) <- circle(center = c(1, 0), radius = 1)
+shape(my_background)
+
 }

@@ -3,12 +3,34 @@
 \name{entrance}
 \alias{entrance}
 \alias{entrance<-}
-\title{Getter/Setter for the entrance-slot}
+\title{Getter/Setter for the \code{entrance}-slot}
 \usage{
 entrance(object)
 
 entrance(object) <- value
 }
 \description{
-Getter/Setter for the entrance-slot
+Works for \code{\link[predped]{background-class}}.
+}
+\examples{
+# Initialize background
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(circle(center = c(0, 0), 
+                                                  radius = 0.5)),
+                            limited_access = list(segment(from = c(-1, -1), 
+                                                          to = c(1, 1))), 
+                            entrance = c(-1, 0), 
+                            exit = c(1, 0)) 
+
+# Access the entrance slot for the background
+entrance(my_background)
+
+# Change the entrance slot for the background
+entrance(my_background) <- c(1, 0)
+entrance(my_background)
+
+}
+\seealso{
+\code{\link[predped]{background-class}}
 }

@@ -3,12 +3,30 @@
 \name{goals}
 \alias{goals}
 \alias{goals<-}
-\title{Getter/Setter for the goals-slot}
+\title{Getter/Setter for the \code{goals}-slot}
 \usage{
 goals(object)
 
 goals(object) <- value
 }
 \description{
-Getter/Setter for the goals-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  goals = list(goal(position = c(1, 0))))
+
+# Access the goals slot for the agent
+goals(my_agent)
+
+# Change the goals slot for the agent
+goals(my_agent) <- list(goal(position = c(-1, 0)))
+goals(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{goal-class}}
 }

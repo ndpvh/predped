@@ -3,12 +3,34 @@
 \name{limited_access}
 \alias{limited_access}
 \alias{limited_access<-}
-\title{Getter/Setter for the limited_access-slot}
+\title{Getter/Setter for the \code{limited_access}-slot}
 \usage{
 limited_access(object)
 
 limited_access(object) <- value
 }
 \description{
-Getter/Setter for the limited_access-slot
+Works for \code{\link[predped]{background-class}}.
+}
+\examples{
+# Initialize background
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(circle(center = c(0, 0), 
+                                                  radius = 0.5)),
+                            limited_access = list(segment(from = c(-1, -1), 
+                                                          to = c(1, 1))), 
+                            entrance = c(-1, 0), 
+                            exit = c(1, 0)) 
+
+# Access the limited_access slot for the background
+limited_access(my_background)
+
+# Change the limited_access slot for the background
+limited_access(my_background) <- list(segment(from = c(-1, 1), to = c(1, -1)))
+limited_access(my_background)
+
+}
+\seealso{
+\code{\link[predped]{background-class}}
 }

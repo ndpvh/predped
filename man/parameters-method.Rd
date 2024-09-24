@@ -3,12 +3,29 @@
 \name{parameters}
 \alias{parameters}
 \alias{parameters<-}
-\title{Getter/Setter for the parameters-slot}
+\title{Getter/Setter for the \code{parameters}-slot}
 \usage{
 parameters(object)
 
 parameters(object) <- value
 }
 \description{
-Getter/Setter for the parameters-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  parameters = draw_parameters(1))
+
+# Access the parameters slot for the agent
+parameters(my_agent)
+
+# Change the parameters slot for the agent
+parameters(my_agent) <- draw_parameters(1)
+parameters(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}}
 }

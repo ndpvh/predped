@@ -3,12 +3,29 @@
 \name{status}
 \alias{status}
 \alias{status<-}
-\title{Getter/Setter for the status-slot}
+\title{Getter/Setter for the \code{status}-slot}
 \usage{
 status(object)
 
 status(object) <- value
 }
 \description{
-Getter/Setter for the status-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  status = "move")
+
+# Access the status slot for the agent
+status(my_agent)
+
+# Change the status slot for the agent
+status(my_agent) <- "reroute"
+status(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}}
 }

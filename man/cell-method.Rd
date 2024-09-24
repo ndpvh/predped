@@ -3,12 +3,29 @@
 \name{cell}
 \alias{cell}
 \alias{cell<-}
-\title{Getter/Setter for the cell-slot}
+\title{Getter/Setter for the \code{cell}-slot}
 \usage{
 cell(object)
 
 cell(object) <- value
 }
 \description{
-Getter/Setter for the cell-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  cell = 1)
+
+# Access the cell slot for the agent
+cell(my_agent)
+
+# Change the cell slot for the agent
+cell(my_agent) <- 2
+cell(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}}
 }

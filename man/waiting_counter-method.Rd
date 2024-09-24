@@ -3,12 +3,30 @@
 \name{waiting_counter}
 \alias{waiting_counter}
 \alias{waiting_counter<-}
-\title{Getter/Setter for the waiting_counter-slot}
+\title{Getter/Setter for the \code{waiting_counter}-slot}
 \usage{
 waiting_counter(object)
 
 waiting_counter(object) <- value
 }
 \description{
-Getter/Setter for the waiting_counter-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  waiting_counter = 0)
+
+# Access the waiting_counter slot for the agent
+waiting_counter(my_agent)
+
+# Change the waiting_counter slot for the agent
+waiting_counter(my_agent) <- 5
+waiting_counter(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{goal-class}}
 }

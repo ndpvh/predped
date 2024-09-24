@@ -3,12 +3,29 @@
 \name{group}
 \alias{group}
 \alias{group<-}
-\title{Getter/Setter for the group-slot}
+\title{Getter/Setter for the \code{group}-slot}
 \usage{
 group(object)
 
 group(object) <- value
 }
 \description{
-Getter/Setter for the group-slot
+Works for \code{\link[predped]{agent-class}}.
+}
+\examples{
+# Initialize agent
+my_agent <- agent(center = c(0, 0), 
+                  radius = 0.25, 
+                  group = 1)
+
+# Access the speed slot for the agent
+group(my_agent)
+
+# Change the speed slot for the agent
+group(my_agent) <- 2
+group(my_agent)
+
+}
+\seealso{
+\code{\link[predped]{agent-class}}
 }

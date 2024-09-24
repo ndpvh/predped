@@ -6,26 +6,44 @@
 \alias{background}
 \title{An S4 Class to Represent the Background}
 \description{
-An S4 Class to Represent the Background
+Defines the \code{background} class, which contains all characteristics of 
+the setting in which agents will be simulated to walk. Currently consists of 
+the shape of the simulated room and objects that are contained within the 
+room.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{shape}}{An object of a type that extends \code{\link[predped]{object-class}}
-defining the shape of the background.}
+\item{\code{shape}}{Object of a type that extends \code{\link[predped]{object-class}}
+defining the shape of the background. Importantly, the shape cannot be of 
+the \code{\link[predped]{segment-class}}.}
 
-\item{\code{objects}}{A list of objects of a type that extends
-\code{\link[predped]{object-class}} defining the objects in the background.}
+\item{\code{objects}}{List of objects of a type that extends
+\code{\link[predped]{object-class}} defining the objects that are present in 
+the simulated room (e.g., tables and cabinets). Importantly, objects cannot 
+be of the \code{\link[predped]{segment-class}}.}
 
-\item{\code{entrance}}{A coordinate specifying the location of the entrance.}
+\item{\code{limited_access}}{List of objects of the \code{\link[predped]{segment-class}}
+which define the routes that can only be taken in one direction (see the 
+documentation of \code{\link[predped]{segment-class}}).}
 
-\item{\code{exit}}{A coordinate specifying the location of the exit. Ignored if 
-`same_exit = TRUE`.}
+\item{\code{precomputed_segment_class}}{List of non-penetrable objects based on the 
+values of slot \code{limited_access}. Is not meant to be changed by the user,
+but is used as a slot to significantly speed up computations.}
+
+\item{\code{entrance}}{Numeric matrix specifying the location(s) of the entrance(s), 
+where the first column denotes the x-coordinate and the second column the 
+y-coordinate.}
+
+\item{\code{exit}}{Numeric matrix specifying the location(s) of the exit(s), 
+where the first column denotes the x-coordinate and the second column the 
+y-coordinate.}
 }}
 
 \seealso{
+\code{\link[predped]{circle-class}}, 
 \code{\link[predped]{object-class}}, 
-\code{\link[predped]{rectangle-class}}, 
 \code{\link[predped]{polygon-class}}, 
-\code{\link[predped]{circle-class}}
+\code{\link[predped]{rectangle-class}}
+\code{\link[predped]{segment-class}}
 }
