@@ -26,6 +26,7 @@ tmp/
 *.zip
 *.pdf
 *.out
+docs/*
 
 R/*_depr.R
 
