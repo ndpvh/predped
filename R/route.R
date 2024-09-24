@@ -17,14 +17,14 @@ create_edges <- function(from,
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_options = FALSE) {
+                         many_nodes = FALSE) {
 
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
                           to, 
                           background, 
                           space_between = space_between,
-                          many_options = many_options)
+                          many_nodes = many_nodes)
 
     # If there are no nodes, then we will have to return NULL
     if(is.null(nodes)) {
@@ -208,13 +208,13 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_options = FALSE) {
+                         many_nodes = FALSE) {
                             
     # Create a matrix of coordinates that fill up the complete space. This will 
     # allow agents to take whatever route to their destination 
     shp <- shape(background)
 
-    if(many_options) {
+    if(many_nodes) {
         if(inherits(shp, "circle")) {
             xlim <- center(shp)[1] + c(-1, 1) * radius(shp)
             ylim <- center(shp)[2] + c(-1, 1) * radius(shp)
@@ -239,7 +239,7 @@ create_nodes <- function(from,
                                        space_between = space_between,
                                        only_corners = TRUE))
 
-    if(many_options) {
+    if(many_nodes) {
         nodes <- rbind(nodes,
                        do.call("rbind", obj_nodes))
     } else {
@@ -488,7 +488,7 @@ combine_nodes <- function(nodes_1,
 #' @param space_between Space to keep between nodes and objects in the 
 #' environment. Defaults to 2.5 times the maximal possible radius that the agents
 #' can be.
-#' @param many_options Logical denoting whether to create more than the minimal
+#' @param many_nodes Logical denoting whether to create more than the minimal
 #' number of nodes, allowing more flexibility in the agents. Defaults to `TRUE`.
 #' 
 #' @return List containing edges, edges_with_coords, and nodes
@@ -496,13 +496,13 @@ combine_nodes <- function(nodes_1,
 #' @export 
 compute_edges <- function(background, 
                           space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius",]),
-                          many_options = TRUE) {
+                          many_nodes = TRUE) {
     # Create the edges themselves with mock-positions of agent and goal
     edges <- create_edges(c(0, 0), 
                           c(0, 0), 
                           background,
                           space_between = space_between,
-                          many_options = many_options)
+                          many_nodes = many_nodes)
 
     # Delete agent and goal positions from these edges, as these should be 
     # dynamic. 

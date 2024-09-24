@@ -256,7 +256,7 @@ setMethod("initialize", "polygon", function(.Object,
                                             id = character(0),
                                             clock_wise = TRUE, 
                                             moveable = FALSE, 
-                                            interactable = FALSE,
+                                            interactable = TRUE,
                                             ...) {
     .Object <- callNextMethod(.Object, ...)
 
@@ -559,7 +559,7 @@ setMethod("initialize", "rectangle", function(.Object,
                                               clock_wise = TRUE,
                                               orientation = 0,
                                               moveable = FALSE,
-                                              interactable = FALSE,
+                                              interactable = TRUE,
                                               degrees = FALSE,
                                               ...) {
 
@@ -804,7 +804,7 @@ circle <- setClass("circle", list(center = "numeric", radius = "numeric"), conta
 setMethod("initialize", "circle", function(.Object, 
                                            id = character(0), 
                                            moveable = FALSE, 
-                                           interactable = FALSE, 
+                                           interactable = TRUE, 
                                            ...) {
 
     .Object <- callNextMethod(.Object, ...)
@@ -1162,7 +1162,7 @@ setMethod("initialize", "segment", function(.Object,
                                             from, 
                                             to, 
                                             id = character(0), 
-                                            interactable = FALSE,
+                                            interactable = TRUE,
                                             ...) {
 
     .Object@id <- if(length(id) == 0) paste("segment", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id

@@ -91,7 +91,7 @@ setMethod("simulate", "predped", function(object,
                                           space_between = 2.5,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
-                                          many_options = precompute_edges,
+                                          many_nodes = precompute_edges,
                                           individual_differences = TRUE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
                                           ...) {
@@ -123,7 +123,7 @@ setMethod("simulate", "predped", function(object,
         cat("\nPrecomputing edges")
         edges <- compute_edges(object@setting, 
                                space_between = space_between * max(params_from_csv[["params_bounds"]]["radius",]), 
-                               many_options = many_options)
+                               many_nodes = many_nodes)
     } else {
         edges <- NULL
     }
@@ -184,7 +184,7 @@ setMethod("simulate", "predped", function(object,
                                    space_between = space_between,
                                    standing_start = standing_start,
                                    precomputed_edges = edges,
-                                   many_options = many_options,
+                                   many_nodes = many_nodes,
                                    precompute_goal_paths = precompute_goal_paths,
                                    ...)
     }
@@ -209,7 +209,7 @@ setMethod("simulate", "state", function(object,
                                         space_between = 2.5,
                                         standing_start = 0.1,
                                         precomputed_edges = NULL,
-                                        many_options = FALSE,
+                                        many_nodes = FALSE,
                                         precompute_goal_paths = FALSE,
                                         report = FALSE,
                                         interactive_report = FALSE,
@@ -284,7 +284,7 @@ setMethod("simulate", "state", function(object,
                      space_between = space_between,
                      standing_start = standing_start,
                      precomputed_edges = precomputed_edges,
-                     many_options = many_options,
+                     many_nodes = many_nodes,
                      precompute_goal_paths = precompute_goal_paths,
                      report = report,
                      interactive_report = interactive_report,
@@ -651,7 +651,7 @@ create_initial_condition <- function(initial_number_agents,
                               c(0, 0), 
                               setting,
                               space_between = space_between * size(new_agent),
-                              many_options = TRUE)
+                              many_nodes = TRUE)
 
         edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
         edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
