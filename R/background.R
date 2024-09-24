@@ -27,11 +27,16 @@
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}}, 
-#' \code{\link[predped]{initialize-background}},
 #' \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{polygon-class}}, 
-#' \code{\link[predped]{rectangle-class}}
-#' \code{\link[predped]{segment-class}}
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{segment-class}},
+#' \code{\link[predped]{entrance-method}},
+#' \code{\link[predped]{exit-method}},
+#' \code{\link[predped]{limited_access-method}},
+#' \code{\link[predped]{objects-method}},
+#' \code{\link[predped]{shape-method}},
+#' \code{\link[predped]{initialize-background}},
 #' 
 #' @rdname background-class
 #' 
@@ -82,13 +87,14 @@ background <- setClass("background", list(shape = "object",
 #' my_background@objects
 #' 
 #' @seealso 
+#' \code{\link[predped]{background-class}},
 #' \code{\link[predped]{entrance-method}},
 #' \code{\link[predped]{exit-method}},
 #' \code{\link[predped]{limited_access-method}},
 #' \code{\link[predped]{objects-method}},
 #' \code{\link[predped]{shape-method}}
 #' 
-#' @rdname initialize-agent-method
+#' @rdname initialize-background-method
 #' 
 #' @export
 setMethod("initialize", "background", function(.Object, 
@@ -160,13 +166,13 @@ setMethod("initialize", "background", function(.Object,
 #' @export
 setMethod("show", "background", function(object) {
     cat(crayon::bold("Background Attributes"), "\n")
-    cat("shape: (a) position:", object@shape@center, "(b) size:", size(object@shape), "\n")
-    cat("objects (number):", length(object@objects), "\n")
-    cat("limited_access (number):", length(object@limited_access), "\n")
     cat("entrance:", "\n")
     print(object@entrance)
     cat("\nexit:", object@exit, "\n")
     print(object@exit)
+    cat("\nlimited_access (number):", length(object@limited_access), "\n")
+    cat("objects (number):", length(object@objects), "\n")
+    cat("shape: (a) position:", object@shape@center, "(b) size:", size(object@shape), "\n")    
     cat("\nFor more detailed information, please extract the wanted information from the background directly.\n")
 })
 

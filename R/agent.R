@@ -39,8 +39,20 @@
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{goal-class}},
-#' \code{\link[predped]{initialize-agent}},
-#' \code{\link[predped]{object-class}}
+#' \code{\link[predped]{object-class}},
+#' \code{\link[predped]{cell-method}},
+#' \code{\link[predped]{current_goal-method}},
+#' \code{\link[predped]{goals-method}},
+#' \code{\link[predped]{group-method}},
+#' \code{\link[predped]{id-method}},
+#' \code{\link[predped]{orientation-method}},
+#' \code{\link[predped]{parameters-method}}
+#' \code{\link[predped]{position-method}},
+#' \code{\link[predped]{size-method}},
+#' \code{\link[predped]{speed-method}},
+#' \code{\link[predped]{status-method}},
+#' \code{\link[predped]{waiting_counter-method}},
+#' \code{\link[predped]{initialize-agent}}
 #' 
 #' @rdname agent-class
 #'
@@ -109,6 +121,7 @@ agent <- setClass("agent", list(id = "character",
 #' my_agent@radius
 #' 
 #' @seealso 
+#' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{cell-method}},
 #' \code{\link[predped]{current_goal-method}},
 #' \code{\link[predped]{goals-method}},
