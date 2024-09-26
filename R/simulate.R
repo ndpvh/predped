@@ -101,13 +101,13 @@ setMethod("simulate", "predped", function(object,
     # For `add_agent`, we should furthermore create a cumulative sum, as we just 
     # need to iteration numbers themselves, not the gaps that are created by 
     # `number`
-    add_agent_index <- draw_number(add_agent_after, iterations)
+    add_agent_index <- determine_values(add_agent_after, iterations)
     add_agent_index <- c(1, cumsum(add_agent_index))
     add_agent_index <- add_agent_index[add_agent_index <= iterations]
 
-    goal_number <- draw_number(goal_number, iterations)
+    goal_number <- determine_values(goal_number, iterations)
 
-    max_agents <- draw_number(max_agents, iterations)
+    max_agents <- determine_values(max_agents, iterations)
 
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
@@ -468,14 +468,14 @@ add_agent <- function(model,
 
     # Create this agents' goal stack
     if(is.null(precomputed_goals)) {
-        goal_stack <- generate_goal_stack(goal_number, 
-                                          background, 
-                                          counter_generator = goal_duration,
-                                          precomputed_edges = precomputed_edges,
-                                          agent_position = position,
-                                          precompute_goal_paths = precompute_goal_paths,
-                                          space_between = space_between * radius,
-                                          order_goal_stack = order_goal_stack)
+        goal_stack <- goal_stack(goal_number, 
+                                 background, 
+                                 counter_generator = goal_duration,
+                                 precomputed_edges = precomputed_edges,
+                                 agent_position = position,
+                                 precompute_goal_paths = precompute_goal_paths,
+                                 space_between = space_between * radius,
+                                 order_goal_stack = order_goal_stack)
     } else {
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]
@@ -583,7 +583,7 @@ create_initial_condition <- function(initial_number_agents,
     setting <- object@setting
 
     # Make sure you have enough goal-numbers for each of the agents
-    goal_number <- draw_number(goal_number, initial_number_agents)
+    goal_number <- determine_values(goal_number, initial_number_agents)
 
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
@@ -742,38 +742,4 @@ create_initial_condition <- function(initial_number_agents,
     }    
     
     return(agents)
-}
-
-# Undocumented function because this is in no way a particularly beautiful 
-# function, nor is it meant to be the final way in which we do this.
-#
-# What this function does is create a set of numbers based on either a function
-# or on a numeric. These numbers should in the end represent integers and are 
-# used to define the number of goals (`goal_number`) or the indices at which 
-# an agent gets added to the simulation (`add_agent`).
-#
-# @param number Integer, vector of integers, or function that defines the numbers
-# to be drawn and used in the simulation.
-# @param iterations Integer denoting the number of iterations to be used in the 
-# simulation
-draw_number <- function(number, iterations) {
-    # First check whether `number` is a function or a numeric
-    if(typeof(number) == "closure") {
-        # If it is a function, just draw `iterations` many numbers
-        number <- number(iterations)
-    } else if(is.numeric(number)) {
-        # If it is a numeric, extend the already existing vector by 
-        # `iterations/length(number)` times
-        number <- rep(number, 
-                      times = ceiling(iterations / length(number)))
-    } else {
-        stop("Cannot draw numbers if the type is not closure or numeric.")
-    }
-
-    # Given that we need positive integers, we first round up all values and 
-    # replace each value lower than 1 with a 1. 
-    number <- ceiling(number)
-    number[number <= 0] <- 1
-
-    return(as.integer(number))
 }
