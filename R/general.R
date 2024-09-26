@@ -1,3 +1,86 @@
+#' Determine iterated values from various arguments
+#' 
+#' @details
+#' Takes in a numeric, numeric vector, or function and transforms this input to 
+#' a numeric vector that contains values based on the input. When a numeric is 
+#' provided, this function will output this same numeric repeated an
+#' \code{iterations} number of times. Similarly, when a numeric vector is 
+#' provided, this numeric vector will also be repeated an \code{iterations}
+#' number of times. When a function is provided, \code{iterations} will be 
+#' provided as an argument of this function.
+#' 
+#' This function is used to enhance the generalizability of how certain values 
+#' are determined, and is used for determining:
+#' \itemize{
+#'    \item{}{the number of goals to simulate in each goal stack in the 
+#'            \code{\link[predped]{multiple_goal_stacks}} function}
+#'    \item{}{the counter for each goal in a goal stack in the 
+#'            \code{\link[predped]{goal_stack}} function}
+#'    \item{}{the number of agents that can maximally be in the simulation at 
+#'            each time point in the \code{\link[predped]{simulate-predped-method}}}
+#'    \item{}{the iteration number at which an agent can be added to the
+#'            simulation in the \code{\link[predped]{simulate-predped-method}}}
+#' }
+#' 
+#' Note that for this function to work, one should correctly define their 
+#' own function when provided to the argument \code{x}. Specifically, this 
+#' function should take in a single argument \code{n} which defines the number 
+#' of values to generate. For example, a typical default for this function is 
+#' \code{\(n) rnorm(n, 10, 2)}.
+#' 
+#' @param x Numeric, numerical vector, or function that should be used to 
+#' generate the needed values.
+#' @param iterations Integer denoting the number of values that should be 
+#' generated.
+#' @param positive_integer Logical denoting whether to make all drawn values 
+#' positive integers. Defaults to \code{TRUE}, given the use-cases that it is 
+#' currently used for.
+#' 
+#' @return Numeric vector containing values based on the input.
+#' 
+#' @examples 
+#' # Generate several variables to be tested with determine_values
+#' number <- 1
+#' numeric_vector <- 1:2
+#' generating_function <- \(n) runif(n, 0, 10)
+#' 
+#' # Test them out with 5 iterations
+#' determine_values(number, 5)
+#' determine_values(numeric_vector, 5)
+#' determine_values(generating_function, 5)
+#' 
+#' @seealso
+#' \code{\link[predped]{simulate-predped-method}}
+#' \code{\link[predped]{goal_stack}}
+#' \code{\link[predped]{multiple_goal_stacks}}
+#' 
+#' @rdname determine_values
+#' 
+#' @export
+determine_values <- function(x, 
+                             iterations,
+                             positive_integer = TRUE) {
+
+    # First check whether the input is a function or a numeric
+    if(inherits(x, "function")) {
+        values <- x(iterations)
+
+    } else if(is.numeric(x)) {
+        values <- rep(x, times = iterations)
+
+    } else {
+        stop("Cannot determine the values in `determine_values`: input is not a function or numeric.")
+    }
+
+    # If positive values are needed, replace each value lower than 1 with a 1.
+    if(positive_integer) {
+        values <- ceiling(values)
+        values[values <= 1] <- 1
+    }
+
+    return(as.integer(values))
+}
+
 #' Find all objects of a given class
 #' 
 #' This function is a simple utility function to extract all objects from a given 
@@ -170,6 +253,87 @@ line_line_intersection <- function(segments_1,
     } else {
         return(any(intersection))
     }
+}
+
+#' Raycasting algorithm
+#' 
+#' This algorithm checks whether a point lies within an arbitrary polygon by
+#' checking the even-odd-rule, which says that for any point (x,y) that lies
+#' within a polygon, the number of times it cross the boundaries of this
+#' polygon when x goes to infinity should be uneven/odd.
+#'
+#' @details
+#' While this may not seem like the most efficient algorithm, it is quite fast 
+#' for the typical objects used in predped.
+#' 
+#' @param coords Numerical matrix of size N x 2 containing the coordinates of 
+#' the corners of the object.
+#' @param x Numerical matrix of size M x 2 containing the coordinates of the 
+#' coordinates of which should be checked whether they are inside of the object.
+#' 
+#' @return Logical vector denoting whether each point in \code{x} lies within
+#' (\code{TRUE}) or outside (\code{FALSE}) of the object.
+#' 
+#' @examples
+#' # Create a set of points that come from a rectangle
+#' my_rectangle <- rectangle(center = c(0, 0), size = c(2, 2))
+#' points <- my_rectangle@points 
+#' 
+#' # Create a set of points that fall inside of or outside of the rectangle
+#' coords <- rbind(c(0, 0), 
+#'                 c(2, 0))
+#' 
+#' # Check where they lie with the raycasting algorithm
+#' raycasting(points, coords)
+#' 
+#' @seealso 
+#' \code{\link[predped]{in_object-method}},
+#' \code{\link[predped]{out_object-method}}
+#' 
+#' @rdname raycasting
+#' 
+#' @export
+raycasting <- function(coords, x) {
+    # Create the edges of the object based on its corner coordinates
+    edges <- cbind(coords, coords[c(2:nrow(coords), 1),])
+
+    # Enlongen the two matrices of segments so that the intersection of each 
+    # segment within the two matrices can be compared to each other. For this, 
+    # take the Kronecker product with a vector of ones
+    n_1 <- nrow(edges)
+    n_2 <- nrow(x)
+
+    edges <- edges %x% rep(1, each = n_2)
+    x <- rep(1, each = n_1) %x% x
+
+    # Check whether the y-coordinate of the points are above the y-coordinates 
+    # of the segments that make up the edges 
+    check_1 <- (edges[,2] > x[,2]) != (edges[,4] > x[,2])
+
+    # Use a derived formula to find out for which value of the x coordinate
+    # the imaginary horizontal line through the point `x` would intersect
+    # with the edge. This derivation is based on deriving the equation
+    # y = mx + b for the edge and then equation it to the equation y = x[2],
+    # which represents the horizontal move from x[2] to infinity.
+    slope <- (edges[,3] - edges[,1]) / (edges[,4] - edges[,2])
+    x_intersection <- edges[,1] + slope * (x[,2] - edges[,2])
+
+    # Finally, check whether this intersection point lies further to the
+    # right (towards infinity) than the initial value of the x coordinate.
+    # If so, then the intersection indeed happens due to the move from the
+    # x coordinate to infinity.
+    check_2 <- x[,1] < x_intersection
+
+    # If both checks are TRUE, then there is an intersection. Determine how often
+    # this occurs in the data
+    counter <- matrix(check_1 & check_2, 
+                      nrow = n_2, 
+                      ncol = n_1) |>
+        rowSums()
+
+    # Return TRUE whenever the counter is uneven, as this indicates that the 
+    # point is inside of the object
+    return(!(counter %% 2 == 0))
 }
 
 # Vectorized version of seq, used in `overlap_with_objects`

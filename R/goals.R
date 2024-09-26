@@ -109,6 +109,9 @@ setMethod("show", "goal", function(object) {
 
 #' Add a goal to an object
 #' 
+#' Uses the characteristics of an object to add a goal to it.
+#' 
+#' @details
 #' Takes in an instance of \code{\link[predped]{object-class}} and uses its 
 #' characteristics to generate an instance of \code{\link[predped]{goal-class}}
 #' that is attached to it. In practice, uses one of the objects in the 
@@ -239,6 +242,12 @@ setMethod("add_goal", signature(object = "circle"), function(object,
 
 #' Find path to a goal
 #' 
+#' Creates a numerical matrix of coordinates which contain the path points that 
+#' the agent will use to move towards a goal. It thus finds itself on the 
+#' strategic level (when performed in an initial planning phase) and the tactical 
+#' level (when performed in response to blockages).
+#' 
+#' @details
 #' Creates a numerical matrix containing coordinates of path points which, 
 #' together, form a strategic path to the goal specified in this function. This
 #' forms one of the functions that operate on the strategic and tactical level 
@@ -478,6 +487,24 @@ setMethod("find_path", "goal", function(object,
 #' @return Object of \code{\link[predped]{goal-class}} with adjusted \code{counter}
 #' slot and, if the goal has been completed, an adjusted \code{done} slot
 #' 
+#' @examples 
+#' # Create a goal
+#' my_goal <- goal(position = c(0, 0), 
+#'                 counter = 5)
+#' 
+#' # Interact with the goal: Decreases the counter, but the goal is not done yet
+#' updated_goal <- interact(my_goal)
+#' updated_goal@counter
+#' updated_goal@done
+#' 
+#' # Adjust the goal so that the counter is only 1 and interact with it again.
+#' # Now the goal is done.
+#' counter(my_goal) <- 1
+#' 
+#' updated_goal <- interact(my_goal)
+#' updated_goal@counter
+#' updated_goal@done
+#'
 #' @seealso 
 #' \code{\link[predped]{goal-class}}
 #' 
@@ -498,8 +525,9 @@ setMethod("interact", "goal", function(object) {
 #' 
 #' Replaces an existing object of \code{\link[predped]{goal-class}} with an 
 #' alternative object of the same class. The new goal is randomly generated or 
-#' randomly drawn from a list of options (if provided). 
+#' randomly drawn from a list of options (if provided).
 #' 
+#' @details
 #' This function allows for a dynamical assignment of goals to agents.
 #' 
 #' @param object Object of \code{\link[predped]{goal-class}} which should be 
@@ -516,6 +544,25 @@ setMethod("interact", "goal", function(object) {
 #' 
 #' @return Object of \code{\link[predped]{goal-class}}.
 #' 
+#' @examples 
+#' # Create a goal
+#' my_goal <- goal(position = c(0, 0))
+#' my_goal
+#' 
+#' # Replace it with a random goal drawn from the environment. For this to work, 
+#' # we first need to create a background as well.
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(rectangle(center = c(0, 0), 
+#'                                                      size = c(1, 1))))
+#' replace(my_goal, setting = my_background)
+#' 
+#' # Replace with a random goal drawn from a list of different goals. For this
+#' # to work, we first define this list.
+#' goal_list <- list(goal(position = c(-0.5, 0)), 
+#'                   goal(position = c(0.5, 0)))
+#' replace(my_goal, goal_list = goal_list)
+#' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' \code{\link[predped]{goal-class}}
@@ -527,9 +574,15 @@ setMethod("interact", "goal", function(object) {
 setGeneric("replace", function(object,...) standardGeneric("replace"))
 
 setMethod("replace", "goal", function(object, 
-                                      setting,
+                                      setting = NULL,
                                       goal_list = NULL,
-                                      counter_generator = \() rnorm(1, 10, 2)) {
+                                      counter = \(n) rnorm(n, 10, 2)) {
+
+    # If neither the background, nor a goal list is provided, we should throw 
+    # an error
+    if(is.null(setting) & is.null(goal_list)) {
+        stop("Either a setting or a goal list should be defined to replace a goal.")
+    }
 
     # If a goal-list is defined, we need to draw one of these goals as an 
     # alternative to the one being replaced.
@@ -542,73 +595,148 @@ setMethod("replace", "goal", function(object,
     }
 })
 
-
-######## LEFT OFF HERE #########################################################
-
 #' Generate a goal stack
 #' 
-#' Use the defined environment or setting to generate the stack of goals an agent 
-#' should complete.
+#' Use the defined setting to generate the stack of random goals an agent should 
+#' complete. This function outputs a list of different instances of the 
+#' \code{\link[predped]{goal-class}}.
 #' 
-#' @param n Integer denoting the number of goals to generate
-#' @param setting List containing all objects in the environment/setting
-#' @param counter_generator Function that defines how the counter for each goal 
-#' should be generated. Defaults to a normal distribution with mean 10 and 
-#' standard deviation 2.
+#' @param n Integer denoting the number of goals to generate.
+#' @param setting Object of \code{\link[predped]{background-class}}.
+#' @param counter Numeric, vector, or function that defines the counter for each 
+#' of the goals that are generated. When numeric, each goal will have the same 
+#' value for counter equal to the value provided to this argument. When a numeric
+#' vector, the values of this vector will be iterated as values for the counter 
+#' in the goals. When a function, a random value for the counter will be 
+#' generated through the function. For this to work, the function that is 
+#' provided should take in the input \code{n} which defines the number of 
+#' values to draw from the function. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param sort Logical denoting whether to order the goal stack in a logical 
+#' way. Currently implemented in the following way. First, we select the first 
+#' goal as being the one that is closest by the starting position provided in 
+#' the argument \code{starting_position}. Then, we define each of the next goals
+#' as being the one that is closest to the position of the previous goal.
+#' Defaults to \code{TRUE}.
+#' @param starting_position Numeric vector denoting the position at which the 
+#' agent starts in the room. Defaults to the first entrance of the \code{setting}.
+#' @param precompute_goal_paths Logical denoting whether to run the
+#' \code{\link[predped]{find_path-method}} for each of the generated goals 
+#' beforehand. Assumes that the agent does all of the goals in the order of the 
+#' goal stack. Defaults to \code{FALSE}. 
+#' @param ... Arguments provided to \code{\link[predped]{find_path-method}} to 
+#' precompute the paths that the agents should take to reach their goals. Only
+#' used when \code{precompute_goal_paths = TRUE}.
+#' 
+#' @return List of instances of the \code{\link[predped]{goal-class}}.
+#' 
+#' @examples 
+#' # Create a setting
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(cirlce(center = c(0, 0), 
+#'                                                   radius = 0.5)))
+#' 
+#' # Create a goal stack containing two goals
+#' goal_stack <- goal_stack(2, my_background)
+#' 
+#' # Two goals
+#' length(goal_stack)
+#' goal_stack
+#' 
+#' @seealso 
+#' \code{\link[predped]{background-class}}
+#' \code{\link[predped]{goal-class}}
+#' \code{\link[predped]{compute_edges}}
+#' \code{\link[predped]{create_edges}}
+#' \code{\link[predped]{determine_values}}
+#' \code{\link[predped]{multiple_goal_stacks}}
+#' 
+#' @rdname goal_stack
 #' 
 #' @export 
-generate_goal_stack <- function(n, 
-                                setting,
-                                counter_generator = \(x) rnorm(x, 10, 2),
-                                agent_position = NULL,
-                                precomputed_edges = NULL,
-                                precompute_goal_paths = TRUE,
-                                space_between = 0.5,
-                                order_goal_stack = TRUE) {
-    # Select the objects in the environment that can contain a goal
-    potential_objects <- list()
-    for(i in seq_along(setting@objects)) {
-        if(setting@objects[[i]]@interactable) {
-            potential_objects <- append(potential_objects, 
-                                        setting@objects[[i]])
-        }
+goal_stack <- function(n, 
+                       setting,
+                       counter = \(n) rnorm(n, 10, 2),
+                       sort = TRUE, 
+                       starting_position = entrance(setting)[1,],
+                       precompute_goal_paths = FALSE,
+                       ...) {
+    
+    # Step 1: Generating the goal stack
+
+    # Generate all the counter values for the goals to-be-generated. Depends on 
+    # the type that has been provided in counter
+    if(inherits(counter, "function")) {
+        counter <- counter(n)
+    } else {
+        counter <- rep(counter, times = n)
     }
 
-    # Throw an error if no objects are interactable
-    if(length(potential_objects) == 0) {
+    # Select the objects in the environment that can contain a goal, as defined 
+    # by the slot interactable
+    idx <- sapply(objects(setting), 
+                  \(x) x@interactable)
+    obj <- objects(setting)[idx]
+
+    # Throw an error if none of the objects are interactable.
+    if(length(obj) == 0) {
         stop("None of the objects in the environment can contain a goal.")
     }
 
     # Randomly sample `n` objects from the `potential_objects` and assign a goal 
     # on one of its edges, as handled by the `add_goal` method. 
-    sampled_objects <- sample(potential_objects, n, replace = TRUE)
-    goal_stack <- lapply(sampled_objects, 
-                         \(x) add_goal(x, 
-                                       setting,
-                                       id = character(0),
-                                       counter = counter_generator(1)))
+    obj <- sample(obj, n, replace = TRUE)
+    goal_stack <- lapply(seq_along(obj), 
+                         \(i) add_goal(obj[[i]], setting, counter = counter[i]))
 
-    # If you want the goal stack to be ordered according to distance, do so
-    if(order_goal_stack) {
-        # Compute the distance starting from the entrance (through which the agent
-        # enters the space)
-        if(is.null(agent_position)) {
-            start <- entrance(setting)
-        } else {
-            start <- agent_position
+
+
+    # Step 2: Ordering the goal stack
+
+    # First check whether the goal stack should be ordered at all. If not, then 
+    # the if-statement is not executed and we immediately go to Step 3.
+    if(sort & length(goal_stack) > 1) {
+        # Create a local function that outputs the goal with the closest distance
+        # to a given coordinate y. This function will be ran until we reached 
+        # the last goal in the goal stack, allowing us to easily sort the goal
+        # stack based on distances from the starting point and from the other 
+        # goals.
+        closest_goal <- function(goal_stack, start) {
+            # Compute the squared distance of each of the goals to the 
+            # starting point.
+            dist <- sapply(goal_stack, 
+                           \(x) (start[1] - position(x)[1])^2 + (start[2] - position(x)[2])^2)
+
+            # Return an index saying for which goal the distance is smallest
+            return(dist == min(dist))
         }
 
-        distances <- sapply(goal_stack, 
-                            \(x) (start[1] - position(x)[1])^2 + (start[2] - position(x)[2])^2)
-        old <- sapply(goal_stack, \(x) x@id)
-        
+        # Get the first goal done and delete it from the list
+        idx <- closest_goal(goal_stack, starting_position)
 
-        # Sort the list of goals based on how close they are to the entrance
-        distances <- cbind(1:n, distances)
-        idx <- distances[order(distances[,2]), 1]
+        ordered_goal_stack <- list(goal_stack[idx])        
+        goal_stack <- goal_stack[!idx]
 
-        goal_stack <- goal_stack[idx]
+        # Now loop over the others, but only if there are enough others to iterate
+        # over.
+        if(length(goal_stack) != 1) {
+            for(i in 2:(n - 1)) {
+                # Repeat the same procedure
+                idx <- closest_goal(goal_stack, position(ordered_goal_stack[[i - 1]]))
+    
+                ordered_goal_stack[[i]] <- goal_stack[idx]
+                goal_stack <- goal_stack[!idx]
+            }
+        }
+
+        # Append the last goal to the goal stack
+        ordered_goal_stack[[n]] <- goal_stack[[1]]
+        goal_stack <- ordered_goal_stack
     }
+
+
+
+    # Step 3: Precomputing the goal paths
 
     # If you don't want to or cannot precompute the goal paths, return the 
     # goal stack as is
@@ -620,101 +748,89 @@ generate_goal_stack <- function(n,
     # in the goal stack and find the path starting at the location of the 
     # previous goal. The path of the first goal is computed in the `add_agent`
     # function and does not need to be addressed here.
-    dummy <- agent(center = c(0, 0), radius = space_between)
-    for(i in 2:length(goal_stack)) {
-        position(dummy) <- position(goal_stack[[i - 1]])
+    dummy <- agent(center = c(0, 0), radius = 0.25)
+    for(i in seq_along(goal_stack)) {
+        # Adjust the position of the dummy based on which goal in the goal stack
+        # we are looking at
+        if(i == 1) {
+            position(dummy) <- starting_position
+        } else {
+            position(dummy) <- position(goal_stack[[i - 1]])
+        }
+        
+        # Compute the path to the goal
         goal_stack[[i]]@path <- find_path(goal_stack[[i]], 
                                           dummy, 
                                           setting,
-                                          space_between = space_between,
-                                          precomputed_edges = precomputed_edges)
+                                          ...)
     }
 
     return(goal_stack)
 }
 
-#' Simulate multiple goal stacks
+#' Generate multiple goal stacks
+#'
+#' Use the defined setting to generate multiple stacks of random goals that 
+#' each agent might have to complete. This function outputs a list of multiple 
+#' lists with different instances of the \code{\link[predped]{goal-class}}.
 #' 
-#' Create multiple goal stacks that can be used in the simulation. Importantly, 
-#' everything is precomputed here, meaning that all paths towards the goals are
-#' already filled out in the simulation.
+#' @param n Integer denoting the number of goals to generate.
+#' @param setting Object of \code{\link[predped]{background-class}}.
+#' @param goal_number Numeric, vector, or function that defines the number of 
+#' goals for each of the goal stacks that will be generated. When numeric, each 
+#' goal stack will have the same number of goals equal to the value provided 
+#' to this argument. When a numeric vector, the values of this vector will be 
+#' iterated as values for the number of goals in the goal stacks. When a 
+#' function, a random value for the number of goals for each goal stack counter 
+#' will be generated through the function. For this to work, the function that is 
+#' provided should take in the input \code{n} which defines the number of 
+#' values to draw from the function. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param ... Arguments provided to \code{\link[predped]{goal_stack}}.
 #' 
-#' @param n Integer denoting the number of goal stacks to create
-#' @param setting List containing all objects in the environment/setting
-#' @param goal_number Integer, vector of integers, or function that determines 
-#' how many goals each of the agents should receive. Defaults to a function that 
-#' draws `x` numbers from a normal distribution with mean 10 and standard 
-#' deviation 2. 
-#' @param goal_duration Function that defines how the counter for each goal 
-#' should be generated. Defaults to a normal distribution with mean 10 and 
-#' standard deviation 2.
-#' @param space_between Numeric denoting the amount of space that is needed 
-#' between a path point and an object
-#' @param order_goal_stack Logical denoting whether to order the goal stack 
-#' based on distance.
+#' @return List of lists containing instances of the 
+#' \code{\link[predped]{goal-class}}.
+#' 
+#' @examples 
+#' # Create a setting
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(cirlce(center = c(0, 0), 
+#'                                                   radius = 0.5)))
+#' 
+#' # Create two goal stacks containing two goals each
+#' goal_stack <- multiple_goal_stacks(2, my_background, goal_number = 2)
+#' 
+#' # Two goal stacks of two goals each
+#' length(goal_stack)
+#' 
+#' length(goal_stack[[1]])
+#' goal_stack[[1]]
+#' 
+#' length(goal_stack[[2]])
+#' goal_stack[[2]]
+#' 
+#' @seealso 
+#' \code{\link[predped]{background-class}}
+#' \code{\link[predped]{goal-class}}
+#' \code{\link[predped]{determine_values}}
+#' \code{\link[predped]{goal_stack}}
+#' 
+#' @rdname multiple_goal_stack
 #' 
 #' @export 
-# TO DO:
-#   - Find a new name for this function: Not happy with how close it is to 
-#     generate_goal_stack
-simulate_goal_stack <- function(n, 
-                                setting,
-                                goal_number = \(x) rnorm(x, 10, 2), 
-                                goal_duration = \(x) rnorm(x, 10, 2),
-                                space_between = 0.5,
-                                order_goal_stack = TRUE) {
+multiple_goal_stacks <- function(n, 
+                                 setting,
+                                 goal_number = \(x) rnorm(x, 10, 2), 
+                                 ...) {
 
-    print("Precomputing goal stacks")
+    cat("\rGenerating multiple goal stacks")
 
     # Define the number of goals per goal-stack
-    goal_number <- draw_number(goal_number, n)
-
-    # If `goal_duration` is not a function, make it a function anyway (assumed
-    # by the `goal` class: To be changed)
-    if(typeof(goal_duration) != "closure") {
-        number <- goal_duration[1]
-        goal_duration <- function(x) number
-    }
-
-    # Precompute the edges so that this might already take a bit less time
-    edges <- create_edges(c(0, 0), 
-                          c(0, 0), 
-                          setting,
-                          space_between = space_between)
-    edges$edges <- edges$edges[!(edges$edges$from %in% c("agent", "goal")),]
-    edges$edges <- edges$edges[!(edges$edges$to %in% c("agent", "goal")),]
-    edges$nodes <- edges$nodes[!(edges$nodes$node_ID %in% c("agent", "goal")),]
+    goal_number <- determine_values(goal_number, n)
 
     # Loop over the number of goal stacks to create
-    goal_stack <- list()
-    for(i in seq_len(n)) {
-        print(paste0("Generating goal stack ", i))
-
-        # Create the entrance through which the agent will have to enter to 
-        # start the goal stack
-        entrance_idx <- sample(seq_len(nrow(setting@entrance)), 1)
-
-        # Generate the complete goal stack and precompute all the paths to the 
-        # goals
-        goal_stack[[i]] <- generate_goal_stack(goal_number[i], 
-                                               setting,
-                                               counter_generator = goal_duration,
-                                               precomputed_edges = edges,
-                                               precompute_goal_paths = TRUE,
-                                               space_between = space_between,
-                                               order_goal_stack = order_goal_stack)
-
-        # The first goal within the goal stack does not have a path yet. Use the
-        # entrance as the position at which the agent starts
-        dummy <- agent(center = entrance(setting)[entrance_idx,], radius = space_between)
-        goal_stack[[i]][[1]]@path <- find_path(goal_stack[[i]][[1]], 
-                                               dummy, 
-                                               setting,
-                                               space_between = space_between,
-                                               precomputed_edges = edges)
-    }
-
-    return(goal_stack)
+    return(lapply(seq_len(n), 
+                  \(i) goal_stack(goal_number[i], setting, ...)))
 }
 
 
@@ -724,117 +840,78 @@ simulate_goal_stack <- function(n,
 ################################################################################
 # GETTERS AND SETTERS
 
-#' Getter/Setter for the position-slot
-#' 
-#' @rdname position-method
-#' 
-#' @export
-setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
-
-#' @rdname position-method
-#' 
-#' @export
-setGeneric("position<-", function(object, value) standardGeneric("position<-"))
-
-setMethod("position", "goal", function(object) {
-    return(object@position)
-})
-
-setMethod("position<-", "goal", function(object, value) {
-    object@position <- as(value, "coordinate")
-    return(object)
-})
-
-
-setMethod("id", "goal", function(object) {
-    return(object@id)
-})
-
-setMethod("id<-", "goal", function(object, value) {
-    object@id <- value
-    return(object)
-})
-
-#' Getter/Setter for the path-slot
-#' 
-#' @rdname path-method
-#' 
-#' @export
-setGeneric("path", function(object) standardGeneric("path"))
-
-#' @rdname path-method
-#' 
-#' @export
-setGeneric("path<-", function(object, value) standardGeneric("path<-"))
-
-setMethod("path", "goal", function(object) {
-    return(object@path)
-})
-
-setMethod("path<-", "goal", function(object, value) {
-    object@path <- value
-    return(object)
-})
-
-#' Getter/Setter for the counter-slot
-#' 
-#' @rdname counter-method
-#' 
-#' @export
-setGeneric("counter", function(object) standardGeneric("counter"))
-
-#' @rdname counter-method
-#' 
-#' @export
-setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
-
-setMethod("counter", "goal", function(object) {
-    return(object@counter)
-})
-
-setMethod("counter<-", "goal", function(object, value) {
-    object@counter <- value
-    return(object)
-})
-
-#' Getter/Setter for the busy-slot
-#' 
 #' @rdname busy-method
-#' 
-#' @export
-setGeneric("busy", function(object) standardGeneric("busy"))
-
-#' @rdname busy-method
-#' 
-#' @export
-setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
-
 setMethod("busy", "goal", function(object) {
     return(object@busy)
 })
 
+#' @rdname busy-method
 setMethod("busy<-", "goal", function(object, value) {
     object@busy <- value
     return(object)
 })
 
-#' Getter/Setter for the done-slot
-#' 
-#' @rdname done-method
-#' 
-#' @export
-setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
+
+
+#' @rdname counter-method
+setMethod("counter", "goal", function(object) {
+    return(object@counter)
+})
+
+#' @rdname counter-method
+setMethod("counter<-", "goal", function(object, value) {
+    object@counter <- value
+    return(object)
+})
+
+
 
 #' @rdname done-method
-#' 
-#' @export
-setGeneric("done<-", function(object, value) standardGeneric("done<-"))
-
 setMethod("done", "goal", function(object) {
     return(object@done)
 })
 
+#' @rdname done-method
 setMethod("done<-", "goal", function(object, value) {
     object@done <- value
+    return(object)
+})
+
+
+
+#' @rdname id-method
+setMethod("id", "goal", function(object) {
+    return(object@id)
+})
+
+#' @rdname id-method
+setMethod("id<-", "goal", function(object, value) {
+    object@id <- value
+    return(object)
+})
+
+
+
+#' @rdname path-method
+setMethod("path", "goal", function(object) {
+    return(object@path)
+})
+
+#' @rdname path-method
+setMethod("path<-", "goal", function(object, value) {
+    object@path <- value
+    return(object)
+})
+
+
+
+#' @rdname position-method
+setMethod("position", "goal", function(object) {
+    return(object@position)
+})
+
+#' @rdname position-method
+setMethod("position<-", "goal", function(object, value) {
+    object@position <- as(value, "coordinate")
     return(object)
 })

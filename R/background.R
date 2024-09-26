@@ -178,6 +178,13 @@ setMethod("show", "background", function(object) {
 
 #' Compute which segments can be crossed
 #' 
+#' Method that determines whether one can cross the segments that are 
+#' contained within the \code{limited_access} slot of the 
+#' \code{\link[predped]{background-class}}. Determines this ability from the 
+#' standpoint of \code{x}, which can either be a matrix of coordinates or an 
+#' instance of the \code{\link[predped]{agent-class}}.
+#'
+#' @details
 #' This method takes in an object of the \code{\link[predped]{background-class}}
 #' and checks whether one can cross the \code{segment}s in the \code{limited_access}
 #' slot from the standpoint taken in \code{x} (if \code{x} is a matrix) or from 
@@ -332,45 +339,12 @@ compute_limited_access <- function(segment) {
 ################################################################################
 # GETTERS AND SETTERS
 
-#' Getter/Setter for the \code{entrance}-slot
-#' 
-#' Works for \code{\link[predped]{background-class}}.
-#' 
-#' @examples
-#' # Initialize background
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(2, 2)), 
-#'                             objects = list(circle(center = c(0, 0), 
-#'                                                   radius = 0.5)),
-#'                             limited_access = list(segment(from = c(-1, -1), 
-#'                                                           to = c(1, 1))), 
-#'                             entrance = c(-1, 0), 
-#'                             exit = c(1, 0)) 
-#' 
-#' # Access the entrance slot for the background
-#' entrance(my_background)
-#' 
-#' # Change the entrance slot for the background
-#' entrance(my_background) <- c(1, 0)
-#' entrance(my_background)
-#' 
-#' @seealso 
-#' \code{\link[predped]{background-class}}
-#' 
 #' @rdname entrance-method
-#' 
-#' @export
-setGeneric("entrance", function(object) standardGeneric("entrance"))
-
-#' @rdname entrance-method
-#' 
-#' @export
-setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
-
 setMethod("entrance", "background", function(object) {
     return(object@entrance)
 })
 
+#' @rdname entrance-method
 setMethod("entrance<-", "background", function(object, value) {
     if(!is.matrix(value)) {
         value <- matrix(value, ncol = 2)
@@ -380,45 +354,14 @@ setMethod("entrance<-", "background", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the \code{exit}-slot
-#' 
-#' Works for \code{\link[predped]{background-class}}.
-#' 
-#' @examples
-#' # Initialize background
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(2, 2)), 
-#'                             objects = list(circle(center = c(0, 0), 
-#'                                                   radius = 0.5)),
-#'                             limited_access = list(segment(from = c(-1, -1), 
-#'                                                           to = c(1, 1))), 
-#'                             entrance = c(-1, 0), 
-#'                             exit = c(1, 0)) 
-#' 
-#' # Access the exit slot for the background
-#' exit(my_background)
-#' 
-#' # Change the exit slot for the background
-#' exit(my_background) <- c(-1, 0)
-#' exit(my_background)
-#' 
-#' @seealso 
-#' \code{\link[predped]{background-class}}
-#' 
-#' @rdname exit-method
-#' 
-#' @export
-setGeneric("exit", function(object) standardGeneric("exit"))
+
 
 #' @rdname exit-method
-#' 
-#' @export
-setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
-
 setMethod("exit", "background", function(object) {
     return(object@exit)
 })
 
+#' @rdname exit-method
 setMethod("exit<-", "background", function(object, value) {
     if(!is.matrix(value)) {
         value <- matrix(value, ncol = 2)
@@ -428,45 +371,14 @@ setMethod("exit<-", "background", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the \code{limited_access}-slot
-#' 
-#' Works for \code{\link[predped]{background-class}}.
-#' 
-#' @examples
-#' # Initialize background
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(2, 2)), 
-#'                             objects = list(circle(center = c(0, 0), 
-#'                                                   radius = 0.5)),
-#'                             limited_access = list(segment(from = c(-1, -1), 
-#'                                                           to = c(1, 1))), 
-#'                             entrance = c(-1, 0), 
-#'                             exit = c(1, 0)) 
-#' 
-#' # Access the limited_access slot for the background
-#' limited_access(my_background)
-#' 
-#' # Change the limited_access slot for the background
-#' limited_access(my_background) <- list(segment(from = c(-1, 1), to = c(1, -1)))
-#' limited_access(my_background)
-#' 
-#' @seealso 
-#' \code{\link[predped]{background-class}}
-#' 
-#' @rdname limited_access-method
-#' 
-#' @export
-setGeneric("limited_access", function(object) standardGeneric("limited_access"))
+
 
 #' @rdname limited_access-method
-#' 
-#' @export
-setGeneric("limited_access<-", function(object, value) standardGeneric("limited_access<-"))
-
 setMethod("limited_access", "background", function(object) {
     return(object@limited_access)
 })
 
+#' @rdname limited_access-method
 setMethod("limited_access<-", "background", function(object, value) {
     object@limited_access <- value
     object@precomputed_limited_access <- lapply(value, 
@@ -475,41 +387,9 @@ setMethod("limited_access<-", "background", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the \code{objects}-slot
-#' 
-#' Works for \code{\link[predped]{background-class}}.
-#' 
-#' @examples
-#' # Initialize background
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(2, 2)), 
-#'                             objects = list(circle(center = c(0, 0), 
-#'                                                   radius = 0.5)),
-#'                             limited_access = list(segment(from = c(-1, -1), 
-#'                                                           to = c(1, 1))), 
-#'                             entrance = c(-1, 0), 
-#'                             exit = c(1, 0)) 
-#' 
-#' # Access the objects slot for the background
-#' objects(my_background)
-#' 
-#' # Change the objects slot for the background
-#' #
-#' # Note that the exit is blocked by the new object, which will lead to errors 
-#' # if run in a simulation
-#' objects(my_background) <- list(circle(center = c(1, 0), radius = 0.5))
-#' objects(my_background)
-#' 
-#' @rdname objects-method
-#' 
-#' @export
-setGeneric("objects", function(object) standardGeneric("objects"))
+
 
 #' @rdname objects-method
-#' 
-#' @export
-setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
-
 setMethod("objects", "background", function(object) {
     return(object@objects)
 })
@@ -519,42 +399,14 @@ setMethod("objects<-", "background", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the \code{shape}-slot
-#' 
-#' Works for \code{\link[predped]{background-class}}.
-#' 
-#' @examples
-#' # Initialize background
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(2, 2)), 
-#'                             objects = list(circle(center = c(0, 0), 
-#'                                                   radius = 0.5)),
-#'                             limited_access = list(segment(from = c(-1, -1), 
-#'                                                           to = c(1, 1))), 
-#'                             entrance = c(-1, 0), 
-#'                             exit = c(1, 0)) 
-#' 
-#' # Access the shape slot for the background
-#' shape(my_background)
-#' 
-#' # Change the shape slot for the background
-#' shape(my_background) <- circle(center = c(1, 0), radius = 1)
-#' shape(my_background)
-#' 
-#' @rdname shape-method
-#' 
-#' @export
-setGeneric("shape", function(object) standardGeneric("shape"))
+
 
 #' @rdname shape-method
-#' 
-#' @export
-setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
-
 setMethod("shape", "background", function(object) {
     return(object@shape)
 })
 
+#' @rdname shape-method
 setMethod("shape<-", "background", function(object, value) {
     object@shape <- value
     return(object)

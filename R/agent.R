@@ -81,6 +81,10 @@ agent <- setClass("agent", list(id = "character",
 #' Defaults to \code{0.1}.
 #' @param orientation Numeric denoting the orientation of the agent (in degrees).
 #' Defaults to \code{0}.
+#' @param current_goal Object of the \code{\link[predped]{goal-class}}. 
+#' Defaults to \code{NULL}, triggering the creation of a placeholder.
+#' @param goals List containing instances of the \code{\link[predped]{goal-class}}.
+#' Defaults to an empty list.
 #' @param group Numeric indicating the group to which the agent belongs. 
 #' Influences the behavior of the agent through the social utility functions.
 #' Defaults to \code{0}.
@@ -144,6 +148,8 @@ setMethod("initialize", "agent", function(.Object,
                                           id = character(0),
                                           speed = 0.1,
                                           orientation = 0,
+                                          current_goal = NULL,
+                                          goals = list(),
                                           group = 0,
                                           status = "move",
                                           waiting_counter = 0,
@@ -161,11 +167,16 @@ setMethod("initialize", "agent", function(.Object,
     .Object@id <- if(length(id) == 0) paste(sample(letters, 5, replace = TRUE), collapse = "") else id
     .Object@speed <- speed
     .Object@orientation <- orientation
+    .Object@goals <- goals
     .Object@group <- group
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
     .Object@color <- color    
+
+    if(!is.null(current_goal)) {
+        .Object@current_goal <- current_goal
+    }
 
     return(.Object)
 })
@@ -204,264 +215,111 @@ setMethod("show", "agent", function(object) {
 ################################################################################
 # GETTERS AND SETTERS
 
-#' Getter/Setter for the \code{cell}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   cell = 1)
-#' 
-#' # Access the cell slot for the agent
-#' cell(my_agent)
-#' 
-#' # Change the cell slot for the agent
-#' cell(my_agent) <- 2
-#' cell(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}}
-#' 
 #' @rdname cell-method
-#' 
-#' @export
-setGeneric("cell", function(object) standardGeneric("cell"))
-
-#' @rdname cell-method
-#' 
-#' @export
-setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
-
 setMethod("cell", "agent", function(object) {
     return(setNames(object@cell, object@id))
 })
 
+#' @rdname cell-method
 setMethod("cell<-", "agent", function(object, value) {
     object@cell <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{color}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   color = "black")
-#' 
-#' # Access the color slot for the agent
-#' color(my_agent)
-#' 
-#' # Change the color slot for the agent
-#' color(my_agent) <- "blue"
-#' color(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}},
-#' \code{\link[predped]{goal-class}}
-#' 
-#' @rdname color-method
-#' 
-#' @export
-setGeneric("color", function(object) standardGeneric("color"))
+
 
 #' @rdname color-method
-#' 
-#' @export
-setGeneric("color<-", function(object, value) standardGeneric("color<-"))
-
 setMethod("color", "agent", function(object) {
     return(setNames(object@color, object@id))
 })
 
+#' @rdname color-method
 setMethod("color<-", "agent", function(object, value) {
     object@color <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{current_goal}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   current_goal = goal(position = c(1, 0)))
-#' 
-#' # Access the current_goal slot for the agent
-#' current_goal(my_agent)
-#' 
-#' # Change the current_goal slot for the agent
-#' current_goal(my_agent) <- goal(position = c(-1, 0))
-#' current_goal(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}},
-#' \code{\link[predped]{goal-class}}
-#' 
-#' @rdname current_goal-method
-#' 
-#' @export
-setGeneric("current_goal", function(object) standardGeneric("current_goal"))
+
 
 #' @rdname current_goal-method
-#' 
-#' @export
-setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
-
 setMethod("current_goal", "agent", function(object) {
     return(object@current_goal)
 })
 
+#' @rdname current_goal-method
 setMethod("current_goal<-", "agent", function(object, value) {
     object@current_goal <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{goals}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   goals = list(goal(position = c(1, 0))))
-#' 
-#' # Access the goals slot for the agent
-#' goals(my_agent)
-#' 
-#' # Change the goals slot for the agent
-#' goals(my_agent) <- list(goal(position = c(-1, 0)))
-#' goals(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}},
-#' \code{\link[predped]{goal-class}}
-#' 
-#' @rdname goals-method
-#' 
-#' @export
-setGeneric("goals", function(object) standardGeneric("goals"))
+
 
 #' @rdname goals-method
-#' 
-#' @export
-setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
-
 setMethod("goals", "agent", function(object) {
     return(object@goals)
 })
 
+#' @rdname goals-method
 setMethod("goals<-", "agent", function(object, value) {
     object@goals <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{group}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   group = 1)
-#' 
-#' # Access the speed slot for the agent
-#' group(my_agent)
-#' 
-#' # Change the speed slot for the agent
-#' group(my_agent) <- 2
-#' group(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}}
-#' 
-#' @rdname group-method
-#' 
-#' @export
-setGeneric("group", function(object) standardGeneric("group"))
+
 
 #' @rdname group-method
-#' 
-#' @export
-setGeneric("group<-", function(object, value) standardGeneric("group<-"))
-
 setMethod("group", "agent", function(object) {
     return(setNames(object@group, object@id))
 })
 
+#' @rdname group-method
 setMethod("group<-", "agent", function(object, value) {
     object@group <- value
     return(object)
 })
 
-# Getter/Setter for id slot for agent
+
+
+#' @rdname id-method
 setMethod("id", "agent", function(object) {
     return(setNames(object@id, object@id))
 })
 
+#' @rdname id-method
 setMethod("id<-", "agent", function(object, value) {
     object@id <- value
     return(object)
 })
 
-# Getter/Setter for orientation slot for agent
+
+
+#' @rdname orientation-method
 setMethod("orientation", "agent", function(object) {
     return(setNames(object@orientation, object@id))
 })
 
+#' @rdname orientation-method
 setMethod("orientation<-", "agent", function(object, value) {
     object@orientation <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{parameters}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   parameters = draw_parameters(1))
-#' 
-#' # Access the parameters slot for the agent
-#' parameters(my_agent)
-#' 
-#' # Change the parameters slot for the agent
-#' parameters(my_agent) <- draw_parameters(1)
-#' parameters(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}}
-#' 
-#' @rdname parameters-method
-#' 
-#' @export
-setGeneric("parameters", function(object) standardGeneric("parameters"))
+
 
 #' @rdname parameters-method
-#' 
-#' @export
-setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
-
 setMethod("parameters", "agent", function(object) {
     return(object@parameters)
 })
 
+#' @rdname parameters-method
 setMethod("parameters<-", "agent", function(object, value) {
     object@parameters <- value
     return(object)
 })
 
-# Getter/Setter for position slot for agent
+
+
+#' @rdname position-method
 setMethod("position", "agent", function(object, return_matrix = FALSE) {
     if (return_matrix) {
         return(matrix(object@center, nrow = 1, ncol = 2, dimnames = list(object@id, names(object@center))))
@@ -469,135 +327,60 @@ setMethod("position", "agent", function(object, return_matrix = FALSE) {
     return(object@center)
 })
 
+#' @rdname position-method
 setMethod("position<-", "agent", function(object, value) {
     object@center <- as(value, "coordinate")
     return(object)
 })
 
-# Getter/Setter for size slot for agent
+
+
+#' @rdname size-method
 setMethod("size", "agent", function(object) {
     return(setNames(object@radius, object@id))
 })
 
+#' @rdname size-method
 setMethod("size<-", "agent", function(object, value) {
     object@radius <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{speed}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   speed = 1)
-#' 
-#' # Access the speed slot for the agent
-#' speed(my_agent)
-#' 
-#' # Change the speed slot for the agent
-#' speed(my_agent) <- 2
-#' speed(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}}
-#' 
-#' @rdname speed-method
-#' 
-#' @export
-setGeneric("speed", function(object) standardGeneric("speed"))
+
 
 #' @rdname speed-method
-#' 
-#' @export
-setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
-
 setMethod("speed", "agent", function(object) {
     return(setNames(object@speed, object@id))
 })
 
+#' @rdname speed-method
 setMethod("speed<-", "agent", function(object, value) {
     object@speed <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{status}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   status = "move")
-#' 
-#' # Access the status slot for the agent
-#' status(my_agent)
-#' 
-#' # Change the status slot for the agent
-#' status(my_agent) <- "reroute"
-#' status(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}}
-#' 
-#' @rdname status-method
-#' 
-#' @export
-setGeneric("status", function(object) standardGeneric("status"))
+
 
 #' @rdname status-method
-#' 
-#' @export
-setGeneric("status<-", function(object, value) standardGeneric("status<-"))
-
 setMethod("status", "agent", function(object) {
     return(setNames(object@status, object@id))
 })
 
+#' @rdname status-method
 setMethod("status<-", "agent", function(object, value) {
     stopifnot(value %in% c("move", "plan", "reroute", "reorient", "completing goal", "exit", "wait"))
     object@status <- value
     return(object)
 })
 
-#' Getter/Setter for the \code{waiting_counter}-slot
-#' 
-#' Works for \code{\link[predped]{agent-class}}.
-#' 
-#' @examples
-#' # Initialize agent
-#' my_agent <- agent(center = c(0, 0), 
-#'                   radius = 0.25, 
-#'                   waiting_counter = 0)
-#' 
-#' # Access the waiting_counter slot for the agent
-#' waiting_counter(my_agent)
-#' 
-#' # Change the waiting_counter slot for the agent
-#' waiting_counter(my_agent) <- 5
-#' waiting_counter(my_agent)
-#' 
-#' @seealso 
-#' \code{\link[predped]{agent-class}},
-#' \code{\link[predped]{goal-class}}
-#' 
-#' @rdname waiting_counter-method
-#' 
-#' @export
-setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
+
 
 #' @rdname waiting_counter-method
-#' 
-#' @export
-setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))
-
 setMethod("waiting_counter", "agent", function(object) {
     return(setNames(object@waiting_counter, object@id))
 })
 
+#' @rdname waiting_counter-method
 setMethod("waiting_counter<-", "agent", function(object, value) {
     object@waiting_counter <- value
     return(object)
