@@ -18,6 +18,25 @@ Defines the interaction with an object of \code{\link[predped]{goal-class}}.
 Subtracts \code{1} from the counter and indicates whether the goal has been 
 accomplished (whenever the counter drops below 0).
 }
+\examples{
+# Create a goal
+my_goal <- goal(position = c(0, 0), 
+                counter = 5)
+
+# Interact with the goal: Decreases the counter, but the goal is not done yet
+updated_goal <- interact(my_goal)
+updated_goal@counter
+updated_goal@done
+
+# Adjust the goal so that the counter is only 1 and interact with it again.
+# Now the goal is done.
+counter(my_goal) <- 1
+
+updated_goal <- interact(my_goal)
+updated_goal@counter
+updated_goal@done
+
+}
 \seealso{
 \code{\link[predped]{goal-class}}
 }

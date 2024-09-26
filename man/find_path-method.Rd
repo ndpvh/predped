@@ -51,12 +51,17 @@ Numerical matrix of coordinates representing the path points the
 agent will have to move to to reach the goal.
 }
 \description{
+Creates a numerical matrix of coordinates which contain the path points that 
+the agent will use to move towards a goal. It thus finds itself on the 
+strategic level (when performed in an initial planning phase) and the tactical 
+level (when performed in response to blockages).
+}
+\details{
 Creates a numerical matrix containing coordinates of path points which, 
 together, form a strategic path to the goal specified in this function. This
 forms one of the functions that operate on the strategic and tactical level 
 of the model.
-}
-\details{
+
 To create this path, the function takes the following approach. First, it 
 will create a network of nodes that are connected through unidirectional 
 edges, as created by the \code{\link[predped]{create_edges}} function. 

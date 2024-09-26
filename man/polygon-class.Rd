@@ -9,23 +9,28 @@
 Polygons can be used to create flexible shapes and are defined through a set
 of points. The last point is automatically connected with the first point.
 }
-\details{
-This class is suitable for creating custom object classes.
-}
 \section{Slots}{
 
 \describe{
-\item{\code{points}}{A numeric matrix with two columns containing the
-x- and y-coordinates of the points.}
+\item{\code{points}}{Numerical matrix with two columns containing the x- and y-
+coordinates of the points that define the polygon.}
 
-\item{\code{clock_wise}}{A single logical element indicating whether the points define
-the polygon clockwise (default) or counter-clockwise.}
+\item{\code{center}}{Numerical vector containing the position of the center of the 
+polygon. For now, the mean of all coordinates in \code{points} used as an 
+indication of the center of the polygon (as the center of a polygon is not 
+easily defined).}
+
+\item{\code{clock_wise}}{Logical indicating whether the points define the polygon 
+in a clockwise (\code{TRUE}) or counter-clockwise fashion (\code{FALSE}).}
+
+\item{\code{...}}{Slots shared with the \code{\link[predped]{object-class}}.}
 }}
 
 \seealso{
+\code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}}, 
 \code{\link[predped]{rectangle-class}},
-\code{\link[predped]{circle-class}}
+\code{\link[predped]{initialize-polygon-method}}
 
 Other objects: 
 \code{\link{circle-class}},

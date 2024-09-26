@@ -10,24 +10,20 @@ An S4 Abstract Base Class to Represent Objects
 \section{Slots}{
 
 \describe{
-\item{\code{id}}{A character giving the object a name.}
+\item{\code{id}}{Character denoting the name of the object.}
 
-\item{\code{moveable}}{A logical indicating whether the object can be moved from its
+\item{\code{moveable}}{Logical denoting whether the object can be moved from its
 position.}
 
-\item{\code{interactable}}{A logical indicating whether the object can be interacted
-with.}
-
-\item{\code{busy}}{A logical indicating whether an agent is interacting with it.}
-
-\item{\code{interacted_with}}{A logical indicating whether the object was interacted
+\item{\code{interactable}}{Logical indicating whether the object can be interacted
 with.}
 }}
 
 \seealso{
-\code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{circle-class}}, 
 \code{\link[predped]{polygon-class}}, 
-\code{\link[predped]{circle-class}}
+\code{\link[predped]{rectangle-class}},
+\code{\link[predped]{segment-class}}
 
 Other objects: 
 \code{\link{circle-class}},

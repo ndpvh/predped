@@ -33,6 +33,26 @@ randomly drawn from a list of options (if provided).
 \details{
 This function allows for a dynamical assignment of goals to agents.
 }
+\examples{
+# Create a goal
+my_goal <- goal(position = c(0, 0))
+my_goal
+
+# Replace it with a random goal drawn from the environment. For this to work, 
+# we first need to create a background as well.
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(center = c(0, 0), 
+                                                     size = c(1, 1))))
+replace(my_goal, setting = my_background)
+
+# Replace with a random goal drawn from a list of different goals. For this
+# to work, we first define this list.
+goal_list <- list(goal(position = c(-0.5, 0)), 
+                  goal(position = c(0.5, 0)))
+replace(my_goal, goal_list = goal_list)
+
+}
 \seealso{
 \code{\link[predped]{background-class}}
 \code{\link[predped]{goal-class}}

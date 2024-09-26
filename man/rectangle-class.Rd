@@ -6,21 +6,29 @@
 \alias{rectangle}
 \title{An S4 Class to Represent Rectangle Objects}
 \description{
-Special case of the \code{\link[predped]{polygon-class}}.
-Rectangles are defined by \code{center}, \code{size}, and \code{orientation} (optional).
+Special case of the \code{\link[predped]{polygon-class}}, defined through its 
+four sides and right angles.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{center}}{A numeric vector of length two with the coordinates of the center.}
+\item{\code{center}}{Numeric vector denoting the coordinates of the center or 
+position of the rectangle.}
 
-\item{\code{size}}{A numeric vector of length two with the object width and height.}
+\item{\code{size}}{Numeric vector denoting the width and height of the rectangle.}
 
-\item{\code{orientation}}{A single numeric element indicating the orientation of the
-rectangle in radians.}
+\item{\code{orientation}}{Numeric indicating the orientation of the rectangle in 
+radians.}
+
+\item{\code{...}}{Slots shared with the \code{\link[predped]{object-class}} and the 
+\code{\link[predped]{polygon-class}}.}
 }}
 
 \seealso{
+\code{\link[predped]{circle-class}},
+\code{\link[predped]{object-class}}, 
+\code{\link[predped]{polygon-class}}
+
 Other objects: 
 \code{\link{circle-class}},
 \code{\link{object-class}},

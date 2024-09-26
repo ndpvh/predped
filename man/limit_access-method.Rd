@@ -17,12 +17,18 @@ Logical vector or matrix denoting whether \code{segment}s can be
 passed through or not.
 }
 \description{
+Method that determines whether one can cross the segments that are 
+contained within the \code{limited_access} slot of the 
+\code{\link[predped]{background-class}}. Determines this ability from the 
+standpoint of \code{x}, which can either be a matrix of coordinates or an 
+instance of the \code{\link[predped]{agent-class}}.
+}
+\details{
 This method takes in an object of the \code{\link[predped]{background-class}}
 and checks whether one can cross the \code{segment}s in the \code{limited_access}
 slot from the standpoint taken in \code{x} (if \code{x} is a matrix) or from 
 the position of \code{x} (if \code{x} is an \code{agent}).
-}
-\details{
+
 Returns a Logical vector or matrix denoting which of the segments in the 
 \code{limited_access} of the \code{background} object can be passed through 
 from the standpoint of the the coordinates in \code{x} (\code{TRUE} means 

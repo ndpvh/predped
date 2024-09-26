@@ -11,6 +11,8 @@
   id = character(0),
   speed = 0.1,
   orientation = 0,
+  current_goal = NULL,
+  goals = list(),
   group = 0,
   status = "move",
   waiting_counter = 0,
@@ -33,6 +35,13 @@ Defaults to \code{0.1}.}
 
 \item{orientation}{Numeric denoting the orientation of the agent (in degrees).
 Defaults to \code{0}.}
+
+\item{current_goal}{Object of class \code{\link[predped]{goal-class}} which
+represents the current goal of the agent. Defaults to a placeholder of class 
+class \code{\link[predped]{goal-class}}.}
+
+\item{goals}{List of goals the agent has to achieve. The current goal is not 
+included in this list. Defaults to an empty list.}
 
 \item{group}{Numeric indicating the group to which the agent belongs. 
 Influences the behavior of the agent through the social utility functions.
@@ -57,13 +66,6 @@ their goal plus 2. Defaults to \code{0}}
 \code{0}.}
 
 \item{color}{Character denoting the color in which the agent should be plotted.}
-
-\item{current_goal}{Object of class \code{\link[predped]{goal-class}} which
-represents the current goal of the agent. Defaults to a placeholder of class 
-class \code{\link[predped]{goal-class}}.}
-
-\item{goals}{List of goals the agent has to achieve. The current goal is not 
-included in this list. Defaults to an empty list.}
 
 \item{parameters}{Dataframe containing the values of the parameters for the 
 agent. Should contain all parameters relevant for the utility functions 

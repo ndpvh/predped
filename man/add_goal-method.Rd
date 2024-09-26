@@ -25,12 +25,14 @@ interact with the goal before the goal has been completed. Defaults to \code{5}.
 Object of \code{\link[predped]{goal-class}}.
 }
 \description{
+Uses the characteristics of an object to add a goal to it.
+}
+\details{
 Takes in an instance of \code{\link[predped]{object-class}} and uses its 
 characteristics to generate an instance of \code{\link[predped]{goal-class}}
 that is attached to it. In practice, uses one of the objects in the 
-\code{objects} slot of a \code{\link[predped]{background-class}} instance.
-}
-\details{
+\code{objects} slot of a \code{\link[predped]{background-class}} instance. 
+
 Is defined for all instances of \code{\link[predped]{object-class}} except for 
 \code{\link[predped]{segment-class}}, which cannot contain goals due to its 
 primary function.
