@@ -29,6 +29,7 @@ Imports:
     ggplot2
 RoxygenNote: 7.3.2
 Collate:
+    'getters_setters.R'
     'objects.R'
     'background.R'
     'route.R'
