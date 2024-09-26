@@ -434,6 +434,14 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' \code{\link[predped]{object-class}}, the \code{\link[predped]{agent-class}}, 
 #' and the \code{\link[predped]{goal-class}}.
 #' 
+#' @details
+#' Note that while the \code{\link[predped]{agent-class}}, 
+#' \code{\link[predped]{circle-class}}, 
+#' \code{\link[predped]{polygon-class}}, 
+#' \code{\link[predped]{rectangle-class}}, and
+#' \code{\link[predped]{segment-class}} are not explicitly mentioned, this 
+#' getter/setter works for these classes as well.#' 
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
