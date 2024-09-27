@@ -30,7 +30,7 @@ in a clockwise (\code{TRUE}) or counter-clockwise fashion (\code{FALSE}).}
 \code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}}, 
 \code{\link[predped]{rectangle-class}},
-\code{\link[predped]{initialize-polygon-method}}
+\code{\link[predped]{initialize-polygon}}
 
 Other objects: 
 \code{\link{circle-class}},

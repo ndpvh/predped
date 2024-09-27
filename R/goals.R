@@ -17,12 +17,12 @@
 #' @rdname goal-class
 #' 
 #' @seealso 
-#' \code{\link[predped]{busy-method}},
-#' \code{\link[predped]{counter-method}},
-#' \code{\link[predped]{done-method}},
-#' \code{\link[predped]{id-method}},
-#' \code{\link[predped]{path-method}},
-#' \code{\link[predped]{position-method}},
+#' \code{\link[predped]{busy}},
+#' \code{\link[predped]{counter}},
+#' \code{\link[predped]{done}},
+#' \code{\link[predped]{id}},
+#' \code{\link[predped]{path}},
+#' \code{\link[predped]{position}},
 #' \code{\link[predped]{initialize-goal}}
 #'
 #' @export
@@ -64,12 +64,12 @@ goal <- setClass("goal", list(id = "character",
 #' 
 #' @seealso 
 #' \code{\link[predped]{goal-class}},
-#' \code{\link[predped]{busy-method}},
-#' \code{\link[predped]{counter-method}},
-#' \code{\link[predped]{done-method}},
-#' \code{\link[predped]{id-method}},
-#' \code{\link[predped]{path-method}},
-#' \code{\link[predped]{position-method}}
+#' \code{\link[predped]{busy}},
+#' \code{\link[predped]{counter}},
+#' \code{\link[predped]{done}},
+#' \code{\link[predped]{id}},
+#' \code{\link[predped]{path}},
+#' \code{\link[predped]{position}}
 #' 
 #' @rdname initialize-goal-method
 #' 
@@ -157,7 +157,7 @@ setMethod("show", "goal", function(object) {
 #' \code{\link[predped]{polygon-class}}
 #' \code{\link[predped]{rectangle-class}}
 #' \code{\link[predped]{segment-class}}
-#' \code{\link[predped]{rng_point-method}}
+#' \code{\link[predped]{rng_point}}
 #' 
 #' @rdname add_goal-method
 #' 
@@ -195,8 +195,8 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
 
         # Check whether this point is not contained within any other objects, 
         # but is still contained within the setting
-        check <- sapply(obj, \(x) in_object(x, coord, outside = FALSE))
-        continue <- in_object(shp, coord, outside = TRUE) | any(check)
+        check <- sapply(obj, \(x) in_object(x, coord))
+        continue <- out_object(shp, coord) | any(check)
     }
     
     return(goal(id = id,
@@ -231,8 +231,8 @@ setMethod("add_goal", signature(object = "circle"), function(object,
 
         # Check whether this point is not contained within any other objects, 
         # but is still contained within the setting
-        check <- sapply(obj, \(x) in_object(x, coord, outside = FALSE))
-        continue <- in_object(shp, coord, outside = TRUE) | any(check)
+        check <- sapply(obj, \(x) in_object(x, coord))
+        continue <- out_object(shp, coord) | any(check)
     }
     
     return(goal(id = id,
@@ -337,7 +337,7 @@ setMethod("add_goal", signature(object = "circle"), function(object,
 #' \code{\link[predped]{background-class}}
 #' \code{\link[predped]{goal-class}}
 #' \code{\link[predped]{object-class}}
-#' \code{\link[predped]{simulate-method}}
+#' \code{\link[predped]{simulate}}
 #' \code{\link[predped]{adjust_edges}}
 #' \code{\link[predped]{compute_edges}}
 #' \code{\link[predped]{create_edges}}

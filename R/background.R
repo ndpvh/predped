@@ -31,11 +31,11 @@
 #' \code{\link[predped]{polygon-class}}, 
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{entrance-method}},
-#' \code{\link[predped]{exit-method}},
-#' \code{\link[predped]{limited_access-method}},
-#' \code{\link[predped]{objects-method}},
-#' \code{\link[predped]{shape-method}},
+#' \code{\link[predped]{entrance}},
+#' \code{\link[predped]{exit}},
+#' \code{\link[predped]{limited_access}},
+#' \code{\link[predped]{objects}},
+#' \code{\link[predped]{shape}},
 #' \code{\link[predped]{initialize-background}},
 #' 
 #' @rdname background-class
@@ -88,11 +88,11 @@ background <- setClass("background", list(shape = "object",
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}},
-#' \code{\link[predped]{entrance-method}},
-#' \code{\link[predped]{exit-method}},
-#' \code{\link[predped]{limited_access-method}},
-#' \code{\link[predped]{objects-method}},
-#' \code{\link[predped]{shape-method}}
+#' \code{\link[predped]{entrance}},
+#' \code{\link[predped]{exit}},
+#' \code{\link[predped]{limited_access}},
+#' \code{\link[predped]{objects}},
+#' \code{\link[predped]{shape}}
 #' 
 #' @rdname initialize-background-method
 #' 
@@ -276,7 +276,7 @@ setMethod("limit_access", "background", function(object, x) {
             co <- as.matrix(x)
         }
 
-        check <- \(y) in_object(y, co, outside = FALSE)
+        check <- \(y) in_object(y, co)
     }
 
     # Loop over all possible access limitations

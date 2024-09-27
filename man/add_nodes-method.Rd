@@ -82,6 +82,6 @@ add_nodes(my_segment)
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{nodes_on_circumference-method}},
+\code{\link[predped]{nodes_on_circumference}},
 \code{\link[predped]{create_nodes}}
 }

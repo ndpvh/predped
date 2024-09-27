@@ -36,5 +36,5 @@ my_circle@id
 \seealso{
 \code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize-object-method}}
+\code{\link[predped]{initialize-object}}
 }

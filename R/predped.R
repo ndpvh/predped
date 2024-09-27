@@ -1,30 +1,26 @@
-# S4 class model function to simulate an agent-based model
-#
-# First, set a model class that takes all of the agent parameters
-# or takes in default parameters.
-#
-# Second, build a simulate method that is akin to the minimal working
-# example. Use the scripts that are available in the GitHub.
-
 #' An S4 Class to Represent the M4MA model.
 #' 
-#' The `predped` class defines the M4MA model that can be used to simulate 
-#' data from. It contains the setting in which the agents should walk around as 
-#' well as the parameters of those agents. At this moment, only supports the use
-#' of archetypes: Prototypical agents that have a given parameter set.
+#' The \code{predped} class defines some of the settings that will be used when 
+#' simulating data with the M4MA model. It contains the setting in which the 
+#' agents should walk around as well as the parameters of those agents. At this 
+#' moment, only supports the use of archetypes: Prototypical agents that have a 
+#' given parameter set (see \code{\link[predped]{generate_parameters}} and 
+#' \code{\link[predped]{params_from_csv}}).
 #'
-#' @slot id A character that can be used to identify the specific model defined
-#' by the class
-#' @slot setting A dataframe containing the objects that define the 
-#' setting in which the agents will walk around
-#' @slot parameters A dataframe containing the parameters per archetype in its
-#' columns. Defaults to the `params_archetype` dataframe.
-#' @slot archetypes A vector of names for the archetypes one wants to use in the 
-#' simulation. Defaults to all archetypes in the `params_archetype` dataframe.
-#' @slot weights A numeric vector containing the probability with which an agent 
-#' can be of a given archetype. The weights should be in the same order as the 
-#' `archetypes` argument. Defaults to an equal weighting of all archetypes in 
-#' `params_archetype`
+#' @slot id Character that defines an identifier for the model.
+#' @slot setting Object of the \code{\link[predped]{background-class}}.
+#' @slot parameters Dataframe containing the parameters per archetype in its
+#' columns.
+#' @slot archetypes Character or character vector containing the names of the 
+#' archetypes that should be included in the simulation. 
+#' @slot weights Numeric vector containing the probability with which an agent 
+#' of each archetype can be selected to wander around in the environment. The 
+#' weights should be in the same length as the \code{archetypes}-slot. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{initialize-predped}}
+#' 
+#' @rdname predped-class
 #' 
 #' @export
 predped <- setClass("predped", list(id = "character",
@@ -33,6 +29,53 @@ predped <- setClass("predped", list(id = "character",
                                     archetypes = "character",
                                     weights = "numeric"))
 
+#' Constructor for the \code{\link[predped]{predped-class}}
+#' 
+#' @param setting Object of the \code{\link[predped]{background-class}}.
+#' @param id Character that serves as an identifier for the agent. Defaults to 
+#' an empty character, triggering the random generation of an id.
+#' @param database Character denoting the name of the database without the 
+#' extension. Currently only the database "predped" is supported. Defaults to 
+#' \code{NULL}, triggering reading in the csv-files. 
+#' @param path_to_database File path that leads to the location of the database. 
+#' Allows some greater flexibility for users. Defaults to the location for 
+#' Niels.
+#' @param archetypes Character or character vector denoting the archetype(s) 
+#' you want to include in the simulation. Defaults to \code{NULL}, triggering 
+#' the inclusion of all currently defined archetypes.
+#' @param weights Numeric vector containing the probability with which an agent 
+#' of each archetype can be selected to wander around in the environment. The 
+#' weights should be in the same length as the \code{archetypes} argument.
+#' Defaults to an equal probability for each of the archetypes. 
+#' 
+#' @return Object of the \code{\link[predped]{predped-class}}
+#' 
+#' @examples
+#' # Initialize predped model
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list())
+#' 
+#' my_model <- predped(setting = my_background, 
+#'                     archetypes = c("BaselineEuropean", 
+#'                                    "DrunkAussie"), 
+#'                     weights = c(0.9, 0.1))
+#' 
+#' # Access the two slots that were specified
+#' my_model@id
+#' head(my_model@parameters)
+#' my_model@weights
+#' 
+#' @seealso 
+#' \code{\link[predped]{background-class}},
+#' \code{\link[predped]{predped-class}},
+#' \code{\link[predped]{generate_parameters}},
+#' \code{\link[predped]{load_parameters}},
+#' \code{\link[predped]{params_from_csv}}
+#' 
+#' @rdname initialize-predped-method
+#' 
+#' @export
 setMethod("initialize", "predped", function(.Object,
                                             setting, 
                                             id = character(0),
@@ -119,28 +162,55 @@ setMethod("initialize", "predped", function(.Object,
     return(.Object)
 })
 
+#' Show method for the \code{\link[predped]{predped-class}}
+#' 
+#' @export
+setMethod("show", "predped", function(object) {
+    cat("Model object:\n")
+    cat("ID:", object@id, "\n")
+    cat("Parameters: \n")
+    cat(write.table(object[["params_archetypes"]]@parameters), "\n")
+})
+
+
+
+
+
+################################################################################
+# GETTERS AND SETTERS
+
+#' @rdname id-method
 setMethod("id", "predped", function(object) {
     return(object@id)
 })
 
+#' @rdname id-method
 setMethod("id<-", "predped", function(object, value) {
     object@id <- value
     return(object)
 })
 
+
+
+#' @rdname setting-method
 setMethod("setting", "predped", function(object) {
     return(object@setting)
 })
 
+#' @rdname setting-method
 setMethod("setting<-", "predped", function(object, value) {
     object@setting <- value
     return(object)
 })
 
+
+
+#' @rdname parameters-method
 setMethod("parameters", "predped", function(object) {
     return(object@parameters)
 })
 
+#' @rdname parameters-method
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
     if(!all(object@archetypes %in% value[["params_archetypes"]]$name) |
@@ -152,22 +222,14 @@ setMethod("parameters<-", "predped", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the archetypes-slot
-#' 
-#' @rdname archetypes-method
-#'
-#' @export
-setGeneric("archetypes", function(object) standardGeneric("archetypes"))
+
 
 #' @rdname archetypes-method
-#'
-#' @export
-setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
-
 setMethod("archetypes", "predped", function(object) {
     return(object@archetypes)
 })
 
+#' @rdname archetypes-method
 setMethod("archetypes<-", "predped", function(object, value) {
     # Throw an error if you don't have the parameters for the provided 
     # archetypes in your data.frame already
@@ -186,22 +248,14 @@ setMethod("archetypes<-", "predped", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the weights-slot
-#' 
-#' @rdname weights-method
-#'
-#' @export
-setGeneric("weights", function(object) standardGeneric("weights"))
+
 
 #' @rdname weights-method
-#'
-#' @export
-setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
-
 setMethod("weights", "predped", function(object) {
     return(object@weights)
 })
 
+#' @rdname weights-method
 setMethod("weights<-", "predped", function(object, value) {
     if(length(value) != length(object@weights)) {
         stop("Provided weights should be of equal size as the provided archetypes.")
@@ -209,14 +263,4 @@ setMethod("weights<-", "predped", function(object, value) {
 
     object@weights <- value
     return(object)
-})
-
-# TO DO: Beautify the output
-setMethod("show", "predped", function(object) {
-    cat("Model object:\n")
-    cat("ID:", object@id, "\n")
-    cat("Parameters: \n")
-    cat(write.table(object[["params_archetypes"]]@parameters), "\n")
-
-    return(object) # object is returned invisibly
 })

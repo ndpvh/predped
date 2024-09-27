@@ -64,7 +64,7 @@ determine_values(generating_function, 5)
 
 }
 \seealso{
-\code{\link[predped]{simulate-predped-method}}
+\code{\link[predped]{simulate-predped}}
 \code{\link[predped]{goal_stack}}
 \code{\link[predped]{multiple_goal_stacks}}
 }

@@ -38,5 +38,5 @@ my_polygon@id
 \seealso{
 \code{\link[predped]{object-class}}
 \code{\link[predped]{polygon-class}}
-\code{\link[predped]{initialize-object-method}}
+\code{\link[predped]{initialize-object}}
 }

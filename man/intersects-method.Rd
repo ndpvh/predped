@@ -79,8 +79,8 @@ intersects(my_circle, my_rectangle)
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{in_object-method}}, 
-\code{\link[predped]{moving_options-method}},
-\code{\link[predped]{nodes_on_circumference-method}},
+\code{\link[predped]{in_object}}, 
+\code{\link[predped]{moving_options}},
+\code{\link[predped]{nodes_on_circumference}},
 \code{\link[predped]{overlap_with_objects}}
 }

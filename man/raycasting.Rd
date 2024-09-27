@@ -41,6 +41,6 @@ raycasting(points, coords)
 
 }
 \seealso{
-\code{\link[predped]{in_object-method}},
-\code{\link[predped]{out_object-method}}
+\code{\link[predped]{in_object}},
+\code{\link[predped]{out_object}}
 }

@@ -1,6 +1,51 @@
 ################################################################################
 # CONTAINS GENERIC OF GETTERS AND SETTERS
 
+#' Getter/Setter for the \code{archetypes}-slot
+#' 
+#' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @examples 
+#' # Initialize a predped model
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list())
+#' 
+#' my_model <- predped(setting = my_background, 
+#'                     archetypes = c("BaselineEuropean", 
+#'                                    "DrunkAussie"))
+#' 
+#' # Access the archetypes slot 
+#' archetypes(my_model)
+#' 
+#' # Change the archetypes slot
+#' archetypes(my_model) <- c("BaselineEuropean")
+#' archetypes(my_model)
+#' 
+#' # Note that this also changes the parameters contained in the model
+#' head(my_model@parameters)
+#' 
+#' # Furthermore note that you may get an error when parameters are not 
+#' # available
+#' archetypes(my_model) <- c("DrunkAussie")
+#' 
+#' @seealso 
+#' \code{\link[predped]{predped-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname archetypes-method
+#'
+#' @export
+setGeneric("archetypes", function(object) standardGeneric("archetypes"))
+
+#' @rdname archetypes-method
+#'
+#' @export
+setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
+
+
+
 #' Getter/Setter for the \code{busy}-slot
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
@@ -802,8 +847,8 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' radius(my_circle)
 #' 
 #' @seealso 
-#' \code{\link[predped]{agent-method}},
-#' \code{\link[predped]{circle-method}}
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{circle-class}}
 #' 
 #' @docType method
 #' 
@@ -890,11 +935,11 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' points(my_rectangle) 
 #' 
 #' @seealso 
-#' \code{\link[predped]{agent-method}},
-#' \code{\link[predped]{circle-method}},
-#' \code{\link[predped]{object-method}},
-#' \code{\link[predped]{rectangle-method}},
-#' \code{\link[predped]{segment-method}}
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{circle-class}},
+#' \code{\link[predped]{object-class}},
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{segment-class}}
 #' 
 #' @docType method
 #' 
@@ -1048,3 +1093,41 @@ setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"
 #' 
 #' @export
 setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))
+
+
+
+#' Getter/Setter for the \code{weights}-slot
+#' 
+#' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @examples
+#' # Initialize a predped model
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list())
+#' 
+#' my_model <- predped(setting = my_background, 
+#'                     archetypes = c("BaselineEuropean", 
+#'                                    "DrunkAussie"))
+#' 
+#' # Access the archetypes slot 
+#' weights(my_model)
+#' 
+#' # Change the archetypes slot
+#' weights(my_model) <- c(0.9, 0.1)
+#' weights(my_model)
+#' 
+#' @seealso 
+#' \code{\link[predped]{predped-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname weights-method
+#'
+#' @export
+setGeneric("weights", function(object) standardGeneric("weights"))
+
+#' @rdname weights-method
+#'
+#' @export
+setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))

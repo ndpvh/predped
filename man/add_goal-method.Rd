@@ -62,5 +62,5 @@ add_goal(my_background)
 \code{\link[predped]{polygon-class}}
 \code{\link[predped]{rectangle-class}}
 \code{\link[predped]{segment-class}}
-\code{\link[predped]{rng_point-method}}
+\code{\link[predped]{rng_point}}
 }

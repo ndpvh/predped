@@ -189,7 +189,7 @@ setMethod("moving_options", "agent", function(object,
 #' @seealso 
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{state-class}},
-#' \code{\link[predped]{moving_options-method}}
+#' \code{\link[predped]{moving_options}}
 #' 
 #' @rdname agents_between_goals
 #' 
@@ -359,9 +359,9 @@ agents_between_goal <- function(agent,
 #' @seealso 
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{background-class}},
-#' \code{\link[predped]{in_object-method}},
-#' \code{\link[predped]{intersects-method}},
-#' \code{\link[predped]{moving_options-method}},
+#' \code{\link[predped]{in_object}},
+#' \code{\link[predped]{intersects}},
+#' \code{\link[predped]{moving_options}},
 #' \code{\link[predped]{nodes_on_circumference}}
 #' 
 #' @rdname overlap_with_objects
@@ -433,7 +433,7 @@ overlap_with_objects <- function(agent,
             # check should read TRUE when one of the coordinates is interpreted as 
             # being okay, hence the reversal of the logical.
             # check[i] <- !any(in_object(agent, coords, outside = FALSE))
-            local_check[i,] <- in_object(agent, coords, outside = FALSE)
+            local_check[i,] <- in_object(agent, coords)
         }
     }
 

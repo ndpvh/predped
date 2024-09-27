@@ -68,6 +68,6 @@ rng_point(my_circle,
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{add_nodes-method}},
-\code{\link[predped]{nodes_on_circumference-method}}
+\code{\link[predped]{add_nodes}},
+\code{\link[predped]{nodes_on_circumference}}
 }

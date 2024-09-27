@@ -6,29 +6,31 @@
 \alias{predped}
 \title{An S4 Class to Represent the M4MA model.}
 \description{
-The `predped` class defines the M4MA model that can be used to simulate 
-data from. It contains the setting in which the agents should walk around as 
-well as the parameters of those agents. At this moment, only supports the use
-of archetypes: Prototypical agents that have a given parameter set.
+The \code{predped} class defines some of the settings that will be used when 
+simulating data with the M4MA model. It contains the setting in which the 
+agents should walk around as well as the parameters of those agents. At this 
+moment, only supports the use of archetypes: Prototypical agents that have a 
+given parameter set (see \code{\link[predped]{generate_parameters}} and 
+\code{\link[predped]{params_from_csv}}).
 }
 \section{Slots}{
 
 \describe{
-\item{\code{id}}{A character that can be used to identify the specific model defined
-by the class}
+\item{\code{id}}{Character that defines an identifier for the model.}
 
-\item{\code{setting}}{A dataframe containing the objects that define the 
-setting in which the agents will walk around}
+\item{\code{setting}}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{\code{parameters}}{A dataframe containing the parameters per archetype in its
-columns. Defaults to the `params_archetype` dataframe.}
+\item{\code{parameters}}{Dataframe containing the parameters per archetype in its
+columns.}
 
-\item{\code{archetypes}}{A vector of names for the archetypes one wants to use in the 
-simulation. Defaults to all archetypes in the `params_archetype` dataframe.}
+\item{\code{archetypes}}{Character or character vector containing the names of the 
+archetypes that should be included in the simulation.}
 
-\item{\code{weights}}{A numeric vector containing the probability with which an agent 
-can be of a given archetype. The weights should be in the same order as the 
-`archetypes` argument. Defaults to an equal weighting of all archetypes in 
-`params_archetype`}
+\item{\code{weights}}{Numeric vector containing the probability with which an agent 
+of each archetype can be selected to wander around in the environment. The 
+weights should be in the same length as the \code{archetypes}-slot.}
 }}
 
+\seealso{
+\code{\link[predped]{initialize-predped}}
+}

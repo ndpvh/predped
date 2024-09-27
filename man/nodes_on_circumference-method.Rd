@@ -64,7 +64,7 @@ nodes_on_circumference(my_segment)
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{add_nodes-method}},
-\code{\link[predped]{in_object-method}}, 
-\code{\link[predped]{moving_options-method}}
+\code{\link[predped]{add_nodes}},
+\code{\link[predped]{in_object}}, 
+\code{\link[predped]{moving_options}}
 }

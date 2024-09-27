@@ -85,8 +85,8 @@ overlap_with_objects(my_agent,
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{background-class}},
-\code{\link[predped]{in_object-method}},
-\code{\link[predped]{intersects-method}},
-\code{\link[predped]{moving_options-method}},
+\code{\link[predped]{in_object}},
+\code{\link[predped]{intersects}},
+\code{\link[predped]{moving_options}},
 \code{\link[predped]{nodes_on_circumference}}
 }

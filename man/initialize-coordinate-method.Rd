@@ -25,5 +25,5 @@ my_coordinate@.Data
 }
 \seealso{
 \code{\link[predped]{coordinate-class}},
-\code{\link[predped]{rotate-method}}
+\code{\link[predped]{rotate}}
 }

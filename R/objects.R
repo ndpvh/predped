@@ -11,7 +11,7 @@
 #' @slot x Numerical vector denoting the coordinate.
 #' 
 #' @seealso 
-#' \code{\link[predped]{rotate-method}},
+#' \code{\link[predped]{rotate}},
 #' \code{\link[predped]{initialize-coordinate}}
 #' 
 #' @rdname coordinate-class
@@ -34,7 +34,7 @@ coordinate <- setClass("coordinate", contains = "numeric")
 #' 
 #' @seealso 
 #' \code{\link[predped]{coordinate-class}},
-#' \code{\link[predped]{rotate-method}}
+#' \code{\link[predped]{rotate}}
 #' 
 #' @rdname initialize-coordinate-method
 #' 
@@ -138,7 +138,7 @@ setMethod("initialize", "object", function(.Object,
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{rectangle-class}},
-#' \code{\link[predped]{initialize-polygon-method}}
+#' \code{\link[predped]{initialize-polygon}}
 #'
 #' @rdname polygon-class
 #' @family objects
@@ -176,7 +176,7 @@ polygon <- setClass("polygon",
 #' @seealso 
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{polygon-class}}
-#' \code{\link[predped]{initialize-object-method}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-polygon-method
 #' 
@@ -262,8 +262,8 @@ rectangle <- setClass("rectangle",
 #' @seealso 
 #' \code{\link[predped]{object-class}},
 #' \code{\link[predped]{polygon-class}},
-#' \code{\link[predped]{initialize-object-method}}
-#' \code{\link[predped]{initialize-polygon-method}}
+#' \code{\link[predped]{initialize-object}}
+#' \code{\link[predped]{initialize-polygon}}
 #' 
 #' @rdname initialize-rectangle-method
 #' 
@@ -341,7 +341,7 @@ setMethod("initialize", "rectangle", function(.Object,
 #'
 #' @seealso 
 #' \code{\link[predped]{object-class}}, 
-#' \code{\link[predped]{initialize-circle-method}}
+#' \code{\link[predped]{initialize-circle}}
 #' 
 #' @rdname circle-class
 #' @family objects
@@ -376,7 +376,7 @@ circle <- setClass("circle",
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize-object-method}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-circle-method
 #' 
@@ -421,11 +421,11 @@ setMethod("initialize", "circle", function(.Object,
 #' P = (x, y). Now we compute the relative angle of this coordinate within the 
 #' circle that is defined by the \code{from} and \code{to} slots. In other words, 
 #' we compute the absolute angle of coordinate P relative to \code{from} -- 
-#' let's call this \alpha -- and then subtract the orientation of the line 
+#' let's call this \eqn{\alpha} -- and then subtract the orientation of the line 
 #' from this to get a relative angle within the circle defined by the 
-#' segment -- let's call the result \beta = \alpha - \code{orientation}. 
-#' We then block an agent whenever \beta \in (0, pi), and let him pass through 
-#' whenever \beta \in [pi, 2 * pi].
+#' segment -- let's call the result \eqn{\beta = \alpha - orientation}. 
+#' We then block an agent whenever \eqn{\beta \in (0, pi)}, and let him pass 
+#' through whenever \eqn{\beta \in [pi, 2 * pi]}.
 #' 
 #' To gain some intuition for this: If you create a segment that is vertical, 
 #' where \code{from} has a lower y-coordinate than \code{to} (e.g., 
@@ -443,8 +443,8 @@ setMethod("initialize", "circle", function(.Object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize-segment-method}},
-#' \code{\link[predped]{limit_access-method}}
+#' \code{\link[predped]{initialize-segment}},
+#' \code{\link[predped]{limit_access}}
 #' 
 #' @rdname segment-class
 #'
@@ -482,7 +482,7 @@ segment <- setClass("segment",
 #' @seealso 
 #' \code{\link[predped]{segment-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize-object-method}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-segment-method
 #' 
@@ -962,7 +962,7 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{out_object-method}},
+#' \code{\link[predped]{out_object}},
 #' \code{\link[predped]{raycasting}}
 #' 
 #' @docType method
@@ -1108,7 +1108,7 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{in_object-method}},
+#' \code{\link[predped]{in_object}},
 #' \code{\link[predped]{raycasting}}
 #' 
 #' @docType method
@@ -1186,12 +1186,7 @@ setMethod("enlarge", signature(object = "rectangle"), function(object,
 
     # Extend the size of the rectangle with the factor sqrt{space_between^2 / 2}, 
     # as we do in the `add_nodes` function.
-    object@size <- object@size + 2 * sqrt(extension^2 / 2)
-
-    # Also change the points of the rectangle in the same way as for polygons
-    object@points <- add_nodes(object, 
-                               space_between = extension, 
-                               only_corners = TRUE)
+    size(object) <- object@size + 2 * sqrt(extension^2 / 2)
 
     return(object)
 })
@@ -1255,8 +1250,8 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{add_nodes-method}},
-#' \code{\link[predped]{nodes_on_circumference-method}}
+#' \code{\link[predped]{add_nodes}},
+#' \code{\link[predped]{nodes_on_circumference}}
 #' 
 #' @docType method
 #' 
@@ -1407,7 +1402,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{nodes_on_circumference-method}},
+#' \code{\link[predped]{nodes_on_circumference}},
 #' \code{\link[predped]{create_nodes}}
 #' 
 #' @docType method
@@ -1474,7 +1469,11 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
                     \(x) find_location(edges[x,], edges[x + 1,]))
     nodes <- do.call("rbind", nodes)
 
-    idx <- in_object(object, nodes, outside = outside)
+    idx <- in_object(object, nodes)
+    if(outside) {
+        idx <- !idx
+    }
+
     nodes <- nodes[idx,]
 
     # Delete NAs in the nodes
@@ -1731,9 +1730,9 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{add_nodes-method}},
-#' \code{\link[predped]{in_object-method}}, 
-#' \code{\link[predped]{moving_options-method}}
+#' \code{\link[predped]{add_nodes}},
+#' \code{\link[predped]{in_object}}, 
+#' \code{\link[predped]{moving_options}}
 #' 
 #' @docType method
 #' 
@@ -1826,9 +1825,9 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{in_object-method}}, 
-#' \code{\link[predped]{moving_options-method}},
-#' \code{\link[predped]{nodes_on_circumference-method}},
+#' \code{\link[predped]{in_object}}, 
+#' \code{\link[predped]{moving_options}},
+#' \code{\link[predped]{nodes_on_circumference}},
 #' \code{\link[predped]{overlap_with_objects}}
 #' 
 #' @docType method
@@ -1995,7 +1994,7 @@ setMethod("intersects",
 #' \code{\link[predped]{polygon-class}},  
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}},
-#' \code{\link[predped]{intersects-method}}
+#' \code{\link[predped]{intersects}}
 #' 
 #' @docType method
 #' 
@@ -2048,7 +2047,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
     # might also just fall completely within the circle, which is fine for our
     # purposes.
     coords <- rbind(segments[,1:2], segments[nrow(segments), 3:4])
-    idx <- in_object(object, coords, outside = FALSE)
+    idx <- in_object(object, coords)
     idy <- idx[1:(length(idx) - 1)] != idx[2:length(idx)] # Do the actual check: One point within, the other outside
     if(any(idy) & !return_all) {
         return(TRUE)

@@ -30,11 +30,11 @@ interact with the goal before the goal has been completed.}
 }}
 
 \seealso{
-\code{\link[predped]{busy-method}},
-\code{\link[predped]{counter-method}},
-\code{\link[predped]{done-method}},
-\code{\link[predped]{id-method}},
-\code{\link[predped]{path-method}},
-\code{\link[predped]{position-method}},
+\code{\link[predped]{busy}},
+\code{\link[predped]{counter}},
+\code{\link[predped]{done}},
+\code{\link[predped]{id}},
+\code{\link[predped]{path}},
+\code{\link[predped]{position}},
 \code{\link[predped]{initialize-goal}}
 }

@@ -33,6 +33,6 @@ radius(my_circle)
 
 }
 \seealso{
-\code{\link[predped]{agent-method}},
-\code{\link[predped]{circle-method}}
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{circle-class}}
 }

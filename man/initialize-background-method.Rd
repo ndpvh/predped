@@ -63,9 +63,9 @@ my_background@objects
 }
 \seealso{
 \code{\link[predped]{background-class}},
-\code{\link[predped]{entrance-method}},
-\code{\link[predped]{exit-method}},
-\code{\link[predped]{limited_access-method}},
-\code{\link[predped]{objects-method}},
-\code{\link[predped]{shape-method}}
+\code{\link[predped]{entrance}},
+\code{\link[predped]{exit}},
+\code{\link[predped]{limited_access}},
+\code{\link[predped]{objects}},
+\code{\link[predped]{shape}}
 }

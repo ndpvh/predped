@@ -52,5 +52,5 @@ agents_between_goal(my_agent, my_state)
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{state-class}},
-\code{\link[predped]{moving_options-method}}
+\code{\link[predped]{moving_options}}
 }

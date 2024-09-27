@@ -44,6 +44,6 @@ out_object(my_circle, coords)
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{in_object-method}},
+\code{\link[predped]{in_object}},
 \code{\link[predped]{raycasting}}
 }

@@ -50,7 +50,7 @@
 #' determine_values(generating_function, 5)
 #' 
 #' @seealso
-#' \code{\link[predped]{simulate-predped-method}}
+#' \code{\link[predped]{simulate-predped}}
 #' \code{\link[predped]{goal_stack}}
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 
@@ -287,8 +287,8 @@ line_line_intersection <- function(segments_1,
 #' raycasting(points, coords)
 #' 
 #' @seealso 
-#' \code{\link[predped]{in_object-method}},
-#' \code{\link[predped]{out_object-method}}
+#' \code{\link[predped]{in_object}},
+#' \code{\link[predped]{out_object}}
 #' 
 #' @rdname raycasting
 #' 

@@ -37,5 +37,5 @@ my_segment@id
 \seealso{
 \code{\link[predped]{segment-class}},
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize-object-method}}
+\code{\link[predped]{initialize-object}}
 }

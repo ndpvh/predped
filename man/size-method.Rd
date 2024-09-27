@@ -69,9 +69,9 @@ points(my_rectangle)
 
 }
 \seealso{
-\code{\link[predped]{agent-method}},
-\code{\link[predped]{circle-method}},
-\code{\link[predped]{object-method}},
-\code{\link[predped]{rectangle-method}},
-\code{\link[predped]{segment-method}}
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{circle-class}},
+\code{\link[predped]{object-class}},
+\code{\link[predped]{rectangle-class}},
+\code{\link[predped]{segment-class}}
 }

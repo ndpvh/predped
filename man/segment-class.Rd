@@ -27,11 +27,11 @@ Consider another point in the Euclidian space, so that it has a position
 P = (x, y). Now we compute the relative angle of this coordinate within the 
 circle that is defined by the \code{from} and \code{to} slots. In other words, 
 we compute the absolute angle of coordinate P relative to \code{from} -- 
-let's call this \alpha -- and then subtract the orientation of the line 
+let's call this \eqn{\alpha} -- and then subtract the orientation of the line 
 from this to get a relative angle within the circle defined by the 
-segment -- let's call the result \beta = \alpha - \code{orientation}. 
-We then block an agent whenever \beta \in (0, pi), and let him pass through 
-whenever \beta \in [pi, 2 * pi].
+segment -- let's call the result \eqn{\beta = \alpha - orientation}. 
+We then block an agent whenever \eqn{\beta \in (0, pi)}, and let him pass 
+through whenever \eqn{\beta \in [pi, 2 * pi]}.
 
 To gain some intuition for this: If you create a segment that is vertical, 
 where \code{from} has a lower y-coordinate than \code{to} (e.g., 
@@ -58,6 +58,6 @@ right of this segment.
 
 \seealso{
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize-segment-method}},
-\code{\link[predped]{limit_access-method}}
+\code{\link[predped]{initialize-segment}},
+\code{\link[predped]{limit_access}}
 }

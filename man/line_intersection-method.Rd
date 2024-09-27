@@ -60,5 +60,5 @@ line_intersection(my_circle, my_lines)
 \code{\link[predped]{polygon-class}},  
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}},
-\code{\link[predped]{intersects-method}}
+\code{\link[predped]{intersects}}
 }

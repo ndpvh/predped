@@ -18,6 +18,6 @@ flexibility of the low-level functions.
 }}
 
 \seealso{
-\code{\link[predped]{rotate-method}},
+\code{\link[predped]{rotate}},
 \code{\link[predped]{initialize-coordinate}}
 }

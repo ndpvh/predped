@@ -113,7 +113,7 @@ find_path(my_goal,
 \code{\link[predped]{background-class}}
 \code{\link[predped]{goal-class}}
 \code{\link[predped]{object-class}}
-\code{\link[predped]{simulate-method}}
+\code{\link[predped]{simulate}}
 \code{\link[predped]{adjust_edges}}
 \code{\link[predped]{compute_edges}}
 \code{\link[predped]{create_edges}}

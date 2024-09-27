@@ -184,7 +184,7 @@ update_position <- function(agent,
     # they are waiting for another agent.
     if(status(agent) %in% c("completing goal", "reroute", "plan", "wait")) { 
         cell(agent) <- 0
-        speed(agent) <- standing_start
+        speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
                         
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
@@ -225,7 +225,7 @@ update_position <- function(agent,
         # agent: This will create new path points and let the agent reorient. 
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
             status(agent) <- "reroute" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
             return(agent)
@@ -241,7 +241,7 @@ update_position <- function(agent,
                      check)
 
         if(!any(is.finite(V))) {
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
             status(agent) <- "reorient"
             cell(agent) <- 0
             return(agent)
@@ -268,7 +268,7 @@ update_position <- function(agent,
         # (moving to another location with a different speed and orientation).
         # If stopped, we need to reset the agent's velocity
         if(cell == 0) {
-            speed(agent) <- standing_start
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
             status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
             
         } else {
@@ -277,7 +277,7 @@ update_position <- function(agent,
             # Update speed to be either higher than or equal to `standing_start`
             acceleration <- velocities[cell]
             speed(agent) <- pmax(speed(agent) * acceleration, 
-                                 standing_start)
+                                 standing_start * parameters(agent)[["preferred_speed"]])
 
             # Update orientation to be in degrees and relative to the current 
             # orientation of the agent

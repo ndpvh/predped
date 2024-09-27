@@ -1,69 +1,212 @@
+# Create the generic for simulate, but keep the documentation for simulate 
+# for predped and state separate: There is some overlap in arguments, but not 
+# as much as one would like for the documentation to be the same
+setGeneric("simulate", function(object,...) standardGeneric("simulate"))
+
 #' Simulate the M4MA
 #' 
-#' This function allows users to simulate data from their specified `predped`
-#' model. 
+#' This function allows users to simulate data from their specified 
+#' \code{\link[predped]{predped-class}}.
 #' 
-#' @param object The `predped` model that you want to simulate
-#' @param max_agents Integer, vector, or function that defines the maximal number
-#' of agents at each iteration in the simulation. Defaults to `20`.
-#' @param iterations Integer denoting the number of iterations to run the 
-#' simulation for. Defaults to `1800`, which corresponds to 15 minutes of 
-#' simulation (each iterations is 500 msec).
-#' @param add_agent_after Integer, vector of integers, or function that determines 
-#' after how many iterations an agent gets added to the environment. Defaults to 
-#' a function that draws `x` numbers from a normal distribution with mean 60 
-#' (30 sec) and standard deviation 15 (7.5 sec).
-#' @param standing_start Numeric denoting the speed of agents when they start 
-#' moving. Defaults to `0.1`.
-#' @param initial_agents List of agents with which to start the simulation. 
-#' Defaults to `NULL`, meaning the simulation should start with no agents in the
-#' room.
-#' @param initial_condition State containing a setting and agents to start the 
-#' simulation from. Defaults to `NULL`, meaning the simulation will start with 
-#' no agents in the room.
-#' @param initial_number_agents Integer denoting the number of agents that 
-#' the simulation should start out with. Defaults to `NULL`, meaning the
-#' simulation should start with no agents in the room. Ignored if `initial_agents`
-#' is provided.
-#' @param goal_number Integer, vector of integers, or function that determines 
-#' how many goals each of the agents should receive. Defaults to a function that 
-#' draws `x` numbers from a normal distribution with mean 10 and standard 
-#' deviation 2. 
-#' @param goal_duration Integer or function that determines the duration of each 
-#' goal. Defaults to a function that draws `x` numbers from a normal distribution 
-#' with mean 10 (5 sec) and standard deviation 2 (1 sec).
-#' @param precompute_goal_paths Logical denoting whether to precompute all path
-#' points beforehand. This means that the agent does not only preplan the way 
-#' towards their next goal, but also to all goals that follow. Defaults to 
-#' `FALSE`.
-#' @param order_goal_stack Logical denoting whether to order the goal stack based
-#' on the distance of the agent to the goal. Defaults to `TRUE`
-#' @param precomputed_goals List of goal stacks from which the agent can be 
-#' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
-#' in the simulation.
-#' @param close_enough Numeric denoting how close (in radii) the agent needs to 
-#' be to an object in order to interact with it. Defaults to `2`, meaning the 
-#' agent can interact with objects at `2 * radius(agent)` distance away.
-#' @param space_between Numeric denoting the space that should be left between 
-#' an object and the created path points for the agents (in radii). Defaults to 
-#' `1`, meaning a space of `1 * radius(agent)` is left between an object and the
-#' path points agents use in their strategy.
+#' @details 
+#' Heavily depends on \code{\link[predped]{simulate-state}} and
+#' \code{\link[predped]{update}}.
+#' 
+#' The arguments that can be used to influence the simulation behavior might 
+#' be overwhelming, which is why we include a small categorization of the 
+#' arguments in this sections. Roughly speaking, this function has multiple 
+#' arguments that influence a same aspect of the simulation. These are the 
+#' following (note that here all arguments are provided; some of these may 
+#' only appear in the documentation of \code{\link[predped]{simulate-state}}).
+#' 
+#' Arguments that directly influence the general characteristics of the 
+#' simulation itself.
+#' \itemize{
+#'     \item{\code{max_agent}:}{How many agents that can be in the room.}
+#'     \item{\code{iterations}:}{How long the simulation should last.}
+#'     \item{\code{add_agent_after}:}{How many iterations to leave between 
+#'                                    each agent entering the room.}
+#'     \item{\code{time_step}:}{How much time passes after each iteration.}
+#' }
+#' 
+#' Arguments that influence general characteristics of the agents.
+#' \itemize{
+#'     \item{\code{individual_differences}:}{Whether agents should have 
+#'                                           continuous individual differences.}
+#'     \item{\code{standing_start}:}{How fast agents are after standing still.}
+#' }
+#' 
+#' Arguments controlling whether an initial condition should be used.
+#' \itemize{
+#'     \item{\code{initial_agents}:}{An initial list of agents.}
+#'     \item{\code{initial_number_agents}:}{An initial number of agents with 
+#'                                          which you want to start the 
+#'                                          simulation.}
+#'     \item{\code{initial_condition}:}{An initial state.}
+#' }
+#' Preferably, only one is used at a time. 
+#' 
+#' Arguments controlling the goals, which can be easily traced back to the 
+#' \code{\link[predped]{goal_stack}} function.
+#' \itemize{
+#'     \item{\code{goal_number}:}{The number of goals the agents should have.}
+#'     \item{\code{goal_duration}:}{How long each goal should take.}
+#'     \item{\code{precompute_goal_paths}:}{Whether the paths to the goals should
+#'                                          be precomputed.}
+#'     \item{\code{sort_goals}:}{Whether to sort the goals based on distance. 
+#'                               Corresponds to the \code{sort} argument in 
+#'                               \code{\link[predped]{goal_stack}}.}
+#'     \item{\code{precomputed_goals}:}{List of goal stacks that already exist 
+#'                                      and which should be assigned to the 
+#'                                      agents.}
+#' }
+#' 
+#' Arguments controlling how path points and edges are handled.
+#' \itemize{
+#'     \item{\code{precomputed_edges}:}{List containing nodes and edges.}
+#'     \item{\code{many_nodes}:}{Whether to have many or few path points.}
+#'     \item{\code{space_between}:}{Space to leave between objects and nodes.}
+#'     \item{\code{close_enough}:}{How close a pedestrian should be before they
+#'                                 can (a) interact with a goal or (b) start 
+#'                                 planning to go to another path point.}
+#' }
+#' 
+#' Arguments that handle live plotting of the simulated states.
+#' \itemize{
+#'     \item{\code{plot_live}:}{Whether to make these plots.}
+#'     \item{\code{plot_time}:}{How much time to leave between the plotting of 
+#'                              each state.}
+#' }
+#' 
+#' @param object Object of the \code{\link[predped]{predped-class}}.
+#' @param iterations Numeric denoting the number of iterations to run the 
+#' simulation for. Defaults to \code{1800}, which corresponds to 15 minutes of 
+#' simulation.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
-#' time should mimic. Defaults to `0.5`, or half a second.
+#' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param max_agents Numeric, vector, or function that defines the maximal number
+#' of agents at each iteration in the simulation. If a vector, the maximal number
+#' of agents will be different at each iteration, allowing users to specify 
+#' peak and off-peak scenarios. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to \code{20}.
+#' @param group_size Numeric matrix with two columns where the first column 
+#' denotes the number of people in a social group and the second column the 
+#' probability with which such a group is added to the simulation. Defaults to 
+#' a 100\% probability that individuals are added to the simulation (i.e., no 
+#' social groups).
+#' @param add_agent_after Numeric, vector, or function that defines the maximal number
+#' of agents at each iteration in the simulation. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to 
+#' \code{\(n) rnorm(n, 60, 15)} or someone walking in every 30 seconds on 
+#' average.
+#' @param standing_start Numeric denoting the factor of their preferred speed 
+#' that agents move when they just came from standing still. Defaults to 
+#' \code{0.1}.
+#' @param individual_differences Logical denoting whether to use the standard 
+#' deviations in the parameter list to create some variation in the parameters.
+#' Defaults to \code{TRUE}.
+#' @param goal_number Numeric, vector, or function that defines the number of 
+#' goals the agents should accomplish. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}. 
+#' @param goal_duration Numeric, vector, or function that defines the duration of 
+#' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param precompute_goal_paths Logical denoting whether to run the
+#' \code{\link[predped]{find_path-method}} for each of the generated goals 
+#' beforehand. Assumes that the agent does all of the goals in the order of the 
+#' goal stack. Defaults to \code{FALSE}. 
+#' @param sort_goals Logical denoting whether to order the goal stack in a logical 
+#' way. Currently implemented in the following way. First, we select the first 
+#' goal as being the one that is closest by the starting position provided in 
+#' the argument \code{starting_position}. Then, we define each of the next goals
+#' as being the one that is closest to the position of the previous goal.
+#' Defaults to \code{TRUE}.
+#' @param precomputed_goals List of goal stacks from which the agent can be 
+#' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
+#' in the simulation. 
+#' @param initial_agents List of objects of the \code{\link[predped]{agent-class}}
+#' with which to start the simulation. Defaults to \code{NULL}, meaning the 
+#' simulation starts with an empty room.
+#' @param initial_condition Object of the \code{\link[predped]{state-class}} 
+#' containing the initial state at which to start the simulation. Defaults to 
+#' \code{NULL}, meaning the simulation starts with an empty room. Ignored when
+#' \code{initial_agents} or \code{initial_number_agents} is provided.
+#' @param initial_number_agents Numeric denoting the number of agents that 
+#' the simulation should start out with. Defaults to \code{NULL}, meaning the
+#' simulation should start with no agents in the room. Ignored if 
+#' \code{initial_agents} is provided.
 #' @param precompute_edges Logical denoting whether to precompute the path points
-#' on which agents can move. Defaults to `TRUE`.
-#' @param individual_differences Logical denoting whether variety on the parameters
-#' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' on which agents can move. Defaults to \code{TRUE}, triggering the creation 
+#' of edges through the \code{\link[predped]{compute_edges}} function.
+#' @param many_nodes Logical denoting whether to use the minimal amount of path
+#' points necessary for the edges (\code{FALSE}) or to use many more \code{TRUE}.
+#' Defaults to \code{TRUE} if \code{precompute_edges = TRUE}, and otherwise 
+#' defaults to \code{FALSE}. See \code{\link[predped]{create_edges}} for full
+#' disclosure on the effect of this logical.
+#' @param space_between Numeric denoting the multiplier for the space to leave 
+#' between the circumference of the object and the nodes created under the hood 
+#' (see \code{\link[predped]{add_nodes}}). Is multiplied by the agent's radius 
+#' to determine the actual space to leave between object and node. Defaults to 
+#' \code{2.5}.
 #' @param plot_live Logical denoting whether to plot each iteration while the 
-#' simulation is going on. Defaults to `FALSE`.
+#' simulation is going on. Defaults to \code{FALSE}.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait 
 #' between iterations, i.e., the time between updating the plot. Defaults to 
-#' `0.2`.
-#' @param ... Arguments passed on to the \code{\link[predped]{update}} function.
+#' \code{0.2}.
+#' @param ... Arguments passed on to the \code{\link[predped]{simulate-state}} 
+#' function.
+#' 
+#' @return List of objects of the \code{\link{state-class}} containing the 
+#' result of the simulation.
+#' 
+#' @examples 
+#' # Create a setting in which to simulate. Note that this setting also serves 
+#' # as an example of one-directional flow, which can be seen if you let the 
+#' # simulation run a bit longer.
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(rectangle(center = c(0, 0), 
+#'                                                      size = c(1, 1))), 
+#'                             limited_access = list(segment(from = c(-1, 0.5), 
+#'                                                           to = c(-0.5, 0.5)), 
+#'                                                   segment(from = c(0.5, 1), 
+#'                                                           to = c(0.5, 0.5)), 
+#'                                                   segment(from = c(1, -0.5), 
+#'                                                           to = c(0.5, -0.5)), 
+#'                                                   segment(from = c(-0.5, -1), 
+#'                                                           to = c(-0.5, -0.5))))
+#' 
+#' # Create a model from which to simulate
+#' my_model <- predped(setting = my_background, 
+#'                     archetypes = c("BaselineEuropean"))
+#' 
+#' # Do the simulation for maximally 2 agents
+#' trace <- simulate(my_model, 
+#'                   max_agents = 2,
+#'                   iterations = 10, 
+#'                   add_agent_after = 5)
+#' 
+#' # Check some interesting statistics, such as the length of the trace and the 
+#' # number of agents in the room.
+#' length(trace)
+#' sapply(trace, \(x) length(x@agents))
+#' 
+#' # If you wish to plot the trace, you can simply use the plot function.
+#' plt <- plot(trace)
+#' plt[[1]]
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate-state}},
+#' \code{\link[predped]{update}}
+#' 
+#' @rdname simulate-predped
 #' 
 #' @export
 #
 # TO DO
+#   - Clean up this function
+#   - Allow for more flexibility for a user, being able to really tune the 
+#     simulation function to their use-case (which currently is difficult, as 
+#     you always have to create a new simulation function)
 #   - At this moment, setting is kept separate from rest in trace. However, at 
 #     some point, agents should be able to move things in the environment, meaning
 #     we should keep a trace of moveable objects as well (either list in 
@@ -72,8 +215,6 @@
 #     beforehand) and chaotic agents (not ordering goal_stacks beforehand)
 #   - At this moment, still assumed that agents are circular. Try to remove this
 #     assumption in functions and in its definition
-setGeneric("simulate", function(object,...) standardGeneric("simulate"))
-
 setMethod("simulate", "predped", function(object,
                                           max_agents = 20,
                                           iterations = 1800,
@@ -85,9 +226,8 @@ setMethod("simulate", "predped", function(object,
                                           goal_number = \(x) rnorm(x, 10, 2), 
                                           goal_duration = \(x) rnorm(x, 10, 2),
                                           precompute_goal_paths = FALSE,
-                                          order_goal_stack = TRUE,
+                                          sort_goals = TRUE,
                                           precomputed_goals = NULL,
-                                          close_enough = 2,
                                           space_between = 2.5,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
@@ -141,7 +281,7 @@ setMethod("simulate", "predped", function(object,
                                                    time_step = time_step,
                                                    precomputed_edges = edges,
                                                    precompute_goal_paths = precompute_goal_paths,
-                                                   order_goal_stack = order_goal_stack,
+                                                   sort_goals = sort_goals,
                                                    precomputed_goals = precomputed_goals,
                                                    individual_differences = individual_differences,
                                                    group_size = group_size)
@@ -180,7 +320,6 @@ setMethod("simulate", "predped", function(object,
                                    group_size = group_size,
                                    goal_number = goal_number[i],
                                    time_step = time_step,
-                                   close_enough = close_enough,
                                    space_between = space_between,
                                    standing_start = standing_start,
                                    precomputed_edges = edges,
@@ -194,10 +333,95 @@ setMethod("simulate", "predped", function(object,
     return(trace)
 })
 
-#' Simulate the next State
-#'
-#' @rdname simulate-method
+
+
+
+
+#' Simulate a singel state for the M4MA
 #' 
+#' This function allows users to simulate a single state from the M4MA based on 
+#' a single previous state.
+#' 
+#' @details 
+#' Heavily depends on \code{\link[predped]{update}}.
+#' 
+#' @param object Object of the \code{\link[predped]{state-class}}.
+#' @param model Object of the \code{\link[predped]{predped-class}}.
+#' @param add_agent Logical denoting whether an agent should be added to the 
+#' simulation. Defaults to \code{FALSE} and is typically handled by the 
+#' \code{\link[predped]{simulate-predped}} function, where it accounts for the 
+#' variables \code{add_agent_after} and \code{max_agents}.
+#' @param group_size Numeric matrix with two columns where the first column 
+#' denotes the number of people in a social group and the second column the 
+#' probability with which such a group is added to the simulation. Defaults to 
+#' a 100\% probability that individuals are added to the simulation (i.e., no 
+#' social groups).
+#' @param goal_number Numeric, vector, or function that defines the number of 
+#' goals the agents should accomplish. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}. 
+#' @param goal_duration Numeric, vector, or function that defines the duration of 
+#' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param precompute_goal_paths Logical denoting whether to run the
+#' \code{\link[predped]{find_path-method}} for each of the generated goals 
+#' beforehand. Assumes that the agent does all of the goals in the order of the 
+#' goal stack. Defaults to \code{FALSE}. 
+#' @param sort_goals Logical denoting whether to order the goal stack in a logical 
+#' way. Currently implemented in the following way. First, we select the first 
+#' goal as being the one that is closest by the starting position provided in 
+#' the argument \code{starting_position}. Then, we define each of the next goals
+#' as being the one that is closest to the position of the previous goal.
+#' Defaults to \code{TRUE}.
+#' 
+#' @param max_agents Numeric, vector, or function that defines the maximal number
+#' of agents at each iteration in the simulation. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to \code{20}.
+#' @param iterations Numeric denoting the number of iterations to run the 
+#' simulation for. Defaults to \code{1800}, which corresponds to 15 minutes of 
+#' simulation.
+#' @param add_agent_after Numeric, vector, or function that defines the maximal number
+#' of agents at each iteration in the simulation. It's exact value is handled by 
+#' \code{\link[predped]{determine_values}}. Defaults to 
+#' \code{\(n) rnorm(n, 60, 15)} or someone walking in every 30 seconds on 
+#' average.
+#' @param standing_start Numeric denoting the factor of their preferred speed 
+#' that agents move when they just came from standing still. Defaults to 
+#' \code{0.1}.
+#' @param initial_agents List of objects of the \code{\link[predped]{agent-class}}
+#' with which to start the simulation. Defaults to \code{NULL}, meaning the 
+#' simulation starts with an empty room.
+#' @param initial_condition Object of the \code{\link[predped]{state-class}} 
+#' containing the initial state at which to start the simulation. Defaults to 
+#' \code{NULL}, meaning the simulation starts with an empty room. Ignored when
+#' \code{initial_agents} or \code{initial_number_agents} is provided.
+#' @param initial_number_agents Numeric denoting the number of agents that 
+#' the simulation should start out with. Defaults to \code{NULL}, meaning the
+#' simulation should start with no agents in the room. Ignored if 
+#' \code{initial_agents} is provided.
+#' 
+#' @param precomputed_goals List of goal stacks from which the agent can be 
+#' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
+#' in the simulation. 
+#' @param close_enough Numeric denoting how close (in radii) the agent needs to 
+#' be to an object in order to interact with it. Defaults to `2`, meaning the 
+#' agent can interact with objects at `2 * radius(agent)` distance away.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents (in radii). Defaults to 
+#' `1`, meaning a space of `1 * radius(agent)` is left between an object and the
+#' path points agents use in their strategy.
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Defaults to `0.5`, or half a second.
+#' @param precompute_edges Logical denoting whether to precompute the path points
+#' on which agents can move. Defaults to `TRUE`.
+#' @param individual_differences Logical denoting whether variety on the parameters
+#' should be accounted for (even within archetypes). Defaults to `TRUE`.
+#' @param plot_live Logical denoting whether to plot each iteration while the 
+#' simulation is going on. Defaults to `FALSE`.
+#' @param plot_time Numeric denoting the amount of time (in seconds) to wait 
+#' between iterations, i.e., the time between updating the plot. Defaults to 
+#' `0.2`.
+#' @param ... Arguments passed on to the \code{\link[predped]{update}} function.
+#' 
+#' @export
 setMethod("simulate", "state", function(object, 
                                         model,
                                         add_agent = FALSE,
@@ -263,9 +487,7 @@ setMethod("simulate", "state", function(object,
 
         pts <- points(agent_to_add)
         agents_in_the_way <- sapply(agents(object), 
-                                    \(x) in_object(x, 
-                                                   pts, 
-                                                   outside = FALSE))
+                                    \(x) in_object(x, pts))
 
         if(!any(agents_in_the_way)) {
             agents(object) <- append(agents(object), agent_to_add)
@@ -414,7 +636,7 @@ add_group <- function(model,
 #' points beforehand. This means that the agent does not only preplan the way 
 #' towards their next goal, but also to all goals that follow. Defaults to 
 #' `FALSE`.
-#' @param order_goal_stack Logical denoting whether to order the goal stack based
+#' @param sort_goals Logical denoting whether to order the goal stack based
 #' on the distance of the agent to the goal. Defaults to `TRUE`
 #' @param precomputed_goals List of goal stacks from which the agent can be 
 #' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
@@ -440,7 +662,7 @@ add_agent <- function(model,
                       time_step = 0.5,
                       precomputed_edges = NULL,
                       precompute_goal_paths = TRUE,
-                      order_goal_stack = TRUE,
+                      sort_goals = TRUE,
                       precomputed_goals = NULL,
                       individual_differences = TRUE) {
 
@@ -475,7 +697,7 @@ add_agent <- function(model,
                                  agent_position = position,
                                  precompute_goal_paths = precompute_goal_paths,
                                  space_between = space_between * radius,
-                                 order_goal_stack = order_goal_stack)
+                                 sort = sort_goals)
     } else {
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]
@@ -552,7 +774,7 @@ add_agent <- function(model,
 #' points beforehand. This means that the agent does not only preplan the way 
 #' towards their next goal, but also to all goals that follow. Defaults to 
 #' `FALSE`.
-#' @param order_goal_stack Logical denoting whether to order the goal stack based
+#' @param sort_goals Logical denoting whether to order the goal stack based
 #' on the distance of the agent to the goal. Defaults to `TRUE`
 #' @param precomputed_goals List of goal stacks from which the agent can be 
 #' assigned one. Defaults to `NULL`, meaning that goal stacks should be created
@@ -574,7 +796,7 @@ create_initial_condition <- function(initial_number_agents,
                                      time_step = 0.5,
                                      precomputed_edges = NULL,
                                      precompute_goal_paths = TRUE,
-                                     order_goal_stack = TRUE,
+                                     sort_goals = TRUE,
                                      precomputed_goals = NULL,
                                      individual_differences = TRUE,
                                      group_size = matrix(1, nrow = 1, ncol = 2)) {
@@ -632,7 +854,7 @@ create_initial_condition <- function(initial_number_agents,
                                time_step = time_step,
                                precomputed_edges = precomputed_edges,
                                precompute_goal_paths = precompute_goal_paths,
-                               order_goal_stack = order_goal_stack,
+                               sort_goals = sort_goals,
                                precomputed_goals = precomputed_goals,
                                individual_differences = individual_differences)
         group(new_agent) <- group_number 
