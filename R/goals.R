@@ -591,7 +591,7 @@ setMethod("replace", "goal", function(object,
 
     # Otherwise, generate a new one.
     } else {
-        return(generate_goal_stack(1, setting, counter_generator)[[1]])
+        return(goal_stack(1, setting, counter_generator)[[1]])
     }
 })
 
@@ -666,11 +666,7 @@ goal_stack <- function(n,
 
     # Generate all the counter values for the goals to-be-generated. Depends on 
     # the type that has been provided in counter
-    if(inherits(counter, "function")) {
-        counter <- counter(n)
-    } else {
-        counter <- rep(counter, times = n)
-    }
+    counter <- determine_values(counter)
 
     # Select the objects in the environment that can contain a goal, as defined 
     # by the slot interactable
