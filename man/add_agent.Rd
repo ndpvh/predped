@@ -2,73 +2,108 @@
 % Please edit documentation in R/simulate.R
 \name{add_agent}
 \alias{add_agent}
-\title{Add an Agent to the Simulation}
+\title{Add a single agent to the simulation}
 \usage{
 add_agent(
   model,
-  goal_number,
-  goal_duration = function(x) rnorm(x, 10, 2),
-  position = NULL,
   group_number = 1,
-  standing_start = 0.1,
-  space_between = 2.5,
-  time_step = 0.5,
-  precomputed_edges = NULL,
+  goal_number = 5,
+  goal_duration = function(x) rnorm(x, 10, 2),
   precompute_goal_paths = TRUE,
-  order_goal_stack = TRUE,
+  sort_goals = TRUE,
   precomputed_goals = NULL,
+  precomputed_edges = NULL,
+  space_between = 2.5,
+  position = NULL,
+  standing_start = 0.1,
   individual_differences = TRUE
 )
 }
 \arguments{
-\item{model}{The `predped` model that you want to simulate}
+\item{group_number}{Numeric denoting the group to which the agent belongs.
+Defaults to \code{1}.}
 
-\item{goal_number}{Integer, vector of integers, or function that determines 
-how many goals each of the agents should receive. Defaults to a function that 
-draws `x` numbers from a normal distribution with mean 10 and standard 
-deviation 2.}
+\item{goal_number}{Numeric, vector, or function that defines the number of 
+goals the agents should accomplish. It's exact value is handled by 
+\code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
-\item{goal_duration}{Integer or function that determines the duration of each 
-goal. Defaults to a function that draws `x` numbers from a normal distribution 
-with mean 10 (5 sec) and standard deviation 2 (1 sec).}
+\item{goal_duration}{Numeric, vector, or function that defines the duration of 
+the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
-\item{position}{Vector denoting the position of the agent you wish to create.
-Defaults to `NULL`, meaning the agent's location will be at the entrance of 
-the room.}
+\item{precompute_goal_paths}{Logical denoting whether to run the
+\code{\link[predped]{find_path-method}} for each of the generated goals 
+beforehand. Assumes that the agent does all of the goals in the order of the 
+goal stack. Defaults to \code{FALSE}.}
 
-\item{group_number}{The number of the group to which the agent belongs. 
-Defaults to `1`.}
+\item{sort_goals}{Logical denoting whether to order the goal stack in a logical 
+way. Currently implemented in the following way. First, we select the first 
+goal as being the one that is closest by the starting position provided in 
+the argument \code{starting_position}. Then, we define each of the next goals
+as being the one that is closest to the position of the previous goal.
+Defaults to \code{TRUE}.}
 
-\item{standing_start}{Numeric denoting the speed of agents when they start 
-moving. Defaults to `0.1`.}
+\item{precomputed_goals}{List of goal stacks from which the agent can be 
+assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
+in the simulation.}
+
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
+containing the nodes and edges the agent can use to plan its path. Defauls 
+to \code{NULL}, triggering the creation of these edges whenever they are 
+needed.}
 
 \item{space_between}{Numeric denoting the space that should be left between 
 an object and the created path points for the agents (in radii). Defaults to 
-`1`, meaning a space of `1 * radius(agent)` is left between an object and the
-path points agents use in their strategy.}
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+object and the path points agents use in their strategy. Ignored if 
+\code{precomputed_edges} is provided.}
 
-\item{time_step}{Numeric denoting the number of seconds each discrete step in
-time should mimic. Defaults to `0.5`, or half a second.}
+\item{position}{Numeric denoting the position you would like to assign to the
+agent. Defaults to \code{NULL}, making the agent start at the entrance. Note 
+that this is an experimental feature that has not been tested yet, and 
+therefore might not work for the moment.}
 
-\item{precomputed_edges}{List of nodes and edges that can be used by the 
-path-finding algorithms under the hood. Defaults to `NULL`, meaning edges 
-have not been precomputed.}
+\item{standing_start}{Numeric denoting the factor of their preferred speed 
+that agents move when they just came from standing still. Defaults to 
+\code{0.1}.}
 
-\item{precompute_goal_paths}{Logical denoting whether to precompute all path
-points beforehand. This means that the agent does not only preplan the way 
-towards their next goal, but also to all goals that follow. Defaults to 
-`FALSE`.}
+\item{individual_differences}{Logical denoting whether to use the standard 
+deviations in the parameter list to create some variation in the parameters.
+Defaults to \code{TRUE}.}
 
-\item{order_goal_stack}{Logical denoting whether to order the goal stack based
-on the distance of the agent to the goal. Defaults to `TRUE`}
-
-\item{precomputed_goals}{List of goal stacks from which the agent can be 
-assigned one. Defaults to `NULL`, meaning that goal stacks should be created
-in the simulation.}
-
-\item{individual_differences}{Logical denoting whether variety on the parameters
-should be accounted for (even within archetypes). Defaults to `TRUE`.}
+\item{object}{Object of the \code{\link[predped]{predped-class}}.}
+}
+\value{
+List of instances of the \code{\link[predped]{agent-class}}.
 }
 \description{
-Add an Agent to the Simulation
+Add a single agent to the simulation
+}
+\examples{
+# Create a setting in which to simulate. 
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(center = c(0, 0), 
+                                                     size = c(1, 1))))
+
+# Create a model from which to simulate
+my_model <- predped(setting = my_background, 
+                    archetypes = c("BaselineEuropean", 
+                                   "DrunkAussie"))
+
+# Generate a group of 5 pedestrians who have 5 goals to accomplish
+agents <- add_group(my_model, 
+                    agent_number = 5,
+                    goal_number = 5)
+
+# Get id's, parameters, and number of goals
+sapply(agents, id)
+sapply(agents, parameters)
+sapply(agents \(x) length(goals(x)))
+
+}
+\seealso{
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{add_group}}, 
+\code{\link[predped]{simulate-predped}}, 
+\code{\link[predped]{simulate-state}}
 }

@@ -666,7 +666,7 @@ goal_stack <- function(n,
 
     # Generate all the counter values for the goals to-be-generated. Depends on 
     # the type that has been provided in counter
-    counter <- determine_values(counter)
+    counter <- determine_values(counter, n)
 
     # Select the objects in the environment that can contain a goal, as defined 
     # by the slot interactable

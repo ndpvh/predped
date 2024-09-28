@@ -1,6 +1,45 @@
 ################################################################################
 # CONTAINS GENERIC OF GETTERS AND SETTERS
 
+#' Getter/Setter for the \code{agents}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background,
+#'                   agents = list(agent(center = c(0, 0), radius = 0.25)))
+#' 
+#' # Access agents slot
+#' agents(my_state)
+#' 
+#' # Change the agents slot
+#' agents(my_state) <- list(agent(center = c(1, 1), radius = 0.25))
+#' agents(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname agents-method
+#' 
+#' @export
+setGeneric("agents", function(object) standardGeneric("agents"))
+
+#' @rdname agents-method
+#' 
+#' @export
+setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
+
+
+
 #' Getter/Setter for the \code{archetypes}-slot
 #' 
 #' Works for \code{\link[predped]{predped-class}}.
@@ -523,6 +562,44 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 
 
 
+#' Getter/Setter for the \code{iteration}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background)
+#' 
+#' # Access iteration slot
+#' iteration(my_state)
+#' 
+#' # Change the iteration slot
+#' iteration(my_state) <- 1
+#' iteration(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname iteration-method
+#' 
+#' @export
+setGeneric("iteration", function(object) standardGeneric("iteration"))
+
+#' @rdname iteration-method
+#' 
+#' @export
+setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-"))
+
+
+
 #' Getter/Setter for the \code{limited_access}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
@@ -830,6 +907,45 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 
 
 
+#' Getter/Setter for the \code{potential_agents}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background,
+#'                   potential_agents = list(agent(center = c(0, 0), radius = 0.25)))
+#' 
+#' # Access agents slot
+#' potential_agents(my_state)
+#' 
+#' # Change the potential_agents slot
+#' potential_agents(my_state) <- list(agent(center = c(1, 1), radius = 0.25))
+#' potential_agents(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname potential_agents-method
+#' 
+#' @export
+setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
+
+#' @rdname potential_agents-method
+#' 
+#' @export
+setGeneric("potential_agents<-", function(object, value) standardGeneric("potential_agents<-"))
+
+
+
 #' Getter/Setter for the \code{radius}-slot
 #' 
 #' Works for the \code{\link[predped]{circle-class}}.
@@ -861,6 +977,49 @@ setGeneric("radius", function(object) standardGeneric("radius"))
 #' 
 #' @export
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
+
+
+
+#' Getter/Setter for the \code{setting}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background)
+#' 
+#' # Access setting slot
+#' setting(my_state)
+#' 
+#' # Change the setting slot
+#' other_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                                  size = c(2, 2)), 
+#'                                objects = list(circle(center = c(0, 0), 
+#'                                                      radius = 1))) 
+#' 
+#' setting(my_state) <- other_background
+#' setting(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname setting-method
+#' 
+#' @export
+setGeneric("setting", function(object) standardGeneric("setting"))
+
+#' @rdname setting-method
+#' 
+#' @export
+setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 
 
 

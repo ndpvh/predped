@@ -29,9 +29,7 @@ setMethod("update", "state", function(object,
                                       standing_start = 0.1,
                                       precomputed_edges = NULL,
                                       many_nodes = FALSE,
-                                      precompute_goal_paths = FALSE,
                                       report = FALSE,
-                                      interactive_report = FALSE,
                                       ...) {
 
     # Extract the components of the state
@@ -79,8 +77,7 @@ setMethod("update", "state", function(object,
                              precomputed_edges = precomputed_edges,
                              many_nodes = many_nodes,
                              precompute_goal_paths = precompute_goal_paths,
-                             report = report, 
-                             interactive_report = interactive_report) 
+                             report = report) 
 
         # Update the position of the agent
         # start_time <- Sys.time()
@@ -320,8 +317,6 @@ update_position <- function(agent,
 #' point or goal in order to interact with it. Defaults to `radius(agent) / 2`
 #' @param report Logical denoting whether we should report the actions of the 
 #' agent with regard to the goal. Defaults to `FALSE`
-#' @param interactive_report Logical denoting whether these reports of `report`
-#' should require user input. Defaults to `FALSE`
 #' 
 #' @return Updated agent
 #' 
@@ -346,10 +341,8 @@ update_goal <- function(agent,
                         close_enough = 2,
                         space_between = 2.5,
                         report = FALSE,
-                        interactive_report = FALSE,
                         precomputed_edges = NULL,
-                        many_nodes = FALSE,
-                        precompute_goal_paths = FALSE) {  
+                        many_nodes = FALSE) {  
 
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
@@ -388,7 +381,7 @@ update_goal <- function(agent,
             }
 
             # Replan if the goal paths were not precomputed yet
-            if(!precompute_goal_paths) {
+            if(nrow(path(agent@current_goal))) {
                 status(agent) <- "plan"
             } else {
                 status(agent) <- "reorient"

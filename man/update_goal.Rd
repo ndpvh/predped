@@ -12,10 +12,8 @@ update_goal(
   close_enough = 2,
   space_between = 2.5,
   report = FALSE,
-  interactive_report = FALSE,
   precomputed_edges = NULL,
-  many_nodes = FALSE,
-  precompute_goal_paths = FALSE
+  many_nodes = FALSE
 )
 }
 \arguments{
@@ -34,9 +32,6 @@ point or goal in order to interact with it. Defaults to `radius(agent) / 2`}
 
 \item{report}{Logical denoting whether we should report the actions of the 
 agent with regard to the goal. Defaults to `FALSE`}
-
-\item{interactive_report}{Logical denoting whether these reports of `report`
-should require user input. Defaults to `FALSE`}
 }
 \value{
 Updated agent
