@@ -201,7 +201,11 @@ setMethod("show", "agent", function(object) {
     cat("id:", object@id, "\n")
     cat("orientation:", object@orientation, "\n")
     cat("parameters:", "\n")
-    print(params)
+    if(is.null(params)){
+        print("Not defined")
+    } else {
+        print(params)
+    }
     cat("\nradius:", object@radius, "\n")
     cat("speed:", object@speed, "\n")
     cat("status:", object@status, "\n")
