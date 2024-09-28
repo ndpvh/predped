@@ -77,7 +77,7 @@ goal <- setClass("goal", list(id = "character",
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
                                          position = numeric(2),
-                                         path = matrix(0, nrow = 2, ncol = 2),
+                                         path = matrix(nrow = 0, ncol = 2),
                                          busy = FALSE,
                                          done = FALSE,
                                          counter = 5) {
