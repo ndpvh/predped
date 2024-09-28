@@ -51,7 +51,7 @@ objects(my_background) <- list(rectangle(center = c(0, 0), size = c(1, 1)))
 add_goal(my_background)
 
 objects(my_background) <- list(polygon(points = cbind(c(0.5, 0.5, -0.5, -0.5), 
-                                                      c(0.5, -0.5, -0.5, 0.5)))
+                                                      c(0.5, -0.5, -0.5, 0.5))))
 add_goal(my_background)
 
 }

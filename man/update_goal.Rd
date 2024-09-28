@@ -11,37 +11,53 @@ update_goal(
   standing_start = 0.1,
   close_enough = 2,
   space_between = 2.5,
-  report = FALSE,
   precomputed_edges = NULL,
-  many_nodes = FALSE
+  many_nodes = !is.null(precomputed_edges),
+  report = FALSE
 )
 }
 \arguments{
-\item{agent}{The agent to move}
+\item{state}{Object of the \code{\link[predped]{state-class}}.}
 
-\item{state}{The current state of affairs. Importantly, the agent in `agent`
-should not be present in that state}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{background}{The setting in which agents are walking around}
+\item{standing_start}{Numeric denoting the factor of their preferred speed 
+that agents move when they just came from standing still. Defaults to 
+\code{0.1}.}
 
-\item{standing_start}{Numeric denoting the speed of the agent when they 
-resume walking after stopping. Defaults to `0.1`}
+\item{close_enough}{Numeric denoting how close (in radii) the agent needs to 
+be to an object in order to interact with it. Defaults to \code{2}, meaning the 
+agent can interact with objects at \code{2 * radius(agent)} distance away.}
 
-\item{close_enough}{Numeric denoting the distance an agent needs to a path 
-point or goal in order to interact with it. Defaults to `radius(agent) / 2`}
+\item{space_between}{Numeric denoting the space that should be left between 
+an object and the created path points for the agents (in radii). Defaults to 
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+object and the path points agents use in their strategy.}
 
-\item{report}{Logical denoting whether we should report the actions of the 
-agent with regard to the goal. Defaults to `FALSE`}
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
+containing the nodes and edges the agent can use to plan its path. Defauls 
+to \code{NULL}, triggering the creation of these edges whenever they are 
+needed.}
+
+\item{many_nodes}{Logical denoting whether to use the minimal number of nodes
+or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
+\code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
+
+\item{report}{Logical denoting whether to report whenever an agent is 
+reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
+
+\item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }
 \value{
-Updated agent
+Object of the \code{\link[predped]{agent-class}}.
 }
 \description{
 Update the Goal of an Agent
 }
 \seealso{
-Other updating-functions: 
-\code{\link{update}()},
-\code{\link{update_position}()}
+\code{\link[predped]{simulate-predped}},
+\code{\link[predped]{simulate-state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update-state}},
+\code{\link[predped]{update_position}}
 }
-\concept{updating-functions}

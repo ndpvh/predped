@@ -90,15 +90,9 @@ my_model <- predped(setting = my_background,
                     archetypes = c("BaselineEuropean", 
                                    "DrunkAussie"))
 
-# Generate a group of 5 pedestrians who have 5 goals to accomplish
-agents <- add_group(my_model, 
-                    agent_number = 5,
-                    goal_number = 5)
-
-# Get id's, parameters, and number of goals
-sapply(agents, id)
-sapply(agents, parameters)
-sapply(agents \(x) length(goals(x)))
+# Generate an agent
+my_agent <- add_agent(my_model, goal_number = 5)
+my_agent
 
 }
 \seealso{

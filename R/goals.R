@@ -23,7 +23,7 @@
 #' \code{\link[predped]{id}},
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}},
-#' \code{\link[predped]{initialize-goal}}
+#' \code{\link[predped]{initialize,goal-method}}
 #'
 #' @export
 #
@@ -147,7 +147,7 @@ setMethod("show", "goal", function(object) {
 #' add_goal(my_background)
 #' 
 #' objects(my_background) <- list(polygon(points = cbind(c(0.5, 0.5, -0.5, -0.5), 
-#'                                                       c(0.5, -0.5, -0.5, 0.5)))
+#'                                                       c(0.5, -0.5, -0.5, 0.5))))
 #' add_goal(my_background)
 #' 
 #' @seealso 

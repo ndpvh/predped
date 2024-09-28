@@ -56,12 +56,12 @@ agents <- add_group(my_model,
 # Get id's, parameters, and number of goals
 sapply(agents, id)
 sapply(agents, parameters)
-sapply(agents \(x) length(goals(x)))
+sapply(agents, \(x) length(goals(x)))
 
 }
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{add_agent}}, 
-\code{\link[predped]{simulate-predped}}, 
-\code{\link[predped]{simulate-state}}
+\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate,state-method}}
 }

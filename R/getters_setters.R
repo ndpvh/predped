@@ -853,7 +853,7 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' my_agent <- agent(center = c(1, 1), radius = 0.25)
 #' my_circle <- circle(center = c(1, 0), radius = 0.25)
 #' my_goal <- goal(position = c(0, 1))
-#' my_polygon <- polygon(cbind(c(1, 1, -1, -1), c(1, -1, -1, 1))))
+#' my_polygon <- polygon(cbind(c(1, 1, -1, -1), c(1, -1, -1, 1)))
 #' my_rectangle <- rectangle(center = c(1, 2), size = c(1, 1))
 #' my_segment <- segment(from = c(0, 0), to = c(2, 2))
 #' 

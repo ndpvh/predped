@@ -52,7 +52,7 @@
 #' \code{\link[predped]{speed}},
 #' \code{\link[predped]{status}},
 #' \code{\link[predped]{waiting_counter}},
-#' \code{\link[predped]{initialize-agent}}
+#' \code{\link[predped]{initialize,agent-method}}
 #' 
 #' @rdname agent-class
 #'
