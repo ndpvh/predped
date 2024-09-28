@@ -21,7 +21,7 @@ center and radius.
 
 \seealso{
 \code{\link[predped]{object-class}}, 
-\code{\link[predped]{initialize-circle}}
+\code{\link[predped]{initialize,circle-method}}
 
 Other objects: 
 \code{\link{object-class}},

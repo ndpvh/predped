@@ -67,6 +67,6 @@ Finally, group members are identified and given the same set of goals.
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{add_agent}},
-\code{\link[predped]{simulate-predped}},
+\code{\link[predped]{simulate,predped-method}},
 \code{\link[predped]{simulate_state}}
 }

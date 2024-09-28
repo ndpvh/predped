@@ -116,7 +116,7 @@ probability with which such a group is added to the simulation. Defaults to
 a 100\% probability that individuals are added to the simulation (i.e., no 
 social groups).}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{simulate-state}} 
+\item{...}{Arguments passed on to the \code{\link[predped]{simulate,state-method}} 
 function.}
 
 \item{plot_live}{Logical denoting whether to plot each iteration while the 
@@ -135,7 +135,7 @@ This function allows users to simulate data from their specified
 \code{\link[predped]{predped-class}}.
 }
 \details{
-Heavily depends on \code{\link[predped]{simulate-state}} and
+Heavily depends on \code{\link[predped]{simulate,state-method}} and
 \code{\link[predped]{update}}.
 
 The arguments that can be used to influence the simulation behavior might 
@@ -143,7 +143,7 @@ be overwhelming, which is why we include a small categorization of the
 arguments in this sections. Roughly speaking, this function has multiple 
 arguments that influence a same aspect of the simulation. These are the 
 following (note that here all arguments are provided; some of these may 
-only appear in the documentation of \code{\link[predped]{simulate-state}}).
+only appear in the documentation of \code{\link[predped]{simulate,state-method}}).
 
 Arguments that directly influence the general characteristics of the 
 simulation and the model itself.
@@ -249,6 +249,6 @@ plt[[1]]
 
 }
 \seealso{
-\code{\link[predped]{simulate-state}},
+\code{\link[predped]{simulate,state-method}},
 \code{\link[predped]{update}}
 }

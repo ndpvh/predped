@@ -312,9 +312,9 @@ update_position <- function(agent,
         # probabilities
         V <- utility(agent, 
                      state, 
+                     background, 
                      agent_specifications, 
                      centers, 
-                     background, 
                      check)
 
         if(!any(is.finite(V))) {

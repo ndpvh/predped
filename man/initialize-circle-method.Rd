@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{...}{Additional arguments passed to 
-\code{\link[predped]{initialize-object-method}}.}
+\code{\link[predped]{initialize,object-method}}.}
 
 \item{center}{Numeric vector denoting the coordinates of the center or 
 position of the circle}
@@ -36,5 +36,5 @@ my_circle@id
 \seealso{
 \code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize-object}}
+\code{\link[predped]{initialize,object-method}}
 }

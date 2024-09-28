@@ -12,7 +12,7 @@ are defined in clockwise (\code{TRUE}) or counter-clockwise fashion
 (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments passed to 
-\code{\link[predped]{initialize-object-method}}.}
+\code{\link[predped]{initialize,object-method}}.}
 
 \item{points}{Numerical matrix containing the coordinates that make up the 
 polygon.}
@@ -38,5 +38,5 @@ my_polygon@id
 \seealso{
 \code{\link[predped]{object-class}}
 \code{\link[predped]{polygon-class}}
-\code{\link[predped]{initialize-object}}
+\code{\link[predped]{initialize,object-method}}
 }

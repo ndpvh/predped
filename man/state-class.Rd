@@ -25,7 +25,7 @@ enter the \code{setting}.}
 
 \seealso{
 \code{\link[predped]{agents}},
-\code{\link[predped]{initialize-state}},
+\code{\link[predped]{initialize,state-method}},
 \code{\link[predped]{iteration}},
 \code{\link[predped]{potential_agents}},
 \code{\link[predped]{setting}}

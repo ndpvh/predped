@@ -74,5 +74,5 @@ agent. Should contain all parameters relevant for the utility functions
 \code{\link[predped]{speed}},
 \code{\link[predped]{status}},
 \code{\link[predped]{waiting_counter}},
-\code{\link[predped]{initialize-agent}}
+\code{\link[predped]{initialize,agent-method}}
 }

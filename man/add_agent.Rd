@@ -98,6 +98,6 @@ my_agent
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{add_group}}, 
-\code{\link[predped]{simulate-predped}}, 
-\code{\link[predped]{simulate-state}}
+\code{\link[predped]{simulate,predped-method}}, 
+\code{\link[predped]{simulate,state-method}}
 }

@@ -89,9 +89,9 @@ etc) and then updating its position (i.e., using the utility functions to
 determine where the agent will move next).
 }
 \seealso{
-\code{\link[predped]{simulate-predped}},
-\code{\link[predped]{simulate-state}},
-\code{\link[predped]{update-state}},
+\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate,state-method}},
+\code{\link[predped]{update,state-method}},
 \code{\link[predped]{update_goal}},
 \code{\link[predped]{update_position}}
 }

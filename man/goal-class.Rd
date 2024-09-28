@@ -36,5 +36,5 @@ interact with the goal before the goal has been completed.}
 \code{\link[predped]{id}},
 \code{\link[predped]{path}},
 \code{\link[predped]{position}},
-\code{\link[predped]{initialize-goal}}
+\code{\link[predped]{initialize,goal-method}}
 }

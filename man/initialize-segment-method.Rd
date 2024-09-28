@@ -14,7 +14,7 @@ begins.}
 ends.}
 
 \item{...}{Additional arguments passed to 
-\code{\link[predped]{initialize-object-method}}.}
+\code{\link[predped]{initialize,object-method}}.}
 }
 \value{
 Object of the \code{\link[predped]{segment-class}}
@@ -37,5 +37,5 @@ my_segment@id
 \seealso{
 \code{\link[predped]{segment-class}},
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize-object}}
+\code{\link[predped]{initialize,object-method}}
 }
