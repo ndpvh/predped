@@ -2309,6 +2309,52 @@ setMethod("points<-", signature(object = "segment"), function(object, value) {
 
 
 
+#' @rdname position-method
+setMethod("position", signature(object = "polygon"), function(object) {
+    return(object@center)
+})
+
+#' @rdname position-method
+setMethod("position<-", signature(object = "polygon"), function(object, value) {
+    center(object) <- value
+    return(object)
+})
+
+#' @rdname position-method
+setMethod("position", signature(object = "rectangle"), function(object) {
+    return(object@center)
+})
+
+#' @rdname position-method
+setMethod("position<-", signature(object = "rectangle"), function(object, value) {
+    center(object) <- value
+    return(object)
+})
+
+#' @rdname position-method
+setMethod("position", signature(object = "circle"), function(object) {
+    return(object@center)
+})
+
+#' @rdname position-method
+setMethod("position<-", signature(object = "circle"), function(object, value) {
+    center(object) <- value
+    return(object)
+})
+
+#' @rdname position-method
+setMethod("position", signature(object = "segment"), function(object) {
+    return(object@center)
+})
+
+#' @rdname position-method
+setMethod("position<-", signature(object = "segment"), function(object, value) {
+    center(object) <- value
+    return(object)
+})
+
+
+
 #' @rdname radius-method
 setMethod("radius", signature(object = "circle"), function(object) {
     return(object@radius)
