@@ -77,8 +77,8 @@ setting <- background(shape = rectangle(center = c(20, 12.5),
                       same_exit = FALSE)
 
 # Precompute some edges
-few_edges <- predped::compute_edges(setting, many_options = FALSE)
-many_edges <- predped::compute_edges(setting, many_options = TRUE)
+few_edges <- predped::compute_edges(setting, many_nodes = FALSE)
+many_edges <- predped::compute_edges(setting, many_nodes = TRUE)
 
 ```
 
@@ -213,19 +213,19 @@ lim_setting <- setting
 limited_access(lim_setting) <- lapply(1:10, \(x) predped::segment(from = c(0, 0), to = c(40, 25)))
 
 # Test
-fn <- (\() predped::compute_edges(setting, many_options = FALSE)) |>
+fn <- (\() predped::compute_edges(setting, many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
-fl <- (\() predped::compute_edges(lim_setting, many_options = FALSE)) |>
+fl <- (\() predped::compute_edges(lim_setting, many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
-mn <- (\() predped::compute_edges(setting, many_options = TRUE)) |>
+mn <- (\() predped::compute_edges(setting, many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
-ml <- (\() predped::compute_edges(lim_setting, many_options = TRUE)) |>
+ml <- (\() predped::compute_edges(lim_setting, many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -270,28 +270,28 @@ tbl %>%
 f <- (\() predped::create_edges(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = FALSE)) |>
+                                many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 m <- (\() predped::create_edges(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = TRUE)) |>
+                                many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
 fa <- (\() predped::create_edges(c(0.3, 0.5), 
                                  c(0, 13), 
                                  new_setting, 
-                                 many_options = FALSE)) |>
+                                 many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 ma <- (\() predped::create_edges(c(0.3, 0.5), 
                                  c(0, 13), 
                                  new_setting, 
-                                 many_options = TRUE)) |>
+                                 many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -331,14 +331,14 @@ tbl %>%
 f <- (\() predped::create_nodes(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = FALSE)) |>
+                                many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 m <- (\() predped::create_nodes(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = TRUE)) |>
+                                many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
