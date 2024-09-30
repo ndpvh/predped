@@ -787,38 +787,53 @@ add_agent <- function(model,
                                   individual_differences = individual_differences) 
     radius <- params$radius
 
+    # Determine the agent's position. Either this is at the specified location 
+    # or this is a bit further down from where the agent enters the room at 
+    # the specified entrance.
+    if(is.null(position)) {
+        # Offset is the x- and y-offset that needs to be added to the entrance 
+        # coordinates in order for the agent to not intersect with the shape of 
+        # the background. The offset is defined by an angle -- which in itself
+        # defines the direction in which the offset should happen, as determined 
+        # to be the perpendicular orientation to the entrance-wall -- and by 
+        # a distance -- which defines how far away from the entrance-wall the 
+        # agent should be placed.
+        offset_angle <- perpendicular_orientation(shape(background),
+                                                  entrance_agent) * pi / 180
+        offset_number <- max(params_from_csv[["params_bounds"]]["radius",])
+
+        offset <- 1.025 * offset_number * c(cos(offset_angle), sin(offset_angle))
+
+        position <- entrance_agent + offset
+
+        # Also take the offset_angle to be the direction in which the agent is 
+        # looking
+        angle <- offset_angle * 180 / pi
+    }
+
     # Create this agents' goal stack
     if(is.null(precomputed_goals)) {
         goal_stack <- goal_stack(goal_number, 
                                  background, 
-                                 counter_generator = goal_duration,
+                                 counter = goal_duration,
                                  precomputed_edges = precomputed_edges,
-                                 agent_position = position,
+                                 starting_position = position,
                                  precompute_goal_paths = precompute_goal_paths,
                                  space_between = space_between * radius,
                                  sort = sort_goals)
     } else {
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]
-    }
+    } 
 
-    # Determine the agent's orientation. Either perpendicular to the wall in 
-    # the agent enters, or directed towards the current goal of the agent.
-    if(is.null(position)) {
-        angle <- perpendicular_orientation(shape(background),
-                                           entrance_agent)
-    } else {
+    # Determine the agent's orientation. This is only triggered if angles wasn't
+    # prevously defined as being perpendicular to the entry.
+    if(is.null(angle)) {
         co_1 <- position
         co_2 <- goal_stack[[1]]@position
-
+    
         angle <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
     }    
-
-    # Determine the position of the agent. Either this is at the entrance, or 
-    # this is at the specified location
-    if(is.null(position)) {
-        position <- entrance_agent + 1.025 * max(params_from_csv[["params_bounds"]]["radius",]) * c(cos(angle * pi / 180), sin(angle * pi / 180))
-    }
     
     # Create the agent itself
     tmp_agent <- agent(center = position,
@@ -914,7 +929,7 @@ create_initial_condition <- function(agent_number,
     setting <- model@setting
 
     # Make sure you have enough goal-numbers for each of the agents
-    goal_number <- determine_values(goal_number, initial_number_agents)
+    goal_number <- determine_values(goal_number, agent_number)
 
     # Check whether the weights in `group_size` sum to 1. If not, correct this
     if(sum(group_size[,2]) != 1) {
@@ -931,10 +946,10 @@ create_initial_condition <- function(agent_number,
     # change (i.e., if you start with a group of two, then the group number 
     # should change after agent 2; see below)
     if(nrow(group_size) == 1) {
-        groups <- rep(group_size[,1], initial_number_agents)
+        groups <- rep(group_size[,1], agent_number)
     } else {
         groups <- sample(group_size[,1], 
-                         initial_number_agents, 
+                         agent_number, 
                          replace = TRUE,
                          prob = group_size[,2])
     }
@@ -946,7 +961,7 @@ create_initial_condition <- function(agent_number,
     # agents start at the entrance walking into the setting.
     group_number <- 1
     agents <- list() ; stop <- FALSE
-    for(i in seq_len(initial_number_agents)) {
+    for(i in seq_len(agent_number)) {
         # Initial agent to create
         new_agent <- add_agent(model, 
                                goal_number[i], 
@@ -968,7 +983,13 @@ create_initial_condition <- function(agent_number,
                                many_nodes = TRUE)
 
         # Additional check to see if there are enough edges to place agents on
-        if(nrow(edges$edges) == 0) {
+        if(is.null(edges$edges)) {
+            stop <- TRUE
+        } else if(nrow(edges$edges) == 0) {
+            stop <- TRUE
+        }
+
+        if(stop) {
             message(paste0("Couldn't add any new agents after ", 
                            length(agents), 
                            " due to crowdiness."))
@@ -995,22 +1016,21 @@ create_initial_condition <- function(agent_number,
             }
 
             # Sample a random edge on which the agent will stand
-            idx <- sample(1:nrow(edges$edges), 1)
+            idx <- sample(1:nrow(edges$edges_with_coords), 1)
 
             # Get the coordinates of the two points that make up this edge
-            co_1 <- edges$edges_with_coords[idx, c("from_x", "from_y")]
-            co_2 <- edges$edges_with_coords[idx, c("to_x", "to_y")]
+            coords <- edges$edges_with_coords[idx,]
 
             # Generate several alternative positions along this edge on which the 
             # agent can stand and bind them into a matrix
-            n_agents_fit <- sqrt((co_1$X - co_2$X)^2 + (co_1$Y - co_2$Y)^2) / size(new_agent)
+            n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / size(new_agent)
 
             if(any(is.na(n_agents_fit))) {
                 browser()
             }
             
-            alternatives <- cbind(seq(co_1$X, co_2$X, length.out = floor(n_agents_fit)),
-                                  seq(co_1$Y, co_2$Y, length.out = floor(n_agents_fit)))
+            alternatives <- cbind(seq(coords$from_x, coords$to_x, length.out = floor(n_agents_fit)),
+                                  seq(coords$from_y, coords$to_y, length.out = floor(n_agents_fit)))
 
             # Check which position are accessible for the agent
             dummy <- agent(center = c(0, 0), radius = size(new_agent))

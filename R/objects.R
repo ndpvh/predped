@@ -283,6 +283,10 @@ setMethod("initialize", "rectangle", function(.Object,
                                               ...) {
 
     # Do some initial checks
+    if(length(center) != 2) {
+        stop("Center position should have length two (x and y)")
+    }
+    
     if(length(size) != 2) {
         stop("Size vector must have length two (x and y)")
     } 
@@ -309,7 +313,7 @@ setMethod("initialize", "rectangle", function(.Object,
     # If the rectangle has a non-zero orietation, then we need to rotate these 
     # points around the center of the rectangle
     if (orientation != 0) {
-        points <- t(apply(points, 1, rotate, radians = orientation, center = center))
+        points <- rotate(points, radians = orientation, center = center)
     }
 
     # if(!clock_wise) {
@@ -615,7 +619,7 @@ setMethod("rotate", signature(object = "numeric"), function(object,
     # return as a coordinate
     y <- y + center
 
-    return(as(y, "coordinate"))
+    return(coordinate(y))
 })
 
 # Make sure coordinate is handled in the same way as numerics for this method
@@ -743,12 +747,14 @@ setMethod("rotate", signature(object = "segment"), function(object,
                                                             ...) {
 
     # Rotate the points of the segment around the point specified. For this, we 
-    # rely on the rotation of a matrix.
-    result <- rotate(rbind(object@from, object@to), 
+    # rely on the rotation of a matrix, Note that the matrix should be 2 x N 
+    # for the rotation in matrix to work, so that we have to put the coordinates
+    # in the columns, not rows. 
+    result <- rotate(cbind(object@from, object@to), 
                      center = center, 
                      ...)
-    object@from <- result[1,]
-    object@to <- result[2]
+    object@from <- result[,1]
+    object@to <- result[,2]
 
     # Adjust the center and orientation as well, as these might have changed
     object@center <- object@from + (object@to - object@from) / 2
@@ -2191,8 +2197,8 @@ setMethod("center", signature(object = "segment"), function(object) {
 setMethod("center<-", signature(object = "segment"), function(object, value) {
     diff <- object@center - value
 
-    object@from <- object@from + diff 
-    object@to <- object@to + diff
+    object@from <- object@from - diff 
+    object@to <- object@to - diff
 
     object@center <- value
     
@@ -2209,6 +2215,8 @@ setMethod("from", signature(object = "segment"), function(object, ...) {
 #' @rdname from-method
 setMethod("from<-", signature(object = "segment"), function(object, value) {
     object@from <- value
+    object@size <- sqrt((object@from[1] - object@to[1])^2 + (object@from[2] - object@to[2])^2)
+    object@center <- object@from + (object@to - object@from) / 2
     return(object)
 })
 
@@ -2252,9 +2260,12 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
     angle <- value - object@orientation
     object@orientation <- value   
 
+    from_x0 <- object@from - object@center 
+    to_x0 <- object@to - object@center 
+
     R <- matrix(c(cos(angle), sin(angle), -sin(angle), cos(angle)), nrow = 2, ncol = 2)
-    object@from <- R %*% object@from
-    object@to <- R %*% object@to
+    object@from <- object@center + as.numeric(R %*% from_x0)
+    object@to <- object@center + as.numeric(R %*% to_x0)
 
     return(object)
 })
@@ -2411,8 +2422,11 @@ setMethod("size<-", signature(object = "segment"), function(object, value) {
     # Assumption: The `from` coordinate remains the same. Then we can use an 
     # imaginary circle to get the new coordinate of `to`
     angle <- orientation(object)
+
     object@to <- object@from + value * c(cos(angle), sin(angle))
     object@size <- value
+    object@center <- object@from + (object@to - object@from) / 2
+
     return(object)
 })
 
@@ -2426,6 +2440,8 @@ setMethod("to", signature(object = "segment"), function(object, ...) {
 #' @rdname to-method
 setMethod("to<-", signature(object = "segment"), function(object, value) {
     object@to <- value
+    object@size <- sqrt((object@from[1] - object@to[1])^2 + (object@from[2] - object@to[2])^2)
+    object@center <- object@from + (object@to - object@from) / 2
     return(object)
 })
 

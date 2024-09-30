@@ -591,7 +591,7 @@ setMethod("replace", "goal", function(object,
 
     # Otherwise, generate a new one.
     } else {
-        return(goal_stack(1, setting, counter_generator)[[1]])
+        return(goal_stack(1, setting, counter = counter)[[1]])
     }
 })
 
@@ -691,7 +691,7 @@ goal_stack <- function(n,
 
     # First check whether the goal stack should be ordered at all. If not, then 
     # the if-statement is not executed and we immediately go to Step 3.
-    if(sort & length(goal_stack) > 1) {
+    if(sort & length(goal_stack) > 1 & !is.null(starting_position)) {
         # Create a local function that outputs the goal with the closest distance
         # to a given coordinate y. This function will be ran until we reached 
         # the last goal in the goal stack, allowing us to easily sort the goal
@@ -710,23 +710,34 @@ goal_stack <- function(n,
         # Get the first goal done and delete it from the list
         idx <- closest_goal(goal_stack, starting_position)
 
-        ordered_goal_stack <- list(goal_stack[idx])        
+        ordered_goal_stack <- goal_stack[idx]
         goal_stack <- goal_stack[!idx]
 
         # Now loop over the others, but only if there are enough others to iterate
         # over.
-        if(length(goal_stack) != 1) {
-            for(i in 2:(n - 1)) {
+        if(length(goal_stack) != 0) {
+            for(i in seq_along(n)) {
+                # Double check whether there are any goals left. If not, then 
+                # we have to break out of this for-loop. Can occur if there are 
+                # many ties in the distances walked.
+                if(length(goal_stack) == 0) {
+                    break
+                }
+
                 # Repeat the same procedure
-                idx <- closest_goal(goal_stack, position(ordered_goal_stack[[i - 1]]))
+                N <- length(ordered_goal_stack)
+                idx <- closest_goal(goal_stack, 
+                                    position(ordered_goal_stack[[N]]))
     
-                ordered_goal_stack[[i]] <- goal_stack[idx]
+                ordered_goal_stack <- append(ordered_goal_stack, goal_stack[idx])
                 goal_stack <- goal_stack[!idx]
             }
         }
 
-        # Append the last goal to the goal stack
-        ordered_goal_stack[[n]] <- goal_stack[[1]]
+        if(length(goal_stack) != 0) {
+            ordered_goal_stack <- append(ordered_goal_stack, goal_stack)
+        }
+
         goal_stack <- ordered_goal_stack
     }
 
@@ -825,8 +836,8 @@ multiple_goal_stacks <- function(n,
     goal_number <- determine_values(goal_number, n)
 
     # Loop over the number of goal stacks to create
-    return(lapply(seq_len(n), 
-                  \(i) goal_stack(goal_number[i], setting, ...)))
+    return(lapply(goal_number[1:n], 
+                  \(x) goal_stack(x, setting, ...)))
 }
 
 

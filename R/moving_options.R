@@ -227,7 +227,7 @@ agents_between_goal <- function(agent,
                                      nrow = 1, 
                                      ncol = 2), 
                               orientation(agent), 
-                              matrix(current_goal(agent)@position,
+                              matrix(current_goal(agent)@path[1,],
                                      nrow = 1, 
                                      ncol = 2))
 

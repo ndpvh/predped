@@ -57,17 +57,19 @@
 #' @rdname agent-class
 #'
 #' @export
-agent <- setClass("agent", list(id = "character",
-                                speed = "numeric",
-                                orientation = "numeric",
-                                group = "numeric",
-                                status = "character",
-                                waiting_counter = "numeric",
-                                cell = "numeric",
-                                current_goal = "goal",
-                                goals = "list", 
-                                parameters = "data.frame",
-                                color = "character"), contains = c("circle"))
+agent <- setClass("agent", 
+                  list(id = "character",
+                       speed = "numeric",
+                       orientation = "numeric",
+                       group = "numeric",
+                       status = "character",
+                       waiting_counter = "numeric",
+                       cell = "numeric",
+                       current_goal = "goal",
+                       goals = "list", 
+                       parameters = "data.frame",
+                       color = "character"), 
+                  contains = c("circle"))
 
 #' Constructor for the \code{\link[predped]{agent-class}}
 #' 
@@ -153,7 +155,8 @@ setMethod("initialize", "agent", function(.Object,
                                           group = 0,
                                           status = "move",
                                           waiting_counter = 0,
-                                          cell = 0,                                          
+                                          cell = 0,
+                                          parameters = data.frame(),                                   
                                           color = "black") {
 
     # Use the circular object as the basis of the agent     
@@ -172,6 +175,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
+    .Object@parameters <- parameters
     .Object@color <- color    
 
     if(!is.null(current_goal)) {
