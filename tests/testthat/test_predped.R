@@ -1,8 +1,8 @@
 testthat::test_that("Predped initialization works", {
     # Create a mock setting
     setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
-                                                              size = c(2,2),
-                                   objects = list()))
+                                                              size = c(2,2)),
+                                   objects = list())
 
     # Load in the parameters. To be used later.
     params_csv <- suppressMessages(load_parameters())
