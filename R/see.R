@@ -36,8 +36,8 @@
 # Object-oriented replacement of the function `bestAngle`.
 best_angle <- function(agent,
                        state,
-                       agent_specifications,
                        background,
+                       agent_specifications,
                        velocities,
                        orientations,
                     #    cores = 1,
@@ -62,10 +62,11 @@ best_angle <- function(agent,
                                    tStep = 0.5)
 
         # Check for occlusions or blocked cells the agent cannot move to
-        check <- moving_options(agent, state, background, centers)
+        check <- tryCatch(moving_options(agent, state, background, centers), 
+                          error = function(e) browser())
 
         # Compute the utility of the proposed cells to move to
-        V <- utility(agent, state, agent_specifications, centers, background, check)[-1] # Omit utility for cell 0
+        V <- utility(agent, state, background, agent_specifications, centers, check)[-1] # Omit utility for cell 0
         utility_angles[i, ] <- c(max(V), orientation(agent))
     }
 

@@ -61,7 +61,7 @@ setMethod("update", "state", function(object,
         agent_list[[i]] <- update(agent, 
                                   state_copy,
                                   background,
-                                  agent_specifications,
+                                  agent_specs,
                                   ...)
     }
 
@@ -269,8 +269,8 @@ update_position <- function(agent,
     } else if(status(agent) == "reorient") {        
         orientation(agent) <- best_angle(agent, 
                                          state, 
+                                         background,
                                          agent_specifications, 
-                                         background, 
                                          velocities, 
                                          orientations)
 
@@ -480,7 +480,7 @@ update_goal <- function(agent,
             }
 
             # Replan if the goal paths were not precomputed yet
-            if(nrow(path(agent@current_goal))) {
+            if(nrow(current_goal(agent)@path) == 0) {
                 status(agent) <- "plan"
             } else {
                 status(agent) <- "reorient"
@@ -673,11 +673,9 @@ update_goal <- function(agent,
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {
         # Keep this in for debugging purposes
-        # if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-        #     View(current_goal(agent))
-        #     View(agent)
-        #     print(plot(state))
-        # }
+        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
+            browser()
+        }
 
         # Determine how far along the `path` they are
         distance_path_point <- m4ma::dist1(position(agent), 
@@ -855,7 +853,7 @@ predict_movement <- function(agent,
 #' 
 #' @export
 create_agent_specifications <- function(agent_list,
-                                        stay_stoppped = TRUE, 
+                                        stay_stopped = TRUE, 
                                         time_step = 0.5) {
     
     # Predict where the agents will be at their current velocity and angle. Is 

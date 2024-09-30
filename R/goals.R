@@ -623,6 +623,10 @@ setMethod("replace", "goal", function(object,
 #' \code{\link[predped]{find_path-method}} for each of the generated goals 
 #' beforehand. Assumes that the agent does all of the goals in the order of the 
 #' goal stack. Defaults to \code{FALSE}. 
+#' @param middle_edge Logical denoting whether to sample the goals from the 
+#' middle of the edge of the objects in the \code{link[predped]{background-class}}
+#' (\code{TRUE}) or to allow the goal locations to fall on all points on these 
+#' edges (\code{FALSE}). Defaults to \code{FALSE}.
 #' @param ... Arguments provided to \code{\link[predped]{find_path-method}} to 
 #' precompute the paths that the agents should take to reach their goals. Only
 #' used when \code{precompute_goal_paths = TRUE}.
@@ -654,12 +658,17 @@ setMethod("replace", "goal", function(object,
 #' @rdname goal_stack
 #' 
 #' @export 
+#
+# TO DO
+#   - Sorting algorithm is not that good yet. Try to come up with a better and 
+#     efficient solution
 goal_stack <- function(n, 
                        setting,
                        counter = \(n) rnorm(n, 10, 2),
                        sort = TRUE, 
                        starting_position = entrance(setting)[1,],
                        precompute_goal_paths = FALSE,
+                       middle_edge = FALSE,
                        ...) {
     
     # Step 1: Generating the goal stack
@@ -683,7 +692,10 @@ goal_stack <- function(n,
     # on one of its edges, as handled by the `add_goal` method. 
     obj <- sample(obj, n, replace = TRUE)
     goal_stack <- lapply(seq_along(obj), 
-                         \(i) add_goal(obj[[i]], setting, counter = counter[i]))
+                         \(i) add_goal(obj[[i]], 
+                                       setting, 
+                                       counter = counter[i],
+                                       middle_edge = middle_edge))
 
 
 

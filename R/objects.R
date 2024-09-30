@@ -1264,6 +1264,10 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' @rdname rng_point-method
 #' 
 #' @export
+# 
+# TO DO:
+#   - Allow for forbidden to be specified at the object-level, so that this 
+#     can be accounted for when sampling goals from them
 setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
 
 #'@rdname rng_point-method

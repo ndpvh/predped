@@ -130,6 +130,10 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' @param precomputed_goals List of goal stacks from which the agent can be 
 #' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 #' in the simulation. 
+#' @param middle_edge Logical denoting whether to sample the goals from the 
+#' middle of the edge of the objects in the \code{link[predped]{background-class}}
+#' (\code{TRUE}) or to allow the goal locations to fall on all points on these 
+#' edges (\code{FALSE}). Defaults to \code{FALSE}.
 #' @param initial_agents List of objects of the \code{\link[predped]{agent-class}}
 #' with which to start the simulation. Defaults to \code{NULL}, meaning the 
 #' simulation starts with an empty room.
@@ -235,6 +239,7 @@ setMethod("simulate", "predped", function(object,
                                           precompute_goal_paths = FALSE,
                                           sort_goals = TRUE,
                                           precomputed_goals = NULL,
+                                          middle_edge = FALSE,
                                           space_between = 2.5,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
@@ -283,6 +288,7 @@ setMethod("simulate", "predped", function(object,
                                                    object,
                                                    goal_number[1:initial_number_agents],
                                                    goal_duration = goal_duration,
+                                                   middle_edge = middle_edge,
                                                    standing_start = standing_start,
                                                    space_between = space_between,
                                                    time_step = time_step,
@@ -332,6 +338,7 @@ setMethod("simulate", "predped", function(object,
                                    precomputed_edges = edges,
                                    many_nodes = many_nodes,
                                    precompute_goal_paths = precompute_goal_paths,
+                                   middle_edge = middle_edge,
                                    ...)
     }
 
@@ -472,6 +479,7 @@ setMethod("simulate", "state", function(object,
                                                          350, 340, 327.5, 310, 287.5) |>
                                             rep(times = 3) |>
                                             matrix(ncol = 3),
+                                        standing_start = 0.1,
                                         close_enough = 2,
                                         space_between = 2.5,
                                         stay_stopped = TRUE, 
@@ -508,6 +516,7 @@ setMethod("simulate", "state", function(object,
         potential_agents(object) <- add_group(model, 
                                               agent_number = agent_number,
                                               group_number = i,
+                                              standing_start = standing_start,
                                               ...)
         agents_in_queue <- TRUE
     }
@@ -541,7 +550,6 @@ setMethod("simulate", "state", function(object,
                      precomputed_edges = precomputed_edges,
                      many_nodes = many_nodes,
                      report = report,
-                     interactive_report = interactive_report,
                      velocities = velocities,
                      orientations = orientations)
 
@@ -700,6 +708,10 @@ add_group <- function(model,
 #' @param precomputed_goals List of goal stacks from which the agent can be 
 #' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 #' in the simulation. 
+#' @param middle_edge Logical denoting whether to sample the goals from the 
+#' middle of the edge of the objects in the \code{link[predped]{background-class}}
+#' (\code{TRUE}) or to allow the goal locations to fall on all points on these 
+#' edges (\code{FALSE}). Defaults to \code{FALSE}.
 #' @param precomputed_edges Output of \code{\link[predped]{compute_edges}} 
 #' containing the nodes and edges the agent can use to plan its path. Defauls 
 #' to \code{NULL}, triggering the creation of these edges whenever they are 
@@ -759,7 +771,8 @@ add_agent <- function(model,
                       precompute_goal_paths = TRUE,
                       sort_goals = TRUE,
                       precomputed_goals = NULL,
-                      precomputed_edges = NULL,                          
+                      middle_edge = FALSE, 
+                      precomputed_edges = NULL,                         
                       space_between = 2.5,
                       position = NULL,
                       standing_start = 0.1,
@@ -820,7 +833,8 @@ add_agent <- function(model,
                                  starting_position = position,
                                  precompute_goal_paths = precompute_goal_paths,
                                  space_between = space_between * radius,
-                                 sort = sort_goals)
+                                 sort = sort_goals,
+                                 middle_edge = middle_edge)
     } else {
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]
