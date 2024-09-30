@@ -59,7 +59,7 @@ testthat::test_that("Segment initialization works", {
 ################################################################################
 # GETTERS AND SETTERS
 
-testthat::test_that("Object getters work", {
+testthat::test_that("Polygon getters work", {
     # Polygon
     set.seed(1)
     tst <- predped::polygon(points = rbind(c(-1, -1),
@@ -73,36 +73,9 @@ testthat::test_that("Object getters work", {
                                                        c(-1, 1), 
                                                        c(1, 1),
                                                        c(1, -1)))
-
-    # Rectangle
-    set.seed(1)
-    tst <- predped::rectangle(center = c(0, 0), 
-                              size = c(2, 2),
-                              orientation = pi)
-
-    testthat::expect_equal(predped::id(tst), "object ydgab")
-    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
-    testthat::expect_equal(predped::size(tst), c(2, 2))
-    testthat::expect_equal(predped::orientation(tst), pi)
-    testthat::expect_equal(predped::points(tst), rbind(c(1, 1),
-                                                       c(1, -1), 
-                                                       c(-1, -1),
-                                                       c(-1, 1)))
-
-    # Circle
-    set.seed(1)
-    tst <- predped::circle(center = c(0, 0), radius = 1)
-    angles <- seq(0, 2 * pi, length.out = 101)[1:100]
-
-    testthat::expect_equal(predped::id(tst), "object ydgab")
-    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
-    testthat::expect_equal(predped::size(tst), 1)
-    testthat::expect_equal(predped::radius(tst), 1)
-    testthat::expect_equal(as.matrix(predped::points(tst)), 
-                           matrix(c(cos(angles), sin(angles)), ncol = 2))
 })
 
-testthat::test_that("Object setters work", {
+testthat::test_that("Polygon setters work", {
     # Polygon
     tst <- predped::polygon(points = rbind(c(-1, -1),
                                            c(-1, 1), 
@@ -118,7 +91,26 @@ testthat::test_that("Object setters work", {
                                              c(0, 2),
                                              c(2, 2),
                                              c(2, 0)))
+})
 
+testthat::test_that("Rectangle getters work", {
+    # Rectangle
+    set.seed(1)
+    tst <- predped::rectangle(center = c(0, 0), 
+                              size = c(2, 2),
+                              orientation = pi)
+
+    testthat::expect_equal(predped::id(tst), "object ydgab")
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::size(tst), c(2, 2))
+    testthat::expect_equal(predped::orientation(tst), pi)
+    testthat::expect_equal(predped::points(tst), rbind(c(1, 1),
+                                                       c(1, -1), 
+                                                       c(-1, -1),
+                                                       c(-1, 1)))
+})
+
+testthat::test_that("Rectangle setters work", {
     # Rectangle
     tst <- predped::rectangle(center = c(0, 0), 
                               size = c(2, 2),
@@ -179,7 +171,23 @@ testthat::test_that("Object setters work", {
                                  c(-sqrt(0.125), -sqrt(2) / 2 - sqrt(0.125)),
                                  c(-sqrt(2) / 2 - sqrt(0.125), -sqrt(0.125))),
                            tolerance = 1e-4)
+})
 
+testthat::test_that("Circle getters work", {
+    # Circle
+    set.seed(1)
+    tst <- predped::circle(center = c(0, 0), radius = 1)
+    angles <- seq(0, 2 * pi, length.out = 101)[1:100]
+
+    testthat::expect_equal(predped::id(tst), "object ydgab")
+    testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::size(tst), 1)
+    testthat::expect_equal(predped::radius(tst), 1)
+    testthat::expect_equal(as.matrix(predped::points(tst)), 
+                           matrix(c(cos(angles), sin(angles)), ncol = 2))
+})
+
+testthat::test_that("Circle setters work", {
     # Circle
     tst <- predped::circle(center = c(0, 0), radius = 1)
 
@@ -226,6 +234,49 @@ testthat::test_that("Circle transformation to polygon works", {
     testthat::expect_false(tst_3)
 })
 
+testthat::test_that("Segment getters work", {
+    # Segment
+    set.seed(1)
+    tst <- predped::segment(from = c(-1, -1), to = c(1, 1))
+
+    testthat::expect_equal(predped::id(tst), "object ydgab")
+    testthat::expect_equal(predped::center(tst), c(0, 0))
+    testthat::expect_equal(predped::size(tst), 2 * sqrt(2))
+    testthat::expect_equal(predped::from(tst), c(-1, -1))
+    testthat::expect_equal(predped::to(tst), c(1, 1))
+    testthat::expect_equal(predped::orientation(tst), pi / 4)
+})
+
+testthat::test_that("Segment setters work", {
+    # Segment
+    tst <- predped::segment(from = c(-1, -1), to = c(1, 1))
+
+    predped::id(tst) <- "test"
+    predped::center(tst) <- c(1, 1)
+
+    testthat::expect_equal(predped::id(tst), "test")
+    testthat::expect_equal(predped::center(tst), c(1, 1))
+    testthat::expect_equal(predped::from(tst), c(0, 0))
+    testthat::expect_equal(predped::to(tst), c(2, 2))
+    
+    predped::from(tst) <- c(-2, -2)
+    predped::to(tst) <- c(3, 3)
+    testthat::expect_equal(predped::from(tst), c(-2, -2))
+    testthat::expect_equal(predped::to(tst), c(3, 3))
+    testthat::expect_equal(predped::size(tst), 5 * sqrt(2))
+    testthat::expect_equal(predped::center(tst), c(0.5, 0.5))
+
+    predped::size(tst) <- sqrt(2)
+    testthat::expect_equal(predped::size(tst), sqrt(2))
+    testthat::expect_equal(predped::from(tst), c(-2, -2))
+    testthat::expect_equal(predped::to(tst), c(-1, -1))
+    testthat::expect_equal(predped::center(tst), c(-1.5, -1.5))
+
+    predped::orientation(tst) <- pi / 2 + pi / 4
+    testthat::expect_equal(predped::from(tst), c(-1, -2))
+    testthat::expect_equal(predped::to(tst), c(-2, -1))
+})
+
 
 
 
@@ -259,6 +310,58 @@ testthat::test_that("Multiple points rotation works", {
     testthat::expect_equal(p, rbind(c(0, 2), c(2, 4)))
 })
 
+testthat::test_that("Polygon rotation around own center works", {
+    # Create a reference for rotation around the polgyon's center
+    ref <- rbind(c(1.5, 0.5),
+                 c(-0.5, 0.5),
+                 c(-0.5, 1.5),
+                 c(1.5, 1.5))
+
+    # Create a polygon to be rotated
+    p <- predped::polygon(points = rbind(c(0, 0), 
+                                         c(0, 2), 
+                                         c(1, 2), 
+                                         c(1, 0)))
+
+    # Rotation based on radians
+    rotated <- predped::rotate(p, radians = pi / 2)
+    testthat::expect_equal(predped::points(rotated), ref)
+
+    # Rotation based on degrees
+    rotated <- predped::rotate(p, degrees = 90)
+    testthat::expect_equal(predped::points(rotated), ref)
+
+    # Rotation based on degrees, but both provided
+    rotated <- predped::rotate(p, radians = pi / 2, degrees = 90)
+    testthat::expect_equal(predped::points(rotated), ref)
+})
+
+testthat::test_that("Polygon rotation around other center works", {
+    # Create a reference for rotation around the origin
+    ref <- rbind(c(0, 0), 
+                 c(-2, 0), 
+                 c(-2, 1),
+                 c(0, 1))
+
+    # Create a polygon to be rotated
+    p <- predped::polygon(points = rbind(c(0, 0), 
+                                         c(0, 2), 
+                                         c(1, 2), 
+                                         c(1, 0)))
+
+    # Rotation based on radians
+    rotated <- predped::rotate(p, radians = pi / 2, center = c(0, 0))
+    testthat::expect_equal(predped::points(rotated), ref)
+
+    # Rotation based on degrees
+    rotated <- predped::rotate(p, degrees = 90, center = c(0, 0))
+    testthat::expect_equal(predped::points(rotated), ref)
+
+    # Rotation based on degrees, but both provided
+    rotated <- predped::rotate(p, radians = pi / 2, degrees = 90, center = c(0, 0))
+    testthat::expect_equal(predped::points(rotated), ref)
+})
+
 testthat::test_that("Rectangle rotation around own center works", {
     # Create a reference for rotation around the rectangles center
     ref <- rbind(c(1.5, 0.5),
@@ -283,7 +386,7 @@ testthat::test_that("Rectangle rotation around own center works", {
 })
 
 testthat::test_that("Rectangle rotation around other center works", {
-    # Create a reference for rotation around the rectangles center
+    # Create a reference for rotation around the origin
     ref <- rbind(c(0, 0), 
                  c(-2, 0), 
                  c(-2, 1),
@@ -305,6 +408,54 @@ testthat::test_that("Rectangle rotation around other center works", {
     testthat::expect_equal(predped::points(rotated), ref)
 })
 
+testthat::test_that("Segment rotation around own center works", {
+    # Create a reference for rotation around the segment's center
+    ref_from <- c(1, 0)
+    ref_to <- c(0, 1)
+
+    # Create a segment to be rotated
+    s <- predped::segment(from = c(0, 0), to = c(1, 1))
+
+    # Rotation based on radians
+    rotated <- predped::rotate(s, radians = pi / 2)
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+
+    # Rotation based on degrees
+    rotated <- predped::rotate(s, degrees = 90)
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+
+    # Rotation based on degrees, but both provided
+    rotated <- predped::rotate(s, radians = pi / 2, degrees = 90)
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+})
+
+testthat::test_that("Segment rotation around other center works", {
+    # Create a reference for rotation around the segment's center
+    ref_from <- c(0, 0)
+    ref_to <- c(-1, 1)
+
+    # Create a segment to be rotated
+    s <- predped::segment(from = c(0, 0), to = c(1, 1))
+
+    # Rotation based on radians
+    rotated <- predped::rotate(s, radians = pi / 2, center = c(0, 0))
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+
+    # Rotation based on degrees
+    rotated <- predped::rotate(s, degrees = 90, center = c(0, 0))
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+
+    # Rotation based on degrees, but both provided
+    rotated <- predped::rotate(s, radians = pi / 2, degrees = 90, center = c(0, 0))
+    testthat::expect_equal(predped::from(rotated), ref_from)
+    testthat::expect_equal(predped::to(rotated), ref_to)
+})
+
 
 
 
@@ -322,7 +473,8 @@ testthat::test_that("Polygon moving works", {
 
     moved <- predped::move(p, c(1, 1))
 
-    testthat::expect_equal(center(moved), c(1, 1))
+    testthat::expect_equal(predped::center(moved), c(1, 1))
+    testthat::expect_equal(predped::points(moved), predped::points(p) + c(1, 1))
 
     # Create an immobile rectangle
     p <- predped::polygon(points = rbind(c(0.5, 0.5),
@@ -334,7 +486,8 @@ testthat::test_that("Polygon moving works", {
     moved <- predped::move(p, c(1, 1)) |>
         suppressWarnings()
 
-    testthat::expect_equal(center(moved), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::center(moved), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::points(moved), predped::points(p))
 
     # When immobile, we should get a warning
     testthat::expect_warning(predped::move(p, c(1, 1)))
@@ -347,7 +500,8 @@ testthat::test_that("Rectangle moving works", {
                             moveable = TRUE)
     moved <- predped::move(r, c(1, 1))
 
-    testthat::expect_equal(center(moved), c(1, 1))
+    testthat::expect_equal(predped::center(moved), c(1, 1))
+    testthat::expect_equal(predped::points(moved), predped::points(r) + c(1, 1))
 
     # Create an immobile rectangle
     r <- predped::rectangle(center = c(0, 0), 
@@ -355,7 +509,8 @@ testthat::test_that("Rectangle moving works", {
                             moveable = FALSE)
     moved <- suppressWarnings(predped::move(r, c(1, 1)))
 
-    testthat::expect_equal(center(moved), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::center(moved), predped::coordinate(c(0, 0)))
+    testthat::expect_equal(predped::points(moved), predped::points(r))
 
     # When immobile, we should get a warning
     testthat::expect_warning(predped::move(r, c(1, 1)))
@@ -382,6 +537,33 @@ testthat::test_that("Circle moving works", {
 
     # When immobile, we should get a warning
     testthat::expect_warning(predped::move(c, c(1, 1)))
+})
+
+testthat::test_that("Segment moving works", {
+    # Create a circle to move
+    s <- predped::segment(from = c(-2, -2), 
+                          to = c(2, 2), 
+                          moveable = TRUE)
+
+    moved <- predped::move(s, c(1, 1))
+    
+    testthat::expect_equal(center(moved), c(1, 1))
+    testthat::expect_equal(from(moved), c(-1, -1))
+    testthat::expect_equal(to(moved), c(3, 3))
+
+    # Create an immobile circle
+    s <- predped::segment(from = c(-2, -2), 
+                          to = c(2, 2), 
+                          moveable = FALSE)
+    moved <- predped::move(s, c(1, 1)) |>
+        suppressWarnings()
+
+    testthat::expect_equal(center(moved), c(0, 0))
+    testthat::expect_equal(from(moved), c(-2, -2))
+    testthat::expect_equal(to(moved), c(2, 2))
+
+    # When immobile, we should get a warning
+    testthat::expect_warning(predped::move(s, c(1, 1)))
 })
 
 
@@ -661,6 +843,36 @@ testthat::test_that("Enlarging object works", {
 
 ################################################################################
 # RNG_POINT
+
+testthat::test_that("Polygon random generation of point works", {
+    p <- predped::polygon(points = rbind(c(1, 1), 
+                                         c(1, -1), 
+                                         c(-1, -1), 
+                                         c(-1, 1)))
+
+    # Middle point of edge
+    ref1 <- c(1, 0)
+
+    set.seed(1)
+    tst1 <- round(rng_point(p), 4)
+
+    # Random point on edge
+    ref2 <- c(1, 0.2558)
+
+    set.seed(1)
+    tst2 <- round(rng_point(p, middle_edge = FALSE), 4)
+
+    # Forbid all except one edge
+    ref3 <- c(0, 1)
+
+    set.seed(1)
+    tst3 <- round(rng_point(p, forbidden = c(1, 2, 3)), 4)
+
+    # Actual test
+    testthat::expect_equal(tst1, ref1)
+    testthat::expect_equal(tst2, ref2)
+    testthat::expect_equal(tst3, ref3)
+})
 
 testthat::test_that("Rectangle random generation of point works", {
     r <- list(predped::rectangle(center = c(0, 0),
