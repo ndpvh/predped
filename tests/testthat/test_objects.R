@@ -80,7 +80,7 @@ testthat::test_that("Object getters work", {
                               size = c(2, 2),
                               orientation = pi)
 
-    testthat::expect_equal(predped::id(tst), "object wknrs") # Why would this object have a different name?
+    testthat::expect_equal(predped::id(tst), "object ydgab")
     testthat::expect_equal(predped::center(tst), predped::coordinate(c(0, 0)))
     testthat::expect_equal(predped::size(tst), c(2, 2))
     testthat::expect_equal(predped::orientation(tst), pi)
@@ -362,18 +362,26 @@ testthat::test_that("Rectangle moving works", {
 })
 
 testthat::test_that("Circle moving works", {
-    r <- predped::move(predped::circle(
-        center = c(0, 0),
-        radius = 0.5,
-        moveable = TRUE
-    ), c(1, 1))
-    testthat::expect_equal(r@center, predped::coordinate(c(1, 1)))
-    r <- predped::move(predped::circle(
-        center = c(0, 0),
-        radius = 0.5,
-        moveable = FALSE
-    ), c(1, 1))
-    testthat::expect_equal(r@center, predped::coordinate(c(0, 0)))
+    # Create a circle to move
+    c <- predped::circle(center = c(0, 0), 
+                         radius = 0.5, 
+                         moveable = TRUE)
+
+    moved <- predped::move(c, c(1, 1))
+    
+    testthat::expect_equal(center(moved), c(1, 1))
+
+    # Create an immobile circle
+    c <- predped::circle(center = c(0, 0), 
+                         radius = 0.5, 
+                         moveable = FALSE)
+    moved <- predped::move(c, c(1, 1)) |>
+        suppressWarnings()
+
+    testthat::expect_equal(center(moved), predped::coordinate(c(0, 0)))
+
+    # When immobile, we should get a warning
+    testthat::expect_warning(predped::move(c, c(1, 1)))
 })
 
 
