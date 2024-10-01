@@ -175,8 +175,9 @@ vf_utility_discrete <- function(b_vf, rel_angles) {
     # Calculate visual field utility
     # If in visual field: disutility = 0
     # If not in visual field: disutility = b*-1
+    visual_field_angle <- 3*pi/4
     visual_field_utility <- -sapply(rel_angles, 
-                                    \(x) ifelse(x > 3*pi/4 & x < 5*pi/4, b_vf * 1, 0))
+                                    \(x) ifelse(x > visual_field_angle & x < 2 * pi - visual_field_angle, b_vf * 1, 0))
 
     # Return the visual field utility
     return(visual_field_utility)

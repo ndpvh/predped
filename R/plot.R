@@ -169,8 +169,9 @@ setMethod("plot", "list", function(object,
             }
 
             plt[[i]] <- plt[[i]] +
-                ggplot2::labs(title = paste("iteration", iter)) +
-                ggplot2::theme(legend.position = "none")
+                ggplot2::labs(title = paste("Iteration", iter)) +
+                ggplot2::theme(legend.position = "none",
+                plot.title = ggplot2::element_text(size = 100, hjust = 0.5))
         }
 
     # If it is not the trace, then we need to output the list of geom's that are
