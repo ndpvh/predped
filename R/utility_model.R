@@ -141,6 +141,24 @@ utility <- function(agent,
                                    objects(background),
                                    pickBest = FALSE)
 
+        # Group Centroid Phenomenon                                       
+        inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
+        p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
+        nped <- dim(p_pred)[1]
+    
+        
+        distance_centroid <- get_mean_group_centroid(p_pred,
+                                                     centers,
+                                                     nped)
+
+        # Visual Field Phenomenon
+        buddies_in_vf <- get_angles_any_buddy(agent_idx,
+                                              agent_specifications$group,
+                                              agent_specifications$predictions,
+                                              orientation(agent),
+                                              centers,
+                                              position(agent))                                                     
+
     # Does not work at this moment, and so is left commented out
     #
     # Subject based
@@ -235,6 +253,20 @@ utility <- function(agent,
                                       p[["b_buddy"]], 
                                       buddies[["buddies"]], 
                                       buddies[["dists"]])
+    }
+
+    if (!is.null(distance_centroid)) {
+        V <- V + gc_utility(p[["a_group_centroid"]],
+                            p[["b_group_centroid"]],
+                            radius(agent),
+                            distance_centroid,
+                            -p[["stop_utility"]],
+                            nped)
+    }
+
+    if (!is.null(buddies_in_vf)) {
+        V <- V + vf_utility_discrete(p[["b_visual_field"]],
+                                     buddies_in_vf)
     }
 
     V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]

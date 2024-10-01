@@ -38,3 +38,6 @@ performance_test*
 .DS_Store
 RCore/
 demo/*
+
+social_utilities_alexander/
+benchmark.md
