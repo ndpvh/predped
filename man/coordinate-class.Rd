@@ -6,5 +6,18 @@
 \alias{coordinate}
 \title{An S4 Class to Represent Coordinate Vectors}
 \description{
-A named numeric vector that can only have two elements (x and y coordinates).
+Defines the \code{coordinate} class, which contains all characteristics of a
+coordinate or a single point. WARNING: Niels wants to phase the use of 
+\code{coordinate}s out of \code{predped}, as they greatly hamper the 
+flexibility of the low-level functions.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{x}}{Numerical vector denoting the coordinate.}
+}}
+
+\seealso{
+\code{\link[predped]{rotate}},
+\code{\link[predped]{initialize,coordinate-method}}
 }

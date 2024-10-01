@@ -4,15 +4,25 @@
 \alias{to_bounded}
 \title{Transform to positive axis}
 \usage{
-to_bounded(parameters)
+to_bounded(parameters, bounds)
 }
 \arguments{
-\item{parameters}{A named list containing the parameters for a given agent}
+\item{parameters}{Dataframe or named list containing values for the 
+parameters of M4MA.}
+
+\item{bounds}{Named numeric matrix containing the bounds for the parameters 
+of M4MA.}
 }
 \value{
-A named list containing the transformed parameters
+Dataframe or named list containing the transformed parameters
 }
 \description{
 Use the real (normal, unbounded) definition of the parameters and transform
 them to a positive (probit, bounded) scale.
+}
+\seealso{
+\code{\link[predped]{generate_parameters}},
+\code{\link[predped]{plot_distribution}},
+\code{\link[predped]{to_unbounded}},
+\code{\link[predped]{to_covariance}}
 }

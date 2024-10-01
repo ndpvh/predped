@@ -2,25 +2,60 @@
 % Please edit documentation in R/route.R
 \name{create_nodes}
 \alias{create_nodes}
-\title{Create nodes of graph to walk on}
+\title{Create nodes that serve as path points}
 \usage{
-create_nodes(from, to, background, space_between = 0.5, many_options = FALSE)
+create_nodes(from, to, background, space_between = 0.5, many_nodes = FALSE)
 }
 \arguments{
-\item{from}{Coordinate from which to start}
+\item{from}{Numeric denoting the coordinate from which to begin routes.}
 
-\item{to}{Coordinate at which to end}
+\item{to}{Numeric denoting the coordinate from which to end routes.}
 
-\item{background}{The background/setting in which the agent is walking}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{space_between}{Numeric denoting the space left between each of the 
-different nodes. Defaults to 0.5.}
+\item{space_between}{Numeric denoting the space to leave between the 
+circumference of the object and the nodes created under the hood (see
+\code{\link[predped]{add_nodes}}). Defaults to \code{0.5}.}
+
+\item{many_nodes}{Logical denoting whether to create many nodes or leave 
+it at the minimum. If \code{FALSE}, nodes are only added at the outlines of 
+the objects contained within the \code{objects} slot of \code{background}. 
+If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
+x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
+making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.}
 }
 \value{
-Matrix containing from, to, and the distance between these coordinates
+Dataframe with the surviving nodes, containing the node id under 
+\code{"node_ID"} and its coordinates under \code{"X"} and \code{"Y"}.
 }
 \description{
-This function uses the background, goal position, and position of the agent
-to create all potential nodes along which the agent can plan their route 
-towards their goal. The output is then used to find the shortest path.
+This function creates a dataframe of nodes that can serve as path points for 
+the agent to use when walking to their goal. The output is used in 
+\code{\link[predped]{create_edges}} to create paths the agent can take, and 
+ultimately in \code{\link[predped]{find_path}} for finding the 
+shortest path from the agent to the goal.
+}
+\examples{
+# Define a background in which the agent can move
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(center = c(0, 0), 
+                                                     size = c(1, 1))))
+
+nodes <- create_nodes(c(-0.75, 0), 
+                      c(0.75, 0), 
+                      my_background, 
+                      space_between = 0.25)
+
+# Check the nodes
+head(nodes)
+
+}
+\seealso{
+\code{\link[predped]{background-class}},
+\code{\link[predped]{add_nodes}},
+\code{\link[predped]{find_path}},
+\code{\link[predped]{in_object}},
+\code{\link[predped]{create_edges}},
+\code{\link[predped]{out_object}},
 }

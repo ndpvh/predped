@@ -4,23 +4,91 @@
 \alias{create_edges}
 \title{Create edges of graph to walk on}
 \usage{
-create_edges(from, to, background, space_between = 0.5, many_options = FALSE)
+create_edges(from, to, background, space_between = 0.5, many_nodes = FALSE)
 }
 \arguments{
-\item{from}{Coordinate from which to start}
+\item{from}{Numeric denoting the coordinate from which to begin routes.}
 
-\item{to}{Coordinate at which to end}
+\item{to}{Numeric denoting the coordinate from which to end routes.}
 
-\item{background}{The background/setting in which the agent is walking}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{space_between}{Numeric denoting the space left between each of the 
-different nodes. Defaults to 0.5.}
+\item{space_between}{Numeric denoting the space to leave between the 
+circumference of the object and the nodes created under the hood (see
+\code{\link[predped]{add_nodes}}). Defaults to \code{0.5}.}
+
+\item{many_nodes}{Logical denoting whether to create many nodes or leave 
+it at the minimum. If \code{FALSE}, nodes are only added at the outlines of 
+the objects contained within the \code{objects} slot of \code{background}. 
+If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
+x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
+making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.}
 }
 \value{
-Matrix containing from, to, and the distance between these coordinates
+List containing a dataframe with the surviving nodes under 
+\code{"nodes"}, a dataframe with the surviving connections between nodes 
+under \code{"edges"}, and a similar dataframe to the previous one but with 
+the coordinates still in there under \code{"edges_with_coords"}.
 }
 \description{
-This function uses the background, goal position, and position of the agent
-to create all possible routes along which the agent can walk towards their 
-goal. The output is then used to find the shortest path.
+This function creates a list of nodes and edges that define the paths that 
+an agent might walk on to reach their goal. The output is then used in 
+\code{\link[predped]{find_path}} to find the shortest path from the 
+agent to the goal.
+}
+\details{
+This function depends on many other functions to do its work, and works in 
+the following way. First, it will create many potential nodes and evaluate 
+whether these nodes can be accessed, that is, that they do not fall outside 
+of the \code{shape} specified in \code{background} or inside of objects that 
+can be found in the \code{objects} slot of the \code{background}. This part 
+of the computation is handled by the \code{\link[predped]{create_nodes}}
+function.
+
+Then, each of the nodes is combined to each other to form edges, that is 
+paths from one node to another that the agent might use to walk to their 
+goals. This is handled by the \code{\link[predped]{combine_nodes}} function.
+
+The appropriateness of these connections is then checked by the 
+\code{\link[predped]{evaluate_edges}} function. Specifically, this function 
+checks whether the connections that are made do not intersect with any of the 
+\code{objects} in the \code{background}, that is whether none of these 
+objects obstructs the path. Note that this computation also accounts for 
+potential limits in the bidirectionality of the ways, as defined by the 
+\code{limited_access} slot in \code{background} (see 
+\code{\link[predped]{limit_access}}).
+
+Once this is done, the result is put in a list as required by the 
+\code{\link[predped]{find_path}} to perform its computations.
+
+Note that all edges are unidirectional. This is enforced to allow for one-
+directional flow as controlled through the \code{limited_access} slot in 
+\code{background}.
+}
+\examples{
+# Define a background in which the agent can move
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(center = c(0, 0), 
+                                                     size = c(1, 1))))
+
+edges <- create_edges(c(-0.75, 0), 
+                      c(0.75, 0), 
+                      my_background, 
+                      space_between = 0.25)
+
+# Check the nodes and edges created
+head(edges$nodes)
+head(edges$edges)
+head(edges$edges_with_coords)
+
+}
+\seealso{
+\code{\link[predped]{background-class}},
+\code{\link[predped]{add_nodes}},
+\code{\link[predped]{find_path}},
+\code{\link[predped]{limit_access}},
+\code{\link[predped]{combine_nodes}},
+\code{\link[predped]{create_nodes}},
+\code{\link[predped]{evaluate_edges}}
 }

@@ -77,16 +77,8 @@ setting <- background(shape = rectangle(center = c(20, 12.5),
                       same_exit = FALSE)
 
 # Precompute some edges
-few_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = FALSE)
-many_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = TRUE)
-
-few_edges$edges <- few_edges$edges[!(few_edges$edges$from %in% c("agent", "goal")),]
-few_edges$edges <- few_edges$edges[!(few_edges$edges$to %in% c("agent", "goal")),]
-few_edges$nodes <- few_edges$nodes[!(few_edges$nodes$node_ID %in% c("agent", "goal")),]
-
-many_edges$edges <- many_edges$edges[!(many_edges$edges$from %in% c("agent", "goal")),]
-many_edges$edges <- many_edges$edges[!(many_edges$edges$to %in% c("agent", "goal")),]
-many_edges$nodes <- many_edges$nodes[!(many_edges$nodes$node_ID %in% c("agent", "goal")),]
+few_edges <- predped::compute_edges(setting, many_nodes = FALSE)
+many_edges <- predped::compute_edges(setting, many_nodes = TRUE)
 
 ```
 
@@ -213,6 +205,64 @@ tbl %>%
 
 ```
 
+## compute_edges
+
+```{r routing compute_edges, echo = FALSE, results = "asis"}
+
+lim_setting <- setting 
+limited_access(lim_setting) <- lapply(1:10, \(x) predped::segment(from = c(0, 0), to = c(40, 25)))
+
+# Test
+fn <- (\() predped::compute_edges(setting, many_nodes = FALSE)) |>
+    test_times() |>
+    rnd()
+
+fl <- (\() predped::compute_edges(lim_setting, many_nodes = FALSE)) |>
+    test_times() |>
+    rnd()
+
+mn <- (\() predped::compute_edges(setting, many_nodes = TRUE)) |>
+    test_times() |>
+    rnd()
+
+ml <- (\() predped::compute_edges(lim_setting, many_nodes = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create a table displaying these results
+tbl <- rbind(c("No limits",
+               fn[2], 
+               paste0("[", fn[1], ",", fn[3], "]"), 
+               mn[2], 
+               paste0("[", mn[1], ",", mn[3], "]")), 
+             c("Limited access", 
+               fl[2], 
+               paste0("[", fl[1], ",", fl[3], "]"), 
+               ml[2], 
+               paste0("[", ml[1], ",", ml[3], "]")))
+rownames(tbl) <- NULL
+colnames(tbl) <- NULL
+
+
+# Define the caption for the table 
+caption <- paste0("Benchmark for the compute\\_edges function. ", 
+                  "Benchmark is computed for few and many possible edges. ", 
+                  "Furthermore distinction made between using limited access or ", 
+                  "not, with the addition of 10 segments.")
+
+# Print the table so that it can be printed in text
+tbl %>% 
+    knitr::kable(format = "latex", 
+                 align = "llllll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Few edges" = 2, "Many edges" = 2)) %>% 
+    print()
+```
+
 ## create_edges
 ```{r routing create_edges, echo = FALSE, results = "asis"}
 
@@ -220,28 +270,28 @@ tbl %>%
 f <- (\() predped::create_edges(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = FALSE)) |>
+                                many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 m <- (\() predped::create_edges(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = TRUE)) |>
+                                many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
 fa <- (\() predped::create_edges(c(0.3, 0.5), 
                                  c(0, 13), 
                                  new_setting, 
-                                 many_options = FALSE)) |>
+                                 many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 ma <- (\() predped::create_edges(c(0.3, 0.5), 
                                  c(0, 13), 
                                  new_setting, 
-                                 many_options = TRUE)) |>
+                                 many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -252,6 +302,7 @@ tbl <- cbind(c("Few edges", "Many edges"),
              c(fa[2], ma[2]),
              c(paste0("[", fa[1], ",", fa[3], "]"), paste0("[", ma[1], ",", ma[3], "]"))) 
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 
 # Define the caption for the table 
@@ -280,14 +331,14 @@ tbl %>%
 f <- (\() predped::create_nodes(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = FALSE)) |>
+                                many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
 m <- (\() predped::create_nodes(c(0.3, 0.5), 
                                 c(0, 13), 
                                 setting, 
-                                many_options = TRUE)) |>
+                                many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -321,31 +372,48 @@ tbl %>%
 
 ```{r routing evaluate_edges, echo = FALSE, results = "asis"}
 
+lim_setting <- setting 
+limited_access(lim_setting) <- lapply(1:10, \(x) predped::segment(from = c(0, 0), to = c(40, 25)))
+
 # Test `create_edges`
 segments <- subset(few_edges$edges_with_coords, select = -cost)
-f <- (\() predped::evaluate_edges(segments, 
-                                  predped::objects(setting))) |>
+fn <- (\() predped::evaluate_edges(segments, setting)) |>
+    test_times() |>
+    rnd()
+
+fl <- (\() predped::evaluate_edges(segments, lim_setting)) |>
     test_times() |>
     rnd()
 
 segments <- subset(many_edges$edges_with_coords, select = -cost)
-m <- (\() predped::evaluate_edges(segments, 
-                                  predped::objects(setting))) |>
+mn <- (\() predped::evaluate_edges(segments, setting)) |>
+    test_times() |>
+    rnd()
+
+ml <- (\() predped::evaluate_edges(segments, lim_setting)) |>
     test_times() |>
     rnd()
 
 # Create a table displaying these results
-tbl <- c(f[2], 
-         paste0("[", f[1], ",", f[3], "]"), 
-         m[2], 
-         paste0("[", m[1], ",", m[3], "]")) %>% 
-    matrix(nrow = 1)
+tbl <- rbind(c("No limits",
+               fn[2], 
+               paste0("[", fn[1], ",", fn[3], "]"), 
+               mn[2], 
+               paste0("[", mn[1], ",", mn[3], "]")), 
+             c("Limited access", 
+               fl[2], 
+               paste0("[", fl[1], ",", fl[3], "]"), 
+               ml[2], 
+               paste0("[", ml[1], ",", ml[3], "]")))
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 
 # Define the caption for the table 
 caption <- paste0("Benchmark for the evaluate\\_edges function. ", 
-                  "Benchmark is computed for few and many possible edges.")
+                  "Benchmark is computed for few and many possible edges. ", 
+                  "Furthermore distinction made between using limited access or ", 
+                  "not, with the addition of 10 segments.")
 
 # Print the table so that it can be printed in text
 tbl %>% 
@@ -356,7 +424,7 @@ tbl %>%
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H" ) %>% 
-    kableExtra::add_header_above(c("Few edges" = 2, "Many edges" = 2)) %>% 
+    kableExtra::add_header_above(c(" " = 1, "Few edges" = 2, "Many edges" = 2)) %>% 
     print()
 ```
 

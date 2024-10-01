@@ -2,45 +2,41 @@
 % Please edit documentation in R/utility_model.R
 \name{utility}
 \alias{utility}
-\title{Utility function}
+\title{Compute the utilities}
 \usage{
-utility(
-  agent,
-  state,
-  agent_specifications,
-  centers,
-  background,
-  check,
-  precomputed = FALSE,
-  subject = TRUE
-)
+utility(agent, state, background, agent_specifications, centers, check)
 }
 \arguments{
-\item{agent}{The agent for whom to compute the utilities}
+\item{state}{Object of the \code{\link[predped]{state-class}}.}
 
-\item{state}{A list with the current state of the simulation}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{centers}{The centers of all the positions the agent may move to}
+\item{agent_specifications}{List created by the 
+\code{\link[predped]{create_agent_specifications}} function. Contains all 
+information of all agents within the current \code{state} and allows for the
+communication between the \code{predped} simulation functions and the 
+\code{m4ma} utility functions.}
 
-\item{check}{Boolean denoting the centers the agent can actually move to
-(which are not blocked)}
+\item{centers}{Numerical matrix containing the coordinates at each position
+the object can be moved to. Should have one row for each cell.}
 
-\item{precomputed}{Boolean denoting whether the different parts that make up
-the utilities have already been computed. Defaults to `FALSE`.}
+\item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
+can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{subject}{Boolean denoting whether the utilities are subject-based.
-Defaults to `TRUE`.}
-
-\item{P_n}{The goal to move to next}
-
-\item{agent_predictions}{The predicted trajectories of the other agents}
-
-\item{iInfo}{Not clear yet}
+\item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }
 \value{
-<type> with utilities
+Numeric matrix denoting the (dis)utility of moving to each of the 
+cells in \code{centers}.
 }
 \description{
-Compute the utilities associated to several movements to be made, based on
-the parameters of an agent.
+This function uses the operational-level utility functions to compute the 
+utility of moving to any given potential cell in \code{centers}.
+}
+\seealso{
+\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate,state-method}},
+\code{\link[predped]{update,agent-method}},
+\code{\link[predped]{update,state-method}},
+\code{\link[predped]{update_position}}
 }

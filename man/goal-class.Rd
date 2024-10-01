@@ -6,19 +6,35 @@
 \alias{goal}
 \title{An S4 Class to Represent Goals}
 \description{
-Defines the `goal` class, which contains all characteristics of a goal that 
+Defines the \code{goal} class, which contains all characteristics of a goal that 
 the agents can pursue.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{id}}{A numerical index for the agent}
+\item{\code{id}}{Character that serves as an identifier for the goal.}
 
-\item{\code{position}}{A coordinate}
+\item{\code{position}}{Numerical vector denoting the position of the goal.}
 
-\item{\code{busy}}{A logical denoting whether it is currently being interacted with}
+\item{\code{path}}{Numerical matrix of size n x 2 denoting the different intermediate
+path points between an agent and a goal. In effect defines which path the 
+agent will take to move towards the goal.}
 
-\item{\code{counter}}{An integer denoting the number of time steps the agent should 
-interact with the goal before moving on to the next one}
+\item{\code{busy}}{Logical denoting whether the goal is currently being interacted 
+with.}
+
+\item{\code{done}}{Logical denoting whether a goal has been completed.}
+
+\item{\code{counter}}{Numeric denoting the number of time steps the agent should 
+interact with the goal before the goal has been completed.}
 }}
 
+\seealso{
+\code{\link[predped]{busy}},
+\code{\link[predped]{counter}},
+\code{\link[predped]{done}},
+\code{\link[predped]{id}},
+\code{\link[predped]{path}},
+\code{\link[predped]{position}},
+\code{\link[predped]{initialize,goal-method}}
+}

@@ -6,7 +6,7 @@
 \alias{agent}
 \title{An S4 Class to Represent Agents.}
 \description{
-Defines the `agent` class, which contains all characteristics of an agent. 
+Defines the \code{agent} class, which contains all characteristics of an agent. 
 Some of these characteristics are time-independent (e.g., parameters and 
 set of goals) while others change during each time step in the simulation or 
 estimation (e.g., speed and orientation).
@@ -14,31 +14,65 @@ estimation (e.g., speed and orientation).
 \section{Slots}{
 
 \describe{
-\item{\code{id}}{A numerical index for the agent}
+\item{\code{id}}{Character that serves as an identifier for the agent.}
 
-\item{\code{position}}{A numerical vector of two elements denoting the position of
-the agent in 2D space}
+\item{\code{center}}{Numerical vector of two elements denoting the current position
+of the agent (x and y coordinate).}
 
-\item{\code{size}}{A numeric indicating the size of the radius of the agent}
+\item{\code{radius}}{Numeric denoting the size of agent. As agents are circular, this 
+is equal to the radius of the agent.}
 
-\item{\code{orientation}}{A numeric denoting the orientation of the agent in degrees}
+\item{\code{speed}}{Numeric denoting the current speed of the agent (in m/sec).}
 
-\item{\code{interacting}}{A logical denoting whether the agent is interacting with
-something in its environment}
+\item{\code{orientation}}{Numeric denoting the orientation of the agent (in degrees)}
 
-\item{\code{parameters}}{A named list that contains the individual-specific parameters
-for the agent}
+\item{\code{group}}{Numeric indicating the group to which the agent belongs. 
+Influences the behavior of the agent through the social utility functions.}
 
-\item{\code{goals}}{A list containing the id's of the goals that are assigned to the
-agent}
+\item{\code{status}}{Character denoting the current status of the agent, or what they
+will be doing to make the next decision. Is one of "move" (the agent will 
+move to another cell), "plan" (the agent will plan the route to their next 
+goal), "reroute" (the agent will replan the route of their current goal), 
+"reorient" (the agent will check other movement options), "completing goal"
+(the agent will interact with their goal), "exit" (the agent will exit the 
+space), or "wait" (the agent will wait for another agent to finish their goal 
+and step out of the way).}
 
-\item{\code{status}}{A character that denotes the status of the agent, or what the 
-agent is doing at the moment. Can take on `"move"`, `"stop"`, `"reorient"`, 
-and `"exit"`}
+\item{\code{waiting_counter}}{Numeric defining how long the agent will remain in the 
+status "wait" once triggered. At the start of the waiting period is set to be 
+equal to the number of iterations the other agent still has to interact with 
+their goal plus 2.}
+
+\item{\code{cell}}{Numeric denoting the cell the agent will move to.}
+
+\item{\code{current_goal}}{Object of class \code{\link[predped]{goal-class}} which
+represents the current goal of the agent.}
+
+\item{\code{goals}}{List of goals the agent has to achieve. The current goal is not 
+included in this list.}
+
+\item{\code{parameters}}{Dataframe containing the values of the parameters for the 
+agent. Should contain all parameters relevant for the utility functions 
+(use \code{predped::draw_parameters(1)} for an example).}
+
+\item{\code{color}}{Character denoting the color in which the agent should be plotted.}
 }}
 
 \seealso{
-\code{\link[predped]{object-class}},
 \code{\link[predped]{circle-class}},
-\code{\link[predped]{goal-class}}
+\code{\link[predped]{goal-class}},
+\code{\link[predped]{object-class}},
+\code{\link[predped]{cell}},
+\code{\link[predped]{current_goal}},
+\code{\link[predped]{goals}},
+\code{\link[predped]{group}},
+\code{\link[predped]{id}},
+\code{\link[predped]{orientation}},
+\code{\link[predped]{parameters}}
+\code{\link[predped]{position}},
+\code{\link[predped]{size}},
+\code{\link[predped]{speed}},
+\code{\link[predped]{status}},
+\code{\link[predped]{waiting_counter}},
+\code{\link[predped]{initialize,agent-method}}
 }

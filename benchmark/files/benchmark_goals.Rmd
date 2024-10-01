@@ -77,8 +77,8 @@ setting <- predped::background(shape = predped::rectangle(center = c(20, 12.5),
                                same_exit = FALSE)
 
 # Precompute some edges
-few_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = FALSE)
-many_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_options = TRUE)
+few_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_nodes = FALSE)
+many_edges <- predped::create_edges(c(0.3, 0.5), c(0, 13), setting, many_nodes = TRUE)
 
 few_edges$edges <- few_edges$edges[!(few_edges$edges$from %in% c("agent", "goal")),]
 few_edges$edges <- few_edges$edges[!(few_edges$edges$to %in% c("agent", "goal")),]
@@ -162,7 +162,7 @@ fn <- (\() predped::find_path(my_goal,
                               my_agent, 
                               setting, 
                               precomputed_edges = NULL,
-                              many_options = FALSE)) |>
+                              many_nodes = FALSE)) |>
     test_times() |>
     rnd()
 
@@ -170,7 +170,7 @@ mn <- (\() predped::find_path(my_goal,
                               my_agent, 
                               setting, 
                               precomputed_edges = NULL,
-                              many_options = TRUE)) |>
+                              many_nodes = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -238,12 +238,12 @@ tbl %>%
 
 ```
 
-## generate_goal_stack
+## goal_stack
 
 ```{r goals generate_goal_stack, echo = FALSE, results = "asis"}
 
 # Test 
-tbl <- (\() predped:::generate_goal_stack(10, setting, \(x) 10)) |>
+tbl <- (\() predped:::goal_stack(10, setting, counter = 10)) |>
     test_times() |>
     rnd() |>
     matrix(nrow = 1)
@@ -322,7 +322,7 @@ tbl |>
 # Test
 my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
 
-tbl <- (\() predped:::replace(my_goal, setting, \(x) 5)) |>
+tbl <- (\() predped:::replace(my_goal, setting, counter = 5)) |>
     test_times() |>
     rnd() |>
     matrix(nrow = 1)

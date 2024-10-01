@@ -1,252 +1,254 @@
-#' Plot an Object.
+#' Plot an object
+#' 
+#' @details 
+#' Returns a geom whenever providing separate instances of the
+#' \code{\link[predped]{object-class}}. Returns a ggpplot when providing 
+#' instances of the \code{\link[predped]{background-class}} or of the
+#' \code{\link[predped]{state-class}}. Whenever either is provided in a list, 
+#' a list containing the respective geoms or ggplots is returned.
 #'
-#' @param object An object of kind \code{\link[predped]{object-class}}
-#' @param ... Additional arguments passed on to the geom used to plot the object.
+#' @param object Object of the \code{\link[predped]{background-class}}, 
+#' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}}, 
+#' or a list containing multiple of these objects.
+#' @param agent.linewidth Numeric denoting the width of the line with which to 
+#' plot the agent. Defaults to \code{1}.
+#' @param plot_goal Logical denoting whether to plot the position of the current
+#' goal of the agent together with the agent. Defaults to \code{TRUE}.
+#' @param goal.size Numeric denoting the size of the point that denotes the goal 
+#' position. Defaults to \code{1}.
+#' @param entry.width Numeric denoting the radius of the entrances and exits to 
+#' be plotted in the background. Defaults to \code{0.3},
+#' @param shape.fill Character defining the fill color of the shape of the 
+#' background. Defaults to \code{"white"}.
+#' @param shape.color Character defining the color of circumference of the shape 
+#' of the background. Defaults to \code{"black"}.
+#' @param shape.linewidth Numeric denoting the width of the circumference of the 
+#' shape of the background. Also concerns the width of the line of the entrances 
+#' and exits. Defaults to \code{1}.
+#' @param object.fill Character defining the fill color of the objects contained 
+#' in the background. Defaults to \code{"grey"}.
+#' @param object.color Character defining the color of the circumference of the 
+#' objects contained in the background. Defaults to \code{"black"}.
+#' @param object.linewidth Numeric denoting the width of the circumference of 
+#' the objects contained in the background. Defaults to \code{1}.
+#' @param plot.title.size Numeric denoting the text size of the plot title. 
+#' Defaults to \code{10}.
+#' @param plot.title.hjust Numeric denoting the position of the plot title, with
+#' \code{0} coding for left, \code{1} for right, and \code{0.5} for the middle. 
+#' Defaults to \code{0.5}.
+#' @param axis.title.size Numeric of the text size of the axis title. Defaults 
+#' to \code{10}.
+#' @param axis.text.size Numeric denoting the text size of the axis text. 
+#' Defaults to \code{8}.
+#' @param dark_mode Logical that can toggle the default colorpallette of predped's 
+#' dark mode. Defaults to \code{FALSE}.
+#' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
-#' @return Either a geom or a ggplot
+#' @return Either a geom or a ggplot, depending on the object provided (see 
+#' Details).
+#' 
+#' @docType method
+#' 
+#' @rdname plot-method
+#' 
 #' @export
-#' @name plot-method
 setGeneric("plot", function(object, ...) standardGeneric("plot"))
 
 #'@rdname plot-method
-#'
-setMethod("plot", "circle", function(object, ...) {
-  # Create circle point from center x,y and radius r
-  t <- seq(0, 2 * pi, length.out = 100)
-  cp <- as.matrix(data.frame(
-    x = object@center[[1]] + object@radius * cos(t),
-    y = object@center[[2]] + object@radius * sin(t)
-  ))
-  
-  # Plot circle using geom_polygon
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = cp[, 1], y = cp[, 2]),
-    ...
-  )
-})
+setMethod("plot", "agent", function(object, 
+                                    plot_goal = TRUE,
+                                    agent.linewidth = 1,
+                                    goal.size = 1,
+                                    ...) {
+    # Determine the orientation of the agent to be plotted
+    angle <- object@orientation * 2 * pi / 360
 
+    # Extract the points of the agent and plot those here. The reason why we 
+    # use points here is to ensure that the agent can take on all shapes that 
+    # they want
+    pts <- points(object)
+    half <- ifelse(inherits(object, "circle"), size(object), 0.5 * size(object)[1])
 
-#'@rdname plot-method
-#'
-setMethod("plot", "rectangle", function(object, ...) {
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = object@points[,1], y = object@points[,2]),
-    ... 
-  )
-})
+    plt <- list(ggplot2::annotate("polygon", 
+                                  x = pts[,1], 
+                                  y = pts[,2], 
+                                  color = object@color,
+                                  fill = NA,
+                                  linewidth = agent.linewidth),
+                ggplot2::annotate("segment", 
+                                  x = object@center[[1]], 
+                                  y = object@center[[2]], 
+                                  xend = object@center[[1]] + half * cos(angle), 
+                                  yend = object@center[[2]] + half * sin(angle), 
+                                  color = object@color,
+                                  linewidth = agent.linewidth))
 
-#'@rdname plot-method
-#'
-setMethod("plot", "polygon", function(object, ...) {
-  ggplot2::geom_polygon(
-    ggplot2::aes(x = object@points[, 1], y = object@points[, 2]), 
-    ...
-  )
-})
-
-#'@rdname plot-method
-#'
-setMethod("plot", "agent", function(object, plot_goal = TRUE,...) {
-  angle <- object@orientation * 2 * pi / 360
-  plt <- list(plot(circle(center = object@center, 
-                          radius = object@radius), 
-                   fill = NA,
-                   color = object@color,
-                   ...),
-              ggplot2::annotate("segment", 
-                                x = object@center[[1]], 
-                                y = object@center[[2]], 
-                                xend = object@center[[1]] + object@radius * cos(angle), 
-                                yend = object@center[[2]] + object@radius * sin(angle), 
-                                color = object@color,
-                                ...))
-
+    # If the agent's goal should be plotted as well, then do so
     if(plot_goal) {
         plt <- append(plt, 
                       ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
                                                        y = current_goal(object)@position[2]),
                                           color = object@color,
-                                          ...))
+                                          size = goal.size))
     }
 
     return(plt)
 })
 
 #'@rdname plot-method
-#'
-setMethod("plot", "list", function(object, 
-                                   trace = FALSE, 
-                                   print_progress = TRUE, 
-                                   iterations = NULL,
-                                   ...) {
-    # If the list in question is the trace, then we have to output the plots for
-    # each state in the simulation. This is a little more complicated than for 
-    # a simple list
-    plt <- list()
-    if(trace) {
-        if(print_progress) {
-            cat("\n")
-        }
-        
-        # Setting doesn't change, so can be saved immediately
-        base_plot <- predped::plot(object[[1]]$setting, 
-                                   fill = "grey", 
-                                   color = "black")
+setMethod("plot", "background", function(object, 
+                                         entry.width = 0.3,
+                                         shape.fill = "white",
+                                         shape.color = "black",
+                                         shape.linewidth = 1,
+                                         object.fill = "grey",
+                                         object.color = "black",
+                                         object.linewidth = 1,
+                                         dark_mode = FALSE,
+                                         ...) {
 
-        # Loop over each state
-        for(i in seq_along(object)) {
-            iter <- ifelse(is.null(iterations[i]), i, iterations[i])
-
-            if(print_progress) {
-                cat(paste0("\rMaking plot for iteration ", iter))
-            }
-
-            # If there are currently no agents, then we just return the base_plot
-            if(length(object[[i]]$agents) == 0) {
-                plt[[i]] <- base_plot
-
-            # Otherwise, we will have to add the agents in the base_plot
-            } else {
-                # Transform the complete state to a collection of segments
-                segments <- matrix(0, nrow = 0, ncol = 5)
-                goals <- matrix(0, nrow = 0, ncol = 3)
-                color_code <- c()
-                for(j in object[[i]]$agents) {
-                    # Get coordinates of the agent themselves and turn into 
-                    # segments
-                    if(inherits(j, "circle")) {
-                        agent_coords <- points(j, length.out = 25)
-                    } else {
-                        agent_coords <- j@points
-                    }
-                    agent_segments <- cbind(agent_coords, 
-                                            agent_coords[c(2:nrow(agent_coords), 1),])
-
-                    # Keep track of the location of the agent's goals. Furthermore
-                    # add a segment that denotes the orientation of the agent
-                    agent_goals <- current_goal(j)@position
-
-                    angle <- j@orientation * 2 * pi / 360
-                    agent_segments <- rbind(agent_segments, 
-                                            c(center(j), 
-                                              center(j) + radius(j) * c(cos(angle), sin(angle))))
-
-                    # Add the color to the color code if it is not already in 
-                    # there
-                    if(!(j@color %in% color_code)) {
-                        color_code[j@color] <- j@color
-                    }
-
-                    # Add information on the color to the dataframes
-                    agent_segments <- cbind(agent_segments, j@color)
-                    agent_goals <- c(agent_goals, j@color)
-
-                    segments <- rbind(segments, agent_segments)
-                    goals <- rbind(goals, agent_goals)
-                }
-
-                # Once done, plot all this information as a collection of segments 
-                # and points
-                segments <- as.data.frame(segments) |>
-                    setNames(c("x", "y", "xend", "yend", "color"))
-                goals <- as.data.frame(goals) |>
-                    setNames(c("x", "y", "color"))
-
-                plt[[i]] <- suppressWarnings(base_plot +
-                    ggplot2::geom_segment(data = segments, 
-                                          ggplot2::aes(x = as.numeric(x), 
-                                                      y = as.numeric(y), 
-                                                      xend = as.numeric(xend),
-                                                      yend = as.numeric(yend),
-                                                      color = color),
-                                          ...) +
-                    ggplot2::geom_point(data = goals, 
-                                        ggplot2::aes(x = as.numeric(x), 
-                                                    y = as.numeric(y), 
-                                                    color = color),
-                                        ...) +
-                    ggplot2::scale_color_manual(values = color_code)) 
-            }
-
-            plt[[i]] <- plt[[i]] +
-                ggplot2::labs(title = paste("Iteration", iter)) +
-                ggplot2::theme(legend.position = "none",
-                plot.title = ggplot2::element_text(size = 100, hjust = 0.5))
-        }
-
-    # If it is not the trace, then we need to output the list of geom's that are
-    # created for each of the elements in the list
-    } else {
-        for(i in seq_along(object)) {
-            plt <- append(plt, plot(object[[i]], ...))
-        }        
+    # If you want to toggle the default dark mode, then change the default colors
+    if(dark_mode) {
+        shape.fill <- "black"
+        shape.color <- "white"
+        object.fill <- "black"
+        object.color <- "white"
     }
 
-    if(print_progress) {
+    # Create some limits to prevent the limits of the plot changing across 
+    # iterations.
+    pts <- points(object@shape)
+    limits <- rbind(range(pts[,1]), range(pts[,2]))
+
+    # Make the entries into a matrix of segments that can be added to the plot.
+    # This is done in several steps.
+    
+    # Step 1: Bind together the entrances and exits: all they need to be handled 
+    # in the same way
+    entries <- rbind(entrance(object), exit(object))
+
+    # Step 2: Loop over these entries, convert them to points, and only retain 
+    # those that fall into the shape of the background. Then transform them to 
+    # a segment structure (x0, y0, x, y)
+    segments <- list()
+    for(i in seq_len(nrow(entries))) {
+        pts <- points(predped::circle(center = entries[i,], radius = entry.width))
+        pts <- pts[predped::in_object(shape(object), pts),]
+
+        segments[[i]] <- cbind(pts[2:nrow(pts) - 1,], pts[2:nrow(pts),])
+    }
+
+    # Step 3: Bind together these segments
+    segments <- do.call("rbind", segments)
+
+    # Finally, with all elements in place, we can now create the plot itself
+    return(ggplot2::ggplot() + 
+        # Plot the shape and objects of the environment
+        predped::plot(shape(object), 
+                      fill = shape.fill, 
+                      color = shape.color) +
+        predped::plot(objects(object), 
+                      fill = object.fill, 
+                      color = object.color,
+                      linewidth = object.linewidth,
+                      ...) +
+        # Plot the entrances and exits
+        ggplot2::annotate("segment", 
+                          x = segments[,1], 
+                          y = segments[,2], 
+                          xend = segments[,3], 
+                          yend = segments[,4], 
+                          color = shape.color,
+                          linewidth = shape.linewidth) +
+        # Things related to the general look of the plot
+        ggplot2::scale_x_continuous(limits = limits[1,]) +
+        ggplot2::scale_y_continuous(limits = limits[2,]) +
+        ggplot2::labs(x = "x", 
+                      y = "y") +
+        ggplot2::theme(panel.background = ggplot2::element_rect(fill = "black"),
+                       panel.grid.major = ggplot2::element_blank(),
+                       panel.grid.minor = ggplot2::element_blank()) +
+        ggplot2::coord_fixed())
+})
+
+#'@rdname plot-method
+setMethod("plot", "list", function(object, ...) {
+    
+    # First a check of whether anything is contained within this list. Otherwise
+    # return an error
+    if(length(object) == 0) {
+        stop("No elements are contained within this list")
+    }
+
+    # If the list in question is the trace, then we have to output the plots for
+    # each state in the simulation. Otherwise, we have to output all the geom's 
+    # that are in the trace. In both cases, we can simply dispatch based on the 
+    # elements of the list, and this can thus be as simple as having an lapply
+    #
+    # However, if it is a trace, we would like some information on the iteration
+    # of the state, which we need to do some bookkeeping for
+    trace <- inherits(object[[1]], "state")
+
+    if(trace) {
+        cat("\n")
+    }
+
+    plt <- lapply(seq_along(object),
+                  function(i) {
+                      if(trace) {
+                          cat(paste0("\rMaking plot for state ", object[[i]]@iteration))
+                      }
+
+                      return(predped::plot(object[[i]], ...))
+                  })
+
+    if(trace) {
         cat("\n")
     }
 
     return(plt)
 })
 
-
 #'@rdname plot-method
-#'
-setMethod("plot", "background", function(object, 
-                                         entry_exit_width = 0.4,
-                                         ...) {
-    # Not my preferred way of doing things: 
-    #
-    # When making gifs out of the plots we create, the boundaries move around 
-    # with the agent when they get close to the sides of the grid. Changing the 
-    # `expand` argument did not fix that, so we have to fix the limits of the 
-    # plot manually. This is what I am doing here. 
-    if(inherits(shape(object), "circle")) {
-        circ <- shape(object)
-        xlims <- center(circ)[1] + c(-radius(circ), radius(circ))
-        ylims <- center(circ)[2] + c(-radius(circ), radius(circ))
-    } else {
-        xlims <- range(shape(object)@points[,1])
-        ylims <- range(shape(object)@points[,2])
-    }
+setMethod("plot", "object", function(object, ...) {
+  # Extract the points of the object
+  pts <- points(object)
+  return(ggplot2::annotate("polygon", 
+                           x = pts[,1], 
+                           y = pts[,2], 
+                           ...))
+})
 
-    x_padding <- 0.05 * (xlims[2] - xlims[1])
-    y_padding <- 0.05 * (ylims[2] - ylims[1])
+#' @rdname plot-method
+setMethod("plot", "state", function(object, 
+                                    agent.linewidth = 1, 
+                                    goal.size = 1,
+                                    plot_goal = TRUE,
+                                    plot.title.size = 10,
+                                    plot.title.hjust = 0.5,
+                                    axis.title.size = 10,
+                                    axis.text.size = 8,
+                                    ...) {
 
-    plt <- ggplot2::ggplot() + 
-        predped::plot(shape(object), fill = "white") +
-        ggplot2::coord_fixed() +
-        ggplot2::scale_x_continuous(limits = c(xlims[1] - x_padding, xlims[2] + x_padding)) +
-        ggplot2::scale_y_continuous(limits = c(ylims[1] - y_padding, ylims[2] + y_padding)) +
-        ggplot2::labs(x = "x", y = "y") +
-        ggplot2::theme(
-            panel.background = ggplot2::element_rect(fill = "black"),
-            panel.grid.major = ggplot2::element_blank(),
-            panel.grid.minor = ggplot2::element_blank()
-        )
-    for (i in seq_along(objects(object))) {
-        plt <- plt + plot(objects(object)[[i]], ...)
-    }
+    # Create the plot for the setting, which will serve as the basis of 
+    base_plot <- predped::plot(setting(object), ...) +
+        ggplot2::labs(title = paste("iteration", object@iteration)) +
+        ggplot2::theme(legend.position = "none",
+                       plot.title = ggplot2::element_text(size = plot.title.size,
+                                                          hjust = plot.title.hjust),
+                       axis.title = ggplot2::element_text(size = axis.title.size),
+                       axis.text = ggplot2::element_text(size = axis.text.size))
 
-    # Convert entrance & exit to polygon coordinates
-    entrance <- lapply(seq_len(nrow(object@entrance)), 
-                       \(i) points(circle(center = c(object@entrance[i, 1], object@entrance[i, 2]), 
-                                       radius = (entry_exit_width / 2))))
-    exit <- lapply(seq_len(nrow(object@exit)), 
-                   \(i) points(circle(center = c(object@exit[i, 1], object@exit[i, 2]), 
-                                   radius = (entry_exit_width / 2))))
-    
-    # Check that polygon coordinates are in the background
-    # If not, set those coorinates to NA
-    for(i in seq_along(entrance)) {
-        idx <- in_object(object@shape, entrance[[i]], outside = FALSE)
-        plt <- plt + plot(polygon(points = entrance[[i]][idx,]), fill = NA, colour = "black")
-    } 
-
-    for(i in seq_along(exit)) {
-        idx <- in_object(object@shape, exit[[i]], outside = FALSE)
-        plt <- plt + plot(polygon(points = exit[[i]][idx,]), fill = NA, colour = "black")
+    # If there are currently no agents, then we just return the base_plot
+    if(length(object@agents) == 0) {
+        return(base_plot)
     }
     
-    return(plt)
+    # Otherwise, we will have to add the agents in the base_plot
+    return(base_plot + 
+        predped::plot(agents(object), 
+                      plot_goal = plot_goal,
+                      agent.linewidth = agent.linewidth,
+                      goal.size = goal.size,
+                      ...))            
 })

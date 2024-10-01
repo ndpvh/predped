@@ -4,15 +4,25 @@
 \alias{to_unbounded}
 \title{Transform to real axis}
 \usage{
-to_unbounded(parameters)
+to_unbounded(parameters, bounds)
 }
 \arguments{
-\item{parameters}{A named list containing the parameters for a given agent}
+\item{parameters}{Dataframe or named list containing values for the 
+parameters of M4MA.}
+
+\item{bounds}{Named numeric matrix containing the bounds for the parameters 
+of M4MA.}
 }
 \value{
-A named list containing the transformed parameters
+Dataframe or named list containing the transformed parameters
 }
 \description{
 Use the probit (positive, bounded) definition of the parameters and transform
 them to a real (normal, unbounded) scale.
+}
+\seealso{
+\code{\link[predped]{generate_parameters}},
+\code{\link[predped]{plot_distribution}},
+\code{\link[predped]{to_bounded}},
+\code{\link[predped]{to_covariance}}
 }

@@ -348,6 +348,51 @@ tbl |>
 
 ```
 
+## out_object
+
+```{r objects out_object, echo = FALSE, results = "asis"}
+
+# Initialize the objects 
+obj <- list(predped:::rectangle(center = c(1, 2), size = c(1, 1)),
+            predped:::circle(center = c(1, 2), radius = 1),
+            predped:::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1)))) 
+pts <- cbind(rep(1, 100), rep(2, 100))
+
+# Test
+r <- (\() predped::out_object(obj[[1]], pts)) |>
+    test_times() |>
+    rnd() 
+c <- (\() predped::out_object(obj[[2]], pts)) |>
+    test_times() |>
+    rnd() 
+p <- (\() predped::out_object(obj[[3]], pts)) |>
+    test_times() |>
+    rnd() 
+
+# Create the table
+tbl <- c(r[2], c(paste0("[", r[1], ",", r[3], "]")), 
+         p[2], c(paste0("[", p[1], ",", p[3], "]")), 
+         c[2], c(paste0("[", c[1], ",", c[3], "]"))) |>
+    matrix(nrow = 1)
+colnames(tbl) <- NULL
+
+# Write the caption
+caption <- paste0("Benchmark for the out\\_object method for objects. ",
+                  "Distinctions are made between the different objects that are exported by predped. ",
+                  "For this benchmark, 100 points are evaluated.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
+    print()
+
+```
+
 ## rng_point 
 
 ```{r objects rng_point, echo = FALSE, results = "asis"}

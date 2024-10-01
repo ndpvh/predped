@@ -24,22 +24,25 @@ Encoding: UTF-8
 Imports: 
     matrixStats,
     methods,
+    cppRouting,
     m4ma,
     ggplot2
 RoxygenNote: 7.3.2
 Collate:
+    'getters_setters.R'
     'objects.R'
     'background.R'
     'route.R'
     'goals.R'
     'group_centroid_utility.R'
     'agent.R'
+    'state.R'
     'moving_options.R'
     'general.R'
     'parameters.R'
     'plot.R'
     'see.R'
-    'update_state.R'
+    'update.R'
     'visual_field_utility.R'
     'utility_model.R'
     'predped.R'

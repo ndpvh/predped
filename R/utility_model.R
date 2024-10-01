@@ -1,27 +1,37 @@
 ################################################################################
 # HIGH-LEVEL UTILITY FUNCTIONS
 
-#' Utility function
-#'
-#' Compute the utilities associated to several movements to be made, based on
-#' the parameters of an agent.
-#'
-#' @param agent The agent for whom to compute the utilities
-#' @param state A list with the current state of the simulation
-#' @param P_n The goal to move to next
-#' @param agent_predictions The predicted trajectories of the other agents
-#' @param centers The centers of all the positions the agent may move to
-#' @param check Boolean denoting the centers the agent can actually move to
-#' (which are not blocked)
-#' @param iInfo Not clear yet
-#' @param precomputed Boolean denoting whether the different parts that make up
-#' the utilities have already been computed. Defaults to `FALSE`.
-#' @param subject Boolean denoting whether the utilities are subject-based.
-#' Defaults to `TRUE`.
-#'
-#' @return <type> with utilities
-#'
-#' @export
+#' Compute the utilities
+#' 
+#' This function uses the operational-level utility functions to compute the 
+#' utility of moving to any given potential cell in \code{centers}.
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param state Object of the \code{\link[predped]{state-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param agent_specifications List created by the 
+#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+#' information of all agents within the current \code{state} and allows for the
+#' communication between the \code{predped} simulation functions and the 
+#' \code{m4ma} utility functions.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' 
+#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
+#' cells in \code{centers}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{update_position}}
+#' 
+#' @rdname utility
+#' 
+#' @export 
 #
 # TO DO
 #  - Is `check` a necessary argument here, or could we just only put the checked
@@ -46,12 +56,13 @@
 #    deleted
 utility <- function(agent,
                     state,
-                    agent_specifications,
-                    centers,
                     background,
-                    check,
-                    precomputed = FALSE,
-                    subject = TRUE) {
+                    agent_specifications,
+                    centers,                    
+                    check) {
+                    # Deprecated
+                    # precomputed = FALSE,
+                    # subject = TRUE) {
 
     # If the different parts that will make up the utilities were not precomputed,
     # compute them here.
@@ -59,75 +70,76 @@ utility <- function(agent,
     # Left subject-based and iteration-based relatively unchanged as we first
     # have to think about how we will save this information. Maybe just make it
     # an agent-characteristic?
-    if(!precomputed) {
-        # Get the index of all other agents in the agent_specifications
-        agent_idx <- seq_along(agent_specifications$id)[agent_specifications$id == id(agent)]
+    # if(!precomputed) {
 
-        # Preferred speed
-        goal_position <- matrix(current_goal(agent)@path[1,],
-                                ncol = 2)
-        goal_distance <- m4ma::dist1_rcpp(position(agent), 
-                                          goal_position)
+    # Get the index of all other agents in the agent_specifications
+    agent_idx <- seq_along(agent_specifications$id)[agent_specifications$id == id(agent)]
 
-        # Angle between agent and the goal
-        direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
-                                                      position(agent, return_matrix = TRUE),
-                                                      goal_position) / 90
+    # Preferred speed
+    goal_position <- matrix(current_goal(agent)@path[1,],
+                            ncol = 2)
+    goal_distance <- m4ma::dist1_rcpp(position(agent), 
+                                      goal_position)
 
-        # Interpersonal distance between agent and other agents
-        interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
-                                                       p1 = position(agent, return_matrix = TRUE), 
-                                                       a1 = orientation(agent),
-                                                       p2 = agent_specifications$position, 
-                                                       r = agent_specifications$size, 
-                                                       centres = centers, 
-                                                       p_pred = agent_specifications$predictions, 
-                                                       objects = objects(background))
+    # Angle between agent and the goal
+    direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
+                                                  position(agent, return_matrix = TRUE),
+                                                  goal_position) / 90
 
-        # Predict which directions might lead to collisions in the future
-        if(nrow(agent_specifications$predictions) == 1) {
-            # When just deleting `agent_idx` from a single-row matrix, we get to 
-            # a numeric, not a matrix. Therefore create empty matrix if there is
-            # only 1 agent.
-            predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
-        } else {
-            # Another weird case is when you only have 2 agents, where it 
-            # transforms the matrix to a numerical vector. To ensure there are 
-            # no problems, we transform to a matrix and reassign the id's  in 
-            # the rows
-            predictions_minus_agent <- matrix(agent_specifications$predictions[-agent_idx,],
-                                              ncol = 2)
-            rownames(predictions_minus_agent) <- agent_specifications$id[-agent_idx]
-        }
+    # Interpersonal distance between agent and other agents
+    interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
+                                                   p1 = position(agent, return_matrix = TRUE), 
+                                                   a1 = orientation(agent),
+                                                   p2 = agent_specifications$position, 
+                                                   r = agent_specifications$size, 
+                                                   centres = centers, 
+                                                   p_pred = agent_specifications$predictions, 
+                                                   objects = objects(background))
 
-        blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
-                                                 orientation(agent),
-                                                 speed(agent),
-                                                 predictions_minus_agent,
-                                                 agent_specifications$size[-agent_idx],
-                                                 objects(background))
+    # Predict which directions might lead to collisions in the future
+    if(nrow(agent_specifications$predictions) == 1) {
+        # When just deleting `agent_idx` from a single-row matrix, we get to 
+        # a numeric, not a matrix. Therefore create empty matrix if there is
+        # only 1 agent.
+        predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
+    } else {
+        # Another weird case is when you only have 2 agents, where it 
+        # transforms the matrix to a numerical vector. To ensure there are 
+        # no problems, we transform to a matrix and reassign the id's  in 
+        # the rows
+        predictions_minus_agent <- matrix(agent_specifications$predictions[-agent_idx,],
+                                          ncol = 2)
+        rownames(predictions_minus_agent) <- agent_specifications$id[-agent_idx]
+    }
 
-        # Follow the leader phenomenon
-        leaders <- m4ma::getLeaders_rcpp(agent_idx,
-                                         agent_specifications$position,
-                                         agent_specifications$orientation,
-                                         agent_specifications$speed,
-                                         goal_position,
-                                         agent_specifications$group,
-                                         centers,
-                                         objects(background))
-        # leaders <- NULL
+    blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
+                                             orientation(agent),
+                                             speed(agent),
+                                             predictions_minus_agent,
+                                             agent_specifications$size[-agent_idx],
+                                             objects(background))
 
-        # Walking besides a buddy
-        buddies <- m4ma::getBuddy_rcpp(agent_idx,
-                                       agent_specifications$position,
-                                       agent_specifications$speed,
-                                       agent_specifications$group,
-                                       agent_specifications$orientation,
-                                       agent_specifications$predictions,
-                                       centers,
-                                       objects(background),
-                                       pickBest = FALSE)
+    # Follow the leader phenomenon
+    leaders <- m4ma::getLeaders_rcpp(agent_idx,
+                                     agent_specifications$position,
+                                     agent_specifications$orientation,
+                                     agent_specifications$speed,
+                                     goal_position,
+                                     agent_specifications$group,
+                                     centers,
+                                     objects(background))
+    # leaders <- NULL
+
+    # Walking besides a buddy
+    buddies <- m4ma::getBuddy_rcpp(agent_idx,
+                                   agent_specifications$position,
+                                   agent_specifications$speed,
+                                   agent_specifications$group,
+                                   agent_specifications$orientation,
+                                   agent_specifications$predictions,
+                                   centers,
+                                   objects(background),
+                                   pickBest = FALSE)
 
         # Group Centroid Phenomenon                                       
         inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
@@ -168,7 +180,7 @@ utility <- function(agent,
     #     leaders <- state$leaders[[n]]
     #     buddies <- state$buddies[[n]]
     # }
-    }
+    #}
 
     # Compute the utilities and sum them up
     p <- parameters(agent)

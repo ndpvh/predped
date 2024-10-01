@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameters.R
 \name{to_covariance}
 \alias{to_covariance}
-\title{Transform user-inputted matrix to covariance matrix}
+\title{Transform user-provided matrix to covariance matrix}
 \usage{
 to_covariance(X)
 }
@@ -11,8 +11,14 @@ to_covariance(X)
 on the diagonal and the correlations between parameters off the diagonal.}
 }
 \value{
-Covariance matrix of the parameters
+Covariance matrix
 }
 \description{
 Use the inputted matrix to construct the covariance matrix for the parameters.
+}
+\seealso{
+\code{\link[predped]{generate_parameters}},
+\code{\link[predped]{plot_distribution}},
+\code{\link[predped]{to_bounded}},
+\code{\link[predped]{to_unbounded}}
 }
