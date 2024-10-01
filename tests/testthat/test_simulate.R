@@ -77,19 +77,21 @@ testthat::test_that("Creating initial condition works", {
 
     # Create an initial condition with 3 agents within this environment
     set.seed(1)
-    agents_few <- predped::create_initial_condition(3, model, goal_number = 5)
+    agents_few <- predped::create_initial_condition(3, model, goal_number = 5, individual_differences = FALSE)
 
     # Also create one with an impossible number of agents
+    #
+    # Check this test, stops prematurely for some reason
     set.seed(1)
-    agents_many <- predped::create_initial_condition(50, model, goal_number = 5)
+    agents_many <- predped::create_initial_condition(50, model, goal_number = 5, individual_differences = FALSE)
 
     testthat::expect_equal(length(agents_few), 3)
     testthat::expect_equal(length(agents_many), 4)
     testthat::expect_message(predped::create_initial_condition(50, model, goal_number = 5))
 
     # If you would ever want to visualize it during debugging
-    # state <- list(agents = agents_many, setting = setting)
-    # predped::plot(list(state), trace = TRUE)
+    state <- predped::state(iteration = 0, agents = agents_many, setting = setting)
+    plot(state)
 })
 
 testthat::test_that("Creating initial condition with groups works", {
