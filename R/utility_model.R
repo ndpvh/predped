@@ -141,23 +141,23 @@ utility <- function(agent,
                                    objects(background),
                                    pickBest = FALSE)
 
-        # Group Centroid Phenomenon                                       
-        inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
-        p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
-        nped <- dim(p_pred)[1]
-    
+    # Group Centroid Phenomenon                                       
+    inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
+    p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
+    nped <- dim(p_pred)[1]    
         
-        distance_centroid <- get_mean_group_centroid(p_pred,
-                                                     centers,
-                                                     nped)
+    distance_centroid <- distance_group_centroid(p_pred,
+                                                 centers,
+                                                 nped)
 
-        # Visual Field Phenomenon
-        buddies_in_vf <- get_angles_any_buddy(agent_idx,
-                                              agent_specifications$group,
-                                              agent_specifications$predictions,
-                                              orientation(agent),
-                                              centers,
-                                              position(agent))                                                     
+    # Visual Field Phenomenon
+    buddies_in_vf <- get_angles(agent_idx,
+                                agent_specifications$group,
+                                orientation(agent),
+                                position(agent),
+                                agent_specifications$predictions,
+                                centers,
+                                any_member = TRUE)                                                     
 
     # Does not work at this moment, and so is left commented out
     #
@@ -290,90 +290,89 @@ utility <- function(agent,
 ################################################################################
 # GROUP CENTROID
 
-#' Distances to Group Centroid
+#' Distances to group centroid
 #'
-#' Get distances to group centroid for pedestrian `n`
+#' Compute the distance of a given agent to the group centroid. This group 
+#' centroid is computed as a summary statistic of the predicted x- and y-
+#' coordinates of all pedestrians belonging to the same group as the agent. The 
+#' summary statistic of choice should be one of mean-tendency, but can be 
+#' specified by the user through the argument \code{fx}.
 #' 
-#' @details Group centroid is calculated using the mean predicted (x & y)
-#'          coordinates of pedestrians belonging to the group of pedestrian `n`.
-#' @details Returns `NULL` if the pedestrian `n` does not belong to a pedestrian social group.
+#' @details 
+#' Note that this function has been defined to be in line with the \code{m4ma}
+#' utility functions.
 #'
-#' @param p_pred Numeric matrix with shape Nx2 (x & y) containing predicted positions
-#' of all pedestrians.
-#' @param centers Numeric matrix with shape (33x2) containing (x & y) for each cell centre.
+#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+#' of all pedestrians that belong to the social group of the agent.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
 #' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
+#' @param fx Function used to find the group centroid. Defaults to \code{mean}
 #'
-#' @return Numeric vector `cell_dist` with distances from each cell center to the group centroid. 
+#' @return Numeric vector containing the distance from each cell in the `center`
+#' to the group centroid. If not other agents belong to the same group as the 
+#' agent, returns \code{NULL}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{gc_utility}},
+#' \code{\link[predped]{utility}}
+#' 
+#' @rdname distance_group_centroid 
 #'
 #' @export 
-get_mean_group_centroid <- function(p_pred, centers, nped) {
+distance_group_centroid <- function(p_pred, 
+                                    centers, 
+                                    nped,
+                                    fx = mean) {
    
-    # First need to identify whether a pedestrian belongs to a social group
-    
+    # First need to identify whether a pedestrian belongs to a social group    
     if (nped == 0) {
         return(NULL)    
     }
 
     # All of the positions of all in-group pedestrians need to be averaged
     # Which represents the group centroid
-    centroid <- c(mean(p_pred[,1]), mean(p_pred[,2]))
+    centroid <- c(fx(p_pred[,1]), fx(p_pred[,2]))
 
     # Euclidean distance for pedestrian_i is calculated for each cell
     return(m4ma::dist1_rcpp(centroid, centers))
 }
 
-#' Distances to Group Centroid
-#'
-#' Get distances to group centroid for pedestrian `n`
-#'
-#' @details Group centroid is calculated using the median predicted (x & y)
-#'          coordinates of pedestrians belonging to the group of pedestrian `n`.
-#' @details Returns `NULL` if the pedestrian `n` does not belong to a pedestrian social group.
-#'
-#' @param agent_idx Integer scalar indexing the pedestrian in the state.
-#' @param p_pred Numeric matrix with shape Nx2 (x & y) containing predicted positions
-#' of all pedestrians.
-#' @param agent_group Numeric vector with group membership indices of all pedestrians.
-#' @param centers Numeric matrix with shape (33x2) containing (x & y) for each cell centre.
-#'
-#' @return Numeric vector `cell_dist` with distances from each cell center to the group centroid. 
-#'
-#' @export 
-get_median_group_centroid <- function(agent_idx, p_pred, agent_group, centers) {
-   
-    # First need to identify whether a pedestrian belongs to a social group
-    inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[inGroup, , drop = FALSE]
-    nped <- dim(p_pred)[1]
-    
-    if (nped == 0) {
-        return(NULL)    
-    }
-
-    # All of the positions of all in-group pedestrians need to be averaged
-    # Which represents the group centroid
-    centroid <- c(median(p_pred[,1]), median(p_pred[,2]))
-
-    # Euclidean distance for pedestrian_i is calculated for each cell
-    return(m4ma::dist1_rcpp(centroid, centers))
-}
-
-#' Group Centroid Utility
-#'
-#' @details Returns `empty numeric` if the pedestrian `n` does not belong to a pedestrian social group.
-#'
-#' @param a_gc Numeric scalar power parameter
-#' @param b_gc Numeric scalar steepness parameter
-#' @param radius Numeric double indicating the radius of pedestrian `n`.
-#' @param cell_dist Numeric vector with the distance from the cell to the predicted group centroid.
-#' @param stop_utility Numeric double with the disutility of 34th stopping cell.
-#' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
+#' Group centroid utility
 #' 
-#' @return Numeric vector `centroid_util` with group centroid utility for each cell.
+#' The parameters that are used by this function -- and which are defined in 
+#' \code{\link[predped]{params_from_csv}} -- are \code{a_group_centroid} and 
+#' \code{b_group_centroid}.
+#'
+#' @param a_gc Numeric denoting the power to which to take the utility.
+#' @param b_gc Numeric denoting the slope of the utility function.
+#' @param radius Numeric denoting the radius of the agent.
+#' @param cell_dist Numeric vector denoting the distance of each cell in the 
+#' \code{centers} to the predicted group centroid.
+#' @param stop_utility Numeric denoting the utility of stopping. Is used to 
+#' ensure the agents do not freeze when they are too far away from each other. 
+#' @param nped Numeric denoting the number of ingroup members. 
+#' 
+#' @return Numeric vector containing the group-centroid-related utility for each 
+#' cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{distance_group_centroid}},
+#' \code{\link[predped]{params_from_csv}},
+#' \code{\link[predped]{utility}}
+#' 
+#' @rdname gc_utility
+#' 
 #' @export
-#'
-gc_utility <- function(a_gc, b_gc, radius, cell_dist, stop_utility, nped) {
+gc_utility <- function(a_gc, 
+                       b_gc, 
+                       radius, 
+                       cell_dist, 
+                       stop_utility, 
+                       nped) {
     
+    # No utilities to be added whenever there are is no group centroid to 
+    # account for (see `distance_group_centroid`).
     if (is.null(cell_dist)) {
         return(numeric(33))
     }
@@ -399,26 +398,46 @@ gc_utility <- function(a_gc, b_gc, radius, cell_dist, stop_utility, nped) {
 ################################################################################
 # VISUAL FIELD
 
-#' Nearest Group Member of Pedestrian `n` in the visual of Pedestrian `n`.
+#' Angle between agent and group members
+#' 
+#' Finds the angle at which the group members are located compared to the agent.
+#' Uses the predicted positions of the group members for this.
 #'
-#' Find cells that minimise the absolute difference between heading angle of pedestrian `n` 
-#' and angle from cell centre to predicted position of nearest group member (in radians).
+#' @param agent_idx Numeric denoting the position of the agent in the prediction 
+#' matrix \code{p_pred}.
+#' @param agent_group Numeric vector with the group membership of all 
+#' pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+#' of all pedestrians that belong to the social group of the agent.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param any_member Logical denoting whether to consider the angles of all 
+#' group members (\code{TRUE}) -- effectively saying that it doesn't matter 
+#' which group member the agent can see, as long as they can see one -- or 
+#' whether to only consider the nearest group member (\code{FALSE}). Defaults 
+#' to \code{TRUE}.
 #'
-#' @details Returns `Null` if pedestrian `n` does not belong to a social group.
-#'
-#' @param agent_idx Integer scalar indexing the pedestrian in the state.
-#' @param agent_group Numeric vector with group membership indices of all pedestrians.
-#' @param p_pred Numeric matrix with shape Nx2 (x & y) containing predicted positions
-#' of all pedestrians.
-#' @param orientation Numeric scalar indicating heading angle pedestrian `n`.
-#' @param centers Numeric matrix with shape (33x2) containing (x & y) for each cell centre.
-#' @param position Numeric vector indicating position (x & y) pedestrian `n`.
-#'
-#' @return Numeric vector with absolute difference between heading angle and angle from cell centre
-#'         to predicted position of nearest group member of pedestrian `n` (in radians).
+#' @return Numeric vector containing the relative angle of the group member(s)
+#' compared to the orientation of the agent within a given cell in \code{centers}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{vf_utility_continuous}}
+#' \code{\link[predped]{vf_utility_discrete}}
+#' 
+#' @rdname get_angles
+#' 
 #' @export 
 #'
-get_angles_closest_buddy <- function (agent_idx, agent_group, p_pred, orientation, centers, position) {
+get_angles <- function (agent_idx, 
+                        agent_group, 
+                        position, 
+                        orientation,  
+                        p_pred, 
+                        centers,
+                        any_member = TRUE) {
     
     # First need to identify whether a pedestrian belongs to a social group
     inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
@@ -428,94 +447,92 @@ get_angles_closest_buddy <- function (agent_idx, agent_group, p_pred, orientatio
     if (nped == 0) {
         return(NULL)    
     }
-    
-    # Find out which pedestrian will be closest to pedestrian `n` at the next iteration.
-    # This means extracting the current_position and calculating the distance 
-    # to other pedestrians in the group at the next time step.
-    nearest_ped <- m4ma::dist1_rcpp(position, p_pred)
-    nearest_ped <- p_pred[which.min(nearest_ped),]
-    orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
 
-    # Get angle from cell centers of pedestrian `n`
-    # to predicted position of the nearest group member.
-    angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
+    # `any_member` is TRUE, we will find the angle for which the cosine is 
+    # maximal, so that we account for any member the agent can see in their 
+    # visual field.
+    if(any_member) {
+        # Get orientations of the cells in for pedestrian `n`.
+        orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+
+        # Get angles from cell centers to positions of other pedestrians
+        # belonging to the group of pedestrian `n`.
+        rel_angles <- lapply(seq_len(nrow(p_pred)),
+                         \(i) atan2(p_pred[i, 2] - centers[,2], p_pred[i, 1] - centers[,1]) - orientations) 
+        rel_angles <- do.call(cbind, rel_angles)
     
-    # Get relative angle from cell 
-    rel_angles <- angles - orientations
-    rel_angles <- ifelse(rel_angles < 0, rel_angles + 2*pi, rel_angles)
+        # Get location of angle on unit circle
+        rel_angles <- ifelse(rel_angles < 0, rel_angles + 2*pi, rel_angles)
+    
+        # Index which angles are maximal
+        minimal_angle <- numeric(nrow(rel_angles))
+        for (i in seq_len(nrow(rel_angles))) {
+            idx <- which.max(cos(rel_angles[i,]))
+            minimal_angle[i] <- rel_angles[i, idx]
+        }
+
+        rel_angles <- minimal_angle
+
+    # If not, then we only want to account for the closest group member, who 
+    # we need to select first
+    } else {    
+        # Find out which pedestrian will be closest to pedestrian `n` at the next iteration.
+        # This means extracting the current_position and calculating the distance 
+        # to other pedestrians in the group at the next time step.
+        nearest_ped <- m4ma::dist1_rcpp(position, p_pred)
+        nearest_ped <- p_pred[which.min(nearest_ped),]
+        orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
+
+        # Get angle from cell centers of pedestrian `n`
+        # to predicted position of the nearest group member.
+        angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
+    
+        # Get relative angle from cell 
+        rel_angles <- angles - orientations
+        rel_angles <- ifelse(rel_angles < 0, rel_angles + 2*pi, rel_angles)
+    }
 
     # Return the difference between cell centers' orientation angle
     # and angle to position randomly selected group member (in radians).
-
     return(rel_angles)
 }
 
-#' Find any pedestrian belonging to the group of pedestrian `n`,
-#' that is in the extended visual field of pedestrian `n`.
+#' Continuous visual field utility
+#' 
+#' The idea of this utility function is to let the angle at which you see your 
+#' group members play a role in the utility. Here, we distinguish between using 
+#' a cosine for the maximization -- leading to maximum utility whenever an agent 
+#' is directly looking at a group member and to minimum utility whenever the 
+#' group member is directly behind the agent -- and the sine -- leading to 
+#' maximum utility whenever the group members are directly besides the agent and 
+#' to minimum utility whenever the agent is either directly behind the group 
+#' member or the group member behind the agent.
 #'
-#' @details Returns `NULL` if pedestrian `n` does not belong to a group.
+#' @param b_vf Numeric denoting the slope of the utility function. 
+#' @param rel_angles Numeric vector containing the relative angle from each cell 
+#' center to the predicted positions of the group members. Typically output of 
+#' \code{\link[predped]{get_angle}}. 
+#' @param fx Trigonometric function applied to the relative angles defining what
+#' their effect is (scaled by \code{b_vf}). Defaults to \code{cos}, saying that 
+#' the maximal utility stems from directly looking at a person (orientation 0).
+#' Alternative could be \code{sin}, which maximizes the utility of looking at 
+#' a person from right next to them (orientation 90).
 #'
-#' @param agent_idx Integer scalar indexing the pedestrian in the state.
-#' @param agent_group Numeric vector with group membership indices of all pedestrians.
-#' @param p_pred Numeric matrix with shape Nx2 (x & y) containing predicted positions
-#' of all pedestrians.
-#' @param orientation Numeric scalar indicating heading angle pedestrian `n`.
-#' @param centers Numeric matrix with shape (33x2) containing (x & y) for each cell centre.
-#' @param position Numeric vector indicating position (x & y) pedestrian `n`.
-#'
-#' @return Numeric vector with absolute difference between heading angle and angle from cell centre
-#'         to predicted position of randomly sampled group member (in radians).
-#'
-#' @export
-#'
-get_angles_any_buddy <- function(agent_idx, agent_group, p_pred, orientation, centers, position) {
-    
-    # First need to identify whether a pedestrian belongs to a social group
-    inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[-agent_idx, , drop = FALSE]
-    p_pred <- p_pred[inGroup, , drop = FALSE]
-    nped <- dim(p_pred)[1]
-    
-    if (nped == 0) {
-        return(NULL)    
-    }
-
-    # Get orientations of the cells in for pedestrian `n`.
-    orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
-
-    # Get angles from cell centers to positions of other pedestrians
-    # belonging to the group of pedestrian `n`.
-    rel_angles <- lapply(seq_len(nrow(p_pred)),
-                     \(i) atan2(p_pred[i, 2] - centers[,2], p_pred[i, 1] - centers[,1]) - orientations) 
-    rel_angles <- do.call(cbind, rel_angles)
-    
-    # Get location of angle on unit circle
-    rel_angles <- ifelse(rel_angles < 0, rel_angles + 2*pi, rel_angles)
-    
-    # Index which angles are maximal
-    minimal_angle <- numeric(nrow(rel_angles))
-    for (i in seq_len(nrow(rel_angles))) {
-        idx <- which.max(cos(rel_angles[i,]))
-        minimal_angle[i] <- rel_angles[i, idx]
-    }
-
-    return(minimal_angle)
-}
-
-
-#' Continuous Visual Field Utility
-#'
-#' @details Returns `empty numeric` if pedestrian `n` does not belong to a pedestrian social group
-#'
-#' @param b_vf Numeric scalar vertex x-coordinate cosine function.
-#' @param rel_angles Numeric vector with relative angle from cell center 
-#'                   to predicted position group member of pedestrian `n` (in radians).
-#'
-#' @return Numeric vector `visual_field_utility` with visual field utilities for each pedestrian `n`.
+#' @return Numeric vector containing the utility attributed to keeping the 
+#' group members within your visual field. Returns 0's if the agent does not 
+#' have any additional group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_angles}},
+#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{vf_utility_discrete}}
+#' 
+#' @rdname vf_utility_continuous
 #'
 #' @export
-#'
-vf_utility_cosine_continuous <- function(b_vf, rel_angles) {
+vf_utility_continuous <- function(b_vf, 
+                                  rel_angles, 
+                                  fx = cos) {
      
      if (is.null(rel_angles)) {
         return(numeric(33))
@@ -523,51 +540,39 @@ vf_utility_cosine_continuous <- function(b_vf, rel_angles) {
 
     # Calculate visual field utility
     visual_field_utility <- -sapply(rel_anlges, 
-                                    \(x) b_vf * cos(x))
+                                    \(x) b_vf * fx(x))
 
     # Return the visual field utility
     return(visual_field_utility)
 }
 
-#' Continuous Visual Field Utility 90 Degrees
+#' Discrete visual field utility
+#' 
+#' The idea of this utility function is that it doesn't matter at which angle 
+#' you see a group member within the visual field, as long as you see them. 
+#' This translates to a discrete added disutility whenever the group member 
+#' falls inside the non-visual zone behind the agent.
 #'
-#' @details Returns `empty numeric` if pedestrian `n` does not belong to a pedestrian social group
+#' @param b_vf Numeric denoting the slope of the utility function. 
+#' @param rel_angles Numeric vector containing the relative angle from each cell 
+#' center to the predicted positions of the group members. Typically output of 
+#' \code{\link[predped]{get_angle}}. 
 #'
-#' @param b_vf Numeric scalar steepness paramter.
-#' @param rel_angles Numeric vector with relative angle from cell center 
-#'                   to predicted position group member of pedestrian `n` (in radians).
-#'
-#' @return Numeric vector `visual_field_utility` with visual field utilities for each pedestrian `n`.
-#'
-#' @export
-#'
-vf_utility_sine_continuous <- function(b_vf, rel_angles) {
-     
-     if (is.null(rel_angles)) {
-        return(numeric(33))
-    }
-
-    # Calculate visual field utility
-    visual_field_utility <- -sapply(rel_anlges, 
-                                    \(x) b_vf * abs(sin(x)))
-
-    # Return the visual field utility
-    return(visual_field_utility)
-}
-
-#' Discrete Visual Field Utility
-#'
-#' @details Returns `empty numeric` if pedestrian `n` does not belong to a pedestrian social group
-#'
-#' @param b_vf Numeric scalar steepness parameter.
-#' @param rel_angles Numeric vector with relative angle from cell center 
-#'                   to predicted position group member of pedestrian `n` (in radians).
-#'
-#' @return Numeric vector `visual_field_utility` with visual field utilities for each cell of pedestrian `n`.
+#' @return Numeric vector containing the utility attributed to keeping the 
+#' group members within your visual field. Returns 0's if the agent does not 
+#' have any additional group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_angles}},
+#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{vf_utility_continuous}}
+#' 
+#' @rdname vf_utility_discrete
 #'
 #' @export
 #'
-vf_utility_discrete <- function(b_vf, rel_angles) {
+vf_utility_discrete <- function(b_vf, 
+                                rel_angles) {
      
      if (is.null(rel_angles)) {
         return(numeric(33))
@@ -583,7 +588,6 @@ vf_utility_discrete <- function(b_vf, rel_angles) {
     # Return the visual field utility
     return(visual_field_utility)
 }
-
 
 # #' Transform utility to probability
 # #'
