@@ -17,6 +17,7 @@
   status = "move",
   waiting_counter = 0,
   cell = 0,
+  parameters = data.frame(),
   color = "black"
 )
 }
@@ -65,12 +66,12 @@ their goal plus 2. Defaults to \code{0}}
 \item{cell}{Numeric denoting the cell the agent will move to. Defaults to 
 \code{0}.}
 
-\item{color}{Character denoting the color in which the agent should be plotted.}
-
 \item{parameters}{Dataframe containing the values of the parameters for the 
 agent. Should contain all parameters relevant for the utility functions 
 (use \code{predped::draw_parameters(1)} for an example). Defaults to a random 
 set of parameters from the default parameter list in \code{predped}.}
+
+\item{color}{Character denoting the color in which the agent should be plotted.}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}

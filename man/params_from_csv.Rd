@@ -124,6 +124,14 @@ decisions pedestrians make when walking around in an environment, namely:
                            to follow this leader} 
     \item{\code{b_buddy}:}{slope that scales the effect of selecting and 
                            walking besides a buddy} 
+    \item{\code{b_group_centroid}:}{slope that scales the effect of trying to 
+                                    maintain a small distance between an 
+                                    agent and their group members}
+    \item{\code{a_group_centroid}:}{exponent that determines the power with 
+                                    which the distance of the agent to their
+                                    group members is taken}
+    \item{\code{b_visual_field}:}{slope that scales the effect of maintaining
+                                  group members within the visual field}
 }
 }
 \seealso{

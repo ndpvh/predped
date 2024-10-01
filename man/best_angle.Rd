@@ -7,8 +7,8 @@
 best_angle(
   agent,
   state,
-  agent_specifications,
   background,
+  agent_specifications,
   velocities,
   orientations,
   step = 45
@@ -19,13 +19,13 @@ best_angle(
 
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
+
 \item{agent_specifications}{List containing the specifications of all agents
 in the state. Is provided here as an argument to increase computational 
 speed, as you only have to define these specifications once (instead of 
 multiple times) per iteration. This list is furthermore needed to make the 
 connection with the \code{m4ma} package.}
-
-\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
 \item{velocities}{Numerical matrix that contains the change in velocity per 
 cell that the agent might move to.}

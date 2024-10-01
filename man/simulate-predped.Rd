@@ -18,6 +18,7 @@
   precompute_goal_paths = FALSE,
   sort_goals = TRUE,
   precomputed_goals = NULL,
+  middle_edge = FALSE,
   space_between = 2.5,
   time_step = 0.5,
   precompute_edges = TRUE,
@@ -86,6 +87,11 @@ Defaults to \code{TRUE}.}
 \item{precomputed_goals}{List of goal stacks from which the agent can be 
 assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 in the simulation.}
+
+\item{middle_edge}{Logical denoting whether to sample the goals from the 
+middle of the edge of the objects in the \code{link[predped]{background-class}}
+(\code{TRUE}) or to allow the goal locations to fall on all points on these 
+edges (\code{FALSE}). Defaults to \code{FALSE}.}
 
 \item{space_between}{Numeric denoting the multiplier for the space to leave 
 between the circumference of the object and the nodes created under the hood 

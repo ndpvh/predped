@@ -4,17 +4,17 @@
 \alias{create_agent_specifications}
 \title{Create agent specifications}
 \usage{
-create_agent_specifications(agent_list, stay_stoppped = TRUE, time_step = 0.5)
+create_agent_specifications(agent_list, stay_stopped = TRUE, time_step = 0.5)
 }
 \arguments{
+\item{stay_stopped}{Logical denoting whether agents will predict others that 
+are currently not moving to remain immobile in the next iteration. Defaults 
+to \code{TRUE}.}
+
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
-
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
-to \code{TRUE}.}
 }
 \value{
 List containing all information of all agents within the current 

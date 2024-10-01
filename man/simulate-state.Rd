@@ -12,6 +12,7 @@
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
+  standing_start = 0.1,
   close_enough = 2,
   space_between = 2.5,
   stay_stopped = TRUE,
