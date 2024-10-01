@@ -10,7 +10,7 @@ devtools::load_all()
 library(tidyverse)
 
 # Create the basic function to be used to investigate the benchmark
-test_times <- function(fx, n = 200) {
+test_times <- function(fx, n = 100) {
     times <- numeric(n)
     for(i in seq_along(times)) {
         start_time <- Sys.time()

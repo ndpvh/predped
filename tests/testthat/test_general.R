@@ -1,7 +1,7 @@
 
 testthat::test_that("Finding a class in a list works", {
     state <- list(predped::rectangle(center = c(0, 0), size = c(2, 2), orientation = 0), 
-                  predped::rectangle(center = c(1, 1), size = c(1, 1), orientation = 45), 
+                  predped::rectangle(center = c(1, 1), size = c(1, 1), orientation = pi / 4), 
                   predped::circle(center = c(2, 2), radius = 1))
 
     rect <- predped::find_class("rectangle", state)
@@ -173,4 +173,21 @@ testthat::test_that("Vectorized line-line intersections are interchangeable", {
 
     testthat::expect_equal(tst_1, ref_1)
     testthat::expect_equal(tst_2, ref_2)
+})
+
+testthat::test_that("Perpendicular orientation making works", {
+    settings <- list(predped::background(shape = predped::rectangle(center = c(0, 0),
+                                                                    size = c(10, 10)), 
+                                         entrance = c(-5, 0)), 
+                     predped::background(shape = predped::rectangle(center = c(0, 0),
+                                                                    size = c(10, 10), 
+                                                                    orientation = pi/4), 
+                                         entrance = c(-2.5, 2.5)))
+
+    ref <- list(0, 315)
+
+    tst <- lapply(settings, 
+                  \(x) perpendicular_orientation(shape(x), entrance(x)))
+
+    testthat::expect_equal(tst, ref)
 })

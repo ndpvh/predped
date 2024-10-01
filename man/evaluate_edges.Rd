@@ -7,24 +7,54 @@
 evaluate_edges(segments, background)
 }
 \arguments{
-\item{segments}{Named matrix or data.frame containing the ids of the nodes 
-under column names "from" and "to", and their coordinates under "from_x", 
-"from_y", "to_x", and "to_y"}
+\item{segments}{Named matrix or dataframe containing the ids of the nodes 
+under column names \code{"from"} and \code{"to"}, and their coordinates under 
+\code{"from_x"}, \code{"from_y"}, \code{"to_x"}, and \code{"to_y"}.}
 
-\item{objects}{List of objects that are contained in the setting}
+\item{objects}{List of objects that extend the 
+\code{\link[predped]{object-class}}.}
 }
 \value{
-List containing the nodes, edges, and edges together with their 
-coordinates
+List containing a dataframe with the surviving connections between 
+the nodes under \code{"edges"} and a similar dataframe also containing the 
+coordinates under \code{"edges_with_coords"}.
 }
 \description{
-This function evaluates whether all connections between the nodes are actually 
-specified, or specifically which one's are occluded by the objects in 
-the background.
+This function evaluates whether the connections that are made between nodes 
+are reachable, that is that the paths are not blocked by any objects. This 
+also accounts for the one-way blockages that are present in the 
+\code{limited_access} slot of the \code{\link[predped]{background-class}}.
 }
 \details{
-Approach taken is to minimize the time it takes to do these computations:
-  - Step 1: Compute the distance between the nodes.
-  - Step 2: Find out which nodes are reachable from one another. In other 
-            words, if I stand at node 1, can I see node 2?
+In this function, a lot of the heavy lifting is done by the 
+\code{\link[predped]{line_intersection}} method and the 
+\code{\link[predped]{prune_edges}} function.
+}
+\examples{
+# Let's create a background
+my_background <- background(shape = rectangle(shape = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(shape = c(0, 0), 
+                                                     size = c(1, 1))))
+
+# Create some segments that do and do not go though the objects in the 
+# background
+potential_edges <- data.frame(from = c("node 1", "node 2", "node 3"), 
+                              from_x = c(-0.75, -0.75, -0.75), 
+                              from_y = c(0, 0, 0),
+                              to = c("node 4", "node 5", "node 6"),
+                              to_x = c(-0.75, 0.75, 0.95), 
+                              to_y = c(0.75, 0, 0.95))
+head(potential_edges)
+
+# Only retain the edges that don't intersect the object
+surviving_edges <- evaluate_edges(potential_edges, my_background)
+head(surviving_edges$edges_with_coords)
+
+}
+\seealso{
+\code{\link[predped]{adjust_edges}},
+\code{\link[predped]{create_edges}},
+\code{\link[predped]{prune_edges}},
+\code{\link[predped]{line_intersection}}
 }

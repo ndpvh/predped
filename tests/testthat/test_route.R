@@ -62,7 +62,7 @@ testthat::test_that("Creating nodes works (few)", {
     tst <- predped::create_nodes(c(-1.5, 1.5), 
                                  c(1.5, -1.5),
                                  setting, 
-                                 many_options = FALSE)
+                                 many_nodes = FALSE)
 
     # Create the reference (from a previous run that looked right)
     ref <- readRDS(file.path(".", "data", "ref_nodes_few.Rds"))
@@ -96,7 +96,7 @@ testthat::test_that("Creating nodes works (many)", {
     tst <- predped::create_nodes(c(-1.5, 1.5), 
                                  c(1.5, -1.5),
                                  setting, 
-                                 many_options = TRUE)
+                                 many_nodes = TRUE)
 
     # Create the reference (from a previous run that looked right)
     ref <- readRDS(file.path(".", "data", "ref_nodes_many.Rds"))
@@ -286,7 +286,7 @@ testthat::test_that("Adjusting edges gives same output as creating edges", {
                                                c(0.75, -0.75), 
                                                setting, 
                                                space_between = spc, 
-                                               many_options = FALSE)
+                                               many_nodes = FALSE)
     precomputed_edges$edges <- precomputed_edges$edges[!(precomputed_edges$edges$from %in% c("agent", "goal")),]
     precomputed_edges$edges <- precomputed_edges$edges[!(precomputed_edges$edges$to %in% c("agent", "goal")),]
     precomputed_edges$nodes <- precomputed_edges$nodes[!(precomputed_edges$nodes$node_ID %in% c("agent", "goal")),]
@@ -304,7 +304,7 @@ testthat::test_that("Adjusting edges gives same output as creating edges", {
                                  c(0.75, -0.75), 
                                  new_setting, 
                                  space_between = spc, 
-                                 many_options = FALSE)
+                                 many_nodes = FALSE)
 
     tst <- predped::adjust_edges(c(-0.75, 0.75),
                                  c(0.75, -0.75),
@@ -394,7 +394,7 @@ testthat::test_that("Creating edges with one-directional flow works", {
                                  c(0.75, 0),
                                  setting,
                                  space_between = spc,
-                                 many_options = FALSE)
+                                 many_nodes = FALSE)
 
     # Put in alphabetical order
     ref<- list(edges = dplyr::arrange(ref$edges, from, to),

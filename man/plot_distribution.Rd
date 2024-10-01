@@ -7,34 +7,22 @@
 plot_distribution(...)
 }
 \arguments{
-\item{n}{Integer denoting the number of parameters to draw. Defaults to `1`.}
-
-\item{mean}{A named list containing the mean for each of the parameters for 
-a given agent.}
-
-\item{Sigma}{Either a covariance matrix that defines the individual differences
-on each of the parameters (when `transform_covariance == FALSE`), or a matrix
-containing standard deviations for each of the parameters on its diagonal and
-correlations between the parameters on its off-diagonal (when 
-`transform_covariance == TRUE`). Default covariance matrices exist for each
-of the archetypes in `params_archetypes` and thus changes with the value of 
-`archetype`.}
-
-\item{archetype}{String denoting the archetype to be used for the covariance
-matrix. Ignored if `Sigma` is provided. Defaults to `BaselineEuropean`.}
-
-\item{individual_differences}{Logical denoting whether to use the standard 
-deviations in the parameter list to create some variation in the parameters.
-Defaults to `TRUE`.}
-
-\item{transform_covariance}{Logical denoting whether to transform `Sigma` to 
-a proper covariance matrix or not. Defaults to `TRUE`.}
+\item{...}{Arguments provided to the \code{\link[predped]{generate_parameters}}.}
 }
 \value{
-Printed histogram of the distribution of parameters under the 
-specifications.
+Plotted histograms of the prior distribution of parameters under the 
+provided specifications.
 }
 \description{
-Use the provided means and covariance matrix to visualize the distribution of
-parameter values.
+Wrapper of the \code{\link[predped]{generate_parameters}} function that uses
+the provided arguments to visualize the distribution of parameter values 
+under the current specifications.
+}
+\seealso{
+\code{\link[predped]{generate_parameters}},
+\code{\link[predped]{load_parameters}},
+\code{\link[predped]{params_to_csv}},
+\code{\link[predped]{to_bounded}},
+\code{\link[predped]{to_covariance}},
+\code{\link[predped]{to_unbounded}}
 }

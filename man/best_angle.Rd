@@ -2,35 +2,53 @@
 % Please edit documentation in R/see.R
 \name{best_angle}
 \alias{best_angle}
-\title{Scan environment for the best direction}
+\title{Look for the best direction to head in}
 \usage{
 best_angle(
   agent,
   state,
-  agent_specifications,
   background,
+  agent_specifications,
   velocities,
   orientations,
   step = 45
 )
 }
 \arguments{
-\item{agent}{The agent that will reorient themselves}
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
 
-\item{state}{The list that contains the current state of the simulation}
+\item{state}{Object of the \code{\link[predped]{state-class}}.}
 
-\item{step}{The stepsize in the angles to be checked}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{P_n}{The goal to move to next}
+\item{agent_specifications}{List containing the specifications of all agents
+in the state. Is provided here as an argument to increase computational 
+speed, as you only have to define these specifications once (instead of 
+multiple times) per iteration. This list is furthermore needed to make the 
+connection with the \code{m4ma} package.}
 
-\item{agent_predictions}{The predicted trajectories of the other agents}
+\item{velocities}{Numerical matrix that contains the change in velocity per 
+cell that the agent might move to.}
 
-\item{iInfo}{Not clear yet}
+\item{orientations}{Numerical matrix that contains the change in orientation 
+per cell that the agent might move to.}
+
+\item{step}{Numeric denoting the change in angle for looking around in 
+degrees. Defaults to \code{45}, meaning that the agent looks around 
+exhaustively in 8 different directions (360 / 45) by default.}
 }
 \value{
-The angle that has the highest utility to move to
+Numeric denoting the angle or direction that had the highest utility
+(in degrees).
 }
 \description{
-This functions scans the environment in a given stepsize and checks the utility
-of each possible angle.
+This functions scans the environment and computes the utility of each 
+possible direction. Used in \code{\link[predped]{update_position}} when 
+the agent has to reorient itself.
+}
+\seealso{
+\code{\link[predped]{simulate-predped}},
+\code{\link[predped]{simulate-state}},
+\code{\link[predped]{update}},
+\code{\link[predped]{utility}}
 }

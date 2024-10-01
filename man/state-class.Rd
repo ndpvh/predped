@@ -11,10 +11,22 @@ An S4 Class to Represent the State
 \section{Slots}{
 
 \describe{
-\item{\code{iteration}}{An integer denoting the iteration number of the state}
+\item{\code{iteration}}{Numeric denoting the iteration number.}
 
-\item{\code{setting}}{An instance of \code{\link[predped]{background-class}}}
+\item{\code{setting}}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{\code{agents}}{A list containing instances of the \code{\link[predped]{agent-class}}}
+\item{\code{agents}}{List containing objects of the \code{\link[predped]{agent-class}}
+representing the agents that are currently walking around in the \code{setting}.}
+
+\item{\code{potential_agents}}{List containing objects of the 
+\code{\link[predped]{agent-class}} representing agents that are waiting to 
+enter the \code{setting}.}
 }}
 
+\seealso{
+\code{\link[predped]{agents}},
+\code{\link[predped]{initialize,state-method}},
+\code{\link[predped]{iteration}},
+\code{\link[predped]{potential_agents}},
+\code{\link[predped]{setting}}
+}

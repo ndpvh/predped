@@ -2,13 +2,26 @@
 % Please edit documentation in R/background.R
 \name{compute_limited_access}
 \alias{compute_limited_access}
-\title{Transform the limited_access segments to polygons}
+\title{Transform \code{segment}s to \code{polygon}s}
 \usage{
 compute_limited_access(segment)
 }
 \arguments{
-\item{segment}{Object of the class `segment`}
+\item{segment}{Object of the \code{\link[predped]{segment-class}}.}
+}
+\value{
+Object of the \code{\link[predped]{polygon-class}}.
 }
 \description{
-Transform the limited_access segments to polygons
+This function is used to transform an object of the 
+\code{\link[predped]{segment-class}} to an object of the 
+\code{\link[predped]{polygon-class}}. Done as a precomputation in the 
+constructor for the \code{\link[predped]{background-class}} (filling the 
+\code{precomputed_limited_access} slot based on the \code{limited_access}
+slot.
+}
+\seealso{
+\code{\link[predped]{background-class}}
+\code{\link[predped]{polygon-class}}
+\code{\link[predped]{segment-class}}
 }

@@ -26,6 +26,7 @@ tmp/
 *.zip
 *.pdf
 *.out
+docs/*
 
 R/*_depr.R
 
@@ -37,3 +38,6 @@ performance_test*
 .DS_Store
 RCore/
 demo/*
+
+social_utilities_alexander/
+benchmark.md

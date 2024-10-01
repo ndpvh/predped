@@ -9,26 +9,86 @@ adjust_edges(
   to,
   background,
   precomputed_edges,
-  new_objects = NULL,
   space_between = 0.5,
-  reevaluate = FALSE
+  new_objects = NULL,
+  reevaluate = !is.null(new_objects)
 )
 }
 \arguments{
-\item{from}{Coordinate from which to start}
+\item{from}{Numeric denoting the coordinate from which to begin routes.}
 
-\item{to}{Coordinate at which to end}
+\item{to}{Numeric denoting the coordinate from which to end routes.}
 
-\item{background}{The background/setting in which the agent is walking}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{precomputed_edges}{Output of `create_edges` in which agent and goal 
-are removed}
+\item{precomputed_edges}{Previously computed edges, usually the output of 
+\code{\link[predped]{compute_edges}}.}
+
+\item{space_between}{Numeric denoting the space to leave between the 
+circumference of the object and the nodes created under the hood (see
+\code{\link[predped]{add_nodes}}). Defaults to \code{0.5}.}
+
+\item{new_objects}{List of instances of the \code{\link[predped]{object-class}}
+that were previously not contained in the \code{objects} slot of the 
+\code{background} when computing the edges provided in 
+\code{precomputed_edges}. Typically, these are other pedestrians that an 
+agent wants to account for when rerouting. Defaults to \code{NULL}, so that
+only \code{from} and \code{to} are added to the already existing edges.}
+
+\item{reevaluate}{Logical denoting whether to reevaluate the appropriateness
+of the edges that are contained in the \code{precomputed_edges}. Defaults to 
+\code{TRUE} when \code{new_objects} is not empty, and to \code{FALSE} 
+whenever it is.}
 }
 \value{
-Matrix containing from, to, and the distance between these coordinates
+List containing a dataframe with the surviving nodes under 
+\code{"nodes"}, a dataframe with the surviving connections between nodes 
+under \code{"edges"}, and a similar dataframe to the previous one but with 
+the coordinates still in there under \code{"edges_with_coords"}.
 }
 \description{
-This function uses the background, goal position, and position of the agent
-to adjust a previously computed graph of possible routes along which the agent 
-can walk towards their goal. The output is then used to find the shortest path.
+This function adjusts a previously created list of nodes and edges to include
+new nodes and edges and/or reevaluate the appropriateness of the old ones.
+The output is then used in the \code{\link[predped]{find_path}} to 
+find the shortest path from the agent to the goal.
+}
+\details{
+Goes through a similar type of steps as \code{\link[predped]{create_edges}},
+with the exception that \code{adjust_edges} takes in already computed and 
+evaluated edges and adjusts those for the current purposes of the 
+environment, there where \code{\link[predped]{create_edges}} creates these 
+same edges from scratch.
+}
+\examples{
+# Define a background in which the agent can move
+my_background <- background(shape = rectangle(center = c(0, 0), 
+                                              size = c(2, 2)), 
+                            objects = list(rectangle(center = c(0, 0), 
+                                                     size = c(1, 1))))
+
+# Create precomputed edges
+edges <- compute_edges(my_background, 
+                       space_between = 0.25,
+                       many_nodes = FALSE)
+head(edges$edges)
+
+# Adjust these edges and provide values for the from and to arguments
+adjusted_edges <- adjust_edges(c(-0.75, 0), 
+                               c(0.75, 0), 
+                               my_background, 
+                               edges,
+                               space_between = 0.25)
+head(adjusted_edges$edges)
+
+}
+\seealso{
+\code{\link[predped]{background-class}},
+\code{\link[predped]{add_nodes}},
+\code{\link[predped]{find_path}},
+\code{\link[predped]{limit_access}},
+\code{\link[predped]{combine_nodes}},
+\code{\link[predped]{compute_edges}},
+\code{\link[predped]{create_edges}},
+\code{\link[predped]{create_nodes}},
+\code{\link[predped]{evaluate_edges}}
 }

@@ -1,8 +1,8 @@
 testthat::test_that("Predped initialization works", {
     # Create a mock setting
     setting <- predped::background(shape = predped::rectangle(center = c(0,0), 
-                                                              size = c(2,2),
-                                   objects = list()))
+                                                              size = c(2,2)),
+                                   objects = list())
 
     # Load in the parameters. To be used later.
     params_csv <- suppressMessages(load_parameters())
@@ -25,10 +25,12 @@ testthat::test_that("Predped initialization works", {
     csv_4 <- predped::predped(setting, 
                               id = "test")
 
+    n_archs <- nrow(params_csv[["params_archetypes"]])
+
     # Do the test for the CSV's, checking whether the results are correct
     testthat::expect_equal(csv_1@id, "model ydgab")
-    testthat::expect_equal(csv_1@weights, rep(1 / 14, 14), tolerance = 1e-3)
-    testthat::expect_equal(length(csv_1@archetypes), 14)
+    testthat::expect_equal(csv_1@weights, rep(1 / n_archs, n_archs), tolerance = 1e-3)
+    testthat::expect_equal(length(csv_1@archetypes), n_archs)
     testthat::expect_equal(names(csv_1@parameters), c("params_archetypes", "params_sigma", "params_bounds"))
     testthat::expect_equal(csv_1@parameters[["params_archetypes"]]$name, csv_1@archetypes)
     testthat::expect_equal(csv_1@setting, setting)

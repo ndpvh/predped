@@ -1,53 +1,60 @@
-#' Plot an Object.
+#' Plot an object
+#' 
+#' @details 
+#' Returns a geom whenever providing separate instances of the
+#' \code{\link[predped]{object-class}}. Returns a ggpplot when providing 
+#' instances of the \code{\link[predped]{background-class}} or of the
+#' \code{\link[predped]{state-class}}. Whenever either is provided in a list, 
+#' a list containing the respective geoms or ggplots is returned.
 #'
-#' @param object An object of kind \code{\link[predped]{object-class}}
-#' @param agent.linewidth Thickness of the line with which to plot the agent. 
-#' Defaults to 1.
+#' @param object Object of the \code{\link[predped]{background-class}}, 
+#' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}}, 
+#' or a list containing multiple of these objects.
+#' @param agent.linewidth Numeric denoting the width of the line with which to 
+#' plot the agent. Defaults to \code{1}.
 #' @param plot_goal Logical denoting whether to plot the position of the current
-#' goal of the agent together with the agent. Defaults to `TRUE`.
-#' @param goal.size Thickness of the point that denotes the goal position. 
-#' Defaults to 1.
-#' @param entry.width Radius of the entrances and exits to be plotted with the 
-#' background. Defaults to 0.3,
-#' @param shape.fill Fill of the shape of the background. Defaults to "white".
-#' @param shape.color Color of circumference of the shape of the background. 
-#' Defaults to "black".
-#' @param shape.linewidth Thickness of the circumference of the shape of the 
-#' background. Also concerns the thickness of the line of the entrances and 
-#' exits. Defaults to 1.
-#' @param object.fill Fill of the objects contained in the background. Defaults 
-#' to "grey".
-#' @param object.color Color of the circumference of the objects contained in 
-#' the background. Defaults to "black".
-#' @param object.linewidth Thickness of the circumference of the objects contained
-#' in the background. Defaults to 1.
-#' @param plot.title.size Size of the plot title. Defaults to 10.
-#' @param plot.title.hjust Position of the plot title. Defaults to 0.5, or the 
-#' middle of the plot.
-#' @param axis.title.size Size of the axis title. Defaults to 10.
-#' @param axis.text.size Size of the axis text. Defaults to 8.
+#' goal of the agent together with the agent. Defaults to \code{TRUE}.
+#' @param goal.size Numeric denoting the size of the point that denotes the goal 
+#' position. Defaults to \code{1}.
+#' @param entry.width Numeric denoting the radius of the entrances and exits to 
+#' be plotted in the background. Defaults to \code{0.3},
+#' @param shape.fill Character defining the fill color of the shape of the 
+#' background. Defaults to \code{"white"}.
+#' @param shape.color Character defining the color of circumference of the shape 
+#' of the background. Defaults to \code{"black"}.
+#' @param shape.linewidth Numeric denoting the width of the circumference of the 
+#' shape of the background. Also concerns the width of the line of the entrances 
+#' and exits. Defaults to \code{1}.
+#' @param object.fill Character defining the fill color of the objects contained 
+#' in the background. Defaults to \code{"grey"}.
+#' @param object.color Character defining the color of the circumference of the 
+#' objects contained in the background. Defaults to \code{"black"}.
+#' @param object.linewidth Numeric denoting the width of the circumference of 
+#' the objects contained in the background. Defaults to \code{1}.
+#' @param plot.title.size Numeric denoting the text size of the plot title. 
+#' Defaults to \code{10}.
+#' @param plot.title.hjust Numeric denoting the position of the plot title, with
+#' \code{0} coding for left, \code{1} for right, and \code{0.5} for the middle. 
+#' Defaults to \code{0.5}.
+#' @param axis.title.size Numeric of the text size of the axis title. Defaults 
+#' to \code{10}.
+#' @param axis.text.size Numeric denoting the text size of the axis text. 
+#' Defaults to \code{8}.
 #' @param dark_mode Logical that can toggle the default colorpallette of predped's 
-#' dark mode. Defaults to `FALSE`.
-#' @param ... Additional ggplot arguments passed on to the geom for the objects.
+#' dark mode. Defaults to \code{FALSE}.
+#' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
-#' @return Either a geom or a ggplot
+#' @return Either a geom or a ggplot, depending on the object provided (see 
+#' Details).
+#' 
+#' @docType method
+#' 
+#' @rdname plot-method
+#' 
 #' @export
-#' @name plot-method
 setGeneric("plot", function(object, ...) standardGeneric("plot"))
 
 #'@rdname plot-method
-#'
-setMethod("plot", "object", function(object, ...) {
-  # Extract the points of the object
-  pts <- points(object)
-  return(ggplot2::annotate("polygon", 
-                           x = pts[,1], 
-                           y = pts[,2], 
-                           ...))
-})
-
-#'@rdname plot-method
-#'
 setMethod("plot", "agent", function(object, 
                                     plot_goal = TRUE,
                                     agent.linewidth = 1,
@@ -89,7 +96,6 @@ setMethod("plot", "agent", function(object,
 })
 
 #'@rdname plot-method
-#'
 setMethod("plot", "background", function(object, 
                                          entry.width = 0.3,
                                          shape.fill = "white",
@@ -127,7 +133,7 @@ setMethod("plot", "background", function(object,
     segments <- list()
     for(i in seq_len(nrow(entries))) {
         pts <- points(predped::circle(center = entries[i,], radius = entry.width))
-        pts <- pts[predped::in_object(shape(object), pts, outside = FALSE),]
+        pts <- pts[predped::in_object(shape(object), pts),]
 
         segments[[i]] <- cbind(pts[2:nrow(pts) - 1,], pts[2:nrow(pts),])
     }
@@ -165,43 +171,7 @@ setMethod("plot", "background", function(object,
         ggplot2::coord_fixed())
 })
 
-#' @rdname plot-method
-#' 
-setMethod("plot", "state", function(object, 
-                                    agent.linewidth = 1, 
-                                    goal.size = 1,
-                                    plot_goal = TRUE,
-                                    plot.title.size = 10,
-                                    plot.title.hjust = 0.5,
-                                    axis.title.size = 10,
-                                    axis.text.size = 8,
-                                    ...) {
-
-    # Create the plot for the setting, which will serve as the basis of 
-    base_plot <- predped::plot(setting(object), ...) +
-        ggplot2::labs(title = paste("iteration", object@iteration)) +
-        ggplot2::theme(legend.position = "none",
-                       plot.title = ggplot2::element_text(size = plot.title.size,
-                                                          hjust = plot.title.hjust),
-                       axis.title = ggplot2::element_text(size = axis.title.size),
-                       axis.text = ggplot2::element_text(size = axis.text.size))
-
-    # If there are currently no agents, then we just return the base_plot
-    if(length(object@agents) == 0) {
-        return(base_plot)
-    }
-    
-    # Otherwise, we will have to add the agents in the base_plot
-    return(base_plot + 
-        predped::plot(agents(object), 
-                      plot_goal = plot_goal,
-                      agent.linewidth = agent.linewidth,
-                      goal.size = goal.size,
-                      ...))            
-})
-
 #'@rdname plot-method
-#'
 setMethod("plot", "list", function(object, ...) {
     
     # First a check of whether anything is contained within this list. Otherwise
@@ -237,4 +207,48 @@ setMethod("plot", "list", function(object, ...) {
     }
 
     return(plt)
+})
+
+#'@rdname plot-method
+setMethod("plot", "object", function(object, ...) {
+  # Extract the points of the object
+  pts <- points(object)
+  return(ggplot2::annotate("polygon", 
+                           x = pts[,1], 
+                           y = pts[,2], 
+                           ...))
+})
+
+#' @rdname plot-method
+setMethod("plot", "state", function(object, 
+                                    agent.linewidth = 1, 
+                                    goal.size = 1,
+                                    plot_goal = TRUE,
+                                    plot.title.size = 10,
+                                    plot.title.hjust = 0.5,
+                                    axis.title.size = 10,
+                                    axis.text.size = 8,
+                                    ...) {
+
+    # Create the plot for the setting, which will serve as the basis of 
+    base_plot <- predped::plot(setting(object), ...) +
+        ggplot2::labs(title = paste("iteration", object@iteration)) +
+        ggplot2::theme(legend.position = "none",
+                       plot.title = ggplot2::element_text(size = plot.title.size,
+                                                          hjust = plot.title.hjust),
+                       axis.title = ggplot2::element_text(size = axis.title.size),
+                       axis.text = ggplot2::element_text(size = axis.text.size))
+
+    # If there are currently no agents, then we just return the base_plot
+    if(length(object@agents) == 0) {
+        return(base_plot)
+    }
+    
+    # Otherwise, we will have to add the agents in the base_plot
+    return(base_plot + 
+        predped::plot(agents(object), 
+                      plot_goal = plot_goal,
+                      agent.linewidth = agent.linewidth,
+                      goal.size = goal.size,
+                      ...))            
 })

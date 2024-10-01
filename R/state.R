@@ -1,8 +1,19 @@
 #' An S4 Class to Represent the State
 #'
-#' @slot iteration An integer denoting the iteration number of the state
-#' @slot setting An instance of \code{\link[predped]{background-class}}
-#' @slot agents A list containing instances of the \code{\link[predped]{agent-class}}
+#' @slot iteration Numeric denoting the iteration number. 
+#' @slot setting Object of the \code{\link[predped]{background-class}}.
+#' @slot agents List containing objects of the \code{\link[predped]{agent-class}}
+#' representing the agents that are currently walking around in the \code{setting}.
+#' @slot potential_agents List containing objects of the 
+#' \code{\link[predped]{agent-class}} representing agents that are waiting to 
+#' enter the \code{setting}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{agents}},
+#' \code{\link[predped]{initialize,state-method}},
+#' \code{\link[predped]{iteration}},
+#' \code{\link[predped]{potential_agents}},
+#' \code{\link[predped]{setting}}
 #' 
 #' @rdname state-class
 #' 
@@ -12,6 +23,44 @@ state <- setClass("state", list(iteration = "numeric",
                                 agents = "list",
                                 potential_agents = "list"))
 
+#' Constructor for the \code{\link[predped]{state-class}}
+#' 
+#' @param iteration Numeric denoting the iteration number that this state 
+#' represents. Makes it possible to order states into one coherent trace, showing
+#' how agents walked around over time.
+#' @param setting Object of the \code{\link[predped]{background-class}}.
+#' @param agents List containing objects of the \code{\link[predped]{agent-class}}
+#' representing the agents that are currently walking around in the \code{setting}.
+#' Defaults to an empty list.
+#' @param potential_agents List containing objects of the 
+#' \code{\link[predped]{agent-class}} representing agents that are waiting to 
+#' enter the \code{setting}. Defaults to an empty list.
+#' 
+#' @return Object of the \code{\link[predped]{state-class}}
+#' 
+#' @examples
+#' # Create a background in which agents will walk around
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)))
+#' 
+#' # Initialize state
+#' my_state <- state(iteration = 0,
+#'                   setting = my_background)
+#' 
+#' # Access the two slots that were specified
+#' my_state@iteration
+#' my_state@agents
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{agents}},
+#' \code{\link[predped]{iteration}},
+#' \code{\link[predped]{potential_agents}},
+#' \code{\link[predped]{setting}}
+#' 
+#' @rdname initialize-state-method
+#' 
+#' @export
 setMethod("initialize", "state", function(.Object, 
                                           iteration,
                                           setting, 
@@ -35,69 +84,19 @@ setMethod("initialize", "state", function(.Object,
     return(.Object)
 })
 
-#' Getter/Setter for the iteration-slot
-#' 
-#' @rdname iteration-method
-#' 
-#' @export
-setGeneric("iteration", function(object) standardGeneric("iteration"))
 
-#' @rdname iteration-method
-#' 
-#' @export
-setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-"))
 
-setMethod("iteration", "state", function(object) {
-    return(object@iteration)
-})
 
-setMethod("iteration<-", "state", function(object, value) {
-    object@iteration <- floor(value)
-    return(object)
-})
 
-#' Getter/Setter for the setting-slot
-#' 
-#' @rdname setting-method
-#' 
-#' @export
-setGeneric("setting", function(object) standardGeneric("setting"))
-
-#' @rdname setting-method
-#' 
-#' @export
-setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
-
-setMethod("setting", "state", function(object) {
-    return(object@setting)
-})
-
-setMethod("setting<-", "state", function(object, value) {
-    # Check
-    if(!inherits(value, "background")) {
-        stop("Provided value for slot `setting` should be of class `background`.")
-    }
-
-    object@setting <- value
-    return(object)
-})
-
-#' Getter/Setter for the agents-slot
-#' 
-#' @rdname agents-method
-#' 
-#' @export
-setGeneric("agents", function(object) standardGeneric("agents"))
+################################################################################
+# GETTERS AND SETTERS
 
 #' @rdname agents-method
-#' 
-#' @export
-setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
-
 setMethod("agents", "state", function(object) {
     return(object@agents)
 })
 
+#' @rdname agents-method
 setMethod("agents<-", "state", function(object, value) {
     # Check
     if(length(value) != 0 & !all(sapply(value, is, class2 = "agent"))) {
@@ -108,22 +107,27 @@ setMethod("agents<-", "state", function(object, value) {
     return(object)
 })
 
-#' Getter/Setter for the potential_agents-slot
-#' 
-#' @rdname potential_agents-method
-#' 
-#' @export
-setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
+
+
+#' @rdname iteration-method
+setMethod("iteration", "state", function(object) {
+    return(object@iteration)
+})
+
+#' @rdname iteration-method
+setMethod("iteration<-", "state", function(object, value) {
+    object@iteration <- floor(value)
+    return(object)
+})
+
+
 
 #' @rdname potential_agents-method
-#' 
-#' @export
-setGeneric("potential_agents<-", function(object, value) standardGeneric("potential_agents<-"))
-
 setMethod("potential_agents", "state", function(object) {
     return(object@potential_agents)
 })
 
+#' @rdname potential_agents-method
 setMethod("potential_agents<-", "state", function(object, value) {
     # Check
     if(length(value) != 0 & !all(sapply(value, is, class2 = "agent"))) {
@@ -131,5 +135,23 @@ setMethod("potential_agents<-", "state", function(object, value) {
     }
 
     object@potential_agents <- value
+    return(object)
+})
+
+
+
+#' @rdname setting-method
+setMethod("setting", "state", function(object) {
+    return(object@setting)
+})
+
+#' @rdname setting-method
+setMethod("setting<-", "state", function(object, value) {
+    # Check
+    if(!inherits(value, "background")) {
+        stop("Provided value for slot `setting` should be of class `background`.")
+    }
+
+    object@setting <- value
     return(object)
 })

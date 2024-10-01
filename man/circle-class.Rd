@@ -6,20 +6,22 @@
 \alias{circle}
 \title{An S4 Class to Represent Circle Objects}
 \description{
-An S4 Class to Represent Circle Objects
+Special case of the \code{\link[predped]{object-class}} defined through its 
+center and radius.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{center}}{A numeric vector of length two indicating the center of the circle.}
+\item{\code{center}}{Numeric vector denoting the center or position of the circle.}
 
-\item{\code{radius}}{A numeric indicating the radius of the circle.}
+\item{\code{radius}}{Numeric denoting the radius of the circle.}
+
+\item{\code{...}}{Slots shared with \code{\link[predped]{object-class}}.}
 }}
 
 \seealso{
 \code{\link[predped]{object-class}}, 
-\code{\link[predped]{rectangle-class}}, 
-\code{\link[predped]{polygon-class}}
+\code{\link[predped]{initialize,circle-method}}
 
 Other objects: 
 \code{\link{object-class}},

@@ -2,72 +2,71 @@
 % Please edit documentation in R/simulate.R
 \name{create_initial_condition}
 \alias{create_initial_condition}
-\title{Create an Initial Condition}
+\title{Create initial condition}
 \usage{
 create_initial_condition(
-  initial_number_agents,
-  object,
-  goal_number,
-  goal_duration = function(x) rnorm(x, 10, 2),
-  standing_start = 0.1,
-  space_between = 1,
-  time_step = 0.5,
-  precomputed_edges = NULL,
-  precompute_goal_paths = TRUE,
-  order_goal_stack = TRUE,
-  precomputed_goals = NULL,
-  individual_differences = TRUE,
-  group_size = matrix(1, nrow = 1, ncol = 2)
+  agent_number,
+  model,
+  goal_number = function(n) rnorm(n, 10, 2),
+  group_size = matrix(1, nrow = 1, ncol = 2),
+  space_between = 2.5,
+  ...
 )
 }
 \arguments{
-\item{initial_number_agents}{Integer denoting the number of agents that 
-the simulation should start out with.}
+\item{agent_number}{Numeric denoting the number of agents that should be 
+included in the initial condition.}
 
-\item{object}{The `predped` model that you want to simulate}
+\item{model}{Object of the \code{\link[predped]{predped-class}}.}
 
-\item{goal_number}{Integer, vector of integers, or function that determines 
-how many goals each of the agents should receive.}
-
-\item{goal_duration}{Integer or function that determines the duration of each 
-goal. Defaults to a function that draws `x` numbers from a normal distribution 
-with mean 10 (5 sec) and standard deviation 2 (1 sec).}
-
-\item{standing_start}{Numeric denoting the speed of agents when they start 
-moving. Defaults to `0.1`.}
-
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-`1`, meaning a space of `1 * radius(agent)` is left between an object and the
-path points agents use in their strategy.}
-
-\item{time_step}{Numeric denoting the number of seconds each discrete step in
-time should mimic. Defaults to `0.5`, or half a second.}
-
-\item{precomputed_edges}{List of nodes and edges that can be used by the 
-path-finding algorithms under the hood. Defaults to `NULL`, meaning edges 
-have not been precomputed.}
-
-\item{precompute_goal_paths}{Logical denoting whether to precompute all path
-points beforehand. This means that the agent does not only preplan the way 
-towards their next goal, but also to all goals that follow. Defaults to 
-`FALSE`.}
-
-\item{order_goal_stack}{Logical denoting whether to order the goal stack based
-on the distance of the agent to the goal. Defaults to `TRUE`}
-
-\item{precomputed_goals}{List of goal stacks from which the agent can be 
-assigned one. Defaults to `NULL`, meaning that goal stacks should be created
-in the simulation.}
-
-\item{individual_differences}{Logical denoting whether variety on the parameters
-should be accounted for (even within archetypes). Defaults to `TRUE`.}
+\item{goal_number}{Numeric, vector, or function that defines the number of 
+goals the agents should accomplish. It's exact value is handled by 
+\code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
 \item{group_size}{Matrix of size n x 2 containing the group sizes you would 
 like to simulate (first column) and the probability of observing groups with 
 this size (second column). Defaults to a 100% probability of observing single 
 agents.}
+
+\item{space_between}{Numeric denoting the space that should be left between 
+an object and the created path points for the agents (in radii). Defaults to 
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+object and the path points agents use in their strategy. Ignored if 
+\code{precomputed_edges} is provided.}
+
+\item{...}{Additional arguments provided to \code{\link[predped]{add_agent}}.}
+}
+\value{
+List of instances of the \code{\link[predped]{agent-class}}.
 }
 \description{
-Create a list that contains agents at random locations within the setting.
+Creates a list of agents that can be used as an initial condition to the 
+simulation. Agents are placed at random locations in the room. Main 
+advantage of this function is that you don't have to wait for a room to fill
+up with the required number of agents, but rather impose that the room is 
+already filled with this number of agents.
+}
+\details{
+In this function, we use the following approach to simulate an initial 
+condition. First, we create an agent using the \code{\link[predped]{add_agent}}
+function. This agent is given a specific group id based on the 
+\code{group_size} argument.
+
+Once created, we then compute all possible paths that the agent may be 
+walking on through the \code{\link[predped]{compute_edges}} function. One 
+of these paths is then chosen, and subsequently a random point on that path 
+is chosen. We then check whether an agent would be able to take the chosen 
+position without intersecting any of the objects in the environment. If not, 
+then we choose another point until we can place the agent there. If we do not
+find a fitting position for the agent after 10 iterations, we break out of 
+the loop and stop trying to fit in \code{agent_number} agents in the space.
+
+Finally, group members are identified and given the same set of goals.
+}
+\seealso{
+\code{\link[predped]{agent-class}},
+\code{\link[predped]{predped-class}},
+\code{\link[predped]{add_agent}},
+\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate_state}}
 }
