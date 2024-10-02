@@ -34,12 +34,8 @@ predped <- setClass("predped", list(id = "character",
 #' @param setting Object of the \code{\link[predped]{background-class}}.
 #' @param id Character that serves as an identifier for the agent. Defaults to 
 #' an empty character, triggering the random generation of an id.
-#' @param database Character denoting the name of the database without the 
-#' extension. Currently only the database "predped" is supported. Defaults to 
+#' @param database Character denoting the name of the database. Defaults to 
 #' \code{NULL}, triggering reading in the csv-files. 
-#' @param path_to_database File path that leads to the location of the database. 
-#' Allows some greater flexibility for users. Defaults to the location for 
-#' Niels.
 #' @param archetypes Character or character vector denoting the archetype(s) 
 #' you want to include in the simulation. Defaults to \code{NULL}, triggering 
 #' the inclusion of all currently defined archetypes.
@@ -79,11 +75,7 @@ predped <- setClass("predped", list(id = "character",
 setMethod("initialize", "predped", function(.Object,
                                             setting, 
                                             id = character(0),
-                                            database = NULL, 
-                                            path_to_database = file.path("..",
-                                                                         "predpedgui",
-                                                                         "build", 
-                                                                         "Qt_6_7_2_for_macOS-Debug"),
+                                            database = NULL,
                                             archetypes = NULL,
                                             weights = NULL) {
 
@@ -91,8 +83,7 @@ setMethod("initialize", "predped", function(.Object,
     .Object@id <- if(length(id) == 0) paste("model", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id 
 
     # Load the parameters
-    params <- load_parameters(x = database, 
-                              path_to_database = path_to_database)
+    params <- load_parameters(x = database)
 
     # If archetypes are not provided, switch to the the default of including 
     # everyone 

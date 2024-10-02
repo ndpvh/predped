@@ -153,12 +153,8 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 #' mean values or \code{params_archetypes}, not for the standard deviations in 
 #' \code{params_sigma} and bounds in \code{params_bounds}.
 #' 
-#' @param x Character denoting the name of the database without the extension. 
-#' Currently only the database \code{"predped"} is supported. Defaults to 
-#' \code{NULL}, triggering reading in the csv-files. 
-#' @param path_to_database File path that leads to the location of the database 
-#' in x. Allows some greater flexibility for users. Defaults to the location for 
-#' Niels.
+#' @param x Character denoting the filename of the database. Defaults to 
+#' \code{NULL}, triggering reading in the csv-files that come with predped. 
 #' 
 #' @return List of parameter values contained in \code{params_archetypes} (means), 
 #' \code{params_sigma} (standard deviations), and \code{params_bounds} (the 
@@ -179,28 +175,18 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 # TO DO: At some point the GUI should be integrated with predped itself or 
 # hosted on a server so that the location of the database doesn't depend on the 
 # user.
-load_parameters <- function(x = NULL,
-                            path_to_database = file.path("..",
-                                                         "predpedgui",
-                                                         "build", 
-                                                         "Qt_6_7_2_for_macOS-Debug")) {
+load_parameters <- function(x = NULL) {
 
     # If the provided database is not NULL, we can try to access it
     if(!is.null(x)) {
-        # Define the location of the database, assuming that the GUI is located 
-        # somewhere close to predped
-        database_location <- file.path(path_to_database, 
-                                       paste0(x, ".sqlite"))
-        if(file.exists(database_location)) {
-            # Create the connection
-            con <- DBI::dbConnect(RSQLite::SQLite(), dbname = database_location)
-    
-            # Check whether the necessary table can be retrieved from the location
-            if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
-                db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
-                    dplyr::collect()
-            } 
-        }
+        # Create the connection
+        con <- DBI::dbConnect(RSQLite::SQLite(), dbname = x)
+
+        # Check whether the necessary table can be retrieved from the location
+        if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
+            db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
+                dplyr::collect()
+        } 
     }
 
     if(!exists("db_loaded_parameters")) {
@@ -274,15 +260,11 @@ utility_parameters <- function(x) {
 #' 
 #' @param n Integer denoting the number of parameters to generate. Defaults to 
 #' \code{1}.
-#' @param database Character denoting the name of the database without the 
-#' extension. Currently only the database "predped" is supported. Defaults to 
+#' @param database Character denoting the name of the database. Defaults to 
 #' \code{NULL}, triggering reading in the csv-files. Ignored when \code{mean}, 
 #' \code{Sigma}, and \code{bounds} are provided 
 #' (when \code{individual_differences = TRUE}) or when \code{mean} is provided 
 #' (when \code{individual_differences = FALSE}).
-#' @param path_to_database File path that leads to the location of the database. 
-#' Allows some greater flexibility for users. Defaults to the location for 
-#' Niels.
 #' @param mean Dataframe containing the means for each of the parameters for 
 #' a given agent. Defaults to \code{NULL}, triggering reading in the data 
 #' instead.
@@ -331,10 +313,6 @@ utility_parameters <- function(x) {
 #' @export  
 generate_parameters <- function(n = 1,
                                 database = NULL,
-                                path_to_database = file.path("..",
-                                                             "predpedgui",
-                                                             "build", 
-                                                             "Qt_6_7_2_for_macOS-Debug"),
                                 archetype = "BaselineEuropean",
                                 mean = NULL,
                                 Sigma = NULL,
@@ -345,15 +323,15 @@ generate_parameters <- function(n = 1,
     # If the parameters are already defined, then we can just use those instead 
     # of reading in the complete database. Use-cases are different. The 
     # arguments `mean`, `Sigma`, and `bounds` will typically be provided within 
-    # a simulation, while the arguments `database` and `path_to_database` will 
-    # typically be used whenever one is trying to visualize the distributions of 
-    # potential parameters.
+    # a simulation, while the argument `database` will typically be used 
+    # whenever one is trying to visualize the distributions of potential 
+    # parameters.
     #
     # Importantly, parameters only read in whenever `mean` is NULL or when `Sigma`
     # and/or `bounds` are NULL and you want individual 
     if((is.null(mean)) | ((is.null(Sigma) | is.null(bounds)) & individual_differences)) {
         # Load the parameters
-        params <- load_parameters(x = database, path_to_database = path_to_database)
+        params <- load_parameters(x = database)
     
         mean <- params[["params_archetypes"]] |>
             dplyr::filter(name %in% archetype)
