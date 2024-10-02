@@ -6,7 +6,7 @@ testthat::test_that("Predped initialization works", {
 
     # Load in the parameters. To be used later.
     params_csv <- suppressMessages(load_parameters())
-    params_db <- load_parameters("predped")
+    # params_db <- load_parameters("predped")
 
     # Let's do some valid cases based on several distinctions:
     #   - CSV vs Database
