@@ -9,7 +9,6 @@
   setting,
   id = character(0),
   database = NULL,
-  path_to_database = file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug"),
   archetypes = NULL,
   weights = NULL
 )
@@ -20,13 +19,8 @@
 \item{id}{Character that serves as an identifier for the agent. Defaults to 
 an empty character, triggering the random generation of an id.}
 
-\item{database}{Character denoting the name of the database without the 
-extension. Currently only the database "predped" is supported. Defaults to 
+\item{database}{Character denoting the name of the database. Defaults to 
 \code{NULL}, triggering reading in the csv-files.}
-
-\item{path_to_database}{File path that leads to the location of the database. 
-Allows some greater flexibility for users. Defaults to the location for 
-Niels.}
 
 \item{archetypes}{Character or character vector denoting the archetype(s) 
 you want to include in the simulation. Defaults to \code{NULL}, triggering 

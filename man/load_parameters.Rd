@@ -4,19 +4,11 @@
 \alias{load_parameters}
 \title{Load parameters}
 \usage{
-load_parameters(
-  x = NULL,
-  path_to_database = file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug")
-)
+load_parameters(x = NULL)
 }
 \arguments{
-\item{x}{Character denoting the name of the database without the extension. 
-Currently only the database \code{"predped"} is supported. Defaults to 
-\code{NULL}, triggering reading in the csv-files.}
-
-\item{path_to_database}{File path that leads to the location of the database 
-in x. Allows some greater flexibility for users. Defaults to the location for 
-Niels.}
+\item{x}{Character denoting the filename of the database. Defaults to 
+\code{NULL}, triggering reading in the csv-files that come with predped.}
 }
 \value{
 List of parameter values contained in \code{params_archetypes} (means), 

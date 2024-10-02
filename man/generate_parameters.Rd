@@ -7,7 +7,6 @@
 generate_parameters(
   n = 1,
   database = NULL,
-  path_to_database = file.path("..", "predpedgui", "build", "Qt_6_7_2_for_macOS-Debug"),
   archetype = "BaselineEuropean",
   mean = NULL,
   Sigma = NULL,
@@ -20,16 +19,11 @@ generate_parameters(
 \item{n}{Integer denoting the number of parameters to generate. Defaults to 
 \code{1}.}
 
-\item{database}{Character denoting the name of the database without the 
-extension. Currently only the database "predped" is supported. Defaults to 
+\item{database}{Character denoting the name of the database. Defaults to 
 \code{NULL}, triggering reading in the csv-files. Ignored when \code{mean}, 
 \code{Sigma}, and \code{bounds} are provided 
 (when \code{individual_differences = TRUE}) or when \code{mean} is provided 
 (when \code{individual_differences = FALSE}).}
-
-\item{path_to_database}{File path that leads to the location of the database. 
-Allows some greater flexibility for users. Defaults to the location for 
-Niels.}
 
 \item{archetype}{String denoting the archetype to be used for the covariance
 matrix. Ignored if \code{Sigma} is provided. Defaults to \code{"BaselineEuropean"}.}
