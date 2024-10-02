@@ -252,3 +252,115 @@ setMethod("plot", "state", function(object,
                       goal.size = goal.size,
                       ...))            
 })
+
+#' Plot the edges in a \code{\link[predped]{background-class}}
+#' 
+#' The color of the edges is determined by the argument \code{object.color}, 
+#' thus following the color of the outer lines of the objects in the background.
+#' Note that \code{dark_mode} also works here!
+#' 
+#' @param setting Object of the \code{\link[predped]{background-class}}
+#' @param coords Numeric matrix containing the positions of the agent and the 
+#' goal. Defaults to \code{NULL}, leaving them out of the equation.
+#' @param space_between Numeric denoting the space to leave between the 
+#' circumference of the object and the nodes created under the hood (see
+#' \code{\link[predped]{add_nodes}}). Defaults to \code{2.5} times the maximal 
+#' radius of an agent.
+#' @param many_nodes Logical denoting whether to create many nodes or leave 
+#' it at the minimum. Defaults to \code{FALSE}.
+#' @param coords.color Character denoting the color to provide to the agent and 
+#' goal positions. Allows one to distinguish between simple path points and the 
+#' start and end positions. Defaults to \code{"cornflowerblue"}.
+#' @param edges.color Character denoting the color of the edges that are 
+#' plotted. Defaults to \code{"black"}.
+#' @param edges.linewidth Numeric denoting the linewidth of the edges that are 
+#' plotted. Defaults to \code{1}.
+#' @param nodes.color Character denoting the color of the nodes that are plotted.
+#' Defaults to \code{"black"}.
+#' @param nodes.size Numeric denoting the size of the nodes that are plotted. 
+#' Defaults to \code{1}.
+#' @param dark_mode Logical denoting whether to use the predped-default dark 
+#' mode for plotting. Overrides the color arguments provided to the plotting 
+#' function. Defaults to \code{FALSE}.
+#' @param ... Arguments provided to the \code{\link[predped]{plot}} function 
+#' for the \code{setting}
+#' 
+#' @return Plot created by \code{ggplot2}
+#' 
+#' @seealso 
+#' \code{\link[predped]{background-class}},
+#' \code{\link[predped]{compute_edges}},
+#' \code{\link[predped]{create_edges}},
+#' \code{\link[predped]{plot}}
+#' 
+#' @rdname plot_edges
+#' 
+#' @export 
+plot_edges <- function(setting, 
+                       coords = NULL,
+                       space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius", ]),
+                       many_nodes = FALSE,
+                       coords.color = "cornflowerblue",
+                       edges.color = "black",
+                       edges.linewidth = 1, 
+                       nodes.color = "black",
+                       nodes.size = 1,
+                       dark_mode = FALSE,
+                       ...) {
+
+    # If you want to toggle the default dark mode, then change the default colors
+    if(dark_mode) {
+        edges.color <- "gray25"
+        nodes.color <- "gray25"
+    }
+
+    # Compute the edges. If `coords` is provided, it will create all edges 
+    # including the provided coordinates. If coords is not provided, we will 
+    # only plot the default edges
+    if(is.null(coords)) {
+        edges <- compute_edges(setting, 
+                               space_between = space_between, 
+                               many_nodes = many_nodes)
+    } else {
+        edges <- create_edges(coords[1,], 
+                              coords[2,], 
+                              setting, 
+                              space_between = space_between, 
+                              many_nodes = many_nodes)
+    }
+
+    # Extract nodes and edges in two separate dataframes
+    nodes <- edges$nodes
+    edges <- edges$edges_with_coords
+
+    # Plot everything. Start with the background, which will already provide us 
+    # with a nice shell. Then proceed in plotting all of the edges, followed 
+    # by the nodes that make up these edges. Whenever a start and end coordinate
+    # are provided, plot these separately as well.
+    plt <- plot(setting, 
+                dark_mode = dark_mode, 
+                ...) +
+        ggplot2::annotate("segment",
+                          x = edges$from_x, 
+                          y = edges$from_y, 
+                          xend = edges$to_x, 
+                          yend = edges$to_y, 
+                          color = edges.color, 
+                          linewidth = edges.linewidth) +
+        ggplot2::annotate("point", 
+                          x = nodes$X, 
+                          y = nodes$Y, 
+                          color = nodes.color, 
+                          size = nodes.size)
+
+    if(!is.null(coords)) {
+        plt <- plt +
+            ggplot2::annotate("point", 
+                              x = coords[,1], 
+                              y = coords[,2], 
+                              color = coords.color, 
+                              size = nodes.size)
+    }
+
+    return(plt)
+}
