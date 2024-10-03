@@ -661,7 +661,8 @@ add_group <- function(model,
     model_parameters <- parameters(model)
     idx <- sample(model@archetypes, 
                   agent_number - 1, 
-                  prob = model@weights)
+                  prob = model@weights, 
+                  replace = TRUE)
     
     # Loop over these agents
     for(i in 2:agent_number) {
@@ -677,6 +678,8 @@ add_group <- function(model,
                                       bounds = model_parameters[["params_bounds"]],
                                       archetype = idx[i - 1],
                                       individual_differences = individual_differences) 
+        
+        id(tmp_agent) <- paste(sample(letters, 5, replace = TRUE), collapse = "")
         radius(tmp_agent) <- params$radius 
         color(tmp_agent) <- mean_params$color
         speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
