@@ -10,6 +10,9 @@
 #' @param object Object of the \code{\link[predped]{background-class}}, 
 #' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}}, 
 #' or a list containing multiple of these objects.
+#' @param agent.fill Character denoting the color with which the agent should 
+#' be filled in. Defaults to \code{"white"} if only plotting an agent or to 
+#' \code{shape.fill} when plotting with a \code{background}.
 #' @param agent.linewidth Numeric denoting the width of the line with which to 
 #' plot the agent. Defaults to \code{1}.
 #' @param plot_goal Logical denoting whether to plot the position of the current
@@ -18,6 +21,9 @@
 #' position. Defaults to \code{1}.
 #' @param entry.width Numeric denoting the radius of the entrances and exits to 
 #' be plotted in the background. Defaults to \code{0.3},
+#' @param plot_segment Logical denoting whether to plot segments (if there are 
+#' any). If \code{TRUE}, it will add arrows to the plot that indicate the 
+#' direction in which agents can walk. Defaults to \code{TRUE}.
 #' @param shape.fill Character defining the fill color of the shape of the 
 #' background. Defaults to \code{"white"}.
 #' @param shape.color Character defining the color of circumference of the shape 
@@ -58,6 +64,7 @@ setGeneric("plot", function(object, ...) standardGeneric("plot"))
 setMethod("plot", "agent", function(object, 
                                     plot_goal = TRUE,
                                     agent.linewidth = 1,
+                                    agent.fill = "white",
                                     goal.size = 1,
                                     ...) {
     # Determine the orientation of the agent to be plotted
@@ -73,7 +80,7 @@ setMethod("plot", "agent", function(object,
                                   x = pts[,1], 
                                   y = pts[,2], 
                                   color = object@color,
-                                  fill = NA,
+                                  fill = agent.fill,
                                   linewidth = agent.linewidth),
                 ggplot2::annotate("segment", 
                                   x = object@center[[1]], 
@@ -98,12 +105,17 @@ setMethod("plot", "agent", function(object,
 #'@rdname plot-method
 setMethod("plot", "background", function(object, 
                                          entry.width = 0.3,
+                                         plot_segment = TRUE,
                                          shape.fill = "white",
                                          shape.color = "black",
                                          shape.linewidth = 1,
                                          object.fill = "grey",
                                          object.color = "black",
                                          object.linewidth = 1,
+                                         segment.color = "black", 
+                                         segment.linewidth = 1,
+                                         segment.size = 0.6, 
+                                         arrow.size = 0.3,
                                          dark_mode = FALSE,
                                          ...) {
 
@@ -113,6 +125,7 @@ setMethod("plot", "background", function(object,
         shape.color <- "white"
         object.fill <- "black"
         object.color <- "white"
+        segment.color <- "white"
     }
 
     # Create some limits to prevent the limits of the plot changing across 
@@ -142,7 +155,7 @@ setMethod("plot", "background", function(object,
     segments <- do.call("rbind", segments)
 
     # Finally, with all elements in place, we can now create the plot itself
-    return(ggplot2::ggplot() + 
+    plt <- ggplot2::ggplot() + 
         # Plot the shape and objects of the environment
         predped::plot(shape(object), 
                       fill = shape.fill, 
@@ -168,7 +181,19 @@ setMethod("plot", "background", function(object,
         ggplot2::theme(panel.background = ggplot2::element_rect(fill = "black"),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.grid.minor = ggplot2::element_blank()) +
-        ggplot2::coord_fixed())
+        ggplot2::coord_fixed()
+
+    # If you want to plot the segments as well, add these to the plot
+    if(plot_segment) {
+        plt <- plt + 
+            predped::plot(limited_access(object), 
+                          segment.color = segment.color, 
+                          segment.size = segment.size,
+                          segment.linewidth = segment.linewidth,
+                          arrow.size = arrow.size)
+    }
+
+    return(plt)
 })
 
 #'@rdname plot-method
@@ -211,12 +236,39 @@ setMethod("plot", "list", function(object, ...) {
 
 #'@rdname plot-method
 setMethod("plot", "object", function(object, ...) {
-  # Extract the points of the object
-  pts <- points(object)
-  return(ggplot2::annotate("polygon", 
-                           x = pts[,1], 
-                           y = pts[,2], 
-                           ...))
+    # Extract the points of the object
+    pts <- points(object)
+    return(ggplot2::annotate("polygon", 
+                             x = pts[,1], 
+                             y = pts[,2], 
+                             ...))
+})
+
+#'@rdname plot-method
+setMethod("plot", "segment", function(object, 
+                                      segment.size = 0.6, 
+                                      segment.color = "black",
+                                      segment.linewidth = 1,
+                                      arrow.size = 0.3) {
+
+    # Get the orientation of the segment and subtract 90 degrees
+    angle <- orientation(object) - pi / 2
+
+    # Define a line of length `segment.size` centered around the center of the 
+    # segment
+    center <- center(object)
+    from <- center + 0.5 * segment.size * c(cos(angle), sin(angle))
+    to <- center - 0.5 * segment.size * c(cos(angle), sin(angle))
+
+    # Create the actual arrow
+    return(ggplot2::annotate("segment", 
+                             x = from[1], 
+                             y = from[2],
+                             xend = to[1],
+                             yend = to[2],
+                             arrow = ggplot2::arrow(length = ggplot2::unit(arrow.size, "cm")),
+                             color = segment.color, 
+                             linewidth = segment.linewidth))
 })
 
 #' @rdname plot-method
@@ -228,10 +280,22 @@ setMethod("plot", "state", function(object,
                                     plot.title.hjust = 0.5,
                                     axis.title.size = 10,
                                     axis.text.size = 8,
+                                    shape.fill = "white",
+                                    agent.fill = shape.fill,
+                                    dark_mode = FALSE,
                                     ...) {
 
+    # Change colors of shape and agent if needed
+    if(dark_mode) {
+        shape.fill <- "black"
+        agent.fill <- "black"
+    }
+
     # Create the plot for the setting, which will serve as the basis of 
-    base_plot <- predped::plot(setting(object), ...) +
+    base_plot <- predped::plot(setting(object), 
+                               shape.fill = shape.fill, 
+                               dark_mode = dark_mode,
+                               ...) +
         ggplot2::labs(title = paste("iteration", object@iteration)) +
         ggplot2::theme(legend.position = "none",
                        plot.title = ggplot2::element_text(size = plot.title.size,
@@ -248,6 +312,7 @@ setMethod("plot", "state", function(object,
     return(base_plot + 
         predped::plot(agents(object), 
                       plot_goal = plot_goal,
+                      agent.fill = agent.fill,
                       agent.linewidth = agent.linewidth,
                       goal.size = goal.size,
                       ...))            
