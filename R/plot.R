@@ -177,7 +177,7 @@ setMethod("plot", "list", function(object, ...) {
     # First a check of whether anything is contained within this list. Otherwise
     # return an error
     if(length(object) == 0) {
-        stop("No elements are contained within this list")
+        return(list())
     }
 
     # If the list in question is the trace, then we have to output the plots for
