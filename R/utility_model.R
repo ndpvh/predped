@@ -153,8 +153,8 @@ utility <- function(agent,
     # Visual Field Phenomenon
     buddies_in_vf <- get_angles(agent_idx,
                                 agent_specifications$group,
-                                orientation(agent),
                                 position(agent),
+                                orientation(agent),
                                 agent_specifications$predictions,
                                 centers,
                                 any_member = TRUE)                                                     
