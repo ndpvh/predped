@@ -670,19 +670,22 @@ add_group <- function(model,
 
         # Change this temporary agent's characterstics based on simulated
         # parameters
+        mean_params <- dplyr::filter(model_parameters[["params_archetypes"]], name == idx[i - 1])
         params <- generate_parameters(1, 
-                                      mean = dplyr::filter(model_parameters[["params_archetypes"]], name == idx[i]),
-                                      Sigma = model_parameters[["params_sigma"]][[idx[i]]],
+                                      mean = mean_params,
+                                      Sigma = model_parameters[["params_sigma"]][[idx[i - 1]]],
                                       bounds = model_parameters[["params_bounds"]],
-                                      archetype = idx[i],
+                                      archetype = idx[i - 1],
                                       individual_differences = individual_differences) 
         radius(tmp_agent) <- params$radius 
-        color(tmp_agent) <- params$color
+        color(tmp_agent) <- mean_params$color
         speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
 
         # Add the agent to the list
         agents[[i]] <- tmp_agent
     }
+
+    return(agents)
 }
                         
 #' Add a single agent to the simulation
