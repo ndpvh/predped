@@ -21,9 +21,6 @@
 #' position. Defaults to \code{1}.
 #' @param entry.width Numeric denoting the radius of the entrances and exits to 
 #' be plotted in the background. Defaults to \code{0.3},
-#' @param plot_segment Logical denoting whether to plot segments (if there are 
-#' any). If \code{TRUE}, it will add arrows to the plot that indicate the 
-#' direction in which agents can walk. Defaults to \code{TRUE}.
 #' @param shape.fill Character defining the fill color of the shape of the 
 #' background. Defaults to \code{"white"}.
 #' @param shape.color Character defining the color of circumference of the shape 
@@ -37,6 +34,23 @@
 #' objects contained in the background. Defaults to \code{"black"}.
 #' @param object.linewidth Numeric denoting the width of the circumference of 
 #' the objects contained in the background. Defaults to \code{1}.
+#' @param plot_segment Logical denoting whether to plot segments (if there are 
+#' any). If \code{TRUE}, it will add arrows to the plot that indicate the 
+#' direction in which agents can walk. These arrows will be placed around the 
+#' center of the line created by the instances of the 
+#' \code{\link[predped]{segment-class}}. Defaults to \code{TRUE}.
+#' @param segment.color Character defining the color of the arrows drawn when 
+#' you impose one-directional flow. Ignored if \code{plot_segment = FALSE}.
+#' Defaults to \code{"black"}.
+#' @param segment.size Numeric denoting the length of the arrow-line drawn when 
+#' you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+#' Defaults to \code{0.6}.
+#' @param arrow.size Numeric denoting the size of the arrow-heads drawn when 
+#' you impose one-directional flow in cm. Ignored if \code{plot_segment = FALSE}.
+#' Defaults to \code{0.3}.
+#' @param segment.linewidth Numeric denoting the linewidth of the arrows drawn 
+#' when you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+#' Defaults to \code{1}.
 #' @param plot.title.size Numeric denoting the text size of the plot title. 
 #' Defaults to \code{10}.
 #' @param plot.title.hjust Numeric denoting the position of the plot title, with

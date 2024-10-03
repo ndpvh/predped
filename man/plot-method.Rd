@@ -7,22 +7,35 @@
 \alias{plot,background-method}
 \alias{plot,list-method}
 \alias{plot,object-method}
+\alias{plot,segment-method}
 \alias{plot,state-method}
 \title{Plot an object}
 \usage{
 plot(object, ...)
 
-\S4method{plot}{agent}(object, plot_goal = TRUE, agent.linewidth = 1, goal.size = 1, ...)
+\S4method{plot}{agent}(
+  object,
+  plot_goal = TRUE,
+  agent.linewidth = 1,
+  agent.fill = "white",
+  goal.size = 1,
+  ...
+)
 
 \S4method{plot}{background}(
   object,
   entry.width = 0.3,
+  plot_segment = TRUE,
   shape.fill = "white",
   shape.color = "black",
   shape.linewidth = 1,
   object.fill = "grey",
   object.color = "black",
   object.linewidth = 1,
+  segment.color = "black",
+  segment.linewidth = 1,
+  segment.size = 0.6,
+  arrow.size = 0.3,
   dark_mode = FALSE,
   ...
 )
@@ -30,6 +43,14 @@ plot(object, ...)
 \S4method{plot}{list}(object, ...)
 
 \S4method{plot}{object}(object, ...)
+
+\S4method{plot}{segment}(
+  object,
+  segment.size = 0.6,
+  segment.color = "black",
+  segment.linewidth = 1,
+  arrow.size = 0.3
+)
 
 \S4method{plot}{state}(
   object,
@@ -40,6 +61,9 @@ plot(object, ...)
   plot.title.hjust = 0.5,
   axis.title.size = 10,
   axis.text.size = 8,
+  shape.fill = "white",
+  agent.fill = shape.fill,
+  dark_mode = FALSE,
   ...
 )
 }
@@ -56,11 +80,21 @@ goal of the agent together with the agent. Defaults to \code{TRUE}.}
 \item{agent.linewidth}{Numeric denoting the width of the line with which to 
 plot the agent. Defaults to \code{1}.}
 
+\item{agent.fill}{Character denoting the color with which the agent should 
+be filled in. Defaults to \code{"white"} if only plotting an agent or to 
+\code{shape.fill} when plotting with a \code{background}.}
+
 \item{goal.size}{Numeric denoting the size of the point that denotes the goal 
 position. Defaults to \code{1}.}
 
 \item{entry.width}{Numeric denoting the radius of the entrances and exits to 
 be plotted in the background. Defaults to \code{0.3},}
+
+\item{plot_segment}{Logical denoting whether to plot segments (if there are 
+any). If \code{TRUE}, it will add arrows to the plot that indicate the 
+direction in which agents can walk. These arrows will be placed around the 
+center of the line created by the instances of the 
+\code{\link[predped]{segment-class}}. Defaults to \code{TRUE}.}
 
 \item{shape.fill}{Character defining the fill color of the shape of the 
 background. Defaults to \code{"white"}.}
@@ -80,6 +114,22 @@ objects contained in the background. Defaults to \code{"black"}.}
 
 \item{object.linewidth}{Numeric denoting the width of the circumference of 
 the objects contained in the background. Defaults to \code{1}.}
+
+\item{segment.color}{Character defining the color of the arrows drawn when 
+you impose one-directional flow. Ignored if \code{plot_segment = FALSE}.
+Defaults to \code{"black"}.}
+
+\item{segment.linewidth}{Numeric denoting the linewidth of the arrows drawn 
+when you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+Defaults to \code{1}.}
+
+\item{segment.size}{Numeric denoting the length of the arrow-line drawn when 
+you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+Defaults to \code{0.6}.}
+
+\item{arrow.size}{Numeric denoting the size of the arrow-heads drawn when 
+you impose one-directional flow in cm. Ignored if \code{plot_segment = FALSE}.
+Defaults to \code{0.3}.}
 
 \item{dark_mode}{Logical that can toggle the default colorpallette of predped's 
 dark mode. Defaults to \code{FALSE}.}
