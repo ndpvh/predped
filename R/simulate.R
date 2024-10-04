@@ -158,6 +158,12 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' (see \code{\link[predped]{add_nodes}}). Is multiplied by the agent's radius 
 #' to determine the actual space to leave between object and node. Defaults to 
 #' \code{2.5}.
+#' @param fx Function that takes in and returns an object of the 
+#' \code{\link[predped]{state-class}}. This will be executed at the beginning of each 
+#' iteration and allows users some flexibility in their simulations. For example
+#' useful when simulating evacuations (giving everyone "goal exit") or trying 
+#' to guide behavior in any other way. Defaults to "\(x) x", meaning the state
+#' remains unaltered. 
 #' @param plot_live Logical denoting whether to plot each iteration while the 
 #' simulation is going on. Defaults to \code{FALSE}.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait 
@@ -246,6 +252,7 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = TRUE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
+                                          fx = \(x) x,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -327,7 +334,8 @@ setMethod("simulate", "predped", function(object,
     
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
-        trace[[i + 1]] <- simulate(trace[[i]],
+        altered_state <- fx(trace[[i]])
+        trace[[i + 1]] <- simulate(altered_state,
                                    object,
                                    add_agent = (i %in% add_agent_index) & (length(agents(trace[[i]])) < max_agents[i]),
                                    group_size = group_size,
