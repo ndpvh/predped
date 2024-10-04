@@ -537,7 +537,7 @@ setMethod("simulate", "state", function(object,
 
         pts <- points(agent_to_add)
         agents_in_the_way <- sapply(agents(object), 
-                                    \(x) in_object(x, pts))
+                                    \(x) in_object(x, pts) | in_object(x, center(agent_to_add)))
 
         if(!any(agents_in_the_way)) {
             agents(object) <- append(agents(object), agent_to_add)
