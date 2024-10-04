@@ -51,6 +51,11 @@
 #' @param segment.linewidth Numeric denoting the linewidth of the arrows drawn 
 #' when you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
 #' Defaults to \code{1}.
+#' @param segment.hjust Numeric bounded between 0 and 1 which defines how to 
+#' place the arrow relative to the center of the segment. If \code{0.5}, the 
+#' arrow's center coincides with the center of the segment. If \code{0}, the 
+#' arrow's tail will coincide with the center of the segment, while if \code{1}, 
+#' the arrow's head will coincide with this center. Defaults to \code{0.5}.
 #' @param plot.title.size Numeric denoting the text size of the plot title. 
 #' Defaults to \code{10}.
 #' @param plot.title.hjust Numeric denoting the position of the plot title, with
@@ -130,6 +135,7 @@ setMethod("plot", "background", function(object,
                                          segment.linewidth = 1,
                                          segment.size = 0.6, 
                                          arrow.size = 0.3,
+                                         segment.hjust = 0.5,
                                          dark_mode = FALSE,
                                          ...) {
 
@@ -204,7 +210,8 @@ setMethod("plot", "background", function(object,
                           segment.color = segment.color, 
                           segment.size = segment.size,
                           segment.linewidth = segment.linewidth,
-                          arrow.size = arrow.size)
+                          arrow.size = arrow.size,
+                          segment.hjust = segment.hjust)
     }
 
     return(plt)
@@ -263,14 +270,19 @@ setMethod("plot", "segment", function(object,
                                       segment.size = 0.6, 
                                       segment.color = "black",
                                       segment.linewidth = 1,
-                                      arrow.size = 0.3) {
+                                      arrow.size = 0.3,
+                                      segment.hjust = 0.5) {
 
     # Get the orientation of the segment and subtract 90 degrees
     angle <- orientation(object) - pi / 2
 
-    # Define a line of length `segment.size` centered around the center of the 
-    # segment
+    # Define a line of length `segment.size` centered around a given `center`. 
+    # To compute this center, you use the `hjust` argument.
     center <- center(object)
+
+    # Adjust the center if you want the arrow to start at the center of the 
+    # segment
+    center <- center + (segment.hjust - 0.5) * segment.size * c(cos(angle), sin(angle))
     from <- center + 0.5 * segment.size * c(cos(angle), sin(angle))
     to <- center - 0.5 * segment.size * c(cos(angle), sin(angle))
 
