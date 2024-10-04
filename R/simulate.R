@@ -535,9 +535,9 @@ setMethod("simulate", "state", function(object,
     if(agents_in_queue) {
         agent_to_add <- potential_agents(object)[[1]]
 
-        pts <- points(agent_to_add)
+        pts <- rbind(points(agent_to_add), center(agent_to_add))
         agents_in_the_way <- sapply(agents(object), 
-                                    \(x) in_object(x, pts) | in_object(x, center(agent_to_add)))
+                                    \(x) in_object(x, pts))
 
         if(!any(agents_in_the_way)) {
             agents(object) <- append(agents(object), agent_to_add)
@@ -546,7 +546,7 @@ setMethod("simulate", "state", function(object,
     }
 
     # Print iteration number and number of agents in the space
-    cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(object)), rep(" ", 10)))
+    cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(object)), paste0(rep(" ", 10), collapse = "")))
 
     # Update the current state
     object <- update(object, 
