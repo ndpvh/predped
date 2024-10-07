@@ -600,6 +600,44 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 
 
 
+#' Getter/Setter for the \code{iteration_variables}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background)
+#' 
+#' # Access iteration slot
+#' iteration_variables(my_state)
+#' 
+#' # Change the iteration slot
+#' iteration_variables(my_state) <- data.frame(x = rep(1,3))
+#' iteration_variables(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname iteration_variables-method
+#' 
+#' @export
+setGeneric("iteration_variables", function(object) standardGeneric("iteration_variables"))
+
+#' @rdname iteration_variables-method
+#' 
+#' @export
+setGeneric("iteration_variables<-", function(object, value) standardGeneric("iteration_variables<-"))
+
+
+
 #' Getter/Setter for the \code{limited_access}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.

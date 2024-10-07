@@ -7,6 +7,8 @@
 #' @slot potential_agents List containing objects of the 
 #' \code{\link[predped]{agent-class}} representing agents that are waiting to 
 #' enter the \code{setting}.
+#' @slot iteration_variables Dataframe containing values for variables that 
+#' control the simulation under the hood, such as \code{max_agents}.
 #' 
 #' @seealso 
 #' \code{\link[predped]{agents}},
@@ -21,7 +23,8 @@
 state <- setClass("state", list(iteration = "numeric", 
                                 setting = "background",
                                 agents = "list",
-                                potential_agents = "list"))
+                                potential_agents = "list",
+                                iteration_variables = "data.frame"))
 
 #' Constructor for the \code{\link[predped]{state-class}}
 #' 
@@ -35,6 +38,9 @@ state <- setClass("state", list(iteration = "numeric",
 #' @param potential_agents List containing objects of the 
 #' \code{\link[predped]{agent-class}} representing agents that are waiting to 
 #' enter the \code{setting}. Defaults to an empty list.
+#' @param iteration_variables Dataframe containing values for variables that 
+#' control the simulation under the hood, such as \code{max_agents}. Defaults 
+#' to an empty data.frame.
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}
 #' 
@@ -65,7 +71,8 @@ setMethod("initialize", "state", function(.Object,
                                           iteration,
                                           setting, 
                                           agents = list(),
-                                          potential_agents = list()) {
+                                          potential_agents = list(),
+                                          iteration_variables = data.frame()) {
 
     # Some checks on the objects
     if(length(agents) != 0 & !all(sapply(agents, is, class2 = "agent"))) {
@@ -80,6 +87,7 @@ setMethod("initialize", "state", function(.Object,
     .Object@setting <- setting
     .Object@agents <- agents
     .Object@potential_agents <- agents
+    .Object@iteration_variables <- iteration_variables # Having this as a complete dataframe is not my preferred way of doing things, but does allow users to change specifications on the fly
 
     return(.Object)
 })
@@ -117,6 +125,19 @@ setMethod("iteration", "state", function(object) {
 #' @rdname iteration-method
 setMethod("iteration<-", "state", function(object, value) {
     object@iteration <- floor(value)
+    return(object)
+})
+
+
+
+#' @rdname iteration_variables-method
+setMethod("iteration_variables", "state", function(object) {
+    return(object@iteration_variables)
+})
+
+#' @rdname iteration-method
+setMethod("iteration_variables<-", "state", function(object, value) {
+    object@iteration_variables <- floor(value)
     return(object)
 })
 

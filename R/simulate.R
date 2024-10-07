@@ -316,7 +316,10 @@ setMethod("simulate", "predped", function(object,
     # initial condition. The trace list also contains this state. 
     state <- predped::state(iteration = 0, 
                             setting = object@setting, 
-                            agents = list())
+                            agents = list(),
+                            iteration_variables = data.frame(max_agents = max_agents[1:iterations], 
+                                                             goal_number = goal_number[1:iterations], 
+                                                             add_agent_index = add_agent_index[1:iterations]))
     if(!is.null(initial_agents)) {
         agents(state) <- initial_agents
         
@@ -337,9 +340,10 @@ setMethod("simulate", "predped", function(object,
         altered_state <- fx(trace[[i]])
         trace[[i + 1]] <- simulate(altered_state,
                                    object,
-                                   add_agent = (i %in% add_agent_index) & (length(agents(trace[[i]])) < max_agents[i]),
+                                   add_agent = (i %in% iteration_variables(altered_state)$add_agent_index) & 
+                                               (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
                                    group_size = group_size,
-                                   goal_number = goal_number[i],
+                                   goal_number = iteration_variables(altered_state)$goal_number[i],
                                    time_step = time_step,
                                    space_between = space_between,
                                    standing_start = standing_start,
