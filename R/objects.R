@@ -374,8 +374,9 @@ circle <- setClass("circle",
 #' position of the circle
 #' @param radius Numeric denoting the radius of the circle.
 #' @param forbidden Numerical matrix containing the angles for which you cannot 
-#' generate goals (in radians). These angles are computed in the Euclidian space.
-#' Defaults to an empty vector, making all angles worthy of goal generation.
+#' generate goals (in radians). These angles are computed in the Euclidian space
+#' and should be contained within the interval 0 and 2 * pi. Defaults to an 
+#' empty matrix, making all angles worthy of goal generation.
 #' @param ... Additional arguments passed to 
 #' \code{\link[predped]{initialize,object-method}}.
 #' 
