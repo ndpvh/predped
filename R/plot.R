@@ -34,6 +34,10 @@
 #' objects contained in the background. Defaults to \code{"black"}.
 #' @param object.linewidth Numeric denoting the width of the circumference of 
 #' the objects contained in the background. Defaults to \code{1}.
+#' @param plot_forbidden Logical denoting whether to plot forbidden edges 
+#' explicitly. Defaults to \code{FALSE}.
+#' @param forbidden.color Character denoting the color of the forbidden edges.
+#' Defaults to \code{"red"}.
 #' @param plot_segment Logical denoting whether to plot segments (if there are 
 #' any). If \code{TRUE}, it will add arrows to the plot that indicate the 
 #' direction in which agents can walk. These arrows will be placed around the 
@@ -256,13 +260,61 @@ setMethod("plot", "list", function(object, ...) {
 })
 
 #'@rdname plot-method
-setMethod("plot", "object", function(object, ...) {
+setMethod("plot", "object", function(object,                                      
+                                     color = "black",
+                                     fill = "gray",
+                                     plot_forbidden = FALSE,
+                                     forbidden.color = "red",
+                                     ...) {
+
     # Extract the points of the object
     pts <- points(object)
-    return(ggplot2::annotate("polygon", 
+
+    # Create the basic geom
+    plt <- ggplot2::annotate("polygon", 
                              x = pts[,1], 
                              y = pts[,2], 
-                             ...))
+                             color = color,
+                             fill = fill,
+                             ...)
+
+    # If you should plot forbidden edges, identify these and plot them 
+    # altogether
+    if(plot_forbidden) {
+        # First, create the edges themselves
+        edges <- cbind(pts, pts[c(2:nrow(pts), 1), ])
+
+        # If it is a circle, we need to find the indices of those edges that are
+        # forbidden and those who are not.
+        if(inherits(object, "circle")) {
+            # Get relative angle from center to points and correct so that they
+            # are positive
+            angles <- atan2(pts[,2] - center(object)[2], 
+                            pts[,1] - center(object)[1])
+            angles <- ifelse(angles < 0, angles + 2 * pi, angles)
+
+            # Extract the forbidden angles from the circle
+            forbidden <- forbidden(object)
+
+            idx <- lapply(1:nrow(forbidden), 
+                          \(i) angles >= forbidden[i, 1] & angles <= forbidden[i, 2])
+            idx <- Reduce("|", idx)
+        } else {
+            idx <- forbidden(object)
+        }
+
+        # Add another annotate with a different color
+        plt <- list(plt, 
+                    ggplot2::annotate("segment", 
+                                      x = edges[idx, 1], 
+                                      y = edges[idx, 2], 
+                                      xend = edges[idx, 3], 
+                                      yend = edges[idx, 4], 
+                                      color = forbidden.color, 
+                                      ...))
+    }
+
+    return(plt)
 })
 
 #'@rdname plot-method
