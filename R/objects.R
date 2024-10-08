@@ -1287,12 +1287,13 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 # TO DO:
 #   - Allow for forbidden to be specified at the object-level, so that this 
 #     can be accounted for when sampling goals from them
-setGeneric("rng_point", function(object, middle_edge = TRUE, forbidden = NULL) standardGeneric("rng_point"))
+setGeneric("rng_point", function(object, middle_edge = TRUE) standardGeneric("rng_point"))
 
 #'@rdname rng_point-method
 setMethod("rng_point", signature(object = "polygon"), function(object, 
-                                                               middle_edge = TRUE,
-                                                               forbidden = NULL) {
+                                                               middle_edge = TRUE) {
+
+    forbidden <- forbidden(object)
     
     # Sample the edge on which to draw a random point. To make our lives easier, 
     # we first transform `points` so that it contains the values of the 
@@ -1302,7 +1303,7 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
     #
     # Importantly, the forbidden edges should be deleted from the options.
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1),])
-    if(!is.null(forbidden)) {
+    if(length(forbidden) != 0) {
         edges <- edges[-forbidden,]
 
         # Extra check if you delete all except one edge
@@ -1328,12 +1329,13 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
 
 #'@rdname rng_point-method
 setMethod("rng_point", signature(object = "circle"), function(object, 
-                                                              middle_edge = TRUE,
-                                                              forbidden = NULL) {
+                                                              middle_edge = TRUE) {
+
+    forbidden <- forbidden(object)
 
     # First check which intervals are allowed to be sampled and add a column 
     # that contains the relative weight of the interval to be sampled in
-    if(!is.null(forbidden)) {
+    if(length(forbidden) != 0) {
         # Convert to vector and sort
         forbidden <- sort(as.numeric(forbidden))
 
