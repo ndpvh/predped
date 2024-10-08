@@ -381,7 +381,7 @@ gc_utility <- function(a_gc,
     
     # Calculate centroid 
     centroid_util <- -sapply(cell_dist, 
-                                \(x) ifelse(x < optimal_distance, 0, b_gc * (x - optimal_distance)^a_gc))
+                                \(x) ifelse(x < optimal_distance, 0, b_gc * abs(x - optimal_distance)^a_gc))
 
     if (all(centroid_util < stop_utility)) {
         return(numeric(33))
