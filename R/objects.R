@@ -132,6 +132,8 @@ setMethod("initialize", "object", function(.Object,
 #' easily defined).
 #' @slot clock_wise Logical indicating whether the points define the polygon 
 #' in a clockwise (\code{TRUE}) or counter-clockwise fashion (\code{FALSE}).
+#' @slot forbidden Numerical vector containing the indices of those edges that
+#' cannot be used to generate goals on.
 #' @slot ... Slots shared with the \code{\link[predped]{object-class}}.
 #' 
 #' @seealso 
@@ -147,7 +149,8 @@ setMethod("initialize", "object", function(.Object,
 polygon <- setClass("polygon", 
                     list(points = "matrix", 
                          center = "numeric",
-                         clock_wise = "logical"), 
+                         clock_wise = "logical",
+                         forbidden = "numeric"), 
                     contains = "object")
 
 #' Constructor for the \code{\link[predped]{polygon-class}}
@@ -157,6 +160,10 @@ polygon <- setClass("polygon",
 #' @param clock_wise Logical denoting whether the coordinates in \code{points} 
 #' are defined in clockwise (\code{TRUE}) or counter-clockwise fashion 
 #' (\code{FALSE}). Defaults to \code{TRUE}.
+#' @param forbidden Numerical vector containing the indices of those edges that
+#' cannot be used to generate goals on. Note that edges are created based on 
+#' the \code{\link[predped]{points}} of the object. Defaults to an empty 
+#' vector, making all edges worthy of goal generation.
 #' @param ... Additional arguments passed to 
 #' \code{\link[predped]{initialize,object-method}}.
 #' 
@@ -183,6 +190,7 @@ polygon <- setClass("polygon",
 #' @export
 setMethod("initialize", "polygon", function(.Object, 
                                             clock_wise = TRUE, 
+                                            forbidden = numeric(0),
                                             ...) {
     
     # Create the polygon as defined in VIRTUAL and in the object-class
@@ -195,6 +203,7 @@ setMethod("initialize", "polygon", function(.Object,
 
     # Add the unique slots of the polygon to the equation
     .Object@clock_wise <- clock_wise
+    .Object@forbidden <- forbidden
     .Object@center <- coordinate(c(mean(range(.Object@points[,1])), 
                                    mean(range(.Object@points[,2]))))
 
@@ -341,6 +350,8 @@ setMethod("initialize", "rectangle", function(.Object,
 #' 
 #' @slot center Numeric vector denoting the center or position of the circle.
 #' @slot radius Numeric denoting the radius of the circle.
+#' @slot forbidden Numerical matrix containing the angles for which you cannot 
+#' generate goals (in radians). 
 #' @slot ... Slots shared with \code{\link[predped]{object-class}}.
 #'
 #' @seealso 
@@ -353,7 +364,8 @@ setMethod("initialize", "rectangle", function(.Object,
 #' @export
 circle <- setClass("circle", 
                    list(center = "numeric", 
-                        radius = "numeric"), 
+                        radius = "numeric", 
+                        forbidden = "matrix"), 
                    contains = c("object"))
 
 #' Constructor for the \code{\link[predped]{circle-class}}
@@ -361,6 +373,9 @@ circle <- setClass("circle",
 #' @param center Numeric vector denoting the coordinates of the center or 
 #' position of the circle
 #' @param radius Numeric denoting the radius of the circle.
+#' @param forbidden Numerical matrix containing the angles for which you cannot 
+#' generate goals (in radians). These angles are computed in the Euclidian space.
+#' Defaults to an empty vector, making all angles worthy of goal generation.
 #' @param ... Additional arguments passed to 
 #' \code{\link[predped]{initialize,object-method}}.
 #' 
@@ -386,6 +401,7 @@ circle <- setClass("circle",
 #' 
 #' @export
 setMethod("initialize", "circle", function(.Object, 
+                                           forbidden = numeric(0),
                                            ...) {
 
     # Pass inherited arguments to the VIRTUAL and object class
@@ -398,6 +414,9 @@ setMethod("initialize", "circle", function(.Object,
     if(length(.Object@radius) != 1) {
         stop("Slot 'radius' should be a single numeric value")
     }
+
+    # Other things to add
+    .Object@forbidden <- forbidden
 
     return(.Object)
 })
@@ -2206,6 +2225,41 @@ setMethod("center<-", signature(object = "segment"), function(object, value) {
 
     object@center <- value
     
+    return(object)
+})
+
+
+
+#' @rdname forbidden-method
+setMethod("forbidden", signature(object = "polygon"), function(object) {
+    return(object@forbidden)
+})
+
+#' @rdname forbidden-method
+setMethod("forbidden<-", signature(object = "polygon"), function(object, value) {
+    object@forbidden <- value
+    return(object)
+})
+
+#' @rdname forbidden-method
+setMethod("forbidden", signature(object = "rectangle"), function(object) {
+    return(object@forbidden)
+})
+
+#' @rdname forbidden-method
+setMethod("forbidden<-", signature(object = "rectangle"), function(object, value) {
+    object@forbidden <- value
+    return(object)
+})
+
+#' @rdname forbidden-method
+setMethod("forbidden", signature(object = "circle"), function(object) {
+    return(object@forbidden)
+})
+
+#' @rdname forbidden-method
+setMethod("forbidden<-", signature(object = "circle"), function(object, value) {
+    object@forbidden <- value
     return(object)
 })
 

@@ -405,6 +405,41 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 
 
 
+#' Getter/Setter for the \code{forbidden}-slot
+#' 
+#' Works for the all instances of the \code{\link[predped]{object-class}}, 
+#' except for the \code{\link[predped]{segment-class}}.
+#' 
+#' @examples 
+#' # Initialize an object
+#' my_rectangle <- rectangle(center = c(0, 0), 
+#'                           size = c(1, 1), 
+#'                           forbidden = 1)
+#' 
+#' # Access iteration slot
+#' forbidden(my_rectangle)
+#' 
+#' # Change the iteration slot
+#' forbidden(my_rectangle) <- 2:3
+#' forbidden(my_rectangle)
+#' 
+#' @seealso 
+#' \code{\link[predped]{object-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname forbidden-method
+#' 
+#' @export
+setGeneric("forbidden", function(object) standardGeneric("forbidden"))
+
+#' @rdname forbidden-method
+#' 
+#' @export
+setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-"))
+
+
+
 #' Getter/Setter for the \code{from}-slot
 #' 
 #' Works for the \code{\link[predped]{segment-class}}.
