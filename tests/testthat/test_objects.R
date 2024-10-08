@@ -866,7 +866,8 @@ testthat::test_that("Polygon random generation of point works", {
     ref3 <- c(0, 1)
 
     set.seed(1)
-    tst3 <- round(rng_point(p, forbidden = c(1, 2, 3)), 4)
+    forbidden(p) <- c(1, 2, 3)
+    tst3 <- round(rng_point(p), 4)
 
     # Actual test
     testthat::expect_equal(tst1, ref1)
@@ -900,7 +901,8 @@ testthat::test_that("Rectangle random generation of point works", {
                  c(0.7071, -0.7071))
 
     set.seed(1)
-    tst3 <- lapply(r, \(x) round(rng_point(x, forbidden = c(1, 2, 3)), 4))
+    r <- lapply(r, \(x) {forbidden(x) <- c(1, 2, 3) ; return(x)})
+    tst3 <- lapply(r, \(x) round(rng_point(x), 4))
 
     # Actual test
     testthat::expect_equal(tst1, ref1)
@@ -912,6 +914,10 @@ testthat::test_that("Circle random generation of point works", {
     r <- predped::circle(center = c(0, 0), 
                          radius = 2)
 
+    r2 <- r3 <- r 
+    forbidden(r2) <- matrix(c(pi / 2, 3 * pi / 2), nrow = 1)
+    forbidden(r3) <- matrix(c(pi / 2, pi, pi, 3 * pi / 2), nrow = 1)
+
     # Unconstrained, constrained for one specific interval, constrained on
     # several intervals
     ref <- list(c(-0.1946, 1.9905), 
@@ -920,8 +926,8 @@ testthat::test_that("Circle random generation of point works", {
 
     set.seed(1)
     tst <- list(round(rng_point(r), 4),
-                round(rng_point(r, forbidden = c(pi / 2, 3 * pi / 2)), 4),
-                round(rng_point(r, forbidden = c(pi / 2, pi, pi, 3 * pi / 2)), 4))    
+                round(rng_point(r2), 4),
+                round(rng_point(r3), 4))    
 
     # Do the same tests, but now check whether in a repeated procedure the actual
     # angles are never in the forbidden intervals
@@ -931,8 +937,10 @@ testthat::test_that("Circle random generation of point works", {
                        3 * pi / 2, 2 * pi), 
                      ncol = 2, 
                      byrow = TRUE)
+
+    forbidden(r) <- bounds
     for(i in 1:1000) {
-        sim[i,] <- rng_point(r, forbidden = bounds)
+        sim[i,] <- rng_point(r)
     }
 
     # For each of these angles, check whether they are inside of the bounds
