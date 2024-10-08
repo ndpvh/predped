@@ -401,7 +401,7 @@ circle <- setClass("circle",
 #' 
 #' @export
 setMethod("initialize", "circle", function(.Object, 
-                                           forbidden = numeric(0),
+                                           forbidden = matrix(nrow = 0, ncol = 0),
                                            ...) {
 
     # Pass inherited arguments to the VIRTUAL and object class
