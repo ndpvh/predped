@@ -370,8 +370,12 @@ generate_parameters <- function(n = 1,
     #   - Transform the drawn parameters back to their usual scale
     mean <- to_unbounded(mean, bounds) |>
         t()
-    params <- MASS::mvrnorm(n, mean, Sigma)
+    params <- MASS::mvrnorm(n, mean, Sigma) |>
+        matrix(ncol = length(u_params)) |>
+        as.data.frame() |>
+        setNames(u_params)
     params <- to_bounded(params, bounds)
+    
 
     return(params[u_params])
 }
@@ -466,10 +470,11 @@ to_unbounded <- function(parameters,
 to_bounded <- function(parameters, 
                        bounds) {
 
-    # If the parameters are numeric, transpose them to a matrix
-    if(!any(class(parameters) %in% "matrix")) {
-        parameters <- t(parameters)
-    }
+    # If the parameters are numeric, transpose them to a matrix. Not needed 
+    # anymore due to check in generate_parameters
+    # if(!any(class(parameters) %in% "matrix")) {
+    #     parameters <- t(parameters)
+    # }
 
     # Extract the utility parameters
     u_params <- utility_parameters(parameters)
@@ -568,7 +573,7 @@ transform_mu <- function(parameters) {
 plot_distribution <- function(...) {
 
     # Simulate several parameters
-    parameters <- draw_parameters(...)
+    parameters <- generate_parameters(...)
 
     # Loop over each of the parameters and create histograms of the distribution
     # of these parameters
