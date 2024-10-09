@@ -509,17 +509,15 @@ to_covariance <- function(X) {
     d <- nrow(X)
 
     # Compute the covariance matrix in the following way:
-    #   - Create two matrices containing all standard deviations of a given 
-    #     dimension in their rows or columns.
+    #   - Create a diagonal matrix containing the standard deviations
     #   - Adjust X so that it contains 1's on its diagonal
-    #   - Multiply X with these two matrices in an element-wise way, so that each
-    #     cell contains the covariance: COV(x, y) = COR(x, y) * SD(x) * SD(y)
+    #   - Multiply X with these the diagonal matrices so that two matrices where
+    #     COV(x, y) = SD(x) * COR(x, y) * SD(y)
     SD <- diag(X) |>
-        rep(times = d) |>
-        matrix(nrow = d, ncol = d)
+        diag()
     diag(X) <- 1
 
-    return(X * SD * t(SD))
+    return(SD %*% X %*% SD)
 }
 
 #' Transform nest association to precision (mu)
