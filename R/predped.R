@@ -34,8 +34,11 @@ predped <- setClass("predped", list(id = "character",
 #' @param setting Object of the \code{\link[predped]{background-class}}.
 #' @param id Character that serves as an identifier for the agent. Defaults to 
 #' an empty character, triggering the random generation of an id.
-#' @param database Character denoting the name of the database. Defaults to 
-#' \code{NULL}, triggering reading in the csv-files. 
+#' @param filename Character denoting the path to personalized parameters. 
+#' Defaults to \code{NULL}, triggering reading in the csv-files. 
+#' @param sep Character denoting the separator of the delimited file in 
+#' \code{filename}. If \code{filename} is not provided or if \code{filename} is
+#' not a delimited file, this argument is ignored. Defaults to \code{","}.
 #' @param archetypes Character or character vector denoting the archetype(s) 
 #' you want to include in the simulation. Defaults to \code{NULL}, triggering 
 #' the inclusion of all currently defined archetypes.
@@ -75,7 +78,8 @@ predped <- setClass("predped", list(id = "character",
 setMethod("initialize", "predped", function(.Object,
                                             setting, 
                                             id = character(0),
-                                            database = NULL,
+                                            filename = NULL,
+                                            sep = ",",
                                             archetypes = NULL,
                                             weights = NULL) {
 
@@ -83,7 +87,7 @@ setMethod("initialize", "predped", function(.Object,
     .Object@id <- if(length(id) == 0) paste("model", paste0(sample(letters, 5, replace = TRUE), collapse = "")) else id 
 
     # Load the parameters
-    params <- load_parameters(x = database)
+    params <- load_parameters(x = filename, sep = sep)
 
     # If archetypes are not provided, switch to the the default of including 
     # everyone 

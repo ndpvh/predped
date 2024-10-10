@@ -153,8 +153,11 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 #' mean values or \code{params_archetypes}, not for the standard deviations in 
 #' \code{params_sigma} and bounds in \code{params_bounds}.
 #' 
-#' @param x Character denoting the filename of the database. Defaults to 
-#' \code{NULL}, triggering reading in the csv-files that come with predped. 
+#' @param x Character denoting the path to a file containing parameters. 
+#' Defaults to \code{NULL}, triggering reading in the csv-files that come with 
+#' predped. 
+#' @param sep Character denoting the separator in case \code{x} is a delimited 
+#' file. Defaults to \code{","}.
 #' 
 #' @return List of parameter values contained in \code{params_archetypes} (means), 
 #' \code{params_sigma} (standard deviations), and \code{params_bounds} (the 
@@ -172,35 +175,101 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 #' 
 #' @export
 #
-# TO DO: At some point the GUI should be integrated with predped itself or 
-# hosted on a server so that the location of the database doesn't depend on the 
-# user.
-load_parameters <- function(x = NULL) {
+# TO DO: 
+#   - At some point the GUI should be integrated with predped itself or hosted
+#     on a server so that the location of the database doesn't depend on the 
+#     user.
+#   - Test this function extensively, including cases where (e.g.) a list contains
+#     other irrelevant information
+load_parameters <- function(x = NULL, 
+                            sep = ",") {
 
-    # If the provided database is not NULL, we can try to access it
-    if(!is.null(x)) {
+    # If the provided database is NULL, we can return the default parameters of 
+    # predped immediately
+    if(is.null(x)) {
+        return(params_from_csv)
+    }
+
+    
+    # Check what type of file you are dealing with. Cases are (a) a database,
+    # (b) R-related files, or (c) csv-files
+    #
+    # Case: Database
+    if(grepl(".sqlite", x, fixed = TRUE)) {
         # Create the connection
         con <- DBI::dbConnect(RSQLite::SQLite(), dbname = x)
 
         # Check whether the necessary table can be retrieved from the location
         if("PedestrianDefinition" %in% DBI::dbListTables(con)) {
-            db_loaded_parameters <- dplyr::tbl(con, "PedestrianDefinition") |>
+            params <- dplyr::tbl(con, "PedestrianDefinition") |>
                 dplyr::collect()
-        } 
-    }
-
-    if(!exists("db_loaded_parameters")) {
-        # Only provide this message whenever it is unexpected that the table is 
-        # not found
-        if(!is.null(x)) {
+        } else {
+            # If the table cannot be retrieved, we will just return the 
+            # default parameters and throw a message indicating this
             message(paste0("Could not read in the parameters from the database. ", 
-                           "Reading them in from a csv-file instead."))
+                           "Returning default parameters instead."))
+            return(params_from_csv)
         }
 
-        return(params_from_csv)
+    # Case: R-files
+    } else if(grepl(".Rda", x, fixed = TRUE) | grepl(".Rds", x, fixed = TRUE)) {
+        # Use the readRDS function to read in the parameters
+        params <- readRDS(x)
+
+    # Case: Other delimited files        
+    } else {
+        # Use read.table for this purpose
+        params <- utils::read.table(x, header = TRUE, sep = sep)
     }
 
-    params_from_csv[["params_archetypes"]] <- db_loaded_parameters
+    # When parameters have been read in, we should check what their type is. 
+    # Specifically, we should check whether we only read in the mean values of 
+    # the parameters ("params_archetypes") or whether we read in a complete 
+    # parameter structure (like for "params_from_csv"). We do this by checking 
+    # the names and whether they belong to the expected list. If not, then we 
+    # know that we can only change the "params_archetypes" slot of 
+    # params_from_csv.
+    if(any(names(params) %in% c("params_archetypes", "params_sigma", "params_bounds"))) {
+        # Change the slots of params_from_csv that are contained in params 
+        # itself. Doing it this way allows for people to only specify one or 
+        # more specific parts of the parameters and predped still retaining all
+        # the needed information.
+        for(i in names(params)) {
+            # Only use information that is necessary to contain here
+            if(!(i %in% c("params_archetypes", "params_sigma", "params_bounds"))) {
+                next
+            }
+
+            params_from_csv[[i]] <- params[[i]]
+        }
+
+    # Check if all the default column names can be found in the retrieved ones.
+    # If so, then we know that we just loaded in the mean parameters, so we can 
+    # change the "params_archetypes" slot
+    } else if(all(names(params_from_csv[["params_archetypes"]]) %in% names(params))) {
+        params_from_csv[["params_archetypes"]] <- params
+
+    # Check whether the names of the parameters are contained within the names
+    # of the "params_archetypes" slot. If so, then we know that it is 
+    # "params_sigma" that has been read in, and which we can change here
+    } else if(any(names(params) %in% params_from_csv[["params_archetypes"]]$name)) {
+        # Only retain those archetypes in the list that are also in the 
+        # dataframe.
+        params <- params[names(params) %in% params_from_csv[["params_archetypes"]]$name]
+        params_from_csv[["params_sigma"]] <- params
+
+    # Check whether the rownames of the parameters are contained within the 
+    # column names of the mean parameters. This would indicate whether we are 
+    # talking about the parameter bounds
+    } else if(all(rownames(params) %in% colnames(params_from_csv[["params_archetypes"]]))) {
+        params_from_csv[["params_bounds"]] <- params
+
+    # Give a message if things are not clear
+    } else {
+        message(paste0("Unable to determine which aspect of the parameters has been provided. ", 
+                       "Returning default parameters instead."))
+    }
+    
     return(params_from_csv)
 }
 
