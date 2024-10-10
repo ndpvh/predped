@@ -4,11 +4,15 @@
 \alias{load_parameters}
 \title{Load parameters}
 \usage{
-load_parameters(x = NULL)
+load_parameters(x = NULL, sep = ",")
 }
 \arguments{
-\item{x}{Character denoting the filename of the database. Defaults to 
-\code{NULL}, triggering reading in the csv-files that come with predped.}
+\item{x}{Character denoting the path to a file containing parameters. 
+Defaults to \code{NULL}, triggering reading in the csv-files that come with 
+predped.}
+
+\item{sep}{Character denoting the separator in case \code{x} is a delimited 
+file. Defaults to \code{","}.}
 }
 \value{
 List of parameter values contained in \code{params_archetypes} (means), 

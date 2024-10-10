@@ -16,6 +16,9 @@ center and radius.
 
 \item{\code{radius}}{Numeric denoting the radius of the circle.}
 
+\item{\code{forbidden}}{Numerical matrix containing the angles for which you cannot 
+generate goals (in radians).}
+
 \item{\code{...}}{Slots shared with \code{\link[predped]{object-class}}.}
 }}
 

@@ -9,7 +9,8 @@
   iteration,
   setting,
   agents = list(),
-  potential_agents = list()
+  potential_agents = list(),
+  iteration_variables = data.frame()
 )
 }
 \arguments{
@@ -26,6 +27,10 @@ Defaults to an empty list.}
 \item{potential_agents}{List containing objects of the 
 \code{\link[predped]{agent-class}} representing agents that are waiting to 
 enter the \code{setting}. Defaults to an empty list.}
+
+\item{iteration_variables}{Dataframe containing values for variables that 
+control the simulation under the hood, such as \code{max_agents}. Defaults 
+to an empty data.frame.}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}

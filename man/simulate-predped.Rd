@@ -25,6 +25,7 @@
   many_nodes = precompute_edges,
   individual_differences = TRUE,
   group_size = matrix(1, nrow = 1, ncol = 2),
+  fx = function(x) x,
   ...
 )
 }
@@ -121,6 +122,13 @@ denotes the number of people in a social group and the second column the
 probability with which such a group is added to the simulation. Defaults to 
 a 100\% probability that individuals are added to the simulation (i.e., no 
 social groups).}
+
+\item{fx}{Function that takes in and returns an object of the 
+\code{\link[predped]{state-class}}. This will be executed at the beginning of each 
+iteration and allows users some flexibility in their simulations. For example
+useful when simulating evacuations (giving everyone "goal exit") or trying 
+to guide behavior in any other way. Defaults to "\(x) x", meaning the state
+remains unaltered.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{simulate,state-method}} 
 function.}

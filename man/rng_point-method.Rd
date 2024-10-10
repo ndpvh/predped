@@ -8,13 +8,13 @@
 \alias{rng_point,segment-method}
 \title{Sample a Random Point on the Circumference}
 \usage{
-rng_point(object, middle_edge = TRUE, forbidden = NULL)
+rng_point(object, middle_edge = TRUE)
 
-\S4method{rng_point}{polygon}(object, middle_edge = TRUE, forbidden = NULL)
+\S4method{rng_point}{polygon}(object, middle_edge = TRUE)
 
-\S4method{rng_point}{circle}(object, middle_edge = TRUE, forbidden = NULL)
+\S4method{rng_point}{circle}(object, middle_edge = TRUE)
 
-\S4method{rng_point}{segment}(object, middle_edge = TRUE, forbidden = NULL)
+\S4method{rng_point}{segment}(object, middle_edge = TRUE)
 }
 \arguments{
 \item{object}{Object of \code{\link[predped]{object-class}}.}

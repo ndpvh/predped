@@ -11,7 +11,7 @@
   limited_access = list(),
   entrance = NULL,
   exit = NULL,
-  same_exit = TRUE
+  same_exit = is.null(exit)
 )
 }
 \arguments{
@@ -42,7 +42,8 @@ then the location(s) of the exit(s) will be the same as the location(s) of the
 entrance(s).}
 
 \item{same_exit}{Logical denoting whether the location(s) of the exit(s) 
-should be the same as for the entrance(s). Defaults to \code{TRUE}.}
+should be the same as for the entrance(s). Defaults to \code{TRUE} if no 
+exit is provided and to \code{FALSE} if an exit is provided.}
 }
 \value{
 Object of the \code{\link[predped]{background-class}}

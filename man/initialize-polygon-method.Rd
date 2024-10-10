@@ -4,12 +4,17 @@
 \alias{initialize,polygon-method}
 \title{Constructor for the \code{\link[predped]{polygon-class}}}
 \usage{
-\S4method{initialize}{polygon}(.Object, clock_wise = TRUE, ...)
+\S4method{initialize}{polygon}(.Object, clock_wise = TRUE, forbidden = numeric(0), ...)
 }
 \arguments{
 \item{clock_wise}{Logical denoting whether the coordinates in \code{points} 
 are defined in clockwise (\code{TRUE}) or counter-clockwise fashion 
 (\code{FALSE}). Defaults to \code{TRUE}.}
+
+\item{forbidden}{Numerical vector containing the indices of those edges that
+cannot be used to generate goals on. Note that edges are created based on 
+the \code{\link[predped]{points}} of the object. Defaults to an empty 
+vector, making all edges worthy of goal generation.}
 
 \item{...}{Additional arguments passed to 
 \code{\link[predped]{initialize,object-method}}.}

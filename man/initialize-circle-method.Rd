@@ -4,9 +4,14 @@
 \alias{initialize,circle-method}
 \title{Constructor for the \code{\link[predped]{circle-class}}}
 \usage{
-\S4method{initialize}{circle}(.Object, ...)
+\S4method{initialize}{circle}(.Object, forbidden = matrix(nrow = 0, ncol = 0), ...)
 }
 \arguments{
+\item{forbidden}{Numerical matrix containing the angles for which you cannot 
+generate goals (in radians). These angles are computed in the Euclidian space
+and should be contained within the interval 0 and 2 * pi. Defaults to an 
+empty matrix, making all angles worthy of goal generation.}
+
 \item{...}{Additional arguments passed to 
 \code{\link[predped]{initialize,object-method}}.}
 

@@ -36,20 +36,29 @@ plot(object, ...)
   segment.linewidth = 1,
   segment.size = 0.6,
   arrow.size = 0.3,
+  segment.hjust = 0.5,
   dark_mode = FALSE,
   ...
 )
 
 \S4method{plot}{list}(object, ...)
 
-\S4method{plot}{object}(object, ...)
+\S4method{plot}{object}(
+  object,
+  color = "black",
+  fill = "gray",
+  plot_forbidden = FALSE,
+  forbidden.color = "red",
+  ...
+)
 
 \S4method{plot}{segment}(
   object,
   segment.size = 0.6,
   segment.color = "black",
   segment.linewidth = 1,
-  arrow.size = 0.3
+  arrow.size = 0.3,
+  segment.hjust = 0.5
 )
 
 \S4method{plot}{state}(
@@ -131,8 +140,20 @@ Defaults to \code{0.6}.}
 you impose one-directional flow in cm. Ignored if \code{plot_segment = FALSE}.
 Defaults to \code{0.3}.}
 
+\item{segment.hjust}{Numeric bounded between 0 and 1 which defines how to 
+place the arrow relative to the center of the segment. If \code{0.5}, the 
+arrow's center coincides with the center of the segment. If \code{0}, the 
+arrow's tail will coincide with the center of the segment, while if \code{1}, 
+the arrow's head will coincide with this center. Defaults to \code{0.5}.}
+
 \item{dark_mode}{Logical that can toggle the default colorpallette of predped's 
 dark mode. Defaults to \code{FALSE}.}
+
+\item{plot_forbidden}{Logical denoting whether to plot forbidden edges 
+explicitly. Defaults to \code{FALSE}.}
+
+\item{forbidden.color}{Character denoting the color of the forbidden edges.
+Defaults to \code{"red"}.}
 
 \item{plot.title.size}{Numeric denoting the text size of the plot title. 
 Defaults to \code{10}.}

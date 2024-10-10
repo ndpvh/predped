@@ -23,6 +23,9 @@ easily defined).}
 \item{\code{clock_wise}}{Logical indicating whether the points define the polygon 
 in a clockwise (\code{TRUE}) or counter-clockwise fashion (\code{FALSE}).}
 
+\item{\code{forbidden}}{Numerical vector containing the indices of those edges that
+cannot be used to generate goals on.}
+
 \item{\code{...}}{Slots shared with the \code{\link[predped]{object-class}}.}
 }}
 

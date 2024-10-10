@@ -8,7 +8,8 @@
   .Object,
   setting,
   id = character(0),
-  database = NULL,
+  filename = NULL,
+  sep = ",",
   archetypes = NULL,
   weights = NULL
 )
@@ -19,8 +20,12 @@
 \item{id}{Character that serves as an identifier for the agent. Defaults to 
 an empty character, triggering the random generation of an id.}
 
-\item{database}{Character denoting the name of the database. Defaults to 
-\code{NULL}, triggering reading in the csv-files.}
+\item{filename}{Character denoting the path to personalized parameters. 
+Defaults to \code{NULL}, triggering reading in the csv-files.}
+
+\item{sep}{Character denoting the separator of the delimited file in 
+\code{filename}. If \code{filename} is not provided or if \code{filename} is
+not a delimited file, this argument is ignored. Defaults to \code{","}.}
 
 \item{archetypes}{Character or character vector denoting the archetype(s) 
 you want to include in the simulation. Defaults to \code{NULL}, triggering 
