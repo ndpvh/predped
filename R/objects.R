@@ -1490,7 +1490,19 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     # Create the edges as needed by the `find_location` function. Important to 
     # note that we need to rbind the first edge to the matrix in order to find 
     # the node for the final point in the matrix.
-    edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
+    #
+    # Note that in the first matrix, we start at the last defined edge in the 
+    # points of the polygon and combine it with the very first edge. The reason
+    # why we do this is to ensure that whenever `add_nodes` is called, we retain
+    # the same order of the points inside the `points` matrix of the polygon. 
+    # This in turn is done so that the function `enlarge` does not change the 
+    # order of the points that make up the polygon, making sure that the 
+    # mapping between the edges and their `forbidden` indices to remain the 
+    # same.
+    N <- nrow(object@points)
+    idx <- c(N, 1:(N - 1))
+
+    edges <- cbind(object@points[idx, ], object@points)
     edges <- rbind(edges, edges[1,])
 
     # Loop over the edges and do the necessary calculations. Then bind together
@@ -1560,78 +1572,78 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     return(nodes)
 })
 
-#'@rdname add_nodes-method
-setMethod("add_nodes", signature(object = "rectangle"), function(object, 
-                                                                 space_between = 0.5,
-                                                                 only_corners = FALSE,
-                                                                 outside = TRUE) {
+# #'@rdname add_nodes-method
+# setMethod("add_nodes", signature(object = "rectangle"), function(object, 
+#                                                                  space_between = 0.5,
+#                                                                  only_corners = FALSE,
+#                                                                  outside = TRUE) {
 
-    # Approach will be to make a new rectangle that is greater than the original
-    # one by a given factor and then taking its points as the new nodes. If we
-    # want `space_between` space between the corners of the old rectangle and 
-    # the corners of the new one, we will have to create an `extension` factor
-    # based on the rule of Pythagoras, where we know that c^2 = `space_between`^2
-    # and a^2 = b^2 = `extension`^2.
-    extension <- sqrt(space_between^2 / 2)
+#     # Approach will be to make a new rectangle that is greater than the original
+#     # one by a given factor and then taking its points as the new nodes. If we
+#     # want `space_between` space between the corners of the old rectangle and 
+#     # the corners of the new one, we will have to create an `extension` factor
+#     # based on the rule of Pythagoras, where we know that c^2 = `space_between`^2
+#     # and a^2 = b^2 = `extension`^2.
+#     extension <- sqrt(space_between^2 / 2)
 
-    # Use the setter for the size of a rectangle to change its size. This setter
-    # will automatically change the corner points inside of the rectangle.
-    #
-    # Importantly, the size of the rectangle changes with 2 times the extension
-    size(object) <- size(object) + ifelse(outside, 2, -2) * extension 
+#     # Use the setter for the size of a rectangle to change its size. This setter
+#     # will automatically change the corner points inside of the rectangle.
+#     #
+#     # Importantly, the size of the rectangle changes with 2 times the extension
+#     size(object) <- size(object) + ifelse(outside, 2, -2) * extension 
     
-    # Return the nodes as is when you only want nodes to be created at the 
-    # corners of the polygon
-    if(only_corners) {
-        return(object@points)
-    } 
+#     # Return the nodes as is when you only want nodes to be created at the 
+#     # corners of the polygon
+#     if(only_corners) {
+#         return(object@points)
+#     } 
 
-    # We need to add some additional spaces so that there is `space_between` 
-    # amount of space between each of the now created nodes. For this, we will 
-    # use logic that is the same as for polygons.
-    nodes <- object@points
-    edges <- cbind(nodes, nodes[c(2:nrow(nodes), 1),])
+#     # We need to add some additional spaces so that there is `space_between` 
+#     # amount of space between each of the now created nodes. For this, we will 
+#     # use logic that is the same as for polygons.
+#     nodes <- object@points
+#     edges <- cbind(nodes, nodes[c(2:nrow(nodes), 1),])
 
-    # Define the number of times each of the lines defined by the edges should 
-    # be divided by
-    sizes <- sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2)
+#     # Define the number of times each of the lines defined by the edges should 
+#     # be divided by
+#     sizes <- sqrt((edges[,1] - edges[,3])^2 + (edges[,2] - edges[,4])^2)
 
-    # Delete those sizes that are smaller than space_between
-    idx <- sizes > space_between 
-    sizes <- sizes[idx]
-    edges <- edges[idx,]
+#     # Delete those sizes that are smaller than space_between
+#     idx <- sizes > space_between 
+#     sizes <- sizes[idx]
+#     edges <- edges[idx,]
 
-    # Get the spaces that should be left inbetween the next points on the grid
-    number_points <- ceiling(sizes / space_between)
-    distances <- sizes / number_points
+#     # Get the spaces that should be left inbetween the next points on the grid
+#     number_points <- ceiling(sizes / space_between)
+#     distances <- sizes / number_points
 
-    # Find the points on the line that correspond to each of the distances 
-    # and bind them to the `nodes` matrix. In order for this to work, we 
-    # should add the distances from a starting point to the end point by using
-    # the angle of the slope with a radius equal to the distance from the 
-    # starting point to the end point. The starting point is always defined 
-    # as that node for which x is minimal, except when the line drawn is 
-    # vertical, in which case the y-coordinate matters
-    # slopes <- (edges[,2] - edges[,4]) / (edges[,1] - edges[,3])
-    slopes <- (edges[,4] - edges[,2]) / (edges[,3] - edges[,1])
-    angles <- atan(slopes)
+#     # Find the points on the line that correspond to each of the distances 
+#     # and bind them to the `nodes` matrix. In order for this to work, we 
+#     # should add the distances from a starting point to the end point by using
+#     # the angle of the slope with a radius equal to the distance from the 
+#     # starting point to the end point. The starting point is always defined 
+#     # as that node for which x is minimal, except when the line drawn is 
+#     # vertical, in which case the y-coordinate matters
+#     # slopes <- (edges[,2] - edges[,4]) / (edges[,1] - edges[,3])
+#     slopes <- (edges[,4] - edges[,2]) / (edges[,3] - edges[,1])
+#     angles <- atan(slopes)
 
-    # In the last step, we loop over these values to create the new nodes
-    new_nodes <- list()
-    for(i in seq_len(nrow(nodes))) {
-        if(slopes[i] == 0) {
-            idx <- c(1, 3)[which.min(edges[i, c(1, 3)])]
-        } else {
-            idx <- 1
-        }
+#     # In the last step, we loop over these values to create the new nodes
+#     new_nodes <- list()
+#     for(i in seq_len(nrow(nodes))) {
+#         if(slopes[i] == 0) {
+#             idx <- c(1, 3)[which.min(edges[i, c(1, 3)])]
+#         } else {
+#             idx <- 1
+#         }
 
-        new_nodes[[i]] <- cbind(1:(number_points[i] - 1) * cos(angles[i]) * distances[i] + edges[i, idx],
-                                1:(number_points[i] - 1) * sin(angles[i]) * distances[i] + edges[i, idx + 1])
-    }
-    nodes <- rbind(nodes, do.call("rbind", new_nodes))
+#         new_nodes[[i]] <- cbind(1:(number_points[i] - 1) * cos(angles[i]) * distances[i] + edges[i, idx],
+#                                 1:(number_points[i] - 1) * sin(angles[i]) * distances[i] + edges[i, idx + 1])
+#     }
+#     nodes <- rbind(nodes, do.call("rbind", new_nodes))
 
-    return(nodes)
-})
+#     return(nodes)
+# })
 
 #'@rdname add_nodes-method
 setMethod("add_nodes", signature(object = "circle"), function(object, 
@@ -2447,17 +2459,26 @@ setMethod("size", signature(object = "rectangle"), function(object) {
 #' @rdname size-method
 setMethod("size<-", signature(object = "rectangle"), function(object, value) {
     object@size <- value
-    points <- 0.5 * rbind(c(value[1], value[2]),
-                          c(value[1], -value[2]),
-                          c(-value[1], -value[2]),
-                          c(-value[1], value[2]))
-    
+
+    # Put the rectangle at the origin and rotate back to an orientation of 0
+    pts <- object@points - rep(object@center, each = 4)
+
     alpha <- object@orientation
+    R <- matrix(c(cos(-alpha), sin(-alpha), -sin(-alpha), cos(-alpha)), nrow = 2, ncol = 2)
+
+    pts <- t(R %*% t(pts))
+
+    # Create the new points matrix and use the signs of the previous rectangle. 
+    # Should allow us to have the same order of the points in both cases.
+    pts <- 0.5 * cbind(sign(pts[,1]) * value[1], 
+                       sign(pts[,2]) * value[2])
+    
     R <- matrix(c(cos(alpha), sin(alpha), -sin(alpha), cos(alpha)), nrow = 2, ncol = 2)
 
-    points <- R %*% t(points)
-    object@points <- cbind(points[1,] + center(object)[1], 
-                           points[2,] + center(object)[2])
+    pts <- t(R %*% t(pts))
+    object@points <- cbind(pts[,1] + center(object)[1], 
+                           pts[,2] + center(object)[2])
+
     return(object)
 })
 

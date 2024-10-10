@@ -167,11 +167,11 @@ setMethod("show", "goal", function(object) {
 # even though it is not a method of the `goal` class.
 setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 
-setMethod("add_goal", signature(object = "polygon"), function(object, 
-                                                              background,
-                                                              id = character(0),
-                                                              counter = 5,
-                                                              ...){
+setMethod("add_goal", signature(object = "object"), function(object, 
+                                                             background,
+                                                             id = character(0),
+                                                             counter = 5,
+                                                             ...){
     # Create an ever so slightly bigger polygon
     #
     # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
@@ -179,65 +179,36 @@ setMethod("add_goal", signature(object = "polygon"), function(object,
     # when making the path points: Given that the goal is part of the object, 
     # it is always unseen. With a slightly bigger object, this is not the case
     # anymore
-    points(object) <- add_nodes(object, 
-                                only_corners = TRUE, 
-                                space_between = 1e-2)
+    object <- enlarge(object, extension = 1e-2)
 
     # Generate a random goal and check whether or not this goal is not contained
     # within another object within the environment
     obj <- objects(background)
     shp <- shape(background)
 
-    continue <- TRUE
+    continue <- TRUE ; goal_check <- 0
     while(continue) {
-        # Generate a random point on the polygon
+        # Generate a random point on the object
         coord <- rng_point(object, ...)
 
         # Check whether this point is not contained within any other objects, 
         # but is still contained within the setting
         check <- sapply(obj, \(x) in_object(x, coord))
         continue <- out_object(shp, coord) | any(check)
+
+        # Add 1 to the counter
+        goal_check <- goal_check + 1
+
+        if(goal_check > 100) {
+            stop(paste0("Could not add a goal to the object with id ", 
+                        id(object), 
+                        ". Check whether goals can be added to accessible places on this object."))
+        }
     }
     
     return(goal(id = id,
                 position = coord, 
                 counter = counter))    
-})
-
-setMethod("add_goal", signature(object = "circle"), function(object, 
-                                                             background,
-                                                             id = character(0),
-                                                             counter = 5,
-                                                             ...){
-
-    # Create an ever so slightly bigger circle
-    #
-    # Is in response to a bug that appears when `m4ma::seesGoal` is used to 
-    # check whether the location of the goal can be seen from a given node 
-    # when making the path points: Given that the goal is part of the object, 
-    # it is always unseen. With a slightly bigger object, this is not the case
-    # anymore
-    radius(object) <- radius(object) + 1e-2
-
-    # Generate a random goal and check whether or not this goal is not contained
-    # within another object within the environment
-    obj <- objects(background)
-    shp <- shape(background)
-
-    continue <- TRUE
-    while(continue) {
-        # Generate a random point on the polygon
-        coord <- rng_point(object, ...)
-
-        # Check whether this point is not contained within any other objects, 
-        # but is still contained within the setting
-        check <- sapply(obj, \(x) in_object(x, coord))
-        continue <- out_object(shp, coord) | any(check)
-    }
-    
-    return(goal(id = id,
-                position = coord, 
-                counter = counter))   
 })
 
 #' Find path to a goal
