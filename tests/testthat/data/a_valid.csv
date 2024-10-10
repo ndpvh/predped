@@ -1,0 +1,4 @@
+name,color,radius,slowing_time,preferred_speed,randomness,stop_utility,reroute,b_current_direction,a_current_direction,blr_current_direction,b_goal_direction,a_goal_direction,b_blocked,a_blocked,b_interpersonal,a_interpersonal,d_interpersonal,b_preferred_speed,a_preferred_speed,b_leader,a_leader,d_leader,b_buddy,a_buddy,a_group_centroid,b_group_centroid,b_visual_field,central,non_central,acceleration,constant_speed,deceleration
+BaselineEuropean,cornflowerblue,0.25,1,1.25,0.1,10000,10,1,2,10,10,2,4,2,2,2,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0
+DrunkAussie,goldenrod,0.25,1,1,5,1000,20,1,2,0.1,10,2,4,2,1,2,0,1,2,1,2,0,0,0,0,0,0,0,0,0,0,0
+Rushed,darkolivegreen,0.25,1,2,0.01,1e+05,20,1,2,1,20,2,1,2,0.5,2,0,8,2,1,2,0,0,0,0,0,0,0,0,0,0,0
