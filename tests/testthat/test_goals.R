@@ -31,13 +31,13 @@ testthat::test_that("Generating goal stack for rectangles works", {
     goal_stack <- predped::goal_stack(2, setting, counter = 5)
 
     # Original order switched due to the goals being ordered according to closeness
-    ref <- list(goal(id = "goal bwknr", 
-                     position = coordinate(c(-1.01, -0.59)), 
-                     busy = FALSE,
-                     counter = 5),
-                goal(id = "goal auujv", 
-                     position = coordinate(c(-1.01, 0.67)), 
+    ref <- list(goal(id = "goal auujv", 
+                     position = coordinate(c(1.01, 1.33)), 
                      busy = FALSE, 
+                     counter = 5),
+                goal(id = "goal bwknr", 
+                     position = coordinate(c(1.01, -1.41)), 
+                     busy = FALSE,
                      counter = 5))
 
     testthat::expect_equal(goal_stack, ref, tolerance = 1e-2)
@@ -56,13 +56,13 @@ testthat::test_that("Generating goal stack for rectangles works", {
     set.seed(1)
     goal_stack <- predped::goal_stack(2, setting, counter = 5)
 
-    ref <- list(goal(id = "goal auujv", 
-                     position = coordinate(c(-1.01, 0.67)), 
-                     busy = FALSE, 
-                     counter = 5),
-                goal(id = "goal bwknr", 
-                     position = coordinate(c(-1.01, 1.41)), 
+    ref <- list(goal(id = "goal bwknr", 
+                     position = coordinate(c(1.01, 0.59)), 
                      busy = FALSE,
+                     counter = 5),
+                goal(id = "goal auujv", 
+                     position = coordinate(c(1.01, 1.33)), 
+                     busy = FALSE, 
                      counter = 5))
 
     testthat::expect_equal(goal_stack, ref, tolerance = 1e-2)
@@ -235,7 +235,7 @@ testthat::test_that("Goal replacement works", {
 
     updated_goal_stack[[1]] <- predped::replace(goal_stack[[1]], setting, counter = 4)
 
-    testthat::expect_equal(updated_goal_stack[[1]]@position@.Data, c(1.01, 0.63), tolerance = 1e-2)
+    testthat::expect_equal(updated_goal_stack[[1]]@position@.Data, c(-1.01, 1.37), tolerance = 1e-2)
     testthat::expect_equal(updated_goal_stack[[1]]@counter, 4)
     testthat::expect_equal(goal_stack[[2]], updated_goal_stack[[2]])
     testthat::expect_equal(goal_stack[[3]], updated_goal_stack[[3]])

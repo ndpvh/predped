@@ -129,10 +129,10 @@ testthat::test_that("Rectangle setters work", {
     points <- tst@points |>
         as.numeric() |>
         matrix(ncol = 2)
-    testthat::expect_equal(points, rbind(c(1.5, 1.5), 
-                                         c(1.5, 0.5),
-                                         c(0.5, 0.5),
-                                         c(0.5, 1.5)))
+    testthat::expect_equal(points, rbind(c(0.5, 0.5), 
+                                         c(0.5, 1.5),
+                                         c(1.5, 1.5),
+                                         c(1.5, 0.5)))
 
     # A tilted rectangle: Changing orientation and size
     # All values here were mathematically derived
@@ -155,10 +155,10 @@ testthat::test_that("Rectangle setters work", {
         as.numeric() |>
         matrix(ncol = 2)
     testthat::expect_equal(points, 
-                           rbind(c(0, sqrt(8) / 2), 
-                                 c(sqrt(8) / 2, 0), 
-                                 c(0, -sqrt(8) / 2),
-                                 c(-sqrt(8) / 2, 0)),
+                           rbind(c(0, -sqrt(8) / 2), 
+                                 c(-sqrt(8) / 2, 0), 
+                                 c(0, sqrt(8) / 2),
+                                 c(sqrt(8) / 2, 0)),
                            tolerance = 1e-4)
 
     predped::size(tst_2) <- c(2, 1)
@@ -166,10 +166,10 @@ testthat::test_that("Rectangle setters work", {
         as.numeric() |>
         matrix(ncol = 2)
     testthat::expect_equal(points, 
-                           rbind(c(sqrt(0.125), sqrt(2) / 2 + sqrt(0.125)), 
-                                 c(sqrt(2) / 2 + sqrt(0.125), sqrt(0.125)),
-                                 c(-sqrt(0.125), -sqrt(2) / 2 - sqrt(0.125)),
-                                 c(-sqrt(2) / 2 - sqrt(0.125), -sqrt(0.125))),
+                           rbind(c(-sqrt(0.125), -(sqrt(2) / 2 + sqrt(0.125))), 
+                                 c(-(sqrt(2) / 2 + sqrt(0.125)), -sqrt(0.125)),
+                                 c(sqrt(0.125), sqrt(2) / 2 + sqrt(0.125)),
+                                 c(sqrt(2) / 2 + sqrt(0.125), sqrt(0.125))),
                            tolerance = 1e-4)
 })
 
