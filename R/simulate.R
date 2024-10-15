@@ -298,7 +298,6 @@ setMethod("simulate", "predped", function(object,
                                                    middle_edge = middle_edge,
                                                    standing_start = standing_start,
                                                    space_between = space_between,
-                                                   time_step = time_step,
                                                    precomputed_edges = edges,
                                                    precompute_goal_paths = precompute_goal_paths,
                                                    sort_goals = sort_goals,
@@ -324,14 +323,14 @@ setMethod("simulate", "predped", function(object,
         agents(state) <- initial_agents
         
     } else if(!is.null(initial_condition)) {
-        if(!identical(initial_condition$setting, state@setting)) {
+        if(!identical(initial_condition@setting, state@setting)) {
             stop(paste0("Setting in the `predped` model is not the same as the ",
                         "setting in the initial condition. ", 
                         "Please make sure the initial condition is compatible ",
                         "with your model."))
         }
 
-        agents(state) <- initial_condition$agents
+        agents(state) <- initial_condition@agents
     }
     trace <- list(state)    
     
@@ -814,7 +813,7 @@ add_agent <- function(model,
                                   mean = dplyr::filter(params[["params_archetypes"]], name == idx),
                                   Sigma = params[["params_sigma"]][[idx]], 
                                   bounds = params[["params_bounds"]], 
-                                  archetype = idx,
+                                #   archetype = idx,
                                   individual_differences = individual_differences) 
     radius <- params$radius
 
@@ -840,6 +839,8 @@ add_agent <- function(model,
         # Also take the offset_angle to be the direction in which the agent is 
         # looking
         angle <- offset_angle * 180 / pi
+    } else {
+        angle <- NULL
     }
 
     # Create this agents' goal stack
