@@ -329,11 +329,11 @@ utility_parameters <- function(x) {
 #' 
 #' @param n Integer denoting the number of parameters to generate. Defaults to 
 #' \code{1}.
-#' @param database Character denoting the name of the database. Defaults to 
-#' \code{NULL}, triggering reading in the csv-files. Ignored when \code{mean}, 
-#' \code{Sigma}, and \code{bounds} are provided 
-#' (when \code{individual_differences = TRUE}) or when \code{mean} is provided 
-#' (when \code{individual_differences = FALSE}).
+#' @param filename Character denoting the path to a file containing parameters. 
+#' Defaults to \code{NULL}, triggering reading in the csv-files that come with 
+#' predped. 
+#' @param sep Character denoting the separator in case \code{x} is a delimited 
+#' file. Defaults to \code{","}.
 #' @param mean Dataframe containing the means for each of the parameters for 
 #' a given agent. Defaults to \code{NULL}, triggering reading in the data 
 #' instead.
@@ -381,7 +381,8 @@ utility_parameters <- function(x) {
 #' 
 #' @export  
 generate_parameters <- function(n = 1,
-                                database = NULL,
+                                filename = NULL,
+                                sep = ",",
                                 archetype = "BaselineEuropean",
                                 mean = NULL,
                                 Sigma = NULL,
@@ -396,18 +397,40 @@ generate_parameters <- function(n = 1,
     # whenever one is trying to visualize the distributions of potential 
     # parameters.
     #
-    # Importantly, parameters only read in whenever `mean` is NULL or when `Sigma`
-    # and/or `bounds` are NULL and you want individual 
-    if((is.null(mean)) | ((is.null(Sigma) | is.null(bounds)) & individual_differences)) {
-        # Load the parameters
-        params <- load_parameters(x = database)
-    
+    # Let's check some cases here and fill up the missing parameter specifications
+    # with the one's of `archetype` (but only consider those cases if not all 
+    # of them are missing, as we can then assume they just want to read in the 
+    # parameters through the filename)
+    params <- load_parameters(x = filename, sep = sep)
+    if(is.null(mean) & is.null(Sigma) & is.null(bounds)) {
         mean <- params[["params_archetypes"]] |>
             dplyr::filter(name %in% archetype)
         Sigma <- params[["params_sigma"]][[archetype]]
         bounds <- params[["params_bounds"]]
 
-    }
+    } else {
+        if(is.null(mean)) {
+            warning(paste0("Mean parameters are NULL. Using those of the ", 
+                           archetype, 
+                           "instead."))
+            mean <- params[["params_archetypes"]] |>
+                dplyr::filter(name %in% archetype)
+        }
+    
+        if(is.null(Sigma) & individual_differences) {
+            warning(paste0("Sigma parameters are NULL. Using those of the ", 
+                           archetype, 
+                           "instead."))
+            Sigma <- params[["params_sigma"]][[archetype]]
+        }
+
+        if(is.null(bounds) & individual_differences) {
+            warning(paste0("Bounds of parameters are NULL. Using those of the ", 
+                           archetype, 
+                           "instead."))
+            bounds <- params[["params_bounds"]]
+        }
+    }   
 
     # Extract the names of the utility parameters
     u_params <- utility_parameters(mean)
