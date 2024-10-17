@@ -43,6 +43,9 @@ rnd <- function(x) {
 ```{r objects, child = "files/benchmark_objects.Rmd", warning = F}
 ```
 
+```{r moving_options, child = "files/benchmark_plot.Rmd", warning = F}
+```
+
 ```{r route, child = "files/benchmark_routing.Rmd", warning = F}
 ```
 
