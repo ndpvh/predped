@@ -422,8 +422,8 @@ setMethod("simulate", "predped", function(object,
 #' `0.2`.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
-#' @param ... Arguments passed on to the \code{\link[predped]{add_group}}
-#' function.
+#' @param ... Arguments passed on to the \code{\link[predped]{add_group}} 
+#' function or the plot method (if \code{plot_live = TRUE}).
 #'
 #' @return Object of the \code{\link[predped]{state-class}}.
 #'
@@ -500,6 +500,14 @@ setMethod("simulate", "state", function(object,
                                         plot_live = FALSE,
                                         plot_time = 0.2,
                                         report = FALSE,
+                                        goal_number = 5,
+                                        goal_duration = \(x) rnorm(x, 10, 2),
+                                        precompute_goal_paths = TRUE,
+                                        sort_goals = TRUE,
+                                        precomputed_goals = NULL,
+                                        middle_edge = FALSE,
+                                        position = NULL,
+                                        individual_differences = TRUE,
                                         ...) {
 
     # Retrieve and update the iteration number in the state
@@ -528,7 +536,17 @@ setMethod("simulate", "state", function(object,
                                               agent_number = agent_number,
                                               group_number = i,
                                               standing_start = standing_start,
-                                              ...)
+                                              goal_number = goal_number,
+                                              goal_duration = goal_duration,
+                                              precompute_goal_paths = precompute_goal_paths,
+                                              sort_goals = sort_goals,
+                                              precomputed_goals = precompute_goals,
+                                              middle_edge = middle_edge,
+                                              precomputed_edges = precomputed_edges,
+                                              space_between = space_between,
+                                              position = position,
+                                              standing_start = standing_start,
+                                              individual_differences = individual_differences)
         agents_in_queue <- TRUE
     }
 
@@ -578,7 +596,7 @@ setMethod("simulate", "state", function(object,
 
     # If you want to plot the result immediately, do so
     if(plot_live) {
-        print(plot(object))
+        print(plot(object, ...))
         Sys.sleep(plot_time)
     }
 
