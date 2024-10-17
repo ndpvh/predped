@@ -164,58 +164,37 @@ setMethod("plot", "background", function(object,
     # and agents will all be plotted with their own `plot` functions, leading
     # to a lot of `geom`s being added together.
     if(optimize) {
-        # Get the points that make up the shape of the background as well as the
-        # entries and exits.
-        pts <- points(object@shape)
-        pts <- data.frame(x = pts[,1],
-                          y = pts[,2],
-                          group = rep("0 shape", each = nrow(pts)),
-                          kind = rep("shape", each = nrow(pts)))
-
-        # Step 1: Bind together the entrances and exits: all they need to be handled
-        # in the same way
-        entries <- rbind(entrance(object), exit(object))
-
-        # Step 2: Loop over these entries, convert them to points, and only retain
-        # those that fall into the shape of the background. Then transform them to
-        # a segment structure (x0, y0, x, y)
-        angles <- seq(0, 2 * pi, length.out = 100)
-        entries <- lapply(1:nrow(entries),
-                          \(x) data.frame(x = entries[x,1] + entry.width * cos(angles),
-                                          y = entries[x,2] + entry.width * sin(angles),
-                                          group = rep(paste("1 entry", x), each = 100),
-                                          kind = rep("shape", each = 100)))
-
-        # Step 3: Retain those entrances that fall within the specified bounds
-        # of the shape
-        entries <- do.call("rbind", entries)
-        entries <- entries[entries$x < limits[1, 2] &
-                           entries$x > limits[1, 1] &
-                           entries$y < limits[2, 2] &
-                           entries$y > limits[2, 1], ]
-
-        # Transform agents and objects and add them to the pts dataframe
-        shape_pts <- rbind(pts, entries)
-        object_pts <- transform_df(object@objects)
-
-        # Create the plot itself
-        plt <- ggplot2::ggplot() +
-            ggplot2::geom_polygon(data = shape_pts,
-                                  ggplot2::aes(x = x,
-                                               y = y,
-                                               group = group),
-                                  fill = shape.fill,
-                                  color = shape.color,
-                                  linewidth = shape.linewidth) +
-            ggplot2::geom_polygon(data = object_pts,
-                                  ggplot2::aes(x = x,
-                                               y = y,
-                                               group = group),
-                                  fill = object.fill,
-                                  color = object.color,
-                                  linewidth = object.linewidth,
-                                  ...)
-
+        pts <- transform_df(object, 
+                            entry.width = entry.width)        
+        plt <- ggplot2::ggplot(data = pts, 
+                               ggplot2::aes(x = x, 
+                                            y = y, 
+                                            group = group, 
+                                            fill = kind, 
+                                            color = kind, 
+                                            linewidth = kind)) +
+            ggplot2::geom_polygon() +
+            ggplot2::scale_fill_manual(values = c("shape" = shape.fill, 
+                                                  "object" = object.fill)) +
+            ggplot2::scale_color_manual(values = c("shape" = shape.color, 
+                                                   "object" = object.color)) +
+            ggplot2::scale_linewidth_manual(values = c("shape" = shape.linewidth, 
+                                                       "object" = object.linewidth))
+            # ggplot2::geom_polygon(data = shape_pts,
+            #                       ggplot2::aes(x = x,
+            #                                    y = y,
+            #                                    group = group),
+            #                       fill = shape.fill,
+            #                       color = shape.color,
+            #                       linewidth = shape.linewidth) +
+            # ggplot2::geom_polygon(data = object_pts,
+            #                       ggplot2::aes(x = x,
+            #                                    y = y,
+            #                                    group = group),
+            #                       fill = object.fill,
+            #                       color = object.color,
+            #                       linewidth = object.linewidth,
+            #                       ...)
 
     } else {
         # Make the entries into a matrix of segments that can be added to the plot.
@@ -418,22 +397,36 @@ setMethod("plot", "segment", function(object,
 #' @rdname plot-method
 setMethod("plot", "state", function(object,
                                     agent.linewidth = 1,
-                                    goal.size = 2,
-                                    plot_goal = TRUE,
                                     plot.title.size = 10,
                                     plot.title.hjust = 0.5,
                                     axis.title.size = 10,
                                     axis.text.size = 8,
-                                    shape.fill = "white",
+                                    plot_goal = TRUE,
+                                    goal.size = 2,
                                     agent.fill = shape.fill,
+                                    shape.fill = "white",
+                                    shape.color = "black",
+                                    shape.linewidth = 1,
+                                    object.fill = "grey",
+                                    object.color = "black",
+                                    object.linewidth = 1,
+                                    segment.color = "black",
+                                    segment.linewidth = 1,
+                                    segment.size = 0.6,
+                                    arrow.size = 0.3,
+                                    segment.hjust = 0.5,
                                     dark_mode = FALSE,
                                     optimize = TRUE,
                                     ...) {
 
     # Change colors of shape and agent if needed
     if(dark_mode) {
-        shape.fill <- "black"
         agent.fill <- "black"
+        shape.fill <- "black"
+        shape.color <- "white"
+        object.fill <- "black"
+        object.color <- "white"
+        segment.color <- "white"
     }
 
     # Change the goal.size if we are in the optimized scenario. Allows users to
@@ -443,49 +436,81 @@ setMethod("plot", "state", function(object,
         goal.size <- goal.size / 100
     }
 
-    # Create the plot for the setting, which will serve as the basis of
-    base_plot <- predped::plot(setting(object),
-                               shape.fill = shape.fill,
-                               dark_mode = dark_mode,
-                               optimize = optimize,
-                               ...) +
-        ggplot2::labs(title = paste("iteration", object@iteration)) +
-        ggplot2::theme(legend.position = "none",
-                       plot.title = ggplot2::element_text(size = plot.title.size,
-                                                          hjust = plot.title.hjust),
-                       axis.title = ggplot2::element_text(size = axis.title.size),
-                       axis.text = ggplot2::element_text(size = axis.text.size))
-
-    # If there are currently no agents, then we just return the base_plot
-    if(length(object@agents) == 0) {
-        return(base_plot)
-    }
-
-    # Otherwise, we will have to add the agents in the base_plot. Here, we
-    # distinguish between an optimized and non-optimize version again.
     if(optimize) {
-        # Create a dataframe for the agents and add them in a polygon geom
-        # all together
-        pts <- transform_df(object@agents,
+        # Create all polygons that are needed
+        pts <- transform_df(object,
                             plot_goal = plot_goal,
-                            goal.size = goal.size)
+                            goal.size = goal.size,
+                            ...)
 
-        # Get the color based on the output of the pts
+        # Create the different lists
+        names_lists <- unique(pts$kind)
+
         colors <- unique(pts$kind)
-        names(colors) <- colors
+        names(colors) <- names_lists
+        colors["shape"] <- shape.color
+        colors["object"] <- object.color
 
-        return(base_plot +
-            ggplot2::geom_polygon(data = pts,
-                                  ggplot2::aes(x = x,
-                                               y = y,
-                                               group = group,
-                                               color = kind),
-                                  fill = agent.fill,
-                                  linewidth = agent.linewidth) +
-            ggplot2::scale_color_manual(values = colors))
+        fills <- rep(shape.fill, each = length(names_lists))
+        names(fills) <- names_lists
+        fills["object"] <- object.fill
+
+        linewidths <- rep(agent.linewidth, each = length(names_lists))
+        names(linewidths) <- names_lists
+        linewidths["shape"] <- shape.linewidth
+        linewidths["object"] <- object.linewidth
+
+        # Create the plot itself
+        plt <- ggplot2::ggplot(data = pts, 
+                               ggplot2::aes(x = x, 
+                                            y = y, 
+                                            group = group, 
+                                            fill = kind, 
+                                            color = kind, 
+                                            linewidth = kind)) +
+            ggplot2::geom_polygon() +
+            # The different specifications per kind of object
+            ggplot2::scale_fill_manual(values = fills) +
+            ggplot2::scale_color_manual(values = colors) +
+            ggplot2::scale_linewidth_manual(values = linewidths) +
+            # Titles and axes
+            ggplot2::labs(title = paste("iteration", object@iteration), 
+                          x = "x", 
+                          y = "y") +
+            ggplot2::scale_x_continuous(limits = range(pts[,1])) +
+            ggplot2::scale_y_continuous(limits = range(pts[,2])) +
+            # Theme
+            ggplot2::theme(panel.background = ggplot2::element_rect(fill = "black"),
+                           panel.grid.major = ggplot2::element_blank(),
+                           panel.grid.minor = ggplot2::element_blank(),
+                           plot.title = ggplot2::element_text(size = plot.title.size,
+                                                              hjust = plot.title.hjust),
+                           axis.title = ggplot2::element_text(size = axis.title.size),
+                           axis.text = ggplot2::element_text(size = axis.text.size), 
+                           legend.position = "none") +
+            ggplot2::coord_fixed()
 
     } else {
-        # Simply add agents through their innate plot-function
+
+        # Create the plot for the setting, which will serve as the basis of
+        base_plot <- predped::plot(setting(object),
+                                   shape.fill = shape.fill,
+                                   dark_mode = dark_mode,
+                                   optimize = optimize,
+                                   ...) +
+            ggplot2::labs(title = paste("iteration", object@iteration)) +
+            ggplot2::theme(legend.position = "none",
+                           plot.title = ggplot2::element_text(size = plot.title.size,
+                                                              hjust = plot.title.hjust),
+                           axis.title = ggplot2::element_text(size = axis.title.size),
+                           axis.text = ggplot2::element_text(size = axis.text.size))
+
+        # If there are currently no agents, then we just return the base_plot
+        if(length(object@agents) == 0) {
+            return(base_plot)
+        }
+
+        # Add agents through their innate plot-function
         return(base_plot +
             predped::plot(agents(object),
                           plot_goal = plot_goal,
@@ -636,8 +661,7 @@ setMethod("transform_df", "agent", function(object,
     pts <- rbind(pts,
                  rbind(object@center,
                        object@center + half * c(cos(angle), sin(angle))))
-    group <- c(group,
-               rep(paste(id(object), "segment"), each = 2))
+    group <- c(group, rep(paste(id(object), "segment"), each = 2))
 
     # Check whether the goal should also be plotted. And if so, add this to
     # polygons to be outputted
@@ -649,8 +673,7 @@ setMethod("transform_df", "agent", function(object,
                           current_goal(object)@position[2] + goal_pts[,2])
 
         pts <- rbind(pts, goal_pts)
-        group <- c(group,
-                   rep(paste(id(object), "goal"), each = 10))
+        group <- c(group, rep(paste(id(object), "goal"), each = 10))
     }
 
     # Manipulate to have a dataframe containing information on the segments as
@@ -660,6 +683,52 @@ setMethod("transform_df", "agent", function(object,
                       y = pts[,2],
                       group = group,
                       kind = rep(object@color, each = nrow(pts))))
+})
+
+#' @rdname transform_df-method
+setMethod("transform_df", "background", function(object, 
+                                                 entry.width = 0.3,
+                                                 ...) {
+    
+    # Create some limits to prevent the limits of the plot changing across
+    # iterations.
+    pts <- points(object@shape)
+    limits <- rbind(range(pts[,1]), range(pts[,2]))
+
+    # Get the points that make up the shape of the background as well as the
+    # entries and exits.
+    pts <- points(object@shape)
+    pts <- data.frame(x = pts[,1],
+                      y = pts[,2],
+                      group = rep("0 shape", each = nrow(pts)),
+                      kind = rep("shape", each = nrow(pts)))
+
+    # Step 1: Bind together the entrances and exits: all they need to be handled
+    # in the same way
+    entries <- rbind(entrance(object), exit(object))
+
+    # Step 2: Loop over these entries, convert them to points, and only retain
+    # those that fall into the shape of the background. Then transform them to
+    # a segment structure (x0, y0, x, y)
+    angles <- seq(0, 2 * pi, length.out = 100)
+    entries <- lapply(1:nrow(entries),
+                      \(x) data.frame(x = entries[x,1] + entry.width * cos(angles),
+                                      y = entries[x,2] + entry.width * sin(angles),
+                                      group = rep(paste("1 entry", x), each = 100),
+                                      kind = rep("shape", each = 100)))
+
+    # Step 3: Retain those entrances that fall within the specified bounds
+    # of the shape
+    entries <- do.call("rbind", entries)
+    entries <- entries[entries$x < limits[1, 2] &
+                       entries$x > limits[1, 1] &
+                       entries$y < limits[2, 2] &
+                       entries$y > limits[2, 1], ]
+
+    # Return all points created here
+    return(rbind(pts, 
+                 entries, 
+                 transform_df(object@objects)))
 })
 
 #'@rdname transform_df-method
@@ -688,5 +757,19 @@ setMethod("transform_df", "object", function(object,
                       y = pts[,2],
                       group = rep(paste("1", id(object)), each = nrow(pts)),
                       kind = rep(kind, each = nrow(pts))))
+})
+
+#' @rdname transform_df-method
+setMethod("transform_df", "state", function(object, 
+                                            entry.width = 0.3, 
+                                            plot_goal = TRUE,
+                                            goal.size = 2/100) {
+
+    # Create a plot for each of its components
+    return(rbind(transform_df(object@setting, 
+                              entry.width = entry.width),
+                 transform_df(object@agents, 
+                              plot_goal = plot_goal, 
+                              goal.size = goal.size)))
 })
 
