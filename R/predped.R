@@ -103,7 +103,7 @@ setMethod("initialize", "predped", function(.Object,
 
     # Now that the archetypes are known, we can delete those archetypes that 
     # don't really matter
-    tmp <- param[["params_archetypes"]]
+    tmp <- params[["params_archetypes"]]
     params[["params_archetypes"]] <- tmp[tmp$name %in% archetypes, ]
     params[["params_sigma"]] <- params[["params_sigma"]][archetypes]
 
