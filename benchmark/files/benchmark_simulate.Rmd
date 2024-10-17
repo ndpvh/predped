@@ -100,7 +100,7 @@ initial_condition <- readRDS(file.path(".", "benchmark_inx.Rds"))
 set.seed(1)
 p_m <- (\() capture.output(predped::simulate(my_model, 
                                              max_agents = 70, 
-                                             initial_agents = initial_condition$agents,
+                                             initial_agents = initial_condition@agents,
                                              iterations = 10, 
                                              precompute_edges = TRUE,
                                              many_options = TRUE))) |>
@@ -110,7 +110,7 @@ p_m <- (\() capture.output(predped::simulate(my_model,
 set.seed(1)
 np_m <- (\() capture.output(predped::simulate(my_model, 
                                               max_agents = 70, 
-                                              initial_agents = initial_condition$agents,
+                                              initial_agents = initial_condition@agents,
                                               iterations = 10, 
                                               precompute_edges = FALSE,
                                               many_options = TRUE))) |>
@@ -120,7 +120,7 @@ np_m <- (\() capture.output(predped::simulate(my_model,
 set.seed(1)
 p_f <- (\() capture.output(predped::simulate(my_model, 
                                               max_agents = 70, 
-                                              initial_agents = initial_condition$agents,
+                                              initial_agents = initial_condition@agents,
                                               iterations = 10, 
                                               precompute_edges = FALSE,
                                               many_options = FALSE))) |>
@@ -130,7 +130,7 @@ p_f <- (\() capture.output(predped::simulate(my_model,
 set.seed(1)
 np_f <- (\() capture.output(predped::simulate(my_model, 
                                               max_agents = 70, 
-                                              initial_agents = initial_condition$agents,
+                                              initial_agents = initial_condition@agents,
                                               iterations = 10, 
                                               precompute_edges = FALSE,
                                               many_options = FALSE))) |>
