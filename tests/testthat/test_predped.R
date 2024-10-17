@@ -123,8 +123,8 @@ testthat::test_that("Predped getters work", {
     testthat::expect_equal(names(predped::parameters(tst)), c("params_archetypes", "params_sigma", "params_bounds"))
 
 
-    params <- params[["params_archetypes"]] |>
-        dplyr::filter(name %in% tst@archetypes)
+    params <- params[["params_archetypes"]] 
+    params <- params[params$name %in% tst@archetypes, ]
     idx <- factor(params$name, levels = c("Rushed", "BaselineEuropean"))
     idx <- order(as.numeric(idx))
 

@@ -699,7 +699,8 @@ add_group <- function(model,
 
         # Change this temporary agent's characterstics based on simulated
         # parameters
-        mean_params <- dplyr::filter(model_parameters[["params_archetypes"]], name == idx[i - 1])
+        tmp <- model_parameters[["params_archetypes"]]
+        mean_params <- tmp[tmp$name == idx[i - 1], ]
         params <- generate_parameters(1,
                                       mean = mean_params,
                                       Sigma = model_parameters[["params_sigma"]][[idx[i - 1]]],
@@ -824,10 +825,11 @@ add_agent <- function(model,
     idx <- sample(model@archetypes, 1, prob = model@weights)
 
     params <- parameters(model)
-    color <- dplyr::filter(params[["params_archetypes"]], name == idx)$color
+    tmp <- params[["params_archetypes"]]
+    color <- tmp[tmp$name == idx, ]$color
 
     params <- generate_parameters(1,
-                                  mean = dplyr::filter(params[["params_archetypes"]], name == idx),
+                                  mean = tmp[tmp$name == idx, ],
                                   Sigma = params[["params_sigma"]][[idx]],
                                   bounds = params[["params_bounds"]],
                                 #   archetype = idx,

@@ -103,8 +103,8 @@ setMethod("initialize", "predped", function(.Object,
 
     # Now that the archetypes are known, we can delete those archetypes that 
     # don't really matter
-    params[["params_archetypes"]] <- dplyr::filter(params[["params_archetypes"]], 
-                                                   name %in% archetypes)
+    tmp <- param[["params_archetypes"]]
+    params[["params_archetypes"]] <- tmp[tmp$name %in% archetypes, ]
     params[["params_sigma"]] <- params[["params_sigma"]][archetypes]
 
     # If the weights are not provided, then we have several possbilities. First, 
