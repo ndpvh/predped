@@ -540,12 +540,11 @@ setMethod("simulate", "state", function(object,
                                               goal_duration = goal_duration,
                                               precompute_goal_paths = precompute_goal_paths,
                                               sort_goals = sort_goals,
-                                              precomputed_goals = precompute_goals,
+                                              precomputed_goals = precomputed_goals,
                                               middle_edge = middle_edge,
                                               precomputed_edges = precomputed_edges,
                                               space_between = space_between,
                                               position = position,
-                                              standing_start = standing_start,
                                               individual_differences = individual_differences)
         agents_in_queue <- TRUE
     }
