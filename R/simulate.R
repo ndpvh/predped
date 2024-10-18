@@ -111,7 +111,7 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' \code{0.1}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
-#' Defaults to \code{TRUE}.
+#' Defaults to \code{FALSE}.
 #' @param goal_number Numeric, vector, or function that defines the number of
 #' goals the agents should accomplish. It's exact value is handled by
 #' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.
@@ -250,7 +250,7 @@ setMethod("simulate", "predped", function(object,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
                                           many_nodes = precompute_edges,
-                                          individual_differences = TRUE,
+                                          individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
                                           fx = \(x) x,
                                           ...) {
@@ -507,7 +507,7 @@ setMethod("simulate", "state", function(object,
                                         precomputed_goals = NULL,
                                         middle_edge = FALSE,
                                         position = NULL,
-                                        individual_differences = TRUE,
+                                        individual_differences = FALSE,
                                         ...) {
 
     # Retrieve and update the iteration number in the state
@@ -621,7 +621,7 @@ setMethod("simulate", "state", function(object,
 #' \code{0.1}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
-#' Defaults to \code{TRUE}.
+#' Defaults to \code{FALSE}.
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_agent}}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.
@@ -665,7 +665,7 @@ setMethod("simulate", "state", function(object,
 add_group <- function(model,
                       agent_number = 1,
                       standing_start = 0.1,
-                      individual_differences = TRUE,
+                      individual_differences = FALSE,
                       ...) {
 
     agents <- list()
@@ -766,7 +766,7 @@ add_group <- function(model,
 #' \code{0.1}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
-#' Defaults to \code{TRUE}.
+#' Defaults to \code{FALSE}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.
 #'
@@ -813,7 +813,7 @@ add_agent <- function(model,
                       space_between = 2.5,
                       position = NULL,
                       standing_start = 0.1,
-                      individual_differences = TRUE) {
+                      individual_differences = FALSE) {
 
     # Extract the background from the `predped` model and determine where the
     # agent will enter the space
