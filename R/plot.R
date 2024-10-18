@@ -326,7 +326,19 @@ setMethod("plot", "object", function(object,
     # If you should plot forbidden edges, identify these and plot them
     # altogether
     if(plot_forbidden) {
-        # First, create the edges themselves
+        # Check whether the object can be interacted with. If not, then we can 
+        # just annotate the same polygon but then with the forbidden.color
+        if(!object@interactable) {
+            return(ggplot2::annotate("polygon", 
+                                     x = pts[,1], 
+                                     y = pts[,2], 
+                                     color = forbidden.color, 
+                                     fill = fill, 
+                                     ...))
+        }
+
+        # If only some parts cannot be interacted with, then we need to plot 
+        # these edges separately. First, create the edges themselves
         edges <- cbind(pts, pts[c(2:nrow(pts), 1), ])
 
         # If it is a circle, we need to find the indices of those edges that are
