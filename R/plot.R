@@ -140,6 +140,8 @@ setMethod("plot", "background", function(object,
                                          segment.size = 0.6,
                                          arrow.size = 0.3,
                                          segment.hjust = 0.5,
+                                         plot_forbidden = FALSE,
+                                         forbidden.color = "red",
                                          dark_mode = FALSE,
                                          optimize = TRUE,
                                          ...) {
@@ -180,6 +182,25 @@ setMethod("plot", "background", function(object,
                                                    "object" = object.color)) +
             ggplot2::scale_linewidth_manual(values = c("shape" = shape.linewidth, 
                                                        "object" = object.linewidth))
+
+        
+
+        # Also check whether there is something forbidden going on.
+        if(plot_forbidden) {
+            segments <- transform_df(object@objects, 
+                                     plot_forbidden = TRUE)
+
+            # Plot these edges
+            plt <- plt + 
+                ggplot2::annotate("segment", 
+                                  x = segments$x,
+                                  y = segments$y,
+                                  xend = segments$xend,
+                                  yend = segments$yend,
+                                  color = forbidden.color,
+                                  linewidth = object.linewidth)
+        }
+
             # ggplot2::geom_polygon(data = shape_pts,
             #                       ggplot2::aes(x = x,
             #                                    y = y,
@@ -228,6 +249,8 @@ setMethod("plot", "background", function(object,
                           fill = object.fill,
                           color = object.color,
                           linewidth = object.linewidth,
+                          plot_forbidden = plot_forbidden,
+                          forbidden.color = forbidden.color,
                           ...) +
             # Plot the entrances and exits
             ggplot2::annotate("segment",
@@ -353,9 +376,13 @@ setMethod("plot", "object", function(object,
             # Extract the forbidden angles from the circle
             forbidden <- forbidden(object)
 
-            idx <- lapply(1:nrow(forbidden),
-                          \(i) angles >= forbidden[i, 1] & angles <= forbidden[i, 2])
-            idx <- Reduce("|", idx)
+            if(nrow(forbidden) == 0) {
+                idx <- logical(0)
+            } else {
+                idx <- lapply(1:nrow(forbidden),
+                              \(i) angles >= forbidden[i, 1] & angles <= forbidden[i, 2])
+                idx <- Reduce("|", idx)
+            }
         } else {
             idx <- forbidden(object)
         }
@@ -428,6 +455,8 @@ setMethod("plot", "state", function(object,
                                     segment.size = 0.6,
                                     arrow.size = 0.3,
                                     segment.hjust = 0.5,
+                                    plot_forbidden = FALSE,
+                                    forbidden.color = "red",
                                     dark_mode = FALSE,
                                     optimize = TRUE,
                                     ...) {
@@ -455,6 +484,10 @@ setMethod("plot", "state", function(object,
                             plot_goal = plot_goal,
                             goal.size = goal.size,
                             ...)
+
+        # Get the limits of the shape
+        tmp <- points(setting(object)@shape)
+        lims <- rbind(tmp[,1], tmp[,2])
 
         # Create the different lists
         names_lists <- unique(pts$kind)
@@ -490,8 +523,8 @@ setMethod("plot", "state", function(object,
             ggplot2::labs(title = paste("iteration", object@iteration), 
                           x = "x", 
                           y = "y") +
-            ggplot2::scale_x_continuous(limits = range(pts[,1])) +
-            ggplot2::scale_y_continuous(limits = range(pts[,2])) +
+            ggplot2::scale_x_continuous(limits = lims[1,]) +
+            ggplot2::scale_y_continuous(limits = lims[2,]) +
             # Theme
             ggplot2::theme(panel.background = ggplot2::element_rect(fill = "black"),
                            panel.grid.major = ggplot2::element_blank(),
@@ -503,22 +536,38 @@ setMethod("plot", "state", function(object,
                            legend.position = "none") +
             ggplot2::coord_fixed()
 
-            # Check whether to add the segments to the plot, and if so, add them
-            # to the plot
-            if(plot_segment) {
-                segments <- transform_df(setting(object)@limited_access)
+        # Check whether to add the segments to the plot, and if so, add them
+        # to the plot
+        if(plot_segment) {
+            segments <- transform_df(setting(object)@limited_access)
 
-                # Create the actual arrows
-                plt <- plt + 
-                    ggplot2::annotate("segment", 
-                                      x = segments$from[1],
-                                      y = segments$from[2],
-                                      xend = segments$to[1],
-                                      yend = segments$to[2],
-                                      arrow = ggplot2::arrow(length = ggplot2::unit(arrow.size, "cm")),
-                                      color = segment.color,
-                                      linewidth = segment.linewidth)
-            }
+            # Create the actual arrows
+            plt <- plt + 
+                ggplot2::annotate("segment", 
+                                  x = segments$from[1],
+                                  y = segments$from[2],
+                                  xend = segments$to[1],
+                                  yend = segments$to[2],
+                                  arrow = ggplot2::arrow(length = ggplot2::unit(arrow.size, "cm")),
+                                  color = segment.color,
+                                  linewidth = segment.linewidth)
+        }
+
+        # Also check whether there is something forbidden going on.
+        if(plot_forbidden) {
+            segments <- transform_df(setting(object)@objects, 
+                                     plot_forbidden = TRUE)
+
+            # Plot these edges
+            plt <- plt + 
+                ggplot2::annotate("segment", 
+                                  x = segments$x,
+                                  y = segments$y,
+                                  xend = segments$xend,
+                                  yend = segments$yend,
+                                  color = forbidden.color,
+                                  linewidth = object.linewidth)
+        }
 
     } else {
 
@@ -528,6 +577,8 @@ setMethod("plot", "state", function(object,
                                    dark_mode = dark_mode,
                                    optimize = optimize,
                                    plot_segment = plot_segment,
+                                   plot_forbidden = plot_forbidden, 
+                                   forbidden.color = forbidden.color,
                                    ...) +
             ggplot2::labs(title = paste("iteration", object@iteration)) +
             ggplot2::theme(legend.position = "none",
@@ -776,6 +827,7 @@ setMethod("transform_df", "list", function(object,
 #' @rdname transform_df-method
 setMethod("transform_df", "object", function(object,
                                              kind = "object",
+                                             plot_forbidden = FALSE,
                                              ...) {
 
     # Extract the points of the object
@@ -784,10 +836,62 @@ setMethod("transform_df", "object", function(object,
     # Manipulate to have a dataframe containing information on the segments as
     # well as the what this object is (used to determine colors, which polygon
     # is which etc)
-    return(data.frame(x = pts[,1],
-                      y = pts[,2],
-                      group = rep(paste("1", id(object)), each = nrow(pts)),
-                      kind = rep(kind, each = nrow(pts))))
+    data <- data.frame(x = pts[,1],
+                       y = pts[,2],
+                       group = rep(paste("1", id(object)), each = nrow(pts)),
+                       kind = rep(kind, each = nrow(pts)))
+
+    # If you should plot forbidden edges, identify these and put them in a 
+    # separate dataframe.
+    if(plot_forbidden) {
+        # If the object cannot be fully interacted with, then we need to separate
+        # these edges from the dataframe.
+        edges <- cbind(pts, pts[c(2:nrow(pts), 1), ])
+
+        # Check whether the object can be interacted with. If not, then we can 
+        # return all edges with the tag "forbidden"
+        if(!object@interactable) {
+            return(data.frame(x = edges[, 1],
+                              y = edges[, 2],
+                              xend = edges[, 3],
+                              yend = edges[, 4],
+                              group = rep(paste("2", id(object), "forbidden"), each = nrow(edges)),
+                              kind = rep("forbidden", each = nrow(edges))))
+        }
+
+        # If it is a circle, we need to find the indices of those edges that are
+        # forbidden and those who are not.
+        if(inherits(object, "circle")) {
+            # Get relative angle from center to points and correct so that they
+            # are positive
+            angles <- atan2(pts[,2] - center(object)[2],
+                            pts[,1] - center(object)[1])
+            angles <- ifelse(angles < 0, angles + 2 * pi, angles)
+
+            # Extract the forbidden angles from the circle
+            forbidden <- forbidden(object)
+
+            if(nrow(forbidden) == 0) {
+                idx <- logical(0)
+            } else {
+                idx <- lapply(1:nrow(forbidden),
+                              \(i) angles >= forbidden[i, 1] & angles <= forbidden[i, 2])
+                idx <- Reduce("|", idx)
+            }
+        } else {
+            idx <- forbidden(object)
+        }
+
+        # Add another annotate with a different color
+        data <- data.frame(x = edges[idx, 1],
+                           y = edges[idx, 2],
+                           xend = edges[idx, 3],
+                           yend = edges[idx, 4],
+                           group = rep(paste("2", id(object), "forbidden"), each = sum(idx)),
+                           kind = rep("forbidden", each = sum(idx)))
+    }
+
+    return(data)
 })
 
 #' @rdname transform_df-method
