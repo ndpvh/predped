@@ -14,67 +14,68 @@ add_agent(
   precomputed_goals = NULL,
   middle_edge = FALSE,
   precomputed_edges = NULL,
+  many_nodes = !is.null(precomputed_edges),
   space_between = 2.5,
   position = NULL,
   standing_start = 0.1,
-  individual_differences = TRUE
+  individual_differences = FALSE
 )
 }
 \arguments{
 \item{group_number}{Numeric denoting the group to which the agent belongs.
 Defaults to \code{1}.}
 
-\item{goal_number}{Numeric, vector, or function that defines the number of 
-goals the agents should accomplish. It's exact value is handled by 
+\item{goal_number}{Numeric, vector, or function that defines the number of
+goals the agents should accomplish. It's exact value is handled by
 \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
-\item{goal_duration}{Numeric, vector, or function that defines the duration of 
+\item{goal_duration}{Numeric, vector, or function that defines the duration of
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
-\code{\link[predped]{find_path-method}} for each of the generated goals 
-beforehand. Assumes that the agent does all of the goals in the order of the 
+\code{\link[predped]{find_path-method}} for each of the generated goals
+beforehand. Assumes that the agent does all of the goals in the order of the
 goal stack. Defaults to \code{FALSE}.}
 
-\item{sort_goals}{Logical denoting whether to order the goal stack in a logical 
-way. Currently implemented in the following way. First, we select the first 
-goal as being the one that is closest by the starting position provided in 
+\item{sort_goals}{Logical denoting whether to order the goal stack in a logical
+way. Currently implemented in the following way. First, we select the first
+goal as being the one that is closest by the starting position provided in
 the argument \code{starting_position}. Then, we define each of the next goals
 as being the one that is closest to the position of the previous goal.
 Defaults to \code{TRUE}.}
 
-\item{precomputed_goals}{List of goal stacks from which the agent can be 
+\item{precomputed_goals}{List of goal stacks from which the agent can be
 assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 in the simulation.}
 
-\item{middle_edge}{Logical denoting whether to sample the goals from the 
+\item{middle_edge}{Logical denoting whether to sample the goals from the
 middle of the edge of the objects in the \code{link[predped]{background-class}}
-(\code{TRUE}) or to allow the goal locations to fall on all points on these 
+(\code{TRUE}) or to allow the goal locations to fall on all points on these
 edges (\code{FALSE}). Defaults to \code{FALSE}.}
 
-\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
-containing the nodes and edges the agent can use to plan its path. Defauls 
-to \code{NULL}, triggering the creation of these edges whenever they are 
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
-object and the path points agents use in their strategy. Ignored if 
+\item{space_between}{Numeric denoting the space that should be left between
+an object and the created path points for the agents (in radii). Defaults to
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
+object and the path points agents use in their strategy. Ignored if
 \code{precomputed_edges} is provided.}
 
 \item{position}{Numeric denoting the position you would like to assign to the
-agent. Defaults to \code{NULL}, making the agent start at the entrance. Note 
-that this is an experimental feature that has not been tested yet, and 
+agent. Defaults to \code{NULL}, making the agent start at the entrance. Note
+that this is an experimental feature that has not been tested yet, and
 therefore might not work for the moment.}
 
-\item{standing_start}{Numeric denoting the factor of their preferred speed 
-that agents move when they just came from standing still. Defaults to 
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
 \code{0.1}.}
 
-\item{individual_differences}{Logical denoting whether to use the standard 
+\item{individual_differences}{Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.
-Defaults to \code{TRUE}.}
+Defaults to \code{FALSE}.}
 
 \item{object}{Object of the \code{\link[predped]{predped-class}}.}
 }
@@ -85,15 +86,15 @@ List of instances of the \code{\link[predped]{agent-class}}.
 Add a single agent to the simulation
 }
 \examples{
-# Create a setting in which to simulate. 
-my_background <- background(shape = rectangle(center = c(0, 0), 
-                                              size = c(2, 2)), 
-                            objects = list(rectangle(center = c(0, 0), 
+# Create a setting in which to simulate.
+my_background <- background(shape = rectangle(center = c(0, 0),
+                                              size = c(2, 2)),
+                            objects = list(rectangle(center = c(0, 0),
                                                      size = c(1, 1))))
 
 # Create a model from which to simulate
-my_model <- predped(setting = my_background, 
-                    archetypes = c("BaselineEuropean", 
+my_model <- predped(setting = my_background,
+                    archetypes = c("BaselineEuropean",
                                    "DrunkAussie"))
 
 # Generate an agent
@@ -103,7 +104,7 @@ my_agent
 }
 \seealso{
 \code{\link[predped]{agent-class}},
-\code{\link[predped]{add_group}}, 
-\code{\link[predped]{simulate,predped-method}}, 
+\code{\link[predped]{add_group}},
+\code{\link[predped]{simulate,predped-method}},
 \code{\link[predped]{simulate,state-method}}
 }

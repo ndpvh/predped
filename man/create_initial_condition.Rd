@@ -14,24 +14,24 @@ create_initial_condition(
 )
 }
 \arguments{
-\item{agent_number}{Numeric denoting the number of agents that should be 
+\item{agent_number}{Numeric denoting the number of agents that should be
 included in the initial condition.}
 
 \item{model}{Object of the \code{\link[predped]{predped-class}}.}
 
-\item{goal_number}{Numeric, vector, or function that defines the number of 
-goals the agents should accomplish. It's exact value is handled by 
+\item{goal_number}{Numeric, vector, or function that defines the number of
+goals the agents should accomplish. It's exact value is handled by
 \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
-\item{group_size}{Matrix of size n x 2 containing the group sizes you would 
-like to simulate (first column) and the probability of observing groups with 
-this size (second column). Defaults to a 100% probability of observing single 
+\item{group_size}{Matrix of size n x 2 containing the group sizes you would
+like to simulate (first column) and the probability of observing groups with
+this size (second column). Defaults to a 100% probability of observing single
 agents.}
 
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
-object and the path points agents use in their strategy. Ignored if 
+\item{space_between}{Numeric denoting the space that should be left between
+an object and the created path points for the agents (in radii). Defaults to
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
+object and the path points agents use in their strategy. Ignored if
 \code{precomputed_edges} is provided.}
 
 \item{...}{Additional arguments provided to \code{\link[predped]{add_agent}}.}
@@ -40,25 +40,25 @@ object and the path points agents use in their strategy. Ignored if
 List of instances of the \code{\link[predped]{agent-class}}.
 }
 \description{
-Creates a list of agents that can be used as an initial condition to the 
-simulation. Agents are placed at random locations in the room. Main 
+Creates a list of agents that can be used as an initial condition to the
+simulation. Agents are placed at random locations in the room. Main
 advantage of this function is that you don't have to wait for a room to fill
-up with the required number of agents, but rather impose that the room is 
+up with the required number of agents, but rather impose that the room is
 already filled with this number of agents.
 }
 \details{
-In this function, we use the following approach to simulate an initial 
+In this function, we use the following approach to simulate an initial
 condition. First, we create an agent using the \code{\link[predped]{add_agent}}
-function. This agent is given a specific group id based on the 
+function. This agent is given a specific group id based on the
 \code{group_size} argument.
 
-Once created, we then compute all possible paths that the agent may be 
-walking on through the \code{\link[predped]{compute_edges}} function. One 
-of these paths is then chosen, and subsequently a random point on that path 
-is chosen. We then check whether an agent would be able to take the chosen 
-position without intersecting any of the objects in the environment. If not, 
+Once created, we then compute all possible paths that the agent may be
+walking on through the \code{\link[predped]{compute_edges}} function. One
+of these paths is then chosen, and subsequently a random point on that path
+is chosen. We then check whether an agent would be able to take the chosen
+position without intersecting any of the objects in the environment. If not,
 then we choose another point until we can place the agent there. If we do not
-find a fitting position for the agent after 10 iterations, we break out of 
+find a fitting position for the agent after 10 iterations, we break out of
 the loop and stop trying to fit in \code{agent_number} agents in the space.
 
 Finally, group members are identified and given the same set of goals.

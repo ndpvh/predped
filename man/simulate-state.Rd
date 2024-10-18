@@ -22,6 +22,14 @@
   plot_live = FALSE,
   plot_time = 0.2,
   report = FALSE,
+  goal_number = 5,
+  goal_duration = function(x) rnorm(x, 10, 2),
+  precompute_goal_paths = TRUE,
+  sort_goals = TRUE,
+  precomputed_goals = NULL,
+  middle_edge = FALSE,
+  position = NULL,
+  individual_differences = FALSE,
   ...
 )
 }
@@ -30,115 +38,115 @@
 
 \item{model}{Object of the \code{\link[predped]{predped-class}}.}
 
-\item{add_agent}{Logical denoting whether an agent should be added to the 
-simulation. Defaults to \code{FALSE} and is typically handled by the 
-\code{\link[predped]{simulate,predped-method}} function, where it accounts for the 
+\item{add_agent}{Logical denoting whether an agent should be added to the
+simulation. Defaults to \code{FALSE} and is typically handled by the
+\code{\link[predped]{simulate,predped-method}} function, where it accounts for the
 variables \code{add_agent_after} and \code{max_agents}.}
 
-\item{group_size}{Numeric matrix with two columns where the first column 
-denotes the number of people in a social group and the second column the 
-probability with which such a group is added to the simulation. Defaults to 
-a 100\% probability that individuals are added to the simulation (i.e., no 
+\item{group_size}{Numeric matrix with two columns where the first column
+denotes the number of people in a social group and the second column the
+probability with which such a group is added to the simulation. Defaults to
+a 100\% probability that individuals are added to the simulation (i.e., no
 social groups).}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
-whenever they move to the respective cell of this matrix. Is used to create 
-the cell positions that the agent might move to, as performed through 
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-and 3 columns (speed). Defaults to a matrix in which the columns contain 
+whenever they move to the respective cell of this matrix. Is used to create
+the cell positions that the agent might move to, as performed through
+\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
+and 3 columns (speed). Defaults to a matrix in which the columns contain
 \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
-\item{orientations}{Numeric matrix containing the change in direction for an 
-agent whenever they move to the respective cell of this matrix. Is used to 
+\item{orientations}{Numeric matrix containing the change in direction for an
+agent whenever they move to the respective cell of this matrix. Is used to
 create the cell positions that the agent might move to, as performed through
 \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the rows contain 
-\code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-\code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
+and 3 columns (speed). Defaults to a matrix in which the rows contain
+\code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350},
+\code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger
 angles are actually the negative symmetric versions of the smaller angles).}
 
-\item{close_enough}{Numeric denoting how close (in radii) the agent needs to 
-be to an object in order to interact with it. Defaults to \code{2}, meaning the 
+\item{close_enough}{Numeric denoting how close (in radii) the agent needs to
+be to an object in order to interact with it. Defaults to \code{2}, meaning the
 agent can interact with objects at \code{2 * radius(agent)} distance away.}
 
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+\item{space_between}{Numeric denoting the space that should be left between
+an object and the created path points for the agents (in radii). Defaults to
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
 object and the path points agents use in their strategy.}
 
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
+\item{stay_stopped}{Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to `0.5`, or half a second.}
 
-\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
-containing the nodes and edges the agent can use to plan its path. Defauls 
-to \code{NULL}, triggering the creation of these edges whenever they are 
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
 \item{many_nodes}{Logical denoting whether to use the minimal number of nodes
-or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
+or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
 
-\item{plot_live}{Logical denoting whether to plot each iteration while the 
+\item{plot_live}{Logical denoting whether to plot each iteration while the
 simulation is going on. Defaults to `FALSE`.}
 
-\item{plot_time}{Numeric denoting the amount of time (in seconds) to wait 
-between iterations, i.e., the time between updating the plot. Defaults to 
+\item{plot_time}{Numeric denoting the amount of time (in seconds) to wait
+between iterations, i.e., the time between updating the plot. Defaults to
 `0.2`.}
 
-\item{report}{Logical denoting whether to report whenever an agent is 
+\item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{add_group}} 
-function.}
+function or the plot method (if \code{plot_live = TRUE}).}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}.
 }
 \description{
-This function allows users to simulate a single state from the M4MA based on 
+This function allows users to simulate a single state from the M4MA based on
 a single previous state.
 }
 \details{
 Heavily depends on \code{\link[predped]{update}}.
 
 Many of the arguments here are either shared or derived from the upper-level
-\code{\link[predped]{simulate,predped-method}} function. Please refer to the 
-Details in its documentation to see a breakdown of the most important 
+\code{\link[predped]{simulate,predped-method}} function. Please refer to the
+Details in its documentation to see a breakdown of the most important
 arguments.
 }
 \examples{
-# Create a setting in which to simulate. Note that this setting also serves 
-# as an example of one-directional flow, which can be seen if you let the 
+# Create a setting in which to simulate. Note that this setting also serves
+# as an example of one-directional flow, which can be seen if you let the
 # simulation run a bit longer.
-my_background <- background(shape = rectangle(center = c(0, 0), 
-                                              size = c(2, 2)), 
-                            objects = list(rectangle(center = c(0, 0), 
-                                                     size = c(1, 1))), 
-                            limited_access = list(segment(from = c(-1, 0.5), 
-                                                          to = c(-0.5, 0.5)), 
-                                                  segment(from = c(0.5, 1), 
-                                                          to = c(0.5, 0.5)), 
-                                                  segment(from = c(1, -0.5), 
-                                                          to = c(0.5, -0.5)), 
-                                                  segment(from = c(-0.5, -1), 
+my_background <- background(shape = rectangle(center = c(0, 0),
+                                              size = c(2, 2)),
+                            objects = list(rectangle(center = c(0, 0),
+                                                     size = c(1, 1))),
+                            limited_access = list(segment(from = c(-1, 0.5),
+                                                          to = c(-0.5, 0.5)),
+                                                  segment(from = c(0.5, 1),
+                                                          to = c(0.5, 0.5)),
+                                                  segment(from = c(1, -0.5),
+                                                          to = c(0.5, -0.5)),
+                                                  segment(from = c(-0.5, -1),
                                                           to = c(-0.5, -0.5))))
 
 # Create a model from which to simulate
-my_model <- predped(setting = my_background, 
+my_model <- predped(setting = my_background,
                     archetypes = c("BaselineEuropean"))
 
 # Create an initial state with no agents in it
-my_state <- state(iteration = 0, 
-                  setting = my_background, 
+my_state <- state(iteration = 0,
+                  setting = my_background,
                   agents = list())
 
 # Simulate the next state
-next_state <- simulate(my_state, 
-                       my_model, 
+next_state <- simulate(my_state,
+                       my_model,
                        add_agent = TRUE)
 
 # Check the number of agents in the next state

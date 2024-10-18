@@ -21,45 +21,45 @@ plot_edges(
 \arguments{
 \item{setting}{Object of the \code{\link[predped]{background-class}}}
 
-\item{coords}{Numeric matrix containing the positions of the agent and the 
+\item{coords}{Numeric matrix containing the positions of the agent and the
 goal. Defaults to \code{NULL}, leaving them out of the equation.}
 
-\item{space_between}{Numeric denoting the space to leave between the 
+\item{space_between}{Numeric denoting the space to leave between the
 circumference of the object and the nodes created under the hood (see
-\code{\link[predped]{add_nodes}}). Defaults to \code{2.5} times the maximal 
+\code{\link[predped]{add_nodes}}). Defaults to \code{2.5} times the maximal
 radius of an agent.}
 
-\item{many_nodes}{Logical denoting whether to create many nodes or leave 
+\item{many_nodes}{Logical denoting whether to create many nodes or leave
 it at the minimum. Defaults to \code{FALSE}.}
 
-\item{coords.color}{Character denoting the color to provide to the agent and 
-goal positions. Allows one to distinguish between simple path points and the 
+\item{coords.color}{Character denoting the color to provide to the agent and
+goal positions. Allows one to distinguish between simple path points and the
 start and end positions. Defaults to \code{"cornflowerblue"}.}
 
-\item{edges.color}{Character denoting the color of the edges that are 
+\item{edges.color}{Character denoting the color of the edges that are
 plotted. Defaults to \code{"black"}.}
 
-\item{edges.linewidth}{Numeric denoting the linewidth of the edges that are 
+\item{edges.linewidth}{Numeric denoting the linewidth of the edges that are
 plotted. Defaults to \code{1}.}
 
 \item{nodes.color}{Character denoting the color of the nodes that are plotted.
 Defaults to \code{"black"}.}
 
-\item{nodes.size}{Numeric denoting the size of the nodes that are plotted. 
+\item{nodes.size}{Numeric denoting the size of the nodes that are plotted.
 Defaults to \code{1}.}
 
-\item{dark_mode}{Logical denoting whether to use the predped-default dark 
-mode for plotting. Overrides the color arguments provided to the plotting 
+\item{dark_mode}{Logical denoting whether to use the predped-default dark
+mode for plotting. Overrides the color arguments provided to the plotting
 function. Defaults to \code{FALSE}.}
 
-\item{...}{Arguments provided to the \code{\link[predped]{plot}} function 
+\item{...}{Arguments provided to the \code{\link[predped]{plot}} function
 for the \code{setting}}
 }
 \value{
 Plot created by \code{ggplot2}
 }
 \description{
-The color of the edges is determined by the argument \code{object.color}, 
+The color of the edges is determined by the argument \code{object.color},
 thus following the color of the outer lines of the objects in the background.
 Note that \code{dark_mode} also works here!
 }

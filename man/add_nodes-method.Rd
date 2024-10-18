@@ -4,7 +4,6 @@
 \name{add_nodes}
 \alias{add_nodes}
 \alias{add_nodes,polygon-method}
-\alias{add_nodes,rectangle-method}
 \alias{add_nodes,circle-method}
 \alias{add_nodes,segment-method}
 \title{Add Nodes along the Outside or Inside of an Object}
@@ -12,8 +11,6 @@
 add_nodes(object, ...)
 
 \S4method{add_nodes}{polygon}(object, space_between = 0.5, only_corners = FALSE, outside = TRUE)
-
-\S4method{add_nodes}{rectangle}(object, space_between = 0.5, only_corners = FALSE, outside = TRUE)
 
 \S4method{add_nodes}{circle}(object, space_between = 0.5, only_corners = FALSE, outside = TRUE)
 

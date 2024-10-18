@@ -8,21 +8,21 @@ add_group(
   model,
   agent_number = 1,
   standing_start = 0.1,
-  individual_differences = TRUE,
+  individual_differences = FALSE,
   ...
 )
 }
 \arguments{
-\item{agent_number}{Numeric denoting the number of agents to add. Defaults 
+\item{agent_number}{Numeric denoting the number of agents to add. Defaults
 to \code{1}.}
 
-\item{standing_start}{Numeric denoting the factor of their preferred speed 
-that agents move when they just came from standing still. Defaults to 
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
 \code{0.1}.}
 
-\item{individual_differences}{Logical denoting whether to use the standard 
+\item{individual_differences}{Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.
-Defaults to \code{TRUE}.}
+Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_agent}}.}
 
@@ -32,24 +32,24 @@ Defaults to \code{TRUE}.}
 List of instances of the \code{\link[predped]{agent-class}}.
 }
 \description{
-When multiple agents are added to the simulation as a group, these agents 
-might all be different (either in archetype or in parameter values), but 
+When multiple agents are added to the simulation as a group, these agents
+might all be different (either in archetype or in parameter values), but
 will share the same goals.
 }
 \examples{
-# Create a setting in which to simulate. 
-my_background <- background(shape = rectangle(center = c(0, 0), 
-                                              size = c(2, 2)), 
-                            objects = list(rectangle(center = c(0, 0), 
+# Create a setting in which to simulate.
+my_background <- background(shape = rectangle(center = c(0, 0),
+                                              size = c(2, 2)),
+                            objects = list(rectangle(center = c(0, 0),
                                                      size = c(1, 1))))
 
 # Create a model from which to simulate
-my_model <- predped(setting = my_background, 
-                    archetypes = c("BaselineEuropean", 
+my_model <- predped(setting = my_background,
+                    archetypes = c("BaselineEuropean",
                                    "DrunkAussie"))
 
 # Generate a group of 5 pedestrians who have 5 goals to accomplish
-agents <- add_group(my_model, 
+agents <- add_group(my_model,
                     agent_number = 5,
                     goal_number = 5)
 
@@ -61,7 +61,7 @@ sapply(agents, \(x) length(goals(x)))
 }
 \seealso{
 \code{\link[predped]{agent-class}},
-\code{\link[predped]{add_agent}}, 
+\code{\link[predped]{add_agent}},
 \code{\link[predped]{simulate,predped-method}},
 \code{\link[predped]{simulate,state-method}}
 }

@@ -6,7 +6,8 @@
 \usage{
 generate_parameters(
   n = 1,
-  database = NULL,
+  filename = NULL,
+  sep = ",",
   archetype = "BaselineEuropean",
   mean = NULL,
   Sigma = NULL,
@@ -19,11 +20,12 @@ generate_parameters(
 \item{n}{Integer denoting the number of parameters to generate. Defaults to 
 \code{1}.}
 
-\item{database}{Character denoting the name of the database. Defaults to 
-\code{NULL}, triggering reading in the csv-files. Ignored when \code{mean}, 
-\code{Sigma}, and \code{bounds} are provided 
-(when \code{individual_differences = TRUE}) or when \code{mean} is provided 
-(when \code{individual_differences = FALSE}).}
+\item{filename}{Character denoting the path to a file containing parameters. 
+Defaults to \code{NULL}, triggering reading in the csv-files that come with 
+predped.}
+
+\item{sep}{Character denoting the separator in case \code{x} is a delimited 
+file. Defaults to \code{","}.}
 
 \item{archetype}{String denoting the archetype to be used for the covariance
 matrix. Ignored if \code{Sigma} is provided. Defaults to \code{"BaselineEuropean"}.}

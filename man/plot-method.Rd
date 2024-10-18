@@ -38,6 +38,7 @@ plot(object, ...)
   arrow.size = 0.3,
   segment.hjust = 0.5,
   dark_mode = FALSE,
+  optimize = TRUE,
   ...
 )
 
@@ -64,21 +65,33 @@ plot(object, ...)
 \S4method{plot}{state}(
   object,
   agent.linewidth = 1,
-  goal.size = 1,
-  plot_goal = TRUE,
   plot.title.size = 10,
   plot.title.hjust = 0.5,
   axis.title.size = 10,
   axis.text.size = 8,
-  shape.fill = "white",
+  plot_goal = TRUE,
+  goal.size = 2,
+  plot_segment = TRUE,
   agent.fill = shape.fill,
+  shape.fill = "white",
+  shape.color = "black",
+  shape.linewidth = 1,
+  object.fill = "grey",
+  object.color = "black",
+  object.linewidth = 1,
+  segment.color = "black",
+  segment.linewidth = 1,
+  segment.size = 0.6,
+  arrow.size = 0.3,
+  segment.hjust = 0.5,
   dark_mode = FALSE,
+  optimize = TRUE,
   ...
 )
 }
 \arguments{
-\item{object}{Object of the \code{\link[predped]{background-class}}, 
-\code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}}, 
+\item{object}{Object of the \code{\link[predped]{background-class}},
+\code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}},
 or a list containing multiple of these objects.}
 
 \item{...}{Additional ggplot arguments passed on to the geoms for the objects.}
@@ -86,90 +99,90 @@ or a list containing multiple of these objects.}
 \item{plot_goal}{Logical denoting whether to plot the position of the current
 goal of the agent together with the agent. Defaults to \code{TRUE}.}
 
-\item{agent.linewidth}{Numeric denoting the width of the line with which to 
+\item{agent.linewidth}{Numeric denoting the width of the line with which to
 plot the agent. Defaults to \code{1}.}
 
-\item{agent.fill}{Character denoting the color with which the agent should 
-be filled in. Defaults to \code{"white"} if only plotting an agent or to 
+\item{agent.fill}{Character denoting the color with which the agent should
+be filled in. Defaults to \code{"white"} if only plotting an agent or to
 \code{shape.fill} when plotting with a \code{background}.}
 
-\item{goal.size}{Numeric denoting the size of the point that denotes the goal 
+\item{goal.size}{Numeric denoting the size of the point that denotes the goal
 position. Defaults to \code{1}.}
 
-\item{entry.width}{Numeric denoting the radius of the entrances and exits to 
+\item{entry.width}{Numeric denoting the radius of the entrances and exits to
 be plotted in the background. Defaults to \code{0.3},}
 
-\item{plot_segment}{Logical denoting whether to plot segments (if there are 
-any). If \code{TRUE}, it will add arrows to the plot that indicate the 
-direction in which agents can walk. These arrows will be placed around the 
-center of the line created by the instances of the 
+\item{plot_segment}{Logical denoting whether to plot segments (if there are
+any). If \code{TRUE}, it will add arrows to the plot that indicate the
+direction in which agents can walk. These arrows will be placed around the
+center of the line created by the instances of the
 \code{\link[predped]{segment-class}}. Defaults to \code{TRUE}.}
 
-\item{shape.fill}{Character defining the fill color of the shape of the 
+\item{shape.fill}{Character defining the fill color of the shape of the
 background. Defaults to \code{"white"}.}
 
-\item{shape.color}{Character defining the color of circumference of the shape 
+\item{shape.color}{Character defining the color of circumference of the shape
 of the background. Defaults to \code{"black"}.}
 
-\item{shape.linewidth}{Numeric denoting the width of the circumference of the 
-shape of the background. Also concerns the width of the line of the entrances 
+\item{shape.linewidth}{Numeric denoting the width of the circumference of the
+shape of the background. Also concerns the width of the line of the entrances
 and exits. Defaults to \code{1}.}
 
-\item{object.fill}{Character defining the fill color of the objects contained 
+\item{object.fill}{Character defining the fill color of the objects contained
 in the background. Defaults to \code{"grey"}.}
 
-\item{object.color}{Character defining the color of the circumference of the 
+\item{object.color}{Character defining the color of the circumference of the
 objects contained in the background. Defaults to \code{"black"}.}
 
-\item{object.linewidth}{Numeric denoting the width of the circumference of 
+\item{object.linewidth}{Numeric denoting the width of the circumference of
 the objects contained in the background. Defaults to \code{1}.}
 
-\item{segment.color}{Character defining the color of the arrows drawn when 
+\item{segment.color}{Character defining the color of the arrows drawn when
 you impose one-directional flow. Ignored if \code{plot_segment = FALSE}.
 Defaults to \code{"black"}.}
 
-\item{segment.linewidth}{Numeric denoting the linewidth of the arrows drawn 
-when you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+\item{segment.linewidth}{Numeric denoting the linewidth of the arrows drawn
+when you impose one-directional flow. Ignored if \code{plot_segment = FALSE}.
 Defaults to \code{1}.}
 
-\item{segment.size}{Numeric denoting the length of the arrow-line drawn when 
-you impose one-directional flow. Ignored if \code{plot_segment = FALSE}. 
+\item{segment.size}{Numeric denoting the length of the arrow-line drawn when
+you impose one-directional flow. Ignored if \code{plot_segment = FALSE}.
 Defaults to \code{0.6}.}
 
-\item{arrow.size}{Numeric denoting the size of the arrow-heads drawn when 
+\item{arrow.size}{Numeric denoting the size of the arrow-heads drawn when
 you impose one-directional flow in cm. Ignored if \code{plot_segment = FALSE}.
 Defaults to \code{0.3}.}
 
-\item{segment.hjust}{Numeric bounded between 0 and 1 which defines how to 
-place the arrow relative to the center of the segment. If \code{0.5}, the 
-arrow's center coincides with the center of the segment. If \code{0}, the 
-arrow's tail will coincide with the center of the segment, while if \code{1}, 
+\item{segment.hjust}{Numeric bounded between 0 and 1 which defines how to
+place the arrow relative to the center of the segment. If \code{0.5}, the
+arrow's center coincides with the center of the segment. If \code{0}, the
+arrow's tail will coincide with the center of the segment, while if \code{1},
 the arrow's head will coincide with this center. Defaults to \code{0.5}.}
 
-\item{dark_mode}{Logical that can toggle the default colorpallette of predped's 
+\item{dark_mode}{Logical that can toggle the default colorpallette of predped's
 dark mode. Defaults to \code{FALSE}.}
 
-\item{plot_forbidden}{Logical denoting whether to plot forbidden edges 
+\item{plot_forbidden}{Logical denoting whether to plot forbidden edges
 explicitly. Defaults to \code{FALSE}.}
 
 \item{forbidden.color}{Character denoting the color of the forbidden edges.
 Defaults to \code{"red"}.}
 
-\item{plot.title.size}{Numeric denoting the text size of the plot title. 
+\item{plot.title.size}{Numeric denoting the text size of the plot title.
 Defaults to \code{10}.}
 
 \item{plot.title.hjust}{Numeric denoting the position of the plot title, with
-\code{0} coding for left, \code{1} for right, and \code{0.5} for the middle. 
+\code{0} coding for left, \code{1} for right, and \code{0.5} for the middle.
 Defaults to \code{0.5}.}
 
-\item{axis.title.size}{Numeric of the text size of the axis title. Defaults 
+\item{axis.title.size}{Numeric of the text size of the axis title. Defaults
 to \code{10}.}
 
-\item{axis.text.size}{Numeric denoting the text size of the axis text. 
+\item{axis.text.size}{Numeric denoting the text size of the axis text.
 Defaults to \code{8}.}
 }
 \value{
-Either a geom or a ggplot, depending on the object provided (see 
+Either a geom or a ggplot, depending on the object provided (see
 Details).
 }
 \description{
@@ -177,8 +190,8 @@ Plot an object
 }
 \details{
 Returns a geom whenever providing separate instances of the
-\code{\link[predped]{object-class}}. Returns a ggpplot when providing 
+\code{\link[predped]{object-class}}. Returns a ggpplot when providing
 instances of the \code{\link[predped]{background-class}} or of the
-\code{\link[predped]{state-class}}. Whenever either is provided in a list, 
+\code{\link[predped]{state-class}}. Whenever either is provided in a list,
 a list containing the respective geoms or ggplots is returned.
 }
