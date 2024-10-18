@@ -403,6 +403,7 @@ setMethod("plot", "state", function(object,
                                     axis.text.size = 8,
                                     plot_goal = TRUE,
                                     goal.size = 2,
+                                    plot_segment = TRUE,
                                     agent.fill = shape.fill,
                                     shape.fill = "white",
                                     shape.color = "black",
@@ -490,6 +491,23 @@ setMethod("plot", "state", function(object,
                            legend.position = "none") +
             ggplot2::coord_fixed()
 
+            # Check whether to add the segments to the plot, and if so, add them
+            # to the plot
+            if(plot_segment) {
+                segments <- transform_df(setting(object)@limited_access)
+
+                # Create the actual arrows
+                plt <- plt + 
+                    ggplot2::annotate("segment", 
+                                      x = segments$from[1],
+                                      y = segments$from[2],
+                                      xend = segments$to[1],
+                                      yend = segments$to[2],
+                                      arrow = ggplot2::arrow(length = ggplot2::unit(arrow.size, "cm")),
+                                      color = segment.color,
+                                      linewidth = segment.linewidth)
+            }
+
     } else {
 
         # Create the plot for the setting, which will serve as the basis of
@@ -497,6 +515,7 @@ setMethod("plot", "state", function(object,
                                    shape.fill = shape.fill,
                                    dark_mode = dark_mode,
                                    optimize = optimize,
+                                   plot_segment = plot_segment,
                                    ...) +
             ggplot2::labs(title = paste("iteration", object@iteration)) +
             ggplot2::theme(legend.position = "none",
@@ -757,6 +776,33 @@ setMethod("transform_df", "object", function(object,
                       y = pts[,2],
                       group = rep(paste("1", id(object)), each = nrow(pts)),
                       kind = rep(kind, each = nrow(pts))))
+})
+
+#' @rdname transform_df-method
+setMethod("transform_df", "segment", function(object,
+                                              kind = "segment",
+                                              ...) {
+    
+    # Get the orientation of the segment and subtract 90 degrees
+    angle <- orientation(object) - pi / 2
+
+    # Define a line of length `segment.size` centered around a given `center`.
+    # To compute this center, you use the `hjust` argument.
+    center <- center(object)
+
+    # Adjust the center if you want the arrow to start at the center of the
+    # segment
+    center <- center + (segment.hjust - 0.5) * segment.size * c(cos(angle), sin(angle))
+    from <- center + 0.5 * segment.size * c(cos(angle), sin(angle))
+    to <- center - 0.5 * segment.size * c(cos(angle), sin(angle))
+   
+    # Manipulate to have a dataframe containing information on the segments
+    return(data.frame(x = object@from[1],
+                      y = object@from[2],
+                      xend = object@to[1],
+                      yend = object@to[2],
+                      group = paste("1", id(object)),
+                      kind = kind))
 })
 
 #' @rdname transform_df-method
