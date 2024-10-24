@@ -487,7 +487,7 @@ setMethod("plot", "state", function(object,
 
         # Get the limits of the shape
         tmp <- points(setting(object)@shape)
-        lims <- rbind(tmp[,1], tmp[,2])
+        lims <- rbind(range(tmp[,1]), range(tmp[,2]))
 
         # Create the different lists
         names_lists <- unique(pts$kind)
@@ -539,15 +539,17 @@ setMethod("plot", "state", function(object,
         # Check whether to add the segments to the plot, and if so, add them
         # to the plot
         if(plot_segment) {
-            segments <- transform_df(setting(object)@limited_access)
+            segments <- transform_df(setting(object)@limited_access,
+                                     segment.size = segment.size, 
+                                     segment.hjust = segment.hjust)
 
             # Create the actual arrows
             plt <- plt + 
                 ggplot2::annotate("segment", 
-                                  x = segments$from[1],
-                                  y = segments$from[2],
-                                  xend = segments$to[1],
-                                  yend = segments$to[2],
+                                  x = segments$x,
+                                  y = segments$y,
+                                  xend = segments$xend,
+                                  yend = segments$yend,
                                   arrow = ggplot2::arrow(length = ggplot2::unit(arrow.size, "cm")),
                                   color = segment.color,
                                   linewidth = segment.linewidth)
@@ -568,6 +570,8 @@ setMethod("plot", "state", function(object,
                                   color = forbidden.color,
                                   linewidth = object.linewidth)
         }
+
+        return(plt)
 
     } else {
 
@@ -897,6 +901,8 @@ setMethod("transform_df", "object", function(object,
 #' @rdname transform_df-method
 setMethod("transform_df", "segment", function(object,
                                               kind = "segment",
+                                              segment.hjust = 0.5,
+                                              segment.size = 0.6,
                                               ...) {
     
     # Get the orientation of the segment and subtract 90 degrees
