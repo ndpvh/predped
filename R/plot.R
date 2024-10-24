@@ -919,10 +919,10 @@ setMethod("transform_df", "segment", function(object,
     to <- center - 0.5 * segment.size * c(cos(angle), sin(angle))
    
     # Manipulate to have a dataframe containing information on the segments
-    return(data.frame(x = object@from[1],
-                      y = object@from[2],
-                      xend = object@to[1],
-                      yend = object@to[2],
+    return(data.frame(x = from[1],
+                      y = from[2],
+                      xend = to[1],
+                      yend = to[2],
                       group = paste("1", id(object)),
                       kind = kind))
 })
