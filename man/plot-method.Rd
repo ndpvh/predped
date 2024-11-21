@@ -37,6 +37,8 @@ plot(object, ...)
   segment.size = 0.6,
   arrow.size = 0.3,
   segment.hjust = 0.5,
+  plot_forbidden = FALSE,
+  forbidden.color = "red",
   dark_mode = FALSE,
   optimize = TRUE,
   ...
@@ -84,6 +86,8 @@ plot(object, ...)
   segment.size = 0.6,
   arrow.size = 0.3,
   segment.hjust = 0.5,
+  plot_forbidden = FALSE,
+  forbidden.color = "red",
   dark_mode = FALSE,
   optimize = TRUE,
   ...
@@ -159,14 +163,14 @@ arrow's center coincides with the center of the segment. If \code{0}, the
 arrow's tail will coincide with the center of the segment, while if \code{1},
 the arrow's head will coincide with this center. Defaults to \code{0.5}.}
 
-\item{dark_mode}{Logical that can toggle the default colorpallette of predped's
-dark mode. Defaults to \code{FALSE}.}
-
 \item{plot_forbidden}{Logical denoting whether to plot forbidden edges
 explicitly. Defaults to \code{FALSE}.}
 
 \item{forbidden.color}{Character denoting the color of the forbidden edges.
 Defaults to \code{"red"}.}
+
+\item{dark_mode}{Logical that can toggle the default colorpallette of predped's
+dark mode. Defaults to \code{FALSE}.}
 
 \item{plot.title.size}{Numeric denoting the text size of the plot title.
 Defaults to \code{10}.}
