@@ -187,11 +187,11 @@ setMethod("utility", "data.frame", function(object,
 
     # Group centroid utility: Check whether people are walking in a group in 
     # the first place and, if so, compute the utility
-    if(!is.null(object$gc_distance)) {
+    if(!is.null(object$gc_distance[[1]])) {
         V <- V + gc_utility(parameters[["a_group_centroid"]],
                             parameters[["b_group_centroid"]],
                             object$gc_radius,
-                            object$gc_distance,
+                            object$gc_distance[[1]],
                             -parameters[["stop_utility"]],
                             object$gc_nped)
     }
@@ -373,9 +373,9 @@ compute_utility_variables <- function(agent,
     p_pred <- predictions_minus_agent[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]    
         
-    uv$gc_distance <- distance_group_centroid(p_pred,
-                                              centers,
-                                              nped)
+    uv$gc_distance <- list(distance_group_centroid(p_pred,
+                                                   centers,
+                                                   nped))
     uv$gc_radius <- radius(agent)
     uv$gc_nped <- nped
 
