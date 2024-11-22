@@ -2,9 +2,12 @@
 % Please edit documentation in R/data.R
 \name{time_series}
 \alias{time_series}
+\alias{unpack_trace}
 \title{Transform trace to time-series}
 \usage{
 time_series(x, time_step = 0.5)
+
+unpack_trace(x, time_step = 0.5)
 }
 \arguments{
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
@@ -14,8 +17,12 @@ to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
 }
 \description{
 Transform trace to time-series
+
+Transform trace to time-series
 }
 \examples{
+# This is my example
+
 # This is my example
 
 }
