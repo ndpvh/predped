@@ -725,7 +725,7 @@ plot_edges <- function(setting,
 
 #' Transform to dataframe of segments
 #'
-#'
+#' @rdname transform_df-method
 setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))
 
 #' @rdname transform_df-method
