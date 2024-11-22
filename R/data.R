@@ -118,29 +118,54 @@ unpack_trace <- function(x,
                                                   goal_y = current_goal(a)@position[2],
                                                   radius = radius(a))
 
-                        # Get the centers for this participant, given their 
-                        # current position, speed, and orientation
-                        centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                                   p1 = position(a),
-                                                   v1 = speed(a),
-                                                   a1 = orientation(a),
-                                                   vels = velocities,
-                                                   angles = orientations,
-                                                   tStep = time_step)
+                        # If the agent is not moving, then you cannot compute 
+                        # the utility variables. We should therefore fill it 
+                        # with values that make sense and otherwise with NULLs
+                        # (in hopes utility will be okay with this).
+                        #
+                        # If the agent is moving, however, we will compute the 
+                        # utility variables for that move.
+                        if(status(a) != "move") {
+                            utility_variables <- data.frame(agent_idx = which(agent_specifications$id == id(a)),
+                                                            ps_speed = NA, 
+                                                            ps_distance = NA, 
+                                                            gd_angle = NA, 
+                                                            id_distance = NA,
+                                                            id_check = NA,
+                                                            id_ingroup = NA,
+                                                            ba_angle = NA,
+                                                            fl_leaders = NA,
+                                                            wb_buddies = NA,
+                                                            gc_distance = NA,
+                                                            gc_radius = NA, 
+                                                            gc_nped = NA,
+                                                            vf_angles = NA)
 
-                        # Do an initial check of which of these centers can be 
-                        # reached and which ones can't
-                        check <- moving_options(a, y, y@setting, centers)
-                        
-                        # Compute the utility variables for this agent under the
-                        # current state
-                        utility_variables <- compute_utility_variables(a,
-                                                                       y,
-                                                                       y@setting,
-                                                                       agent_specifications,
-                                                                       centers,                    
-                                                                       check)
-
+                        } else {
+                            # Get the centers for this participant, given their 
+                            # current position, speed, and orientation
+                            centers <- m4ma::c_vd_rcpp(cells = 1:33,
+                                                       p1 = position(a),
+                                                       v1 = speed(a),
+                                                       a1 = orientation(a),
+                                                       vels = velocities,
+                                                       angles = orientations,
+                                                       tStep = time_step)
+    
+                            # Do an initial check of which of these centers can be 
+                            # reached and which ones can't
+                            check <- moving_options(a, y, y@setting, centers)
+                            
+                            # Compute the utility variables for this agent under the
+                            # current state                            
+                            utility_variables <- compute_utility_variables(a,
+                                                                           y,
+                                                                           y@setting,
+                                                                           agent_specifications,
+                                                                           centers,                    
+                                                                           check)
+                        }
+    
                         # Bind them all together in one dataframe and return 
                         # the result
                         return(cbind(time_series, utility_variables))
