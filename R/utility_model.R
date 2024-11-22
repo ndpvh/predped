@@ -1,10 +1,19 @@
 ################################################################################
 # HIGH-LEVEL UTILITY FUNCTIONS
 
-#' Compute the utilities
+# Set up a generic for `utility`. This allows us to differentiate between the 
+# function when all utility variables have been precomputed vs when they haven't.
+setGeneric("utility", function(object, ...) standardGeneric("utility"))
+
+#' Compute the utilities on the agent level
 #' 
 #' This function uses the operational-level utility functions to compute the 
-#' utility of moving to any given potential cell in \code{centers}.
+#' utility of moving to any given potential cell in \code{centers}. Here, we 
+#' assume that none of the utility variables (i.e., the variables that serve as 
+#' input to the utility functions) is precomputed, so that it will first compute
+#' their values. This input is then provided to 
+#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
@@ -27,81 +36,93 @@
 #' \code{\link[predped]{simulate,state-method}},
 #' \code{\link[predped]{update,agent-method}},
 #' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @rdname utility
+#' @rdname utility-agent
+#' 
+#' @export
+setMethod("utility", "agent", function(object,
+                                       state,
+                                       background,
+                                       agent_specifications,
+                                       centers,                    
+                                       check) {
+
+    # Compute the utility variables that are used as input to the utility 
+    # functions.
+    #
+    # Name choice "uv" comes from abbreviating the more informative "utility 
+    # variables", which would've otherwise made the code a bit less elegant.
+    uv <- compute_utility_variables(object,
+                                    state,
+                                    background,
+                                    agent_specifications,
+                                    centers,                    
+                                    check)
+
+    # Pass down to a lower-level utility function that uses all of this 
+    # information
+    return(utility(uv, parameters(object), check))
+})
+
+#' Compute the utilities with all utility variables known
+#' 
+#' This function uses the values of the relevant variables used as input in the
+#' utility functions to derive the utility for each of the different moving 
+#' options.
+#' 
+#' @param object Dataframe containing all of the needed information to compute 
+#' the utilities. Typically output of the 
+#' \code{\link[predped]{compute_utility_variables}} function.
+#' @param parameters Dataframe containing the parameters of the agent. Should 
+#' conform to the naming conventions mentioned in 
+#' \code{\link[predped]{params_from_csv}}.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' 
+#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
+#' cells in \code{centers}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{compute_utility_variables}},
+#' \code{\link[predped]{params_from_csv}},
+#' \code{\link[predped]{update_position}}
+#' 
+#' @rdname utility-agent
 #' 
 #' @export 
 #
 # TO DO
-#  - Is `check` a necessary argument here, or could we just only put the checked
-#    centers in them
-#  - Maybe make `precomputed` a list that contains the precomputed items? Then
-#    we can just simply extract them from this list instead of from `state`:
-#    We should think about this, as this information is not directly available
-#    from `state` anymore if this becomes a list of agents and objects
-#  - Make it so so that you can just give a set of different utilities that
-#    you want accounted for, making the utility function on the lower level
-#    highly manipulable at the higher level
 #  - I have the feeling that a lot of the computations on the lower level can
 #    be solved by the object-oriented way of dealing with things. For example,
 #    we can just access the position of all other agents and define which cell
 #    of `agent` they occupy in a more straightforward way than is currently
 #    implemented in `get_leaders` and `get_buddy`.
-#  - Make each of the utilities a class of their own, with the method
-#    `compute` to compute the specific utility it needs to compute. This will
-#    allow for a very easy combination of utilities that can be changed at the
-#    upper level
-#  - Unless I am mistaken, iInfo is not used in this function and can thus be
-#    deleted
-utility <- function(agent,
-                    state,
-                    background,
-                    agent_specifications,
-                    centers,                    
-                    check, 
-                    precomputed_variables = NULL) {
-
-    ############################################################################
-    # PREPARATION
-
-    # Whenever the utility variables are not precomputed, we need to compute 
-    # them at this moment. If they are precomputed, however, we can just 
-    # proceed.
-    #
-    # Name choice "uv" comes from abbreviating the more informative "utility 
-    # variables", which would've otherwise made the code a bit less elegant.
-    if(is.null(precomputed_variables)) {
-        uv <- compute_utility_variables(agent,
-                                        state,
-                                        background,
-                                        agent_specifications,
-                                        centers,                    
-                                        check)
-    } else {
-        uv <- precomputed_variables
-    }
-
-    # Prepare being able to compute the utilities by extracting the parameters 
-    # and preparing a vector V of zeros.
-    params <- parameters(agent)
-    V <- numeric(nrow(centers))
-
-
-
-
+setMethod("utility", "data.frame", function(object,
+                                            parameters,
+                                            check) {
 
     ############################################################################
     # COMPUTATION
+
+    # Create an empty vector of the same size needed for the computation                            
+    V <- numeric(length(check))
 
     # Preferred speed utility: Check whether the distance to the goal is not 
     # NULL and, if not, compute the utility of deceleration, acceleration, or 
     # maintenance of speed
     if(!is.null(uv$ps_distance)) {
-        V <- V + m4ma::psUtility_rcpp(params[["a_preferred_speed"]], 
-                                      params[["b_preferred_speed"]], 
-                                      params[["preferred_speed"]], 
-                                      params[["slowing_time"]], 
+        V <- V + m4ma::psUtility_rcpp(parameters[["a_preferred_speed"]], 
+                                      parameters[["b_preferred_speed"]], 
+                                      parameters[["preferred_speed"]], 
+                                      parameters[["slowing_time"]], 
                                       uv$ps_speed, 
                                       uv$ps_distance)
     }
@@ -110,23 +131,23 @@ utility <- function(agent,
     # if so, compute the utility of heading in a given direction relative to 
     # where the goal is located
     if (!is.null(uv$gd_angle)) {
-        V <- V + m4ma::gaUtility_rcpp(params[["b_goal_direction"]], 
-                                      params[["a_goal_direction"]], 
+        V <- V + m4ma::gaUtility_rcpp(parameters[["b_goal_direction"]], 
+                                      parameters[["a_goal_direction"]], 
                                       uv$gd_angle)
     }
 
     # Current direction utility: Compute the utility of heading in a given 
     # direction. No other variables needed for this.
-    V <- V + m4ma::caUtility_rcpp(params[["a_current_direction"]], 
-                                  params[["b_current_direction"]], 
-                                  params[["blr_current_direction"]])
+    V <- V + m4ma::caUtility_rcpp(parameters[["a_current_direction"]], 
+                                  parameters[["b_current_direction"]], 
+                                  parameters[["blr_current_direction"]])
 
     # Interpersonal distance utility: Check whether the distance to other 
     # pedestrians is defined and, if so, compute the utility
     if(!is.null(interpersonal_distance)) {
-        V <- V + m4ma::idUtility_rcpp(params[["b_interpersonal"]], 
-                                      params[["d_interpersonal"]], 
-                                      params[["a_interpersonal"]], 
+        V <- V + m4ma::idUtility_rcpp(parameters[["b_interpersonal"]], 
+                                      parameters[["d_interpersonal"]], 
+                                      parameters[["a_interpersonal"]], 
                                       uv$id_ingroup, 
                                       uv$id_check[[1]], 
                                       uv$id_distance, 
@@ -138,8 +159,8 @@ utility <- function(agent,
     # Blocked angle utility: Check whether any of the angles are blocked in the 
     # first place, and if so, compute the utility
     if(!is.null(uv$ba_angle[[1]])) {
-        V <- V + m4ma::baUtility_rcpp(params[["a_blocked"]], 
-                                      params[["b_blocked"]],
+        V <- V + m4ma::baUtility_rcpp(parameters[["a_blocked"]], 
+                                      parameters[["b_blocked"]],
                                       pmax(uv$ba_angle[[1]], 0), # Make sure all angles are >= 0; this was previously done in baUtility()
                                       as.integer(names(uv$ba_angle[[1]])) - 1)
     }
@@ -147,9 +168,9 @@ utility <- function(agent,
     # Follow the leader utility: Check whether there are any leaders in the first 
     # place and, if so, compute the utility
     if(!is.null(uv$fl_leaders)) {
-        V <- V + m4ma::flUtility_rcpp(params[["a_leader"]], 
-                                      params[["b_leader"]], 
-                                      params[["d_leader"]], 
+        V <- V + m4ma::flUtility_rcpp(parameters[["a_leader"]], 
+                                      parameters[["b_leader"]], 
+                                      parameters[["d_leader"]], 
                                       uv$fl_leaders[["leaders"]], 
                                       uv$fl_leaders[["dists"]])
     }
@@ -157,8 +178,8 @@ utility <- function(agent,
     # Walk beside utility: Check whether there are any buddies and, if so, 
     # compute the utility
     if(!is.null(uv$wb_buddies)) {
-        V <- V + m4ma::wbUtility_rcpp(params[["a_buddy"]], 
-                                      params[["b_buddy"]], 
+        V <- V + m4ma::wbUtility_rcpp(parameters[["a_buddy"]], 
+                                      parameters[["b_buddy"]], 
                                       uv$wb_buddies[["buddies"]], 
                                       uv$wb_buddies[["dists"]])
     }
@@ -166,18 +187,18 @@ utility <- function(agent,
     # Group centroid utility: Check whether people are walking in a group in 
     # the first place and, if so, compute the utility
     if(!is.null(uv$gc_distance)) {
-        V <- V + gc_utility(params[["a_group_centroid"]],
-                            params[["b_group_centroid"]],
+        V <- V + gc_utility(parameters[["a_group_centroid"]],
+                            parameters[["b_group_centroid"]],
                             uv$gc_radius,
                             uv$gc_distance,
-                            -params[["stop_utility"]],
+                            -parameters[["stop_utility"]],
                             uv$gc_nped)
     }
 
     # Visual field utility: Check whether people are walking in a group and, if 
     # so, compute the utility
     if(!is.null(uv$vf_angles[[1]])) {
-        V <- V + vf_utility_discrete(params[["b_visual_field"]],
+        V <- V + vf_utility_discrete(parameters[["b_visual_field"]],
                                      uv$vf_angles[[1]])
     }
 
@@ -190,7 +211,7 @@ utility <- function(agent,
 
     # Add the stopping utility to the vector and transform them according to the 
     # randomness parameter
-    V_transformed <- c(-params[["stop_utility"]], V) / params[["randomness"]]
+    V_transformed <- c(-parameters[["stop_utility"]], V) / parameters[["randomness"]]
 
     # Robustness against NAs. Can sometimes occur when you have the difference
     # between Inf - Inf = NA. Should not occur, but might inconvenience one 
@@ -202,7 +223,7 @@ utility <- function(agent,
     }
 
     return(V_transformed)
-}
+})
 
 #' Compute utility variables
 #' 
