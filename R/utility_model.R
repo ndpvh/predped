@@ -343,8 +343,8 @@ compute_utility_variables <- function(agent,
     # Group centroid utility: Required variables are the distance to the predicted
     # group centroid, the number of pedestrians in the group, and the radius of 
     # the agent in question
-    inGroup <- agent_specifications$group[-uv$agent_idx] == agent_specifications$group[uv$agent_idx]
-    p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
+    ingroup <- agent_specifications$group[-uv$agent_idx] == agent_specifications$group[uv$agent_idx]
+    p_pred <- predictions_minus_agent[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]    
         
     uv$gc_distance <- distance_group_centroid(p_pred,
@@ -523,8 +523,8 @@ get_angles <- function (agent_idx,
                         any_member = TRUE) {
     
     # First need to identify whether a pedestrian belongs to a social group
-    inGroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[inGroup, , drop = FALSE]
+    ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    p_pred <- p_pred[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]
     
     if (nped == 0) {
