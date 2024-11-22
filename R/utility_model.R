@@ -59,217 +59,138 @@ utility <- function(agent,
                     background,
                     agent_specifications,
                     centers,                    
-                    check) {
-                    # Deprecated
-                    # precomputed = FALSE,
-                    # subject = TRUE) {
+                    check, 
+                    precomputed_variables = NULL) {
 
-    # If the different parts that will make up the utilities were not precomputed,
-    # compute them here.
+    ############################################################################
+    # PREPARATION
+
+    # Whenever the utility variables are not precomputed, we need to compute 
+    # them at this moment. If they are precomputed, however, we can just 
+    # proceed.
     #
-    # Left subject-based and iteration-based relatively unchanged as we first
-    # have to think about how we will save this information. Maybe just make it
-    # an agent-characteristic?
-    # if(!precomputed) {
-
-    # Get the index of all other agents in the agent_specifications
-    agent_idx <- seq_along(agent_specifications$id)[agent_specifications$id == id(agent)]
-
-    # Preferred speed
-    goal_position <- matrix(current_goal(agent)@path[1,],
-                            ncol = 2)
-    goal_distance <- m4ma::dist1_rcpp(position(agent), 
-                                      goal_position)
-
-    # Angle between agent and the goal
-    direction_goal <- m4ma::destinationAngle_rcpp(orientation(agent), 
-                                                  position(agent, return_matrix = TRUE),
-                                                  goal_position) / 90
-
-    # Interpersonal distance between agent and other agents
-    interpersonal_distance <- m4ma::predClose_rcpp(agent_idx, 
-                                                   p1 = position(agent, return_matrix = TRUE), 
-                                                   a1 = orientation(agent),
-                                                   p2 = agent_specifications$position, 
-                                                   r = agent_specifications$size, 
-                                                   centres = centers, 
-                                                   p_pred = agent_specifications$predictions, 
-                                                   objects = objects(background))
-
-    # Predict which directions might lead to collisions in the future
-    if(nrow(agent_specifications$predictions) == 1) {
-        # When just deleting `agent_idx` from a single-row matrix, we get to 
-        # a numeric, not a matrix. Therefore create empty matrix if there is
-        # only 1 agent.
-        predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
+    # Name choice "uv" comes from abbreviating the more informative "utility 
+    # variables", which would've otherwise made the code a bit less elegant.
+    if(is.null(precomputed_variables)) {
+        uv <- compute_utility_variables(agent,
+                                        state,
+                                        background,
+                                        agent_specifications,
+                                        centers,                    
+                                        check)
     } else {
-        # Another weird case is when you only have 2 agents, where it 
-        # transforms the matrix to a numerical vector. To ensure there are 
-        # no problems, we transform to a matrix and reassign the id's  in 
-        # the rows
-        predictions_minus_agent <- matrix(agent_specifications$predictions[-agent_idx,],
-                                          ncol = 2)
-        rownames(predictions_minus_agent) <- agent_specifications$id[-agent_idx]
+        uv <- precomputed_variables
     }
 
-    blocked_angle <- m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
-                                             orientation(agent),
-                                             speed(agent),
-                                             predictions_minus_agent,
-                                             agent_specifications$size[-agent_idx],
-                                             objects(background))
-
-    # Follow the leader phenomenon
-    leaders <- m4ma::getLeaders_rcpp(agent_idx,
-                                     agent_specifications$position,
-                                     agent_specifications$orientation,
-                                     agent_specifications$speed,
-                                     goal_position,
-                                     agent_specifications$group,
-                                     centers,
-                                     objects(background))
-    # leaders <- NULL
-
-    # Walking besides a buddy
-    buddies <- m4ma::getBuddy_rcpp(agent_idx,
-                                   agent_specifications$position,
-                                   agent_specifications$speed,
-                                   agent_specifications$group,
-                                   agent_specifications$orientation,
-                                   agent_specifications$predictions,
-                                   centers,
-                                   objects(background),
-                                   pickBest = FALSE)
-
-    # Group Centroid Phenomenon                                       
-    inGroup <- agent_specifications$group[-agent_idx] == agent_specifications$group[agent_idx]
-    p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
-    nped <- dim(p_pred)[1]    
-        
-    distance_centroid <- distance_group_centroid(p_pred,
-                                                 centers,
-                                                 nped)
-
-    # Visual Field Phenomenon
-    buddies_in_vf <- get_angles(agent_idx,
-                                agent_specifications$group,
-                                position(agent),
-                                orientation(agent),
-                                agent_specifications$predictions,
-                                centers,
-                                any_member = TRUE)                                                     
-
-    # Does not work at this moment, and so is left commented out
-    #
-    # Subject based
-    # } else if (subject) {
-    #     check <- state$check
-    #     goal_distance <- state$goal_distance[n]
-    #     direction_goal <- state$direction_goal
-    #     interpersonal_distance <- state$interpersonal_distance
-    #     blocked_angle <- state$blocked_angle
-    #     leaders <- state$leaders
-    #     buddies <- state$buddies
-    # # Iteration based
-    # } else {
-    #     check <- state$check[[n]]
-    #     goal_distance <- state$goal_distance[n]
-    #     direction_goal <- state$direction_goal[[n]]
-    #     interpersonal_distance <- state$interpersonal_distance[[n]]
-    #     blocked_angle <- state$blocked_angle[[n]]
-    #     leaders <- state$leaders[[n]]
-    #     buddies <- state$buddies[[n]]
-    # }
-    #}
-
-    # Compute the utilities and sum them up
-    p <- parameters(agent)
-
+    # Prepare being able to compute the utilities by extracting the parameters 
+    # and preparing a vector V of zeros.
+    params <- parameters(agent)
     V <- numeric(nrow(centers))
 
-    # Always check if utility data is NULL
-    if (!is.null(goal_distance)) {
-        V <- V + m4ma::psUtility_rcpp(p[["a_preferred_speed"]], 
-                                      p[["b_preferred_speed"]], 
-                                      p[["preferred_speed"]], 
-                                      p[["slowing_time"]], 
-                                      speed(agent), 
-                                      goal_distance)
+
+
+
+
+    ############################################################################
+    # COMPUTATION
+
+    # Preferred speed utility: Check whether the distance to the goal is not 
+    # NULL and, if not, compute the utility of deceleration, acceleration, or 
+    # maintenance of speed
+    if(!is.null(uv$ps_distance)) {
+        V <- V + m4ma::psUtility_rcpp(params[["a_preferred_speed"]], 
+                                      params[["b_preferred_speed"]], 
+                                      params[["preferred_speed"]], 
+                                      params[["slowing_time"]], 
+                                      uv$ps_speed, 
+                                      uv$ps_distance)
     }
 
-    if (!is.null(direction_goal)) {
-        V <- V + m4ma::gaUtility_rcpp(p[["b_goal_direction"]], 
-                                      p[["a_goal_direction"]], 
-                                      direction_goal)
+    # Goal direction utility: Check whether the angle to the goal is defined and,
+    # if so, compute the utility of heading in a given direction relative to 
+    # where the goal is located
+    if (!is.null(uv$gd_angle)) {
+        V <- V + m4ma::gaUtility_rcpp(params[["b_goal_direction"]], 
+                                      params[["a_goal_direction"]], 
+                                      uv$gd_angle)
     }
 
-    V <- V + m4ma::caUtility_rcpp(p[["a_current_direction"]], 
-                                  p[["b_current_direction"]], 
-                                  p[["blr_current_direction"]])
+    # Current direction utility: Compute the utility of heading in a given 
+    # direction. No other variables needed for this.
+    V <- V + m4ma::caUtility_rcpp(params[["a_current_direction"]], 
+                                  params[["b_current_direction"]], 
+                                  params[["blr_current_direction"]])
 
-    if (!is.null(interpersonal_distance)) {
-        # The next lines used to be in idUtility_rcpp but are not depending on parameter values therefore
-        # they have been taken out to speed up the estimation
-        # Get names of ingroup agents
-        agent_groups <- agent_specifications$group[-agent_idx]
-        names_ingroup <- names(agent_groups[agent_groups == agent_specifications$group[agent_idx]])
-
-        # Check if agent is part of in group
-        is_ingroup <- row.names(interpersonal_distance) %in% names_ingroup
-
-        # Check which cells have only positive distance
-        check <- check & apply(interpersonal_distance, 2, function(x) {
-            all(x > 0)
-        })
-
-        V <- V + m4ma::idUtility_rcpp(p[["b_interpersonal"]], 
-                                      p[["d_interpersonal"]], 
-                                      p[["a_interpersonal"]], 
-                                      is_ingroup, 
-                                      check, 
-                                      interpersonal_distance, 
-                                      as.vector(ifelse(check, 0, -Inf))) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
+    # Interpersonal distance utility: Check whether the distance to other 
+    # pedestrians is defined and, if so, compute the utility
+    if(!is.null(interpersonal_distance)) {
+        V <- V + m4ma::idUtility_rcpp(params[["b_interpersonal"]], 
+                                      params[["d_interpersonal"]], 
+                                      params[["a_interpersonal"]], 
+                                      uv$id_ingroup, 
+                                      uv$id_check[[1]], 
+                                      uv$id_distance, 
+                                      as.vector(ifelse(uv$id_check[[1]], 0, -Inf))) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
     } else {
-        V <- V + as.vector(ifelse(check, 0, -Inf))
+        V <- V + as.vector(ifelse(uv$id_check[[1]], 0, -Inf))
     }
 
-    if (!is.null(blocked_angle)) {
-        V <- V + m4ma::baUtility_rcpp(p[["a_blocked"]], 
-                                      p[["b_blocked"]],
-                                      pmax(blocked_angle, 0), # Make sure all angles are >= 0; this was previously done in baUtility()
-                                      as.integer(names(blocked_angle)) - 1)
+    # Blocked angle utility: Check whether any of the angles are blocked in the 
+    # first place, and if so, compute the utility
+    if(!is.null(uv$ba_angle[[1]])) {
+        V <- V + m4ma::baUtility_rcpp(params[["a_blocked"]], 
+                                      params[["b_blocked"]],
+                                      pmax(uv$ba_angle[[1]], 0), # Make sure all angles are >= 0; this was previously done in baUtility()
+                                      as.integer(names(uv$ba_angle[[1]])) - 1)
     }
 
-    if (!is.null(leaders)) {
-        V <- V + m4ma::flUtility_rcpp(p[["a_leader"]], 
-                                      p[["b_leader"]], 
-                                      p[["d_leader"]], 
-                                      leaders[["leaders"]], 
-                                      leaders[["dists"]])
+    # Follow the leader utility: Check whether there are any leaders in the first 
+    # place and, if so, compute the utility
+    if(!is.null(uv$fl_leaders)) {
+        V <- V + m4ma::flUtility_rcpp(params[["a_leader"]], 
+                                      params[["b_leader"]], 
+                                      params[["d_leader"]], 
+                                      uv$fl_leaders[["leaders"]], 
+                                      uv$fl_leaders[["dists"]])
     }
 
-    if (!is.null(buddies)) {
-        V <- V + m4ma::wbUtility_rcpp(p[["a_buddy"]], 
-                                      p[["b_buddy"]], 
-                                      buddies[["buddies"]], 
-                                      buddies[["dists"]])
+    # Walk beside utility: Check whether there are any buddies and, if so, 
+    # compute the utility
+    if(!is.null(uv$wb_buddies)) {
+        V <- V + m4ma::wbUtility_rcpp(params[["a_buddy"]], 
+                                      params[["b_buddy"]], 
+                                      uv$wb_buddies[["buddies"]], 
+                                      uv$wb_buddies[["dists"]])
     }
 
-    if (!is.null(distance_centroid)) {
-        V <- V + gc_utility(p[["a_group_centroid"]],
-                            p[["b_group_centroid"]],
-                            radius(agent),
-                            distance_centroid,
-                            -p[["stop_utility"]],
-                            nped)
+    # Group centroid utility: Check whether people are walking in a group in 
+    # the first place and, if so, compute the utility
+    if(!is.null(uv$gc_distance)) {
+        V <- V + gc_utility(params[["a_group_centroid"]],
+                            params[["b_group_centroid"]],
+                            uv$gc_radius,
+                            uv$gc_distance,
+                            -params[["stop_utility"]],
+                            uv$gc_nped)
     }
 
-    if (!is.null(buddies_in_vf)) {
-        V <- V + vf_utility_discrete(p[["b_visual_field"]],
-                                     buddies_in_vf)
+    # Visual field utility: Check whether people are walking in a group and, if 
+    # so, compute the utility
+    if(!is.null(uv$vf_angles[[1]])) {
+        V <- V + vf_utility_discrete(params[["b_visual_field"]],
+                                     uv$vf_angles[[1]])
     }
 
-    V_transformed <- c(-p[["stop_utility"]], V) / p[["randomness"]]
+
+
+
+
+    ############################################################################
+    # TRANSFORMATION
+
+    # Add the stopping utility to the vector and transform them according to the 
+    # randomness parameter
+    V_transformed <- c(-params[["stop_utility"]], V) / params[["randomness"]]
 
     # Robustness against NAs. Can sometimes occur when you have the difference
     # between Inf - Inf = NA. Should not occur, but might inconvenience one 
@@ -281,6 +202,168 @@ utility <- function(agent,
     }
 
     return(V_transformed)
+}
+
+#' Compute utility variables
+#' 
+#' This function uses the current state of the environment to determine the 
+#' values of a whole range of variables that are used within the utility 
+#' functions.
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param state Object of the \code{\link[predped]{state-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param agent_specifications List created by the 
+#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+#' information of all agents within the current \code{state} and allows for the
+#' communication between the \code{predped} simulation functions and the 
+#' \code{m4ma} utility functions.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' 
+#' @return Data.frame containing all of the needed variables to be able to 
+#' compute the values of the utility functions.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{update_position}},
+#' \code{\link[predped]{update}}
+#' 
+#' @rdname compute_utility_variables
+#' 
+#' @export 
+compute_utility_variables <- function(agent,
+                                      state,
+                                      background,
+                                      agent_specifications,
+                                      centers,                    
+                                      check) {
+
+    # Create a data.frame that will contain all of the needed information in 
+    # a single row. This data.frame will already contain the index of the agent
+    # of interest, making sure that the single row is already defined.
+    #
+    # The variable name contains the first two letters of "utility variables" as
+    # the more informative name (but too long to spell out here)
+    uv <- data.frame(agent_idx = which(agent_specifications$id == id(agent)))
+
+    # Preferred speed utility: Required variables are the goal position and the 
+    # goal distance
+    uv$ps_position <- list(matrix(current_goal(agent)@path[1,],
+                                  ncol = 2)) 
+    uv$ps_speed <- speed(agent)
+    uv$ps_distance <- m4ma::dist1_rcpp(position(agent), 
+                                       goal_position)
+
+    # Goal direction utility: Required variable is the angle between agent and 
+    # the goal
+    uv$gd_angle <- m4ma::destinationAngle_rcpp(orientation(agent), 
+                                               position(agent, return_matrix = TRUE),
+                                               goal_position) / 90
+
+    # Interpersonal distance utility: Required variable is the distance between 
+    # agent and other agents, and whether these agents are part of the ingroup, 
+    # and whether the distances are all positive.
+    uv$id_distance <- list(m4ma::predClose_rcpp(uv$agent_idx, 
+                                                p1 = position(agent, return_matrix = TRUE), 
+                                                a1 = orientation(agent),
+                                                p2 = agent_specifications$position, 
+                                                r = agent_specifications$size, 
+                                                centres = centers, 
+                                                p_pred = agent_specifications$predictions, 
+                                                objects = objects(background)))
+    
+    # Check which cells have only positive distance
+    uv$id_check <- list(check & apply(uv$id_distance, 
+                                      2, 
+                                      \(x) all(x > 0)))
+
+    # Get names of ingroup agents and check whether these agents are part of the 
+    # ingroup or not
+    agent_groups <- agent_specifications$group[-uv$agent_idx]
+    names_ingroup <- names(agent_groups[agent_groups == agent_specifications$group[uv$agent_idx]])
+
+    uv$id_ingroup <- row.names(uv$id_distance) %in% names_ingroup
+
+    # Blocked angle utility: Required variable is those angles that might be 
+    # blocked in the near future. In other words, we are trying to predict which 
+    # directions might lead to collisions in the future
+    if(nrow(agent_specifications$predictions) == 1) {
+        # When just deleting `agent_idx` from a single-row matrix, we get to 
+        # a numeric, not a matrix. Therefore create empty matrix if there is
+        # only 1 agent.
+        predictions_minus_agent <- matrix(0, nrow = 0, ncol = 2)
+    } else {
+        # Another weird case is when you only have 2 agents, where it 
+        # transforms the matrix to a numerical vector. To ensure there are 
+        # no problems, we transform to a matrix and reassign the id's  in 
+        # the rows
+        predictions_minus_agent <- matrix(agent_specifications$predictions[-uv$agent_idx,],
+                                          ncol = 2)
+        rownames(predictions_minus_agent) <- agent_specifications$id[-uv$agent_idx]
+    }
+
+    uv$ba_angle <- list(m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
+                                                orientation(agent),
+                                                speed(agent),
+                                                predictions_minus_agent,
+                                                agent_specifications$size[-uv$agent_idx],
+                                                objects(background)))
+
+    # Follow the leader utility: Required variable is the potential leaders and 
+    # their distances. This is all outputted in a list by getLeaders_rcpp, which
+    # is why we just append it to the data.frame directly
+    uv$fl_leaders <- m4ma::getLeaders_rcpp(uv$agent_idx,
+                                           agent_specifications$position,
+                                           agent_specifications$orientation,
+                                           agent_specifications$speed,
+                                           goal_position,
+                                           agent_specifications$group,
+                                           centers,
+                                           objects(background))
+
+    # Walking besides utility: Required variable is the potential buddies that 
+    # you can walk besides. A similar reasoning to follow the leader is applied 
+    # here.
+    uv$wb_buddies <- m4ma::getBuddy_rcpp(uv$agent_idx,
+                                         agent_specifications$position,
+                                         agent_specifications$speed,
+                                         agent_specifications$group,
+                                         agent_specifications$orientation,
+                                         agent_specifications$predictions,
+                                         centers,
+                                         objects(background),
+                                         pickBest = FALSE)
+
+    # Group centroid utility: Required variables are the distance to the predicted
+    # group centroid, the number of pedestrians in the group, and the radius of 
+    # the agent in question
+    inGroup <- agent_specifications$group[-uv$agent_idx] == agent_specifications$group[uv$agent_idx]
+    p_pred <- predictions_minus_agent[inGroup, , drop = FALSE]
+    nped <- dim(p_pred)[1]    
+        
+    uv$gc_distance <- distance_group_centroid(p_pred,
+                                              centers,
+                                              nped)
+    uv$gc_radius <- radius(agent)
+    uv$gc_nped <- nped
+
+    # Visual field utility: Required variable is the angle of one or more 
+    # other pedestrians.
+    uv$vf_angles <- list(get_angles(uv$agent_idx,
+                                    agent_specifications$group,
+                                    position(agent),
+                                    orientation(agent),
+                                    agent_specifications$predictions,
+                                    centers,
+                                    any_member = TRUE))
+
+    return(uv)       
 }
 
 
