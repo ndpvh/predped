@@ -130,10 +130,10 @@ setMethod("utility", "data.frame", function(object,
     # Goal direction utility: Check whether the angle to the goal is defined and,
     # if so, compute the utility of heading in a given direction relative to 
     # where the goal is located
-    if (!is.null(object$gd_angle)) {
+    if (!is.null(object$gd_angle[[1]])) {
         V <- V + m4ma::gaUtility_rcpp(parameters[["b_goal_direction"]], 
                                       parameters[["a_goal_direction"]], 
-                                      object$gd_angle)
+                                      object$gd_angle[[1]])
     }
 
     # Current direction utility: Compute the utility of heading in a given 
@@ -284,9 +284,9 @@ compute_utility_variables <- function(agent,
 
     # Goal direction utility: Required variable is the angle between agent and 
     # the goal
-    uv$gd_angle <- m4ma::destinationAngle_rcpp(orientation(agent), 
-                                               position(agent, return_matrix = TRUE),
-                                               goal_position) / 90
+    uv$gd_angle <- list(m4ma::destinationAngle_rcpp(orientation(agent), 
+                                                    position(agent, return_matrix = TRUE),
+                                                    goal_position) / 90)
 
     # Interpersonal distance utility: Required variable is the distance between 
     # agent and other agents, and whether these agents are part of the ingroup, 
