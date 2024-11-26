@@ -422,8 +422,8 @@ setMethod("simulate", "predped", function(object,
 #' `0.2`.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
-#' @param ... Arguments passed on to the \code{\link[predped]{add_group}} 
-#' function or the plot method (if \code{plot_live = TRUE}).
+#' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
+#' \code{plot_live = TRUE}).
 #'
 #' @return Object of the \code{\link[predped]{state-class}}.
 #'

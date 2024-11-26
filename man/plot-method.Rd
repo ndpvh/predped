@@ -172,6 +172,9 @@ Defaults to \code{"red"}.}
 \item{dark_mode}{Logical that can toggle the default colorpallette of predped's
 dark mode. Defaults to \code{FALSE}.}
 
+\item{optimize}{Logical that defines whether to use an optimized version of 
+the plotting or an unoptimized version. Defaults to \code{TRUE}.}
+
 \item{plot.title.size}{Numeric denoting the text size of the plot title.
 Defaults to \code{10}.}
 

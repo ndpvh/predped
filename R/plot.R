@@ -71,6 +71,8 @@
 #' Defaults to \code{8}.
 #' @param dark_mode Logical that can toggle the default colorpallette of predped's
 #' dark mode. Defaults to \code{FALSE}.
+#' @param optimize Logical that defines whether to use an optimized version of 
+#' the plotting or an unoptimized version. Defaults to \code{TRUE}.
 #' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
 #' @return Either a geom or a ggplot, depending on the object provided (see

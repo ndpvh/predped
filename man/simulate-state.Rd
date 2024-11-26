@@ -100,8 +100,8 @@ between iterations, i.e., the time between updating the plot. Defaults to
 \item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{add_group}} 
-function or the plot method (if \code{plot_live = TRUE}).}
+\item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if 
+\code{plot_live = TRUE}).}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}.
