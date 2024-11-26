@@ -47,7 +47,7 @@ setting <- background(shape = rectangle(center = c(4, 4),
 # setting, you can provide this function with several other arguments that 
 # influence how the plot looks like. These additional arguments are passed on to
 # `ggplot` functions.
-plot(setting, fill = "grey", color = "black", linewidth = 1.5)
+plot(setting, object.fill = "grey", object.color = "black", object.linewidth = 1.5)
 
 # Once you defined the setting, it is time to define the characteristics of the 
 # pedestrians and bind both together in what we call a `predped` model. This 
