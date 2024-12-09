@@ -192,11 +192,6 @@ setMethod("variables", "state", function(object) {
 
 #' @rdname variables-method
 setMethod("variables<-", "state", function(object, value) {
-    # Check
-    if(!inherits(value, "background")) {
-        stop("Provided value for slot `setting` should be of class `background`.")
-    }
-
     object@variables <- value
     return(object)
 })
