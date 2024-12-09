@@ -24,7 +24,8 @@ state <- setClass("state", list(iteration = "numeric",
                                 setting = "background",
                                 agents = "list",
                                 potential_agents = "list",
-                                iteration_variables = "data.frame"))
+                                iteration_variables = "data.frame", 
+                                variables = "list"))
 
 #' Constructor for the \code{\link[predped]{state-class}}
 #' 
@@ -41,6 +42,9 @@ state <- setClass("state", list(iteration = "numeric",
 #' @param iteration_variables Dataframe containing values for variables that 
 #' control the simulation under the hood, such as \code{max_agents}. Defaults 
 #' to an empty data.frame.
+#' @param variables Named list containing variables that you want to use to 
+#' control the simulation in the \code{fx} argument of the 
+#' \code{\link[predped]{simulate,predped-method}}. Defaults to an empty list.
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}
 #' 
@@ -72,7 +76,8 @@ setMethod("initialize", "state", function(.Object,
                                           setting, 
                                           agents = list(),
                                           potential_agents = list(),
-                                          iteration_variables = data.frame()) {
+                                          iteration_variables = data.frame(), 
+                                          variables = list()) {
 
     # Some checks on the objects
     if(length(agents) != 0 & !all(sapply(agents, is, class2 = "agent"))) {
@@ -88,6 +93,7 @@ setMethod("initialize", "state", function(.Object,
     .Object@agents <- agents
     .Object@potential_agents <- agents
     .Object@iteration_variables <- iteration_variables # Having this as a complete dataframe is not my preferred way of doing things, but does allow users to change specifications on the fly
+    .Object@variables <- variables
 
     return(.Object)
 })
@@ -174,5 +180,23 @@ setMethod("setting<-", "state", function(object, value) {
     }
 
     object@setting <- value
+    return(object)
+})
+
+
+
+#' @rdname variables-method
+setMethod("variables", "state", function(object) {
+    return(object@variables)
+})
+
+#' @rdname variables-method
+setMethod("variables<-", "state", function(object, value) {
+    # Check
+    if(!inherits(value, "background")) {
+        stop("Provided value for slot `setting` should be of class `background`.")
+    }
+
+    object@variables <- value
     return(object)
 })
