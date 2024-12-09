@@ -323,6 +323,14 @@ setMethod("simulate", "predped", function(object,
         }
 
         state <- initial_condition
+
+        # Check whether iteration_variables is defined for this initial condition.
+        # If not, then we will have to create them ourselves
+        if(!(nrow(iteration_variables(state)) >= iterations)) {
+            iteration_variables(state) <- data.frame(max_agents = max_agents[1:iterations],
+                                                     goal_number = goal_number[1:iterations],
+                                                     add_agent_index = add_agent_index[1:iterations])
+        }
     } else {
         state <- predped::state(iteration = 0,
                                 setting = object@setting,
