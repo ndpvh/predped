@@ -10,7 +10,8 @@
   setting,
   agents = list(),
   potential_agents = list(),
-  iteration_variables = data.frame()
+  iteration_variables = data.frame(),
+  variables = list()
 )
 }
 \arguments{
@@ -31,6 +32,10 @@ enter the \code{setting}. Defaults to an empty list.}
 \item{iteration_variables}{Dataframe containing values for variables that 
 control the simulation under the hood, such as \code{max_agents}. Defaults 
 to an empty data.frame.}
+
+\item{variables}{Named list containing variables that you want to use to 
+control the simulation in the \code{fx} argument of the 
+\code{\link[predped]{simulate,predped-method}}. Defaults to an empty list.}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}
