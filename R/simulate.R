@@ -290,7 +290,7 @@ setMethod("simulate", "predped", function(object,
     # If you want a number of agents to be there at the start, and you don't
     # have an initial condition yet, generate several agents that stand on
     # random positions in the environment.
-    if(is.null(initial_agents) & !is.null(initial_number_agents)) {
+    if((is.null(initial_agents) & is.null(initial_condition)) & !is.null(initial_number_agents)) {
         initial_agents <- create_initial_condition(initial_number_agents,
                                                    object,
                                                    goal_number[1:initial_number_agents],
@@ -311,18 +311,10 @@ setMethod("simulate", "predped", function(object,
         add_agent_index <- add_agent_index[-1]
     }
 
-    # Initialize the trace and state lists. The state will already contain the
-    # initial condition. The trace list also contains this state.
-    state <- predped::state(iteration = 0,
-                            setting = object@setting,
-                            agents = list(),
-                            iteration_variables = data.frame(max_agents = max_agents[1:iterations],
-                                                             goal_number = goal_number[1:iterations],
-                                                             add_agent_index = add_agent_index[1:iterations]))
-    if(!is.null(initial_agents)) {
-        agents(state) <- initial_agents
-
-    } else if(!is.null(initial_condition)) {
+    # Initialize the trace and state lists. Two cases. Either the initial state 
+    # already exists, which case we just use this one, or we create an empty 
+    # state and check whether there are any agents to add to this state.
+    if(!is.null(initial_condition)) {
         if(!identical(initial_condition@setting, state@setting)) {
             stop(paste0("Setting in the `predped` model is not the same as the ",
                         "setting in the initial condition. ",
@@ -330,8 +322,21 @@ setMethod("simulate", "predped", function(object,
                         "with your model."))
         }
 
-        agents(state) <- initial_condition@agents
+        state <- initial_condition
+    } else {
+        state <- predped::state(iteration = 0,
+                                setting = object@setting,
+                                agents = list(),
+                                iteration_variables = data.frame(max_agents = max_agents[1:iterations],
+                                                                 goal_number = goal_number[1:iterations],
+                                                                 add_agent_index = add_agent_index[1:iterations]), 
+                                variables = list())
+
+        if(!is.null(initial_agents)) {
+            agents(state) <- initial_agents
+        }
     }
+
     trace <- list(state)
 
     # Loop over each iteration of the model
