@@ -315,7 +315,7 @@ setMethod("simulate", "predped", function(object,
     # already exists, which case we just use this one, or we create an empty 
     # state and check whether there are any agents to add to this state.
     if(!is.null(initial_condition)) {
-        if(!identical(initial_condition@setting, state@setting)) {
+        if(!identical(initial_condition@setting, object@setting)) {
             stop(paste0("Setting in the `predped` model is not the same as the ",
                         "setting in the initial condition. ",
                         "Please make sure the initial condition is compatible ",
