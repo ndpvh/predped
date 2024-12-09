@@ -649,10 +649,10 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' my_state <- state(iteration = 0, 
 #'                   setting = my_background)
 #' 
-#' # Access iteration slot
+#' # Access iteration_variables slot
 #' iteration_variables(my_state)
 #' 
-#' # Change the iteration slot
+#' # Change the iteration_variables slot
 #' iteration_variables(my_state) <- data.frame(x = rep(1,3))
 #' iteration_variables(my_state)
 #' 
@@ -1290,6 +1290,44 @@ setGeneric("to", function(object, ...) standardGeneric("to"))
 #' 
 #' @export 
 setGeneric("to<-", function(object, value) standardGeneric("to<-"))
+
+
+
+#' Getter/Setter for the \code{variables}-slot
+#' 
+#' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @examples 
+#' # Initialize state
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(2, 2)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 0.5))) 
+#' 
+#' my_state <- state(iteration = 0, 
+#'                   setting = my_background)
+#' 
+#' # Access variables slot
+#' variables(my_state)
+#' 
+#' # Change the variables slot
+#' variables(my_state) <- list("my_variable" = 10)
+#' variables(my_state)
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname variables-method
+#' 
+#' @export
+setGeneric("variables", function(object) standardGeneric("variables"))
+
+#' @rdname variables-method
+#' 
+#' @export
+setGeneric("variables<-", function(object, value) standardGeneric("variables<-"))
 
 
 
