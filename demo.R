@@ -134,7 +134,7 @@ create_gif <- function(x) {
     trace <- readRDS(file.path("demo", paste0(x, ".Rds")))
 
     # Get size of gif in pixels
-    size <- shape(trace[[1]]$setting)@points |>
+    size <- shape(trace[[1]]@setting)@points |>
         matrixStats::colRanges() |>
         t() |>
         diff()
@@ -142,9 +142,8 @@ create_gif <- function(x) {
 
     # Create the plots and save them to a gif
     plt <- plot(trace, 
-                trace = TRUE, 
-                linewidth = 1.5, 
-                size = 4) 
+                object.linewidth = 1.5, 
+                goal.size = 4) 
 
     gifski::save_gif(lapply(plt, \(x) print(x)), 
                      file.path("demo", paste0(x, ".gif")),
