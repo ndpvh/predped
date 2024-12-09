@@ -91,7 +91,7 @@ setMethod("initialize", "state", function(.Object,
     .Object@iteration <- floor(iteration)
     .Object@setting <- setting
     .Object@agents <- agents
-    .Object@potential_agents <- agents
+    .Object@potential_agents <- potential_agents
     .Object@iteration_variables <- iteration_variables # Having this as a complete dataframe is not my preferred way of doing things, but does allow users to change specifications on the fly
     .Object@variables <- variables
 
