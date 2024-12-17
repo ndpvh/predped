@@ -73,6 +73,9 @@
 #' dark mode. Defaults to \code{FALSE}.
 #' @param optimize Logical that defines whether to use an optimized version of 
 #' the plotting or an unoptimized version. Defaults to \code{TRUE}.
+#' @param print_progress Logical that denotes whether to print the iteration of 
+#' the state that is currently being plotted. Only applies when plotting a trace.
+#' Defaults to \code{TRUE}.
 #' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
 #' @return Either a geom or a ggplot, depending on the object provided (see
@@ -292,7 +295,7 @@ setMethod("plot", "background", function(object,
 })
 
 #'@rdname plot-method
-setMethod("plot", "list", function(object, ...) {
+setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
 
     # First a check of whether anything is contained within this list. Otherwise
     # return an error
@@ -315,7 +318,7 @@ setMethod("plot", "list", function(object, ...) {
 
     plt <- lapply(seq_along(object),
                   function(i) {
-                      if(trace) {
+                      if(trace & print_progress) {
                           cat(paste0("\rMaking plot for state ", object[[i]]@iteration))
                       }
 
