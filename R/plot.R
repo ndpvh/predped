@@ -325,7 +325,7 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
                       return(predped::plot(object[[i]], ...))
                   })
 
-    if(trace) {
+    if(trace & print_progress) {
         cat("\n")
     }
 
