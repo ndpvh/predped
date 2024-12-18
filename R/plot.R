@@ -312,7 +312,7 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
     # of the state, which we need to do some bookkeeping for
     trace <- inherits(object[[1]], "state")
 
-    if(trace) {
+    if(trace & print_progress) {
         cat("\n")
     }
 
