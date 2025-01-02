@@ -602,6 +602,19 @@ update_goal <- function(agent,
                                                   many_nodes = many_nodes,
                                                   reevaluate = TRUE)
 
+            # Perform a first check. If no path remains open, try to reroute 
+            # without accounting for the other agents that are standing in the 
+            # way. Only if this doesn't work will we move on to something else.
+            if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
+                current_goal(agent)@path <- find_path(current_goal(agent), 
+                                                      agent, 
+                                                      background,
+                                                      space_between = space_between,
+                                                      precomputed_edges = precomputed_edges,
+                                                      many_nodes = many_nodes,
+                                                      reevaluate = TRUE)
+            }
+
             # Quick check whether the path is clearly defined. If not, 
             # then the agent will have to reroute at a later time and 
             # wait for now. 
