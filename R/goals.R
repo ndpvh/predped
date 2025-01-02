@@ -375,9 +375,9 @@ setMethod("find_path", "goal", function(object,
     # Create a graph that can be used by `cppRouting`. In constrast to Andrew, 
     # I put the directed argument to TRUE as the order of the nodes in the edges
     # matters
-    tryCatch(graph <- cppRouting::makegraph(edges$edges, 
+    graph <- cppRouting::makegraph(edges$edges, 
                                    directed = TRUE,
-                                   coords = edges$nodes), error = function(e) browser())
+                                   coords = edges$nodes)
 
     # Make a check of whether "agent" and "goal" are contained within the nodes.
     # Might be deleted because of blocking, or because `make_graph` deletes them.
