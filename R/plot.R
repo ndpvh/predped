@@ -474,6 +474,17 @@ setMethod("plot", "state", function(object,
         object.fill <- "black"
         object.color <- "white"
         segment.color <- "white"
+
+        # If any of the agents have a "black" color, we need to change that to 
+        # white. Makes sure agents without specified color can still be seen.
+        agents(object) <- lapply(agents(object),
+                                 function(x) {
+                                     if(color(x) == "black") {
+                                         color(x) <- "white"
+                                     }
+ 
+                                     return(x)
+                                 })
     }
 
     # Change the goal.size if we are in the optimized scenario. Allows users to
