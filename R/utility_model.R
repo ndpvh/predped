@@ -261,7 +261,7 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' @rdname compute_utility_variables
 #' 
 #' @export 
-setMethod("compute_utility_variables", "agent", function(agent,
+setMethod("compute_utility_variables", "agent", function(object,
                                                          state,
                                                          background,
                                                          agent_specifications,
@@ -274,28 +274,28 @@ setMethod("compute_utility_variables", "agent", function(agent,
     #
     # The variable name contains the first two letters of "utility variables" as
     # the more informative name (but too long to spell out here)
-    uv <- data.frame(agent_idx = which(agent_specifications$id == id(agent)))
+    uv <- data.frame(agent_idx = which(agent_specifications$id == id(object)))
 
     # Preferred speed utility: Required variables are the current speed and the 
     # goal distance
-    goal_position <- matrix(current_goal(agent)@path[1,], ncol = 2)
+    goal_position <- matrix(current_goal(object)@path[1,], ncol = 2)
 
-    uv$ps_speed <- speed(agent)
-    uv$ps_distance <- m4ma::dist1_rcpp(position(agent), 
+    uv$ps_speed <- speed(object)
+    uv$ps_distance <- m4ma::dist1_rcpp(position(object), 
                                        goal_position)
 
     # Goal direction utility: Required variable is the angle between agent and 
     # the goal
-    uv$gd_angle <- list(m4ma::destinationAngle_rcpp(orientation(agent), 
-                                                    position(agent, return_matrix = TRUE),
+    uv$gd_angle <- list(m4ma::destinationAngle_rcpp(orientation(object), 
+                                                    position(object, return_matrix = TRUE),
                                                     goal_position) / 90)
 
     # Interpersonal distance utility: Required variable is the distance between 
     # agent and other agents, and whether these agents are part of the ingroup, 
     # and whether the distances are all positive.
     uv$id_distance <- list(m4ma::predClose_rcpp(uv$agent_idx, 
-                                                p1 = position(agent, return_matrix = TRUE), 
-                                                a1 = orientation(agent),
+                                                p1 = position(object, return_matrix = TRUE), 
+                                                a1 = orientation(object),
                                                 p2 = agent_specifications$position, 
                                                 r = agent_specifications$size, 
                                                 centres = centers, 
@@ -336,9 +336,9 @@ setMethod("compute_utility_variables", "agent", function(agent,
         rownames(predictions_minus_agent) <- agent_specifications$id[-uv$agent_idx]
     }
 
-    uv$ba_angle <- list(m4ma::blockedAngle_rcpp(position(agent, return_matrix = TRUE),
-                                                orientation(agent),
-                                                speed(agent),
+    uv$ba_angle <- list(m4ma::blockedAngle_rcpp(position(object, return_matrix = TRUE),
+                                                orientation(object),
+                                                speed(object),
                                                 predictions_minus_agent,
                                                 agent_specifications$size[-uv$agent_idx],
                                                 objects(background)))
@@ -378,15 +378,15 @@ setMethod("compute_utility_variables", "agent", function(agent,
     uv$gc_distance <- list(distance_group_centroid(p_pred,
                                                    centers,
                                                    nped))
-    uv$gc_radius <- radius(agent)
+    uv$gc_radius <- radius(object)
     uv$gc_nped <- nped
 
     # Visual field utility: Required variable is the angle of one or more 
     # other pedestrians.
     uv$vf_angles <- list(get_angles(uv$agent_idx,
                                     agent_specifications$group,
-                                    position(agent),
-                                    orientation(agent),
+                                    position(object),
+                                    orientation(object),
                                     agent_specifications$predictions,
                                     centers,
                                     any_member = TRUE))
@@ -427,10 +427,10 @@ setMethod("compute_utility_variables", "agent", function(agent,
 #' @rdname compute_utility_variables
 #' 
 #' @export 
-setMethod("compute_utility_variables", "data.frame", function(data,
+setMethod("compute_utility_variables", "data.frame", function(object,
                                                               background) {
     # Transform the data to a trace and then back to a dataframe
-    trace <- to_trace(data, background)
+    trace <- to_trace(object, background)
     return(unpack_trace(trace))
 })
 
