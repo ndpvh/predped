@@ -924,10 +924,12 @@ add_agent <- function(model,
                                               background,
                                               precomputed_edges = precomputed_edges,
                                               reevaluate = FALSE)
-    browser()
-    # current_goal(tmp_agent)@path <- matrix(current_goal(tmp_agent)@position,
-    #                                        nrow = 1,
-    #                                        ncol = 2)
+
+    if(nrow(current_goal(tmp_agent)@path) == 0) {
+        current_goal(tmp_agent)@path <- matrix(current_goal(tmp_agent)@position,
+                                               nrow = 1,
+                                               ncol = 2)
+    }
 
     return(tmp_agent)
 }
@@ -1128,7 +1130,11 @@ create_initial_condition <- function(agent_number,
 
         # Let the agent face the way of its goal
         co_1 <- position(new_agent)
-        co_2 <- current_goal(new_agent)@path[1,]
+        if(nrow(current_goal(new_agent)@path) == 0) {
+            co_2 <- current_goal(new_agent)@position
+        } else {
+            co_2 <- current_goal(new_agent)@path[1,]
+        }
 
         orientation(new_agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
 
