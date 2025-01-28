@@ -881,24 +881,16 @@ add_agent <- function(model,
     if(is.null(precomputed_goals)) {
         # Try to generate a goal stack. If that's not possible, then the agent
         # will be provided with an exit goal.
-        goal_stack <- tryCatch(goal_stack(goal_number,
-                                          background,
-                                          counter = goal_duration,
-                                          precomputed_edges = precomputed_edges,
-                                          many_nodes = many_nodes,
-                                          starting_position = position,
-                                          precompute_goal_paths = precompute_goal_paths,
-                                          space_between = space_between * radius,
-                                          sort = sort_goals,
-                                          middle_edge = middle_edge),
-                               error = function(e) {
-                                   # Give a message about this
-                                #    cat("\rNo goal stack could be created. Will give exit goal.\n")
-
-                                   exits <- exit(background)
-                                   return(list(goal(id = "goal exit",
-                                                    position = exits[sample(1:nrow(exits), 1),])))
-                               })
+        goal_stack <- goal_stack(goal_number,
+                                 background,
+                                 counter = goal_duration,
+                                 precomputed_edges = precomputed_edges,
+                                 many_nodes = many_nodes,
+                                 starting_position = position,
+                                 precompute_goal_paths = precompute_goal_paths,
+                                 space_between = space_between * radius,
+                                 sort = sort_goals,
+                                 middle_edge = middle_edge)
     } else {
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]

@@ -207,6 +207,13 @@ setMethod("initialize", "polygon", function(.Object,
     .Object@center <- coordinate(c(mean(range(.Object@points[,1])), 
                                    mean(range(.Object@points[,2]))))
 
+    # Check whether all of the objects edges are forbidden or not. If so, then 
+    # we need to make the object uninteractable. Only needed if the object is 
+    # interactable in the first place
+    if(.Object@interactable) {
+        .Object@interactable <- length(.Object@forbidden) < nrow(.Object@points)
+    }    
+
     return(.Object)
 })
 
@@ -418,6 +425,24 @@ setMethod("initialize", "circle", function(.Object,
 
     # Other things to add
     .Object@forbidden <- forbidden
+
+    # Check whether all of the objects edges are forbidden or not. If so, then 
+    # we need to make the object uninteractable. Only needed if the object is 
+    # interactable in the first place
+    if(.Object@interactable & length(forbidden) > 0) {
+        forbidden_angles <- sapply(
+            seq_len(nrow(forbidden)),
+            \(i) seq(0, 2 * pi, 0.01) >= forbidden[i, 1] & seq(0, 2 * pi, 0.01) <= forbidden[i, 2]
+        )
+
+        if(ncol(forbidden_angles) > 1) {
+            forbidden_angles <- rowSums(forbidden_angles) > 0
+        } else {
+            forbidden_angles <- as.logical(forbidden_angles)
+        }
+
+        .Object@interactable <- !all(forbidden_angles)
+    }
 
     return(.Object)
 })
@@ -1313,7 +1338,7 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
         }
     }
 
-    idx <- sample(seq_len(nrow(edges)), 1)
+    tryCatch(idx <- sample(seq_len(nrow(edges)), 1), error = function(e) browser())
 
     # If the middle of the edge should not be sampled, first sample a random 
     # number between 0 and 1. This number will determine how far along the 
