@@ -212,7 +212,7 @@ load_parameters <- function(x = NULL,
         }
 
     # Case: R-files
-    } else if(grepl(".Rda", x, fixed = TRUE) | grepl(".Rds", x, fixed = TRUE)) {
+    } else if(grepl(".Rda", x, fixed = TRUE) | grepl(".Rds", x, fixed = TRUE) | grepl(".RDS", x, fixed = TRUE) | grepl(".RDA", x, fixed = TRUE)) {
         # Use the readRDS function to read in the parameters
         params <- readRDS(x)
 
