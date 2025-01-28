@@ -184,3 +184,95 @@ unpack_trace <- function(x,
     # Create a continuous time-variable in seconds
     return(x)
 }
+
+#' Transform data to a trace
+#' 
+#' This function does the opposite of \code{\link[predped]{unpack_trace}}. It
+#' takes in a data.frame and return a trace according to \code{predped}s 
+#' requirements. The data.frame should at least have the column names "x", "y", 
+#' "time", and "id", containing the coordinates, times at which the data were 
+#' gathered (in seconds), and the id-number of the person whose data it is.
+#' Additionally, dataframe needs information on the goals that agents were 
+#' doing
+#' 
+#' @param data Instance of a data.frame containing the data you want to transform.
+#' @param background Instance of the \code{\link[predped]background-class} 
+#' containing the setting in which the data were gathered.
+#' @param velocities Numeric matrix containing the change in speed for an agent
+#' whenever they move to the respective cell of this matrix. Is used to create 
+#' the cell positions that the agent might move to, as performed through 
+#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
+#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
+#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an 
+#' agent whenever they move to the respective cell of this matrix. Is used to 
+#' create the cell positions that the agent might move to, as performed through
+#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
+#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
+#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
+#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
+#' angles are actually the negative symmetric versions of the smaller angles).
+#' @param stay_stopped Logical denoting whether agents will predict others that 
+#' are currently not moving to remain immobile in the next iteration. Defaults 
+#' to \code{TRUE}.
+#' @param time_step Numeric denoting the time between each iteration. Defaults 
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' 
+#' @examples
+#' # This is my example
+#'
+#' @rdname to_trace
+#' 
+#' @export
+to_trace <- function(data, 
+                     background,
+                     velocities = c(1.5, 1, 0.5) |>
+                        rep(each = 11) |>
+                        matrix(ncol = 3),
+                     orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                      350, 340, 327.5, 310, 287.5) |>
+                         rep(times = 3) |>
+                         matrix(ncol = 3),
+                     stay_stopped = TRUE,
+                     time_step = 0.5) {
+
+    # Define the times at which the simulation ran and define the bins and 
+    # iterations that come with it
+    time_max <- diff(range(data$time))
+
+    steps <- seq(0, time_max, by = time_step)
+    iterations <- seq(0, length(steps), by = 1)
+
+    # Get the unique individuals in the data so that you can loop over them.
+    agents <- unique(data$id)
+    per_agent <- list()
+    for(i in agents) {
+        # Select the data for this agent
+        agent_data <- data[data$id == i, ]
+
+        browser()
+
+        # Approximate the positions of the agent by taking a mean for every 
+        # binned interval the length of "time_step".
+        positions <- sapply(
+            2:length(steps), 
+            function(i) {
+                idx <- data$time < steps[i] & data$time >= steps[i - 1]
+                return(data.frame(
+                    "iteration" = iterations[i - 1],
+                    "time" = steps[i - 1],
+                    "x" = mean(data$x[idx]),
+                    "y" = mean(data$y[idx]),
+                    "goal_id" = data$goal_id[idx][1],
+                    "goal_x" = data$goal_x[idx][1],
+                    "goal_y" = data$goal_y[idx][1]
+                ))
+            }
+        )
+        positions <- as.data.frame(t(positions))
+
+        # Create a speed and orientation vector for these data
+
+    }
+
+}
