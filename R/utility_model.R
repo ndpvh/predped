@@ -61,10 +61,11 @@ setMethod("utility", "agent", function(object,
                                     agent_specifications,
                                     centers,                    
                                     check)
+    uv$check <- list(check)
 
     # Pass down to a lower-level utility function that uses all of this 
     # information
-    return(utility(uv, parameters(object), check))
+    return(utility(uv, parameters(object)))
 })
 
 #' Compute the utilities with all utility variables known
@@ -79,8 +80,6 @@ setMethod("utility", "agent", function(object,
 #' @param parameters Dataframe containing the parameters of the agent. Should 
 #' conform to the naming conventions mentioned in 
 #' \code{\link[predped]{params_from_csv}}.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
 #' 
 #' @return Numeric matrix denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.
@@ -106,14 +105,13 @@ setMethod("utility", "agent", function(object,
 #    of `agent` they occupy in a more straightforward way than is currently
 #    implemented in `get_leaders` and `get_buddy`.
 setMethod("utility", "data.frame", function(object,
-                                            parameters,
-                                            check) {
+                                            parameters) {
 
     ############################################################################
     # COMPUTATION
 
     # Create an empty vector of the same size needed for the computation                            
-    V <- numeric(length(check))
+    V <- numeric(length(object$check[[1]]))
 
     # Preferred speed utility: Check whether the distance to the goal is not 
     # NULL and, if not, compute the utility of deceleration, acceleration, or 
@@ -226,6 +224,10 @@ setMethod("utility", "data.frame", function(object,
     return(V_transformed)
 })
 
+# Set up a generic for `utility`. This allows us to differentiate between the 
+# function when all utility variables have been precomputed vs when they haven't.
+setGeneric("compute_utility_variables", function(object, ...) standardGeneric("compute_utility_variables"))
+
 #' Compute utility variables
 #' 
 #' This function uses the current state of the environment to determine the 
@@ -259,12 +261,12 @@ setMethod("utility", "data.frame", function(object,
 #' @rdname compute_utility_variables
 #' 
 #' @export 
-compute_utility_variables <- function(agent,
-                                      state,
-                                      background,
-                                      agent_specifications,
-                                      centers,                    
-                                      check) {
+setMethod("compute_utility_variables", "agent", function(agent,
+                                                         state,
+                                                         background,
+                                                         agent_specifications,
+                                                         centers,                    
+                                                         check) {
 
     # Create a data.frame that will contain all of the needed information in 
     # a single row. This data.frame will already contain the index of the agent
@@ -390,7 +392,47 @@ compute_utility_variables <- function(agent,
                                     any_member = TRUE))
 
     return(uv)       
-}
+})
+
+#' Compute utility variables
+#' 
+#' This function uses the current state of the environment to determine the 
+#' values of a whole range of variables that are used within the utility 
+#' functions.
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param state Object of the \code{\link[predped]{state-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param agent_specifications List created by the 
+#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+#' information of all agents within the current \code{state} and allows for the
+#' communication between the \code{predped} simulation functions and the 
+#' \code{m4ma} utility functions.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' 
+#' @return Data.frame containing all of the needed variables to be able to 
+#' compute the values of the utility functions.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{update_position}},
+#' \code{\link[predped]{update}}
+#' 
+#' @rdname compute_utility_variables
+#' 
+#' @export 
+setMethod("compute_utility_variables", "data.frame", function(data,
+                                                              background) {
+    # Transform the data to a trace and then back to a dataframe
+    trace <- to_trace(data, background)
+    return(unpack_trace(trace))
+})
 
 
 
