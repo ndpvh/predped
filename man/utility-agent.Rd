@@ -7,7 +7,7 @@
 \usage{
 \S4method{utility}{agent}(object, state, background, agent_specifications, centers, check)
 
-\S4method{utility}{data.frame}(object, parameters, check)
+\S4method{utility}{data.frame}(object, parameters)
 }
 \arguments{
 \item{object}{Dataframe containing all of the needed information to compute 

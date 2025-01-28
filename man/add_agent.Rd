@@ -15,7 +15,7 @@ add_agent(
   middle_edge = FALSE,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
-  space_between = 2.5,
+  space_between = 1.25,
   position = NULL,
   standing_start = 0.1,
   individual_differences = FALSE

@@ -44,7 +44,7 @@ plot(object, ...)
   ...
 )
 
-\S4method{plot}{list}(object, ...)
+\S4method{plot}{list}(object, print_progress = TRUE, ...)
 
 \S4method{plot}{object}(
   object,
@@ -174,6 +174,10 @@ dark mode. Defaults to \code{FALSE}.}
 
 \item{optimize}{Logical that defines whether to use an optimized version of 
 the plotting or an unoptimized version. Defaults to \code{TRUE}.}
+
+\item{print_progress}{Logical that denotes whether to print the iteration of 
+the state that is currently being plotted. Only applies when plotting a trace.
+Defaults to \code{TRUE}.}
 
 \item{plot.title.size}{Numeric denoting the text size of the plot title.
 Defaults to \code{10}.}

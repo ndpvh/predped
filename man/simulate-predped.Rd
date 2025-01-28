@@ -19,7 +19,7 @@
   sort_goals = TRUE,
   precomputed_goals = NULL,
   middle_edge = FALSE,
-  space_between = 2.5,
+  space_between = 1.25,
   time_step = 0.5,
   precompute_edges = TRUE,
   many_nodes = precompute_edges,

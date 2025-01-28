@@ -10,7 +10,7 @@ update_goal(
   background,
   standing_start = 0.1,
   close_enough = 2,
-  space_between = 2.5,
+  space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   report = FALSE

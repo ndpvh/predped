@@ -14,7 +14,7 @@
     times = 3), ncol = 3),
   standing_start = 0.1,
   close_enough = 2,
-  space_between = 2.5,
+  space_between = 1.25,
   stay_stopped = TRUE,
   time_step = 0.5,
   precomputed_edges = NULL,

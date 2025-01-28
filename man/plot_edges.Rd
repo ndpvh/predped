@@ -7,7 +7,7 @@
 plot_edges(
   setting,
   coords = NULL,
-  space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius", ]),
+  space_between = 1.25 * max(params_from_csv[["params_bounds"]]["radius", ]),
   many_nodes = FALSE,
   coords.color = "cornflowerblue",
   edges.color = "black",

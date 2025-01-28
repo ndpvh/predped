@@ -14,7 +14,7 @@
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
   close_enough = 2,
-  space_between = 2.5,
+  space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   standing_start = 0.1,
