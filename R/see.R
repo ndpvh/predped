@@ -62,8 +62,7 @@ best_angle <- function(agent,
                                    tStep = 0.5)
 
         # Check for occlusions or blocked cells the agent cannot move to
-        check <- tryCatch(moving_options(agent, state, background, centers), 
-                          error = function(e) browser())
+        check <- moving_options(agent, state, background, centers)
 
         # Compute the utility of the proposed cells to move to
         V <- utility(agent, state, background, agent_specifications, centers, check)[-1] # Omit utility for cell 0
