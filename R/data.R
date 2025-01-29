@@ -246,6 +246,7 @@ to_trace <- function(data,
     # trace.
     trace <- list()
     N <- max(data$iteration)
+    browser()
     for(i in seq_len(N)) {
         # Add state to the trace and adjust the iteration number
         trace[[i]] <- dummy_state
@@ -328,8 +329,8 @@ to_trace <- function(data,
 #' @export
 add_motion_variables <- function(data, 
                                  velocities = c(1.5, 1, 0.5) ,
-                                 orientations = c(72.5, 50, 32.5, 20, 10, 0, 
-                                                  350, 340, 327.5, 310, 287.5),
+                                 orientations = c(-72.5, -50, -32.5, -20, -10, 0, 
+                                                  10, 20, 32.5, 50, 72.5),
                                  time_step = 0.5,
                                  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step) {
 
@@ -337,7 +338,7 @@ add_motion_variables <- function(data,
     # iterations that come with it
     time_max <- diff(range(data$time))
 
-    steps <- seq(0, time_max, by = time_step)
+    steps <- seq(0, time_max + time_step, by = time_step) + min(data$time)
     iterations <- seq(0, length(steps), by = 1)
 
     # Get the unique individuals in the data so that you can loop over them.
@@ -399,12 +400,23 @@ add_motion_variables <- function(data,
         positions$orientation <- positions$orientation * 180 / pi
 
         # Make some derived changes in speeds and orientation. These will combine
-        # into the cells that are chosen.
+        # into the cells that are chosen. Make sure that the difference in 
+        # orientation falls within (-180, 180), thus making an angle relative to 
+        # the current direction
         d_speed <- c(
             NA,
             positions$speed[2:nrow(positions) - 1] / positions$speed[2:nrow(positions)]
         )
         d_orientation <- c(NA, diff(positions$orientation))
+        d_orientation <- ifelse(
+            d_orientation > 180, 
+            d_orientation - 360,
+            ifelse(
+                d_orientation < -180, 
+                d_orientation + 360,
+                d_orientation
+            )
+        )
 
         ring <- rowSums(
             cbind(
@@ -430,11 +442,13 @@ add_motion_variables <- function(data,
         )
 
         cells <- matrix(1:33, nrow = length(orientations), ncol = length(velocities))
-        cells[d_speed <= threshold] <- 0
-
         positions$cell <- sapply(
             seq_along(ring), 
-            \(j) cells[cone[j], ring[j]]
+            \(j) ifelse(
+                positions$speed[j] <= threshold,
+                0,
+                cells[cone[j], ring[j]]
+            )
         )
 
         # Delete rows with NA and add the agent-specific information to the 
