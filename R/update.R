@@ -571,7 +571,7 @@ update_goal <- function(agent,
                 # Compute the probability of rerouting based on the number of
                 # agents that are standing inbetween the `agent` and their goal
                 blocking_agents <- agents_between_goal(agent, state)
-                prob_rerouting <- pnorm(blocking_agents - reroute_param)
+                prob_rerouting <- pnorm(length(blocking_agents) - reroute_param)
             } else {
                 prob_rerouting <- 0
             }
@@ -587,32 +587,25 @@ update_goal <- function(agent,
             # other agents that this agent should account for when planning),
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
-            # current_goal(agent)@path <- find_path(current_goal(agent), 
-            #                                       agent, 
-            #                                       updated_background,
-            #                                       space_between = space_between,
-            #                                       precomputed_edges = NULL,
-            #                                       many_nodes = TRUE)
-            current_goal(agent)@path <- find_path(current_goal(agent), 
+            old_path <- current_goal(agent)@path
+            blocking_agents <- agents_between_goal(agent, state)
+
+            tryCatch(current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   background,
                                                   space_between = space_between,
-                                                #   new_objects = agents(state),
+                                                  new_objects = blocking_agents,
                                                   precomputed_edges = precomputed_edges,
                                                   many_nodes = many_nodes,
-                                                  reevaluate = TRUE)
+                                                  reevaluate = TRUE),
+                error = function(e) browser()
+            )
 
             # Perform a first check. If no path remains open, try to reroute 
             # without accounting for the other agents that are standing in the 
             # way. Only if this doesn't work will we move on to something else.
             if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-                current_goal(agent)@path <- find_path(current_goal(agent), 
-                                                      agent, 
-                                                      background,
-                                                      space_between = space_between,
-                                                      precomputed_edges = precomputed_edges,
-                                                      many_nodes = many_nodes,
-                                                      reevaluate = TRUE)
+                current_goal(agent)@path <- old_path
             }
 
             # Quick check whether the path is clearly defined. If not, 
