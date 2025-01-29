@@ -60,7 +60,7 @@ testthat::test_that("Number of pedestrians blocking view from goal works", {
                    state_2a, state_2b, state_2c)
 
     # Test the function
-    tst <- lapply(states, \(x) agents_between_goal(me, x))
+    tst <- lapply(states, \(x) length(agents_between_goal(me, x)))
     ref <- list(0, 0, 0, 1, 1, 1, 2, 2, 2)
 
     testthat::expect_equal(tst, ref)
