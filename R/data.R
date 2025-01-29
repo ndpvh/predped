@@ -246,7 +246,6 @@ to_trace <- function(data,
     # trace.
     trace <- list()
     N <- max(data$iteration)
-    browser()
     for(i in seq_len(N)) {
         # Add state to the trace and adjust the iteration number
         trace[[i]] <- dummy_state
@@ -353,16 +352,16 @@ add_motion_variables <- function(data,
         positions <- sapply(
             2:length(steps), 
             function(j) {
-                idx <- data$time < steps[j] & data$time >= steps[j - 1]
+                idx <- agent_data$time < steps[j] & agent_data$time >= steps[j - 1]
                 return(c(
                     "iteration" = iterations[j - 1],
                     "time" = steps[j - 1],
                     "id" = i,
-                    "x" = mean(data$x[idx]),
-                    "y" = mean(data$y[idx]),
-                    "goal_id" = data$goal_id[idx][1],
-                    "goal_x" = data$goal_x[idx][1],
-                    "goal_y" = data$goal_y[idx][1]
+                    "x" = mean(agent_data$x[idx]),
+                    "y" = mean(agent_data$y[idx]),
+                    "goal_id" = agent_data$goal_id[idx][1],
+                    "goal_x" = agent_data$goal_x[idx][1],
+                    "goal_y" = agent_data$goal_y[idx][1]
                 ))
             }
         )
