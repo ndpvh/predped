@@ -244,6 +244,7 @@ to_trace <- function(data,
 
     # Loop over each of the iterations and add the agents to the states of the 
     # trace.
+    trace <- list()
     N <- max(data$iteration)
     for(i in seq_len(N)) {
         # Add state to the trace and adjust the iteration number
@@ -265,13 +266,17 @@ to_trace <- function(data,
             seq_len(nrow(iter_data)),
             function(j) {
                 dummy_agent@id <- iter_data$id[j]
-                dummy_agent@center <- iter_data[j, c("x", "y")]
+                dummy_agent@center <- as.numeric(iter_data[j, c("x", "y")])
                 dummy_agent@speed <- iter_data$speed[j]
                 dummy_agent@orientation <- iter_data$orientation[j]
                 dummy_agent@cell <- iter_data$cell[j]
 
                 dummy_goal@id <- iter_data$goal_id[j]
-                dummy_goal@position <- iter_data[j, c("goal_x", "goal_y")]
+                dummy_goal@position <- coordinate(
+                    as.numeric(
+                        iter_data[j, c("goal_x", "goal_y")]
+                    )
+                )
                 dummy_agent@current_goal <- dummy_goal
 
                 return(dummy_agent)
@@ -440,7 +445,7 @@ add_motion_variables <- function(data,
 
     # Bind all data together and order according to iterations
     new_data <- do.call("rbind", per_agent)
-    new_data <- new_data[order(new_data$iteration)]
+    new_data <- new_data[order(new_data$iteration), ]
 
     return(new_data)
 }
