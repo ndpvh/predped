@@ -162,7 +162,7 @@ setMethod("moving_options", "agent", function(object,
 #' triggering this function to consider where the other agents are right now 
 #' (instead of where they will be in the next iteration).
 #' 
-#' @return Numeric denoting the number of agents that are standing in the way.
+#' @return List containing all of the agents that are blocking the path
 #' 
 #' @examples 
 #' # Create an agent and a state
@@ -191,7 +191,7 @@ setMethod("moving_options", "agent", function(object,
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @rdname agents_between_goals
+#' @rdname agents_between_goal
 #' 
 #' @export
 #
@@ -204,13 +204,16 @@ agents_between_goal <- function(agent,
                                 state, 
                                 agent_predictions = NULL) {
 
+    # Extract the agent list and delete the agent in question from this list.
+    agent_list <- agents(state)
+    agent_list <- agent_list[sapply(agent_list, id) != id(agent)]
+
     # If no predicted positions are delivered to the function, we will use the 
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
-        agent_positions <- lapply(agents(state), position)
-        agent_positions <- do.call("rbind", 
-                                   agent_positions)
+        agent_positions <- lapply(agent_list, position)
+        agent_positions <- do.call("rbind", agent_positions)
     } else {
         agent_positions <- agent_predictions[-id(agent),] |>
             matrix(ncol = 2)
@@ -218,7 +221,7 @@ agents_between_goal <- function(agent,
 
     # If there are no other agents to consider, we can safely exit the function
     if(length(agent_positions) == 0) {
-        return(0)
+        return(list())
     }
     colnames(agent_positions) <- c("x", "y")
 
@@ -232,7 +235,7 @@ agents_between_goal <- function(agent,
                                      ncol = 2))
 
     if(is.na(goal_cone)) {
-        return(0)
+        return(list())
     }
 
     # The discrete cone bin in which the goal is contained is the same for each
@@ -274,15 +277,8 @@ agents_between_goal <- function(agent,
                            }
                        })
 
-    # Get the number of blocking agents
-    n_agents <- sum(blocking)
-
-    # Give them the names of the agents
-    # if(n_agents > 0) {
-    #     attr(n_agents, "ends") <- ends[names(blocking), , , drop = FALSE]
-    # }
-
-    return(n_agents)
+    # Return those agents that are blocking the agent
+    return(agent_list[blocking])
 }
 
 #' Check agent and object overlap
