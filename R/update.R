@@ -597,7 +597,7 @@ update_goal <- function(agent,
                                                   agent, 
                                                   background,
                                                   space_between = space_between,
-                                                  new_objects = agents(state),
+                                                #   new_objects = agents(state),
                                                   precomputed_edges = precomputed_edges,
                                                   many_nodes = many_nodes,
                                                   reevaluate = TRUE)
