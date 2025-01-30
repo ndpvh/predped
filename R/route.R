@@ -416,9 +416,14 @@ create_nodes <- function(from,
     # are deleted. This ensures that the agents will leave some space between 
     # them and the object.
     extension <- space_between - 1e-4
-    to_delete <- lapply(obj, 
+
+    if(length(obj) == 0) {
+        to_delete <- out_object(shp, nodes)
+    } else {
+        to_delete <- lapply(obj, 
                         \(x) in_object(enlarge(x, extension), nodes))
-    to_delete <- Reduce("|", to_delete) | out_object(shp, nodes)
+        to_delete <- Reduce("|", to_delete) | out_object(shp, nodes)
+    }   
 
     nodes <- nodes[!to_delete,] |> 
         matrix(ncol = 2)
