@@ -301,10 +301,17 @@ update_position <- function(agent,
         # If there are no good options available, trigger a reroutening of the 
         # agent: This will create new path points and let the agent reorient. 
         if(!any(check)) {
-            # Change the agent's speed to the starting speed after waiting
+            # Change the agent's speed to the starting speed after waiting and 
+            # indicate that the agent is choosing the stop cell
             speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-            status(agent) <- "reorient" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
+
+            # Let the agent reroute. During this rerouting, they will attempt to
+            # find a better path, and if not, will wait until their path is 
+            # opened up.
+            status(agent) <- "reroute" 
+
+            # Return agent and don't evaluate utilities
             return(agent)
         }
 
@@ -346,7 +353,7 @@ update_position <- function(agent,
         # If stopped, we need to reset the agent's velocity
         if(cell == 0) {
             speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-            status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
+            # status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
             
         } else {
             position(agent) <- centers[cell,]
@@ -544,14 +551,16 @@ update_goal <- function(agent,
     # agents can still plan their path if they can see their goal, but other 
     # agents are in the way. This is determined by the reroute parameter
     if(status(agent) == "reroute") {
-        # Check whether the agent can see the current goal.
-        # seen <- sees_location(agent, 
-        #                       current_goal(agent)@position, 
-        #                       obj)
-        if(length(obj) == 0) {
+        # Check whether the agent can see the current goal based on (a) whether
+        # any objects can be in the way and (b) the shape of the room. With 
+        # regard to the latter, we note that an agent is guaranteed to see their
+        # goal if the room is regular (rectangle or circle) and no objects are 
+        # in the way. Otherwise, we have to do a check
+        shp <- shape(background)
+        if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
             seen <- TRUE
         } else {
-            seen <- all(prune_edges(obj, 
+            seen <- all(prune_edges(append(obj, shape(background)), 
                                     matrix(c(position(agent), current_goal(agent)@position),
                                            nrow = 1)))
         }
@@ -578,6 +587,7 @@ update_goal <- function(agent,
         }
 
         # Check whether you will reroute on this move
+        old_path <- current_goal(agent)@path
         if(runif(1) < prob_rerouting) {
             # Given that you have to reroute, reroute how you will get to your 
             # goal. Add the other agents in objects to account for so you don't 
@@ -587,19 +597,15 @@ update_goal <- function(agent,
             # other agents that this agent should account for when planning),
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
-            old_path <- current_goal(agent)@path
             blocking_agents <- agents_between_goal(agent, state)
-
-            tryCatch(current_goal(agent)@path <- find_path(current_goal(agent), 
+            current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   background,
                                                   space_between = space_between,
                                                   new_objects = blocking_agents,
                                                   precomputed_edges = precomputed_edges,
                                                   many_nodes = many_nodes,
-                                                  reevaluate = TRUE),
-                error = function(e) browser()
-            )
+                                                  reevaluate = TRUE)
 
             # Perform a first check. If no path remains open, try to reroute 
             # without accounting for the other agents that are standing in the 
@@ -615,16 +621,27 @@ update_goal <- function(agent,
                 status(agent) <- "reroute"
                 return(agent)
             }
-
-        } else {
-            # If you don't need to reroute, but can go to the goal directly,
-            # then the `path` attribute just takes in the goal's location
-            current_goal(agent)@path <- matrix(current_goal(agent)@position,
-                                               ncol = 2)
-        }
+        } 
 
         # Turn to the new path point and slow down
         speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+
+        goal_position <- current_goal(agent)@path
+        agent_position <- position(agent)
+        orientation(agent) <- atan2(goal_position[1, 2] - agent_position[2],
+                                    goal_position[1, 1] - agent_position[1]) * 180 / pi
+
+        # If the old path was retained, then that means that there is not 
+        # better way of going to the goal. This means that the agent is not 
+        # able to walk through and should wait for a little bit. 
+        #
+        # Note that this wait state was not originally meant for this purpose
+        # and might therefore be a bit "hacky".
+        if(all(current_goal(agent)@path == old_path)) {
+            status(agent) <- "wait"
+            waiting_counter(agent) <- 1
+            return(agent)
+        }
 
         # After reroutening, put the status to "reorient" so that they will be
         # able to reorient in the next move
