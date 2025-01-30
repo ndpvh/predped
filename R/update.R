@@ -621,31 +621,34 @@ update_goal <- function(agent,
                 status(agent) <- "reroute"
                 return(agent)
             }
+
+            # Turn to the new path point and slow down
+            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+
+            goal_position <- current_goal(agent)@path
+            agent_position <- position(agent)
+            orientation(agent) <- atan2(goal_position[1, 2] - agent_position[2],
+                                        goal_position[1, 1] - agent_position[1]) * 180 / pi
+    
+            # If the old path was retained, then that means that there is not 
+            # better way of going to the goal. This means that the agent is not 
+            # able to walk through and should wait for a little bit. 
+            #
+            # Note that this wait state was not originally meant for this purpose
+            # and might therefore be a bit "hacky".
+            if(all(current_goal(agent)@path == old_path)) {
+                status(agent) <- "wait"
+                waiting_counter(agent) <- 1
+                return(agent)
+            }
+
+            # After reroutening, put the status to "reorient" so that they will be
+            # able to reorient in the next move
+            status(agent) <- "reorient"
         } 
 
-        # Turn to the new path point and slow down
-        speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-
-        goal_position <- current_goal(agent)@path
-        agent_position <- position(agent)
-        orientation(agent) <- atan2(goal_position[1, 2] - agent_position[2],
-                                    goal_position[1, 1] - agent_position[1]) * 180 / pi
-
-        # If the old path was retained, then that means that there is not 
-        # better way of going to the goal. This means that the agent is not 
-        # able to walk through and should wait for a little bit. 
-        #
-        # Note that this wait state was not originally meant for this purpose
-        # and might therefore be a bit "hacky".
-        if(all(current_goal(agent)@path == old_path)) {
-            status(agent) <- "wait"
-            waiting_counter(agent) <- 1
-            return(agent)
-        }
-
-        # After reroutening, put the status to "reorient" so that they will be
-        # able to reorient in the next move
-        status(agent) <- "reorient"
+        # If not rerouted, let them move again
+        status(agent) <- "move"
     }
 
     # If the agent is currently waiting, check the following:
