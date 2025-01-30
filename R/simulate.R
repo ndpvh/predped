@@ -266,7 +266,7 @@ setMethod("simulate", "predped", function(object,
 
     goal_number <- determine_values(goal_number, iterations)
 
-    max_agents <- determine_values(max_agents, iterations)
+    max_agents <- determine_values(max_agents, iterations, positive_integer = FALSE)
 
     # If `goal_duration` is not a function, make it a function anyway (assumed
     # by the `goal` class: To be changed)
