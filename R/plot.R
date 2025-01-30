@@ -899,7 +899,7 @@ setMethod("transform_df", "object", function(object,
                 idx <- Reduce("|", idx)
             }
         } else {
-            idx <- forbidden(object)
+            idx <- 1:nrow(points(object)) %in% forbidden(object)
         }
 
         # Add another annotate with a different color
