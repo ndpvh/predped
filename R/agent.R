@@ -175,9 +175,18 @@ setMethod("initialize", "agent", function(.Object,
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
-    .Object@parameters <- parameters
     .Object@color <- color    
 
+    # If the parameters are empty, add the BaselineEuropean as default. Otherwise
+    # use the defined parameters
+    if(nrow(parameters) == 0) {
+        params <- params_from_csv[["params_archetypes"]]
+        .Object@parameters <- params[params$name == "BaselineEuropean", ]
+    } else {
+        .Object@parameters <- parameters
+    }
+    
+    # Only add the provided current goal if it is defined.
     if(!is.null(current_goal)) {
         .Object@current_goal <- current_goal
     }
