@@ -745,7 +745,7 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state@agents) > 0) & (goal_distance <= 2 * close_enough)) {
+        if((length(state@agents) > 0) & (goal_distance <= 1.5 * close_enough)) {
             # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
@@ -755,7 +755,7 @@ update_goal <- function(agent,
             # If only one agent is blocking the goal, let the agent wait. Only invoke
             # this the moment that the agent is actually in its last movement towards
             # the goal (i.e., when the position of the current goal is also the 
-            # last path point)
+            # last path point) and if the agent is almost within reach of the goal
             if(any(blocking_agents) & (nrow(current_goal(agent)@path) == 1)) {
                 # Find out whether that agent is actually completing a goal or not.
                 # If not, then the agent will just continue business as usual.
@@ -767,7 +767,7 @@ update_goal <- function(agent,
                 # the agent will just have to wait until they move on.
                 stati <- lapply(state@agents[idx], \(x) c(status(x), current_goal(x)@counter))
                 stati <- do.call("rbind", stati)
-                stati[stati[,1] != "completing goal", 2] <- 0
+                stati[stati[,1] != "completing goal", 2] <- 1
 
                 status(agent) <- "wait"
                 waiting_counter(agent) <- max(as.numeric(stati[,2]) + 2)
