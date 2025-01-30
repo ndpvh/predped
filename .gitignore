@@ -38,7 +38,7 @@ performance_test*
 .DS_Store
 RCore/
 demo/*
-bugs/
+issues/
 
 social_utilities_alexander/
 benchmark.md
