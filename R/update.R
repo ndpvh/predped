@@ -303,7 +303,7 @@ update_position <- function(agent,
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting
             speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
-            status(agent) <- "reroute" # Get errors when not leaving this in
+            status(agent) <- "reorient" # Get errors when not leaving this in
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
             return(agent)
         }
@@ -640,11 +640,26 @@ update_goal <- function(agent,
         # Check the counter
         waiting_counter(agent) <- waiting_counter(agent) - 1
 
+        # Draw a circle around the current goal of the agent and find out whether
+        # any of the other agents intersects with this. If so, then we can assume
+        # one of the agents is blocking the access to the goal, and the agent
+        # cannot start the interaction phase.
+        goal_circle <- circle(center = current_goal(agent)@position,
+                              radius = radius(agent))
+        blocking_agents <- sapply(agents(state), 
+                                  \(x) intersects(goal_circle, x))
+
+        # If no agents are blocking access to the goal, allow the agent to move
+        # again
+        if(!any(blocking_agents)) {
+            status(agent) <- "move"
+        }
+
         # If counter is low enough, the agent will have to reroute his approach
         # to the goal. To make sure agents don't get stuck easily, let them 
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
-        if(waiting_counter(agent) < 0) {
+        if(waiting_counter(agent) < 0 & status(agent) != "move") {
             if(length(goals(agent)) != 0) {
                 goals(agent) <- append(current_goal(agent), 
                                        goals(agent))
@@ -654,25 +669,7 @@ update_goal <- function(agent,
             } else {
                 status(agent) <- "move"
             }
-
-        # If the counter is not low enough yet, but the agent is still waiting, 
-        # we can check whether other agents are still blocking his way
-        } else {
-            # Draw a circle around the current goal of the agent and find out whether
-            # any of the other agents intersects with this. If so, then we can assume
-            # one of the agents is blocking the access to the goal, and the agent
-            # cannot start the interaction phase.
-            goal_circle <- circle(center = current_goal(agent)@position,
-                                  radius = radius(agent))
-            blocking_agents <- sapply(agents(state), 
-                                      \(x) intersects(goal_circle, x))
-
-            # If no agents are blocking access to the goal, allow the agent to move
-            # again
-            if(!any(blocking_agents)) {
-                status(agent) <- "move"
-            }
-        }        
+        }
     }
         
     # Finally, it might also be that the agent is close to the goal and can 
