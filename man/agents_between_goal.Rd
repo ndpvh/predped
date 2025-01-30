@@ -18,7 +18,7 @@ triggering this function to consider where the other agents are right now
 (instead of where they will be in the next iteration).}
 }
 \value{
-Numeric denoting the number of agents that are standing in the way.
+List containing all of the agents that are blocking the path
 }
 \description{
 This function computes the number of other agents in a particular state who 

@@ -4,15 +4,7 @@
 \alias{to_trace}
 \title{Transform data to a trace}
 \usage{
-to_trace(
-  data,
-  background,
-  velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
-  orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
-    times = 3), ncol = 3),
-  stay_stopped = TRUE,
-  time_step = 0.5
-)
+to_trace(data, background, ...)
 }
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
@@ -20,28 +12,7 @@ to_trace(
 \item{background}{Instance of the \code{\link[predped]background-class} 
 containing the setting in which the data were gathered.}
 
-\item{velocities}{Numeric matrix containing the change in speed for an agent
-whenever they move to the respective cell of this matrix. Is used to create 
-the cell positions that the agent might move to, as performed through 
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-and 3 columns (speed). Defaults to a matrix in which the columns contain 
-\code{1.5} (acceleration), \code{1}, and \code{0.5}.}
-
-\item{orientations}{Numeric matrix containing the change in direction for an 
-agent whenever they move to the respective cell of this matrix. Is used to 
-create the cell positions that the agent might move to, as performed through
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the rows contain 
-\code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-\code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-angles are actually the negative symmetric versions of the smaller angles).}
-
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
-to \code{TRUE}.}
-
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
+\item{...}{Arguments passed to \code{\link[predped]{add_cells}}.}
 }
 \description{
 This function does the opposite of \code{\link[predped]{unpack_trace}}. It
@@ -49,6 +20,9 @@ takes in a data.frame and return a trace according to \code{predped}s
 requirements. The data.frame should at least have the column names "x", "y", 
 "time", and "id", containing the coordinates, times at which the data were 
 gathered (in seconds), and the id-number of the person whose data it is.
+Additionally, data.frame needs information on the goals that agents were 
+trying to achieve at each timepoint, of which their positions should be 
+saved under "goal_x" and "goal_y", and their id to "goal_id".
 }
 \examples{
 # This is my example
