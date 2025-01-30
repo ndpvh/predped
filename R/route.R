@@ -402,12 +402,18 @@ create_nodes <- function(from,
                         \(x) add_nodes(x, 
                                        space_between = space_between,
                                        only_corners = TRUE))
+    shp_nodes <- add_nodes(shp, 
+                           space_between = space_between, 
+                           only_corners = TRUE,
+                           outside = FALSE)
 
     if(many_nodes) {
         nodes <- rbind(nodes,
-                       do.call("rbind", obj_nodes))
+                       do.call("rbind", obj_nodes),
+                       shp_nodes)
     } else {
-        nodes <- do.call("rbind", obj_nodes)
+        nodes <- rbind(do.call("rbind", obj_nodes),
+                       shp_nodes)
     }
 
     # Check which nodes are contained within the environment and only retain 
