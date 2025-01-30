@@ -71,9 +71,8 @@ testthat::test_that("Creating nodes works (few)", {
 
     # If you want to visualize it
     # plot(setting) +
-    #     ggplot2::geom_point(data = tst, ggplot2::aes(x = X, y = Y), color = "black") +
-    #     ggplot2::geom_point(data = ref, ggplot2::aes(x = X, y = Y), color = "red")
-    
+    #     ggplot2::annotate("point", x = tst$X, y = tst$Y, color = "black") +
+    #     ggplot2::annotate("point", x = ref$X, y = ref$Y, color = "red")
 })
 
 testthat::test_that("Creating nodes works (many)", {
@@ -105,8 +104,8 @@ testthat::test_that("Creating nodes works (many)", {
 
     # If you want to visualize it
     # plot(setting) +
-    #     ggplot2::geom_point(data = tst, ggplot2::aes(x = X, y = Y), color = "black") +
-    #     ggplot2::geom_point(data = ref, ggplot2::aes(x = X, y = Y), color = "red")
+    #     ggplot2::annotate("point", x = tst$X, y = tst$Y, color = "black") +
+    #     ggplot2::annotate("point", x = ref$X, y = ref$Y, color = "red")
 })
 
 testthat::test_that("Evaluating which edges should be deleted works", {
@@ -351,43 +350,9 @@ testthat::test_that("Creating edges with one-directional flow works", {
                                    entrance = c(-1, 0))
     spc <- 0.1
 
-    # Create the reference (originally done on a piece of paper)
-    ref <- list(edges = data.frame(from = c("agent", "agent", "goal", "goal", 
-                                            "node 1", "node 1", "node 2", "node 3",
-                                            "node 3", "node 4"), 
-                                   to = c("node 1", "node 2", "node 3", "node 4",
-                                          "agent", "node 2", "node 3", "goal", 
-                                          "node 4", "node 1"), 
-                                   cost = c(0.3579, 0.3579, 0.3579, 0.3579, 
-                                            0.3579, 1.3028, 1.3028, 0.3579, 
-                                            1.3028, 1.3028)),
-                edges_with_coords = data.frame(from = c("agent", "agent", "goal", "goal", 
-                                                        "node 1", "node 1", "node 2", "node 3",
-                                                        "node 3", "node 4"), 
-                                               from_x = c(-0.75, -0.75, 0.75, 0.75, 
-                                                          -0.5707, -0.5707, -0.5707, 0.5707,
-                                                          0.5707, 0.5707),
-                                               from_y = c(0, 0, 0, 0, 
-                                                          -0.5707, -0.5707, 0.5707, 0.5707,
-                                                          0.5707, -0.5707),
-                                               to = c("node 1", "node 2", "node 3", "node 4",
-                                                      "agent", "node 2", "node 3", "goal", 
-                                                      "node 4", "node 1"), 
-                                               to_x = c(-0.5707, -0.5707, 0.5707, 0.5707, 
-                                                        -0.75, -0.5707, 0.5707, 0.75, 
-                                                        0.5707, -0.5707),
-                                               to_y = c(-0.5707, 0.5707, 0.5707, -0.5707, 
-                                                        0, 0.5707, 0.5707, 0, 
-                                                        -0.5707, -0.5707),
-                                               cost = c(0.3579, 0.3579, 0.3579, 0.3579, 
-                                                        0.3579, 1.3028, 1.3028, 0.3579, 
-                                                        1.3028, 1.3028)),
-                nodes = data.frame(node_ID = c("agent", "goal", "node 1", "node 2",
-                                               "node 3", "node 4"),
-                                   X = c(-0.75, 0.75, -0.5707, -0.5707, 
-                                         0.5707, 0.5707),
-                                   Y = c(0, 0, -0.5707, 0.5707, 
-                                         0.5707, -0.5707)))
+    # Load in the reference (originally done on a piece of paper and then 
+    # adjusted to fit the algorithm)
+    ref <- readRDS(file.path(".", "data", "unidirectional_edges.Rds"))
 
     # Compute the edges
     tst <- predped::create_edges(c(-0.75, 0), 
@@ -407,18 +372,6 @@ testthat::test_that("Creating edges with one-directional flow works", {
     # For the evaluation, we are going to put them in matrix format with no 
     # dimension names. Makes things easier for us. For the tst, also round the 
     # values
-    tst$edges <- dplyr::mutate(tst$edges, 
-                               cost = round(cost, 4))
-    tst$nodes <- dplyr::mutate(tst$nodes, 
-                               X = round(X, 4), 
-                               Y = round(Y, 4))
-    tst$edges_with_coords <- dplyr::mutate(tst$edges_with_coords, 
-                                           from_x = round(from_x, 4), 
-                                           from_y = round(from_y, 4), 
-                                           to_x = round(to_x, 4), 
-                                           to_y = round(to_y, 4),
-                                           cost = round(cost, 4))
-
     ref <- lapply(ref, \(x) { x <- as.matrix(x) ; dimnames(x) <- NULL ; x }) 
     tst <- lapply(tst, \(x) { x <- as.matrix(x) ; dimnames(x) <- NULL ; x })
 
