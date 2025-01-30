@@ -636,10 +636,16 @@ update_goal <- function(agent,
             #
             # Note that this wait state was not originally meant for this purpose
             # and might therefore be a bit "hacky".
-            if(all(current_goal(agent)@path == old_path)) {
-                status(agent) <- "wait"
-                waiting_counter(agent) <- 1
-                return(agent)
+            #
+            # First checked for an equal number of rows to avoid problems in 
+            # comparing both matrices because of non-comformability of the rows.
+            new_path <- current_goal(agent)@path
+            if(nrow(new_path) == nrow(old_path)) {
+                if(all(new_path == old_path)) {
+                    status(agent) <- "wait"
+                    waiting_counter(agent) <- 1
+                    return(agent)
+                }
             }
 
             # After reroutening, put the status to "reorient" so that they will be
