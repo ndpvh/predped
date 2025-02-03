@@ -380,7 +380,7 @@ overlap_with_objects <- function(agent,
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.
     coords <- lapply(objects(background), 
-                     \(x) nodes_on_circumference(x, space_between = 5e-2))
+                     \(x) nodes_on_circumference(x, space_between = 1e-2))
     coords <- do.call("rbind", coords)
 
     # Do the same for the background and bind this together with the other 
@@ -388,7 +388,7 @@ overlap_with_objects <- function(agent,
     # (`intersects`) is quite time-inefficient.
     coords <- rbind(coords, 
                     nodes_on_circumference(shape(background), 
-                                           space_between = 5e-2))
+                                           space_between = 1e-2))
 
     # Only retain those coordinates that are within a certain range around the 
     # agent.
