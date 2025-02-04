@@ -459,6 +459,28 @@ update_goal <- function(agent,
     # Make some placeholders for reroutening and rerouting
     reroute <- FALSE
 
+    # Check whether an agent is close to their goal. If so, they can stop what 
+    # they're doing and instead start completing the goal. 
+    distance_path_point <- m4ma::dist1(position(agent), 
+                                       matrix(current_goal(agent)@position, 
+                                              nrow = 1, 
+                                              ncol = 2))
+
+    if((distance_path_point <= close_enough) & !(status(agent) %in% c("exit", "completing goal"))) {
+        # Differentiate between normal goals and exit goals for the start of the
+        # interaction phase.
+        if(current_goal(agent)@id == "goal exit") {
+            status(agent) <- "exit"
+        } else {
+            status(agent) <- "completing goal"                    
+            co_1 <- position(agent)
+            co_2 <- current_goal(agent)@position 
+            orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+        }
+            
+        return(agent)
+    }
+
     # Check what the status of the goal is
     if(status(agent) == "completing goal") {
         # If still completing the goal, interact with it
@@ -643,7 +665,7 @@ update_goal <- function(agent,
             if(nrow(new_path) == nrow(old_path)) {
                 if(all(new_path == old_path)) {
                     status(agent) <- "wait"
-                    waiting_counter(agent) <- 5 # Keep at 5
+                    waiting_counter(agent) <- 5 # Keep at 5 
                     return(agent)
                 }
             }
@@ -700,59 +722,25 @@ update_goal <- function(agent,
         
     # Finally, it might also be that the agent is close to the goal and can 
     # start interacting with it. This is what's handled in this code block.
-    if(status(agent) == "move") {
-        # Keep this in for debugging purposes
-        if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-            browser()
-        }
+    if(status(agent) == "move") {  
+        if(nrow(current_goal(agent)@path) > 1) {
+            # If there are still path points left, check whether the agent can see 
+            # the next path point.
+            if(length(obj) == 0) {
+                seen <- TRUE
+            } else {
+                seen <- all(prune_edges(obj, 
+                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                               nrow = 1)))
+            }
 
-        # Determine how far along the `path` they are
-        distance_path_point <- m4ma::dist1(position(agent), 
-                                           matrix(current_goal(agent)@path[1,], 
-                                                  nrow = 1, 
-                                                  ncol = 2))
-
-        # Check whether they are "close enough" to the goal
-        if((distance_path_point <= close_enough)) {
-            # If the next path point is actually their goal, they can enter in an 
-            # interaction state.
-            #
-            # Check if the goal is the exit goal. If so, the interaction state
-            # is not "completing goal" but rather "exit", allowing us to delete
-            # the agent
-            if(nrow(current_goal(agent)@path) == 1) {
-                if(current_goal(agent)@id == "goal exit") {
-                    status(agent) <- "exit"
-                } else {
-                    status(agent) <- "completing goal"                    
-
-                    co_1 <- position(agent)
-                    co_2 <- current_goal(agent)@position 
-
-                    orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
-                }
+            # If a next path point is visialbe, the agent will switch to that 
+            # path point instead
+            if(seen) {
+                current_goal(agent)@path <- current_goal(agent)@path[-1, , drop = FALSE] 
+                # status(agent) <- "reorient"
 
                 return(agent)
-
-            # If the next path point is not their goal, we have to do an 
-            # additional check of whether the agent can see the next path point.
-            # If so, the agent will move to that path point instead
-            } else {
-                if(length(obj) == 0) {
-                    seen <- TRUE
-                } else {
-                    seen <- all(prune_edges(obj, 
-                                            matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                                   nrow = 1)))
-                }
-
-                if(seen) {
-                    current_goal(agent)@path <- current_goal(agent)@path[-1,] |>
-                        matrix(ncol = 2)
-                    status(agent) <- "reorient"
-
-                    return(agent)
-                }
             }
         }
 
