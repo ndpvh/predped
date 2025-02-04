@@ -324,6 +324,9 @@ agents_between_goal <- function(agent,
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param space_between Numeric denoting the space to leave between the nodes 
+#' put on the circumference of the objects in the space (used for checking the
+#' overlap with an agent). Defaults to \code{0.05} or 5cm.
 #' 
 #' @return Logical matrix containing availabilities of the centers.
 #' 
@@ -369,7 +372,8 @@ agents_between_goal <- function(agent,
 overlap_with_objects <- function(agent, 
                                  background, 
                                  centers, 
-                                 check) {
+                                 check,
+                                 space_between = 5e-2) {
     
     # If the centers are not provided, return an empty logical
     if(length(centers) == 0) {
@@ -380,7 +384,7 @@ overlap_with_objects <- function(agent,
     # allow us to vectorize the search for intersections between the agent and 
     # an object, hopefully speeding up the search.
     coords <- lapply(objects(background), 
-                     \(x) nodes_on_circumference(x, space_between = 1e-2))
+                     \(x) nodes_on_circumference(x, space_between = space_between))
     coords <- do.call("rbind", coords)
 
     # Do the same for the background and bind this together with the other 
@@ -388,7 +392,7 @@ overlap_with_objects <- function(agent,
     # (`intersects`) is quite time-inefficient.
     coords <- rbind(coords, 
                     nodes_on_circumference(shape(background), 
-                                           space_between = 1e-2))
+                                           space_between = space_between))
 
     # Only retain those coordinates that are within a certain range around the 
     # agent.
