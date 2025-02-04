@@ -643,7 +643,7 @@ update_goal <- function(agent,
             if(nrow(new_path) == nrow(old_path)) {
                 if(all(new_path == old_path)) {
                     status(agent) <- "wait"
-                    waiting_counter(agent) <- 1
+                    waiting_counter(agent) <- 5 # Keep at 5
                     return(agent)
                 }
             }
