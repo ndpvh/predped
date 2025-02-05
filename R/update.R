@@ -477,8 +477,6 @@ update_goal <- function(agent,
             co_2 <- current_goal(agent)@position 
             orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
         }
-            
-        return(agent)
     }
 
     # Check what the status of the goal is
@@ -734,11 +732,11 @@ update_goal <- function(agent,
                                                nrow = 1)))
             }
 
-            # If a next path point is visialbe, the agent will switch to that 
+            # If a next path point is visible, the agent will switch to that 
             # path point instead
             if(seen) {
                 current_goal(agent)@path <- current_goal(agent)@path[-1, , drop = FALSE] 
-                # status(agent) <- "reorient"
+                status(agent) <- "reorient" # Keep this in! Otherwise agents get stuck
 
                 return(agent)
             }
@@ -759,7 +757,7 @@ update_goal <- function(agent,
         goal_position <- current_goal(agent)@position
         goal_distance <- sqrt((center(agent)[1] - goal_position[1])^2 + 
             (center(agent)[2] - goal_position[2])^2)
-        if((length(state@agents) > 0) & (goal_distance <= 1.5 * close_enough)) {
+        if((length(state@agents) > 0) & (goal_distance <= 2 * close_enough)) {
             # Find whether an agent is blocking the way
             goal_circle <- circle(center = current_goal(agent)@position,
                                   radius = radius(agent))
