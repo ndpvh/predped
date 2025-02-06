@@ -328,7 +328,8 @@ agents_between_goal <- function(agent,
 #' put on the circumference of the objects in the space (used for checking the
 #' overlap with an agent). Defaults to \code{0.05} or 5cm.
 #' 
-#' @return Logical matrix containing availabilities of the centers.
+#' @return Logical matrix containing availabilities of the centers (\code{TRUE}
+#' if available, \code{FALSE} if not).
 #' 
 #' @examples 
 #' # Initialize all objects that you need
