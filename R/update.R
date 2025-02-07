@@ -323,7 +323,9 @@ update_position <- function(agent,
                      centers, 
                      check)
 
-        if(!any(is.finite(V))) {
+        # Check whether you have only infinite moving options. Delete the baseline
+        # (cell 0) utility from this list and invoke that they should reorient.
+        if(!any(is.finite(V[-1]))) {
             speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
             status(agent) <- "reorient"
             cell(agent) <- 0
@@ -693,7 +695,7 @@ update_goal <- function(agent,
         # If no agents are blocking access to the goal, allow the agent to move
         # again
         if(!any(blocking_agents)) {
-            status(agent) <- "move"
+            status(agent) <- "reorient"
         }
 
         # If counter is low enough, the agent will have to reroute his approach
@@ -708,7 +710,7 @@ update_goal <- function(agent,
                 goals(agent) <- goals(agent)[-2]
                 status(agent) <- "plan"
             } else {
-                status(agent) <- "move"
+                status(agent) <- "reorient"
             }
         }
     }
