@@ -306,10 +306,9 @@ update_position <- function(agent,
             speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
 
-            # Let the agent reroute. During this rerouting, they will attempt to
-            # find a better path, and if not, will wait until their path is 
-            # opened up.
-            status(agent) <- "reroute" 
+            # Let the agent reorient to find a better way to move out of the 
+            # current situation. 
+            status(agent) <- "reorient" 
 
             # Return agent and don't evaluate utilities
             return(agent)
@@ -638,7 +637,7 @@ update_goal <- function(agent,
             # then the agent will have to reroute at a later time and 
             # wait for now. 
             if(nrow(current_goal(agent)@path) == 0 | is.null(current_goal(agent)@path)) {
-                status(agent) <- "reroute"
+                status(agent) <- "plan"
                 return(agent)
             }
 
@@ -667,14 +666,10 @@ update_goal <- function(agent,
                     return(agent)
                 }
             }
-
-            # After reroutening, put the status to "reorient" so that they will be
-            # able to reorient in the next move
-            status(agent) <- "reorient"
         } 
 
-        # If not rerouted, let them move again
-        status(agent) <- "move"
+        # At the end of rerouting (whether it occurred or not), let them reorient
+        status(agent) <- "reorient"
     }
 
     # If the agent is currently waiting, check the following:
