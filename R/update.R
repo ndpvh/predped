@@ -120,6 +120,8 @@ setMethod("update", "state", function(object,
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is 
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
+#' @param print_iteration Logical denoting whether to report each simulated
+#' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -152,7 +154,8 @@ setMethod("update", "agent", function(object,
                                       many_nodes = !is.null(precomputed_edges),
                                       standing_start = 0.1,
                                       time_step = 0.5,
-                                      report = FALSE) {
+                                      report = FALSE,
+                                      print_iteration = FALSE) {
 
     # Update the goals of the agent
     object <- update_goal(object, 
@@ -163,7 +166,8 @@ setMethod("update", "agent", function(object,
                           space_between = space_between,                     
                           precomputed_edges = precomputed_edges,
                           many_nodes = many_nodes,
-                          report = report) 
+                          report = report,
+                          print_iteration = print_iteration) 
 
     # Update the position of the agent
     object <- update_position(object, 
@@ -174,7 +178,8 @@ setMethod("update", "agent", function(object,
                               orientations = orientations,
                               standing_start = standing_start,
                               time_step = time_step,
-                              report = report) 
+                              report = report,
+                              print_iteration = print_iteration) 
     
     return(object)
 })
@@ -210,6 +215,8 @@ setMethod("update", "agent", function(object,
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is 
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
+#' @param print_iteration Logical denoting whether to report each simulated
+#' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -247,7 +254,8 @@ update_position <- function(agent,
                                 matrix(ncol = 3),
                             standing_start = 0.1,
                             time_step = 0.5,
-                            report = TRUE) {
+                            report = TRUE,
+                            print_iteration = TRUE) {
 
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
@@ -275,10 +283,13 @@ update_position <- function(agent,
                                          orientations)
 
         # Report the degress that the agent is reorienting to
-        turn <- paste("to", orientation(agent), "degrees")
-        if(report) {
-            paste(id(agent), "turning", turn, "\n") |>
+        turn <- paste("towards", orientation(agent), "degrees")
+        if(report & print_iteration) {
+            paste0("\rIteration: ", iteration(state), "; Number of agents: ", length(agents(state)) + 1, "; ", id(agent), " is turning ", turn, "\r") |>
                 cat()
+        } else if(report) {
+            paste("\r", id(agent), "is turning", turn, paste0(rep(" ", 2, collapse = ""))) |>
+            cat()
         }
 
         status(agent) <- "move"
@@ -417,6 +428,8 @@ update_position <- function(agent,
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
 #' @param report Logical denoting whether to report whenever an agent is 
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
+#' @param print_iteration Logical denoting whether to report each simulated
+#' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -449,7 +462,8 @@ update_goal <- function(agent,
                         space_between = 1.25,
                         precomputed_edges = NULL,
                         many_nodes = !is.null(precomputed_edges),
-                        report = FALSE) {  
+                        report = FALSE,
+                        print_iteration = FALSE) {  
 
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
