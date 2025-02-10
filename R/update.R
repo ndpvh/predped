@@ -259,7 +259,7 @@ update_position <- function(agent,
     # agent is currently interacting with another object, when they are currently 
     # rerouting, when they are currently planning a route to their goal, or when 
     # they are waiting for another agent.
-    if(status(agent) %in% c("completing goal", "reroute", "plan", "wait")) { 
+    if(status(agent) %in% c("completing goal", "exit", "reroute", "plan", "wait")) { 
         cell(agent) <- 0
         speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
                         
