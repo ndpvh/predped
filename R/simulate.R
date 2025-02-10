@@ -252,7 +252,7 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          fx = \(x) x,
+                                          fx = \(x) x,                                          
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -347,6 +347,9 @@ setMethod("simulate", "predped", function(object,
 
     trace <- list(state)
 
+    # Print that the model is being simulated if no feedback is desired
+    cat(paste0("\rYour model: ", crayon::bold(id(object)), " is being simulated"), paste0(rep(" ", 10), collapse = ""))
+
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
         altered_state <- fx(trace[[i]])
@@ -435,6 +438,12 @@ setMethod("simulate", "predped", function(object,
 #' `0.2`.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
+#' @param print_iteration Logical denoting whether to report each simulated
+#' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
+#' @param step_report Numeric denoting at which iteration to report the 
+#' current iteration in the simulation & the number of agents present 
+#' at the current iteration in the simulation. Defaults to 1, which
+#' represents each iteration to be reported.
 #' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
 #' \code{plot_live = TRUE}).
 #'
@@ -513,6 +522,8 @@ setMethod("simulate", "state", function(object,
                                         plot_live = FALSE,
                                         plot_time = 0.2,
                                         report = FALSE,
+                                        print_iteration = FALSE,
+                                        step_report = 1,
                                         goal_number = 5,
                                         goal_duration = \(x) rnorm(x, 10, 2),
                                         precompute_goal_paths = TRUE,
@@ -580,7 +591,10 @@ setMethod("simulate", "state", function(object,
     }
 
     # Print iteration number and number of agents in the space
-    cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(object)), paste0(rep(" ", 10), collapse = "")))
+    if(print_iteration & i %% step_report == 0) {
+        cat(paste0("\rIteration: ", i, "; Number of agents: ", length(agents(object)), paste0(rep(" ", 40), collapse = "")))
+    }
+
 
     # Update the current state
     object <- update(object,
@@ -593,7 +607,8 @@ setMethod("simulate", "state", function(object,
                      many_nodes = many_nodes,
                      report = report,
                      velocities = velocities,
-                     orientations = orientations)
+                     orientations = orientations,
+                     print_iteration = print_iteration)
 
     # Check whether one of the pedestrians is waiting at the exit and delete them
     # from the agent-list
