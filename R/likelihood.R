@@ -28,19 +28,31 @@ likelihood_dummy[1, ] <- 0
 #' @export 
 mll <- function(data, 
                 parameters,
-                parameter_names = colnames(likelihood_dummy),
+                parameter_names = colnames(likelihood_dummy)[-c(1, 2)],
                 ...) {
-    
-    browser()
 
     # Check whether the utility variables are in there. Just checked for one and 
     # assumed that the others are there as well
     if(!("ps_speed" %in% colnames(data))) {
         data <- add_motion_variables(data, ...)
+
+        # Delete those instances in which a person is not moving around
+        data <- data[!is.na(data$ps_speed), ]
+    }
+
+    # Retrieve each person's identifier
+    ids <- unique(data$id)
+
+    # Check whether the provided parameters conform to matrix format. If not, 
+    # transform
+    if(!is.matrix(parameters)) {
+        parameters <- matrix(parameters, 
+                             nrow = length(ids),
+                             ncol = length(parameters),
+                             byrow = TRUE)
     }
 
     # For each agent, loop over the unique participant id's 
-    ids <- unique(data$id)
     MLL <- sapply(seq_along(ids), 
                   function(i) {
                       # Select the data for which the utilities should be computed
@@ -52,7 +64,19 @@ mll <- function(data,
                       # Get the utilities for each cell based on the provided 
                       # results
                       browser()
-                      V <- utility(selection, likelihood_dummy)
+                      L <- sapply(1:nrow(selection), 
+                                  function(j) {
+                                      V <- utility(selection[j, ], likelihood_dummy)
+                                      browser()
+
+                                      # Currently, something going wrong with id_check (all FALSE)
+                                      #     -> Problem probably found in unpack_trace
+
+                                      V <- V - max(V)
+                                      exp_V <- exp(V)
+                                      return(exp_V[selection$cell[j]] / sum(exp_V))
+                                  })
+                      
                   })
 
 
