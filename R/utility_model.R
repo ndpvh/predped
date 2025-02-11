@@ -275,6 +275,7 @@ setMethod("compute_utility_variables", "agent", function(object,
     # The variable name contains the first two letters of "utility variables" as
     # the more informative name (but too long to spell out here)
     uv <- data.frame(agent_idx = which(agent_specifications$id == id(object)))
+    uv$check <- list(check)
 
     # Preferred speed utility: Required variables are the current speed and the 
     # goal distance
