@@ -63,21 +63,22 @@ mll <- function(data,
   
                       # Get the utilities for each cell based on the provided 
                       # results
-                      browser()
                       L <- sapply(1:nrow(selection), 
                                   function(j) {
                                       V <- utility(selection[j, ], likelihood_dummy)
-                                      browser()
-
-                                      # Currently, something going wrong with id_check (all FALSE)
-                                      #     -> Problem probably found in unpack_trace
 
                                       V <- V - max(V)
                                       exp_V <- exp(V)
-                                      return(exp_V[selection$cell[j]] / sum(exp_V))
+                                      return(exp_V[selection$cell[j] + 1] / sum(exp_V))
                                   })
                       
+                      # Invoke a lower bound on the probabilities so that 0 
+                      # probability doesn't interfere with the min-log-likelihood
+                      # and convert likelihoods to the latter type.
+                      L[L <= 1e-5] <- 1e-5
+                      return(sum(-log(L)))                      
                   })
 
-
+    names(MLL) <- ids 
+    return(MLL)
 }
