@@ -6,7 +6,7 @@
 
 # Read in the data to be used for the mll. Consists of one person with 2500 
 # samples.
-data <- readRDS(file.path("..", "..", "tests", "testthat", "data", "data_mll.Rds"))
+data <- readRDS(file.path("..", "tests", "testthat", "data", "data_mll.Rds"))
 data <- data[data$id == "hierb", ]
 data <- data[1:2500, ]
 
@@ -32,8 +32,9 @@ real <- (\() predped::mll(full_data, params_real, transform = TRUE)) |>
     rnd()
 
 # Create the table
-tbl <- cbind(c("transform = TRUE", "transform = FALSE"),
+tbl <- cbind(c("transform = FALSE", "transform = TRUE"),
              rbind(bounded, real))
+rownames(tbl) <- NULL
 colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
 caption <- paste0("Benchmark for the mll function. ",
