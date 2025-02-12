@@ -25,6 +25,8 @@ likelihood_dummy[1, ] <- 0
 #' 
 #' @return Min-log-likelihood per person in the dataset.
 #' 
+#' @
+#' 
 #' @export 
 mll <- function(data, 
                 parameters,
@@ -72,11 +74,10 @@ mll <- function(data,
                                       return(exp_V[selection$cell[j] + 1] / sum(exp_V))
                                   })
                       
-                      # Invoke a lower bound on the probabilities so that 0 
-                      # probability doesn't interfere with the min-log-likelihood
-                      # and convert likelihoods to the latter type.
-                      L[L <= 1e-5] <- 1e-5
-                      return(sum(-log(L)))                      
+                      # Convert likelihoods to min-log-likelihood. 1 was added
+                      # to each likelihood to ensure that 0 probability will 
+                      # not lead to -Inf min-log-likelihood.
+                      return(-sum(log(1 + L)))
                   })
 
     names(MLL) <- ids 
