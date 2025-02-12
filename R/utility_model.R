@@ -143,14 +143,13 @@ setMethod("utility", "data.frame", function(object,
     # Interpersonal distance utility: Check whether the distance to other 
     # pedestrians is defined and, if so, compute the utility
     if(!is.null(object$id_distance[[1]])) {
-        V <- tryCatch(V + m4ma::idUtility_rcpp(parameters[["b_interpersonal"]], 
+        V <- V + m4ma::idUtility_rcpp(parameters[["b_interpersonal"]], 
                                       parameters[["d_interpersonal"]], 
                                       parameters[["a_interpersonal"]], 
                                       object$id_ingroup[[1]], 
                                       object$id_check[[1]],
                                       object$id_distance[[1]], 
-                                      as.vector(ifelse(object$id_check[[1]], 0, -Inf))), 
-                      error = function(e) browser()) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
+                                      as.vector(ifelse(object$id_check[[1]], 0, -Inf))) # Add precomputed utility here with -Inf for invalid cells; necessary for estimation
     } else {
         V <- V + as.vector(ifelse(object$id_check[[1]], 0, -Inf))
     }
