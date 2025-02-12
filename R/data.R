@@ -131,8 +131,10 @@ unpack_trace <- function(x,
                         #
                         # If the agent is moving, however, we will compute the 
                         # utility variables for that move.
+                        agent_idx <- which(agent_specifications$id == id(a))
                         if(status(a) != "move") {
-                            utility_variables <- data.frame(agent_idx = which(agent_specifications$id == id(a)),
+                            utility_variables <- data.frame(agent_idx = agent_idx,
+                                                            check = NA,
                                                             ps_speed = NA, 
                                                             ps_distance = NA, 
                                                             gd_angle = NA, 
@@ -157,10 +159,18 @@ unpack_trace <- function(x,
                                                        vels = velocities,
                                                        angles = orientations,
                                                        tStep = time_step)
+
+                            # Delete the agent from the agent list in the state
+                            # (otherwise moving options will give wrong results)
+                            agent_state <- y
+                            agents(agent_state) <- agents(agent_state)[-agent_idx] 
     
                             # Do an initial check of which of these centers can be 
                             # reached and which ones can't
-                            check <- moving_options(a, y, y@setting, centers)
+                            check <- moving_options(a, 
+                                                    agent_state, 
+                                                    agent_state@setting, 
+                                                    centers)
                             
                             # Compute the utility variables for this agent under the
                             # current state                            

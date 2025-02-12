@@ -19,16 +19,27 @@ likelihood_dummy[1, ] <- 0
 #' want to estimate. Defaults to all parameters defined in
 #' \code{\link[predped]{params_from_csv}}. Whenever not all parameters are used,
 #' the excluded parameters are assumed to have a value of 0.
+#' @param transform Logical denoting whether to transform the provided parameters
+#' from the real axis to the bounded scales imposed on the parameters within 
+#' \code{predped}. Defaults to \code{TRUE}.
+#' @param bounds Matrix containing the lower and upper bounds of the parameters
+#' in its first and second column respectively. Additionally, rownames should 
+#' denote for which parameter a certain pair represents the bounds. Only used 
+#' when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 #' In a typical estimation situation, these motion variables should already be 
 #' in \code{data}.
 #' 
 #' @return Min-log-likelihood per person in the dataset.
 #' 
+#' @
+#' 
 #' @export 
 mll <- function(data, 
                 parameters,
                 parameter_names = colnames(likelihood_dummy)[-c(1, 2)],
+                transform = TRUE,
+                bounds = params_from_csv[["params_bounds"]],
                 ...) {
 
     # Check whether the utility variables are in there. Just checked for one and 
@@ -38,6 +49,12 @@ mll <- function(data,
 
         # Delete those instances in which a person is not moving around
         data <- data[!is.na(data$ps_speed), ]
+    }
+
+    # If transform is TRUE, then we need to transform the parameters from the 
+    # real scale to the bounded scale.
+    if(transform) {
+        parameters <- to_bounded(parameters, bounds)
     }
 
     # Retrieve each person's identifier
@@ -63,21 +80,21 @@ mll <- function(data,
   
                       # Get the utilities for each cell based on the provided 
                       # results
-                      browser()
                       L <- sapply(1:nrow(selection), 
                                   function(j) {
                                       V <- utility(selection[j, ], likelihood_dummy)
-                                      browser()
-
-                                      # Currently, something going wrong with id_check (all FALSE)
-                                      #     -> Problem probably found in unpack_trace
 
                                       V <- V - max(V)
                                       exp_V <- exp(V)
-                                      return(exp_V[selection$cell[j]] / sum(exp_V))
+                                      return(exp_V[selection$cell[j] + 1] / sum(exp_V))
                                   })
                       
+                      # Convert likelihoods to min-log-likelihood. 1 was added
+                      # to each likelihood to ensure that 0 probability will 
+                      # not lead to -Inf min-log-likelihood.
+                      return(-sum(log(1 + L)))
                   })
 
-
+    names(MLL) <- ids 
+    return(MLL)
 }

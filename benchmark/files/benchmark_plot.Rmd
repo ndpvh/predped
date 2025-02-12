@@ -107,7 +107,7 @@ tbl |>
 
 ## background
 
-```{r plot agent, echo = FALSE, results = "asis"}
+```{r plot background, echo = FALSE, results = "asis"}
 
 # Plot them
 no <- (\() predped:::plot(setting, optimize = FALSE)) |>
@@ -121,6 +121,7 @@ op <- (\() predped:::plot(setting)) |>
 tbl <- rbind(c("optimize = TRUE", op[2], paste0("[", op[1], ",", op[3], "]")),
              c("optimize = FALSE", no[2], paste0("[", no[1], ",", no[3], "]")))
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 # Create table
 caption <- paste0("Benchmark for the plot method for background. ",
@@ -139,7 +140,7 @@ tbl |>
 
 ## object
 
-```{r plot agent, echo = FALSE, results = "asis"}
+```{r plot object, echo = FALSE, results = "asis"}
 
 # Create the objects to be plotted
 my_rectangle <- predped::rectangle(center = c(0, 0), size = c(1, 1))
@@ -166,6 +167,7 @@ tbl <- c(r[2],
          paste0("[", c[1], ",", c[3], "]")) |>
     matrix(nrow = 1)
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 # Create table
 caption <- paste0("Benchmark for the plot method for background. ",
@@ -182,6 +184,8 @@ tbl |>
     print()
 
 ```
+
+## state 
 
 ```{r plot state, echo = FALSE, results = "asis"}
 
@@ -200,6 +204,7 @@ op <- (\() predped:::plot(initial_condition)) |>
 tbl <- rbind(c("optimize = TRUE", op[2], paste0("[", op[1], ",", op[3], "]")),
              c("optimize = FALSE", no[2], paste0("[", no[1], ",", no[3], "]")))
 rownames(tbl) <- NULL
+colnames(tbl) <- NULL
 
 # Create table
 caption <- paste0("Benchmark for the plot method for state. ",

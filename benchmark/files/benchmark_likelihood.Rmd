@@ -1,0 +1,54 @@
+# likelihood.R
+
+## mll
+
+```{r likelihood mll, echo = FALSE, results = "asis"}
+
+# Read in the data to be used for the mll. Consists of one person with 2500 
+# samples.
+data <- readRDS(file.path("..", "tests", "testthat", "data", "data_mll.Rds"))
+data <- data[data$id == "hierb", ]
+data <- data[1:2500, ]
+
+full_data <- data 
+for(i in 1:9) {
+    data$id <- paste0("person_", i)
+    full_data <- rbind(full_data, data)
+}
+
+# Create parameters that fall on the real axis and parameters that fall on the 
+# bounded axis
+params_bounded <- predped::params_from_csv[["params_archetypes"]][1, -c(1:2)]
+params_real <- predped::to_unbounded(params_bounded, 
+                                     predped::params_from_csv[["params_bounds"]])
+
+# Do two tests, one for unbounded and one for bounded estimation.
+bounded <- (\() predped::mll(full_data, params_bounded, transform = FALSE)) |>
+    test_times() |>
+    rnd()
+
+real <- (\() predped::mll(full_data, params_real, transform = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create the table
+tbl <- cbind(c("transform = FALSE", "transform = TRUE"),
+             rbind(bounded, real))
+rownames(tbl) <- NULL
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+caption <- paste0("Benchmark for the mll function. ",
+                  "In this benchmark, we use 2500 datapoints of 10 different people. ",
+                  "We also distinguish between providing parameters on the real axis ",
+                  "(transform = TRUE) or on the bounded scale of predped (transform = FALSE).")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lccc",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```

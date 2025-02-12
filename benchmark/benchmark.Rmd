@@ -37,6 +37,9 @@ rnd <- function(x) {
 ```{r goals, child = "files/benchmark_goals.Rmd", warning = F}
 ```
 
+```{r likelihood, child = "files/benchmark_likelihood.Rmd", warning = F}
+```
+
 ```{r moving_options, child = "files/benchmark_moving_options.Rmd", warning = F}
 ```
 
