@@ -43,3 +43,6 @@ issues/
 social_utilities_alexander/
 benchmark.md
 tmp*
+
+*.o 
+*.so
