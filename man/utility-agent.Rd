@@ -2,17 +2,12 @@
 % Please edit documentation in R/utility_model.R
 \name{utility,agent-method}
 \alias{utility,agent-method}
-\alias{utility,data.frame-method}
 \title{Compute the utilities on the agent level}
 \usage{
 \S4method{utility}{agent}(object, state, background, agent_specifications, centers, check)
-
-\S4method{utility}{data.frame}(object, parameters)
 }
 \arguments{
-\item{object}{Dataframe containing all of the needed information to compute 
-the utilities. Typically output of the 
-\code{\link[predped]{compute_utility_variables}} function.}
+\item{object}{Object of the \code{\link[predped]{agent-class}}.}
 
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
@@ -29,16 +24,9 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{parameters}{Dataframe containing the parameters of the agent. Should 
-conform to the naming conventions mentioned in 
-\code{\link[predped]{params_from_csv}}.}
 }
 \value{
-Numeric matrix denoting the (dis)utility of moving to each of the 
-cells in \code{centers}.
-
-Numeric matrix denoting the (dis)utility of moving to each of the 
+Numeric vector denoting the (dis)utility of moving to each of the 
 cells in \code{centers}.
 }
 \description{
@@ -49,10 +37,6 @@ input to the utility functions) is precomputed, so that it will first compute
 their values. This input is then provided to 
 \code{\link[predped]{utility,data.frame-method}} for the actual computation 
 of the utility.
-
-This function uses the values of the relevant variables used as input in the
-utility functions to derive the utility for each of the different moving 
-options.
 }
 \seealso{
 \code{\link[predped]{simulate,predped-method}},
@@ -61,14 +45,5 @@ options.
 \code{\link[predped]{update,state-method}},
 \code{\link[predped]{utility,data.frame-method}},
 \code{\link[predped]{compute_utility_variables}},
-\code{\link[predped]{update_position}}
-
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
-\code{\link[predped]{utility,agent-method}},
-\code{\link[predped]{compute_utility_variables}},
-\code{\link[predped]{params_from_csv}},
 \code{\link[predped]{update_position}}
 }

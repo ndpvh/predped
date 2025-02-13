@@ -14,7 +14,8 @@ update_position(
     times = 3), ncol = 3),
   standing_start = 0.1,
   time_step = 0.5,
-  report = TRUE
+  report = TRUE,
+  print_iteration = TRUE
 )
 }
 \arguments{
@@ -53,6 +54,9 @@ time should mimic. Defaults to \code{0.5}, or half a second.}
 
 \item{report}{Logical denoting whether to report whenever an agent is 
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
+
+\item{print_iteration}{Logical denoting whether to report each simulated
+iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }

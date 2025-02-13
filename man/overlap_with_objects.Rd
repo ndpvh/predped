@@ -4,7 +4,7 @@
 \alias{overlap_with_objects}
 \title{Check agent and object overlap}
 \usage{
-overlap_with_objects(agent, background, centers, check)
+overlap_with_objects(agent, background, centers, check, space_between = 0.05)
 }
 \arguments{
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
@@ -16,9 +16,14 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{space_between}{Numeric denoting the space to leave between the nodes 
+put on the circumference of the objects in the space (used for checking the
+overlap with an agent). Defaults to \code{0.05} or 5cm.}
 }
 \value{
-Logical matrix containing availabilities of the centers.
+Logical matrix containing availabilities of the centers (\code{TRUE}
+if available, \code{FALSE} if not).
 }
 \description{
 This function checks whether there is an overlap between a given agent and 

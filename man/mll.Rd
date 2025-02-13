@@ -4,7 +4,14 @@
 \alias{mll}
 \title{Compute the min-log-likelihood}
 \usage{
-mll(data, parameters, parameter_names = colnames(likelihood_dummy), ...)
+mll(
+  data,
+  parameters,
+  parameter_names = colnames(likelihood_dummy)[-c(1, 2)],
+  transform = TRUE,
+  bounds = params_from_csv[["params_bounds"]],
+  ...
+)
 }
 \arguments{
 \item{data}{Data.frame containing at least "id", "time", "x", "y", "goal_x",
@@ -20,6 +27,15 @@ be estimated for each instance of "id" separately.}
 want to estimate. Defaults to all parameters defined in
 \code{\link[predped]{params_from_csv}}. Whenever not all parameters are used,
 the excluded parameters are assumed to have a value of 0.}
+
+\item{transform}{Logical denoting whether to transform the provided parameters
+from the real axis to the bounded scales imposed on the parameters within 
+\code{predped}. Defaults to \code{TRUE}.}
+
+\item{bounds}{Matrix containing the lower and upper bounds of the parameters
+in its first and second column respectively. Additionally, rownames should 
+denote for which parameter a certain pair represents the bounds. Only used 
+when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.}
 
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 In a typical estimation situation, these motion variables should already be 

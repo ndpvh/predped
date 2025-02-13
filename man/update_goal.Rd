@@ -13,7 +13,8 @@ update_goal(
   space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
-  report = FALSE
+  report = FALSE,
+  print_iteration = FALSE
 )
 }
 \arguments{
@@ -45,6 +46,9 @@ or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 
 \item{report}{Logical denoting whether to report whenever an agent is 
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
+
+\item{print_iteration}{Logical denoting whether to report each simulated
+iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }
