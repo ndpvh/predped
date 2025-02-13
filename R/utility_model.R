@@ -28,7 +28,7 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
 #' 
-#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.
 #' 
 #' @seealso 
@@ -81,8 +81,8 @@ setMethod("utility", "agent", function(object,
 #' conform to the naming conventions mentioned in 
 #' \code{\link[predped]{params_from_csv}}.
 #' 
-#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
-#' cells in \code{centers}.
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
+#' cells.
 #' 
 #' @seealso 
 #' \code{\link[predped]{simulate,predped-method}},
@@ -94,7 +94,7 @@ setMethod("utility", "agent", function(object,
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @rdname utility-agent
+#' @rdname utility-data.frame
 #' 
 #' @export 
 #
