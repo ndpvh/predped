@@ -32,8 +32,6 @@ likelihood_dummy[1, ] <- 0
 #' 
 #' @return Min-log-likelihood per person in the dataset.
 #' 
-#' @
-#' 
 #' @export 
 mll <- function(data, 
                 parameters,
