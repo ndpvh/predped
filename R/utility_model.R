@@ -343,6 +343,12 @@ setMethod("compute_utility_variables", "agent", function(object,
                                                 agent_specifications$size[-uv$agent_idx],
                                                 objects(background)))
 
+    if(is.null(uv$ba_angle[[1]])) {
+        uv$ba_cones <- list()
+    } else {
+        uv$ba_cones <- list(as.integer(names(uv$ba_angle[[1]])))
+    }
+
     # Follow the leader utility: Required variable is the potential leaders and 
     # their distances. This is all outputted in a list by getLeaders_rcpp, which
     # is why we just append it to the data.frame directly
