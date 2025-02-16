@@ -27,6 +27,8 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param cpp Logical denoting whether to use the Rcpp version of the function
+#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.
@@ -48,7 +50,8 @@ setMethod("utility", "agent", function(object,
                                        background,
                                        agent_specifications,
                                        centers,                    
-                                       check) {
+                                       check,
+                                       cpp = TRUE) {
 
     # Compute the utility variables that are used as input to the utility 
     # functions.
@@ -65,7 +68,7 @@ setMethod("utility", "agent", function(object,
 
     # Pass down to a lower-level utility function that uses all of this 
     # information
-    return(utility(uv, parameters(object)))
+    return(utility(uv, parameters(object), cpp = cpp))
 })
 
 #' Compute the utilities with all utility variables known
@@ -80,6 +83,8 @@ setMethod("utility", "agent", function(object,
 #' @param parameters Dataframe containing the parameters of the agent. Should 
 #' conform to the naming conventions mentioned in 
 #' \code{\link[predped]{params_from_csv}}.
+#' @param cpp Logical denoting whether to use the Rcpp version of the function
+#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells.
@@ -105,7 +110,12 @@ setMethod("utility", "agent", function(object,
 #    of `agent` they occupy in a more straightforward way than is currently
 #    implemented in `get_leaders` and `get_buddy`.
 setMethod("utility", "data.frame", function(object,
-                                            parameters) {
+                                            parameters,
+                                            cpp = TRUE) {
+
+    if(cpp) {
+        return(utility_rcpp(object, parameters))
+    }
 
     ############################################################################
     # COMPUTATION
