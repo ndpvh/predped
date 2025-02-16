@@ -1,0 +1,46 @@
+# utility.R 
+
+## utility 
+
+```{r utility utility}
+
+# Read in the data used in the tests and only retain the first instance with 
+# all of the utility variables defined (row 10)
+data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
+data <- data[10, ]
+
+# Get the parameters of the SocialBaselineEuropean
+params <- predped::params_from_csv[["params_archetypes"]]
+params <- params[params$name == "SocialBaselineEuropean", ]
+
+# Do two tests, one for unbounded and one for bounded estimation.
+r <- (\() predped::utility(data, params, cpp = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rcpp <- (\() predped::utility(data, params, cpp = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create the table
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             rbind(r, rcpp))
+rownames(tbl) <- NULL
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+caption <- paste0("Benchmark for the utility function. ",
+                  "In this benchmark, we use a single row from data that makes ",
+                  "use of all utility functions simultaneously. "
+                  "Comparison is made between using the R version (cpp = FALSE) ",
+                  "or the Rcpp version of the function (cpp = TRUE).")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lccc",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
