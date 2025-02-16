@@ -143,6 +143,11 @@ setMethod("moving_options", "agent", function(object,
         check <- if(!all(!local_check)) local_check else !opposite_check
     }
 
+    # Make sure check is always in matrix format
+    if(!is.matrix(check)) {
+        check <- matrix(check, ncol = 3)
+    }
+
     # Finally, return the cells that are free to move to
     return(check)
 })
