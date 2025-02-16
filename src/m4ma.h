@@ -1,0 +1,59 @@
+#ifndef M4MA
+#define M4MA
+
+#include <Rcpp.h>
+
+Rcpp::NumericVector psUtility(
+    double a_preferred_speed, 
+    double b_preferred_speed,
+    double preferred_speed,
+    double slowing_time, 
+    Rcpp::NumericVector current_speed,
+    Rcpp::NumericVector goal_distance
+);
+
+Rcpp::NumericVector gaUtility(
+    double b_goal_direction, 
+    double a_goal_direction,
+    Rcpp::NumericVector goal_angles
+);
+
+Rcpp::NumericVector caUtility(
+    double b_current_direction, 
+    double a_current_direction,
+    double blr_current_direction
+);
+
+Rcpp::NumericVector idUtility(
+    double b_current_direction, 
+    double d_current_direction,
+    double a_current_direction,
+    Rcpp::LogicalVector id_ingroup,
+    Rcpp::LogicalMatrix id_check,
+    Rcpp::NumericMatrix id_distance,
+    Rcpp::NumericVector impossible_utility
+); 
+
+Rcpp::NumericVector baUtility(
+    double a_blocked, 
+    double b_blocked,
+    Rcpp::NumericVector ba_angle,
+    Rcpp::IntegerVector cone_id
+);
+
+Rcpp::NumericVector flUtility(
+    double a_leader, 
+    double b_leader,
+    double d_leader,
+    Rcpp::NumericMatrix leaders,
+    Rcpp::NumericMatrix distances
+);
+
+Rcpp::NumericVector wbUtility(
+    double a_buddy, 
+    double b_buddy,
+    Rcpp::NumericMatrix buddies,
+    Rcpp::NumericMatrix distances
+);
+
+#endif
