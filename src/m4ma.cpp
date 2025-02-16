@@ -110,7 +110,7 @@ NumericVector wbUtility(double a_buddy,
                         NumericMatrix buddies,
                         NumericMatrix distances) {
 
-    Function f = m4ma["flUtility_rcpp"];
+    Function f = m4ma["wbUtility_rcpp"];
     return f(
         a_buddy,
         b_buddy,
