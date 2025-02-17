@@ -7,9 +7,10 @@
 mll(
   data,
   parameters,
-  parameter_names = colnames(likelihood_dummy)[-c(1, 2)],
+  parameter_names = colnames(params_from_csv[["params_archetypes"]])[-c(1, 2)],
   transform = TRUE,
   bounds = params_from_csv[["params_bounds"]],
+  cpp = TRUE,
   ...
 )
 }
