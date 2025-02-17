@@ -55,7 +55,7 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
             double difference = cell_distances[i] - optimal_distance;
             difference = std::abs(difference);
 
-            V[i] = b_group_centroid * std::pow(difference, a_group_centroid);
+            V[i] = -1 * b_group_centroid * std::pow(difference, a_group_centroid);
         }
 
         check[i] = V[i] < stop_utility;
@@ -109,7 +109,7 @@ NumericVector vf_utility_rcpp(double b_visual_field,
     NumericVector V(relative_angles.length());
     for(int i = 0; i < relative_angles.length(); i++) {
         if((relative_angles[i] > lower_angle) && (relative_angles[i] < upper_angle)) {
-            V[i] = b_visual_field;
+            V[i] = -1 * b_visual_field;
         } else {
             V[i] = 0.;
         }
