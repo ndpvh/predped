@@ -11,6 +11,31 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// unique
+std::unordered_set<std::string> unique(CharacterVector x);
+RcppExport SEXP _predped_unique(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(unique(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mll_rcpp
+NumericVector mll_rcpp(DataFrame data, DataFrame parameters, CharacterVector parameter_names, CharacterVector ids);
+RcppExport SEXP _predped_mll_rcpp(SEXP dataSEXP, SEXP parametersSEXP, SEXP parameter_namesSEXP, SEXP idsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type parameter_names(parameter_namesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ids(idsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mll_rcpp(data, parameters, parameter_names, ids));
+    return rcpp_result_gen;
+END_RCPP
+}
 // psUtility
 NumericVector psUtility(double a_preferred_speed, double b_preferred_speed, double preferred_speed, double slowing_time, NumericVector current_speed, NumericVector goal_distance);
 RcppExport SEXP _predped_psUtility(SEXP a_preferred_speedSEXP, SEXP b_preferred_speedSEXP, SEXP preferred_speedSEXP, SEXP slowing_timeSEXP, SEXP current_speedSEXP, SEXP goal_distanceSEXP) {
@@ -155,6 +180,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
+    {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 4},
     {"_predped_psUtility", (DL_FUNC) &_predped_psUtility, 6},
     {"_predped_gaUtility", (DL_FUNC) &_predped_gaUtility, 3},
     {"_predped_caUtility", (DL_FUNC) &_predped_caUtility, 3},
