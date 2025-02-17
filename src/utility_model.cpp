@@ -247,7 +247,7 @@ NumericVector utility_rcpp(DataFrame data,
             parameters["a_blocked"], 
             parameters["b_blocked"],
             ba_angle, 
-            ba_cones - 1
+            ba_cones
         );
     }
 
