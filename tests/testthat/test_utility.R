@@ -15,7 +15,7 @@ testthat::test_that("Utility R and Rcpp converge", {
         tst <- predped::utility(data[i, ], params, cpp = TRUE)
 
         result[i] <- all(ref == tst)
-    }    
+    }
 
     testthat::expect_true(all(result))
 })
