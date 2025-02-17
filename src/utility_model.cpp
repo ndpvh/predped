@@ -102,16 +102,16 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
 NumericVector vf_utility_rcpp(double b_visual_field, 
                               NumericVector relative_angles) {
      
-    
     double lower_angle = 130 * M_PI / 180;
     double upper_angle = 2 * M_PI - lower_angle;
 
     NumericVector V(relative_angles.length());
     for(int i = 0; i < relative_angles.length(); i++) {
-        if((relative_angles[i] > lower_angle) && (relative_angles[i] < upper_angle)) {
-            V[i] = -1 * b_visual_field;
-        } else {
-            V[i] = 0.;
+        bool check_1 = relative_angles[i] > lower_angle;
+        bool check_2 = relative_angles[i] < upper_angle;
+
+        if(check_1 & check_2) {
+            V[i] -= b_visual_field;
         }
     }
 
@@ -236,18 +236,16 @@ NumericVector utility_rcpp(DataFrame data,
         // Adjust the index of the cones so that it corresponds to C++ instead
         // of R. Additionally make sure angles are either 0 or greater than 0.
         for(int i = 0; i < ba_angle.length(); i++) {
-            ba_cones[i] -= 1;
-
             if(ba_angle[i] < 0) {
                 ba_angle[i] = 0.;
             }
         }
-
+        
         V += baUtility(
             parameters["a_blocked"], 
             parameters["b_blocked"],
             ba_angle, 
-            ba_cones
+            ba_cones - 1
         );
     }
 
@@ -299,11 +297,13 @@ NumericVector utility_rcpp(DataFrame data,
 
     // Visual field utility: Check whether people are walking in a group and, if 
     // so, compute the utility
-    List vf_angles = data["vf_angles"];
-    if(!(vf_angles[0] == R_NilValue)) {
+    List vf_angles_list = data["vf_angles"];
+    if(!(vf_angles_list[0] == R_NilValue)) {
+        NumericVector vf_angles = vf_angles_list[0];
+
         V += vf_utility_rcpp(
             parameters["b_visual_field"],
-            vf_angles[0]
+            vf_angles
         );
     }
 
