@@ -14,11 +14,17 @@ params <- predped::params_from_csv[["params_archetypes"]]
 params <- params[params$name == "SocialBaselineEuropean", ]
 
 # Do two tests, one for unbounded and one for bounded estimation.
-r <- (\() predped::utility(data, params, cpp = FALSE)) |>
+benchmark_function <- function(cpp) {
+    for(i in 1:100) {
+        dummy <- predped::utility(data, params, cpp = cpp)
+    }
+}
+
+r <- (\() benchmark_function(cpp = FALSE)) |>
     test_times() |>
     rnd()
 
-rcpp <- (\() predped::utility(data, params, cpp = TRUE)) |>
+rcpp <- (\() benchmark_function(cpp = TRUE)) |>
     test_times() |>
     rnd()
 
@@ -29,7 +35,7 @@ rownames(tbl) <- NULL
 colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
 caption <- paste0("Benchmark for the utility function. ",
-                  "In this benchmark, we use a single row from data that makes ",
+                  "In this benchmark, we use a 1000 rows from data that makes ",
                   "use of all utility functions simultaneously. "
                   "Comparison is made between using the R version (cpp = FALSE) ",
                   "or the Rcpp version of the function (cpp = TRUE).")
