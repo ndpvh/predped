@@ -51,7 +51,7 @@ setMethod("utility", "agent", function(object,
                                        agent_specifications,
                                        centers,                    
                                        check,
-                                       cpp = TRUE) {
+                                       cpp = FALSE) {
 
     # Compute the utility variables that are used as input to the utility 
     # functions.
@@ -170,7 +170,7 @@ setMethod("utility", "data.frame", function(object,
         V <- V + m4ma::baUtility_rcpp(parameters[["a_blocked"]], 
                                       parameters[["b_blocked"]],
                                       pmax(object$ba_angle[[1]], 0), # Make sure all angles are >= 0; this was previously done in baUtility()
-                                      as.integer(names(object$ba_angle[[1]])) - 1)
+                                      object$ba_cones[[1]] - 1)
     }
 
     # Follow the leader utility: Check whether there are any leaders in the first 
