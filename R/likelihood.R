@@ -80,7 +80,7 @@ mll <- function(data,
                       # results
                       L <- sapply(1:nrow(selection), 
                                   function(j) {
-                                      V <- utility(selection[j, ], likelihood_dummy)
+                                      V <- utility(selection[j, ], likelihood_dummy, cpp = FALSE)
 
                                       V <- V - max(V)
                                       exp_V <- exp(V)
