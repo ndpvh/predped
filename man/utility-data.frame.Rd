@@ -4,7 +4,7 @@
 \alias{utility,data.frame-method}
 \title{Compute the utilities with all utility variables known}
 \usage{
-\S4method{utility}{data.frame}(object, parameters)
+\S4method{utility}{data.frame}(object, parameters, cpp = TRUE)
 }
 \arguments{
 \item{object}{Dataframe containing all of the needed information to compute 
@@ -14,6 +14,9 @@ the utilities. Typically output of the
 \item{parameters}{Dataframe containing the parameters of the agent. Should 
 conform to the naming conventions mentioned in 
 \code{\link[predped]{params_from_csv}}.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp version of the function
+(\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 

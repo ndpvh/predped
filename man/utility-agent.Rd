@@ -4,7 +4,15 @@
 \alias{utility,agent-method}
 \title{Compute the utilities on the agent level}
 \usage{
-\S4method{utility}{agent}(object, state, background, agent_specifications, centers, check)
+\S4method{utility}{agent}(
+  object,
+  state,
+  background,
+  agent_specifications,
+  centers,
+  check,
+  cpp = FALSE
+)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
@@ -24,6 +32,9 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{cpp}{Logical denoting whether to use the Rcpp version of the function
+(\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 
