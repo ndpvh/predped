@@ -56,4 +56,9 @@ Rcpp::NumericVector wbUtility(
     Rcpp::NumericMatrix distances
 );
 
+Rcpp::NumericVector dist1(
+    Rcpp::NumericVector position, 
+    Rcpp::NumericMatrix goal_position
+);
+
 #endif

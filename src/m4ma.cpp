@@ -118,3 +118,14 @@ NumericVector wbUtility(double a_buddy,
         distances
     );
 } 
+
+// [[Rcpp::export]]
+NumericVector dist1(NumericVector position, 
+                    NumericMatrix goal_position) {
+
+    Function f = m4ma["dist1_rcpp"];
+    return f(
+        position, 
+        goal_position
+    );
+}
