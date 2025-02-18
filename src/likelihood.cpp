@@ -86,41 +86,4 @@ NumericVector mll_rcpp(DataFrame data,
 
     MLL.attr("names") = ids;
     return MLL;
-
-    // return MLL;
-
-    // // For each agent, loop over the unique participant id's
-    // NumericVector MLL(ids.length());
-    // for(int i = 0; i < ids.length(); i++) {
-    //     // Select the participants data
-    //     DataFrame selection = data[data['id'] == ids[i], ];
-    // }
-    // return MLL;
-    // MLL <- sapply(seq_along(ids), 
-    //               function(i) {
-    //                   # Select the data for which the utilities should be computed
-    //                   selection <- data[data$id == ids[i], ]
-  
-    //                   # Adjust the parameters to those that were provided
-    //                   likelihood_dummy[, parameter_names] <- parameters[i, ]
-  
-    //                   # Get the utilities for each cell based on the provided 
-    //                   # results
-    //                   L <- sapply(1:nrow(selection), 
-    //                               function(j) {
-    //                                   V <- utility(selection[j, ], likelihood_dummy, cpp = FALSE)
-
-    //                                   V <- V - max(V)
-    //                                   exp_V <- exp(V)
-    //                                   return(exp_V[selection$cell[j] + 1] / sum(exp_V))
-    //                               })
-                      
-    //                   # Convert likelihoods to min-log-likelihood. 1 was added
-    //                   # to each likelihood to ensure that 0 probability will 
-    //                   # not lead to -Inf min-log-likelihood.
-    //                   return(-sum(log(1 + L)))
-    //               })
-
-    // names(MLL) <- ids 
-    // return(MLL)
 }
