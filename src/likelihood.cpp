@@ -81,7 +81,6 @@ NumericVector mll_rcpp(DataFrame data,
         NumericVector P = V / Rcpp::sum(V);
         
         int cell = data_i["cell"];
-        Rcout << cell << "\n";
         MLL[idx] -= log(1 + P[cell]);
     }
 
