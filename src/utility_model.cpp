@@ -207,13 +207,14 @@ NumericVector utility_rcpp(DataFrame data,
     List id_distance = data["id_distance"];
     if(!(id_distance[0] == R_NilValue)) {
         List id_ingroup = data["id_ingroup"];
+        List id_check = data["id_check"];
 
         V += idUtility(
             parameters["b_interpersonal"], 
             parameters["d_interpersonal"], 
             parameters["a_interpersonal"], 
             id_ingroup[0], 
-            check,
+            id_check[0],
             id_distance[0], 
             V_id
         );
