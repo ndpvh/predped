@@ -56,9 +56,58 @@ Rcpp::NumericVector wbUtility(
     Rcpp::NumericMatrix distances
 );
 
+Rcpp::NumericMatrix destinationAngle(
+    double orientation, 
+    Rcpp::NumericMatrix agent_position,
+    Rcpp::NumericMatrix goal_position
+);
+
+Rcpp::Nullable<Rcpp::NumericMatrix> predClose(
+    int agent_idx,
+    Rcpp::NumericMatrix agent_position,
+    double orientation,
+    Rcpp::NumericMatrix others_position,
+    Rcpp::NumericVector radius,
+    Rcpp::NumericMatrix centers,
+    Rcpp::NumericMatrix predicted_positions,
+    Rcpp::List objects
+);
+
+Rcpp::NumericVector blockedAngle(
+    Rcpp::NumericMatrix agent_position,
+    double orientation,
+    double speed,
+    Rcpp::NumericMatrix predictions_minus_agent,
+    Rcpp::NumericVector radii,
+    Rcpp::List objects
+);
+
 Rcpp::NumericVector dist1(
     Rcpp::NumericVector position, 
     Rcpp::NumericMatrix goal_position
+);
+
+Rcpp::Nullable<Rcpp::List> getLeaders(
+    int agent_idx,
+    Rcpp::NumericMatrix positions,
+    Rcpp::NumericVector orientations,
+    Rcpp::NumericVector speeds,
+    Rcpp::NumericMatrix goal_position,
+    Rcpp::NumericVector groups,
+    Rcpp::NumericMatrix centers,
+    Rcpp::List objects
+);
+
+Rcpp::Nullable<Rcpp::List> getBuddy(
+    int agent_idx,
+    Rcpp::NumericMatrix positions,
+    Rcpp::NumericVector speeds,
+    Rcpp::NumericVector groups,
+    Rcpp::NumericVector orientations,
+    Rcpp::NumericMatrix predictions,
+    Rcpp::NumericMatrix centers,
+    Rcpp::List objects,
+    bool pickBest
 );
 
 #endif
