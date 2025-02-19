@@ -255,6 +255,8 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.
@@ -275,7 +277,18 @@ setMethod("compute_utility_variables", "agent", function(object,
                                                          background,
                                                          agent_specifications,
                                                          centers,                    
-                                                         check) {
+                                                         check, 
+                                                         cpp = TRUE) {
+
+    # If you want Rcpp to handle everything, let it do so
+    if(cpp) {
+        return(compute_utility_variables_rcpp(object, 
+                                              state,
+                                              background,
+                                              agent_specifications,
+                                              centers,
+                                              check))
+    }
 
     # Create a data.frame that will contain all of the needed information in 
     # a single row. This data.frame will already contain the index of the agent
