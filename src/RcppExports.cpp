@@ -138,6 +138,53 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// destinationAngle
+NumericMatrix destinationAngle(double orientation, NumericMatrix agent_position, NumericMatrix goal_position);
+RcppExport SEXP _predped_destinationAngle(SEXP orientationSEXP, SEXP agent_positionSEXP, SEXP goal_positionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type orientation(orientationSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type agent_position(agent_positionSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type goal_position(goal_positionSEXP);
+    rcpp_result_gen = Rcpp::wrap(destinationAngle(orientation, agent_position, goal_position));
+    return rcpp_result_gen;
+END_RCPP
+}
+// predClose
+Nullable<NumericMatrix> predClose(int agent_idx, NumericMatrix agent_position, double orientation, NumericMatrix others_position, NumericVector radius, NumericMatrix centers, NumericMatrix predicted_positions, List objects);
+RcppExport SEXP _predped_predClose(SEXP agent_idxSEXP, SEXP agent_positionSEXP, SEXP orientationSEXP, SEXP others_positionSEXP, SEXP radiusSEXP, SEXP centersSEXP, SEXP predicted_positionsSEXP, SEXP objectsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type agent_idx(agent_idxSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type agent_position(agent_positionSEXP);
+    Rcpp::traits::input_parameter< double >::type orientation(orientationSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type others_position(others_positionSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type predicted_positions(predicted_positionsSEXP);
+    Rcpp::traits::input_parameter< List >::type objects(objectsSEXP);
+    rcpp_result_gen = Rcpp::wrap(predClose(agent_idx, agent_position, orientation, others_position, radius, centers, predicted_positions, objects));
+    return rcpp_result_gen;
+END_RCPP
+}
+// blockedAngle
+NumericVector blockedAngle(NumericMatrix agent_position, double orientation, double speed, NumericMatrix predictions_minus_agent, NumericVector radii, List objects);
+RcppExport SEXP _predped_blockedAngle(SEXP agent_positionSEXP, SEXP orientationSEXP, SEXP speedSEXP, SEXP predictions_minus_agentSEXP, SEXP radiiSEXP, SEXP objectsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type agent_position(agent_positionSEXP);
+    Rcpp::traits::input_parameter< double >::type orientation(orientationSEXP);
+    Rcpp::traits::input_parameter< double >::type speed(speedSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type predictions_minus_agent(predictions_minus_agentSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
+    Rcpp::traits::input_parameter< List >::type objects(objectsSEXP);
+    rcpp_result_gen = Rcpp::wrap(blockedAngle(agent_position, orientation, speed, predictions_minus_agent, radii, objects));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gc_utility_rcpp
 NumericVector gc_utility_rcpp(double a_group_centroid, double b_group_centroid, double radius, NumericVector cell_distances, double stop_utility, int nped);
 RcppExport SEXP _predped_gc_utility_rcpp(SEXP a_group_centroidSEXP, SEXP b_group_centroidSEXP, SEXP radiusSEXP, SEXP cell_distancesSEXP, SEXP stop_utilitySEXP, SEXP npedSEXP) {
@@ -178,6 +225,52 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// distance_group_centroid_rcpp
+Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions, NumericMatrix centers, int number_agents);
+RcppExport SEXP _predped_distance_group_centroid_rcpp(SEXP predictionsSEXP, SEXP centersSEXP, SEXP number_agentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type predictions(predictionsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< int >::type number_agents(number_agentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(distance_group_centroid_rcpp(predictions, centers, number_agents));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_angles_rcpp
+Nullable<NumericVector> get_angles_rcpp(int agent_idx, NumericVector agent_groups, NumericVector position, double orientation, NumericMatrix predictions, NumericMatrix centers, bool any_member);
+RcppExport SEXP _predped_get_angles_rcpp(SEXP agent_idxSEXP, SEXP agent_groupsSEXP, SEXP positionSEXP, SEXP orientationSEXP, SEXP predictionsSEXP, SEXP centersSEXP, SEXP any_memberSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type agent_idx(agent_idxSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type agent_groups(agent_groupsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type position(positionSEXP);
+    Rcpp::traits::input_parameter< double >::type orientation(orientationSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type predictions(predictionsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< bool >::type any_member(any_memberSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_angles_rcpp(agent_idx, agent_groups, position, orientation, predictions, centers, any_member));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_utility_variables_rcpp
+DataFrame compute_utility_variables_rcpp(S4 agent, S4 state, S4 background, List agent_specifications, NumericMatrix centers, LogicalMatrix check);
+RcppExport SEXP _predped_compute_utility_variables_rcpp(SEXP agentSEXP, SEXP stateSEXP, SEXP backgroundSEXP, SEXP agent_specificationsSEXP, SEXP centersSEXP, SEXP checkSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type agent(agentSEXP);
+    Rcpp::traits::input_parameter< S4 >::type state(stateSEXP);
+    Rcpp::traits::input_parameter< S4 >::type background(backgroundSEXP);
+    Rcpp::traits::input_parameter< List >::type agent_specifications(agent_specificationsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type check(checkSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_utility_variables_rcpp(agent, state, background, agent_specifications, centers, check));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
@@ -189,9 +282,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_baUtility", (DL_FUNC) &_predped_baUtility, 4},
     {"_predped_flUtility", (DL_FUNC) &_predped_flUtility, 5},
     {"_predped_wbUtility", (DL_FUNC) &_predped_wbUtility, 4},
+    {"_predped_destinationAngle", (DL_FUNC) &_predped_destinationAngle, 3},
+    {"_predped_predClose", (DL_FUNC) &_predped_predClose, 8},
+    {"_predped_blockedAngle", (DL_FUNC) &_predped_blockedAngle, 6},
     {"_predped_gc_utility_rcpp", (DL_FUNC) &_predped_gc_utility_rcpp, 6},
     {"_predped_vf_utility_rcpp", (DL_FUNC) &_predped_vf_utility_rcpp, 2},
     {"_predped_utility_rcpp", (DL_FUNC) &_predped_utility_rcpp, 2},
+    {"_predped_distance_group_centroid_rcpp", (DL_FUNC) &_predped_distance_group_centroid_rcpp, 3},
+    {"_predped_get_angles_rcpp", (DL_FUNC) &_predped_get_angles_rcpp, 7},
+    {"_predped_compute_utility_variables_rcpp", (DL_FUNC) &_predped_compute_utility_variables_rcpp, 6},
     {NULL, NULL, 0}
 };
 

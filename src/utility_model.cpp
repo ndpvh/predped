@@ -2,12 +2,17 @@
 #include <Rcpp.h>
 #include "m4ma.h"
 #include <typeinfo>
+#include <string>
+#include <math.h>
 
 using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// utility
 
 //' Group centroid utility
 //'
@@ -323,6 +328,408 @@ NumericVector utility_rcpp(DataFrame data,
     }
 
     return V;    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// compute_utility_variable
+
+//' Distances to group centroid
+//'
+//' Rcpp version of \code{\link[predped]{distance_group_centroid}}. 
+//' 
+//' Compute the distance of a given agent to the group centroid. This group 
+//' centroid is computed as a summary statistic of the predicted x- and y-
+//' coordinates of all pedestrians belonging to the same group as the agent. The 
+//' summary statistic of choice should be one of mean-tendency, but can be 
+//' specified by the user through the argument \code{fx}.
+//' 
+//' Note that this function has been defined to be in line with the \code{m4ma}
+//' utility functions.
+//'
+//' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+//' of all pedestrians that belong to the social group of the agent.
+//' @param centers Numerical matrix containing the coordinates at each position
+//' the object can be moved to. Should have one row for each cell.
+//' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
+//' @param fx Function used to find the group centroid. Defaults to \code{mean}
+//'
+//' @return Numeric vector containing the distance from each cell in the `center`
+//' to the group centroid. If not other agents belong to the same group as the 
+//' agent, returns \code{NULL}.
+//' 
+//' @seealso 
+//' \code{\link[predped]{gc_utility}},
+//' \code{\link[predped]{utility}}
+//' 
+//' @rdname distance_group_centroid_rcpp
+//'
+//' @export 
+// [[Rcpp::export]]
+Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions, 
+                                                     NumericMatrix centers, 
+                                                     int number_agents) {
+   
+    // First need to identify whether a pedestrian belongs to a social group    
+    if(number_agents == 0) {
+        return R_NilValue;   
+    }
+
+    // All of the positions of all in-group pedestrians need to be averaged
+    // Which represents the group centroid
+    NumericVector centroid = {mean(predictions(_, 0)), mean(predictions(_, 1))};
+
+    // Euclidean distance for pedestrian_i is calculated for each cell
+    return dist1(centroid, centers);
+}
+
+//' Angle between agent and group members
+//' 
+//' Finds the angle at which the group members are located compared to the agent.
+//' Uses the predicted positions of the group members for this.
+//'
+//' @param agent_idx Numeric denoting the position of the agent in the prediction 
+//' matrix \code{p_pred}.
+//' @param agent_group Numeric vector with the group membership of all 
+//' pedestrians.
+//' @param position Numeric vector denoting the current position of the agent.
+//' @param orientation Numeric denoting the current orientation of the agent.
+//' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+//' of all pedestrians that belong to the social group of the agent.
+//' @param centers Numerical matrix containing the coordinates at each position
+//' the object can be moved to. Should have one row for each cell.
+//' @param any_member Logical denoting whether to consider the angles of all 
+//' group members (\code{TRUE}) -- effectively saying that it doesn't matter 
+//' which group member the agent can see, as long as they can see one -- or 
+//' whether to only consider the nearest group member (\code{FALSE}). Defaults 
+//' to \code{TRUE}.
+//'
+//' @return Numeric vector containing the relative angle of the group member(s)
+//' compared to the orientation of the agent within a given cell in \code{centers}.
+//' 
+//' @seealso 
+//' \code{\link[predped]{utility}}
+//' \code{\link[predped]{vf_utility_continuous}}
+//' \code{\link[predped]{vf_utility_discrete}}
+//' 
+//' @rdname get_angles_rcpp
+//' 
+//' @export 
+// [[Rcpp::export]]
+Nullable<NumericVector> get_angles_rcpp(int agent_idx, 
+                                        NumericVector agent_groups, 
+                                        NumericVector position, 
+                                        double orientation,  
+                                        NumericMatrix predictions, 
+                                        NumericMatrix centers,
+                                        bool any_member = true) {
+    
+    // First need to identify whether a pedestrian belongs to a social group
+    int nped = predictions.nrow();
+    if(nped == 0) {
+        return R_NilValue;
+    }
+
+    // `any_member` is false, we need to first identify the closest pedestrian 
+    // and change the predictions to him. Other computations are the same. 
+    if(!any_member) {
+        NumericVector distances = dist1(position, predictions);
+        int idx = Rcpp::which_min(distances);
+        NumericVector selection = predictions(idx, _);
+        NumericMatrix predictions(1, 2, selection.begin());
+    } 
+    
+    // Loop over each of the centers and find out what the relative angle is 
+    // to the group member(s) from these different positions
+    NumericVector rel_angles(centers.nrow());
+    for(int i = 0; i < centers.nrow(); i++) {
+        // Get orientation of the cell
+        double orientation = atan2(
+            centers(i, 1) - position[1], 
+            centers(i, 0) - position[0]
+        );
+
+        // Loop over the relative angles and compute the angle of the 
+        // predicted position to the cell center. We only need to know the 
+        // angle for which the cosine is maximal
+        double max_cosine = -1;
+        double max_angle = 0;
+        for(int j = 0; j < predictions.nrow(); j++) {
+            double angle = atan2(
+                predictions(j, 1) - centers(i, 1),
+                predictions(j, 0) - centers(i, 0)
+            );
+
+            angle = rel_angles[j] - orientation;
+
+            if(angle < 0) {
+                angle += M_PI * 2;
+            }
+
+            if(cos(angle) > max_cosine) {
+                max_angle = angle;
+            }
+        }
+
+        rel_angles[i] = max_angle;
+    }
+
+    return rel_angles;
+}
+
+//' Compute utility variables
+//' 
+//' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
+//' 
+//' @param object Object of the \code{\link[predped]{agent-class}}.
+//' @param state Object of the \code{\link[predped]{state-class}}.
+//' @param background Object of the \code{\link[predped]{background-class}}.
+//' @param agent_specifications List created by the 
+//' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+//' information of all agents within the current \code{state} and allows for the
+//' communication between the \code{predped} simulation functions and the 
+//' \code{m4ma} utility functions.
+//' @param centers Numerical matrix containing the coordinates at each position
+//' the object can be moved to. Should have one row for each cell.
+//' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+//' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+//' 
+//' @return Data.frame containing all of the needed variables to be able to 
+//' compute the values of the utility functions.
+//' 
+//' @seealso 
+//' \code{\link[predped]{simulate,predped-method}},
+//' \code{\link[predped]{simulate,state-method}},
+//' \code{\link[predped]{update,agent-method}},
+//' \code{\link[predped]{update,state-method}},
+//' \code{\link[predped]{update_position}},
+//' \code{\link[predped]{update}}
+//' 
+//' @rdname compute_utility_variables_rcpp
+//' 
+//' @export 
+// [[Rcpp::export]]
+DataFrame compute_utility_variables_rcpp(S4 agent,
+                                         S4 state,
+                                         S4 background,
+                                         List agent_specifications,
+                                         NumericMatrix centers,                    
+                                         LogicalMatrix check) {
+
+    // Retrieve the index of the agent of interest. Importantly, make sure that 
+    // the indices are defined for R, not Rcpp (conversions to Rcpp are handled
+    // in its own functions)
+    std::string agent_id = agent.slot("id");
+    CharacterVector everyone = agent_specifications["id"];
+
+    int agent_idx = 0;
+    for(int i = 0; i < everyone.length(); i++) {
+        std::string agent_i = Rcpp::as<std::string>(everyone[i]);
+        if(agent_id == agent_i) {
+            agent_idx = i + 1;
+        }
+    }
+
+    // Preferred speed utility: Required variables are the current speed and the 
+    // goal distance
+    S4 goal = agent.slot("current_goal");
+    NumericMatrix goal_position = goal.slot("path");
+    
+    double ps_speed = agent.slot("speed");
+    NumericVector ps_distance = dist1(agent.slot("center"), goal_position);
+
+    // Goal direction utility: Required variable is the angle between agent and 
+    // the goal
+    NumericVector agent_position = agent.slot("center");
+    NumericMatrix agent_center(1, 2, agent_position.begin());
+
+    NumericMatrix gd_angle_multiple = destinationAngle(
+        agent.slot("orientation"),
+        agent_center,
+        goal_position
+    );
+    NumericVector gd_angle_vector = gd_angle_multiple(0, _);
+    NumericMatrix gd_angle(1, 11, gd_angle_vector.begin());
+    gd_angle = gd_angle / 90;
+
+
+    // Interpersonal distance utility: Required variable is the distance between 
+    // agent and other agents, and whether these agents are part of the ingroup, 
+    // and whether the distances are all positive.
+    Nullable<NumericMatrix> id_distance = predClose(
+        agent_idx,
+        agent_center,
+        agent.slot("orientation"),
+        agent_specifications["position"],
+        agent_specifications["size"],
+        centers,
+        agent_specifications["predictions"],
+        background.slot("objects")
+    );
+    
+    // Check which cells have only positive distance
+    LogicalMatrix id_check = check;
+    if(!(id_distance == R_NilValue)) {
+        // Check whether each column consists of only positive distances. If 
+        // not, then we have to set this to FALSE.
+        NumericMatrix id_distance_matrix(id_distance);
+
+        // Adjust the "check" matrix so that you have FALSE in those locations 
+        // where at least one negative distance showed up. Unfortunately couldn't
+        // use the `all` function because of conversion issues, so a loopo was 
+        // used instead.
+        for(int i = 0; i < id_check.length(); i++) {
+            if(check[i]) {
+                id_check[i] = all(id_distance_matrix(_, i) > 0).is_true();
+            }
+        }
+    }
+
+    // Get names of ingroup agents and check whether these agents are part of the 
+    // ingroup or not
+    IntegerVector agent_groups = agent_specifications["group"];
+    int group = agent_groups[agent_idx - 1];
+    agent_groups.erase(agent_idx - 1);
+
+    LogicalVector id_ingroup = agent_groups == group;
+
+    // Blocked angle utility: Required variable is those angles that might be 
+    // blocked in the near future. In other words, we are trying to predict which 
+    // directions might lead to collisions in the future
+    //
+    // The underlying functions depend on the predicted positions of everyone 
+    // except the current agent. Therefore delete the current agent from the 
+    // prediction matrix.
+    NumericMatrix predictions = agent_specifications["predictions"];
+    NumericMatrix predictions_minus_agent(agent_groups.length(), 2);
+    int j = 0;
+    for(int i = 0; i < predictions.nrow(); i++) {
+        if(i != agent_idx - 1) {
+            predictions_minus_agent(j, _) = predictions(i, _);
+            j++;
+        }
+    } 
+
+    // Make sure predictions_minus_agent contains the names of all other agents 
+    // on its rows. If not done, then a stackoverflow error will happen (names 
+    // are called in m4ma::blockedAngle_rcpp)
+    CharacterVector everyone_else = everyone;
+    everyone_else.erase(agent_idx - 1);
+    CharacterVector xy = {"x", "y"};
+    predictions_minus_agent.attr("dimnames") = List::create(everyone_else, xy);
+
+    NumericVector everyone_size = agent_specifications["size"];
+    everyone_size.erase(agent_idx - 1);
+
+    NumericVector ba_angle = blockedAngle(
+        agent_center,
+        agent.slot("orientation"),
+        agent.slot("speed"),
+        predictions_minus_agent,
+        everyone_size,
+        background.slot("objects")
+    );
+
+    // Also save which cones these angles belong to in a separate variable. 
+    IntegerVector ba_cones(ba_angle.length());
+    if(ba_angle.length() != 0) {
+        CharacterVector ba_cones_names = ba_angle.attr("names");
+
+        for(int i = 0; i < ba_cones_names.length(); i++) {
+            ba_cones[i] = std::stoi(std::string(ba_cones_names[i]));
+        }
+    } 
+
+    // Follow the leader utility: Required variable is the potential leaders and 
+    // their distances. This is all outputted in a list by getLeaders_rcpp, which
+    // is why we just append it to the data.frame directly
+    Nullable<List> fl_leaders = getLeaders(
+        agent_idx,
+        agent_specifications["position"],
+        agent_specifications["orientation"],
+        agent_specifications["speed"],
+        goal_position,
+        agent_specifications["group"],
+        centers,
+        background.slot("objects")
+    );
+
+    // Walking besides utility: Required variable is the potential buddies that 
+    // you can walk besides. A similar reasoning to follow the leader is applied 
+    // here.
+    Nullable<List> wb_buddies = getBuddy(
+        agent_idx,
+        agent_specifications["position"],
+        agent_specifications["speed"],
+        agent_specifications["group"],
+        agent_specifications["orientation"],
+        agent_specifications["predictions"],
+        centers,
+        background.slot("objects"),
+        false
+    );
+
+    // Group centroid utility: Required variables are the distance to the predicted
+    // group centroid, the number of pedestrians in the group, and the radius of 
+    // the agent in question
+    NumericMatrix predictions_ingroup(sum(id_ingroup), 2);
+    j = 0;
+    for(int i = 0; i < predictions_ingroup.nrow(); i++) {
+        if(id_ingroup[i]) {
+            predictions_ingroup(j, _) = predictions(i, _);
+            j++; 
+        }
+    }
+
+    Nullable<NumericVector> gc_distance = distance_group_centroid_rcpp(
+        predictions_ingroup,
+        centers,
+        predictions_ingroup.nrow()
+    );
+
+    double gc_radius = agent.slot("radius");
+    int gc_nped = predictions_ingroup.nrow();
+
+    // Visual field utility: Required variable is the angle of one or more 
+    // other pedestrians.
+    Nullable<NumericVector> vf_angles = get_angles_rcpp(
+        agent_idx, 
+        agent_specifications["group"],
+        agent.slot("center"),
+        agent.slot("orientation"),
+        predictions_ingroup,
+        centers,
+        true
+    );
+
+    // Create the list that will contain all of the needed information. 
+    // Afterwards, convert to a DataFrame as expected by the utility
+    // functions. This is the preferred way of doing things in Rcpp.
+    List uv = List::create(
+        Named("agent_idx") = agent_idx,
+        Named("check") = List::create(check),
+        Named("ps_speed") = ps_speed, 
+        Named("ps_distance") = ps_distance[0],
+        Named("gd_angle") = List::create(gd_angle),
+        Named("id_distance") = List::create(id_distance),
+        Named("id_check") = List::create(id_check),
+        Named("id_ingroup") = List::create(id_ingroup),
+        Named("ba_angle") = List::create(ba_angle),
+        Named("ba_cones") = List::create(ba_cones),
+        Named("fl_leaders") = List::create(fl_leaders),
+        Named("wb_buddies") = List::create(wb_buddies),
+        Named("gc_distance") = List::create(gc_distance),
+        Named("gc_radius") = List::create(gc_radius),
+        Named("gc_nped") = List::create(gc_nped),
+        Named("vf_angles") = List::create(vf_angles)
+    );    
+
+    // Change attribute to DataFrame and return
+    uv.attr("class") = "data.frame";
+    uv.attr("row.names") = 1;
+    return uv;
 }
 
 

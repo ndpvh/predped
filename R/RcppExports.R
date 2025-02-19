@@ -70,6 +70,18 @@ wbUtility <- function(a_buddy, b_buddy, buddies, distances) {
     .Call('_predped_wbUtility', PACKAGE = 'predped', a_buddy, b_buddy, buddies, distances)
 }
 
+destinationAngle <- function(orientation, agent_position, goal_position) {
+    .Call('_predped_destinationAngle', PACKAGE = 'predped', orientation, agent_position, goal_position)
+}
+
+predClose <- function(agent_idx, agent_position, orientation, others_position, radius, centers, predicted_positions, objects) {
+    .Call('_predped_predClose', PACKAGE = 'predped', agent_idx, agent_position, orientation, others_position, radius, centers, predicted_positions, objects)
+}
+
+blockedAngle <- function(agent_position, orientation, speed, predictions_minus_agent, radii, objects) {
+    .Call('_predped_blockedAngle', PACKAGE = 'predped', agent_position, orientation, speed, predictions_minus_agent, radii, objects)
+}
+
 #' Group centroid utility
 #'
 #' Rcpp alternative for the group centroid utility function. 
@@ -159,5 +171,111 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' 
 utility_rcpp <- function(data, parameters) {
     .Call('_predped_utility_rcpp', PACKAGE = 'predped', data, parameters)
+}
+
+#' Distances to group centroid
+#'
+#' Rcpp version of \code{\link[predped]{distance_group_centroid}}. 
+#' 
+#' Compute the distance of a given agent to the group centroid. This group 
+#' centroid is computed as a summary statistic of the predicted x- and y-
+#' coordinates of all pedestrians belonging to the same group as the agent. The 
+#' summary statistic of choice should be one of mean-tendency, but can be 
+#' specified by the user through the argument \code{fx}.
+#' 
+#' Note that this function has been defined to be in line with the \code{m4ma}
+#' utility functions.
+#'
+#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+#' of all pedestrians that belong to the social group of the agent.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
+#' @param fx Function used to find the group centroid. Defaults to \code{mean}
+#'
+#' @return Numeric vector containing the distance from each cell in the `center`
+#' to the group centroid. If not other agents belong to the same group as the 
+#' agent, returns \code{NULL}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{gc_utility}},
+#' \code{\link[predped]{utility}}
+#' 
+#' @rdname distance_group_centroid_rcpp
+#'
+#' @export 
+distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
+    .Call('_predped_distance_group_centroid_rcpp', PACKAGE = 'predped', predictions, centers, number_agents)
+}
+
+#' Angle between agent and group members
+#' 
+#' Finds the angle at which the group members are located compared to the agent.
+#' Uses the predicted positions of the group members for this.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the prediction 
+#' matrix \code{p_pred}.
+#' @param agent_group Numeric vector with the group membership of all 
+#' pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+#' of all pedestrians that belong to the social group of the agent.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param any_member Logical denoting whether to consider the angles of all 
+#' group members (\code{TRUE}) -- effectively saying that it doesn't matter 
+#' which group member the agent can see, as long as they can see one -- or 
+#' whether to only consider the nearest group member (\code{FALSE}). Defaults 
+#' to \code{TRUE}.
+#'
+#' @return Numeric vector containing the relative angle of the group member(s)
+#' compared to the orientation of the agent within a given cell in \code{centers}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{vf_utility_continuous}}
+#' \code{\link[predped]{vf_utility_discrete}}
+#' 
+#' @rdname get_angles_rcpp
+#' 
+#' @export 
+get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, predictions, centers, any_member = TRUE) {
+    .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_groups, position, orientation, predictions, centers, any_member)
+}
+
+#' Compute utility variables
+#' 
+#' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param state Object of the \code{\link[predped]{state-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param agent_specifications List created by the 
+#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+#' information of all agents within the current \code{state} and allows for the
+#' communication between the \code{predped} simulation functions and the 
+#' \code{m4ma} utility functions.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' 
+#' @return Data.frame containing all of the needed variables to be able to 
+#' compute the values of the utility functions.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{update_position}},
+#' \code{\link[predped]{update}}
+#' 
+#' @rdname compute_utility_variables_rcpp
+#' 
+#' @export 
+compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
+    .Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check)
 }
 
