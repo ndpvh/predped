@@ -569,12 +569,16 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         background.slot("objects")
     );
     
-    // Check which cells have only positive distance
+    // Check which cells have only positive distance. Already instantiate the 
+    // list that will hold either the NULL or the resulting matrix, allowing 
+    // us to differentiate between both cases in an easy way.
     LogicalMatrix id_check = check;
+    List list_id_distance = List::create(id_distance);
     if(!(id_distance == R_NilValue)) {
         // Check whether each column consists of only positive distances. If 
         // not, then we have to set this to FALSE.
         NumericMatrix id_distance_matrix(id_distance);
+        list_id_distance = List::create(id_distance_matrix);
 
         // Adjust the "check" matrix so that you have FALSE in those locations 
         // where at least one negative distance showed up. Unfortunately couldn't
@@ -713,7 +717,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         Named("ps_speed") = ps_speed, 
         Named("ps_distance") = ps_distance[0],
         Named("gd_angle") = List::create(gd_angle),
-        Named("id_distance") = List::create(id_distance),
+        Named("id_distance") = list_id_distance,
         Named("id_check") = List::create(id_check),
         Named("id_ingroup") = List::create(id_ingroup),
         Named("ba_angle") = List::create(ba_angle),
@@ -724,11 +728,11 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         Named("gc_radius") = List::create(gc_radius),
         Named("gc_nped") = List::create(gc_nped),
         Named("vf_angles") = List::create(vf_angles)
-    );    
+    );
 
     // Change attribute to DataFrame and return
     uv.attr("class") = "data.frame";
-    uv.attr("row.names") = 1;
+    uv.attr("row.names") = 0;
     return uv;
 }
 
