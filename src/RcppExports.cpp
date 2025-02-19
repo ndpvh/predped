@@ -256,10 +256,9 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_utility_variables_rcpp
-DataFrame compute_utility_variables_rcpp(S4 agent, S4 state, S4 background, List agent_specifications, NumericMatrix centers, LogicalMatrix check);
+void compute_utility_variables_rcpp(S4 agent, S4 state, S4 background, List agent_specifications, NumericMatrix centers, LogicalMatrix check);
 RcppExport SEXP _predped_compute_utility_variables_rcpp(SEXP agentSEXP, SEXP stateSEXP, SEXP backgroundSEXP, SEXP agent_specificationsSEXP, SEXP centersSEXP, SEXP checkSEXP) {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< S4 >::type agent(agentSEXP);
     Rcpp::traits::input_parameter< S4 >::type state(stateSEXP);
@@ -267,8 +266,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type agent_specifications(agent_specificationsSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
     Rcpp::traits::input_parameter< LogicalMatrix >::type check(checkSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_utility_variables_rcpp(agent, state, background, agent_specifications, centers, check));
-    return rcpp_result_gen;
+    compute_utility_variables_rcpp(agent, state, background, agent_specifications, centers, check);
+    return R_NilValue;
 END_RCPP
 }
 
