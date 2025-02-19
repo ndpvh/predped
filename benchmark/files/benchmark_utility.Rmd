@@ -1,5 +1,65 @@
 # utility.R 
 
+## compute_utility_variables
+
+```{r utility compute_utility_variables}
+
+# Read in data and extract a single state
+trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_utility.Rds"))
+state_i <- trace[[20]]
+
+# Create agent specifications in the same way as done in simulate
+agent_specs <- predped::create_agent_specifications(state_i@agents)
+
+# Create centers and check
+centers <- matrix(1, nrow = 33, ncol = 2)
+check <- matrix(TRUE, nrow = 11, ncol = 3)
+
+# Compute the utility variables
+benchmark_function <- function(cpp) {
+    for(i in 1:100) {
+        dummy <- predped::compute_utility_variables(
+            state_i@agents[[3]],
+            state_i, 
+            state_i@setting, 
+            agent_specs,
+            centers, 
+            check,
+            cpp = cpp
+        )
+    }
+}
+
+r <- (\() benchmark_function(cpp = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rcpp <- (\() benchmark_function(cpp = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create the table
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             rbind(r, rcpp))
+rownames(tbl) <- NULL
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+caption <- paste0("Benchmark for the compute_utility_variables function. ",
+                  "In this benchmark, we repeat the function call 100 times. ",
+                  "Comparison is made between using the R version (cpp = FALSE) ",
+                  "or the Rcpp version of the function (cpp = TRUE).")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lccc",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
 ## utility 
 
 ```{r utility utility}
@@ -35,8 +95,9 @@ rownames(tbl) <- NULL
 colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
 caption <- paste0("Benchmark for the utility function. ",
-                  "In this benchmark, we use a 1000 rows from data that makes ",
-                  "use of all utility functions simultaneously. "
+                  "In this benchmark, we repeat the function call 100 times and ",
+                  "use a dataset where all utility functions are simultaneously ",
+                  "used. ",
                   "Comparison is made between using the R version (cpp = FALSE) ",
                   "or the Rcpp version of the function (cpp = TRUE).")
 tbl |>
