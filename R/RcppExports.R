@@ -276,6 +276,6 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' 
 #' @export 
 compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
-    invisible(.Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check))
+    .Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check)
 }
 
