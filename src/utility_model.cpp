@@ -462,13 +462,14 @@ Nullable<NumericVector> get_angles_rcpp(int agent_idx,
                 predictions(j, 0) - centers(i, 0)
             );
 
-            angle = rel_angles[j] - orientation;
+            angle = angle - orientation;
 
             if(angle < 0) {
                 angle += M_PI * 2;
             }
 
             if(cos(angle) > max_cosine) {
+                max_cosine = cos(angle);
                 max_angle = angle;
             }
         }

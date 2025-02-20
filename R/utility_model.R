@@ -620,6 +620,7 @@ get_angles <- function (agent_idx,
                         any_member = TRUE) {
     
     # First need to identify whether a pedestrian belongs to a social group
+    p_pred <- p_pred[-agent_idx, , drop = FALSE]
     ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
     p_pred <- p_pred[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]
