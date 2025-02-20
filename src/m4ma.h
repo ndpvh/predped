@@ -110,6 +110,16 @@ Rcpp::NumericVector dist1(
     Rcpp::NumericMatrix goal_position
 );
 
+Rcpp::NumericMatrix c_vd(
+    Rcpp::IntegerVector cells, 
+    Rcpp::NumericVector position,
+    double velocity,
+    double angle,
+    Rcpp::NumericMatrix velocities,
+    Rcpp::NumericMatrix angles,
+    double time_step
+);
+
 Rcpp::NumericMatrix aTOd(Rcpp::NumericVector angle);
 
 Rcpp::NumericVector scaleVel(

@@ -230,6 +230,26 @@ NumericVector dist1(NumericVector position,
     );
 }
 
+NumericMatrix c_vd(IntegerVector cells, 
+                   NumericVector position,
+                   double velocity,
+                   double angle,
+                   NumericMatrix velocities,
+                   NumericMatrix angles,
+                   double time_step) {
+    
+    Function f = m4ma["c_vd_rcpp"];
+    return f(
+        cells,
+        position,
+        velocity,
+        angle,
+        velocities,
+        angles,
+        time_step
+    );
+}
+
 NumericVector aTOd(NumericVector angle) {
 
     Function f = m4ma["aTOd_rcpp"];
