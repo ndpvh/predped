@@ -700,11 +700,17 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // Group centroid utility: Required variables are the distance to the predicted
     // group centroid, the number of pedestrians in the group, and the radius of 
     // the agent in question
-    NumericMatrix predictions_ingroup(sum(id_ingroup), 2);
+    IntegerVector agent_groups = agent_specifications["group"];
+    int group = agent_groups[agent_idx - 1];
+
+    agent_groups.erase(agent_idx - 1);
+    LogicalVector all_ingroup = agent_groups == group;
+
+    NumericMatrix predictions_ingroup(sum(all_ingroup), 2);
     j = 0;
     for(int i = 0; i < predictions_ingroup.nrow(); i++) {
-        if(id_ingroup[i]) {
-            predictions_ingroup(j, _) = predictions(i, _);
+        if(all_ingroup[i]) {
+            predictions_ingroup(j, _) = predictions_minus_agent(i, _);
             j++; 
         }
     }
@@ -747,8 +753,8 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         Named("fl_leaders") = List::create(fl_leaders),
         Named("wb_buddies") = List::create(wb_buddies),
         Named("gc_distance") = List::create(gc_distance),
-        Named("gc_radius") = List::create(gc_radius),
-        Named("gc_nped") = List::create(gc_nped),
+        Named("gc_radius") = gc_radius,
+        Named("gc_nped") = gc_nped,
         Named("vf_angles") = List::create(vf_angles)
     );
 
