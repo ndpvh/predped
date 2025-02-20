@@ -64,6 +64,9 @@ tbl |>
 
 ```{r utility utility}
 
+################################################################################
+# data.frame
+
 # Read in the data used in the tests and only retain the first instance with 
 # all of the utility variables defined (row 10)
 data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
@@ -80,34 +83,101 @@ benchmark_function <- function(cpp) {
     }
 }
 
-r <- (\() benchmark_function(cpp = FALSE)) |>
+r_data <- (\() benchmark_function(cpp = FALSE)) |>
     test_times() |>
     rnd()
 
-rcpp <- (\() benchmark_function(cpp = TRUE)) |>
+rcpp_data <- (\() benchmark_function(cpp = TRUE)) |>
     test_times() |>
     rnd()
 
-# Create the table
+################################################################################
+# data.frame
+
+# Read in the data used in the tests and only retain the first instance with 
+# all of the utility variables defined (row 10)
+trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_utility.Rds"))
+state_i <- trace[[10]]
+
+# Create agent specifications in the same way as done in simulate
+agent_specs <- predped::create_agent_specifications(state_i@agents)
+
+# Create centers and check. For the latter, we need to delete the current
+# agent from the list
+centers <- m4ma::c_vd_rcpp(
+    1:33, 
+    predped::position(agent_i),
+    predped::speed(agent_i),
+    predped::orientation(agent_i),
+    matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
+    matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5), times = 3), ncol = 3)
+)
+
+tmp_state <- state_i
+agents(tmp_state) <- agents(tmp_state)[-2]
+check <- predped::moving_options(
+    agent_i,
+    tmp_state,
+    state_i@setting, 
+    centers
+)
+
+# Do two tests, one for unbounded and one for bounded estimation.
+benchmark_function <- function(cpp) {
+    for(i in 1:100) {
+        dummy <- predped::utility(
+            agents(state_i)[[2]],
+            state_i,
+            state_i@setting,
+            agent_specs,
+            centers,
+            check, 
+            cpp = cpp
+        )
+    }
+}
+
+r_agent <- (\() benchmark_function(cpp = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rcpp_agent <- (\() benchmark_function(cpp = TRUE)) |>
+    test_times() |>
+    rnd()
+
+################################################################################
+# creating the table
+
 tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
-             rbind(r, rcpp))
+             c(r_agent[2], rcpp_agent[2]),
+             c(paste0("[", r_agent[1], ",", r_agent[3], "]"), paste0("[", rcpp_agent[1], ",", rcpp_agent[3], "]")),
+             c(r_data[2], rcpp_data[2]),
+             c(paste0("[", r_data[1], ",", r_data[3], "]"), paste0("[", rcpp_data[1], ",", rcpp_data[3], "]")))
 rownames(tbl) <- NULL
-colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
+
+# Define the caption for the table 
 caption <- paste0("Benchmark for the utility function. ",
                   "In this benchmark, we repeat the function call 100 times and ",
                   "use a dataset where all utility functions are simultaneously ",
                   "used. ",
                   "Comparison is made between using the R version (cpp = FALSE) ",
-                  "or the Rcpp version of the function (cpp = TRUE).")
-tbl |>
+                  "or the Rcpp version of the function (cpp = TRUE). ",
+                  "Additionally, distinction made between calling `utility` with ",
+                  "the argument `agent` (computation of utility variables should ",
+                  "still be done) or with a data.frame (this computation has ",
+                  "been done before).")
+
+# Print the table so that it can be printed in text
+tbl %>% 
     knitr::kable(format = "latex", 
-                 align = "lccc",
+                 align = "lllll",
                  caption = caption,
                  longtable = FALSE,
                  booktabs = TRUE,
                  escape = FALSE,  
-                 position = "H" ) |>
+                 position = "H" ) %>% 
+    kableExtra::add_header_above(c(" " = 1, "agent" = 2, "data.frame" = 2)) %>% 
     print()
 
 ```
