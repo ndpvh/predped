@@ -82,97 +82,6 @@ blockedAngle <- function(agent_position, orientation, speed, predictions_minus_a
     .Call('_predped_blockedAngle', PACKAGE = 'predped', agent_position, orientation, speed, predictions_minus_agent, radii, objects)
 }
 
-#' Group centroid utility
-#'
-#' Rcpp alternative for the group centroid utility function. 
-#' 
-#' @param a_gc Numeric denoting the power to which to take the utility.
-#' @param b_gc Numeric denoting the slope of the utility function.
-#' @param radius Numeric denoting the radius of the agent.
-#' @param cell_dist Numeric vector denoting the distance of each cell in the 
-#' \code{centers} to the predicted group centroid.
-#' @param stop_utility Numeric denoting the utility of stopping. Is used to 
-#' ensure the agents do not freeze when they are too far away from each other. 
-#' @param nped Numeric denoting the number of ingroup members. 
-#' 
-#' @return Numeric vector containing the group-centroid-related utility for each 
-#' cell. 
-#' 
-#' @seealso 
-#' \code{\link[predped]{distance_group_centroid}},
-#' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility}}
-#' 
-#' @rdname gc_utility_rcpp
-#' 
-#' @export
-gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped) {
-    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped)
-}
-
-#' Discrete visual field utility
-#' 
-#' Rcpp alternative to the \code{vf_utility_discrete} function.
-#' 
-#' The idea of this utility function is that it doesn't matter at which angle 
-#' you see a group member within the visual field, as long as you see them. 
-#' This translates to a discrete added disutility whenever the group member 
-#' falls inside the non-visual zone behind the agent.
-#' 
-#' @param b_vf Numeric denoting the slope of the utility function. 
-#' @param rel_angles Numeric vector containing the relative angle from each cell 
-#' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
-#' 
-#' @return Numeric vector containing the utility attributed to keeping the 
-#' group members within your visual field. Returns 0's if the agent does not 
-#' have any additional group members.
-#' 
-#' @seealso 
-#' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
-#' \code{\link[predped]{vf_utility_continuous}}
-#' 
-#' @rdname vf_utility_rcpp
-#' 
-#' @export
-vf_utility_rcpp <- function(b_visual_field, relative_angles) {
-    .Call('_predped_vf_utility_rcpp', PACKAGE = 'predped', b_visual_field, relative_angles)
-}
-
-#' Utility
-#'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. It
-#' takes in a dataframe containing all of the relevant values for computing the
-#' utility, as well as a dataframe containing the parameters. Heavily depends 
-#' on the \code{m4ma} package.
-#' 
-#' @param object Dataframe containing all of the needed information to compute 
-#' the utilities. Typically output of the 
-#' \code{\link[predped]{compute_utility_variables}} function.
-#' @param parameters Dataframe containing the parameters of the agent. Should 
-#' conform to the naming conventions mentioned in 
-#' \code{\link[predped]{params_from_csv}}.
-#' 
-#' @return Numeric vector denoting the (dis)utility of moving to each of the 
-#' potential cells.
-#' 
-#' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,agent-method}},
-#' \code{\link[predped]{compute_utility_variables}},
-#' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{update_position}}
-#' 
-#' @rdname utility_rcpp
-#' 
-utility_rcpp <- function(data, parameters) {
-    .Call('_predped_utility_rcpp', PACKAGE = 'predped', data, parameters)
-}
-
 #' Distances to group centroid
 #'
 #' Rcpp version of \code{\link[predped]{distance_group_centroid}}. 
@@ -277,5 +186,141 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' @export 
 compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
     .Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check)
+}
+
+#' Group centroid utility
+#'
+#' Rcpp alternative for the group centroid utility function. 
+#' 
+#' @param a_gc Numeric denoting the power to which to take the utility.
+#' @param b_gc Numeric denoting the slope of the utility function.
+#' @param radius Numeric denoting the radius of the agent.
+#' @param cell_dist Numeric vector denoting the distance of each cell in the 
+#' \code{centers} to the predicted group centroid.
+#' @param stop_utility Numeric denoting the utility of stopping. Is used to 
+#' ensure the agents do not freeze when they are too far away from each other. 
+#' @param nped Numeric denoting the number of ingroup members. 
+#' 
+#' @return Numeric vector containing the group-centroid-related utility for each 
+#' cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{distance_group_centroid}},
+#' \code{\link[predped]{params_from_csv}},
+#' \code{\link[predped]{utility}}
+#' 
+#' @rdname gc_utility_rcpp
+#' 
+#' @export
+gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped) {
+    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped)
+}
+
+#' Discrete visual field utility
+#' 
+#' Rcpp alternative to the \code{vf_utility_discrete} function.
+#' 
+#' The idea of this utility function is that it doesn't matter at which angle 
+#' you see a group member within the visual field, as long as you see them. 
+#' This translates to a discrete added disutility whenever the group member 
+#' falls inside the non-visual zone behind the agent.
+#' 
+#' @param b_vf Numeric denoting the slope of the utility function. 
+#' @param rel_angles Numeric vector containing the relative angle from each cell 
+#' center to the predicted positions of the group members. Typically output of 
+#' \code{\link[predped]{get_angle}}. 
+#' 
+#' @return Numeric vector containing the utility attributed to keeping the 
+#' group members within your visual field. Returns 0's if the agent does not 
+#' have any additional group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_angles}},
+#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{vf_utility_continuous}}
+#' 
+#' @rdname vf_utility_rcpp
+#' 
+#' @export
+vf_utility_rcpp <- function(b_visual_field, relative_angles) {
+    .Call('_predped_vf_utility_rcpp', PACKAGE = 'predped', b_visual_field, relative_angles)
+}
+
+#' Utility
+#'
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. It
+#' takes in a dataframe containing all of the relevant values for computing the
+#' utility, as well as a dataframe containing the parameters. Heavily depends 
+#' on the \code{m4ma} package.
+#' 
+#' @param object Dataframe containing all of the needed information to compute 
+#' the utilities. Typically output of the 
+#' \code{\link[predped]{compute_utility_variables}} function.
+#' @param parameters Dataframe containing the parameters of the agent. Should 
+#' conform to the naming conventions mentioned in 
+#' \code{\link[predped]{params_from_csv}}.
+#' 
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
+#' potential cells.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{compute_utility_variables}},
+#' \code{\link[predped]{params_from_csv}},
+#' \code{\link[predped]{update_position}}
+#' 
+#' @rdname utility_rcpp
+#' 
+utility_rcpp <- function(data, parameters) {
+    .Call('_predped_utility_rcpp', PACKAGE = 'predped', data, parameters)
+}
+
+#' Utility
+#'
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. 
+#' This function uses the operational-level utility functions to compute the 
+#' utility of moving to any given potential cell in \code{centers}. Here, we 
+#' assume that none of the utility variables (i.e., the variables that serve as 
+#' input to the utility functions) is precomputed, so that it will first compute
+#' their values. This input is then provided to 
+#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' of the utility.
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param state Object of the \code{\link[predped]{state-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param agent_specifications List created by the 
+#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
+#' information of all agents within the current \code{state} and allows for the
+#' communication between the \code{predped} simulation functions and the 
+#' \code{m4ma} utility functions.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param cpp Logical denoting whether to use the Rcpp version of the function
+#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
+#' 
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
+#' cells in \code{centers}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{update,agent-method}},
+#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{compute_utility_variables}},
+#' \code{\link[predped]{update_position}}
+#' 
+#' @rdname utility_agent_rcpp
+#' 
+#' @export
+utility_agent_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
+    .Call('_predped_utility_agent_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check)
 }
 
