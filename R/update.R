@@ -818,6 +818,9 @@ update_goal <- function(agent,
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param cpp Logical denoting whether to use the Rcpp alternative of this 
+#' function (\code{TRUE}) or the R alternative (\code{FALSE}). Defaults to 
+#' \code{TRUE}.
 #' 
 #' @return Numeric matrix containing the predicted positions all agents if 
 #' they all maintain their speed and direction.
@@ -834,7 +837,14 @@ update_goal <- function(agent,
 #' @export
 predict_movement <- function(agent, 
                              stay_stopped = TRUE,
-                             time_step = 0.5) {
+                             time_step = 0.5,
+                             cpp = TRUE) {
+
+    if(cpp) {
+        return(predict_movement_rcpp(agent, 
+                                     stay_stopped,
+                                     time_step))
+    }
     
     # Compute the coordinate where the agents will end up when moving at the 
     # same speed in the same direction. Different when an agent is currently 

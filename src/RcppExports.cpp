@@ -11,6 +11,20 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// unpack_trace
+void unpack_trace(List x, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
+RcppExport SEXP _predped_unpack_trace(SEXP xSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type velocities(velocitiesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type orientations(orientationsSEXP);
+    Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
+    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
+    unpack_trace(x, velocities, orientations, stay_stopped, time_step);
+    return R_NilValue;
+END_RCPP
+}
 // unique
 std::unordered_set<std::string> unique(CharacterVector x);
 RcppExport SEXP _predped_unique(SEXP xSEXP) {
@@ -185,6 +199,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// predict_movement_rcpp
+NumericVector predict_movement_rcpp(S4 agent, bool stay_stopped, double time_step);
+RcppExport SEXP _predped_predict_movement_rcpp(SEXP agentSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type agent(agentSEXP);
+    Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
+    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
+    rcpp_result_gen = Rcpp::wrap(predict_movement_rcpp(agent, stay_stopped, time_step));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_agent_specifications_rcpp
+void create_agent_specifications_rcpp(List agent_list, bool stay_stopped, double time_step);
+RcppExport SEXP _predped_create_agent_specifications_rcpp(SEXP agent_listSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type agent_list(agent_listSEXP);
+    Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
+    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
+    create_agent_specifications_rcpp(agent_list, stay_stopped, time_step);
+    return R_NilValue;
+END_RCPP
+}
 // distance_group_centroid_rcpp
 Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions, NumericMatrix centers, int number_agents);
 RcppExport SEXP _predped_distance_group_centroid_rcpp(SEXP predictionsSEXP, SEXP centersSEXP, SEXP number_agentsSEXP) {
@@ -289,6 +328,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_predped_unpack_trace", (DL_FUNC) &_predped_unpack_trace, 5},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
     {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 4},
     {"_predped_psUtility", (DL_FUNC) &_predped_psUtility, 6},
@@ -301,6 +341,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_destinationAngle", (DL_FUNC) &_predped_destinationAngle, 3},
     {"_predped_predClose", (DL_FUNC) &_predped_predClose, 8},
     {"_predped_blockedAngle", (DL_FUNC) &_predped_blockedAngle, 6},
+    {"_predped_predict_movement_rcpp", (DL_FUNC) &_predped_predict_movement_rcpp, 3},
+    {"_predped_create_agent_specifications_rcpp", (DL_FUNC) &_predped_create_agent_specifications_rcpp, 3},
     {"_predped_distance_group_centroid_rcpp", (DL_FUNC) &_predped_distance_group_centroid_rcpp, 3},
     {"_predped_get_angles_rcpp", (DL_FUNC) &_predped_get_angles_rcpp, 7},
     {"_predped_compute_utility_variables_rcpp", (DL_FUNC) &_predped_compute_utility_variables_rcpp, 6},
