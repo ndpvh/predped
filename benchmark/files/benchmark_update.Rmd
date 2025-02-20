@@ -1,5 +1,56 @@
 # update.R 
 
+## create_agent_specifications 
+
+```{r update create_agent_specifications}
+
+agent_i <- predped::agent(center = c(-1, 0),
+                          speed = 2,
+                          orientation = 0,
+                          radius = 0.2)
+agent_list <- list(agent_i, agent_i, agent_i, agent_i, agent_i)
+                          
+# Compute the utility variables
+benchmark_function <- function(cpp) {
+    for(i in 1:100) {
+        dummy <- predped::create_agent_specifications(
+            agent_list,
+            cpp = cpp
+        )
+    }
+}
+
+r <- (\() benchmark_function(cpp = FALSE)) |>
+    test_times() |>
+    rnd()
+
+rcpp <- (\() benchmark_function(cpp = TRUE)) |>
+    test_times() |>
+    rnd()
+
+# Create the table
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             rbind(r, rcpp))
+rownames(tbl) <- NULL
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+caption <- paste0("Benchmark for the create_agent_specifications function. ",
+                  "In this benchmark, we repeat the function call 100 times for ",
+                  "5 agents. ",
+                  "Comparison is made between using the R version (cpp = FALSE) ",
+                  "or the Rcpp version of the function (cpp = TRUE).")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lccc",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
 ## predict_movement
 
 ```{r update predict_movement}
@@ -8,7 +59,7 @@ agent_i <- predped::agent(center = c(-1, 0),
                           speed = 2,
                           orientation = 0,
                           radius = 0.2)
-                          
+
 # Compute the utility variables
 benchmark_function <- function(cpp) {
     for(i in 1:100) {
