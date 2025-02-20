@@ -95,46 +95,68 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' 
 //' @export
 // [[Rcpp::export]]
-void create_agent_specifications_rcpp(List agent_list,
+List create_agent_specifications_rcpp(List agent_list,
                                       bool stay_stopped = true, 
                                       double time_step = 0.5) {
     
-    // Predict where the agents will be at their current velocity and angle. Is 
-    // used by other agents to change their own directions in order to avoid 
-    // collisions.
-    //
-    // In order for this to work with m4ma, we need to transform it to a matrix 
-    // and provide it rownames that are equal to the id's of the agents
-    NumericMatrix agent_predictions(agent_list.length(), 2);
+    // Initialize all of the variables that we want to fill with the information
+    // of each agent
+    CharacterVector id(agent_list.length());
+    NumericVector size(agent_list.length());
+    NumericMatrix position(agent_list.length(), 2);
+    NumericVector orientation(agent_list.length());
+    NumericVector speed(agent_list.length());
+    NumericVector group(agent_list.length());
+    NumericMatrix predictions(agent_list.length(), 2);
+    
+    // Loop over all agents and do the required computations.
     for(int i = 0; i < agent_list.length(); i++) {
-        agent_predictions(i, _) = predict_movement_rcpp(
+        S4 agent_i = agent_list[i];
+
+        // Needed to ensure that C++ knows what types these attributes have 
+        // before assigning them to the overall variables
+        std::string id_agent = agent_i.slot("id");
+        double size_agent = agent_i.slot("radius");
+        NumericVector pos_agent = agent_i.slot("center");
+        double orient_agent = agent_i.slot("orientation");
+        double speed_agent = agent_i.slot("speed");
+        double group_agent = agent_i.slot("group");
+
+        // Assign them to the overall variables
+        id[i] = id_agent;
+        size[i] = size_agent;
+        position(i, _) = pos_agent;
+        orientation[i] = orient_agent;
+        speed[i] = speed_agent;
+        group[i] = group_agent;
+        predictions(i, _) = predict_movement_rcpp(
             agent_list[i],
             stay_stopped,
             time_step
         );
     }
 
+    // Change the names of the vectors and matrices so that you have the 
+    // agent ids in there. Required by m4ma
+    CharacterVector xy = {"x", "y"};
 
+    size.attr("names") = id;
+    position.attr("dimnames") = List::create(id, xy);
+    orientation.attr("names") = id;
+    speed.attr("names") = id;
+    group.attr("names") = id;
+    predictions.attr("dimnames") = List::create(id, xy);
 
+    // Combine them all in a list
+    List specifications = List::create(
+        Named("id") = id,
+        Named("size") = size,
+        Named("position") = position,
+        Named("orientation") = orientation,
+        Named("speed") = speed,
+        Named("group") = group,
+        Named("predictions") = predictions
+    );
 
-    // # Make the object-based arguments of predped compatible with the information
-    // # needed by m4ma. 
-    // agent_specs <- list(id = as.character(sapply(agent_list, id)),
-    //                     size = as.numeric(sapply(agent_list, size)),
-    //                     position = t(sapply(agent_list, position)),
-    //                     orientation = as.numeric(sapply(agent_list, orientation)), 
-    //                     speed = as.numeric(sapply(agent_list, speed)), 
-    //                     group = as.numeric(sapply(agent_list, group)),
-    //                     predictions = agent_predictions)
-
-    // # Required for utility helper functions: Add names of the agents to their
-    // # characteristics
-    // rownames(agent_specs$position) <- agent_specs$id
-    // names(agent_specs$size) <- agent_specs$id
-    // names(agent_specs$orientation) <- agent_specs$id
-    // names(agent_specs$speed) <- agent_specs$id
-    // names(agent_specs$group) <- agent_specs$id
-    // rownames(agent_specs$predictions) <- agent_specs$id
-
-    // return(agent_specs)
+    return specifications;
 }

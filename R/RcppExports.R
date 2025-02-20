@@ -189,7 +189,7 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' 
 #' @export
 create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, time_step = 0.5) {
-    invisible(.Call('_predped_create_agent_specifications_rcpp', PACKAGE = 'predped', agent_list, stay_stopped, time_step))
+    .Call('_predped_create_agent_specifications_rcpp', PACKAGE = 'predped', agent_list, stay_stopped, time_step)
 }
 
 #' Distances to group centroid

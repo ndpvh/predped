@@ -890,7 +890,12 @@ predict_movement <- function(agent,
 #' @export
 create_agent_specifications <- function(agent_list,
                                         stay_stopped = TRUE, 
-                                        time_step = 0.5) {
+                                        time_step = 0.5,
+                                        cpp = TRUE) {
+
+    if(cpp) {
+        return(create_agent_specifications_rcpp(agent_list, stay_stopped, time_step))
+    }
     
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
@@ -898,12 +903,6 @@ create_agent_specifications <- function(agent_list,
     #
     # In order for this to work with m4ma, we need to transform it to a matrix 
     # and provide it rownames that are equal to the id's of the agents
-    # agent_predictions <- lapply(agent_list, 
-    #                             \(x) predict_movement(x, 
-    #                                                   stay_stopped = stay_stopped,
-    #                                                   time_step = time_step))
-    # agent_predictions <- sapply(agent_predictions, \(x) x) |>
-    #     t()
     agent_predictions <- sapply(agent_list, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,

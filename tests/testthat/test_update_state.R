@@ -97,3 +97,28 @@ testthat::test_that("Predict movement same across R and Rcpp", {
 
     testthat::expect_equal(tst, ref)
 })
+
+testthat::test_that("Creating agent specifications is the same across R and Rcpp", {
+    pedestrians <- list(predped::agent(center = c(0, 0), 
+                                       speed = 1, 
+                                       orientation = 90,
+                                       radius = 0.2),
+                        predped::agent(center = c(-1, 0),
+                                       speed = 2,
+                                       orientation = 0,
+                                       radius = 0.2),
+                        predped::agent(center = c(1, 0),
+                                       speed = 0.5, 
+                                       orientation = 180,
+                                       radius = 0.2),
+                        predped::agent(center = c(0, 0), 
+                                       speed = 1, 
+                                       orientation = 90, 
+                                       radius = 0.2, 
+                                       status = "stop"))
+
+    ref <- create_agent_specifications(pedestrians, cpp = FALSE)
+    tst <- create_agent_specifications(pedestrians, cpp = TRUE)
+
+    testthat::expect_equal(tst, ref)
+})
