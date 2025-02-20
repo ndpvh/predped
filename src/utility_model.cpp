@@ -574,6 +574,8 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // us to differentiate between both cases in an easy way.
     LogicalMatrix id_check = check;
     List list_id_distance = List::create(id_distance);
+
+    LogicalVector id_ingroup(0);
     if(!(id_distance == R_NilValue)) {
         // Check whether each column consists of only positive distances. If 
         // not, then we have to set this to FALSE.
@@ -589,15 +591,35 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
                 id_check[i] = all(id_distance_matrix(_, i) > 0).is_true();
             }
         }
+
+        // Get names of ingroup agents and check whether these agents are part of the 
+        // ingroup or not.
+        //
+        // Importantly, you should only retain those who are also present in
+        // id_ingroup. In other words, do not only erase the agent itself, but also
+        // all the other agents who do not overlap with the agent's centers.
+        IntegerVector agent_groups = agent_specifications["group"];
+        int group = agent_groups[agent_idx - 1];
+
+        List dimnames = id_distance_matrix.attr("dimnames");
+        CharacterVector blocking_agents(dimnames[0]);
+ 
+        IntegerVector retained_groups(blocking_agents.length());
+        int k = 0;
+        for(int i = 0; i < everyone.length(); i++) {      
+            LogicalVector local_check(blocking_agents.length());
+            for(int j = 0; j < blocking_agents.length(); j++) {
+                local_check[j] = blocking_agents[j] == everyone[i];
+            }
+
+            if(any(local_check).is_true()) {
+                retained_groups[k] = agent_groups[i];
+                k++;
+            }
+        }
+
+        id_ingroup = retained_groups == group;
     }
-
-    // Get names of ingroup agents and check whether these agents are part of the 
-    // ingroup or not
-    IntegerVector agent_groups = agent_specifications["group"];
-    int group = agent_groups[agent_idx - 1];
-    agent_groups.erase(agent_idx - 1);
-
-    LogicalVector id_ingroup = agent_groups == group;
 
     // Blocked angle utility: Required variable is those angles that might be 
     // blocked in the near future. In other words, we are trying to predict which 
@@ -607,7 +629,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // except the current agent. Therefore delete the current agent from the 
     // prediction matrix.
     NumericMatrix predictions = agent_specifications["predictions"];
-    NumericMatrix predictions_minus_agent(agent_groups.length(), 2);
+    NumericMatrix predictions_minus_agent(everyone.length() - 1, 2);
     int j = 0;
     for(int i = 0; i < predictions.nrow(); i++) {
         if(i != agent_idx - 1) {
@@ -732,7 +754,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
 
     // Change attribute to DataFrame and return
     uv.attr("class") = "data.frame";
-    uv.attr("row.names") = 0;
+    uv.attr("row.names") = 1;
     return uv;
 }
 
