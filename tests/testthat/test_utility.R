@@ -23,8 +23,6 @@ testthat::test_that("Utility data R and Rcpp converge", {
 testthat::test_that("Utility agent R and Rcpp converge", {
     trace <- readRDS(file.path("data", "trace_utility.Rds"))
 
-    trace <- readRDS(file.path("tests", "testthat", "data", "trace_utility.Rds"))
-
     # Loop over 10 of the traces
     result <- logical(10)
     for(i in 1:10) {
