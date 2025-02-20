@@ -41,7 +41,8 @@ best_angle <- function(agent,
                        velocities,
                        orientations,
                     #    cores = 1,
-                       step = 45) {
+                       step = 45,
+                       cpp = TRUE) {
 
     # Get all possible angles with a step-size `step` inbetween them
     new_angles <- step * (0:(360 %/% step))
