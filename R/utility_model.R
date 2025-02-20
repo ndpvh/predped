@@ -51,7 +51,17 @@ setMethod("utility", "agent", function(object,
                                        agent_specifications,
                                        centers,                    
                                        check,
-                                       cpp = FALSE) {
+                                       cpp = TRUE) {
+
+    # If Rcpp alternative wanted, let them use it
+    if(cpp) {
+        return(utility_agent_rcpp(object,
+                                  state,
+                                  background,
+                                  agent_specifications,
+                                  centers,                    
+                                  check))
+    }
 
     # Compute the utility variables that are used as input to the utility 
     # functions.
