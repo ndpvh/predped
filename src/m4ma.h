@@ -82,11 +82,6 @@ Rcpp::NumericVector blockedAngle(
     Rcpp::List objects
 );
 
-Rcpp::NumericVector dist1(
-    Rcpp::NumericVector position, 
-    Rcpp::NumericMatrix goal_position
-);
-
 Rcpp::Nullable<Rcpp::List> getLeaders(
     int agent_idx,
     Rcpp::NumericMatrix positions,
@@ -108,6 +103,18 @@ Rcpp::Nullable<Rcpp::List> getBuddy(
     Rcpp::NumericMatrix centers,
     Rcpp::List objects,
     bool pickBest
+);
+
+Rcpp::NumericVector dist1(
+    Rcpp::NumericVector position, 
+    Rcpp::NumericMatrix goal_position
+);
+
+Rcpp::NumericMatrix aTOd(Rcpp::NumericVector angle);
+
+Rcpp::NumericVector scaleVel(
+    Rcpp::NumericVector velocities,
+    double time_step
 );
 
 #endif

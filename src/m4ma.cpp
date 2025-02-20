@@ -229,3 +229,19 @@ NumericVector dist1(NumericVector position,
         goal_position
     );
 }
+
+NumericVector aTOd(NumericVector angle) {
+
+    Function f = m4ma["aTOd_rcpp"];
+    return f(angle);
+}
+
+NumericVector scaleVel(NumericVector velocities,
+                       double time_step) {
+
+    Function f = m4ma["scaleVel_rcpp"];
+    return f(
+        velocities,
+        time_step
+    );
+}
