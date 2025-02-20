@@ -55,7 +55,8 @@ testthat::test_that("Compute utility variables agent R and Rcpp converge", {
         # Create agent specifications in the same way as done in simulate
         agent_specs <- predped::create_agent_specifications(state_i@agents)
 
-        # Create centers and check
+        # Create centers and check. For the latter, we need to delete the current
+        # agent from the list
         centers <- m4ma::c_vd_rcpp(
             1:33, 
             predped::position(agent_i),
@@ -64,9 +65,12 @@ testthat::test_that("Compute utility variables agent R and Rcpp converge", {
             matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
             matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5), times = 3), ncol = 3)
         )
+
+        tmp_state <- state_i
+        agents(tmp_state) <- agents(tmp_state)[-2]
         check <- predped::moving_options(
             agent_i,
-            state_i,
+            tmp_state,
             state_i@setting, 
             centers
         )
