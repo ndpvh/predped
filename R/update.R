@@ -906,7 +906,8 @@ create_agent_specifications <- function(agent_list,
     agent_predictions <- sapply(agent_list, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,
-                                                      time_step = time_step)) |>
+                                                      time_step = time_step,
+                                                      cpp = cpp)) |>
         t()
 
     # Make the object-based arguments of predped compatible with the information
