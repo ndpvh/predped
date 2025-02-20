@@ -8,6 +8,15 @@ testthat::test_that("Transforming to time series works", {
     testthat::expect_equal(ref, tst)
 })
 
+testthat::test_that("Transforming to time series from R and Rcpp is same", {
+    trace <- readRDS(file.path(".", "data", "example_trace.Rds"))
+
+    ref <- predped::time_series(trace, cpp = FALSE)
+    tst <- predped::time_series(trace, cpp = TRUE)
+
+    testthat::expect_equal(ref, tst)
+})
+
 testthat::test_that("Transforming to trace works", {
     ref <- readRDS(file.path(".", "data", "example_trace.Rds"))
 

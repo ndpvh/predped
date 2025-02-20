@@ -15,7 +15,12 @@
 #' 
 #' @export
 time_series <- function(x, 
-                        time_step = 0.5) {
+                        time_step = 0.5,
+                        cpp = TRUE) {
+
+    if(cpp) {
+        return(time_series_rcpp(x, time_step))
+    }
 
     # Create a function that will extract all details of the agents from a 
     # particular state.
@@ -91,7 +96,17 @@ unpack_trace <- function(x,
                              rep(times = 3) |>
                              matrix(ncol = 3),
                          stay_stopped = TRUE,
-                         time_step = 0.5) {
+                         time_step = 0.5,
+                         cpp = TRUE) {
+
+    # If Rcpp alternative requested, then let them use it
+    if(cpp) {
+        return(unpack_trace(x, 
+                            velocities,
+                            orientations,
+                            stay_stopped,
+                            time_step))
+    }
 
     # Create a function that will extract all details of the agents from a 
     # particular state.

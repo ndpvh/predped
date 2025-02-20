@@ -11,17 +11,29 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// unpack_trace
-void unpack_trace(List x, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
-RcppExport SEXP _predped_unpack_trace(SEXP xSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
+// time_series_rcpp
+DataFrame time_series_rcpp(List trace, double time_step);
+RcppExport SEXP _predped_time_series_rcpp(SEXP traceSEXP, SEXP time_stepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type trace(traceSEXP);
+    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
+    rcpp_result_gen = Rcpp::wrap(time_series_rcpp(trace, time_step));
+    return rcpp_result_gen;
+END_RCPP
+}
+// unpack_trace_rcpp
+void unpack_trace_rcpp(List trace, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
+RcppExport SEXP _predped_unpack_trace_rcpp(SEXP traceSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type x(xSEXP);
+    Rcpp::traits::input_parameter< List >::type trace(traceSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type velocities(velocitiesSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type orientations(orientationsSEXP);
     Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
     Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
-    unpack_trace(x, velocities, orientations, stay_stopped, time_step);
+    unpack_trace_rcpp(trace, velocities, orientations, stay_stopped, time_step);
     return R_NilValue;
 END_RCPP
 }
@@ -329,7 +341,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_predped_unpack_trace", (DL_FUNC) &_predped_unpack_trace, 5},
+    {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 2},
+    {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 5},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
     {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 4},
     {"_predped_psUtility", (DL_FUNC) &_predped_psUtility, 6},
