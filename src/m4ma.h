@@ -127,4 +127,10 @@ Rcpp::NumericVector scaleVel(
     double time_step
 );
 
+Rcpp::LogicalMatrix free_cells(
+    Rcpp::S4 agent, 
+    Rcpp::S4 background, 
+    Rcpp::NumericMatrix centers
+);
+
 #endif

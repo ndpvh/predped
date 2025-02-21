@@ -265,3 +265,15 @@ NumericVector scaleVel(NumericVector velocities,
         time_step
     );
 }
+
+LogicalMatrix free_cells(S4 agent, 
+                         S4 background, 
+                         NumericMatrix centers) {
+    
+    Function f = m4ma["free_cells_rcpp"];
+    return f(
+        agent,
+        background,
+        centers
+    );
+}
