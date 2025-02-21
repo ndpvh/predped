@@ -58,7 +58,7 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' 
 #' @export
 unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE, time_step = 0.5) {
-    invisible(.Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step))
+    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step)
 }
 
 unique <- function(x) {

@@ -2,10 +2,29 @@
 #include <Rcpp.h>
 #include <algorithm>
 #include "general.h"
+#include "m4ma.h"
 #include "update.h"
 #include "utility_model.h"
 
 using namespace Rcpp;
+
+// Import the moving_options function => At some point, it can become an Rcpp 
+// function, but now is not the time. Note, however, that this makes the 
+// functions that call this function will be slower because of this choice.
+LogicalMatrix imported_moving_options(S4 agent, 
+                                      S4 state,
+                                      S4 background,
+                                      NumericMatrix centers) {
+    
+    Function f("moving_options"); 
+    return f(
+        agent,
+        state,
+        background,
+        centers
+    );
+}
+
 
 
 
@@ -62,6 +81,10 @@ DataFrame time_series_rcpp(List trace,
         // Extract the state and its agents from the trace
         S4 state = trace[i];
         List agents = state.slot("agents");
+
+        if(agents.length() == 0) {
+            continue;
+        }
 
         // Loop over each of the agents separately
         for(int j = 0; j < agents.length(); j++) {
@@ -178,116 +201,267 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @export
 // [[Rcpp::export]]
-void unpack_trace_rcpp(List trace, 
+List unpack_trace_rcpp(List trace, 
                        NumericMatrix velocities,
                        NumericMatrix orientations,
                        bool stay_stopped = true,
                        double time_step = 0.5) {
+
+    // Find out how many rows the dataframe should have
+    int N = 0;
+    for(int i = 0; i < trace.length(); i++) {
+        S4 state = trace[i];
+        List agents = state.slot("agents");
+        N += agents.length();
+    }
+
+    // Initialize all of the needed variables
+    IntegerVector iteration(N);
+    NumericVector time(N);
+
+    CharacterVector id(N);
+    NumericVector x(N);
+    NumericVector y(N);
+    NumericVector speed(N);
+    NumericVector orientation(N);
+    IntegerVector cell(N);
+    NumericVector group(N);
+    CharacterVector status(N);
+    NumericVector radius(N);
+
+    CharacterVector goal_id(N);
+    NumericVector goal_x(N);
+    NumericVector goal_y(N);
+
+    IntegerVector agent_idx(N);
+    List check = List::create();
+    NumericVector ps_speed(N);
+    NumericVector ps_distance(N);
+    List gd_angle = List::create();
+    List id_distance = List::create();
+    List id_check = List::create();
+    List id_ingroup = List::create();
+    List ba_angle = List::create();
+    List ba_cones = List::create();
+    List fl_leaders = List::create();
+    List wb_buddies = List::create();
+    List gc_distance = List::create();
+    NumericVector gc_radius(N);
+    IntegerVector gc_nped(N);
+    List vf_angles = List::create();
+
+    // Create some NA vectors that correspond to the R alternative. Used whenever
+    // the utility variables are not defined at a given iteration for a given 
+    // agent.
+    LogicalVector NA_logical(1);
+    NA_logical[0] = NA_LOGICAL;
+
+    // Loop over the different instances in the trace.
+    int idx = 0;
+    for(int i = 0; i < trace.length(); i++) {
+        // Extract the state and its agents from the trace
+        S4 state = trace[i];
+        List agents = state.slot("agents");
+
+        if(agents.length() == 0) {
+            continue;
+        }
+
+        // Create the agent specifications list as used in the lower level 
+        // utility functions
+        List specifications = create_agent_specifications_rcpp(
+            agents,
+            stay_stopped, 
+            time_step
+        );
+
+        // Loop over each of the agents separately
+        for(int j = 0; j < agents.length(); j++) {
+            // Extract state variables
+            int iteration_j = state.slot("iteration");
+            double time_j = iteration_j * time_step;
+
+            iteration[idx] = iteration_j;
+            time[idx] = time_j;
+
+            // Extract some agent characteristics
+            S4 agent = agents[j];
+
+            std::string id_j = agent.slot("id");
+            NumericVector position_j = agent.slot("center");
+            double x_j = position_j[0];
+            double y_j = position_j[1];
+            double speed_j = agent.slot("speed");
+            double orientation_j = agent.slot("orientation");
+            int cell_j = agent.slot("cell");
+            double group_j = agent.slot("group");
+            std::string status_j = agent.slot("status");
+            double radius_j = agent.slot("radius");
+
+            id[idx] = id_j;
+            x[idx] = x_j;
+            y[idx] = y_j;
+            speed[idx] = speed_j;
+            orientation[idx] = orientation_j;
+            cell[idx] = cell_j;
+            group[idx] = group_j;
+            status[idx] = status_j;
+            radius[idx] = radius_j;
+
+            // Extract agent goal characteristics
+            S4 goal = agent.slot("current_goal");
+
+            std::string goal_id_j = goal.slot("id");
+            NumericVector goal_position = goal.slot("position");
+            double goal_x_j = goal_position[0];
+            double goal_y_j = goal_position[1];
+
+            goal_id[idx] = goal_id_j;
+            goal_x[idx] = goal_x_j;
+            goal_y[idx] = goal_y_j;
+
+            // If the agent is moving, we compute the utility variables that 
+            // govern the agents's behavior. 
+            if(status_j == "move") {
+                // Get the centers for this participant, given their current
+                // position, speed, and orientation
+                NumericMatrix centers = c_vd(
+                    seq(1, 33),
+                    position_j,
+                    speed_j,
+                    orientation_j,
+                    velocities,
+                    orientations,
+                    time_step
+                );
+
+                // Delete the agent from the agent list in the state (otherwise 
+                // moving options will give wrong results)
+                List agents_minus_agent = clone(agents);
+                agents_minus_agent.erase(j);
+
+                S4 copy_state = clone(state);
+                copy_state.slot("agents") = agents_minus_agent;
+
+                S4 setting = state.slot("setting");
     
-    // # Create a function that will extract all details of the agents from a 
-    // # particular state.
-    // extract_state <- function(y) {
-    //     # Create the agent-specifications for this state
-    //     agent_specifications <- create_agent_specifications(y@agents, 
-    //                                                         stay_stopped = stay_stopped, 
-    //                                                         time_step = time_step)
-
-    //     # Loop over all of the agents and create their own row in the dataframe.
-    //     # This will consist of all variables included in the time_series function
-    //     # and the utility variables that are used as an input to the utility 
-    //     # functions.
-    //     y <- lapply(y@agents, 
-    //                 function(a) {
-    //                     # Simple time-series such as the one defined in the 
-    //                     # designated function
-    //                     time_series <- data.frame(iteration = y@iteration,
-    //                                               time = y@iteration * time_step,
-    //                                               id = id(a),
-    //                                               x = position(a)[1], 
-    //                                               y = position(a)[2], 
-    //                                               speed = speed(a), 
-    //                                               orientation = orientation(a), 
-    //                                               cell = cell(a), 
-    //                                               group = group(a), 
-    //                                               status = status(a),
-    //                                               goal_id = current_goal(a)@id,
-    //                                               goal_x = current_goal(a)@position[1], 
-    //                                               goal_y = current_goal(a)@position[2],
-    //                                               radius = radius(a))
-
-    //                     # If the agent is not moving, then you cannot compute 
-    //                     # the utility variables. We should therefore fill it 
-    //                     # with values that make sense and otherwise with NULLs
-    //                     # (in hopes utility will be okay with this).
-    //                     #
-    //                     # If the agent is moving, however, we will compute the 
-    //                     # utility variables for that move.
-    //                     agent_idx <- which(agent_specifications$id == id(a))
-    //                     if(status(a) != "move") {
-    //                         utility_variables <- data.frame(agent_idx = agent_idx,
-    //                                                         check = NA,
-    //                                                         ps_speed = NA, 
-    //                                                         ps_distance = NA, 
-    //                                                         gd_angle = NA, 
-    //                                                         id_distance = NA,
-    //                                                         id_check = NA,
-    //                                                         id_ingroup = NA,
-    //                                                         ba_angle = NA,
-    //                                                         ba_cones = NA,
-    //                                                         fl_leaders = NA,
-    //                                                         wb_buddies = NA,
-    //                                                         gc_distance = NA,
-    //                                                         gc_radius = NA, 
-    //                                                         gc_nped = NA,
-    //                                                         vf_angles = NA)
-
-    //                     } else {
-    //                         # Get the centers for this participant, given their 
-    //                         # current position, speed, and orientation
-    //                         centers <- m4ma::c_vd_rcpp(cells = 1:33,
-    //                                                    p1 = position(a),
-    //                                                    v1 = speed(a),
-    //                                                    a1 = orientation(a),
-    //                                                    vels = velocities,
-    //                                                    angles = orientations,
-    //                                                    tStep = time_step)
-
-    //                         # Delete the agent from the agent list in the state
-    //                         # (otherwise moving options will give wrong results)
-    //                         agent_state <- y
-    //                         agents(agent_state) <- agents(agent_state)[-agent_idx] 
-    
-    //                         # Do an initial check of which of these centers can be 
-    //                         # reached and which ones can't
-    //                         check <- moving_options(a, 
-    //                                                 agent_state, 
-    //                                                 agent_state@setting, 
-    //                                                 centers)
+                // Do an initial check of which of these centers can be 
+                // reached and which ones can't
+                LogicalMatrix check_j = imported_moving_options(
+                    agent, 
+                    copy_state,
+                    setting,
+                    centers
+                );
                             
-    //                         # Compute the utility variables for this agent under the
-    //                         # current state                            
-    //                         utility_variables <- compute_utility_variables(a,
-    //                                                                        y,
-    //                                                                        y@setting,
-    //                                                                        agent_specifications,
-    //                                                                        centers,                    
-    //                                                                        check)
-    //                     }
-    
-    //                     # Bind them all together in one dataframe and return 
-    //                     # the result
-    //                     return(cbind(time_series, utility_variables))
-    //                 })
+                // Compute the utility variables for this agent under the
+                // current state                            
+                DataFrame uv_j = compute_utility_variables_rcpp(
+                    agent, 
+                    state,
+                    setting,
+                    specifications,
+                    centers,
+                    check_j
+                );
 
-    //     return(do.call("rbind", y))
-    // }
+                // Save each of the individual columns within their respective
+                // vectors or lists to be used later.
+                int agent_idx_j = uv_j["agent_idx"];
+                double ps_speed_j = uv_j["ps_speed"];
+                List ps_distance_j = uv_j["ps_distance"];
+                List gd_angle_j = uv_j["gd_angle"];
+                List id_distance_j = uv_j["id_distance"];
+                List id_check_j = uv_j["id_check"];
+                List id_ingroup_j = uv_j["id_ingroup"];
+                List ba_angle_j = uv_j["ba_angle"];
+                List ba_cones_j = uv_j["ba_cones"];
+                List fl_leaders_j = uv_j["fl_leaders"];
+                List wb_buddies_j = uv_j["wb_buddies"];
+                List gc_distance_j = uv_j["gc_distance"];
+                double gc_radius_j = uv_j["gc_radius"];
+                int gc_nped_j = uv_j["gc_nped"];
+                List vf_angles_j = uv_j["vf_angles"];
 
-    // # Iterate over each object in the list and extract the state. 
-    // x <- lapply(x, extract_state)
-    // x <- do.call("rbind", x)
-    // rownames(x) <- NULL
+                agent_idx[idx] = agent_idx_j;
+                check.push_back(check_j);
+                ps_speed[idx] = ps_speed_j;
+                ps_distance[idx] = ps_distance_j[0];
+                gd_angle.push_back(gd_angle_j[0]);
+                id_distance.push_back(id_distance_j[0]);
+                id_check.push_back(id_check_j[0]);
+                id_ingroup.push_back(id_ingroup_j[0]);
+                ba_angle.push_back(ba_angle_j[0]);
+                ba_cones.push_back(ba_cones_j[0]);
+                fl_leaders.push_back(fl_leaders_j[0]);
+                wb_buddies.push_back(wb_buddies_j[0]);
+                gc_distance.push_back(gc_distance_j[0]);
+                gc_radius[idx] = gc_radius_j;
+                gc_nped[idx] = gc_nped_j;
+                vf_angles.push_back(vf_angles_j[0]);
 
-    // # Create a continuous time-variable in seconds
-    // return(x)
+            // If the agent is not moving, then you cannot compute the utility
+            // variables. We therefore fill the variables with NAs.
+            } else {
+                agent_idx[idx] = j + 1;
+                check.push_back(NA_logical);
+                ps_speed[idx] = NA_REAL;
+                ps_distance[idx] = NA_REAL;
+                gd_angle.push_back(NA_logical);
+                id_distance.push_back(NA_logical);
+                id_check.push_back(NA_logical);
+                id_ingroup.push_back(NA_logical);
+                ba_angle.push_back(NA_logical);
+                ba_cones.push_back(NA_logical);
+                fl_leaders.push_back(NA_logical);
+                wb_buddies.push_back(NA_logical);
+                gc_distance.push_back(NA_logical);
+                gc_radius[idx] = NA_REAL;
+                gc_nped[idx] = NA_INTEGER;
+                vf_angles.push_back(NA_logical);
+            }
+
+            // Update the index
+            idx++;
+        }
+    }
+
+    // Create a List with all of the variables of interest and transform to a 
+    // data.frame
+    List data = List::create(
+        Named("iteration") = iteration,
+        Named("time") = time,
+        Named("id") = id,
+        Named("x") = x,
+        Named("y") = y,
+        Named("speed") = speed,
+        Named("orientation") = orientation,
+        Named("cell") = cell,
+        Named("group") = group,
+        Named("status") = status,
+        Named("goal_id") = goal_id,
+        Named("goal_x") = goal_x,
+        Named("goal_y") = goal_y,
+        Named("radius") = radius,
+        Named("agent_idx") = agent_idx,
+        Named("check") = check,
+        Named("ps_speed") = ps_speed,
+        Named("ps_distance") = ps_distance,
+        Named("gd_angle") = gd_angle,
+        Named("id_distance") = id_distance,
+        Named("id_check") = id_check,
+        Named("id_ingroup") = id_ingroup,
+        Named("ba_angle") = ba_angle,
+        Named("ba_cones") = ba_cones,
+        Named("fl_leaders") = fl_leaders,
+        Named("wb_buddies") = wb_buddies,
+        Named("gc_distance") = gc_distance,
+        Named("gc_radius") = gc_radius,
+        Named("gc_nped") = gc_nped,
+        Named("vf_angles") = vf_angles
+    );
+
+    data.attr("class") = "data.frame";
+    data.attr("row.names") = seq(1, idx);
+    return data;
 }
-

@@ -24,17 +24,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // unpack_trace_rcpp
-void unpack_trace_rcpp(List trace, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
+List unpack_trace_rcpp(List trace, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
 RcppExport SEXP _predped_unpack_trace_rcpp(SEXP traceSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type trace(traceSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type velocities(velocitiesSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type orientations(orientationsSEXP);
     Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
     Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
-    unpack_trace_rcpp(trace, velocities, orientations, stay_stopped, time_step);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(unpack_trace_rcpp(trace, velocities, orientations, stay_stopped, time_step));
+    return rcpp_result_gen;
 END_RCPP
 }
 // unique

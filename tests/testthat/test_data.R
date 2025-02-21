@@ -34,3 +34,23 @@ testthat::test_that("Transforming to trace works", {
         c(0, 1, 1, 1, 1, 2, 2, 2, 2)
     )
 })
+
+testthat::test_that("Unpacking trace from R and Rcpp is same", {
+    # Check for the datasets in which all columns are filled.
+    trace <- readRDS(file.path("data", "trace_mll.Rds"))
+    trace <- trace[101:200]
+
+    ref <- predped::unpack_trace(trace, cpp = FALSE)
+    tst <- predped::unpack_trace(trace, cpp = TRUE)
+
+    testthat::expect_equal(tst, ref)
+
+    # Check for the datasets in which NAs exist.
+    trace <- readRDS(file.path("data", "example_trace.Rds"))
+
+    ref <- predped::unpack_trace(trace, cpp = FALSE)
+    tst <- predped::unpack_trace(trace, cpp = TRUE)
+
+    testthat::expect_equal(tst, ref)
+
+})

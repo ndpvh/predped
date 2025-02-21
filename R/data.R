@@ -101,11 +101,11 @@ unpack_trace <- function(x,
 
     # If Rcpp alternative requested, then let them use it
     if(cpp) {
-        return(unpack_trace(x, 
-                            velocities,
-                            orientations,
-                            stay_stopped,
-                            time_step))
+        return(unpack_trace_rcpp(x, 
+                                 velocities,
+                                 orientations,
+                                 stay_stopped,
+                                 time_step))
     }
 
     # Create a function that will extract all details of the agents from a 
