@@ -277,3 +277,19 @@ LogicalMatrix free_cells(S4 agent,
         centers
     );
 }
+
+LogicalVector seesGoalOK(int agent_idx, 
+                         List objects, 
+                         S4 state,
+                         NumericMatrix centers,
+                         LogicalMatrix check) {
+    
+    Function f = m4ma["seesGoalOK_rcpp"];
+    return f(
+        agent_idx,
+        objects,
+        state,
+        centers,
+        check
+    );
+}

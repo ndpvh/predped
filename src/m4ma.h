@@ -133,4 +133,12 @@ Rcpp::LogicalMatrix free_cells(
     Rcpp::NumericMatrix centers
 );
 
+Rcpp::LogicalVector seesGoalOK(
+    int agent_idx, 
+    Rcpp::List objects, 
+    Rcpp::S4 state,
+    Rcpp::NumericMatrix centers,
+    Rcpp::LogicalMatrix check
+);
+
 #endif
