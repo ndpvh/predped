@@ -280,7 +280,7 @@ LogicalMatrix free_cells(S4 agent,
 
 LogicalVector seesGoalOK(int agent_idx, 
                          List objects, 
-                         S4 state,
+                         List m4ma_state,
                          NumericMatrix centers,
                          LogicalMatrix check) {
     
@@ -288,7 +288,7 @@ LogicalVector seesGoalOK(int agent_idx,
     return f(
         agent_idx,
         objects,
-        state,
+        m4ma_state,
         centers,
         check
     );
