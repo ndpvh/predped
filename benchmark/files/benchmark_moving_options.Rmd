@@ -130,20 +130,72 @@ tbl |>
 
 ```
 
+## moving_options-agent
+
+```{r moving_options moving_options, echo = FALSE, results = "asis"}
+
+my_state <- predped::state(iteration = 0, 
+                           setting = setting, 
+                           agents = agents)
+
+# Test
+r <- (\() predped:::moving_options(current_agent,  my_state, setting, centers, cpp = FALSE)) |>
+    test_times() |>
+    rnd() 
+
+rcpp <- (\() predped:::moving_options(current_agent, my_state, setting, centers, cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+
+tbl <- rbind(r, rcpp)
+rownames(tbl) <- NULL
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             tbl)
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the moving\\_options method (for agents). ", 
+                  "Distinction is made between the Rcpp version of the function ",
+                  "(cpp = TRUE) and the R version of this function (cpp = FALSE).")
+
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
 ## overlap_with_objects 
 
 ```{r moving_options overlap_with_objects, echo = FALSE, results = "asis"}
 
 # Test
-check <- !logical(33)
-tbl <- (\() predped:::overlap_with_objects(current_agent, setting, centers, check)) |>
+check <- matrix(TRUE, nrow = 11, ncol = 3)
+r <- (\() predped:::overlap_with_objects(current_agent, setting, centers, check, cpp = FALSE)) |>
     test_times() |>
-    rnd() |>
-    matrix(nrow = 1)
-colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+    rnd() 
+
+rcpp <- (\() predped:::overlap_with_objects(current_agent, setting, centers, check, cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+
+tbl <- rbind(r, rcpp)
+rownames(tbl) <- NULL
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             tbl)
+
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
 
-caption <- paste0("Benchmark for the overlap\\_with\\_objects method.")
+caption <- paste0("Benchmark for the overlap\\_with\\_objects method. ", 
+                  "Distinction is made between the Rcpp version of the function ",
+                  "(cpp = TRUE) and the R version of this function (cpp = FALSE).")
+
 tbl |>
     knitr::kable(format = "latex", 
                  align = "lll",
