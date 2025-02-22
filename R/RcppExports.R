@@ -12,7 +12,7 @@
 #' @examples
 #' # This is my example
 #'
-#' @rdname time_series
+#' @rdname time_series_rcpp
 #' 
 #' @export
 time_series_rcpp <- function(trace, time_step = 0.5) {
@@ -140,6 +140,242 @@ predClose <- function(agent_idx, agent_position, orientation, others_position, r
 
 blockedAngle <- function(agent_position, orientation, speed, predictions_minus_agent, radii, objects) {
     .Call('_predped_blockedAngle', PACKAGE = 'predped', agent_position, orientation, speed, predictions_minus_agent, radii, objects)
+}
+
+#' Check agent and object overlap
+#' 
+#' Rcpp alternative to \code{\link[predped]{overlap_with_objects}}. 
+#' 
+#' This function checks whether there is an overlap between a given agent and 
+#' the objects in the environment, provided that the agent would move to the 
+#' locations in \code{centers}. Returns a logical matrix as needed in 
+#' \code{\link[predped]{moving_options-method}}.
+#' 
+#' @details
+#' In this function, we can only approximately check the intersection of agent 
+#' and object. Specifically, we use the following method. First, we sample 
+#' nodes on the circumference of each of the objects in the setting that is 
+#' provided to this function. For this, we depend on the function 
+#' \code{\link[predped]{nodes_on_circumference}} and we currently take these 
+#' nodes to be 5cm. 
+#' 
+#' In the next step, we bind all these coordinates together in a single matrix. 
+#' This matrix thus consists of nodes that should not be embedded in the agents:
+#' Whenever one of these points is included in the agents, we can conclude that
+#' the agents and objects intersect. [Note, however, that if these points are 
+#' not included in the agents, that we cannot with certainty conclude that agent 
+#' and object do not intersect]
+#' 
+#' This check is then performed by looping over all the centers, changing the 
+#' agents position to the position of this center, and using the 
+#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized 
+#' test: For each position in \code{centers} we have a logical \code{TRUE} or 
+#' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a 
+#' logical matrix with an equal number of rows as \code{centers} and an equal 
+#' number of columns as nodes in the coordinate matrix. In a last step, 
+#' we aggregate over the columns in this matrix so that we have a single logical
+#' for each center.
+#' 
+#' The reason why we use this approximate method is because of time efficiency. 
+#' Using the \code{\link[predped]{intersects-method}} takes a longer time than 
+#' using the \code{\link[predped]{in_object-method}}, especially as the number 
+#' of objects in the environment increases.
+#' 
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param space_between Numeric denoting the space to leave between the nodes 
+#' put on the circumference of the objects in the space (used for checking the
+#' overlap with an agent). Defaults to \code{0.05} or 5cm.
+#' 
+#' @return Logical matrix containing availabilities of the centers (\code{TRUE}
+#' if available, \code{FALSE} if not).
+#' 
+#' @examples 
+#' # Initialize all objects that you need
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(6, 6)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 2)))
+#' my_agent <- agent(center = c(-2.75, 0), 
+#'                   radius = 0.25, 
+#'                   speed = 1, 
+#'                   orientation = 0,
+#'                   current_goal = goal(position = c(-2.01, 0)))
+#' 
+#' # Generate several locations the agent can move to
+#' centers <- m4ma::c_vd_r(1:33, 
+#'                         position(my_agent), 
+#'                         speed(my_agent), 
+#'                         orientation(my_agent))
+#' check <- matrix(TRUE, nrow = 11, ncol = 3)
+#' 
+#' # Use moving_options to see which of these possibilities is sound
+#' overlap_with_objects(my_agent, 
+#'                      my_background,
+#'                      centers,
+#'                      check,
+#'                      cpp = TRUE)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{background-class}},
+#' \code{\link[predped]{in_object}},
+#' \code{\link[predped]{intersects}},
+#' \code{\link[predped]{moving_options}},
+#' \code{\link[predped]{nodes_on_circumference}}
+#' 
+#' @rdname overlap_with_objects_rcpp
+#' 
+#' @export
+overlap_with_objects_rcpp <- function(agent, background, centers, check, space_between = 5e-2) {
+    .Call('_predped_overlap_with_objects_rcpp', PACKAGE = 'predped', agent, background, centers, check, space_between)
+}
+
+#' Check where an object can be moved to
+#'
+#' Rcpp alternative to \code{\link[predped]{moving_options}}. This method checks 
+#' where an object can be moved to. It returns a logical matrix that codes 
+#' \code{TRUE} for the cells that are available and \code{FALSE} for those that 
+#' aren't.
+#' 
+#' @details
+#' In general, this method works as follows. First, it checks whether any of the 
+#' provided cell centers are freely available, in the sense that they are not 
+#' contained inside any objects or fall outside of the setting. This is a crude
+#' measure of whether a particular spot is available and is handled by the 
+#' \code{\link[m4ma]{free_cells_rcpp}} function of the \code{m4ma} package.
+#' 
+#' Second, we check whether the object itself can be moved to this space, or 
+#' whether it would intersect with any of the objects and/or the outline of the 
+#' setting. This is a more direct measure of availability, as it doesn't only 
+#' account for whether a specific spot can be reached theoretically, but also 
+#' accounts for the size of the object that is being moved there. This is 
+#' handled by the \code{\link[predped]{overlap_with_objects}} function in 
+#' \code{predped}.
+#' 
+#' Finally, if the object is an instance of the \code{\link[predped]{agent-class}}, 
+#' we also check whether the agent can still see there current goal or path-point
+#' when they move to the open spots. They will not move to the spots from which
+#' they cannot see their goal/path-point. This is handled by the 
+#' \code{\link[m4ma]{seesGoalOK_rcpp}} function in the \code{m4ma} package.
+#' 
+#' WARNING: Due to its reliance on the \code{m4ma} package, centers needs to be 
+#' of length 33 x 2. This corresponds to the 3 (change in speed) x 11 
+#' (change in orientation) options that are inherent to M4MA.
+#'
+#' @param object Object of the \code{\link[predped]{agent-class}} or the 
+#' \code{\link[predped]{object-class}} (latter not yet supported).
+#' @param state Object of the \code{\link[predped]{state-class}} containing the 
+#' current state.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#'
+#' @return Logical matrix containing availabilities of the centers.
+#' 
+#' @examples 
+#' # Initialize all objects that you need
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
+#'                                               size = c(6, 6)), 
+#'                             objects = list(circle(center = c(0, 0), 
+#'                                                   radius = 2)))
+#' my_agent <- agent(center = c(-2.75, 0), 
+#'                   radius = 0.25, 
+#'                   speed = 1, 
+#'                   orientation = 0,
+#'                   current_goal = goal(position = c(-2.01, 0)))
+#' 
+#' my_state <- state(iteration = 1,
+#'                   setting = my_background, 
+#'                   agents = list())
+#' 
+#' # Generate several locations the agent can move to
+#' centers <- m4ma::c_vd_r(1:33, 
+#'                         position(my_agent), 
+#'                         speed(my_agent), 
+#'                         orientation(my_agent))
+#' 
+#' # Use moving_options to see which of these possibilities is sound
+#' moving_options(my_agent, 
+#'                my_state, 
+#'                my_background,
+#'                centers,
+#'                cpp = TRUE)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{background-class}},
+#' \code{\link[predped]{object-class}},
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{overlap_with_objects}} 
+#'
+#' @docType methods
+#' 
+#' @rdname moving_options_rcpp
+#'
+#' @export
+moving_options_rcpp <- function(agent, state, background, centers) {
+    .Call('_predped_moving_options_rcpp', PACKAGE = 'predped', agent, state, background, centers)
+}
+
+#' Add Nodes on the Circumference of an Object
+#' 
+#' Rcpp alternative of \code{\link[predped]{nodes_on_circumference}}.
+#' 
+#' Used in the \code{\link[predped]{overlap_with_objects}} function for creating 
+#' nodes of which their presence within an agent can be checked in an efficient 
+#' way (see \code{\link[predped]{moving_options-method}} and 
+#' \code{\link[predped]{in_object-method}}). Currently works for all 
+#' instances of \code{\link[predped]{object-class}}, but only returns 
+#' \code{NULL} for the \code{\link[predped]{segment-class}}.
+#' 
+#' @details 
+#' Related to the \code{\link[predped]{add_nodes-method}} with the main difference
+#' being that the \code{\link[predped]{add_nodes-method}} adds nodes around or 
+#' within an object, while \code{nodes_on_circumference} adds nodes directly on
+#' the circumference of an object.
+#' 
+#' Note that while \code{\link[predped]{rectangle-class}} is not explicitly 
+#' mentioned here, this method does work for this class of objects.
+#'
+#' @param object Object of \code{\link[predped]{object-class}}.
+#' @param space_between Numeric denoting the space to leave between the 
+#' circumference of the object and the nodes to create. When \code{outside = TRUE},
+#' \code{space_between} distance is created to the outside of the object, while
+#' if \code{outside = FALSE} this same distance is created towards the inside 
+#' of the object. Defaults to \code{5e-2}.
+#'
+#' @return Numerical matrix containing the nodes that were created around/within
+#' the provided object.
+#' 
+#' @examples 
+#' # Create an object
+#' my_circle <- circle(center = c(0, 0), radius = 1)
+#' 
+#' # Generate nodes that fall around this circle with a distance of 1 around 
+#' # the circle
+#' nodes_on_circumference(my_circle, space_between = pi / 2, cpp = TRUE)
+#' 
+#' @seealso 
+#' \code{\link[predped]{circle-class}}, 
+#' \code{\link[predped]{polygon-class}},  
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{segment-class}},
+#' \code{\link[predped]{add_nodes}},
+#' \code{\link[predped]{in_object}}, 
+#' \code{\link[predped]{moving_options}}
+#' 
+#' @docType method
+#' 
+#' @rdname nodes_on_circumference_rcpp
+#' 
+#' @export
+nodes_on_circumference_rcpp <- function(object, space_between) {
+    .Call('_predped_nodes_on_circumference_rcpp', PACKAGE = 'predped', object, space_between)
 }
 
 #' Predict agents' movement

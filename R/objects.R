@@ -1824,10 +1824,10 @@ setMethod("nodes_on_circumference", signature(object = "polygon"), function(obje
     x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
     y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
 
-    len_x <- abs((x_changes[,2] - x_changes[,1]) / space_between)
-    len_y <- abs((y_changes[,2] - y_changes[,1]) / space_between)
+    len_x <- (x_changes[,2] - x_changes[,1]) / space_between
+    len_y <- (y_changes[,2] - y_changes[,1]) / space_between
 
-    len <- sqrt(len_x^2 + len_y^2)
+    len <- sqrt(len_x^2 + len_y^2) + 1
 
     nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
                                                x_changes[,2],

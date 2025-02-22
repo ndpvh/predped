@@ -212,6 +212,47 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// overlap_with_objects_rcpp
+LogicalMatrix overlap_with_objects_rcpp(S4 agent, S4 background, NumericMatrix centers, LogicalMatrix check, double space_between);
+RcppExport SEXP _predped_overlap_with_objects_rcpp(SEXP agentSEXP, SEXP backgroundSEXP, SEXP centersSEXP, SEXP checkSEXP, SEXP space_betweenSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type agent(agentSEXP);
+    Rcpp::traits::input_parameter< S4 >::type background(backgroundSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type check(checkSEXP);
+    Rcpp::traits::input_parameter< double >::type space_between(space_betweenSEXP);
+    rcpp_result_gen = Rcpp::wrap(overlap_with_objects_rcpp(agent, background, centers, check, space_between));
+    return rcpp_result_gen;
+END_RCPP
+}
+// moving_options_rcpp
+LogicalMatrix moving_options_rcpp(S4 agent, S4 state, S4 background, NumericMatrix centers);
+RcppExport SEXP _predped_moving_options_rcpp(SEXP agentSEXP, SEXP stateSEXP, SEXP backgroundSEXP, SEXP centersSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type agent(agentSEXP);
+    Rcpp::traits::input_parameter< S4 >::type state(stateSEXP);
+    Rcpp::traits::input_parameter< S4 >::type background(backgroundSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    rcpp_result_gen = Rcpp::wrap(moving_options_rcpp(agent, state, background, centers));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nodes_on_circumference_rcpp
+NumericMatrix nodes_on_circumference_rcpp(S4 object, double space_between);
+RcppExport SEXP _predped_nodes_on_circumference_rcpp(SEXP objectSEXP, SEXP space_betweenSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type object(objectSEXP);
+    Rcpp::traits::input_parameter< double >::type space_between(space_betweenSEXP);
+    rcpp_result_gen = Rcpp::wrap(nodes_on_circumference_rcpp(object, space_between));
+    return rcpp_result_gen;
+END_RCPP
+}
 // predict_movement_rcpp
 NumericVector predict_movement_rcpp(S4 agent, bool stay_stopped, double time_step);
 RcppExport SEXP _predped_predict_movement_rcpp(SEXP agentSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
@@ -356,6 +397,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_destinationAngle", (DL_FUNC) &_predped_destinationAngle, 3},
     {"_predped_predClose", (DL_FUNC) &_predped_predClose, 8},
     {"_predped_blockedAngle", (DL_FUNC) &_predped_blockedAngle, 6},
+    {"_predped_overlap_with_objects_rcpp", (DL_FUNC) &_predped_overlap_with_objects_rcpp, 5},
+    {"_predped_moving_options_rcpp", (DL_FUNC) &_predped_moving_options_rcpp, 4},
+    {"_predped_nodes_on_circumference_rcpp", (DL_FUNC) &_predped_nodes_on_circumference_rcpp, 2},
     {"_predped_predict_movement_rcpp", (DL_FUNC) &_predped_predict_movement_rcpp, 3},
     {"_predped_create_agent_specifications_rcpp", (DL_FUNC) &_predped_create_agent_specifications_rcpp, 3},
     {"_predped_distance_group_centroid_rcpp", (DL_FUNC) &_predped_distance_group_centroid_rcpp, 3},
