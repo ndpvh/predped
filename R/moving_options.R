@@ -36,6 +36,8 @@
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #'
 #' @return Logical matrix containing availabilities of the centers.
 #' 
@@ -93,7 +95,13 @@ setGeneric("moving_options", function(object, ...) standardGeneric("moving_optio
 setMethod("moving_options", "agent", function(object, 
                                               state, 
                                               background, 
-                                              centers){
+                                              centers,
+                                              cpp = TRUE){
+
+    # If the user wants to use the cpp version, allow them to do so
+    if(cpp) {
+        return(moving_options_rcpp(object, state, background, centers))
+    }
 
     # Add the other agents to the background objects. This will allow us to 
     # immediately test whether cells are occupied by other agents instead of 
@@ -332,6 +340,8 @@ agents_between_goal <- function(agent,
 #' @param space_between Numeric denoting the space to leave between the nodes 
 #' put on the circumference of the objects in the space (used for checking the
 #' overlap with an agent). Defaults to \code{0.05} or 5cm.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Logical matrix containing availabilities of the centers (\code{TRUE}
 #' if available, \code{FALSE} if not).
@@ -379,11 +389,17 @@ overlap_with_objects <- function(agent,
                                  background, 
                                  centers, 
                                  check,
-                                 space_between = 5e-2) {
+                                 space_between = 5e-2,
+                                 cpp = FALSE) {
     
     # If the centers are not provided, return an empty logical
     if(length(centers) == 0) {
         return(logical(0))
+    }
+
+    # If you want to use the cpp version. Allow the person to do so
+    if(cpp) {
+        return(overlap_with_objects_rcpp(agent, background, centers, check, space_between))
     }
 
     # Transform all background-objects into one big matrix of segments. This will
