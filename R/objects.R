@@ -1812,7 +1812,7 @@ setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("node
 #'@rdname nodes_on_circumference-method
 setMethod("nodes_on_circumference", signature(object = "polygon"), function(object, 
                                                                             space_between = 5e-2,
-                                                                            cpp = TRUE) {
+                                                                            cpp = FALSE) {
 
     if(cpp) {
         return(nodes_on_circumference_rcpp(object, space_between))
@@ -1842,7 +1842,7 @@ setMethod("nodes_on_circumference", signature(object = "polygon"), function(obje
 #'@rdname nodes_on_circumference-method
 setMethod("nodes_on_circumference", signature(object = "circle"), function(object, 
                                                                            space_between = 5e-2,
-                                                                           cpp = TRUE) {
+                                                                           cpp = FALSE) {
 
     if(cpp) {
         return(nodes_on_circumference_rcpp(object, space_between))
