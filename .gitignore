@@ -46,3 +46,4 @@ tmp*
 
 *.o 
 *.so
+tests/testthat/data/trace_mll.Rds
