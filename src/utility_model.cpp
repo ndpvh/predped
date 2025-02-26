@@ -195,7 +195,9 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
                                          S4 background,
                                          List agent_specifications,
                                          NumericMatrix centers,                    
-                                         LogicalMatrix check) {
+                                         LogicalMatrix check_original) {
+    
+    LogicalMatrix check = clone(check_original);
 
     // Retrieve the index of the agent of interest. Importantly, make sure that 
     // the indices are defined for R, not Rcpp (conversions to Rcpp are handled

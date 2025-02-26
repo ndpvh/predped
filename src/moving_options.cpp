@@ -97,61 +97,92 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 LogicalMatrix overlap_with_objects_rcpp(S4 agent, 
-                                        S4 background, 
+                                        S4 background,
                                         NumericMatrix centers, 
                                         LogicalMatrix check,
                                         double space_between = 5e-2) {
+
+    // S4 copy_background = clone(background);
+    // LogicalMatrix check = clone(check_original);
 
     // Extract objects and shape from the background
     List objects = background.slot("objects");
     S4 shape = background.slot("shape");
     objects.push_back(shape);
 
-    // Loop over each of the objects and create a big coordinates matrix 
-    // containing all of the points we will compare the agent to.
-    NumericVector x(0);
-    NumericVector y(0);
-    for(int i = 0; i < objects.length(); i++) {
-        NumericMatrix object_coords = nodes_on_circumference_rcpp(
-            objects[i],
-            space_between
-        );
+    // Square the values of the centers. This is done to make the computation 
+    // of of the distance between center and nodes faster. Steered clear from 
+    // pow for efficiency purposes.
+    int N = centers.nrow();
 
-        for(int j = 0; j < object_coords.nrow(); j++) {
-            x.push_back(object_coords(j, 0));
-            y.push_back(object_coords(j, 1));
-        }
+    // Reinitalize the centers
+    std::vector<double> position = agent.slot("center");
+    NumericVector dist(N);
+
+    std::vector<double> cx(N);
+    std::vector<double> cy(N);
+    for(int i = 0; i < N; i++) {
+        cx[i] = centers(i, 0);
+        cy[i] = centers(i, 1);
+
+        dist[i] = (cx[i] - position[0]) * (cx[i] - position[0]) + (cy[i] - position[1]) * (cy[i] - position[1]);
     }
 
-    NumericMatrix coords = cbind(x, y);
-
-    // Loop over each of the objects in the list and try to find out whether 
-    // the agent intersects with it at a given location in centers.
-    //
-    // Primary assumption right now is that the agent is circular.
+    // Extract agent characteristics. Will help in determining whether any of 
+    // the nodes of an object might intersect with the agent determined through
+    // an (arbitrary) cutoff.
     double radius = agent.slot("radius");
-    for(int i = 0; i < centers.nrow(); i++) {
-        // Immediately go to the next one if the current value for check is 
-        // false
-        if(!check[i]) {
+
+    double distance = std::sqrt(max(dist)); 
+    double cutoff = distance + radius; // Cutoff in R is: distance of agent to farthest center + radius. Here squared
+
+    cutoff *= cutoff;
+    radius *= radius;
+
+    // Loop over all of the objects in the environment
+    double minimum = 0;
+
+    for(List::iterator i = objects.begin(); i < objects.end(); ++i) {
+        // Place nodes on the circumference of the object
+        NumericMatrix xy = nodes_on_circumference_rcpp(
+            *i, 
+            space_between
+        );
+        NumericVector x = xy(_, 0);
+        NumericVector y = xy(_, 1);
+
+        // Compute the distance of the coordinates to the center of the agent. 
+        // Retain only those that fall within a given distance
+        LogicalVector idx = (((x - position[0]) * (x - position[0]) + (y - position[1]) * (y - position[1])) <= cutoff);
+
+        if(any(idx).is_false()) {
             continue;
+        } else {
+            x = x[idx];
+            y = y[idx];
         }
 
-        // Compute the distance from the center to any of the coordinates
-        NumericVector distances = dist1(
-            centers(i, _),
-            coords
-        );
+        for(int j = 0; j < N; j++) {
+            // Only adjust the check when it is not yet blocked
+            if(check[j]) {
+                // Compute the distance from the center to any of the coordinates
+                minimum = min((x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]));
+                NumericVector dist = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]);
 
-        // Check whether any of these distances is smaller than the radius of 
-        // the agent. If so, then we know that the agent intersects with the 
-        // object
-        LogicalVector local_check = distances < radius; 
-        check[i] = !(any(local_check).is_true());        
+                // Check whether any of these distances is smaller than the radius of 
+                // the agent. If so, then we know that the agent intersects with the 
+                // object. Is a bit faster written this way than if it were written 
+                // as `check[j] = minimum > radius`
+                if(minimum <= radius) {
+                    check[j] = false;
+                }
+            }
+        }
     }
 
     return check;
 }
+
 
 //' Check where an object can be moved to
 //'
@@ -242,21 +273,33 @@ LogicalMatrix moving_options_rcpp(S4 agent,
                                   S4 background, 
                                   NumericMatrix centers) {
 
+    // These copies are necessary!
+    S4 copy_state = clone(state);
+    S4 copy_background = clone(background);
+
     // Add the other agents to the background objects. This will allow us to 
     // immediately test whether cells are occupied by other agents instead of 
     // doing this check only later.
-    List agents = state.slot("agents");
-    List objects = background.slot("objects");
-    for(int i = 0; i < agents.length(); i++) {
-        objects.push_back(agents[i]);
-    }
+    NumericVector agent_center = agent.slot("center");
 
-    // Use the `free_cells` function to get all free cells to which the agent
-    // might move. Specifically look at whether a cell lies within the background
-    // and whether the agent has a direct line of sight to that cell.
+    List agents = copy_state.slot("agents");
+    List objects = copy_background.slot("objects");
+    for(int i = 0; i < agents.length(); i++) {
+        S4 agent_i = agents[i];
+        NumericVector center_i = agent_i.slot("center");
+
+        if(sum((center_i - agent_center) * (center_i - agent_center)) < 5) {
+            objects.push_back(agents[i]);
+        }
+    }
+    copy_background.slot("objects") = objects;
+
+    // // Use the `free_cells` function to get all free cells to which the agent
+    // // might move. Specifically look at whether a cell lies within the background
+    // // and whether the agent has a direct line of sight to that cell.
     LogicalMatrix check = free_cells(
         agent, 
-        background, 
+        copy_background, 
         centers
     );
 
@@ -266,22 +309,44 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     // of this function can overwrite the local `check` variable without any
     // issues
     if(any(check).is_true()) {
+
+        // Currently, there is an unknown divergence between the R and Rcpp versions
+        // of overlap_with_objects. However, we can use the original m4ma function
+        // to achieve the same purpose.
         check = overlap_with_objects_rcpp(
             agent, 
-            background, 
+            copy_background, 
             centers, 
             check
         );
+        // // Make copy of check
+        // LogicalMatrix check_vec = clone(check);
+        // check_vec.attr("dim") = R_NilValue;
+
+        // check = bodyObjectOK(
+        //     agent.slot("radius"), 
+        //     centers, 
+        //     copy_background.slot("objects"), 
+        //     check_vec
+        // );
 
         // If something blocks the way in the previous column, then it should also 
         // block the way on the columns
         for(int i = 0; i < check.nrow(); i++) {
-            if(!check(i, 3)) {
-                check(i, 2) = false;
-            }
+            // For some reason, the loop doesn't work! Keep it in for legacy purposes
+            // for(int j = 1; j < check.ncol(); j++) {
+            //     Rcout << check(i, j) << "\n";
+            //     if(!check(i, j)) {
+            //         check(i, j - 1) = false;
+            //     }
+            // }
 
             if(!check(i, 2)) {
                 check(i, 1) = false;
+            }
+
+            if(!check(i, 1)) {
+                check(i, 0) = false;
             }
         }
     }
@@ -289,6 +354,10 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     // If there are still cells free, check whether the goal can still be seen
     // or whether an agent should re-plan
     if(any(check).is_true()) {
+        // Make copy of check
+        LogicalMatrix check_vec = clone(check);
+        check_vec.attr("dim") = R_NilValue;
+
         // Function to rewrite! New arguments are already provided to this one,
         // but not the original one.
         //
@@ -296,10 +365,8 @@ LogicalMatrix moving_options_rcpp(S4 agent,
         // in predped and(b) compatability with m4ma.
         S4 goal = agent.slot("current_goal");
         NumericMatrix path = goal.slot("path");
-        NumericMatrix path_0(1, 2, path(0, _).begin());
-        
-        List goal_list = List::create(path_0);
-        goal_list.attr("i") = 1;
+        path.attr("i") = 1;        
+        List goal_list = List::create(path);
         
         List state_dummy = List::create(Named("P") = goal_list);
         LogicalVector local_check = seesGoalOK(
@@ -307,17 +374,16 @@ LogicalMatrix moving_options_rcpp(S4 agent,
             objects,
             state_dummy,
             centers,
-            check
+            check_vec
         );
 
         // Here, change `check` based on the results of the function. Importantly,
         // agent should still move even if it cannot see their goal (hence the
         // if-statement), otherwise the agent will get stuck
         if(any(local_check).is_true()) {
-            // Convert to matrix before assigning to check again
             LogicalMatrix converted_check(
-                check.nrow(),
-                check.ncol(),
+                11,
+                3,
                 local_check.begin()
             );
             check = converted_check;

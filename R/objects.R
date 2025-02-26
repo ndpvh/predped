@@ -1777,6 +1777,8 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' \code{space_between} distance is created to the outside of the object, while
 #' if \code{outside = FALSE} this same distance is created towards the inside 
 #' of the object. Defaults to \code{5e-2}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.

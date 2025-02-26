@@ -114,7 +114,8 @@ unpack_trace <- function(x,
         # Create the agent-specifications for this state
         agent_specifications <- create_agent_specifications(y@agents, 
                                                             stay_stopped = stay_stopped, 
-                                                            time_step = time_step)
+                                                            time_step = time_step,
+                                                            cpp = FALSE)
 
         # Loop over all of the agents and create their own row in the dataframe.
         # This will consist of all variables included in the time_series function
@@ -186,7 +187,8 @@ unpack_trace <- function(x,
                             check <- moving_options(a, 
                                                     agent_state, 
                                                     agent_state@setting, 
-                                                    centers)
+                                                    centers,
+                                                    cpp = FALSE)
                             
                             # Compute the utility variables for this agent under the
                             # current state                            
@@ -195,7 +197,8 @@ unpack_trace <- function(x,
                                                                            y@setting,
                                                                            agent_specifications,
                                                                            centers,                    
-                                                                           check)
+                                                                           check,
+                                                                           cpp = FALSE)
                         }
     
                         # Bind them all together in one dataframe and return 

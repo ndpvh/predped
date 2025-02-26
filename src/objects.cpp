@@ -68,110 +68,86 @@ NumericMatrix nodes_on_circumference_rcpp(S4 object,
 
     // For polygons and rectangles, we base ourselves on the linearity of the 
     // lines on which we can add nodes. 
-    NumericMatrix nodes(0, 2);
     if((object_class == "polygon") || (object_class == "rectangle")) {
         // Extract the points of the object and mend them into segments
         NumericMatrix points = object.slot("points"); 
+        NumericVector x = points(_, 0);
+        NumericVector y = points(_, 1);
+        x.push_back(x[0]);
+        y.push_back(y[0]);
+
         int n = points.nrow();
-    
-        IntegerVector idx = seq(1, n - 1);
-        idx.push_back(0);
 
-        NumericMatrix matched_points(points.nrow(), points.ncol());
-        for(int i = 0; i < points.nrow(); i++) {
-            matched_points(i, _) = points(idx[i], _);
-        }
-
-        NumericVector points_x = points(_, 0);
-        NumericVector matched_x = matched_points(_, 0);
-        NumericVector points_y = points(_, 1);
-        NumericVector matched_y = matched_points(_, 1);
-
-        NumericMatrix x_changes = cbind(points_x, matched_x);
-        NumericMatrix y_changes = cbind(points_y, matched_y);
-
-        NumericVector x(0);
-        NumericVector y(0);
-        for(int i = 0; i < x_changes.nrow(); i++) {
+        // Loop over each of the points
+        NumericVector len(n);
+        for(int i = 0; i < n; i++) {
             // Get the number of nodes that you would have to create in the x 
             // and y direction to cover the whole thing
-            double len_x = (x_changes(i, 1) - x_changes(i, 0)) / space_between;
-            double len_y = (y_changes(i, 1) - y_changes(i, 0)) / space_between;
-
-            // Based on these two lengths, find out what the length should be 
-            // of the tilted line between the two points using Pythagoras. Then
-            // transform to the upper integer.
-            double a = std::pow(len_x, 2);
-            double b = std::pow(len_y, 2);
-            double c = a + b;
-
-            double len = std::sqrt(c);
-            NumericVector len_vec(1);
-            len_vec[0] = len;
-
-            int len_int = ceiling(len_vec)[0];
-            double denominator = len_int;
-
-            // Create the x and y nodes with the seq function
-            for(int j = 0; j <= len_int; j++) {
-                // Define how far along you are on the line. You have to convert
-                // the numerator and denominator to doubles in order for the 
-                // relative location to be computed correctly (as a double 
-                // itself)
-                double numerator = j;
-                double rel_loc = numerator / denominator;
-
-                // Define coordinates to show how far along the line you are
-                double xij = x_changes(i, 0) + rel_loc * (x_changes(i, 1) - x_changes(i, 0));
-                double yij = y_changes(i, 0) + rel_loc * (y_changes(i, 1) - y_changes(i, 0));
-
-                // Add to the x and y vectors
-                x.push_back(xij);
-                y.push_back(yij);
-            }
+            double squared = std::sqrt((x(i + 1) - x(i)) * (x(i + 1) - x(i)) + (y(i + 1) - y(i)) * (y(i + 1) - y(i)));
+            len[i] = std::ceil(squared / space_between);
         }
-        
-        // Bind the two vectors together
-        nodes = cbind(x, y);
+
+        // // Loop over each of the points again, but now with initialization of 
+        // // x and y
+        int m = sum(len) + n;
+        NumericVector points_x(m);
+        NumericVector points_y(m);
+        NumericVector diff_x(m);
+        NumericVector diff_y(m);
+        NumericVector rel_loc(m);
+
+        int k = 0;
+        for(int i = 0; i < n; i++) {
+            // Get an index that tells you where to assign to
+            Rcpp::Range idx = seq(k, k + len[i]);
+
+            // Assign repetitions of the first point to their vectors
+            points_x[idx] = rep(x[i], len[i] + 1);
+            points_y[idx] = rep(y[i], len[i] + 1);
+
+            // Assign the difference between two consecutive points to their 
+            // respective vectors
+            diff_x[idx] = rep(x[i + 1] - x[i], len[i] + 1);
+            diff_y[idx] = rep(y[i + 1] - y[i], len[i] + 1);
+
+            // Assign a vector of factors with which to multiply the differences
+            // in x and y
+            NumericVector sequence(len[i] + 1);
+            std::iota(sequence.begin(), sequence.end(), 0);
+            rel_loc[idx] = sequence / len[i];
+
+            k += len[i] + 1;
+        }
+
+        NumericVector res_x = points_x + rel_loc * diff_x;
+        NumericVector res_y = points_y + rel_loc * diff_y;
+        return cbind(res_x, res_y);
 
     // For circles, we use the angles of a circle to achieve the placement of 
     // nodes.
-    } else if(object_class == "circle") {
+    } else if((object_class == "circle") || (object_class == "agent")) {
+
         // Compute the circumference of the circle and, based on that, compute
         // the number of nodes that you need to output
         double radius = object.slot("radius");
-        double circumference = 2 * M_PI * radius;
-        double len_float = circumference / space_between;
-
-        NumericVector len_vec(1);
-        len_vec[0] = len_float;
-        int len = ceiling(len_vec)[0];
+        int len = std::ceil(2 * M_PI * radius / space_between);
 
         // Define the angles at which the nodes should be placed if we want to 
-        // have len nodes on the circumference. Also delete the one angle that 
-        // is the same, it being 0 and 2 \pi
-        NumericVector angles(len);
-        double denominator = len;
-        for(int i = 0; i < len; i++) {
-            double numerator = i;
-
-            angles[i] = numerator / denominator;
-            angles[i] = angles[i] * 2 * M_PI;
-        }
+        // have len nodes on the circumference. Note that in using .begin() and 
+        // .end(), we automatically don't compute the value for angle 2\pi, 
+        // which is what we want as this value would be the same as the one 
+        // for 0.
+        NumericVector sequence(len);
+        std::iota(sequence.begin(), sequence.end(), 0);
+        NumericVector angles = 2 * M_PI * sequence / len;
 
         // Create the points based on trigometry.
-        NumericVector x = radius * cos(angles);
-        NumericVector y = radius * sin(angles);
-
-
-        // Add the position of the object to it as well.
         NumericVector position = object.slot("center");
-        x = x + position[0];
-        y = y + position[1];
+        NumericVector x = position[0] + radius * cos(angles);
+        NumericVector y = position[1] + radius * sin(angles);
 
-        // Bind together
-        nodes = cbind(x, y);
+        return cbind(x, y);
     }
 
-    return nodes;
+    return NumericMatrix(0, 2);
 }

@@ -142,6 +142,10 @@ blockedAngle <- function(agent_position, orientation, speed, predictions_minus_a
     .Call('_predped_blockedAngle', PACKAGE = 'predped', agent_position, orientation, speed, predictions_minus_agent, radii, objects)
 }
 
+bodyObjectOK <- function(radius, centers, objects, check) {
+    .Call('_predped_bodyObjectOK', PACKAGE = 'predped', radius, centers, objects, check)
+}
+
 #' Check agent and object overlap
 #' 
 #' Rcpp alternative to \code{\link[predped]{overlap_with_objects}}. 
@@ -548,8 +552,8 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' @rdname compute_utility_variables_rcpp
 #' 
 #' @export 
-compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
-    .Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check)
+compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check_original) {
+    .Call('_predped_compute_utility_variables_rcpp', PACKAGE = 'predped', agent, state, background, agent_specifications, centers, check_original)
 }
 
 #' Group centroid utility

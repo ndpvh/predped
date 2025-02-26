@@ -121,7 +121,8 @@ setMethod("moving_options", "agent", function(object,
     # issues
     if(!all(!check)){
         # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
-        check <- overlap_with_objects(object, background, centers, check)
+        check <- overlap_with_objects(object, background, centers, check, cpp = FALSE)
+        # check <- bodyObjectOK(size(object), centers, objects(background), as.vector(check))
 
         # If something blocks the way in the previous column, then it should also 
         # block the way on the columns
@@ -143,6 +144,7 @@ setMethod("moving_options", "agent", function(object,
         goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
+        
         local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
 
         # Here, change `check` based on the results of the function. Importantly,
@@ -460,8 +462,10 @@ overlap_with_objects <- function(agent,
     }
 
     if(is.null(ncol(check))) {
-        return(!(rowSums(local_check) > 0))
+        result <- (!(rowSums(local_check) > 0))
     } else {
-        return(matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
+        result <- (matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
     }
+
+    return(result)
 }

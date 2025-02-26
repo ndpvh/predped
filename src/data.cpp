@@ -3,27 +3,28 @@
 #include <algorithm>
 #include "general.h"
 #include "m4ma.h"
+#include "moving_options.h"
 #include "update.h"
 #include "utility_model.h"
 
 using namespace Rcpp;
 
-// Import the moving_options function => At some point, it can become an Rcpp 
-// function, but now is not the time. Note, however, that this makes the 
-// functions that call this function will be slower because of this choice.
-LogicalMatrix imported_moving_options(S4 agent, 
-                                      S4 state,
-                                      S4 background,
-                                      NumericMatrix centers) {
+// // Import the moving_options function => At some point, it can become an Rcpp 
+// // function, but now is not the time. Note, however, that this makes the 
+// // functions that call this function will be slower because of this choice.
+// LogicalMatrix imported_moving_options(S4 agent, 
+//                                       S4 state,
+//                                       S4 background,
+//                                       NumericMatrix centers) {
     
-    Function f("moving_options"); 
-    return f(
-        agent,
-        state,
-        background,
-        centers
-    );
-}
+//     Function f("moving_options"); 
+//     return f(
+//         agent,
+//         state,
+//         background,
+//         centers
+//     );
+// }
 
 
 
@@ -42,7 +43,7 @@ LogicalMatrix imported_moving_options(S4 agent,
 //' @examples
 //' # This is my example
 //'
-//' @rdname time_series
+//' @rdname time_series_rcpp
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -201,11 +202,11 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @export
 // [[Rcpp::export]]
-List unpack_trace_rcpp(List trace, 
-                       NumericMatrix velocities,
-                       NumericMatrix orientations,
-                       bool stay_stopped = true,
-                       double time_step = 0.5) {
+DataFrame unpack_trace_rcpp(List trace, 
+                            NumericMatrix velocities,
+                            NumericMatrix orientations,
+                            bool stay_stopped = true,
+                            double time_step = 0.5) {
 
     // Find out how many rows the dataframe should have
     int N = 0;
@@ -234,21 +235,21 @@ List unpack_trace_rcpp(List trace,
     NumericVector goal_y(N);
 
     IntegerVector agent_idx(N);
-    List check = List::create();
+    List check(N);
     NumericVector ps_speed(N);
     NumericVector ps_distance(N);
-    List gd_angle = List::create();
-    List id_distance = List::create();
-    List id_check = List::create();
-    List id_ingroup = List::create();
-    List ba_angle = List::create();
-    List ba_cones = List::create();
-    List fl_leaders = List::create();
-    List wb_buddies = List::create();
-    List gc_distance = List::create();
+    List gd_angle(N);
+    List id_distance(N);
+    List id_check(N);
+    List id_ingroup(N);
+    List ba_angle(N);
+    List ba_cones(N);
+    List fl_leaders(N);
+    List wb_buddies(N);
+    List gc_distance(N);
     NumericVector gc_radius(N);
     IntegerVector gc_nped(N);
-    List vf_angles = List::create();
+    List vf_angles(N);
 
     // Create some NA vectors that correspond to the R alternative. Used whenever
     // the utility variables are not defined at a given iteration for a given 
@@ -256,16 +257,21 @@ List unpack_trace_rcpp(List trace,
     LogicalVector NA_logical(1);
     NA_logical[0] = NA_LOGICAL;
 
+    // Create a check_j variable beforehand
+    LogicalMatrix check_j(11, 3);
+
     // Loop over the different instances in the trace.
+    List copy_trace = clone(trace);
     int idx = 0;
     for(int i = 0; i < trace.length(); i++) {
         // Extract the state and its agents from the trace
-        S4 state = trace[i];
+        S4 state = copy_trace[i];
         List agents = state.slot("agents");
 
         if(agents.length() == 0) {
             continue;
         }
+        S4 setting = state.slot("setting");
 
         // Create the agent specifications list as used in the lower level 
         // utility functions
@@ -339,23 +345,20 @@ List unpack_trace_rcpp(List trace,
                 // moving options will give wrong results)
                 List agents_minus_agent = clone(agents);
                 agents_minus_agent.erase(j);
-
-                S4 copy_state = clone(state);
-                copy_state.slot("agents") = agents_minus_agent;
-
-                S4 setting = state.slot("setting");
+                state.slot("agents") = agents_minus_agent;
     
                 // Do an initial check of which of these centers can be 
                 // reached and which ones can't
-                LogicalMatrix check_j = imported_moving_options(
+                LogicalMatrix check_j = moving_options_rcpp(
                     agent, 
-                    copy_state,
+                    state,
                     setting,
                     centers
                 );
                             
                 // Compute the utility variables for this agent under the
-                // current state                            
+                // current state      
+                state.slot("agents") = agents;
                 DataFrame uv_j = compute_utility_variables_rcpp(
                     agent, 
                     state,
@@ -384,41 +387,41 @@ List unpack_trace_rcpp(List trace,
                 List vf_angles_j = uv_j["vf_angles"];
 
                 agent_idx[idx] = agent_idx_j;
-                check.push_back(check_j);
+                check[idx] = check_j;
                 ps_speed[idx] = ps_speed_j;
                 ps_distance[idx] = ps_distance_j[0];
-                gd_angle.push_back(gd_angle_j[0]);
-                id_distance.push_back(id_distance_j[0]);
-                id_check.push_back(id_check_j[0]);
-                id_ingroup.push_back(id_ingroup_j[0]);
-                ba_angle.push_back(ba_angle_j[0]);
-                ba_cones.push_back(ba_cones_j[0]);
-                fl_leaders.push_back(fl_leaders_j[0]);
-                wb_buddies.push_back(wb_buddies_j[0]);
-                gc_distance.push_back(gc_distance_j[0]);
+                gd_angle[idx] = gd_angle_j[0];
+                id_distance[idx] = id_distance_j[0];
+                id_check[idx] = id_check_j[0];
+                id_ingroup[idx] = id_ingroup_j[0];
+                ba_angle[idx] = ba_angle_j[0];
+                ba_cones[idx] = ba_cones_j[0];
+                fl_leaders[idx] = fl_leaders_j[0];
+                wb_buddies[idx] = wb_buddies_j[0];
+                gc_distance[idx] = gc_distance_j[0];
                 gc_radius[idx] = gc_radius_j;
                 gc_nped[idx] = gc_nped_j;
-                vf_angles.push_back(vf_angles_j[0]);
+                vf_angles[idx] = vf_angles_j[0];
 
             // If the agent is not moving, then you cannot compute the utility
             // variables. We therefore fill the variables with NAs.
             } else {
                 agent_idx[idx] = j + 1;
-                check.push_back(NA_logical);
+                check[idx] = NA_logical;
                 ps_speed[idx] = NA_REAL;
                 ps_distance[idx] = NA_REAL;
-                gd_angle.push_back(NA_logical);
-                id_distance.push_back(NA_logical);
-                id_check.push_back(NA_logical);
-                id_ingroup.push_back(NA_logical);
-                ba_angle.push_back(NA_logical);
-                ba_cones.push_back(NA_logical);
-                fl_leaders.push_back(NA_logical);
-                wb_buddies.push_back(NA_logical);
-                gc_distance.push_back(NA_logical);
+                gd_angle[idx] = NA_logical;
+                id_distance[idx] = NA_logical;
+                id_check[idx] = NA_logical;
+                id_ingroup[idx] = NA_logical;
+                ba_angle[idx] = NA_logical;
+                ba_cones[idx] = NA_logical;
+                fl_leaders[idx] = NA_logical;
+                wb_buddies[idx] = NA_logical;
+                gc_distance[idx] = NA_logical;
                 gc_radius[idx] = NA_REAL;
                 gc_nped[idx] = NA_INTEGER;
-                vf_angles.push_back(NA_logical);
+                vf_angles[idx] = NA_logical;
             }
 
             // Update the index
