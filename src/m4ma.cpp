@@ -230,6 +230,16 @@ NumericVector dist1(NumericVector position,
     );
 }
 
+NumericVector dist(NumericMatrix matrix_1, 
+                   NumericMatrix matrix_2) {
+
+    Function f = m4ma["dist_rcpp"];
+    return f(
+        matrix_1, 
+        matrix_2
+    );
+}
+
 NumericMatrix c_vd(IntegerVector cells, 
                    NumericVector position,
                    double velocity,
@@ -282,7 +292,7 @@ LogicalVector seesGoalOK(int agent_idx,
                          List objects, 
                          List m4ma_state,
                          NumericMatrix centers,
-                         LogicalMatrix check) {
+                         LogicalVector check) {
     
     Function f = m4ma["seesGoalOK_rcpp"];
     return f(
@@ -292,4 +302,27 @@ LogicalVector seesGoalOK(int agent_idx,
         centers,
         check
     );
+}
+
+// [[Rcpp::export]]
+LogicalMatrix bodyObjectOK(double radius,
+                                     NumericMatrix centers,
+                                     List objects,
+                                     LogicalVector check) {
+
+    Function f = m4ma["bodyObjectOK_rcpp"];
+
+    Nullable<LogicalMatrix> new_check = f(
+        radius,
+        centers,
+        objects,
+        check
+    );
+
+    if(!(new_check == R_NilValue)) {
+        LogicalMatrix result = new_check.get(); 
+        return result;
+    }
+    
+    return LogicalMatrix(11, 3);
 }

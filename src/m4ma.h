@@ -110,6 +110,11 @@ Rcpp::NumericVector dist1(
     Rcpp::NumericMatrix goal_position
 );
 
+Rcpp::NumericVector dist(
+    Rcpp::NumericMatrix matrix_1, 
+    Rcpp::NumericMatrix matrix_2
+);
+
 Rcpp::NumericMatrix c_vd(
     Rcpp::IntegerVector cells, 
     Rcpp::NumericVector position,
@@ -138,7 +143,14 @@ Rcpp::LogicalVector seesGoalOK(
     Rcpp::List objects, 
     Rcpp::List m4ma_state,
     Rcpp::NumericMatrix centers,
-    Rcpp::LogicalMatrix check
+    Rcpp::LogicalVector check
+);
+
+Rcpp::LogicalMatrix bodyObjectOK(
+    double radius,
+    Rcpp::NumericMatrix centers,
+    Rcpp::List objects,
+    Rcpp::LogicalVector check
 );
 
 #endif
