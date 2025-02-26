@@ -77,8 +77,8 @@ mll <- function(data,
     if(cpp) {
         return(mll_rcpp(data, 
                         parameters, 
-                        parameter_names = names(parameters), 
-                        ids = ids))
+                        names(parameters), 
+                        ids))
     }
 
     # For each agent, loop over the unique participant id's 
