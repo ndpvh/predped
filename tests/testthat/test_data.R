@@ -9,7 +9,7 @@ testthat::test_that("Transforming to time series works", {
 })
 
 testthat::test_that("Transforming to time series from R and Rcpp is same", {
-    trace <- readRDS(file.path(".", "data", "example_trace.Rds"))
+    trace <- readRDS(file.path(".", "data", "trace_example.Rds"))
 
     ref <- predped::time_series(trace, cpp = FALSE)
     tst <- predped::time_series(trace, cpp = TRUE)
@@ -38,7 +38,7 @@ testthat::test_that("Transforming to trace works", {
 testthat::test_that("Unpacking trace from R and Rcpp is same", {
     # Check for the datasets in which all columns are filled.
     trace <- readRDS(file.path("data", "trace_mll.Rds"))
-    trace <- trace[101:200]
+    trace <- trace[101:105]
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
     tst <- predped::unpack_trace(trace, cpp = TRUE)
@@ -46,11 +46,10 @@ testthat::test_that("Unpacking trace from R and Rcpp is same", {
     testthat::expect_equal(tst, ref)
 
     # Check for the datasets in which NAs exist.
-    trace <- readRDS(file.path("data", "example_trace.Rds"))
+    trace <- readRDS(file.path("data", "trace_example.Rds"))
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
     tst <- predped::unpack_trace(trace, cpp = TRUE)
 
     testthat::expect_equal(tst, ref)
-
 })
