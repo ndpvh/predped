@@ -20,7 +20,8 @@
   standing_start = 0.1,
   time_step = 0.5,
   report = FALSE,
-  print_iteration = FALSE
+  print_iteration = FALSE,
+  cpp = TRUE
 )
 }
 \arguments{
@@ -82,6 +83,10 @@ reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
 \item{print_iteration}{Logical denoting whether to report each simulated
 iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
+of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+instead (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}.

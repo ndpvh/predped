@@ -32,6 +32,7 @@
   middle_edge = FALSE,
   position = NULL,
   individual_differences = FALSE,
+  cpp = TRUE,
   ...
 )
 }
@@ -109,6 +110,10 @@ iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 current iteration in the simulation & the number of agents present 
 at the current iteration in the simulation. Defaults to 1, which
 represents each iteration to be reported.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
+of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+instead (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if 
 \code{plot_live = TRUE}).}

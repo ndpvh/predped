@@ -11,7 +11,7 @@
   agent_specifications,
   centers,
   check,
-  cpp = FALSE
+  cpp = TRUE
 )
 }
 \arguments{
