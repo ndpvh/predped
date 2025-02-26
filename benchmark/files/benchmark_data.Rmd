@@ -54,8 +54,6 @@ r <- (\() unpack_trace(trace, cpp = FALSE)) |>
     test_times(10) |>
     rnd()
 
-start <- Sys.time(); kaka <- unpack_trace(trace, cpp = TRUE) ; end <- Sys.time() ; end - start
-
 rcpp <- (\() unpack_trace(trace, cpp = TRUE)) |>
     test_times(10) |>
     rnd()
