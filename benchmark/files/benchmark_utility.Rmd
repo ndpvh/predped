@@ -2,7 +2,7 @@
 
 ## compute_utility_variables
 
-```{r utility compute_utility_variables}
+```{r utility compute_utility_variables, echo = FALSE, results = "asis"}
 
 # Read in data and extract a single state
 trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_utility.Rds"))
@@ -62,7 +62,7 @@ tbl |>
 
 ## utility 
 
-```{r utility utility}
+```{r utility utility, echo = FALSE, results = "asis"}
 
 ################################################################################
 # data.frame

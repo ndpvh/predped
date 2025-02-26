@@ -2,12 +2,12 @@
 
 ## time_series
 
-```{r data time_series}
+```{r data time_series, echo = FALSE, results = "asis"}
 
 # Read in data and extract a single state
 trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll.Rds"))
 trace <- readRDS(file.path("tests", "testthat", "data", "trace_mll.Rds"))
-trace <- trace[2:101]
+trace <- trace[90:99]
 
 # Compute the utility variables
 r <- (\() time_series(trace, cpp = FALSE)) |>
@@ -25,7 +25,49 @@ rownames(tbl) <- NULL
 colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
 caption <- paste0("Benchmark for the time_series function. ",
-                  "In this benchmark, we transform the trace to data for 100 ",
+                  "In this benchmark, we transform the trace to data for 10 ",
+                  "iterations with 3 agents walking together. ",
+                  "Comparison is made between using the R version (cpp = FALSE) ",
+                  "or the Rcpp version of the function (cpp = TRUE).")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lccc",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
+## unpack_trace
+
+```{r data unpack_trace, echo = FALSE, results = "asis"}
+
+# Read in data and extract a single state
+trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll.Rds"))
+trace <- trace[90:99]
+
+# Compute the utility variables
+r <- (\() unpack_trace(trace, cpp = FALSE)) |>
+    test_times(10) |>
+    rnd()
+
+start <- Sys.time(); kaka <- unpack_trace(trace, cpp = TRUE) ; end <- Sys.time() ; end - start
+
+rcpp <- (\() unpack_trace(trace, cpp = TRUE)) |>
+    test_times(10) |>
+    rnd()
+
+# Create the table
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             rbind(r, rcpp))
+rownames(tbl) <- NULL
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+caption <- paste0("Benchmark for the unpack_trace function. ",
+                  "In this benchmark, we transform the trace to data for 10 ",
                   "iterations with 3 agents walking together. ",
                   "Comparison is made between using the R version (cpp = FALSE) ",
                   "or the Rcpp version of the function (cpp = TRUE).")

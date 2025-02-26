@@ -139,7 +139,7 @@ my_state <- predped::state(iteration = 0,
                            agents = agents)
 
 # Test
-r <- (\() predped:::moving_options(current_agent,  my_state, setting, centers, cpp = FALSE)) |>
+r <- (\() predped:::moving_options(current_agent, my_state, setting, centers, cpp = FALSE)) |>
     test_times() |>
     rnd() 
 
