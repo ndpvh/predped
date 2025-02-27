@@ -4,7 +4,7 @@
 \alias{utility_rcpp}
 \title{Utility}
 \usage{
-utility_rcpp(data, parameters)
+utility_rcpp(Data, parameters)
 }
 \arguments{
 \item{parameters}{Dataframe containing the parameters of the agent. Should 
