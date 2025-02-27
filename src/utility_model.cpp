@@ -488,28 +488,22 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
     // of this distance, all utilities are equal to 0. Otherwise, they are 
     // equal to the output of the group centroid utility function
     double optimal_distance = 1.5 * nped * radius;
+    LogicalVector optimal = cell_distances >= optimal_distance;
+    double difference = 0;
     
     NumericVector V(cell_distances.length());
-    LogicalVector check(cell_distances.length());
     for(int i = 0; i < cell_distances.length(); i++) {
-        if(cell_distances[i] < optimal_distance) {
-            V[i] = 0;
-        } else {
-            double difference = cell_distances[i] - optimal_distance;
-            difference = std::abs(difference);
-
-            V[i] = -1 * b_group_centroid * std::pow(difference, a_group_centroid);
+        if(optimal[i]) {
+            difference = std::abs(cell_distances[i] - optimal_distance);
+            V[i] -= b_group_centroid * std::pow(difference, a_group_centroid);
         }
-
-        check[i] = V[i] < stop_utility;
     }
 
     // Perform a check: If all utilities are lower than the stop utility, return
     // a vector with only zeros. This makes sure that agents are still able to 
     // walk around even when separated from their friends.
-    if(is_true(all(check))) {
-        NumericVector Zero(cell_distances.length());
-        return Zero;
+    if(is_true(all(V < stop_utility))) {
+        return NumericVector(cell_distances.length());
     }
     
     return V;
@@ -548,10 +542,13 @@ NumericVector vf_utility_rcpp(double b_visual_field,
     double lower_angle = 130 * M_PI / 180;
     double upper_angle = 2 * M_PI - lower_angle;
 
+    bool check_1 = false;
+    bool check_2 = false;
+
     NumericVector V(relative_angles.length());
     for(int i = 0; i < relative_angles.length(); i++) {
-        bool check_1 = relative_angles[i] > lower_angle;
-        bool check_2 = relative_angles[i] < upper_angle;
+        check_1 = relative_angles[i] > lower_angle;
+        check_2 = relative_angles[i] < upper_angle;
 
         if(check_1 & check_2) {
             V[i] -= b_visual_field;
@@ -591,16 +588,21 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' @rdname utility_rcpp
 //' 
 // [[Rcpp::export]]
-NumericVector utility_rcpp(DataFrame data, 
+NumericVector utility_rcpp(DataFrame Data, 
                            DataFrame parameters) {
 
     // Create an empty vector of the same size as needed for the computation
-    List check_list = data["check"];
-    LogicalMatrix check = check_list[0];
+    Rcpp::List data = Data;
+
+    Rcpp::List check_list = data["check"];
+    Rcpp::LogicalMatrix check = check_list[0];
     int rows = check.nrow();
     int cols = check.ncol();
 
     NumericVector V(rows * cols);
+
+    double stop_utility = parameters["stop_utility"];
+    stop_utility *= -1;
 
     // Preferred speed utility: Check whether the distance to the goal is not 
     // NULL and, if not, compute the utility of deceleration, acceleration, or 
@@ -640,10 +642,8 @@ NumericVector utility_rcpp(DataFrame data,
     // pedestrians is defined and, if so, compute the utility.
     NumericVector V_id(rows * cols);
     for(int i = 0; i < V_id.length(); i++) {
-        if(check[i]) {
-            V_id[i] = 0;
-        } else {
-            V_id[i] = -1 * arma::datum::inf;
+        if(!check[i]) {
+            V_id[i] -= arma::datum::inf;
         }
     }
 
@@ -726,15 +726,12 @@ NumericVector utility_rcpp(DataFrame data,
     // the first place and, if so, compute the utility
     List gc_distance = data["gc_distance"];
     if(!(gc_distance[0] == R_NilValue)) {
-        NumericVector distances = gc_distance[0];
-        double stop_utility = parameters["stop_utility"];
-
         V += gc_utility_rcpp(
             parameters["a_group_centroid"],
             parameters["b_group_centroid"],
             data["gc_radius"],
-            distances,
-            -1 * stop_utility,
+            gc_distance[0],
+            stop_utility,
             data["gc_nped"]
         );
     }
@@ -743,11 +740,9 @@ NumericVector utility_rcpp(DataFrame data,
     // so, compute the utility
     List vf_angles_list = data["vf_angles"];
     if(!(vf_angles_list[0] == R_NilValue)) {
-        NumericVector vf_angles = vf_angles_list[0];
-
         V += vf_utility_rcpp(
             parameters["b_visual_field"],
-            vf_angles
+            vf_angles_list[0]
         );
     }
 
@@ -757,13 +752,9 @@ NumericVector utility_rcpp(DataFrame data,
 
     // Add the stopping utility to the vector and transform them according to the 
     // randomness parameter
-    double stop_utility = parameters["stop_utility"];
     double randomness = parameters["randomness"];
-
-    V.insert(V.begin(), -1 * stop_utility);
-    for(int i = 0; i < V.length(); i++) {
-        V[i] = V[i] / randomness;
-    }
+    V.insert(V.begin(), stop_utility);
+    V = V / randomness;
 
     return V;    
 }

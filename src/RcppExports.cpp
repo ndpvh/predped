@@ -368,14 +368,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // utility_rcpp
-NumericVector utility_rcpp(DataFrame data, DataFrame parameters);
-RcppExport SEXP _predped_utility_rcpp(SEXP dataSEXP, SEXP parametersSEXP) {
+NumericVector utility_rcpp(DataFrame Data, DataFrame parameters);
+RcppExport SEXP _predped_utility_rcpp(SEXP DataSEXP, SEXP parametersSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type Data(DataSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type parameters(parametersSEXP);
-    rcpp_result_gen = Rcpp::wrap(utility_rcpp(data, parameters));
+    rcpp_result_gen = Rcpp::wrap(utility_rcpp(Data, parameters));
     return rcpp_result_gen;
 END_RCPP
 }

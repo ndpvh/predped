@@ -51,37 +51,40 @@ NumericVector mll_rcpp(DataFrame data,
 
     // Create an index saying which data belong to which participant
     CharacterVector id_column = data["id"];
-    
+    IntegerVector cells = data["cell"];
+
     // Loop over each row and do the actual computations
     NumericVector MLL(ids.length());
+    NumericVector V(34);
+    double P = 0;
+
+    DataFrame data_i = subset(data, 0, R_MissingArg);
+    DataFrame params_i = subset(parameters, 0, R_MissingArg);
+
+    int idx = 0;
     for(int i = 0; i < data.nrow(); i++) {
         // Get the index of the person who corresponds to the data
-        int idx = 0;
         for(int j = 0; j < ids.length(); j++) {
             if(id_column[i] == ids[j]) {
                 idx = j;
+                break;
             }
         }
 
         // Compute the utility of the data under the parameters of the person.
         // Note that we need to transform the indices to +1 because we are using
         // an R function for subsetting rather than an Rcpp function.
-        DataFrame data_i = subset(data, i + 1, R_MissingArg);
-        DataFrame params_i = subset(parameters, idx + 1, R_MissingArg);
-        
-        NumericVector V = utility_rcpp(
-            data_i, 
-            params_i
+        V = utility_rcpp(
+            subset(data, i + 1, R_MissingArg), 
+            subset(parameters, idx + 1, R_MissingArg)
         );
 
         // Transform V to probabilities and afterwards to the min-log-likelihood.
         // Add the value of this likelihood to the MLL vector.
-        V = V - *std::max_element(V.begin(), V.end());
-        V = Rcpp::exp(V);
-        NumericVector P = V / Rcpp::sum(V);
+        V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
+        P = V[cells[i]] / Rcpp::sum(V);
         
-        int cell = data_i["cell"];
-        MLL[idx] -= log(1 + P[cell]);
+        MLL[idx] -= log(1 + P);
     }
 
     MLL.attr("names") = ids;
