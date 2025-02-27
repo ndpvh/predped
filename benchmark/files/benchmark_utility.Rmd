@@ -69,7 +69,8 @@ tbl |>
 
 # Read in the data used in the tests and only retain the first instance with 
 # all of the utility variables defined (row 10)
-data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
+# data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
+data <- readRDS(file.path("tests", "testthat", "data", "data_utility.Rds"))
 data <- data[10, ]
 
 # Get the parameters of the SocialBaselineEuropean
@@ -92,7 +93,7 @@ rcpp_data <- (\() benchmark_function(cpp = TRUE)) |>
     rnd()
 
 ################################################################################
-# data.frame
+# trace
 
 # Read in the data used in the tests and only retain the first instance with 
 # all of the utility variables defined (row 10)
