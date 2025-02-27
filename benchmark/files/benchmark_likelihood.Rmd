@@ -7,8 +7,6 @@
 # Read in the data to be used for the mll. Consists of one person with 2500 
 # samples.
 data <- readRDS(file.path("..", "tests", "testthat", "data", "data_mll_benchmark.Rds"))
-
-data <- readRDS(file.path("tests", "testthat", "data", "data_mll_benchmark.Rds"))
 data <- data[data$id == "eqdyv", ]
 data <- data[1:100, ]
 

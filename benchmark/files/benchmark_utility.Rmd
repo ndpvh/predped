@@ -17,7 +17,7 @@ check <- matrix(TRUE, nrow = 11, ncol = 3)
 
 # Compute the utility variables
 benchmark_function <- function(cpp) {
-    for(i in 1:100) {
+    for(i in 1:1000) {
         dummy <- predped::compute_utility_variables(
             state_i@agents[[3]],
             state_i, 
@@ -44,7 +44,7 @@ tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
 rownames(tbl) <- NULL
 colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
 
-caption <- paste0("Benchmark for the compute_utility_variables function. ",
+caption <- paste0("Benchmark for the compute\\_utility\\_variables function. ",
                   "In this benchmark, we repeat the function call 100 times. ",
                   "Comparison is made between using the R version (cpp = FALSE) ",
                   "or the Rcpp version of the function (cpp = TRUE).")
@@ -69,8 +69,7 @@ tbl |>
 
 # Read in the data used in the tests and only retain the first instance with 
 # all of the utility variables defined (row 10)
-# data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
-data <- readRDS(file.path("tests", "testthat", "data", "data_utility.Rds"))
+data <- readRDS(file.path("..", "tests", "testthat", "data", "data_utility.Rds"))
 data <- data[10, ]
 
 # Get the parameters of the SocialBaselineEuropean
@@ -99,6 +98,7 @@ rcpp_data <- (\() benchmark_function(cpp = TRUE)) |>
 # all of the utility variables defined (row 10)
 trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_utility.Rds"))
 state_i <- trace[[10]]
+agent_i <- state_i@agents[[2]]
 
 # Create agent specifications in the same way as done in simulate
 agent_specs <- predped::create_agent_specifications(state_i@agents)
@@ -164,8 +164,8 @@ caption <- paste0("Benchmark for the utility function. ",
                   "used. ",
                   "Comparison is made between using the R version (cpp = FALSE) ",
                   "or the Rcpp version of the function (cpp = TRUE). ",
-                  "Additionally, distinction made between calling `utility` with ",
-                  "the argument `agent` (computation of utility variables should ",
+                  "Additionally, distinction made between calling utility with ",
+                  "the argument agent (computation of utility variables should ",
                   "still be done) or with a data.frame (this computation has ",
                   "been done before).")
 
