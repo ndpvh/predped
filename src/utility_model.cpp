@@ -46,9 +46,9 @@ using namespace Rcpp;
 //'
 //' @export 
 // [[Rcpp::export]]
-Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions, 
-                                                     NumericMatrix centers, 
-                                                     int number_agents) {
+RObject distance_group_centroid_rcpp(NumericMatrix predictions, 
+                                     NumericMatrix centers, 
+                                     int number_agents) {
    
     // First need to identify whether a pedestrian belongs to a social group    
     if(number_agents == 0) {
@@ -96,13 +96,13 @@ Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions,
 //' 
 //' @export 
 // [[Rcpp::export]]
-Nullable<NumericVector> get_angles_rcpp(int agent_idx, 
-                                        NumericVector agent_groups, 
-                                        NumericVector position, 
-                                        double orientation,  
-                                        NumericMatrix predictions, 
-                                        NumericMatrix centers,
-                                        bool any_member = true) {
+RObject get_angles_rcpp(int agent_idx, 
+                        NumericVector agent_groups, 
+                        NumericVector position, 
+                        double orientation,  
+                        NumericMatrix predictions, 
+                        NumericMatrix centers,
+                        bool any_member = true) {
     
     // First need to identify whether a pedestrian belongs to a social group
     int nped = predictions.nrow();
@@ -239,7 +239,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // Interpersonal distance utility: Required variable is the distance between 
     // agent and other agents, and whether these agents are part of the ingroup, 
     // and whether the distances are all positive.
-    Nullable<NumericMatrix> id_distance = predClose(
+    RObject id_distance = predClose(
         agent_idx,
         agent_center,
         agent.slot("orientation"),
@@ -254,7 +254,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // list that will hold either the NULL or the resulting matrix, allowing 
     // us to differentiate between both cases in an easy way.
     LogicalMatrix id_check = check;
-    List list_id_distance = List::create(id_distance);
+    List list_id_distance = List::create(R_NilValue);
 
     LogicalVector id_ingroup(0);
     if(!(id_distance == R_NilValue)) {
@@ -352,7 +352,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // Follow the leader utility: Required variable is the potential leaders and 
     // their distances. This is all outputted in a list by getLeaders_rcpp, which
     // is why we just append it to the data.frame directly
-    Nullable<List> fl_leaders = getLeaders(
+    RObject fl_leaders = getLeaders(
         agent_idx,
         agent_specifications["position"],
         agent_specifications["orientation"],
@@ -366,7 +366,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
     // Walking besides utility: Required variable is the potential buddies that 
     // you can walk besides. A similar reasoning to follow the leader is applied 
     // here.
-    Nullable<List> wb_buddies = getBuddy(
+    RObject wb_buddies = getBuddy(
         agent_idx,
         agent_specifications["position"],
         agent_specifications["speed"],
@@ -396,7 +396,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         }
     }
 
-    Nullable<NumericVector> gc_distance = distance_group_centroid_rcpp(
+    RObject gc_distance = distance_group_centroid_rcpp(
         predictions_ingroup,
         centers,
         predictions_ingroup.nrow()
@@ -407,7 +407,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
 
     // Visual field utility: Required variable is the angle of one or more 
     // other pedestrians.
-    Nullable<NumericVector> vf_angles = get_angles_rcpp(
+    RObject vf_angles = get_angles_rcpp(
         agent_idx, 
         agent_specifications["group"],
         agent.slot("center"),
@@ -588,14 +588,12 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' @rdname utility_rcpp
 //' 
 // [[Rcpp::export]]
-NumericVector utility_rcpp(DataFrame Data, 
+NumericVector utility_rcpp(DataFrame data, 
                            DataFrame parameters) {
 
     // Create an empty vector of the same size as needed for the computation
-    Rcpp::List data = Data;
-
-    Rcpp::List check_list = data["check"];
-    Rcpp::LogicalMatrix check = check_list[0];
+    List check_list = data["check"];
+    LogicalMatrix check = check_list[0];
     int rows = check.nrow();
     int cols = check.ncol();
 
@@ -613,8 +611,8 @@ NumericVector utility_rcpp(DataFrame Data,
             parameters["b_preferred_speed"], 
             parameters["preferred_speed"], 
             parameters["slowing_time"], 
-            data["ps_speed"], 
-            data["ps_distance"]
+            as<NumericVector>(data["ps_speed"]), 
+            as<NumericVector>(data["ps_distance"])
         );
     }
 
@@ -626,7 +624,7 @@ NumericVector utility_rcpp(DataFrame Data,
         V += gaUtility(
             parameters["b_goal_direction"], 
             parameters["a_goal_direction"], 
-            gd_angle[0]
+            as<NumericVector>(gd_angle[0])
         );
     }
 
@@ -656,9 +654,9 @@ NumericVector utility_rcpp(DataFrame Data,
             parameters["b_interpersonal"], 
             parameters["d_interpersonal"], 
             parameters["a_interpersonal"], 
-            id_ingroup[0], 
-            id_check[0],
-            id_distance[0], 
+            as<LogicalVector>(id_ingroup[0]), 
+            as<LogicalMatrix>(id_check[0]),
+            as<NumericMatrix>(id_distance[0]), 
             V_id
         );
     } else {
@@ -672,10 +670,10 @@ NumericVector utility_rcpp(DataFrame Data,
         // Retrieve the numbers of the cones that could be blocked on the long 
         // term. Additionally, make sure that all angles are either equal to 
         // or greater than 0.
-        NumericVector ba_angle = ba_angle_list[0];
+        NumericVector ba_angle = as<NumericVector>(ba_angle_list[0]);
 
         List ba_cones_list = data["ba_cones"];
-        IntegerVector ba_cones = ba_cones_list[0];
+        IntegerVector ba_cones = as<IntegerVector>(ba_cones_list[0]);
 
         // Adjust the index of the cones so that it corresponds to C++ instead
         // of R. Additionally make sure angles are either 0 or greater than 0.
@@ -697,7 +695,7 @@ NumericVector utility_rcpp(DataFrame Data,
     // place and, if so, compute the utility
     List fl_leaders_list = data["fl_leaders"];
     if(!(fl_leaders_list[0] == R_NilValue)) {
-        List fl_leaders = fl_leaders_list[0];
+        List fl_leaders = as<List>(fl_leaders_list[0]);
 
         V += flUtility(
             parameters["a_leader"], 
@@ -712,7 +710,7 @@ NumericVector utility_rcpp(DataFrame Data,
     // compute the utility
     List wb_buddies_list = data["wb_buddies"];
     if(!(wb_buddies_list[0] == R_NilValue)) {
-        List wb_buddies = wb_buddies_list[0];
+        List wb_buddies = as<List>(wb_buddies_list[0]);
 
         V += wbUtility(
             parameters["a_buddy"], 
@@ -730,7 +728,7 @@ NumericVector utility_rcpp(DataFrame Data,
             parameters["a_group_centroid"],
             parameters["b_group_centroid"],
             data["gc_radius"],
-            gc_distance[0],
+            as<NumericVector>(gc_distance[0]),
             stop_utility,
             data["gc_nped"]
         );
@@ -742,7 +740,7 @@ NumericVector utility_rcpp(DataFrame Data,
     if(!(vf_angles_list[0] == R_NilValue)) {
         V += vf_utility_rcpp(
             parameters["b_visual_field"],
-            vf_angles_list[0]
+            as<NumericVector>(vf_angles_list[0])
         );
     }
 

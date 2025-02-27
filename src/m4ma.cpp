@@ -133,17 +133,17 @@ NumericMatrix destinationAngle(double orientation,
 } 
 
 // [[Rcpp::export]] 
-Nullable<NumericMatrix> predClose(int agent_idx,
-                                  NumericMatrix agent_position,
-                                  double orientation,
-                                  NumericMatrix others_position,
-                                  NumericVector radius,
-                                  NumericMatrix centers,
-                                  NumericMatrix predicted_positions,
-                                  List objects) {
+RObject predClose(int agent_idx,
+                  NumericMatrix agent_position,
+                  double orientation,
+                  NumericMatrix others_position,
+                  NumericVector radius,
+                  NumericMatrix centers,
+                  NumericMatrix predicted_positions,
+                  List objects) {
     
     Function f = m4ma["predClose_rcpp"];
-    return f(
+    Nullable<NumericMatrix> result = f(
         agent_idx,
         agent_position,
         orientation,
@@ -153,6 +153,8 @@ Nullable<NumericMatrix> predClose(int agent_idx,
         predicted_positions,
         objects
     );
+
+    return RObject(result);
 }
 
 // [[Rcpp::export]] 
@@ -174,17 +176,17 @@ NumericVector blockedAngle(NumericMatrix agent_position,
     );
 }
 
-Nullable<List> getLeaders(int agent_idx,
-                          NumericMatrix positions,
-                          NumericVector orientations,
-                          NumericVector speeds,
-                          NumericMatrix goal_position,
-                          NumericVector groups,
-                          NumericMatrix centers,
-                          List objects) {
+RObject getLeaders(int agent_idx,
+                   NumericMatrix positions,
+                   NumericVector orientations,
+                   NumericVector speeds,
+                   NumericMatrix goal_position,
+                   NumericVector groups,
+                   NumericMatrix centers,
+                   List objects) {
     
     Function f = m4ma["getLeaders_rcpp"];
-    return f(
+    Nullable<List> result = f(
         agent_idx,
         positions,
         orientations,
@@ -194,20 +196,22 @@ Nullable<List> getLeaders(int agent_idx,
         centers,
         objects
     );
+
+    return RObject(result);
 }
 
-Nullable<List> getBuddy(int agent_idx,
-                        NumericMatrix positions,
-                        NumericVector speeds,
-                        NumericVector groups,
-                        NumericVector orientations,
-                        NumericMatrix predictions,
-                        NumericMatrix centers,
-                        List objects,
-                        bool pickBest) {
+RObject getBuddy(int agent_idx,
+                 NumericMatrix positions,
+                 NumericVector speeds,
+                 NumericVector groups,
+                 NumericVector orientations,
+                 NumericMatrix predictions,
+                 NumericMatrix centers,
+                 List objects,
+                 bool pickBest) {
     
     Function f = m4ma["getBuddy_rcpp"];
-    return f(
+    Nullable<List> result = f(
         agent_idx,
         positions,
         speeds,
@@ -218,6 +222,8 @@ Nullable<List> getBuddy(int agent_idx,
         objects,
         pickBest
     );
+
+    return RObject(result);
 }
 
 NumericVector dist1(NumericVector position, 

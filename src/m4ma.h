@@ -62,7 +62,7 @@ Rcpp::NumericMatrix destinationAngle(
     Rcpp::NumericMatrix goal_position
 );
 
-Rcpp::Nullable<Rcpp::NumericMatrix> predClose(
+Rcpp::RObject predClose(
     int agent_idx,
     Rcpp::NumericMatrix agent_position,
     double orientation,
@@ -82,7 +82,7 @@ Rcpp::NumericVector blockedAngle(
     Rcpp::List objects
 );
 
-Rcpp::Nullable<Rcpp::List> getLeaders(
+Rcpp::RObject getLeaders(
     int agent_idx,
     Rcpp::NumericMatrix positions,
     Rcpp::NumericVector orientations,
@@ -93,7 +93,7 @@ Rcpp::Nullable<Rcpp::List> getLeaders(
     Rcpp::List objects
 );
 
-Rcpp::Nullable<Rcpp::List> getBuddy(
+Rcpp::RObject getBuddy(
     int agent_idx,
     Rcpp::NumericMatrix positions,
     Rcpp::NumericVector speeds,

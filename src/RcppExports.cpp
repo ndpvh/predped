@@ -179,7 +179,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // predClose
-Nullable<NumericMatrix> predClose(int agent_idx, NumericMatrix agent_position, double orientation, NumericMatrix others_position, NumericVector radius, NumericMatrix centers, NumericMatrix predicted_positions, List objects);
+RObject predClose(int agent_idx, NumericMatrix agent_position, double orientation, NumericMatrix others_position, NumericVector radius, NumericMatrix centers, NumericMatrix predicted_positions, List objects);
 RcppExport SEXP _predped_predClose(SEXP agent_idxSEXP, SEXP agent_positionSEXP, SEXP orientationSEXP, SEXP others_positionSEXP, SEXP radiusSEXP, SEXP centersSEXP, SEXP predicted_positionsSEXP, SEXP objectsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -294,7 +294,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // distance_group_centroid_rcpp
-Nullable<NumericVector> distance_group_centroid_rcpp(NumericMatrix predictions, NumericMatrix centers, int number_agents);
+RObject distance_group_centroid_rcpp(NumericMatrix predictions, NumericMatrix centers, int number_agents);
 RcppExport SEXP _predped_distance_group_centroid_rcpp(SEXP predictionsSEXP, SEXP centersSEXP, SEXP number_agentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -307,7 +307,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // get_angles_rcpp
-Nullable<NumericVector> get_angles_rcpp(int agent_idx, NumericVector agent_groups, NumericVector position, double orientation, NumericMatrix predictions, NumericMatrix centers, bool any_member);
+RObject get_angles_rcpp(int agent_idx, NumericVector agent_groups, NumericVector position, double orientation, NumericMatrix predictions, NumericMatrix centers, bool any_member);
 RcppExport SEXP _predped_get_angles_rcpp(SEXP agent_idxSEXP, SEXP agent_groupsSEXP, SEXP positionSEXP, SEXP orientationSEXP, SEXP predictionsSEXP, SEXP centersSEXP, SEXP any_memberSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -368,14 +368,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // utility_rcpp
-NumericVector utility_rcpp(DataFrame Data, DataFrame parameters);
-RcppExport SEXP _predped_utility_rcpp(SEXP DataSEXP, SEXP parametersSEXP) {
+NumericVector utility_rcpp(DataFrame data, DataFrame parameters);
+RcppExport SEXP _predped_utility_rcpp(SEXP dataSEXP, SEXP parametersSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type Data(DataSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type data(dataSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type parameters(parametersSEXP);
-    rcpp_result_gen = Rcpp::wrap(utility_rcpp(Data, parameters));
+    rcpp_result_gen = Rcpp::wrap(utility_rcpp(data, parameters));
     return rcpp_result_gen;
 END_RCPP
 }

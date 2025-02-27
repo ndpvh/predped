@@ -643,8 +643,8 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' 
 #' @rdname utility_rcpp
 #' 
-utility_rcpp <- function(Data, parameters) {
-    .Call('_predped_utility_rcpp', PACKAGE = 'predped', Data, parameters)
+utility_rcpp <- function(data, parameters) {
+    .Call('_predped_utility_rcpp', PACKAGE = 'predped', data, parameters)
 }
 
 #' Utility
