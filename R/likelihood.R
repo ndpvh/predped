@@ -1,7 +1,3 @@
-likelihood_dummy <- agent(center = c(0, 0), radius = 1)
-likelihood_dummy <- parameters(likelihood_dummy)
-likelihood_dummy[1, ] <- 0
-
 #' Compute the min-log-likelihood
 #' 
 #' Use data to compute the min-log-likelihood of choosing a given observed cell  
@@ -32,14 +28,13 @@ likelihood_dummy[1, ] <- 0
 #' 
 #' @return Min-log-likelihood per person in the dataset.
 #' 
-#' @
-#' 
 #' @export 
 mll <- function(data, 
                 parameters,
-                parameter_names = colnames(likelihood_dummy)[-c(1, 2)],
+                parameter_names = colnames(params_from_csv[["params_archetypes"]])[-c(1, 2)],
                 transform = TRUE,
                 bounds = params_from_csv[["params_bounds"]],
+                cpp = TRUE,
                 ...) {
 
     # Check whether the utility variables are in there. Just checked for one and 
@@ -60,13 +55,30 @@ mll <- function(data,
     # Retrieve each person's identifier
     ids <- unique(data$id)
 
-    # Check whether the provided parameters conform to matrix format. If not, 
-    # transform
-    if(!is.matrix(parameters)) {
+    # Check whether the provided parameters conform to data.frame format. If not, 
+    # transform.
+    #
+    # Two cases: Either parameters is a vector or a matrix (first case), or 
+    # parameters is a dataframe of insufficient length. Ensure they fit the bill
+    # or the Rcpp code will throw errors
+    if(is.null(dim(parameters)) | is.matrix(parameters)) {
         parameters <- matrix(parameters, 
                              nrow = length(ids),
                              ncol = length(parameters),
-                             byrow = TRUE)
+                             byrow = TRUE) |>
+            as.data.frame() |>
+            setNames(parameter_names)
+
+    } else if(is.data.frame(parameters) & nrow(parameters) < length(ids)) {
+        idx <- rep_len(1:nrow(parameters), length(ids))
+        parameters <- parameters[idx, ]
+    }
+
+    if(cpp) {
+        return(mll_rcpp(data, 
+                        parameters, 
+                        names(parameters), 
+                        ids))
     }
 
     # For each agent, loop over the unique participant id's 
@@ -75,14 +87,11 @@ mll <- function(data,
                       # Select the data for which the utilities should be computed
                       selection <- data[data$id == ids[i], ]
   
-                      # Adjust the parameters to those that were provided
-                      likelihood_dummy[, parameter_names] <- parameters[i, ]
-  
                       # Get the utilities for each cell based on the provided 
                       # results
                       L <- sapply(1:nrow(selection), 
                                   function(j) {
-                                      V <- utility(selection[j, ], likelihood_dummy)
+                                      V <- utility(selection[j, ], parameters[i, ], cpp = FALSE)
 
                                       V <- V - max(V)
                                       exp_V <- exp(V)

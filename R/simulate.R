@@ -444,6 +444,9 @@ setMethod("simulate", "predped", function(object,
 #' current iteration in the simulation & the number of agents present 
 #' at the current iteration in the simulation. Defaults to 1, which
 #' represents each iteration to be reported.
+#' @param cpp Logical denoting whether to use the Rcpp alternatives for several
+#' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+#' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
 #' \code{plot_live = TRUE}).
 #'
@@ -532,6 +535,7 @@ setMethod("simulate", "state", function(object,
                                         middle_edge = FALSE,
                                         position = NULL,
                                         individual_differences = FALSE,
+                                        cpp = TRUE,
                                         ...) {
 
     # Retrieve and update the iteration number in the state
@@ -608,7 +612,8 @@ setMethod("simulate", "state", function(object,
                      report = report,
                      velocities = velocities,
                      orientations = orientations,
-                     print_iteration = print_iteration)
+                     print_iteration = print_iteration,
+                     cpp = cpp)
 
     # Check whether one of the pedestrians is waiting at the exit and delete them
     # from the agent-list

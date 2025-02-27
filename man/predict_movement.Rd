@@ -4,7 +4,7 @@
 \alias{predict_movement}
 \title{Predict agents' movement}
 \usage{
-predict_movement(agent, stay_stopped = TRUE, time_step = 0.5)
+predict_movement(agent, stay_stopped = TRUE, time_step = 0.5, cpp = TRUE)
 }
 \arguments{
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
@@ -15,6 +15,10 @@ to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative of this 
+function (\code{TRUE}) or the R alternative (\code{FALSE}). Defaults to 
+\code{TRUE}.}
 }
 \value{
 Numeric matrix containing the predicted positions all agents if 

@@ -11,7 +11,8 @@
   background,
   agent_specifications,
   centers,
-  check
+  check,
+  cpp = TRUE
 )
 
 \S4method{compute_utility_variables}{data.frame}(object, background)
@@ -34,6 +35,9 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Data.frame containing all of the needed variables to be able to 

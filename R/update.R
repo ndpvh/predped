@@ -16,6 +16,9 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
+#' @param cpp Logical denoting whether to use the Rcpp alternatives for several
+#' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+#' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' @param ... Additional arguments passed to \code{\link[predped]{update-agent}}.
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}.
@@ -34,6 +37,7 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 setMethod("update", "state", function(object,
                                       time_step = 0.5,
                                       stay_stopped = TRUE, 
+                                      cpp = TRUE,
                                       ...) {
 
     # Extract the components of the state
@@ -45,7 +49,8 @@ setMethod("update", "state", function(object,
     # exponentially with more agents)
     agent_specs <- create_agent_specifications(agent_list, 
                                                stay_stopped = stay_stopped, 
-                                               time_step = time_step)
+                                               time_step = time_step,
+                                               cpp = cpp)
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
@@ -62,6 +67,7 @@ setMethod("update", "state", function(object,
                                   state_copy,
                                   background,
                                   agent_specs,
+                                  cpp = cpp,
                                   ...)
     }
 
@@ -122,6 +128,9 @@ setMethod("update", "state", function(object,
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
 #' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
+#' @param cpp Logical denoting whether to use the Rcpp alternatives for several
+#' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+#' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -155,7 +164,8 @@ setMethod("update", "agent", function(object,
                                       standing_start = 0.1,
                                       time_step = 0.5,
                                       report = FALSE,
-                                      print_iteration = FALSE) {
+                                      print_iteration = FALSE,
+                                      cpp = TRUE) {
 
     # Update the goals of the agent
     object <- update_goal(object, 
@@ -167,7 +177,8 @@ setMethod("update", "agent", function(object,
                           precomputed_edges = precomputed_edges,
                           many_nodes = many_nodes,
                           report = report,
-                          print_iteration = print_iteration) 
+                          print_iteration = print_iteration,
+                          cpp = cpp) 
 
     # Update the position of the agent
     object <- update_position(object, 
@@ -179,7 +190,8 @@ setMethod("update", "agent", function(object,
                               standing_start = standing_start,
                               time_step = time_step,
                               report = report,
-                              print_iteration = print_iteration) 
+                              print_iteration = print_iteration,
+                              cpp = cpp) 
     
     return(object)
 })
@@ -217,6 +229,9 @@ setMethod("update", "agent", function(object,
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
 #' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
+#' @param cpp Logical denoting whether to use the Rcpp alternatives for several
+#' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+#' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -255,7 +270,8 @@ update_position <- function(agent,
                             standing_start = 0.1,
                             time_step = 0.5,
                             report = TRUE,
-                            print_iteration = TRUE) {
+                            print_iteration = TRUE,
+                            cpp = TRUE) {
 
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
@@ -280,7 +296,8 @@ update_position <- function(agent,
                                          background,
                                          agent_specifications, 
                                          velocities, 
-                                         orientations)
+                                         orientations,
+                                         cpp = cpp)
 
         # Report the degress that the agent is reorienting to
         turn <- paste("towards", orientation(agent), "degrees")
@@ -332,7 +349,8 @@ update_position <- function(agent,
                      background, 
                      agent_specifications, 
                      centers, 
-                     check)
+                     check,
+                     cpp = cpp)
 
         # Check whether you have only infinite moving options. Delete the baseline
         # (cell 0) utility from this list and invoke that they should reorient.
@@ -430,6 +448,9 @@ update_position <- function(agent,
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
 #' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
+#' @param cpp Logical denoting whether to use the Rcpp alternatives for several
+#' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+#' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
@@ -463,7 +484,8 @@ update_goal <- function(agent,
                         precomputed_edges = NULL,
                         many_nodes = !is.null(precomputed_edges),
                         report = FALSE,
-                        print_iteration = FALSE) {  
+                        print_iteration = FALSE,
+                        cpp = TRUE) {  
 
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
@@ -818,6 +840,9 @@ update_goal <- function(agent,
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param cpp Logical denoting whether to use the Rcpp alternative of this 
+#' function (\code{TRUE}) or the R alternative (\code{FALSE}). Defaults to 
+#' \code{TRUE}.
 #' 
 #' @return Numeric matrix containing the predicted positions all agents if 
 #' they all maintain their speed and direction.
@@ -834,7 +859,14 @@ update_goal <- function(agent,
 #' @export
 predict_movement <- function(agent, 
                              stay_stopped = TRUE,
-                             time_step = 0.5) {
+                             time_step = 0.5,
+                             cpp = TRUE) {
+
+    if(cpp) {
+        return(predict_movement_rcpp(agent, 
+                                     stay_stopped,
+                                     time_step))
+    }
     
     # Compute the coordinate where the agents will end up when moving at the 
     # same speed in the same direction. Different when an agent is currently 
@@ -880,7 +912,12 @@ predict_movement <- function(agent,
 #' @export
 create_agent_specifications <- function(agent_list,
                                         stay_stopped = TRUE, 
-                                        time_step = 0.5) {
+                                        time_step = 0.5,
+                                        cpp = TRUE) {
+
+    if(cpp) {
+        return(create_agent_specifications_rcpp(agent_list, stay_stopped, time_step))
+    }
     
     # Predict where the agents will be at their current velocity and angle. Is 
     # used by other agents to change their own directions in order to avoid 
@@ -888,16 +925,11 @@ create_agent_specifications <- function(agent_list,
     #
     # In order for this to work with m4ma, we need to transform it to a matrix 
     # and provide it rownames that are equal to the id's of the agents
-    # agent_predictions <- lapply(agent_list, 
-    #                             \(x) predict_movement(x, 
-    #                                                   stay_stopped = stay_stopped,
-    #                                                   time_step = time_step))
-    # agent_predictions <- sapply(agent_predictions, \(x) x) |>
-    #     t()
     agent_predictions <- sapply(agent_list, 
                                 \(x) predict_movement(x, 
                                                       stay_stopped = stay_stopped,
-                                                      time_step = time_step)) |>
+                                                      time_step = time_step,
+                                                      cpp = cpp)) |>
         t()
 
     # Make the object-based arguments of predped compatible with the information

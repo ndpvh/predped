@@ -36,6 +36,8 @@
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #'
 #' @return Logical matrix containing availabilities of the centers.
 #' 
@@ -93,7 +95,13 @@ setGeneric("moving_options", function(object, ...) standardGeneric("moving_optio
 setMethod("moving_options", "agent", function(object, 
                                               state, 
                                               background, 
-                                              centers){
+                                              centers,
+                                              cpp = TRUE){
+
+    # If the user wants to use the cpp version, allow them to do so
+    if(cpp) {
+        return(moving_options_rcpp(object, state, background, centers))
+    }
 
     # Add the other agents to the background objects. This will allow us to 
     # immediately test whether cells are occupied by other agents instead of 
@@ -113,7 +121,8 @@ setMethod("moving_options", "agent", function(object,
     # issues
     if(!all(!check)){
         # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
-        check <- overlap_with_objects(object, background, centers, check)
+        check <- overlap_with_objects(object, background, centers, check, cpp = FALSE)
+        # check <- bodyObjectOK(size(object), centers, objects(background), as.vector(check))
 
         # If something blocks the way in the previous column, then it should also 
         # block the way on the columns
@@ -135,12 +144,18 @@ setMethod("moving_options", "agent", function(object,
         goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
+        
         local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
 
         # Here, change `check` based on the results of the function. Importantly,
         # agent should still move even if it cannot see their goal (hence the
         # if-statement), otherwise the agent will get stuck
         check <- if(!all(!local_check)) local_check else !opposite_check
+    }
+
+    # Make sure check is always in matrix format
+    if(!is.matrix(check)) {
+        check <- matrix(check, ncol = 3)
     }
 
     # Finally, return the cells that are free to move to
@@ -327,6 +342,8 @@ agents_between_goal <- function(agent,
 #' @param space_between Numeric denoting the space to leave between the nodes 
 #' put on the circumference of the objects in the space (used for checking the
 #' overlap with an agent). Defaults to \code{0.05} or 5cm.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Logical matrix containing availabilities of the centers (\code{TRUE}
 #' if available, \code{FALSE} if not).
@@ -374,11 +391,17 @@ overlap_with_objects <- function(agent,
                                  background, 
                                  centers, 
                                  check,
-                                 space_between = 5e-2) {
+                                 space_between = 5e-2,
+                                 cpp = FALSE) {
     
     # If the centers are not provided, return an empty logical
     if(length(centers) == 0) {
         return(logical(0))
+    }
+
+    # If you want to use the cpp version. Allow the person to do so
+    if(cpp) {
+        return(overlap_with_objects_rcpp(agent, background, centers, check, space_between))
     }
 
     # Transform all background-objects into one big matrix of segments. This will
@@ -439,8 +462,10 @@ overlap_with_objects <- function(agent,
     }
 
     if(is.null(ncol(check))) {
-        return(!(rowSums(local_check) > 0))
+        result <- (!(rowSums(local_check) > 0))
     } else {
-        return(matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
+        result <- (matrix(!(rowSums(local_check) > 0), ncol = ncol(check)))
     }
+
+    return(result)
 }

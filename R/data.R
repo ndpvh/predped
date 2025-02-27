@@ -15,7 +15,12 @@
 #' 
 #' @export
 time_series <- function(x, 
-                        time_step = 0.5) {
+                        time_step = 0.5,
+                        cpp = TRUE) {
+
+    if(cpp) {
+        return(time_series_rcpp(x, time_step))
+    }
 
     # Create a function that will extract all details of the agents from a 
     # particular state.
@@ -91,7 +96,17 @@ unpack_trace <- function(x,
                              rep(times = 3) |>
                              matrix(ncol = 3),
                          stay_stopped = TRUE,
-                         time_step = 0.5) {
+                         time_step = 0.5,
+                         cpp = TRUE) {
+
+    # If Rcpp alternative requested, then let them use it
+    if(cpp) {
+        return(unpack_trace_rcpp(x, 
+                                 velocities,
+                                 orientations,
+                                 stay_stopped,
+                                 time_step))
+    }
 
     # Create a function that will extract all details of the agents from a 
     # particular state.
@@ -99,7 +114,8 @@ unpack_trace <- function(x,
         # Create the agent-specifications for this state
         agent_specifications <- create_agent_specifications(y@agents, 
                                                             stay_stopped = stay_stopped, 
-                                                            time_step = time_step)
+                                                            time_step = time_step,
+                                                            cpp = FALSE)
 
         # Loop over all of the agents and create their own row in the dataframe.
         # This will consist of all variables included in the time_series function
@@ -142,6 +158,7 @@ unpack_trace <- function(x,
                                                             id_check = NA,
                                                             id_ingroup = NA,
                                                             ba_angle = NA,
+                                                            ba_cones = NA,
                                                             fl_leaders = NA,
                                                             wb_buddies = NA,
                                                             gc_distance = NA,
@@ -170,7 +187,8 @@ unpack_trace <- function(x,
                             check <- moving_options(a, 
                                                     agent_state, 
                                                     agent_state@setting, 
-                                                    centers)
+                                                    centers,
+                                                    cpp = FALSE)
                             
                             # Compute the utility variables for this agent under the
                             # current state                            
@@ -179,7 +197,8 @@ unpack_trace <- function(x,
                                                                            y@setting,
                                                                            agent_specifications,
                                                                            centers,                    
-                                                                           check)
+                                                                           check,
+                                                                           cpp = FALSE)
                         }
     
                         # Bind them all together in one dataframe and return 

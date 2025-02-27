@@ -315,26 +315,49 @@ obj <- list(predped:::rectangle(center = c(1, 2), size = c(1, 1)),
             predped:::polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1)))) 
 
 # Test
-r <- (\() predped:::nodes_on_circumference(obj[[1]])) |>
+r_r <- (\() predped:::nodes_on_circumference(obj[[1]], cpp = FALSE)) |>
     test_times() |>
     rnd() 
-c <- (\() predped:::nodes_on_circumference(obj[[2]])) |>
+c_r <- (\() predped:::nodes_on_circumference(obj[[2]], cpp = FALSE)) |>
     test_times() |>
     rnd() 
-p <- (\() predped:::nodes_on_circumference(obj[[3]])) |>
+p_r <- (\() predped:::nodes_on_circumference(obj[[3]], cpp = FALSE)) |>
+    test_times() |>
+    rnd() 
+
+r_rcpp <- (\() predped:::nodes_on_circumference(obj[[1]], cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+c_rcpp <- (\() predped:::nodes_on_circumference(obj[[2]], cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+p_rcpp <- (\() predped:::nodes_on_circumference(obj[[3]], cpp = TRUE)) |>
     test_times() |>
     rnd() 
 
 # Create the table
-tbl <- c(r[2], c(paste0("[", r[1], ",", r[3], "]")), 
-         p[2], c(paste0("[", p[1], ",", p[3], "]")), 
-         c[2], c(paste0("[", c[1], ",", c[3], "]"))) |>
-    matrix(nrow = 1)
+tbl <- rbind(c("cpp = FALSE", 
+               r_r[2], 
+               paste0("[", r_r[1], ",", r_r[3], "]"), 
+               p_r[2], 
+               paste0("[", p_r[1], ",", p_r[3], "]"), 
+               c_r[2], 
+               paste0("[", c_r[1], ",", c_r[3], "]")), 
+             c("cpp = TRUE", 
+               r_rcpp[2], 
+               paste0("[", r_rcpp[1], ",", r_rcpp[3], "]"), 
+               p_rcpp[2], 
+               paste0("[", p_rcpp[1], ",", p_rcpp[3], "]"), 
+               c_rcpp[2], 
+               paste0("[", c_rcpp[1], ",", c_rcpp[3], "]")))
 colnames(tbl) <- NULL
 
 # Write the caption
 caption <- paste0("Benchmark for the nodes\\_on\\_circumference method for objects. ",
-                  "Distinctions are made between the different objects that are exported by predped.")
+                  "Distinctions are made between the different objects that are exported by predped. ",
+                  "Additionally, we make the distinction between the Rcpp version ",
+                  "of the function (cpp = TRUE) and the R version of the function ",
+                  "(cpp = FALSE).")
 tbl |>
     knitr::kable(format = "latex", 
                  align = "lll",
@@ -343,7 +366,7 @@ tbl |>
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H" ) |>
-    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
+    kableExtra::add_header_above(c(" " = 1, "Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
     print()
 
 ```
