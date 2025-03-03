@@ -2,7 +2,7 @@
 
 ## create_agent_specifications 
 
-```{r update create_agent_specifications}
+```{r update create_agent_specifications, echo = FALSE, results = "asis"}
 
 agent_i <- predped::agent(center = c(-1, 0),
                           speed = 2,
@@ -53,7 +53,7 @@ tbl |>
 
 ## predict_movement
 
-```{r update predict_movement}
+```{r update predict_movement, echo = FALSE, results = "asis"}
 
 agent_i <- predped::agent(center = c(-1, 0),
                           speed = 2,
