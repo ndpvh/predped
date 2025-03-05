@@ -27,8 +27,10 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param cpp Logical denoting whether to use the Rcpp version of the function
+#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
-#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.
 #' 
 #' @seealso 
@@ -48,7 +50,18 @@ setMethod("utility", "agent", function(object,
                                        background,
                                        agent_specifications,
                                        centers,                    
-                                       check) {
+                                       check,
+                                       cpp = TRUE) {
+
+    # If Rcpp alternative wanted, let them use it
+    if(cpp) {
+        return(utility_agent_rcpp(object,
+                                  state,
+                                  background,
+                                  agent_specifications,
+                                  centers,                    
+                                  check))
+    }
 
     # Compute the utility variables that are used as input to the utility 
     # functions.
@@ -65,7 +78,7 @@ setMethod("utility", "agent", function(object,
 
     # Pass down to a lower-level utility function that uses all of this 
     # information
-    return(utility(uv, parameters(object)))
+    return(utility(uv, parameters(object), cpp = cpp))
 })
 
 #' Compute the utilities with all utility variables known
@@ -80,9 +93,11 @@ setMethod("utility", "agent", function(object,
 #' @param parameters Dataframe containing the parameters of the agent. Should 
 #' conform to the naming conventions mentioned in 
 #' \code{\link[predped]{params_from_csv}}.
+#' @param cpp Logical denoting whether to use the Rcpp version of the function
+#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
-#' @return Numeric matrix denoting the (dis)utility of moving to each of the 
-#' cells in \code{centers}.
+#' @return Numeric vector denoting the (dis)utility of moving to each of the 
+#' cells.
 #' 
 #' @seealso 
 #' \code{\link[predped]{simulate,predped-method}},
@@ -94,7 +109,7 @@ setMethod("utility", "agent", function(object,
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @rdname utility-agent
+#' @rdname utility-data.frame
 #' 
 #' @export 
 #
@@ -105,7 +120,12 @@ setMethod("utility", "agent", function(object,
 #    of `agent` they occupy in a more straightforward way than is currently
 #    implemented in `get_leaders` and `get_buddy`.
 setMethod("utility", "data.frame", function(object,
-                                            parameters) {
+                                            parameters,
+                                            cpp = TRUE) {
+
+    if(cpp) {
+        return(utility_rcpp(object, parameters))
+    }
 
     ############################################################################
     # COMPUTATION
@@ -160,7 +180,7 @@ setMethod("utility", "data.frame", function(object,
         V <- V + m4ma::baUtility_rcpp(parameters[["a_blocked"]], 
                                       parameters[["b_blocked"]],
                                       pmax(object$ba_angle[[1]], 0), # Make sure all angles are >= 0; this was previously done in baUtility()
-                                      as.integer(names(object$ba_angle[[1]])) - 1)
+                                      object$ba_cones[[1]] - 1)
     }
 
     # Follow the leader utility: Check whether there are any leaders in the first 
@@ -245,6 +265,8 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.
@@ -265,7 +287,18 @@ setMethod("compute_utility_variables", "agent", function(object,
                                                          background,
                                                          agent_specifications,
                                                          centers,                    
-                                                         check) {
+                                                         check, 
+                                                         cpp = TRUE) {
+
+    # If you want Rcpp to handle everything, let it do so
+    if(cpp) {
+        return(compute_utility_variables_rcpp(object, 
+                                              state,
+                                              background,
+                                              agent_specifications,
+                                              centers,
+                                              check))
+    }
 
     # Create a data.frame that will contain all of the needed information in 
     # a single row. This data.frame will already contain the index of the agent
@@ -342,6 +375,12 @@ setMethod("compute_utility_variables", "agent", function(object,
                                                 predictions_minus_agent,
                                                 agent_specifications$size[-uv$agent_idx],
                                                 objects(background)))
+
+    if(is.null(uv$ba_angle[[1]])) {
+        uv$ba_cones <- list()
+    } else {
+        uv$ba_cones <- list(as.integer(names(uv$ba_angle[[1]])))
+    }
 
     # Follow the leader utility: Required variable is the potential leaders and 
     # their distances. This is all outputted in a list by getLeaders_rcpp, which
@@ -591,6 +630,7 @@ get_angles <- function (agent_idx,
                         any_member = TRUE) {
     
     # First need to identify whether a pedestrian belongs to a social group
+    p_pred <- p_pred[-agent_idx, , drop = FALSE]
     ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
     p_pred <- p_pred[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]

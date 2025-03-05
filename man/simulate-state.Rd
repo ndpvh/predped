@@ -22,6 +22,8 @@
   plot_live = FALSE,
   plot_time = 0.2,
   report = FALSE,
+  print_iteration = FALSE,
+  step_report = 1,
   goal_number = 5,
   goal_duration = function(x) rnorm(x, 10, 2),
   precompute_goal_paths = TRUE,
@@ -30,6 +32,7 @@
   middle_edge = FALSE,
   position = NULL,
   individual_differences = FALSE,
+  cpp = TRUE,
   ...
 )
 }
@@ -99,6 +102,18 @@ between iterations, i.e., the time between updating the plot. Defaults to
 
 \item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
+
+\item{print_iteration}{Logical denoting whether to report each simulated
+iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
+
+\item{step_report}{Numeric denoting at which iteration to report the 
+current iteration in the simulation & the number of agents present 
+at the current iteration in the simulation. Defaults to 1, which
+represents each iteration to be reported.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
+of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
+instead (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if 
 \code{plot_live = TRUE}).}

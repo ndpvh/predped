@@ -4,7 +4,7 @@
 \alias{time_series}
 \title{Transform trace to time-series}
 \usage{
-time_series(x, time_step = 0.5)
+time_series(x, time_step = 0.5, cpp = TRUE)
 }
 \arguments{
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 

@@ -11,7 +11,8 @@ best_angle(
   agent_specifications,
   velocities,
   orientations,
-  step = 45
+  step = 45,
+  cpp = TRUE
 )
 }
 \arguments{

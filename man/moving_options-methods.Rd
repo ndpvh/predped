@@ -8,7 +8,7 @@
 \usage{
 moving_options(object, ...)
 
-\S4method{moving_options}{agent}(object, state, background, centers)
+\S4method{moving_options}{agent}(object, state, background, centers, cpp = TRUE)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{agent-class}} or the 
@@ -21,6 +21,9 @@ current state.}
 
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Logical matrix containing availabilities of the centers.

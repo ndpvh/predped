@@ -44,4 +44,9 @@ social_utilities_alexander/
 benchmark.md
 tmp*
 
+*.o 
+*.so
+tests/testthat/data/trace_mll.Rds
+
+
 testing_items/

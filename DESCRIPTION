@@ -22,13 +22,16 @@ Description: Helper functions to allow simulating pedestrian flow with the Minds
 License: GPL v3
 Encoding: UTF-8
 Imports: 
+    Rcpp (>= 1.0.14),
     matrixStats,
     methods,
     cppRouting,
     m4ma,
     ggplot2
+LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
+    'imports.R'
     'getters_setters.R'
     'objects.R'
     'background.R'
@@ -41,6 +44,7 @@ Collate:
     'parameters.R'
     'plot.R'
     'see.R'
+    'RcppExports.R'
     'update.R'
     'utility_model.R'
     'predped.R'

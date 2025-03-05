@@ -10,7 +10,8 @@ unpack_trace(
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
   stay_stopped = TRUE,
-  time_step = 0.5
+  time_step = 0.5,
+  cpp = TRUE
 )
 }
 \arguments{

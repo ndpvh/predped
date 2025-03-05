@@ -55,4 +55,10 @@ rnd <- function(x) {
 ```{r simulate, child = "files/benchmark_simulate.Rmd", warning = F}
 ```
 
+```{r simulate, child = "files/benchmark_update.Rmd", warning = F}
+```
+
+```{r simulate, child = "files/benchmark_utility.Rmd", warning = F}
+```
+
 

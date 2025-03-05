@@ -1123,3 +1123,52 @@ testthat::test_that("Polygon line intersection works", {
     # Actual tests
     testthat::expect_equal(tst, ref)
 })
+
+
+
+
+################################################################################
+# R vs RCPP
+
+testthat::test_that("Nodes on circumference returns same result for R and Rcpp", {
+    # Polygon without tilted segments and one with tilted segments
+    poly <- list(predped::polygon(points = rbind(c(-1, -1),
+                                                 c(-1, 1),
+                                                 c(1, 1),
+                                                 c(1, -1))),
+                 predped::polygon(points = rbind(c(-1, 0),
+                                                 c(0, 0.25),
+                                                 c(1, -3),
+                                                 c(0, -1),
+                                                 c(0.5, -0.9))))
+
+    ref <- lapply(poly,
+                  \(x) predped::nodes_on_circumference(x, cpp = FALSE))
+    tst <- lapply(poly, 
+                  \(x) predped::nodes_on_circumference(x, cpp = TRUE))
+
+    testthat::expect_equal(tst, ref)
+
+    # Rectangle with and without orientation
+    rect <- list(predped::rectangle(center = c(1, 1),
+                                    size = c(2, 2)),
+                 predped::rectangle(center = c(1, 1),
+                                    size = c(2, 2),
+                                    orientation = pi / 4))
+
+    ref <- lapply(rect,
+                  \(x) predped::nodes_on_circumference(x, cpp = FALSE))
+    tst <- lapply(rect, 
+                  \(x) predped::nodes_on_circumference(x, cpp = TRUE))
+
+    testthat::expect_equal(tst, ref)
+
+    # Circle
+    circ <- predped::circle(center = c(1, 1),
+                            radius = 1)
+
+    ref <- predped::nodes_on_circumference(circ, cpp = FALSE)
+    tst <- predped::nodes_on_circumference(circ, cpp = TRUE)
+
+    testthat::expect_equal(tst, ref)
+})

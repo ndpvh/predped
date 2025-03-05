@@ -10,9 +10,9 @@
 \usage{
 nodes_on_circumference(object, ...)
 
-\S4method{nodes_on_circumference}{polygon}(object, space_between = 0.05)
+\S4method{nodes_on_circumference}{polygon}(object, space_between = 0.05, cpp = FALSE)
 
-\S4method{nodes_on_circumference}{circle}(object, space_between = 0.05)
+\S4method{nodes_on_circumference}{circle}(object, space_between = 0.05, cpp = FALSE)
 
 \S4method{nodes_on_circumference}{segment}(object, ...)
 }
@@ -24,6 +24,9 @@ circumference of the object and the nodes to create. When \code{outside = TRUE},
 \code{space_between} distance is created to the outside of the object, while
 if \code{outside = FALSE} this same distance is created towards the inside 
 of the object. Defaults to \code{5e-2}.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.}
 }
 \value{
 Numerical matrix containing the nodes that were created around/within

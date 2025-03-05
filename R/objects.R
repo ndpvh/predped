@@ -1777,6 +1777,8 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' \code{space_between} distance is created to the outside of the object, while
 #' if \code{outside = FALSE} this same distance is created towards the inside 
 #' of the object. Defaults to \code{5e-2}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.
@@ -1811,7 +1813,12 @@ setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("node
 
 #'@rdname nodes_on_circumference-method
 setMethod("nodes_on_circumference", signature(object = "polygon"), function(object, 
-                                                                            space_between = 5e-2) {
+                                                                            space_between = 5e-2,
+                                                                            cpp = FALSE) {
+
+    if(cpp) {
+        return(nodes_on_circumference_rcpp(object, space_between))
+    }
 
     corners <- object@points 
     n <- nrow(corners)
@@ -1819,10 +1826,10 @@ setMethod("nodes_on_circumference", signature(object = "polygon"), function(obje
     x_changes <- cbind(corners[,1], corners[c(2:n, 1), 1])
     y_changes <- cbind(corners[,2], corners[c(2:n, 1), 2])
 
-    len_x <- ceiling(abs((x_changes[,2] - x_changes[,1]) / space_between))
-    len_y <- ceiling(abs((y_changes[,2] - y_changes[,1]) / space_between))
+    len_x <- (x_changes[,2] - x_changes[,1]) / space_between
+    len_y <- (y_changes[,2] - y_changes[,1]) / space_between
 
-    len <- matrixStats::rowMaxs(cbind(len_x, len_y))
+    len <- sqrt(len_x^2 + len_y^2) + 1
 
     nodes <- cbind(as.numeric(unlist(multi_seq(x_changes[,1], 
                                                x_changes[,2],
@@ -1836,7 +1843,12 @@ setMethod("nodes_on_circumference", signature(object = "polygon"), function(obje
 
 #'@rdname nodes_on_circumference-method
 setMethod("nodes_on_circumference", signature(object = "circle"), function(object, 
-                                                                           space_between = 5e-2) {
+                                                                           space_between = 5e-2,
+                                                                           cpp = FALSE) {
+
+    if(cpp) {
+        return(nodes_on_circumference_rcpp(object, space_between))
+    }
 
     return(points(object, length.out = ceiling(2 * pi * radius(object) / space_between)))
 })

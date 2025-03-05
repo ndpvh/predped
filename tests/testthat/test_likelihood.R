@@ -84,3 +84,29 @@ testthat::test_that("Computing the MLL with conversion works", {
     testthat::expect_true(all(best <= q75))
     testthat::expect_true(all(best <= max))
 })
+
+testthat::test_that("Likelihood R and Rcpp converge", {
+    # Read in some test data. Of these, select only the first 100, as these 
+    # already contain all necessary ingredients (social simulation)
+    data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- data[1:100, ]
+
+    # Retrieve the parameters of the SocialBaselineEuropean
+    params <- predped::params_from_csv[["params_archetypes"]]
+    params <- params[params$name == "SocialBaselineEuropean", ]
+
+    # Create test and reference and compare both across all datapoints. Here, 
+    # we don't transform the parameters
+    ref <- predped::mll(data, params, transform = FALSE, cpp = FALSE)
+    tst <- predped::mll(data, params, transform = FALSE, cpp = TRUE)
+
+    testthat::expect_equal(ref, tst)
+
+    # And now do one where you do transform the parameters
+    params <- predped::to_unbounded(params, predped::params_from_csv[["params_bounds"]])
+
+    ref <- predped::mll(data, params, transform = TRUE, cpp = FALSE)
+    tst <- predped::mll(data, params, transform = TRUE, cpp = TRUE)
+
+    testthat::expect_equal(ref, tst)
+})

@@ -4,7 +4,12 @@
 \alias{create_agent_specifications}
 \title{Create agent specifications}
 \usage{
-create_agent_specifications(agent_list, stay_stopped = TRUE, time_step = 0.5)
+create_agent_specifications(
+  agent_list,
+  stay_stopped = TRUE,
+  time_step = 0.5,
+  cpp = TRUE
+)
 }
 \arguments{
 \item{stay_stopped}{Logical denoting whether agents will predict others that 
