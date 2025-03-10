@@ -73,33 +73,23 @@ unique <- function(x) {
 #' better not used as an alternative to the R version, but rather as an 
 #' extension of it (as done automatically in predped). 
 #'
-#' @param data Data.frame containing at least "id", "time", "x", "y", "goal_x",
-#' "goal_y", and "goal_id". If it does not have the utility variables yet, these
-#' will add them to the data.frame.
-#' @param parameters Numeric vector or matrix containing the parameters to be 
-#' used. Should be specified in the same order as specified in 
-#' \code{"parameter_names"}. If a matrix, each row should contain parameters to 
-#' be estimated for each instance of "id" separately.
-#' @param parameter_names Character vector containing the parameters that you 
-#' want to estimate. Defaults to all parameters defined in
-#' \code{\link[predped]{params_from_csv}}. Whenever not all parameters are used,
-#' the excluded parameters are assumed to have a value of 0.
-#' @param transform Logical denoting whether to transform the provided parameters
-#' from the real axis to the bounded scales imposed on the parameters within 
-#' \code{predped}. Defaults to \code{TRUE}.
-#' @param bounds Matrix containing the lower and upper bounds of the parameters
-#' in its first and second column respectively. Additionally, rownames should 
-#' denote for which parameter a certain pair represents the bounds. Only used 
-#' when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.
-#' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-#' In a typical estimation situation, these motion variables should already be 
-#' in \code{data}.
+#' @param data List containing data.frames to use in the estimation procedure.
+#' @param parameters List containing the parameters to be used.
+#' Should be specified in the same order as specified in \code{"parameter_names"}. 
+#' @param ids CharacterVector containing the names of the participants in the 
+#' data set.
+#' @param idx IntegerVector containing the index of the parameters to use to 
+#' evaluate a given row in the data. Note that this index uses C++ convention.
+#' Order should conform to the order in the list of the data.
+#' @param cells IntegerVector denoting the cell to which a participant has 
+#' moved at a given iteration. Order should conform to the order in the list of 
+#' the data.
 #' 
 #' @return Min-log-likelihood per person in the dataset.
 #' 
 #' @export 
-mll_rcpp <- function(data, parameters, parameter_names, ids) {
-    .Call('_predped_mll_rcpp', PACKAGE = 'predped', data, parameters, parameter_names, ids)
+mll_rcpp <- function(data, parameters, ids, idx, cells) {
+    .Call('_predped_mll_rcpp', PACKAGE = 'predped', data, parameters, ids, idx, cells)
 }
 
 psUtility <- function(a_preferred_speed, b_preferred_speed, preferred_speed, slowing_time, current_speed, goal_distance) {

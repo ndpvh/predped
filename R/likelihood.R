@@ -75,10 +75,24 @@ mll <- function(data,
     }
 
     if(cpp) {
-        return(mll_rcpp(data, 
-                        parameters, 
-                        names(parameters), 
-                        ids))
+        # Transform the data and parameters to a list of dataframes. Makes data
+        # handling easier in cpp
+        data_list <- split(data, 1:nrow(data))
+        params <- split(parameters, 1:nrow(parameters))
+
+        # Denote which participant should be updated at each iteration in the
+        # data_list. Transform so that it coheres to C++ indexing
+        idx <- factor(data$id,
+                      levels = levels(factor(ids))) |>
+            as.numeric()
+        idx <- idx - 1
+
+        # Actually execute
+        return(mll_rcpp(data_list, 
+                        params, 
+                        ids,
+                        idx,
+                        data$cell))
     }
 
     # For each agent, loop over the unique participant id's 
