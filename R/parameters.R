@@ -518,11 +518,11 @@ to_unbounded <- function(parameters,
         # by an arbitrarily small number to make sure there are no infinities in 
         # our generated parameters
         if(parameters[[i]] == 0) {
-            parameters[[i]] <- parameters[[i]] + 1e-5
+            parameters[[i]] <- parameters[[i]]
         }
 
         if(parameters[[i]] == 1) {
-            parameters[[i]] <- parameters[[i]] - 1e-5
+            parameters[[i]] <- parameters[[i]]
         }
 
         # Transform to a value of a normal distribution
