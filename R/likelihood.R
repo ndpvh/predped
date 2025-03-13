@@ -53,7 +53,8 @@ mll <- function(data,
     }
 
     # Retrieve each person's identifier
-    ids <- unique(data$id)
+    ids <- unique(data$id) |>
+        sort()
 
     # Check whether the provided parameters conform to data.frame format. If not, 
     # transform.
