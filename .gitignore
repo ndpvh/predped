@@ -50,3 +50,4 @@ tests/testthat/data/trace_mll.Rds
 
 
 testing_items/
+examples/*
