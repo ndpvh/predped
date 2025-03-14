@@ -88,8 +88,8 @@ unique <- function(x) {
 #' @return Min-log-likelihood per person in the dataset.
 #' 
 #' @export 
-mll_rcpp <- function(data, parameters, ids, idx, cells) {
-    .Call('_predped_mll_rcpp', PACKAGE = 'predped', data, parameters, ids, idx, cells)
+mll_rcpp <- function(data, parameters, ids, idx, cells, sizes, summed) {
+    .Call('_predped_mll_rcpp', PACKAGE = 'predped', data, parameters, ids, idx, cells, sizes, summed)
 }
 
 psUtility <- function(a_preferred_speed, b_preferred_speed, preferred_speed, slowing_time, current_speed, goal_distance) {

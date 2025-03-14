@@ -50,8 +50,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // mll_rcpp
-NumericVector mll_rcpp(List data, List parameters, CharacterVector ids, IntegerVector idx, IntegerVector cells);
-RcppExport SEXP _predped_mll_rcpp(SEXP dataSEXP, SEXP parametersSEXP, SEXP idsSEXP, SEXP idxSEXP, SEXP cellsSEXP) {
+List mll_rcpp(List data, List parameters, CharacterVector ids, IntegerVector idx, IntegerVector cells, IntegerVector sizes, bool summed);
+RcppExport SEXP _predped_mll_rcpp(SEXP dataSEXP, SEXP parametersSEXP, SEXP idsSEXP, SEXP idxSEXP, SEXP cellsSEXP, SEXP sizesSEXP, SEXP summedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -60,7 +60,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< CharacterVector >::type ids(idsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type idx(idxSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type cells(cellsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mll_rcpp(data, parameters, ids, idx, cells));
+    Rcpp::traits::input_parameter< IntegerVector >::type sizes(sizesSEXP);
+    Rcpp::traits::input_parameter< bool >::type summed(summedSEXP);
+    rcpp_result_gen = Rcpp::wrap(mll_rcpp(data, parameters, ids, idx, cells, sizes, summed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -401,7 +403,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 2},
     {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 5},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
-    {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 5},
+    {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 7},
     {"_predped_psUtility", (DL_FUNC) &_predped_psUtility, 6},
     {"_predped_gaUtility", (DL_FUNC) &_predped_gaUtility, 3},
     {"_predped_caUtility", (DL_FUNC) &_predped_caUtility, 3},
