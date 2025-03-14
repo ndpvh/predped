@@ -4,38 +4,39 @@
 \alias{mll_rcpp}
 \title{Compute the min-log-likelihood}
 \usage{
-mll_rcpp(data, parameters, parameter_names, ids)
+mll_rcpp(data, parameters, ids, idx, cells, sizes, summed)
 }
 \arguments{
-\item{data}{Data.frame containing at least "id", "time", "x", "y", "goal_x",
-"goal_y", and "goal_id". If it does not have the utility variables yet, these
-will add them to the data.frame.}
+\item{data}{List containing data.frames to use in the estimation procedure.}
 
-\item{parameters}{Numeric vector or matrix containing the parameters to be 
-used. Should be specified in the same order as specified in 
-\code{"parameter_names"}. If a matrix, each row should contain parameters to 
-be estimated for each instance of "id" separately.}
+\item{parameters}{List containing the parameters to be used.
+Should be specified in the same order as specified in \code{"parameter_names"}.}
 
-\item{parameter_names}{Character vector containing the parameters that you 
-want to estimate. Defaults to all parameters defined in
-\code{\link[predped]{params_from_csv}}. Whenever not all parameters are used,
-the excluded parameters are assumed to have a value of 0.}
+\item{ids}{CharacterVector containing the names of the participants in the 
+data set.}
 
-\item{transform}{Logical denoting whether to transform the provided parameters
-from the real axis to the bounded scales imposed on the parameters within 
-\code{predped}. Defaults to \code{TRUE}.}
+\item{idx}{IntegerVector containing the index of the parameters to use to 
+evaluate a given row in the data. Note that this index uses C++ convention.
+Order should conform to the order in the list of the data.}
 
-\item{bounds}{Matrix containing the lower and upper bounds of the parameters
-in its first and second column respectively. Additionally, rownames should 
-denote for which parameter a certain pair represents the bounds. Only used 
-when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.}
+\item{cells}{IntegerVector denoting the cell to which a participant has 
+moved at a given iteration. Order should conform to the order in the list of 
+the data.}
 
-\item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-In a typical estimation situation, these motion variables should already be 
-in \code{data}.}
+\item{sizes}{IntegerVector containing the number of data points per person.
+Ignored if \code{summed} is \code{TRUE}.}
+
+\item{summed}{Boolean denoting whether to sum the min-log-likelihood to one
+value per person. If \code{TRUE}, you get the resulting summed 
+min-log-likelihood for each individual with a correction to avoid \code{-Inf}s.
+If \code{FALSE}, the function will instead return a list of vectors containing
+the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
+their own corrections (if needed).}
 }
 \value{
-Min-log-likelihood per person in the dataset.
+Either named vector containing the summed min-log-likelihood 
+(\code{summed = TRUE}) or named list with vectors of raw likelihoods
+(\code{summed = FALSE}) per person in the dataset.
 }
 \description{
 Rcpp alternative to \code{\link[predped]{mll}}. Be wary: This version does 

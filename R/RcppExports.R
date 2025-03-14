@@ -84,8 +84,18 @@ unique <- function(x) {
 #' @param cells IntegerVector denoting the cell to which a participant has 
 #' moved at a given iteration. Order should conform to the order in the list of 
 #' the data.
+#' @param sizes IntegerVector containing the number of data points per person.
+#' Ignored if \code{summed} is \code{TRUE}.
+#' @param summed Boolean denoting whether to sum the min-log-likelihood to one
+#' value per person. If \code{TRUE}, you get the resulting summed 
+#' min-log-likelihood for each individual with a correction to avoid \code{-Inf}s.
+#' If \code{FALSE}, the function will instead return a list of vectors containing
+#' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
+#' their own corrections (if needed).
 #' 
-#' @return Min-log-likelihood per person in the dataset.
+#' @return Either named vector containing the summed min-log-likelihood 
+#' (\code{summed = TRUE}) or named list with vectors of raw likelihoods
+#' (\code{summed = FALSE}) per person in the dataset.
 #' 
 #' @export 
 mll_rcpp <- function(data, parameters, ids, idx, cells, sizes, summed) {
