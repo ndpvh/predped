@@ -108,42 +108,38 @@ mll <- function(data,
                         data$cell,
                         as.integer(table(data$id)),
                         summed)
-        
-        if(summed) {
-            MLL <- as.vector(MLL)
-        }
-        return(MLL)
-    }
-
-    # For each agent, loop over the unique participant id's 
-    MLL <- lapply(seq_along(ids), 
-                  function(i) {
-                      # Select the data for which the utilities should be computed
-                      selection <- data[data$id == ids[i], ]
+                        
+    } else {
+        # For each agent, loop over the unique participant id's 
+         MLL <- lapply(seq_along(ids), 
+                       function(i) {
+                           # Select the data for which the utilities should be computed
+                           selection <- data[data$id == ids[i], ]
   
-                      # Get the utilities for each cell based on the provided 
-                      # results
-                      L <- sapply(1:nrow(selection), 
-                                  function(j) {
-                                      V <- utility(selection[j, ], parameters[i, ], cpp = FALSE)
-
-                                      V <- V - max(V)
-                                      exp_V <- exp(V)
-                                      return(exp_V[selection$cell[j] + 1] / sum(exp_V))
-                                  })
+                           # Get the utilities for each cell based on the provided 
+                           # results
+                           L <- sapply(1:nrow(selection), 
+                                       function(j) {
+                                           V <- utility(selection[j, ], parameters[i, ], cpp = FALSE)
+     
+                                           V <- V - max(V)
+                                           exp_V <- exp(V)
+                                           return(exp_V[selection$cell[j] + 1] / sum(exp_V))
+                                       })
                       
-                      # Convert likelihoods to min-log-likelihood. 1 was added
-                      # to each likelihood to ensure that 0 probability will 
-                      # not lead to -Inf min-log-likelihood.
-                      if(summed) {
-                        return(-sum(log(1 + L)))
-                      } else {
-                        return(L)
-                      }
-                  })
+                           # Convert likelihoods to min-log-likelihood. 1 was added
+                           # to each likelihood to ensure that 0 probability will 
+                           # not lead to -Inf min-log-likelihood.
+                           if(summed) {
+                             return(-sum(log(1 + L)))
+                           } else {
+                             return(L)
+                           }
+                       })
+    }    
 
     if(summed) {
-        MLL <- as.vector(MLL)
+        MLL <- as.numeric(MLL)
     }
     names(MLL) <- ids 
     return(MLL)
