@@ -29,34 +29,94 @@ Function subset("[.data.frame");
 //' @param cells IntegerVector denoting the cell to which a participant has 
 //' moved at a given iteration. Order should conform to the order in the list of 
 //' the data.
+//' @param sizes IntegerVector containing the number of data points per person.
+//' Ignored if \code{summed} is \code{TRUE}.
+//' @param summed Boolean denoting whether to sum the min-log-likelihood to one
+//' value per person. If \code{TRUE}, you get the resulting summed 
+//' min-log-likelihood for each individual with a correction to avoid \code{-Inf}s.
+//' If \code{FALSE}, the function will instead return a list of vectors containing
+//' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
+//' their own corrections (if needed).
 //' 
-//' @return Min-log-likelihood per person in the dataset.
+//' @return Either named vector containing the summed min-log-likelihood 
+//' (\code{summed = TRUE}) or named list with vectors of raw likelihoods
+//' (\code{summed = FALSE}) per person in the dataset.
 //' 
 //' @export 
 // [[Rcpp::export]]
-NumericVector mll_rcpp(List data, 
-                       List parameters,
-                       CharacterVector ids,
-                       IntegerVector idx,
-                       IntegerVector cells) {
+List mll_rcpp(List data, 
+              List parameters,
+              CharacterVector ids,
+              IntegerVector idx,
+              IntegerVector cells,
+              IntegerVector sizes,
+              bool summed) {
 
-    // Loop over each row and do the actual computations
-    NumericVector MLL(ids.length());
-    NumericVector V(34);
+    // Distinguish between summing the MLL for each iteration (summed = TRUE)
+    // and not doing that. Requires different memory allocation in the beginning
+    List MLL(ids.length());
+    if(summed) {
+        // Initialize an MLL list as a collection of doubles. If not done, then 
+        // we cannot allocate the results to it
+        for(int i = 0; i < MLL.length(); i++) {
+            MLL[i] = 0.;
+        }
 
-    for(int i = 0; i < data.length(); i++) {
-        // Compute the utility of the data under the parameters of the person.
-        // Note that we need to transform the indices to +1 because we are using
-        // an R function for subsetting rather than an Rcpp function.
-        V = utility_rcpp(
-            as<DataFrame>(data[i]),
-            as<DataFrame>(parameters[idx[i]])
-        );
+        // Loop over each row and do the actual computations
+        NumericVector V(34);
+        double MLL_i = 0.;
 
-        // Transform V to probabilities and afterwards to the min-log-likelihood.
-        // Add the value of this likelihood to the MLL vector.
-        V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
-        MLL[idx[i]] -= log(1 + V[cells[i]] / Rcpp::sum(V));
+        for(int i = 0; i < data.length(); i++) {
+            // Compute the utility of the data under the parameters of the person.
+            // Note that we need to transform the indices to +1 because we are using
+            // an R function for subsetting rather than an Rcpp function.
+            V = utility_rcpp(
+                as<DataFrame>(data[i]),
+                as<DataFrame>(parameters[idx[i]])
+            );
+
+            // Transform V to probabilities and afterwards to the min-log-likelihood.
+            // Add the value of this likelihood to the MLL vector.
+            V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
+
+            MLL_i = MLL[idx[i]]; 
+            MLL_i -= log(1 + V[cells[i]] / Rcpp::sum(V));
+            MLL[idx[i]] = MLL_i;
+        }
+
+    } else {
+        // Initialize an MLL list and an additional indexing vector that tells us 
+        // how far along we are along the NumericVector of MLLs for each specific 
+        // participant
+        for(int i = 0; i < MLL.length(); i++) {
+            MLL[i] = NumericVector(sizes[i]);
+        }
+
+        IntegerVector idx_participant(ids.length());
+
+        // Loop over each iteration and assign the likelihood to the MLL list of the 
+        // respective participant
+        NumericVector V(34);
+        for(int i = 0; i < data.length(); i++) {
+            // Compute the utility of the data under the parameters of the person.
+            // Note that we need to transform the indices to +1 because we are using
+            // an R function for subsetting rather than an Rcpp function.
+            V = utility_rcpp(
+                as<DataFrame>(data[i]),
+                as<DataFrame>(parameters[idx[i]])
+            );
+
+            // Transform V to probabilities and afterwards to the min-log-likelihood.
+            // Add the value of this likelihood to the MLL vector.
+            V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
+
+            NumericVector MLL_i = MLL[idx[i]];
+            MLL_i[idx_participant[idx[i]]] = V[cells[i]] / Rcpp::sum(V);
+            MLL[idx[i]] = MLL_i;
+
+            // Update the participant index
+            idx_participant[idx[i]]++;
+        }
     }
 
     MLL.attr("names") = ids;

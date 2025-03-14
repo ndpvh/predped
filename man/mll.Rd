@@ -11,6 +11,7 @@ mll(
   transform = TRUE,
   bounds = params_from_csv[["params_bounds"]],
   cpp = TRUE,
+  summed = FALSE,
   ...
 )
 }
@@ -38,12 +39,23 @@ in its first and second column respectively. Additionally, rownames should
 denote for which parameter a certain pair represents the bounds. Only used 
 when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.}
 
+\item{cpp}{Logical denoting whether to use the \code{\link[predped]{mll_rcpp}}
+function to compute the min-log-likelihood. Defaults to \code{TRUE}.}
+
+\item{summed}{Logical denoting whether to sum the min-log-likelihood to one
+value per person. If \code{TRUE}, you get the resulting summed 
+min-log-likelihood for each individual with a correction to avoid \code{-Inf}s.
+If \code{FALSE}, the function will instead return a list of vectors containing
+the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
+their own corrections (if needed). Defaults to \code{FALSE}.}
+
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 In a typical estimation situation, these motion variables should already be 
-in \code{data}.}
-}
-\value{
-Min-log-likelihood per person in the dataset.
+in \code{data}.
+
+ @return Either named vector containing the summed min-log-likelihood 
+(\code{summed = TRUE}) or named list with vectors of raw likelihoods
+(\code{summed = FALSE}) per person in the dataset.}
 }
 \description{
 Use data to compute the min-log-likelihood of choosing a given observed cell  
