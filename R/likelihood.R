@@ -104,8 +104,8 @@ mll <- function(data,
         MLL <- mll_rcpp(data_list, 
                         params, 
                         ids,
-                        idx,
-                        data$cell,
+                        as.integer(idx),
+                        as.integer(data$cell),
                         as.integer(table(data$id)),
                         summed)
                         
