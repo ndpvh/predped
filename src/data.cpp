@@ -257,9 +257,6 @@ DataFrame unpack_trace_rcpp(List trace,
     LogicalVector NA_logical(1);
     NA_logical[0] = NA_LOGICAL;
 
-    // Create a check_j variable beforehand
-    LogicalMatrix check_j(11, 3);
-
     // Loop over the different instances in the trace.
     List copy_trace = clone(trace);
     int idx = 0;
@@ -329,14 +326,22 @@ DataFrame unpack_trace_rcpp(List trace,
             // Access the utility variables slot in the agent class. 
             DataFrame uv_j = as<DataFrame>(agent.slot("utility_variables"));
 
+            // Do a small check of whether the current utility variables are 
+            // filled with information. If not, then we cannot preallocate.
+            // For this, I use one of the variables that should always be 
+            // defined.
+            NumericVector tmp = uv_j["ps_speed"];
+            LogicalVector tmp_check = Rcpp::is_na(tmp);
+
             // Assign different values to the resulting DataFrame depending on 
             // the status of the agent. This approach taken to allow for 
             // the correct preallocation in different variables
-            if(status_j == "move") {
+            if(!any(tmp_check).is_true()) {
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
-                List check_j = uv_j["check"];
+                List check_list = uv_j["check"];
+                LogicalMatrix check_j = check_list[0];
                 double ps_speed_j = uv_j["ps_speed"];
                 List ps_distance_j = uv_j["ps_distance"];
                 List gd_angle_j = uv_j["gd_angle"];
