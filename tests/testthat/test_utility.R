@@ -14,7 +14,15 @@ testthat::test_that("Utility data R and Rcpp converge", {
         ref <- predped::utility(data[i, ], params, cpp = FALSE)
         tst <- predped::utility(data[i, ], params, cpp = TRUE)
 
-        result[i] <- all(ref == tst)
+        # There is a difference in precision between R and Rcpp. Hence the 
+        # leniency in the tolerance. Note that we first check for infinities, 
+        # only then we check for finite values
+        check_1 <- all(which(ref == -Inf) == which(tst == -Inf))
+
+        diffs <- abs(ref[!is.infinite(ref)] - tst[!is.infinite(tst)])
+        check_2 <- all(diffs <= 10^(-10))
+
+        result[i] <- check_1 & check_2
     }
 
     testthat::expect_true(all(result))
