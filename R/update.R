@@ -62,6 +62,25 @@ setMethod("update", "state", function(object,
         agent <- agent_list[[i]]
         agents(state_copy) <- agent_list[-i]
 
+        # Update the utility variables slot for the agents, as we don't want 
+        # carry-over effects in this variable
+        agent@utility_variables <- data.frame(agent_idx = i,
+                                              check = NA,
+                                              ps_speed = NA, 
+                                              ps_distance = NA, 
+                                              gd_angle = NA, 
+                                              id_distance = NA,
+                                              id_check = NA,
+                                              id_ingroup = NA,
+                                              ba_angle = NA,
+                                              ba_cones = NA,
+                                              fl_leaders = NA,
+                                              wb_buddies = NA,
+                                              gc_distance = NA,
+                                              gc_radius = NA, 
+                                              gc_nped = NA,
+                                              vf_angles = NA)
+
         # Update the agent himself
         agent_list[[i]] <- update(agent, 
                                   state_copy,
@@ -322,6 +341,7 @@ update_position <- function(agent,
                                    vels = velocities,
                                    angles = orientations,
                                    tStep = time_step)
+        agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)
@@ -342,14 +362,19 @@ update_position <- function(agent,
             return(agent)
         }
 
-        # Compute the utility of of each option and transform the utilities to
+        # Compute the utility variables
+        agent@utility_variables <- compute_utility_variables(agent, 
+                                                             state,
+                                                             background,
+                                                             agent_specifications,
+                                                             centers,
+                                                             check,
+                                                             cpp = cpp)
+
+        # Compute the utility of each option and transform the utilities to
         # probabilities
-        V <- utility(agent, 
-                     state, 
-                     background, 
-                     agent_specifications, 
-                     centers, 
-                     check,
+        V <- utility(agent@utility_variables,
+                     agent@parameters,
                      cpp = cpp)
 
         # Check whether you have only infinite moving options. Delete the baseline
@@ -371,11 +396,7 @@ update_position <- function(agent,
         # Using the probabilities, sample the cell to which the agent will move.
         # Importantly, 1 is subtracted from the integer as 0 is also an option
         # (standing still), but `seq_along` starts at 1
-        cell <- sample.int(length(Pr),
-                           1,
-                           TRUE,
-                           prob = Pr) - 1
-
+        cell <- sample(seq_along(Pr), 1, prob = Pr) - 1
         cell(agent) <- cell
 
         # Check what to do: Either the chosen cell is 0 (stop) or something else
@@ -386,7 +407,7 @@ update_position <- function(agent,
             # status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
             
         } else {
-            position(agent) <- centers[cell,]
+            position(agent) <- centers[cell, ]
 
             # Update speed to be either higher than or equal to `standing_start`
             acceleration <- velocities[cell]

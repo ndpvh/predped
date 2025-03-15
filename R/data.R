@@ -140,70 +140,9 @@ unpack_trace <- function(x,
                                                   goal_y = current_goal(a)@position[2],
                                                   radius = radius(a))
 
-                        # If the agent is not moving, then you cannot compute 
-                        # the utility variables. We should therefore fill it 
-                        # with values that make sense and otherwise with NULLs
-                        # (in hopes utility will be okay with this).
-                        #
-                        # If the agent is moving, however, we will compute the 
-                        # utility variables for that move.
-                        agent_idx <- which(agent_specifications$id == id(a))
-                        if(status(a) != "move") {
-                            utility_variables <- data.frame(agent_idx = agent_idx,
-                                                            check = NA,
-                                                            ps_speed = NA, 
-                                                            ps_distance = NA, 
-                                                            gd_angle = NA, 
-                                                            id_distance = NA,
-                                                            id_check = NA,
-                                                            id_ingroup = NA,
-                                                            ba_angle = NA,
-                                                            ba_cones = NA,
-                                                            fl_leaders = NA,
-                                                            wb_buddies = NA,
-                                                            gc_distance = NA,
-                                                            gc_radius = NA, 
-                                                            gc_nped = NA,
-                                                            vf_angles = NA)
-
-                        } else {
-                            # Get the centers for this participant, given their 
-                            # current position, speed, and orientation
-                            centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                                       p1 = position(a),
-                                                       v1 = speed(a),
-                                                       a1 = orientation(a),
-                                                       vels = velocities,
-                                                       angles = orientations,
-                                                       tStep = time_step)
-
-                            # Delete the agent from the agent list in the state
-                            # (otherwise moving options will give wrong results)
-                            agent_state <- y
-                            agents(agent_state) <- agents(agent_state)[-agent_idx] 
-    
-                            # Do an initial check of which of these centers can be 
-                            # reached and which ones can't
-                            check <- moving_options(a, 
-                                                    agent_state, 
-                                                    agent_state@setting, 
-                                                    centers,
-                                                    cpp = FALSE)
-                            
-                            # Compute the utility variables for this agent under the
-                            # current state                            
-                            utility_variables <- compute_utility_variables(a,
-                                                                           y,
-                                                                           y@setting,
-                                                                           agent_specifications,
-                                                                           centers,                    
-                                                                           check,
-                                                                           cpp = FALSE)
-                        }
-    
-                        # Bind them all together in one dataframe and return 
-                        # the result
-                        return(cbind(time_series, utility_variables))
+                        # Access the utility variables slot of the agents and 
+                        # bind them together with the time_series data
+                        return(cbind(time_series, a@utility_variables))
                     })
 
         return(do.call("rbind", y))

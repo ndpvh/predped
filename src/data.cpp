@@ -326,51 +326,17 @@ DataFrame unpack_trace_rcpp(List trace,
             goal_x[idx] = goal_x_j;
             goal_y[idx] = goal_y_j;
 
-            // If the agent is moving, we compute the utility variables that 
-            // govern the agents's behavior. 
+            // Access the utility variables slot in the agent class. 
+            DataFrame uv_j = as<DataFrame>(agent.slot("utility_variables"));
+
+            // Assign different values to the resulting DataFrame depending on 
+            // the status of the agent. This approach taken to allow for 
+            // the correct preallocation in different variables
             if(status_j == "move") {
-                // Get the centers for this participant, given their current
-                // position, speed, and orientation
-                NumericMatrix centers = c_vd(
-                    seq(1, 33),
-                    position_j,
-                    speed_j,
-                    orientation_j,
-                    velocities,
-                    orientations,
-                    time_step
-                );
-
-                // Delete the agent from the agent list in the state (otherwise 
-                // moving options will give wrong results)
-                List agents_minus_agent = clone(agents);
-                agents_minus_agent.erase(j);
-                state.slot("agents") = agents_minus_agent;
-    
-                // Do an initial check of which of these centers can be 
-                // reached and which ones can't
-                LogicalMatrix check_j = moving_options_rcpp(
-                    agent, 
-                    state,
-                    setting,
-                    centers
-                );
-                            
-                // Compute the utility variables for this agent under the
-                // current state      
-                state.slot("agents") = agents;
-                DataFrame uv_j = compute_utility_variables_rcpp(
-                    agent, 
-                    state,
-                    setting,
-                    specifications,
-                    centers,
-                    check_j
-                );
-
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
+                List check_j = uv_j["check"];
                 double ps_speed_j = uv_j["ps_speed"];
                 List ps_distance_j = uv_j["ps_distance"];
                 List gd_angle_j = uv_j["gd_angle"];

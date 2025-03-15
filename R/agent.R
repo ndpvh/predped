@@ -68,7 +68,9 @@ agent <- setClass("agent",
                        current_goal = "goal",
                        goals = "list", 
                        parameters = "data.frame",
-                       color = "character"), 
+                       color = "character",
+                       cell_centers = "matrix",
+                       utility_variables = "data.frame"), 
                   contains = c("circle"))
 
 #' Constructor for the \code{\link[predped]{agent-class}}
@@ -157,7 +159,9 @@ setMethod("initialize", "agent", function(.Object,
                                           waiting_counter = 0,
                                           cell = 0,
                                           parameters = data.frame(),                                   
-                                          color = "black") {
+                                          color = "black",
+                                          cell_centers = matrix(0, nrow = 33, ncol = 2),
+                                          utility_variables = data.frame()) {
 
     # Use the circular object as the basis of the agent     
     .Object <- callNextMethod(.Object, 
@@ -175,7 +179,9 @@ setMethod("initialize", "agent", function(.Object,
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
-    .Object@color <- color    
+    .Object@color <- color
+    .Object@cell_centers <- cell_centers
+    .Object@utility_variables <- data.frame()
 
     # If the parameters are empty, add the BaselineEuropean as default. Otherwise
     # use the defined parameters
@@ -240,6 +246,19 @@ setMethod("cell", "agent", function(object) {
 #' @rdname cell-method
 setMethod("cell<-", "agent", function(object, value) {
     object@cell <- value
+    return(object)
+})
+
+
+
+#' @rdname cell_centers-method
+setMethod("cell_centers", "agent", function(object) {
+    return(object@cell_centers)
+})
+
+#' @rdname cell_centers-method
+setMethod("cell_centers<-", "agent", function(object, value) {
+    object@cell_centers <- value
     return(object)
 })
 
@@ -387,6 +406,19 @@ setMethod("status", "agent", function(object) {
 setMethod("status<-", "agent", function(object, value) {
     stopifnot(value %in% c("move", "plan", "reroute", "reorient", "completing goal", "exit", "wait"))
     object@status <- value
+    return(object)
+})
+
+
+
+#' @rdname utility_variables-method
+setMethod("utility_variables", "agent", function(object) {
+    return(object@utility_variables)
+})
+
+#' @rdname utility_variables-method
+setMethod("utility_variables<-", "agent", function(object, value) {
+    object@utility_variables <- value
     return(object)
 })
 

@@ -149,6 +149,43 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 
 
 
+#' Getter/Setter for the \code{cell_centers}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   cell_centeres = matrix(1, nrow = 33, ncol = 2))
+#' 
+#' # Access the cell centers for the agent
+#' cell_centers(my_agent)
+#' 
+#' # Change the cell centers for the agent
+#' cell_centers(my_agent) <- m4ma::c_vd_r(1:33, 
+#'                                        position(my_agent), 
+#'                                        speed(my_agent),
+#'                                        orientation(my_agent))
+#' cell_centers(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname cell_centers-method
+#' 
+#' @export
+setGeneric("cell_centers", function(object) standardGeneric("cell_centers"))
+
+#' @rdname cell_centers-method
+#' 
+#' @export
+setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_centers<-"))
+
+
+
 #' Getter/Setter for the \code{center}-slot
 #' 
 #' Is a more specific version of \code{\link[predped]{position-method}} that 
@@ -1290,6 +1327,41 @@ setGeneric("to", function(object, ...) standardGeneric("to"))
 #' 
 #' @export 
 setGeneric("to<-", function(object, value) standardGeneric("to<-"))
+
+
+
+#' Getter/Setter for the \code{utility_variables}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   utility_variables = data.frame())
+#' 
+#' # Access the utility_variables slot for the agent
+#' utility_variables(my_agent)
+#' 
+#' # Change the utility_variables slot for the agent
+#' utility_variables(my_agent) <- data.frame(value = 1)
+#' utility_variables(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{goal-class}}
+#' 
+#' @docType method
+#' 
+#' @rdname utility_variables-method
+#' 
+#' @export
+setGeneric("utility_variables", function(object) standardGeneric("utility_variables"))
+
+#' @rdname utility_variables-method
+#' 
+#' @export
+setGeneric("utility_variables<-", function(object, value) standardGeneric("utility_variables<-"))
 
 
 
