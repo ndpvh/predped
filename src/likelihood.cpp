@@ -80,7 +80,7 @@ List mll_rcpp(List data,
             V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
 
             MLL_i = MLL[idx[i]]; 
-            MLL_i -= log(1 + V[cells[i]] / Rcpp::sum(V));
+            MLL_i -= log(V[cells[i]] / Rcpp::sum(V));
             MLL[idx[i]] = MLL_i;
         }
 

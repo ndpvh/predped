@@ -131,7 +131,7 @@ mll <- function(data,
                            # to each likelihood to ensure that 0 probability will 
                            # not lead to -Inf min-log-likelihood.
                            if(summed) {
-                             return(-sum(log(1 + L)))
+                             return(-sum(log(L)))
                            } else {
                              return(L)
                            }
