@@ -1,6 +1,7 @@
 testthat::test_that("Computing the MLL works", {
     # Get the data to be used
     data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- data[!is.na(data$ps_speed), ]
 
     # Extract the simulating parameters
     params <- predped::params_from_csv[["params_archetypes"]][1, -(1:2)]
@@ -41,6 +42,7 @@ testthat::test_that("Computing the MLL works", {
 testthat::test_that("Computing the MLL with conversion works", {
     # Get the data to be used
     data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- data[!is.na(data$ps_speed), ]
 
     # Extract the simulating parameters
     params <- predped::params_from_csv[["params_archetypes"]][1, -(1:2)]
@@ -92,6 +94,7 @@ testthat::test_that("Likelihood R and Rcpp converge", {
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
     data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- data[!is.na(data$ps_speed), ]
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
