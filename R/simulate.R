@@ -250,9 +250,9 @@ setMethod("simulate", "predped", function(object,
                                           time_step = 0.5,
                                           precompute_edges = TRUE,
                                           many_nodes = precompute_edges,
-                                          individual_differences = FALSE,
+                                          individual_differences = TRUE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          fx = \(x) x,                                          
+                                          fx = \(x) x,
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -311,8 +311,8 @@ setMethod("simulate", "predped", function(object,
         add_agent_index <- add_agent_index[-1]
     }
 
-    # Initialize the trace and state lists. Two cases. Either the initial state 
-    # already exists, which case we just use this one, or we create an empty 
+    # Initialize the trace and state lists. Two cases. Either the initial state
+    # already exists, which case we just use this one, or we create an empty
     # state and check whether there are any agents to add to this state.
     if(!is.null(initial_condition)) {
         if(!identical(initial_condition@setting, object@setting)) {
@@ -337,7 +337,7 @@ setMethod("simulate", "predped", function(object,
                                 agents = list(),
                                 iteration_variables = data.frame(max_agents = max_agents[1:iterations],
                                                                  goal_number = goal_number[1:iterations],
-                                                                 add_agent_index = add_agent_index[1:iterations]), 
+                                                                 add_agent_index = add_agent_index[1:iterations]),
                                 variables = list())
 
         if(!is.null(initial_agents)) {
@@ -440,14 +440,14 @@ setMethod("simulate", "predped", function(object,
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
 #' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
-#' @param step_report Numeric denoting at which iteration to report the 
-#' current iteration in the simulation & the number of agents present 
+#' @param step_report Numeric denoting at which iteration to report the
+#' current iteration in the simulation & the number of agents present
 #' at the current iteration in the simulation. Defaults to 1, which
 #' represents each iteration to be reported.
 #' @param cpp Logical denoting whether to use the Rcpp alternatives for several
 #' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 #' instead (\code{FALSE}). Defaults to \code{TRUE}.
-#' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
+#' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if
 #' \code{plot_live = TRUE}).
 #'
 #' @return Object of the \code{\link[predped]{state-class}}.
@@ -534,7 +534,7 @@ setMethod("simulate", "state", function(object,
                                         precomputed_goals = NULL,
                                         middle_edge = FALSE,
                                         position = NULL,
-                                        individual_differences = FALSE,
+                                        individual_differences = TRUE,
                                         cpp = TRUE,
                                         ...) {
 
@@ -698,7 +698,7 @@ setMethod("simulate", "state", function(object,
 add_group <- function(model,
                       agent_number = 1,
                       standing_start = 0.1,
-                      individual_differences = FALSE,
+                      individual_differences = TRUE,
                       ...) {
 
     agents <- list()
@@ -846,7 +846,7 @@ add_agent <- function(model,
                       space_between = 1.25,
                       position = NULL,
                       standing_start = 0.1,
-                      individual_differences = FALSE) {
+                      individual_differences = TRUE) {
 
     # Extract the background from the `predped` model and determine where the
     # agent will enter the space
@@ -915,7 +915,7 @@ add_agent <- function(model,
         } else {
             exits <- exit(background)
             idx <- sample(1:nrow(exits), 1)
-                
+
             goal_stack <- list(goal(id = "goal exit",
                                     position = as.numeric(exits[idx,])))
         }
@@ -1024,6 +1024,7 @@ create_initial_condition <- function(agent_number,
                                      goal_number = \(n) rnorm(n, 10, 2),
                                      group_size = matrix(1, nrow = 1, ncol = 2),
                                      space_between = 1.25,
+                                     individual_differences=TRUE,
                                      ...) {
 
     # Copy the setting
@@ -1066,6 +1067,7 @@ create_initial_condition <- function(agent_number,
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number[i],
+                               individual_differences = individual_differences,
                                ...)
         group(new_agent) <- group_number
 
