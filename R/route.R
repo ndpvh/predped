@@ -106,7 +106,7 @@ create_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background 
     # and return the required list of edges and nodes
-    return(append(evaluate_edges(segments, background), 
+    return(append(evaluate_edges(segments, background, space_between - 1e-4), 
                   list(nodes = nodes)))
 }
 
@@ -296,7 +296,7 @@ adjust_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background
     objects(background) <- obj
-    edges <- evaluate_edges(segments, background)
+    edges <- evaluate_edges(segments, background, space_between - 1e-4)
 
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
@@ -520,9 +520,11 @@ create_nodes <- function(from,
 #' 
 #' @export
 evaluate_edges <- function(segments, 
-                           background) {
+                           background,
+                           space_between) {
 
-    obj <- objects(background)
+    obj <- lapply(objects(background),
+                  \(x) enlarge(x, space_between))
     lim <- limited_access(background)
 
     # Step 1: Note, we use squared distances as the cost for efficiency purposes
@@ -534,7 +536,11 @@ evaluate_edges <- function(segments,
     if(length(obj) == 0) {
         idx <- rep(TRUE, nrow(segments))
     } else {
-        idx <- prune_edges(obj, segments[, c("from_x", "from_y", "to_x", "to_y")])
+        idx <- prune_edges(
+            obj, 
+            segments[, c("from_x", "from_y", "to_x", "to_y")],
+            coord_specific = objects(background)
+        )
     }
 
     # Step 3: If there is limited access, we need to account for this. Unfortunately, 
@@ -632,7 +638,7 @@ evaluate_edges <- function(segments,
 #
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
-prune_edges <- function(objects, segments) {
+prune_edges <- function(objects, segments, coord_specific = NULL) {
     # If there are no objects, then there can be no intersections
     if(length(objects) == 0) {
         return(rep(TRUE, nrow(segments)))
@@ -640,13 +646,41 @@ prune_edges <- function(objects, segments) {
 
     # Loop over the objects in the environment and check their intersections 
     # with the lines in `segments`
+    #
+    # Also check whether the coordinates themselves fall within the objects. If 
+    # so, then we make an exception: None of the nodes that make up the edges 
+    # should themselves be contained within the enlarged object except when these
+    # represent goals and agents. For these cases, we make exceptions whenever 
+    # there is an intersection.
+    #
+    # In practice comes down to also checking whether the coordinates lie outside
+    # of the objects that you intersect them with (in `all_intersections`) and
+    # later checking only for these exceptions with an alternative set of 
+    # objects (in `coord_intersection`)
     all_intersections <- lapply(objects, 
-                                \(x) line_intersection(x, segments, return_all = TRUE))
+                                \(x) line_intersection(x, segments, return_all = TRUE) &
+                                     (out_object(x, segments[, 1:2]) & 
+                                      out_object(x, segments[, 3:4])))
+    test_1 <- Reduce("|", all_intersections)
+
+    if(!is.null(coord_specific)) {
+        if(length(coord_specific) != length(objects)) {
+            test_2 <- logical(length(objects))
+        } else { 
+            coord_intersection <- lapply(seq_along(coord_specific), 
+                                         \(i) line_intersection(coord_specific[[i]], segments, return_all = TRUE) &
+                                              (in_object(objects[[i]], segments[, 1:2]) | 
+                                               in_object(objects[[i]], segments[, 3:4])))
+            test_2 <- Reduce("|", coord_intersection)
+        }
+    } else {
+        test_2 <- logical(length(objects))
+    }
 
     # I want to only retain those that do not intersect, meaning that the complete
     # row should be FALSE. We therefore check whether any of the sides is TRUE and 
     # then reverse the operation, so that none of them can be
-    return(!Reduce("|", all_intersections))
+    return(!(test_1 | test_2))
 }
 
 #' Make combinations of different nodes
