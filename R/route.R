@@ -665,7 +665,7 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
 
     if(!is.null(coord_specific)) {
         if(length(coord_specific) != length(objects)) {
-            test_2 <- logical(length(objects))
+            test_2 <- logical(length(nrow(segments)))
         } else { 
             coord_intersection <- lapply(seq_along(coord_specific), 
                                          \(i) line_intersection(coord_specific[[i]], segments, return_all = TRUE) &
@@ -674,7 +674,7 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
             test_2 <- Reduce("|", coord_intersection)
         }
     } else {
-        test_2 <- logical(length(objects))
+        test_2 <- logical(length(nrow(segments)))
     }
 
     # I want to only retain those that do not intersect, meaning that the complete
