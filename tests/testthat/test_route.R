@@ -167,7 +167,7 @@ testthat::test_that("Evaluating which edges should be deleted works", {
                                                cost = cost[1:8]))
 
     # Do the test
-    tst <- predped:::evaluate_edges(segments, setting)
+    tst <- predped:::evaluate_edges(segments, setting, space_between = 0)
 
     testthat::expect_equal(tst$edges, ref$edges)
     testthat::expect_equal(tst$edges_with_coords, ref$edges_with_coords)
