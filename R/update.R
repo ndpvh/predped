@@ -508,14 +508,28 @@ update_goal <- function(agent,
                         print_iteration = FALSE,
                         cpp = TRUE) {  
 
+    # Adjust the relative measures to account for the radius of the agent
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
+    # Extract objects and shape of the environment
     obj <- objects(background)
+    shp <- shape(background)
 
-    # Make some placeholders for reroutening and rerouting
-    reroute <- FALSE
+    # Check whether the agent can see the current goal. This is used in "plan", 
+    # "reroute", and "move". Based on (a) whether any objects can be in the way 
+    # and (b) the shape of the room. With regard to the latter, we note that an 
+    # agent is guaranteed to see their goal if the room is regular (rectangle or 
+    # circle) and no objects are in the way. Otherwise, we have to do a check
+    if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
+        seen <- TRUE
+    } else if(nrow(current_goal(agent)@path) < 1) {
+        seen <- FALSE
+    } else {
+        edge <- matrix(c(position(agent), current_goal(agent)@path[1, ]), nrow = 1)
+        seen <- all(prune_edges(append(obj, shape(background)), edge))
+    }
 
     # Check whether an agent is close to their goal. If so, they can stop what 
     # they're doing and instead start completing the goal. 
@@ -584,15 +598,6 @@ update_goal <- function(agent,
     # directly towards it, or they cannot see their goal and they have to 
     # actually plan their route.
     if(status(agent) == "plan") {
-        # Check whether the agent can see the current goal.
-        if(length(obj) == 0) {
-            seen <- TRUE 
-        } else {
-            seen <- all(prune_edges(obj, 
-                                    matrix(c(position(agent), current_goal(agent)@position),
-                                           nrow = 1)))
-        }
-
         # If the agent sees their goal, the path is just going to go directly 
         # towards the goal
         if(seen) {
@@ -629,20 +634,6 @@ update_goal <- function(agent,
     # agents can still plan their path if they can see their goal, but other 
     # agents are in the way. This is determined by the reroute parameter
     if(status(agent) == "reroute") {
-        # Check whether the agent can see the current goal based on (a) whether
-        # any objects can be in the way and (b) the shape of the room. With 
-        # regard to the latter, we note that an agent is guaranteed to see their
-        # goal if the room is regular (rectangle or circle) and no objects are 
-        # in the way. Otherwise, we have to do a check
-        shp <- shape(background)
-        if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
-            seen <- TRUE
-        } else {
-            seen <- all(prune_edges(append(obj, shape(background)), 
-                                    matrix(c(position(agent), current_goal(agent)@position),
-                                           nrow = 1)))
-        }
-
         # If the agent doesn't see their current goal, they have to reroute with
         # a probability of 100%
         if(!seen) {
@@ -775,6 +766,15 @@ update_goal <- function(agent,
     # Finally, it might also be that the agent is close to the goal and can 
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {  
+        # Check whether agents can still see their goal. If not, then let them
+        # reroute.
+        if(!seen) {
+            status(agent) <- "reroute"
+            return(agent)
+        }
+
+        # Check whether agents can see the next path point. If so, then they 
+        # can move to that one instead of the first one
         if(nrow(current_goal(agent)@path) > 1) {
             # If there are still path points left, check whether the agent can see 
             # the next path point.
