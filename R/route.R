@@ -657,15 +657,21 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
     # of the objects that you intersect them with (in `all_intersections`) and
     # later checking only for these exceptions with an alternative set of 
     # objects (in `coord_intersection`)
-    all_intersections <- lapply(objects, 
-                                \(x) line_intersection(x, segments, return_all = TRUE) &
-                                     (out_object(x, segments[, 1:2]) & 
-                                      out_object(x, segments[, 3:4])))
-    test_1 <- Reduce("|", all_intersections)
+    if(is.null(coord_specific)) {
+        all_intersections <- lapply(objects, 
+                                    \(x) line_intersection(x, segments, return_all = TRUE))
 
-    if(!is.null(coord_specific)) {
+        test_1 <- Reduce("|", all_intersections)
+        test_2 <- logical(nrow(segments))
+    } else {
+        all_intersections <- lapply(objects, 
+                                    \(x) line_intersection(x, segments, return_all = TRUE) &
+                                         (out_object(x, segments[, 1:2]) & 
+                                          out_object(x, segments[, 3:4])))
+        test_1 <- Reduce("|", all_intersections)
+
         if(length(coord_specific) != length(objects)) {
-            test_2 <- logical(length(nrow(segments)))
+            test_2 <- logical(nrow(segments))
         } else { 
             coord_intersection <- lapply(seq_along(coord_specific), 
                                          \(i) line_intersection(coord_specific[[i]], segments, return_all = TRUE) &
@@ -673,8 +679,6 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
                                                in_object(objects[[i]], segments[, 3:4])))
             test_2 <- Reduce("|", coord_intersection)
         }
-    } else {
-        test_2 <- logical(length(nrow(segments)))
     }
 
     # I want to only retain those that do not intersect, meaning that the complete
