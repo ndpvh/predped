@@ -106,8 +106,15 @@ setMethod("moving_options", "agent", function(object,
     # Add the other agents to the background objects. This will allow us to 
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
+    # 
+    # You have to delete the current agent from this!
+    ids <- sapply(agents(state), id)
+    agents_minus_agent <- agents(state)[ids != id(object)]
+
     objects(background) <- append(objects(background), 
-                                  agents(state))
+                                  agents_minus_agent)
+
+    browser()
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
