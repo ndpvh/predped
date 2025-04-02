@@ -344,7 +344,7 @@ update_position <- function(agent,
         agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to
-        check <- moving_options(agent, state, background, centers)
+        check <- moving_options(agent, state, background, centers, cpp = cpp)
         
         # If there are no good options available, trigger a reroutening of the 
         # agent: This will create new path points and let the agent reorient. 
