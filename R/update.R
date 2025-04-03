@@ -64,15 +64,25 @@ setMethod("update", "state", function(object,
     #
     # This is a necessary part of the code that prevents agents from getting 
     # stuck
-    if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
-        seen <- TRUE
-    } else if(nrow(current_goal(agent)@path) < 1) {
-        seen <- FALSE
+    # if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
+    if(length(obj) == 0) {
+        seen <- rep(TRUE, length(agent_list))
     } else {
-        edge <- matrix(c(position(agent), current_goal(agent)@path[1, ]), nrow = 1)
-        seen <- all(prune_edges(append(obj, shape(background)), edge))
+        edges <- sapply(agent_list, 
+                        function(x) {
+                            if(nrow(current_goal(x)@path) < 1) {
+                                return(c(position(x), rep(0, 2)))
+                            } else {
+                                return(c(position(x), current_goal(x)@path[1, ]))
+                            }
+                        })
+        edges <- t(edges)
+
+        seen_1 <- sapply(agent_list, \(x) nrow(current_goal(x)@path) >= 1)
+        seen_2 <- prune_edges(obj, edges)
+
+        seen <- seen_1 & seen_2
     }
-    
 
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
@@ -108,7 +118,7 @@ setMethod("update", "state", function(object,
                                   state_copy,
                                   background,
                                   agent_specs,
-                                  seen,
+                                  seen[i],
                                   cpp = cpp,
                                   ...)
     }
@@ -133,7 +143,7 @@ setMethod("update", "state", function(object,
 #' information of all agents within the current \code{state} and allows for the
 #' communication between the \code{predped} simulation functions and the 
 #' \code{m4ma} utility functions.
-#' @param seen Logical vector indicating whether agents can see the path point 
+#' @param seen Logical indicating whether the agent can see the path point 
 #' to which they are currently moving.
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Is used to create 
@@ -475,7 +485,7 @@ update_position <- function(agent,
 #' @param object Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
-#' @param seen Logical vector indicating whether agents can see the path point 
+#' @param seen Logical indicating whether the agent can see the path point 
 #' to which they are currently moving.
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
@@ -797,9 +807,9 @@ update_goal <- function(agent,
             if(length(obj) == 0) {
                 seen_next <- TRUE
             } else {
-                seen_next <- all(prune_edges(append(obj, shp),
-                                             matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                                    nrow = 1)))
+                seen_next <- prune_edges(obj,
+                                         matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                                nrow = 1))
             }
 
             # If a next path point is visible, the agent will switch to that 
