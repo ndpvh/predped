@@ -114,8 +114,6 @@ setMethod("moving_options", "agent", function(object,
     objects(background) <- append(objects(background), 
                                   agents_minus_agent)
 
-    browser()
-
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
     # and whether the agent has a direct line of sight to that cell.
