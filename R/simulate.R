@@ -366,6 +366,7 @@ setMethod("simulate", "predped", function(object,
                                    many_nodes = many_nodes,
                                    precompute_goal_paths = precompute_goal_paths,
                                    middle_edge = middle_edge,
+                                   individual_differences = individual_differences,
                                    ...)
     }
 
