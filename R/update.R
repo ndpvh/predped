@@ -52,6 +52,38 @@ setMethod("update", "state", function(object,
                                                time_step = time_step,
                                                cpp = cpp)
 
+    # Extract objects and shape of the environment
+    obj <- objects(background)
+    shp <- shape(background)
+
+    # Check whether each agent can see the current goal. This is used in "plan", 
+    # "reroute", and "move". Based on (a) whether any objects can be in the way 
+    # and (b) the shape of the room. With regard to the latter, we note that an 
+    # agent is guaranteed to see their goal if the room is regular (rectangle or 
+    # circle) and no objects are in the way. 
+    #
+    # This is a necessary part of the code that prevents agents from getting 
+    # stuck
+    # if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
+    if(length(obj) == 0) {
+        seen <- rep(TRUE, length(agent_list))
+    } else {
+        edges <- sapply(agent_list, 
+                        function(x) {
+                            if(nrow(current_goal(x)@path) < 1) {
+                                return(c(position(x), rep(0, 2)))
+                            } else {
+                                return(c(position(x), current_goal(x)@path[1, ]))
+                            }
+                        })
+        edges <- t(edges)
+
+        seen_1 <- sapply(agent_list, \(x) nrow(current_goal(x)@path) >= 1)
+        seen_2 <- prune_edges(obj, edges)
+
+        seen <- seen_1 & seen_2
+    }
+
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
     state_copy <- object
@@ -86,6 +118,7 @@ setMethod("update", "state", function(object,
                                   state_copy,
                                   background,
                                   agent_specs,
+                                  seen[i],
                                   cpp = cpp,
                                   ...)
     }
@@ -110,6 +143,8 @@ setMethod("update", "state", function(object,
 #' information of all agents within the current \code{state} and allows for the
 #' communication between the \code{predped} simulation functions and the 
 #' \code{m4ma} utility functions.
+#' @param seen Logical indicating whether the agent can see the path point 
+#' to which they are currently moving.
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Is used to create 
 #' the cell positions that the agent might move to, as performed through 
@@ -169,6 +204,7 @@ setMethod("update", "agent", function(object,
                                       state,
                                       background,
                                       agent_specifications,
+                                      seen,
                                       velocities = c(1.5, 1, 0.5) |>
                                           rep(each = 11) |>
                                           matrix(ncol = 3),
@@ -190,6 +226,7 @@ setMethod("update", "agent", function(object,
     object <- update_goal(object, 
                           state, 
                           background,
+                          seen,
                           standing_start = standing_start,     
                           close_enough = close_enough,
                           space_between = space_between,                     
@@ -344,7 +381,7 @@ update_position <- function(agent,
         agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to
-        check <- moving_options(agent, state, background, centers)
+        check <- moving_options(agent, state, background, centers, cpp = cpp)
         
         # If there are no good options available, trigger a reroutening of the 
         # agent: This will create new path points and let the agent reorient. 
@@ -448,6 +485,8 @@ update_position <- function(agent,
 #' @param object Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param seen Logical indicating whether the agent can see the path point 
+#' to which they are currently moving.
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -499,6 +538,7 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
+                        seen,
                         standing_start = 0.1,
                         close_enough = 2,
                         space_between = 1.25,
@@ -516,20 +556,6 @@ update_goal <- function(agent,
     # Extract objects and shape of the environment
     obj <- objects(background)
     shp <- shape(background)
-
-    # Check whether the agent can see the current goal. This is used in "plan", 
-    # "reroute", and "move". Based on (a) whether any objects can be in the way 
-    # and (b) the shape of the room. With regard to the latter, we note that an 
-    # agent is guaranteed to see their goal if the room is regular (rectangle or 
-    # circle) and no objects are in the way. Otherwise, we have to do a check
-    if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
-        seen <- TRUE
-    } else if(nrow(current_goal(agent)@path) < 1) {
-        seen <- FALSE
-    } else {
-        edge <- matrix(c(position(agent), current_goal(agent)@path[1, ]), nrow = 1)
-        seen <- all(prune_edges(append(obj, shape(background)), edge))
-    }
 
     # Check whether an agent is close to their goal. If so, they can stop what 
     # they're doing and instead start completing the goal. 
@@ -779,16 +805,16 @@ update_goal <- function(agent,
             # If there are still path points left, check whether the agent can see 
             # the next path point.
             if(length(obj) == 0) {
-                seen <- TRUE
+                seen_next <- TRUE
             } else {
-                seen <- all(prune_edges(obj, 
-                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                               nrow = 1)))
+                seen_next <- prune_edges(obj,
+                                         matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                                nrow = 1))
             }
 
             # If a next path point is visible, the agent will switch to that 
             # path point instead
-            if(seen) {
+            if(seen_next) {
                 current_goal(agent)@path <- current_goal(agent)@path[-1, , drop = FALSE] 
                 status(agent) <- "reorient" # Keep this in! Otherwise agents get stuck
 

@@ -276,6 +276,7 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     // These copies are necessary!
     S4 copy_state = clone(state);
     S4 copy_background = clone(background);
+    CharacterVector id_agent = agent.slot("id");
 
     // Add the other agents to the background objects. This will allow us to 
     // immediately test whether cells are occupied by other agents instead of 
@@ -286,6 +287,14 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     List objects = copy_background.slot("objects");
     for(int i = 0; i < agents.length(); i++) {
         S4 agent_i = agents[i];
+
+        // Skip the addition for the current agent
+        CharacterVector id_i = agent_i.slot("id");
+        LogicalVector id_check = (id_i == id_agent);
+        if(all(id_check).is_true()) {
+            continue;
+        }
+
         NumericVector center_i = agent_i.slot("center");
 
         if(sum((center_i - agent_center) * (center_i - agent_center)) < 5) {
