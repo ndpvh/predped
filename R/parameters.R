@@ -219,7 +219,10 @@ load_parameters <- function(x = NULL,
     # Case: Other delimited files        
     } else {
         # Use read.table for this purpose
-        params <- utils::read.table(x, header = TRUE, sep = sep)
+        params <- utils::read.table(x, 
+                                    header = TRUE, 
+                                    sep = sep,
+                                    comment.char = "@")
     }
 
     # When parameters have been read in, we should check what their type is. 
