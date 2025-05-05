@@ -375,3 +375,163 @@ testthat::test_that("Overlap with objects of R and Rcpp converges", {
 
     testthat::expect_equal(tst, ref)
 })
+
+testthat::test_that("Testing edge case; agent cannot walk inside of an object", {
+    # Create agent, background, and state
+    my_agent <- predped::agent(center = c(0.5, 0), 
+                               radius = 0.25, 
+                               orientation = 0,
+                               current_goal = predped::goal(position = c(-0.1, 0), 
+                                                            path = matrix(c(-0.1, 0), nrow = 1)))
+
+    my_background <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                                    size = c(20, 5)),
+                                         objects = list(predped::rectangle(center = c(5, 0), 
+                                                                           size = c(10, 3))))
+
+    my_state <- predped::state(iteration = 0, 
+                               setting = my_background, 
+                               agents = list(my_agent))
+
+    # Three sets of centers, ones that fall inside of the object, ones that fall 
+    # outside of the object, and ones that combine the two
+    inside <- cbind(rep(seq(1, 9, length.out = 11), times = 3),
+                     rep(-1:1, each = 11))
+    outside <- cbind(rep(- seq(1, 9, length.out = 11), times = 3),
+                    rep(-1:1, each = 11))
+    combo <- rbind(inside[1:16, ], 
+                   outside[1:17, ])
+
+    # Do the test for each of these possibilities, as well as R and Rcpp
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       outside, 
+                                                       cpp = FALSE)))
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       outside, 
+                                                       cpp = TRUE)))
+
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       inside, 
+                                                       cpp = FALSE)))
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       inside, 
+                                                       cpp = TRUE)))
+
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       combo, 
+                                                       cpp = FALSE)))
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       combo, 
+                                                       cpp = TRUE)))
+
+    # Visualize them all 
+    # predped::plot(my_background) +
+    #     predped::plot(my_agent) +
+    #     ggplot2::annotate("point", 
+    #                       x = outside[, 1],
+    #                       y = outside[, 2],
+    #                       color = "red") +
+    #     ggplot2::annotate("point", 
+    #                       x = inside[, 1],
+    #                       y = inside[, 2],
+    #                       color = "blue") +
+    #     ggplot2::annotate("point", 
+    #                       x = combo[, 1],
+    #                       y = combo[, 2],
+    #                       color = "green")
+})
+
+testthat::test_that("Testing edge case; agent cannot cross border of an object", {
+    # Create agent, background, and state
+    my_agent <- predped::agent(center = c(-0.5, 0), 
+                               radius = 0.25, 
+                               orientation = 0,
+                               current_goal = predped::goal(position = c(-0.1, 0), 
+                                                            path = matrix(c(-0.1, 0), nrow = 1)))
+
+    my_background <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+                                                                    size = c(20, 5)),
+                                         objects = list(predped::rectangle(center = c(5, 0), 
+                                                                           size = c(10, 3))))
+
+    my_state <- predped::state(iteration = 0, 
+                               setting = my_background, 
+                               agents = list(my_agent))
+
+    # Three sets of centers, ones that fall inside of the object, ones that fall 
+    # outside of the object, and ones that combine the two
+    outside <- cbind(rep(seq(1, 9, length.out = 11), times = 3),
+                     rep(-1:1, each = 11))
+    inside <- cbind(rep(- seq(1, 9, length.out = 11), times = 3),
+                    rep(-1:1, each = 11))
+    combo <- rbind(outside[1:16, ], 
+                   inside[1:17, ])
+
+    # Do the test for each of these possibilities, as well as R and Rcpp
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       outside, 
+                                                       cpp = FALSE)))
+    testthat::expect_false(any(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       outside, 
+                                                       cpp = TRUE)))
+
+    testthat::expect_true(all(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       inside, 
+                                                       cpp = FALSE)))
+    testthat::expect_true(all(predped::moving_options(my_agent, 
+                                                       my_state, 
+                                                       my_background,
+                                                       inside, 
+                                                       cpp = TRUE)))
+
+    testthat::expect_equal(predped::moving_options(my_agent, 
+                                                   my_state, 
+                                                   my_background,
+                                                   combo, 
+                                                   cpp = FALSE), 
+                           matrix(c(rep(FALSE, 16), rep(TRUE, 17)), 
+                                  nrow = 11, 
+                                  ncol = 3))
+    testthat::expect_equal(predped::moving_options(my_agent, 
+                                                   my_state, 
+                                                   my_background,
+                                                   combo, 
+                                                   cpp = TRUE), 
+                           matrix(c(rep(FALSE, 16), rep(TRUE, 17)), 
+                                  nrow = 11, 
+                                  ncol = 3))
+
+    # Visualize them all 
+    # predped::plot(my_background) +
+    #     predped::plot(my_agent) +
+    #     ggplot2::annotate("point", 
+    #                       x = outside[, 1],
+    #                       y = outside[, 2],
+    #                       color = "red") +
+    #     ggplot2::annotate("point", 
+    #                       x = inside[, 1],
+    #                       y = inside[, 2],
+    #                       color = "blue") +
+    #     ggplot2::annotate("point", 
+    #                       x = combo[, 1],
+    #                       y = combo[, 2],
+    #                       color = "green")
+})

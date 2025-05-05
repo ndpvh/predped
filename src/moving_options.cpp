@@ -303,9 +303,9 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     }
     copy_background.slot("objects") = objects;
 
-    // // Use the `free_cells` function to get all free cells to which the agent
-    // // might move. Specifically look at whether a cell lies within the background
-    // // and whether the agent has a direct line of sight to that cell.
+    // Use the `free_cells` function to get all free cells to which the agent
+    // might move. Specifically look at whether a cell lies within the background
+    // and whether the agent has a direct line of sight to that cell.
     LogicalMatrix check = free_cells(
         agent, 
         copy_background, 
@@ -361,11 +361,41 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     }
 
     // If there are still cells free, check whether the goal can still be seen
-    // or whether an agent should re-plan
+    // or whether an agent should re-plan. Additionally, check whether any of 
+    // the centers is actually lying inside of any of the objects
     if(any(check).is_true()) {
         // Make copy of check
         LogicalMatrix check_vec = clone(check);
         check_vec.attr("dim") = R_NilValue;
+
+        // Additional thing to check: Make sure none of these centers lies 
+        // within an object. Apparently, this is not automatically checked in 
+        // `free_cells_rcpp`!
+        //
+        // Moved here to do the conversion to a vector only once: `in_object` 
+        // will return a LogicalVector, not Matrix.
+        NumericMatrix coord(1, 2);
+        bool for_check = false;
+        for(int i = 0; i < check_vec.length(); i++) {
+            // If this check is already FALSE, move on to the next one
+            for_check = check_vec[i];
+            if(!for_check) {
+                continue;
+            }
+
+            // Extract current coordinates
+            coord(0, _) = centers(i, _);
+
+            for(int j = 0; j < objects.length(); j++) {
+                LogicalVector result = in_object_rcpp(objects[j], coord);
+                for_check = result[0];
+
+                if(for_check) {
+                    check_vec[i] = false;
+                    break;
+                }
+            }
+        }
 
         // Function to rewrite! New arguments are already provided to this one,
         // but not the original one.
@@ -394,6 +424,17 @@ LogicalMatrix moving_options_rcpp(S4 agent,
                 11,
                 3,
                 local_check.begin()
+            );
+            check = converted_check;
+
+        // If the local check doesn't contain anything, we can base ourselves 
+        // upon the results of the check_vec that we created earlier. Note that 
+        // this check_vec is already accounted for in local_check as well
+        } else {
+            LogicalMatrix converted_check(
+                11, 
+                3, 
+                check_vec.begin()
             );
             check = converted_check;
         }

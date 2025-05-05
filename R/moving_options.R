@@ -119,6 +119,12 @@ setMethod("moving_options", "agent", function(object,
     # and whether the agent has a direct line of sight to that cell.
     check <- m4ma::free_cells_rcpp(object, background, centers)
 
+    # Additional thing to check: Make sure none of these centers lies within an 
+    # object. Apparently, this is not automatically checked in `free_cells_rcpp`!
+    check_in <- lapply(objects(background), 
+                       \(x) in_object(x, centers))
+    check <- check & !Reduce("|", check_in)
+
     # If there are still cells free, check whether an agent would intersect with
     # an object if it were to move to a given cell. Given that the function
     # `overlap_with_object` only checks those cells that are free, the output
