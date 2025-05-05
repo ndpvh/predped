@@ -1028,7 +1028,7 @@ setGeneric("in_object", function(object, x, ...) standardGeneric("in_object"))
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "polygon"), function(object, 
                                                                x,
-                                                               cpp = FALSE) {
+                                                               cpp = TRUE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1053,7 +1053,7 @@ setMethod("in_object", signature(object = "polygon"), function(object,
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "rectangle"), function(object, 
                                                                  x,
-                                                                 cpp = FALSE) {
+                                                                 cpp = TRUE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1098,7 +1098,7 @@ setMethod("in_object", signature(object = "rectangle"), function(object,
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "circle"), function(object, 
                                                               x,
-                                                              cpp = FALSE) {
+                                                              cpp = TRUE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1125,7 +1125,8 @@ setMethod("in_object", signature(object = "circle"), function(object,
 
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "segment"), function(object, 
-                                                               x) {
+                                                               x,
+                                                               ...) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
