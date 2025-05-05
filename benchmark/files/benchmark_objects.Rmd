@@ -118,26 +118,44 @@ obj <- list(predped:::rectangle(center = c(1, 2), size = c(1, 1)),
 pts <- cbind(rep(1, 100), rep(2, 100))
 
 # Test
-r <- (\() predped::in_object(obj[[1]], pts)) |>
+r_r <- (\() predped::in_object(obj[[1]], pts, cpp = FALSE)) |>
     test_times() |>
     rnd() 
-c <- (\() predped::in_object(obj[[2]], pts)) |>
+c_r <- (\() predped::in_object(obj[[2]], pts, cpp = FALSE)) |>
     test_times() |>
     rnd() 
-p <- (\() predped::in_object(obj[[3]], pts)) |>
+p_r <- (\() predped::in_object(obj[[3]], pts, cpp = FALSE)) |>
+    test_times() |>
+    rnd() 
+
+
+r_rcpp <- (\() predped::in_object(obj[[1]], pts, cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+c_rcpp <- (\() predped::in_object(obj[[2]], pts, cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+p_rcpp <- (\() predped::in_object(obj[[3]], pts, cpp = TRUE)) |>
     test_times() |>
     rnd() 
 
 # Create the table
-tbl <- c(r[2], c(paste0("[", r[1], ",", r[3], "]")), 
-         p[2], c(paste0("[", p[1], ",", p[3], "]")), 
-         c[2], c(paste0("[", c[1], ",", c[3], "]"))) |>
-    matrix(nrow = 1)
+tbl <- c("cpp = FALSE", 
+         "cpp = TRUE", 
+         r_r[2], r_rcpp[2], 
+         c(paste0("[", r_r[1], ",", r_r[3], "]")),  c(paste0("[", r_rcpp[1], ",", r_rcpp[3], "]")), 
+         p_r[2], p_rcpp[2], 
+         c(paste0("[", p_r[1], ",", p_r[3], "]")), c(paste0("[", p_rcpp[1], ",", p_rcpp[3], "]")), 
+         c_r[2], c_rcpp[2], 
+         c(paste0("[", c_r[1], ",", c_r[3], "]")), c(paste0("[", c_rcpp[1], ",", c_rcpp[3], "]"))) |>
+    matrix(nrow = 2)
 colnames(tbl) <- NULL
 
 # Write the caption
 caption <- paste0("Benchmark for the in\\_object method for objects. ",
                   "Distinctions are made between the different objects that are exported by predped. ",
+                  "We additionally distinguish between using the R version of the function (`cpp = FALSE`) ",
+                  "or the Rcpp version (`cpp = TRUE`). ",
                   "For this benchmark, 100 points are evaluated.")
 tbl |>
     knitr::kable(format = "latex", 
@@ -147,7 +165,7 @@ tbl |>
                  booktabs = TRUE,
                  escape = FALSE,  
                  position = "H" ) |>
-    kableExtra::add_header_above(c("Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
+    kableExtra::add_header_above(c(" " = 1, "Rectangle" = 2, "Polygon" = 2, "Circle" = 2)) |>
     print()
 
 ```

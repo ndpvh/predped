@@ -151,3 +151,116 @@ NumericMatrix nodes_on_circumference_rcpp(S4 object,
 
     return NumericMatrix(0, 2);
 }
+
+//' Check Whether a Point Lies Within an Object
+//' 
+//' Currently works for all classes inside of the \code{\link[predped]{object-class}}.
+//'
+//' @param object Object of the \code{\link[predped]{object-class}}.
+//' @param x Numeric vector or matrix containing x- and y-coordinates to be 
+//' checked.
+//'
+//' @return Logical whether the point is inside of the object (\code{TRUE}) or 
+//' outside of the object (\code{FALSE}).
+//' 
+//' @examples 
+//' # Create an object
+//' my_circle <- circle(center = c(0, 0), radius = 1)
+//' 
+//' # Let's create a matrix of different coordinates of which the first is 
+//' # inside of the object, the second on its circumference, and the third  
+//' # outside of the object
+//' coords <- rbind(c(0, 0), 
+//'                 c(1, 0), 
+//'                 c(2, 0))
+//' 
+//' # Let's do the test
+//' in_object_rcpp(my_circle, coords)
+//' 
+//' @seealso 
+//' \code{\link[predped]{circle-class}}, 
+//' \code{\link[predped]{polygon-class}},  
+//' \code{\link[predped]{rectangle-class}},
+//' \code{\link[predped]{segment-class}},
+//' \code{\link[predped]{out_object}}, 
+//' \code{\link[predped]{moving_options}}
+//' 
+//' @docType method
+//' 
+//' @rdname in_object_rcpp
+//' 
+//' @export
+// [[Rcpp::export]]
+LogicalVector in_object_rcpp(S4 object,
+                             NumericMatrix x) {
+
+    // Check the class of the object. Depending on this, the computation 
+    // is different
+    std::string object_class = object.attr("class");
+    LogicalVector result(x.nrow());
+
+    // For polygons and rectangles, we will use the raycasting algorithm to find
+    // out whether a point lies within the object
+    if((object_class == "polygon") || (object_class == "rectangle")) {
+        // Extract the points of the object and make them into edges or segments
+        NumericMatrix points = object.slot("points");
+        NumericVector xp = points(_, 0);
+        NumericVector yp = points(_, 1);
+        xp.push_back(xp[0]);
+        yp.push_back(yp[0]); 
+
+        // Define the number of edges to loop over, as well as the number of 
+        // points to check.
+        for(int i = 0; i < x.nrow(); i++) {
+            // Initialize a counter that will tell us how many segments the point
+            // crosses through raycasting.
+            int counter = 0;
+
+            // Loop over the different segments and check whether a line starting 
+            // from the point and driving on to infinity leads to an intersection 
+            // with the segments. If so, increase the counter
+            for(int j = 0; j < xp.length() - 1; j++) {
+                // First check: The y-coordinate of the point is above or below 
+                // the y-coordinates that make up the segment. Can only intersect 
+                // if at least one is above and one is below, or vice-versa.
+                bool check_1 = (yp[j] > x(i, 1)) != (yp[j + 1] > x(i, 1));
+
+                // Second check: Use a derived formula to find out whether 
+                // drawing a horizontal line from the starting point to infinity 
+                // will lead to an intersection with this segment.
+                double slope = (xp[j + 1] - xp[j]) / (yp[j + 1] - yp[j]);
+                double x_intersection = xp[j] + slope * (x(i, 1) - yp[j]);
+
+                bool check_2 = x(i, 0) < x_intersection;
+
+                // Update the counter if both checks are TRUE.
+                if(check_1 & check_2) {
+                    counter++;
+                }
+            }
+
+            // After checking per segment, we can use the counter to check whether
+            // the point lies inside or outside of the object. Inside when uneven,
+            // outside when even.
+            result[i] = (counter % 2 == 1);
+        }
+
+    // For circles, will use the distance from the point to the center of the 
+    // circle to find out whether a point lies within this circle
+    } else if((object_class == "circle") || (object_class == "agent")) {
+
+        // Compute the distance between the coordinates and the center of the 
+        // of the circle. Then check whether this distance is smaller thna the 
+        // radius of the circle.
+        NumericVector y = object.slot("center");
+        double radius = object.slot("radius");
+        radius = radius * radius;
+
+        for(int i = 0; i < x.nrow(); i++) {
+            double dist = (x(i, 0) - y[0]) * (x(i, 0) - y[0]) + (x(i, 1) - y[1]) * (x(i, 1) - y[1]);
+            result[i] = dist < radius;
+        }
+    }
+
+    return result;
+}
