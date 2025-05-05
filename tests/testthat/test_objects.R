@@ -810,6 +810,35 @@ testthat::test_that("Segment contains multiple points works", {
     testthat::expect_equal(tst, ref)
 })
 
+testthat::test_that("Results in_object converge between R and Rcpp", {
+    # Create the different shapes that should be tested.
+    shapes <- list(predped::polygon(points = cbind(c(-5, -5, 5, 5, 0, 0),
+                                                   c(-5, 5, 5, 0, 0, -5))),
+                   predped::polygon(points = cbind(c(-5, -5, 5, 5, 3, 3, -3, -3),
+                                                   c(-5, 5, 5, -5, -5, 3, 3, -5))),
+                   predped::rectangle(center = c(-2.5, -2.5), size = c(5, 5)),
+                   predped::rectangle(center = c(2.5, 2.5), size = c(5, 5)),
+                   predped::rectangle(center = c(-2.5, -2.5), size = c(5, 5), orientation = pi/4),
+                   predped::rectangle(center = c(2.5, 2.5), size = c(5, 5), orientation = pi/4),
+                   predped::circle(center = c(-2.5, -2.5), radius = 2.5),
+                   predped::circle(center = c(2.5, 2.5), radius = 2.5))
+    
+    points <- cbind(rep(seq(-5, 5, 0.5), each = 21),
+                    rep(seq(-5, 5, 0.5), times = 21))
+
+    # Create the results for the R and Rcpp versions and compare (in_object)
+    ref <- lapply(shapes, \(x) predped::in_object(x, points, cpp = FALSE))
+    tst <- lapply(shapes, \(x) predped::in_object(x, points, cpp = TRUE))
+
+    testthat::expect_equal(tst, ref)
+
+    # Create the results for the R and Rcpp versions and compare (out_object)
+    ref <- lapply(shapes, \(x) predped::out_object(x, points, cpp = FALSE))
+    tst <- lapply(shapes, \(x) predped::out_object(x, points, cpp = TRUE))
+
+    testthat::expect_equal(tst, ref)
+})
+
 
 
 

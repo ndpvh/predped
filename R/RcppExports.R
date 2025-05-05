@@ -382,6 +382,48 @@ nodes_on_circumference_rcpp <- function(object, space_between) {
     .Call('_predped_nodes_on_circumference_rcpp', PACKAGE = 'predped', object, space_between)
 }
 
+#' Check Whether a Point Lies Within an Object
+#' 
+#' Currently works for all classes inside of the \code{\link[predped]{object-class}}.
+#'
+#' @param object Object of the \code{\link[predped]{object-class}}.
+#' @param x Numeric vector or matrix containing x- and y-coordinates to be 
+#' checked.
+#'
+#' @return Logical whether the point is inside of the object (\code{TRUE}) or 
+#' outside of the object (\code{FALSE}).
+#' 
+#' @examples 
+#' # Create an object
+#' my_circle <- circle(center = c(0, 0), radius = 1)
+#' 
+#' # Let's create a matrix of different coordinates of which the first is 
+#' # inside of the object, the second on its circumference, and the third  
+#' # outside of the object
+#' coords <- rbind(c(0, 0), 
+#'                 c(1, 0), 
+#'                 c(2, 0))
+#' 
+#' # Let's do the test
+#' in_object_rcpp(my_circle, coords)
+#' 
+#' @seealso 
+#' \code{\link[predped]{circle-class}}, 
+#' \code{\link[predped]{polygon-class}},  
+#' \code{\link[predped]{rectangle-class}},
+#' \code{\link[predped]{segment-class}},
+#' \code{\link[predped]{out_object}}, 
+#' \code{\link[predped]{moving_options}}
+#' 
+#' @docType method
+#' 
+#' @rdname in_object_rcpp
+#' 
+#' @export
+in_object_rcpp <- function(object, x) {
+    .Call('_predped_in_object_rcpp', PACKAGE = 'predped', object, x)
+}
+
 #' Predict agents' movement
 #' 
 #' Rcpp alternative of \code{\link[predped]{predict_movement}}.

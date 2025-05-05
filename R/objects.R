@@ -990,6 +990,8 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' @param object Object of the \code{\link[predped]{object-class}}.
 #' @param x Numeric vector or matrix containing x- and y-coordinates to be 
 #' checked.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return Logical whether the point is inside of the object (\code{TRUE}) or 
 #' outside of the object (\code{FALSE}).
@@ -1021,11 +1023,12 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' @rdname in_object-method
 #' 
 #' @export
-setGeneric("in_object", function(object, x) standardGeneric("in_object"))
+setGeneric("in_object", function(object, x, ...) standardGeneric("in_object"))
 
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "polygon"), function(object, 
-                                                               x) {
+                                                               x,
+                                                               cpp = FALSE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1035,6 +1038,11 @@ setMethod("in_object", signature(object = "polygon"), function(object,
 
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
+    }
+
+    # Check whether cpp requested
+    if(cpp) {
+        return(in_object_rcpp(object, x))
     }
 
     # Use the raycasting algorithm to determine whether the points in x are 
@@ -1044,7 +1052,8 @@ setMethod("in_object", signature(object = "polygon"), function(object,
 
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "rectangle"), function(object, 
-                                                                 x) {
+                                                                 x,
+                                                                 cpp = FALSE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1054,6 +1063,11 @@ setMethod("in_object", signature(object = "rectangle"), function(object,
     
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
+    }
+
+    # Check whether cpp requested
+    if(cpp) {
+        return(in_object_rcpp(object, x))
     }
 
     # Use the raycasting algorithm to determine whether the points in x are 
@@ -1083,7 +1097,8 @@ setMethod("in_object", signature(object = "rectangle"), function(object,
 
 #' @rdname in_object-method
 setMethod("in_object", signature(object = "circle"), function(object, 
-                                                              x) {
+                                                              x,
+                                                              cpp = FALSE) {
 
     # If x is not a matrix, make it one. This will allow us to use `in_object`
     # in a vectorized manner (taking in a matrix of coordinates)
@@ -1093,6 +1108,11 @@ setMethod("in_object", signature(object = "circle"), function(object,
     
     if(!is.matrix(x)) {
         x <- matrix(x, ncol = 2)
+    }
+
+    # Check whether cpp requested
+    if(cpp) {
+        return(in_object_rcpp(object, x))
     }
 
     # Compute the distance between the coordinate and the center of the circle.
@@ -1136,6 +1156,8 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' @param object Object of the \code{\link[predped]{object-class}}.
 #' @param x Numeric vector or matrix containing x- and y-coordinates to be 
 #' checked.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return Logical whether the point is outside of the object (\code{TRUE}) or 
 #' inside of the object (\code{FALSE}).
@@ -1167,10 +1189,10 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' @rdname out_object-method
 #' 
 #' @export
-setGeneric("out_object", function(object, x) standardGeneric("out_object"))
+setGeneric("out_object", function(object, x, ...) standardGeneric("out_object"))
 
 #' @rdname out_object-method
-setMethod("out_object", signature(object = "object"), function(object, x) !in_object(object, x))
+setMethod("out_object", signature(object = "object"), function(object, x, ...) !in_object(object, x, ...))
 
 
 
