@@ -143,7 +143,7 @@ setMethod("moving_options", "agent", function(object,
 
     # If there are still cells free, check whether the goal can still be seen
     # or whether an agent should re-plan
-    if(!all(!check)){
+    if(!all(!check)) { 
         # Weird bug: running seesGoalOK_rcpp changes `check` or copy of `check`.
         # Keep copy of the opposite of `check` for later use
         opposite_check <- !check

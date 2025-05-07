@@ -328,7 +328,7 @@ LogicalMatrix moving_options_rcpp(S4 agent,
             centers, 
             check
         );
-        // // Make copy of check
+        // Make copy of check
         // LogicalMatrix check_vec = clone(check);
         // check_vec.attr("dim") = R_NilValue;
 
