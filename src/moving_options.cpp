@@ -312,6 +312,41 @@ LogicalMatrix moving_options_rcpp(S4 agent,
         centers
     );
 
+    // Additional thing to check: Make sure none of these centers lies 
+    // within an object. Apparently, this is not automatically checked in 
+    // `free_cells_rcpp`!
+    NumericMatrix coord(1, 2);
+    for(int i = 0; i < check.length(); i++) {
+        // If this check is already FALSE, move on to the next one
+        bool for_check = check[i];
+        if(!for_check) {
+            continue;
+        }
+
+        // Extract current coordinates
+        coord(0, _) = centers(i, _);
+        for(List::iterator j = objects.begin(); j < objects.end(); ++j) {
+            for_check = as<bool>(in_object_rcpp(*j, coord));
+
+            if(for_check) {
+                check[i] = false;
+                break;
+            }
+        }
+    }
+
+    // If something blocks the way in the previous column, then it should also 
+    // block the way on the columns
+    for(int i = 0; i < check.nrow(); i++) {
+        if(!check(i, 2)) {
+            check(i, 1) = false;
+        }
+
+        if(!check(i, 1)) {
+            check(i, 0) = false;
+        }
+    }
+
     // If there are still cells free, check whether an agent would intersect with
     // an object if it were to move to a given cell. Given that the function
     // `overlap_with_object` only checks those cells that are free, the output
@@ -342,14 +377,6 @@ LogicalMatrix moving_options_rcpp(S4 agent,
         // If something blocks the way in the previous column, then it should also 
         // block the way on the columns
         for(int i = 0; i < check.nrow(); i++) {
-            // For some reason, the loop doesn't work! Keep it in for legacy purposes
-            // for(int j = 1; j < check.ncol(); j++) {
-            //     Rcout << check(i, j) << "\n";
-            //     if(!check(i, j)) {
-            //         check(i, j - 1) = false;
-            //     }
-            // }
-
             if(!check(i, 2)) {
                 check(i, 1) = false;
             }
@@ -367,35 +394,6 @@ LogicalMatrix moving_options_rcpp(S4 agent,
         // Make copy of check
         LogicalMatrix check_vec = clone(check);
         check_vec.attr("dim") = R_NilValue;
-
-        // Additional thing to check: Make sure none of these centers lies 
-        // within an object. Apparently, this is not automatically checked in 
-        // `free_cells_rcpp`!
-        //
-        // Moved here to do the conversion to a vector only once: `in_object` 
-        // will return a LogicalVector, not Matrix.
-        NumericMatrix coord(1, 2);
-        bool for_check = false;
-        for(int i = 0; i < check_vec.length(); i++) {
-            // If this check is already FALSE, move on to the next one
-            for_check = check_vec[i];
-            if(!for_check) {
-                continue;
-            }
-
-            // Extract current coordinates
-            coord(0, _) = centers(i, _);
-
-            for(int j = 0; j < objects.length(); j++) {
-                LogicalVector result = in_object_rcpp(objects[j], coord);
-                for_check = result[0];
-
-                if(for_check) {
-                    check_vec[i] = false;
-                    break;
-                }
-            }
-        }
 
         // Function to rewrite! New arguments are already provided to this one,
         // but not the original one.

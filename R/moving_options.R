@@ -125,6 +125,14 @@ setMethod("moving_options", "agent", function(object,
                        \(x) in_object(x, centers))
     check <- check & !Reduce("|", check_in)
 
+    # If something blocks the way in the previous column, then it should also 
+    # block the way on the columns. Note that we do this twice: Once here and 
+    # once after `overlap_with_objects`. Apparently, the model is sensitive to 
+    # both in their own right: Moving this check to once at the end changes how
+    # the pedestrians move around!
+    check[!check[,3],2] <- FALSE
+    check[!check[,2],1] <- FALSE
+
     # If there are still cells free, check whether an agent would intersect with
     # an object if it were to move to a given cell. Given that the function
     # `overlap_with_object` only checks those cells that are free, the output
