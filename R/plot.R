@@ -822,10 +822,7 @@ setMethod("transform_df", "background", function(object,
     # Step 3: Retain those entrances that fall within the specified bounds
     # of the shape
     entries <- do.call("rbind", entries)
-    entries <- entries[entries$x < limits[1, 2] &
-                       entries$x > limits[1, 1] &
-                       entries$y < limits[2, 2] &
-                       entries$y > limits[2, 1], ]
+    entries <- entries[in_object(object@shape, entries[, c("x", "y")]), ]
 
     # Return all points created here
     return(rbind(pts, 
