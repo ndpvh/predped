@@ -424,18 +424,7 @@ LogicalMatrix moving_options_rcpp(S4 agent,
                 local_check.begin()
             );
             check = converted_check;
-
-        // If the local check doesn't contain anything, we can base ourselves 
-        // upon the results of the check_vec that we created earlier. Note that 
-        // this check_vec is already accounted for in local_check as well
-        } else {
-            LogicalMatrix converted_check(
-                11, 
-                3, 
-                check_vec.begin()
-            );
-            check = converted_check;
-        }
+        } 
     }
 
     return check;
