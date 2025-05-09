@@ -102,9 +102,6 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
                                         LogicalMatrix check,
                                         double space_between = 5e-2) {
 
-    // S4 copy_background = clone(background);
-    // LogicalMatrix check = clone(check_original);
-
     // Extract objects and shape from the background
     List objects = background.slot("objects");
     S4 shape = background.slot("shape");
@@ -134,10 +131,7 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
     double radius = agent.slot("radius");
 
     double distance = std::sqrt(max(dist)); 
-    double cutoff = distance + radius; // Cutoff in R is: distance of agent to farthest center + radius. Here squared
-
-    cutoff *= cutoff;
-    radius *= radius;
+    double cutoff = distance + radius; // Use of the same cutoff as in R
 
     // Loop over all of the objects in the environment
     double minimum = 0;
@@ -153,7 +147,8 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
 
         // Compute the distance of the coordinates to the center of the agent. 
         // Retain only those that fall within a given distance
-        LogicalVector idx = (((x - position[0]) * (x - position[0]) + (y - position[1]) * (y - position[1])) <= cutoff);
+        NumericVector dist = ((x - position[0]) * (x - position[0]) + (y - position[1]) * (y - position[1]));
+        LogicalVector idx = sqrt(dist) <= cutoff;
 
         if(any(idx).is_false()) {
             continue;
@@ -166,8 +161,8 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
             // Only adjust the check when it is not yet blocked
             if(check[j]) {
                 // Compute the distance from the center to any of the coordinates
-                minimum = min((x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]));
                 NumericVector dist = (x - cx[j]) * (x - cx[j]) + (y - cy[j]) * (y - cy[j]);
+                minimum = min(sqrt(dist));
 
                 // Check whether any of these distances is smaller than the radius of 
                 // the agent. If so, then we know that the agent intersects with the 
@@ -276,15 +271,21 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     // These copies are necessary!
     S4 copy_state = clone(state);
     S4 copy_background = clone(background);
-    CharacterVector id_agent = agent.slot("id");
 
     // Add the other agents to the background objects. This will allow us to 
     // immediately test whether cells are occupied by other agents instead of 
     // doing this check only later.
+    //
+    // Differentiate between a list that does contain the other agents 
+    // (slot in background) and a list that does not (obj). This distinction is 
+    // used later when checking the seeing of goals 
     NumericVector agent_center = agent.slot("center");
+    CharacterVector id_agent = agent.slot("id");
 
     List agents = copy_state.slot("agents");
-    List objects = copy_background.slot("objects");
+
+    List objects = background.slot("objects");
+    List objects_agents = copy_background.slot("objects");
     for(int i = 0; i < agents.length(); i++) {
         S4 agent_i = agents[i];
 
@@ -297,11 +298,11 @@ LogicalMatrix moving_options_rcpp(S4 agent,
 
         NumericVector center_i = agent_i.slot("center");
 
-        if(sum((center_i - agent_center) * (center_i - agent_center)) < 5) {
-            objects.push_back(agents[i]);
-        }
+        // if(sum((center_i - agent_center) * (center_i - agent_center)) < 5) {
+        objects_agents.push_back(agents[i]);
+        // }
     }
-    copy_background.slot("objects") = objects;
+    copy_background.slot("objects") = objects_agents;
 
     // Use the `free_cells` function to get all free cells to which the agent
     // might move. Specifically look at whether a cell lies within the background
@@ -353,7 +354,6 @@ LogicalMatrix moving_options_rcpp(S4 agent,
     // of this function can overwrite the local `check` variable without any
     // issues
     if(any(check).is_true()) {
-
         // Currently, there is an unknown divergence between the R and Rcpp versions
         // of overlap_with_objects. However, we can use the original m4ma function
         // to achieve the same purpose.
@@ -363,7 +363,7 @@ LogicalMatrix moving_options_rcpp(S4 agent,
             centers, 
             check
         );
-        // Make copy of check
+        // // Make copy of check
         // LogicalMatrix check_vec = clone(check);
         // check_vec.attr("dim") = R_NilValue;
 

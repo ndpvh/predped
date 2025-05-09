@@ -107,12 +107,15 @@ setMethod("moving_options", "agent", function(object,
     # immediately test whether cells are occupied by other agents instead of 
     # doing this check only later.
     # 
-    # You have to delete the current agent from this!
+    # Differentiate between a list that does contain the other agents 
+    # (slot in background) and a list that does not (obj). This distinction is 
+    # used later when checking the seeing of goals 
     ids <- sapply(agents(state), id)
     agents_minus_agent <- agents(state)[ids != id(object)]
 
+    obj <- objects(background)
     objects(background) <- append(objects(background), 
-                                  agents_minus_agent)
+                                  agents_minus_agent)   
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
@@ -138,7 +141,7 @@ setMethod("moving_options", "agent", function(object,
     # `overlap_with_object` only checks those cells that are free, the output
     # of this function can overwrite the local `check` variable without any
     # issues
-    if(!all(!check)){
+    if(!all(!check)) {
         # check <- m4ma::bodyObjectOK_rcpp(size(agent), centers, objects(background), check) # Original
         check <- overlap_with_objects(object, background, centers, check, cpp = FALSE)
         # check <- bodyObjectOK(size(object), centers, objects(background), as.vector(check))
@@ -151,7 +154,7 @@ setMethod("moving_options", "agent", function(object,
 
     # If there are still cells free, check whether the goal can still be seen
     # or whether an agent should re-plan
-    if(!all(!check)) { 
+    if(!all(!check)){
         # Weird bug: running seesGoalOK_rcpp changes `check` or copy of `check`.
         # Keep copy of the opposite of `check` for later use
         opposite_check <- !check
@@ -164,7 +167,8 @@ setMethod("moving_options", "agent", function(object,
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
         
-        local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
+        # local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
+        local_check <- m4ma::seesGoalOK_rcpp(1, obj, state_dummy, centers, check)
 
         # Here, change `check` based on the results of the function. Importantly,
         # agent should still move even if it cannot see their goal (hence the
