@@ -492,15 +492,15 @@ testthat::test_that("Testing edge case; agent cannot cross border of an object",
                                                        cpp = TRUE)))
 
     testthat::expect_true(all(predped::moving_options(my_agent, 
-                                                       my_state, 
-                                                       my_background,
-                                                       inside, 
-                                                       cpp = FALSE)))
+                                                      my_state, 
+                                                      my_background,
+                                                      inside, 
+                                                      cpp = FALSE)))
     testthat::expect_true(all(predped::moving_options(my_agent, 
-                                                       my_state, 
-                                                       my_background,
-                                                       inside, 
-                                                       cpp = TRUE)))
+                                                      my_state, 
+                                                      my_background,
+                                                      inside, 
+                                                      cpp = TRUE)))
 
     testthat::expect_equal(predped::moving_options(my_agent, 
                                                    my_state, 
@@ -535,3 +535,80 @@ testthat::test_that("Testing edge case; agent cannot cross border of an object",
     #                       y = combo[, 2],
     #                       color = "green")
 })
+
+# Add attempted test: Problem is that when all seesGoalOK are FALSE, it will move
+# back to the initial check, which in this case is all TRUE. 
+#
+# TO DO: Check whether we can test this feature of the model anyway.
+# testthat::test_that(
+#     "Testing edge case: Can move everywhere, but won't see goal, R and Rcpp",
+#     {
+#         # Create a setting with only a single object
+#         my_setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
+#                                                                      size = c(10, 10)),
+#                                           objects = list(predped::rectangle(center = c(0, 0), 
+#                                                                             size = c(2, 2))))
+
+#         # Create a state (importantly, without the actual agent in there)
+#         my_state <- predped::state(iteration = 1, 
+#                                    setting = my_setting, 
+#                                    agents = list())
+        
+#         # Create a set of goals that may or may not be visible to the agent
+#         goals <- list(predped::goal(position = c(0, 1.05)),
+#                       predped::goal(position = c(1.05, 0)),
+#                       predped::goal(position = c(0, -1.05)),
+#                       predped::goal(position = c(-1.05, 0)))
+#         goals <- lapply(goals, 
+#                         function(x) {
+#                             x@path <- matrix(x@position, nrow = 1)
+#                             return(x)
+#                         })
+
+#         # Create an agent in the left-corner of the space. Will allow them to 
+#         # see the negative position goals, but not the others. Importantly, 
+#         # will be able to move anywhere with regards to not overlapping with 
+#         # objects: Any restrictions in moving_options comes from not seeing a 
+#         # goal
+#         my_agent <- predped::agent(center = c(-4, -4), 
+#                                    radius = 0.25,
+#                                    orientation = 45, 
+#                                    speed = 1.5)
+
+#         centers <- m4ma::c_vd(1:33, 
+#                               predped::position(my_agent),
+#                               predped::speed(my_agent),
+#                               predped::orientation(my_agent))
+
+#         # Create the reference
+#         ref <- c(FALSE, FALSE, TRUE, TRUE)
+
+#         # Loop over the different goals and do the required tests
+#         for(i in seq_along(goals)) {
+#             # Change the current goal of the agent
+#             my_agent@current_goal <- goals[[i]] 
+
+#             # Compute the moving options for the agent
+#             check <- predped::moving_options(my_agent, 
+#                                              my_state, 
+#                                              my_setting, 
+#                                              centers,
+#                                              cpp = FALSE)
+
+#         }
+
+#         # Visualize the situation
+#         # predped::plot(my_setting) +
+#         #     predped::plot(my_agent) + 
+#         #     ggplot2::annotate("point", 
+#         #                       x = sapply(goals, \(x) x@position[1]),
+#         #                       y = sapply(goals, \(x) x@position[2]),
+#         #                       size = 3, 
+#         #                       color = "cornflowerblue") +
+#         #     ggplot2::annotate("point", 
+#         #                       x = centers[, 1],
+#         #                       y = centers[, 2],
+#         #                       size = 1.5, 
+#         #                       color = "red")
+#     }
+# )
