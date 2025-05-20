@@ -638,6 +638,10 @@ NumericVector utility_rcpp(DataFrame data,
 
     // Interpersonal distance utility: Check whether the distance to other 
     // pedestrians is defined and, if so, compute the utility.
+    //
+    // Note that we divide the utility by the number of pedestrians that we need
+    // to account for. This is done to average over pedestrians, rather than 
+    // summing.
     NumericVector V_id(rows * cols);
     for(int i = 0; i < V_id.length(); i++) {
         if(!check[i]) {
@@ -650,6 +654,9 @@ NumericVector utility_rcpp(DataFrame data,
         List id_ingroup = data["id_ingroup"];
         List id_check = data["id_check"];
 
+        LogicalVector id_ingroup_vector = id_ingroup[0];
+        int N = id_ingroup_vector.length();
+
         V += idUtility(
             parameters["b_interpersonal"], 
             parameters["d_interpersonal"], 
@@ -658,7 +665,7 @@ NumericVector utility_rcpp(DataFrame data,
             as<LogicalMatrix>(id_check[0]),
             as<NumericMatrix>(id_distance[0]), 
             V_id
-        );
+        ) / N;
     } else {
         V += V_id;
     }
