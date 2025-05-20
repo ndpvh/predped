@@ -37,8 +37,8 @@ testthat::test_that("Transforming to trace works", {
 
 testthat::test_that("Unpacking trace from R and Rcpp is same", {
     # Check for the datasets in which all columns are filled.
-    trace <- readRDS(file.path("data", "trace_mll.Rds"))
-    trace <- trace[101:105]
+    trace <- readRDS(file.path("data", "trace_mll_bench.Rds"))
+    trace <- trace[11:16]
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
     tst <- predped::unpack_trace(trace, cpp = TRUE)

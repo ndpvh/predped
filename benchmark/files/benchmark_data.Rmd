@@ -5,9 +5,8 @@
 ```{r data time_series, echo = FALSE, results = "asis"}
 
 # Read in data and extract a single state
-trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll.Rds"))
-trace <- readRDS(file.path("tests", "testthat", "data", "trace_mll.Rds"))
-trace <- trace[90:99]
+trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll_bench.Rds"))
+trace <- trace[1:10]
 
 # Compute the utility variables
 r <- (\() time_series(trace, cpp = FALSE)) |>
@@ -46,8 +45,8 @@ tbl |>
 ```{r data unpack_trace, echo = FALSE, results = "asis"}
 
 # Read in data and extract a single state
-trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll.Rds"))
-trace <- trace[90:99]
+trace <- readRDS(file.path("..", "tests", "testthat", "data", "trace_mll_bench.Rds"))
+trace <- trace[1:10]
 
 # Compute the utility variables
 r <- (\() unpack_trace(trace, cpp = FALSE)) |>

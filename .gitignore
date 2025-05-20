@@ -47,7 +47,7 @@ tmp*
 
 *.o 
 *.so
-tests/testthat/data/trace_mll.Rds
+tests/testthat/data/trace_mll_full.Rds
 
 
 testing_items/
