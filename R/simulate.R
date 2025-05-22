@@ -902,7 +902,9 @@ add_agent <- function(model,
     if(is.null(precomputed_goals)) {
         # Try to generate a goal stack. If that's not possible, then the agent
         # will be provided with an exit goal.
-        if(length(objects(background)) != 0) {
+        check_1 <- length(objects(background)) != 0
+        check_2 <- any(sapply(objects(background), interactable))
+        if(check_1 & check_2) {
             goal_stack <- goal_stack(goal_number,
                                      background,
                                      counter = goal_duration,
