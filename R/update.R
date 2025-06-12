@@ -65,7 +65,7 @@ setMethod("update", "state", function(object,
     # This is a necessary part of the code that prevents agents from getting 
     # stuck
     # if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
-    if(length(obj) == 0) {
+    if((length(obj) == 0) | (length(agent_list) == 0)) {
         seen <- rep(TRUE, length(agent_list))
     } else {
         edges <- sapply(agent_list, 

@@ -644,6 +644,11 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
         return(rep(TRUE, nrow(segments)))
     }
 
+    # If there are no segments, there can be no intersections
+    if(length(segments) == 0) {
+        return(logical(0))
+    }
+
     # Loop over the objects in the environment and check their intersections 
     # with the lines in `segments`
     #
