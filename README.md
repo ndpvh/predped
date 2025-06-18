@@ -118,12 +118,13 @@ While this model already came far, there are still many gaps in the behaviors it
 
 ## Credits
 
-The development of this package would not have been possible without the help of its many contributors. For the original implementation of the model, we thank (in alphabetical order):
+The development of this package would not have been possible without the help of its many contributors. For the development of the ```m4ma``` package, we thank (in alphabetical order):
 
 - [Andrew Heathcote](https://github.com/andrewheathcote)
+- [Malte Lüken](https://github.com/maltelueken)
 - [Charlotte Tanis](https://github.com/CharlotteTanis)
 
-For the reworked version of ```predped```, we thank several permanent project members (in alphabetical order):
+For the creation of the ```predped```, we thank several permanent project members (in alphabetical order):
 
 - [Andrew Heathcote](https://github.com/andrewheathcote)
 - [Niels Vanhasbroeck](https://github.com/ndpvh)
