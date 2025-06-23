@@ -293,7 +293,7 @@ setMethod("simulate", "predped", function(object,
     if((is.null(initial_agents) & is.null(initial_condition)) & !is.null(initial_number_agents)) {
         initial_agents <- create_initial_condition(initial_number_agents,
                                                    object,
-                                                   goal_number[1:initial_number_agents],
+                                                   goal_number = goal_number[1:initial_number_agents],
                                                    goal_duration = goal_duration,
                                                    middle_edge = middle_edge,
                                                    standing_start = standing_start,
@@ -1068,7 +1068,7 @@ create_initial_condition <- function(agent_number,
     for(i in seq_len(agent_number)) {
         # Initial agent to create
         new_agent <- add_agent(model,
-                               goal_number[i],
+                               goal_number = goal_number[i],
                                ...)
         group(new_agent) <- group_number
 
