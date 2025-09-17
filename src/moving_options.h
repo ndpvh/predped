@@ -3,6 +3,15 @@
 
 #include <Rcpp.h>
 
+Rcpp::NumericMatrix compute_centers_rcpp(
+    Rcpp::S4 agent, 
+    double a,
+    double b, 
+    Rcpp::NumericVector velocities,
+    Rcpp::NumericVector orientations,
+    double time_step
+);
+
 Rcpp::LogicalMatrix overlap_with_objects_rcpp(
     Rcpp::S4 agent, 
     Rcpp::S4 background, 
