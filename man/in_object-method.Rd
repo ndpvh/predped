@@ -9,21 +9,24 @@
 \alias{in_object,segment-method}
 \title{Check Whether a Point Lies Within an Object}
 \usage{
-in_object(object, x)
+in_object(object, x, ...)
 
-\S4method{in_object}{polygon}(object, x)
+\S4method{in_object}{polygon}(object, x, cpp = TRUE)
 
-\S4method{in_object}{rectangle}(object, x)
+\S4method{in_object}{rectangle}(object, x, cpp = TRUE)
 
-\S4method{in_object}{circle}(object, x)
+\S4method{in_object}{circle}(object, x, cpp = TRUE)
 
-\S4method{in_object}{segment}(object, x)
+\S4method{in_object}{segment}(object, x, ...)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{object-class}}.}
 
 \item{x}{Numeric vector or matrix containing x- and y-coordinates to be 
 checked.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.}
 }
 \value{
 Logical whether the point is inside of the object (\code{TRUE}) or 

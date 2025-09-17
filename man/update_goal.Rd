@@ -8,6 +8,7 @@ update_goal(
   agent,
   state,
   background,
+  seen,
   standing_start = 0.1,
   close_enough = 2,
   space_between = 1.25,
@@ -22,6 +23,9 @@ update_goal(
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
+
+\item{seen}{Logical indicating whether the agent can see the path point 
+to which they are currently moving.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed 
 that agents move when they just came from standing still. Defaults to 
