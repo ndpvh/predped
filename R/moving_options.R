@@ -271,8 +271,8 @@ compute_centers <- function(agent,
 
     # Extract the relevant parameters from the agent
     params <- parameters(agent)
-    a <- parameters$a_turning
-    b <- parameters$b_turning
+    a <- as.numeric(params$a_turning[1])
+    b <- as.numeric(params$b_turning[1])
 
     # Introduce error if velocities and orientations are not the same length
     if(length(velocities) != length(orientations)) {
