@@ -537,6 +537,36 @@ testthat::test_that("Testing edge case; agent cannot cross border of an object",
 })
 
 testthat::test_that(
+    "Test known error for compute_cells: Velocities and angles don't match up",
+    {
+        # Create a dummy agent
+        dummy <- predped::agent(center = c(0, 0), radius = 0.25)
+        
+        # Create two sets of velocities and angles that either match up or don't
+        angles_1 <- rep(1, 10)
+        angles_2 <- rep(1, 20)
+
+        speed_1 <- rep(2, 10)
+        speed_2 <- rep(2, 20)
+
+        # Test known errors
+        testthat::expect_error(predped::compute_centers(dummy, 
+                                                        velocities = speed_1, 
+                                                        orientations = angles_2))
+        testthat::expect_error(predped::compute_centers(dummy, 
+                                                        velocities = speed_2, 
+                                                        orientations = angles_1))
+
+        testthat::expect_no_error(predped::compute_centers(dummy, 
+                                                           velocities = speed_1, 
+                                                           orientations = angles_1))
+        testthat::expect_no_error(predped::compute_centers(dummy, 
+                                                           velocities = speed_2, 
+                                                           orientations = angles_2))
+    }
+)
+
+testthat::test_that(
     "Compute cell centers whilst accounting for turning angle works for varying speeds",
     {
         # Create different agents
