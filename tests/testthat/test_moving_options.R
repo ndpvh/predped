@@ -825,6 +825,74 @@ testthat::test_that(
     }
 )
 
+testthat::test_that(
+    "R and Rcpp version of compute_centers converge",
+    {
+        # Create a combination of different original orientations and velocities
+        # to test this with
+        angles <- seq(0, 360, by = 45)
+        speed <- seq(0.1, 2, by = 0.2)
+        combinations <- cbind(
+            rep(angles, each = length(speed)),
+            rep(speed, times = length(angles))
+        )
+
+        # Also create different starting positions, ensuring we're not missing 
+        # anything
+        centers <- cbind(
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4))),
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4)))
+        )
+
+        # Create a dummy agent who we'll provide with new things along the way
+        dummy <- predped::agent(center = c(0, 0), 
+                                radius = 0.25)
+
+        # Create velocities and orientations to be used by the functions
+        velocities <- c(1.5, 1, 0.5) |>
+            rep(each = 11) |>
+            matrix(ncol = 3)
+        orientations <- c(72.5, 50, 32.5, 20, 10, 0,
+                          350, 340, 327.5, 310, 287.5) |>
+            rep(times = 3) |>
+            matrix(ncol = 3)
+
+        # Loop over each of the combinations and each of the cell centers
+        tst <- logical(nrow(combinations) * nrow(centers))
+        idx <- 1
+        for(i in seq_len(nrow(combinations))) {
+            for(j in seq_len(nrow(centers))) {
+                # Assign the conditions to the dummy agent
+                dummy@orientation <- combinations[i, 1]
+                dummy@speed <- combinations[i, 2]
+                dummy@center <- centers[j, ]
+
+                # Compute cell centers through predped
+                centers_1 <- predped::compute_centers(dummy,
+                                                      velocities = velocities,
+                                                      orientations = orientations,
+                                                      cpp = FALSE)
+
+                # Compute cell centers through m4ma
+                centers_2 <- predped::compute_centers(dummy,
+                                                      velocities = velocities,
+                                                      orientations = orientations,
+                                                      cpp = TRUE)
+
+                # Check whether all cell centers are the same (taking into account
+                # some computational error)
+                diff <- centers_1 - centers_2
+
+                tst[idx] <- all(abs(diff) < 1e-4)
+                idx <- idx + 1
+            }
+        }
+
+        # Do the test
+        testthat::expect_true(all(tst))
+    }
+)
+
 # Add attempted test: Problem is that when all seesGoalOK are FALSE, it will move
 # back to the initial check, which in this case is all TRUE. 
 #
