@@ -191,11 +191,6 @@ setMethod("moving_options", "agent", function(object,
 #' Seethapathi et al. (2024), Brown et al. (2020), and Glaister et al. (2007).
 #' 
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
-#' @param a,b Numerics denoting the parameters of the weighting function, where 
-#' \code{a} is used for the power of the function and \code{b} for the slope of 
-#' function. \code{a} is required to be positive and \code{b} should lie between 
-#' 0 and 1, where \code{1 - b} denotes the maximal decrease in velocities in 
-#' percentage. The parameters default to \code{a = 2} and \code{b = 0.2}.
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Defaults to a matrix 
 #' in which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
@@ -259,8 +254,6 @@ setMethod("moving_options", "agent", function(object,
 #'
 #' @export
 compute_centers <- function(agent, 
-                            a = 2,
-                            b = 0.2,
                             velocities = c(1.5, 1, 0.5) |>
                                rep(each = 11) |>
                                matrix(ncol = 3),
@@ -275,6 +268,11 @@ compute_centers <- function(agent,
     # for these computations
     velocities <- as.numeric(velocities)
     orientations <- as.numeric(orientations)
+
+    # Extract the relevant parameters from the agent
+    params <- parameters(agent)
+    a <- parameters$a_turning
+    b <- parameters$b_turning
 
     # Introduce error if velocities and orientations are not the same length
     if(length(velocities) != length(orientations)) {
