@@ -185,6 +185,126 @@ setMethod("moving_options", "agent", function(object,
     return(check)
 })
 
+#' Compute cell centers 
+#' 
+#' Compute cell centers based on a person's current position and velocity, 
+#' accounting for potential changes in speed and direction. Alternative to 
+#' \code{\link[m4ma]{c_vd}} that accounts for biomechanical limitations in the 
+#' speed one can maintain when turning at a greater angle. Defaults are based on 
+#' Seethapathi et al. (2024), Brown et al. (2020), and Glaister et al. (2007).
+#' 
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param a,b Numerics denoting the parameters of the weighting function, where 
+#' \code{a} is used for the power of the function and \code{b} for the slope of 
+#' function. \code{a} is required to be positive and \code{b} should lie between 
+#' 0 and 1, where \code{1 - b} denotes the maximal decrease in velocities in 
+#' percentage. The parameters default to \code{a = 2} and \code{b = 0.2}.
+#' @param velocities Numeric matrix containing the change in speed for an agent
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to, as performed through
+#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
+#' and 3 columns (speed). Defaults to a matrix in which the columns contain
+#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to, as performed through
+#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
+#' and 3 columns (speed). Defaults to a matrix in which the rows contain
+#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350},
+#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger
+#' angles are actually the negative symmetric versions of the smaller angles).
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
+#'
+#' @return Numeric matrix of (x, y) coordinates for each cell
+#' 
+#' @examples 
+#' # Create two agents, one fast and one slow
+#' slow_agent <- agent(center = c(-2.75, 0), 
+#'                     radius = 0.25, 
+#'                     speed = 0.5, 
+#'                     orientation = 0,
+#'                     current_goal = goal(position = c(-2.01, 0)))
+#' 
+#' fast_agent <- agent(center = c(-2.75, 0), 
+#'                     radius = 0.25, 
+#'                     speed = 2, 
+#'                     orientation = 0,
+#'                     current_goal = goal(position = c(-2.01, 0)))
+#' 
+#' # Generate the cell centers with predped
+#' slow_centers <- compute_centers(slow_agent)
+#' fast_centers <- compute_centers(fast_agent)
+#' 
+#' # Generate the cell centers with m4ma
+#' slow_m4ma <- m4ma::c_vd(1:33, 
+#'                         position(slow_agent), 
+#'                         speed(slow_agent), 
+#'                         orientation(slow_agent))
+#' fast_m4ma <- m4ma::c_vd(1:33, 
+#'                         position(fast_agent), 
+#'                         speed(fast_agent), 
+#'                         orientation(fast_agent))
+#' 
+#' # Compare both through a plot. This should show that the predped variant 
+#' # accounts for an interaction between an agent's speed and change in 
+#' # direction when computing the cell centers
+#' base::plot(slow_centers, col = "black")
+#' graphics::points(slow_m4ma[, 1], slow_m4ma[, 2], col = "red")
+#' 
+#' base::plot(fast_centers, col = "black")
+#' graphics::points(fast_m4ma[, 1], fast_m4ma[, 2], col = "red")
+#' 
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[m4ma]{c_vd}}
+#' \code{\link[predped]{moving_options-method}} 
+#' 
+#' @rdname compute_centers
+#'
+#' @export
+compute_centers <- function(agent, 
+                            a = 2,
+                            b = 0.2,
+                            velocities = c(1.5, 1, 0.5) |>
+                               rep(each = 11) |>
+                               matrix(ncol = 3),
+                            orientations = c(72.5, 50, 32.5, 20, 10, 0,
+                                             350, 340, 327.5, 310, 287.5) |>
+                                rep(times = 3) |>
+                                matrix(ncol = 3),
+                            time_step = 0.5,
+                            cpp = TRUE) {
+    
+    # Transform the velocities and orientations to numerics. Easier to deal with
+    # for these computations
+    velocities <- as.numeric(velocities)
+    orientations <- as.numeric(orientations)
+
+    # Pass on to cpp if asked for
+    ########
+
+    # Define a slowing factor that depends on the turning angle or change in 
+    # direction
+    angles <- orientations * pi / 180
+    slow <- 1 - b * sin(abs(angles))^a
+
+    # Create a matrix of velocities based on the slow factor, the ring multipliers, 
+    # and the agents current speed, furthermore taking into account the time 
+    # between movements
+    velocity <- speed(agent) * slow * velocities * time_step
+
+    # Compute the new cell centers based on the computed speeds and velocities
+    new_orientation <- orientation(agent) * pi / 180 + angles
+    centers <- cbind(
+        position(agent)[1] + velocity * cos(new_orientation), 
+        position(agent)[2] + velocity * sin(new_orientation)
+    )
+
+    return(centers)
+}
+
 #' Find number of agents blocking agent
 #' 
 #' This function computes the number of other agents in a particular state who 
