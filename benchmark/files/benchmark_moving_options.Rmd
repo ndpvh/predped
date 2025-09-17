@@ -130,6 +130,45 @@ tbl |>
 
 ```
 
+## compute_centers
+
+```{r moving_options compute_centers, echo = FALSE, results = "asis"}
+
+my_agent <- predped::agent(center = c(0, 0), 
+                           radius = 0.25)
+
+# Test
+r <- (\() predped:::compute_centers(my_agent, cpp = FALSE)) |>
+    test_times() |>
+    rnd() 
+
+rcpp <- (\() predped:::compute_centers(my_agent, cpp = TRUE)) |>
+    test_times() |>
+    rnd() 
+
+tbl <- rbind(r, rcpp)
+rownames(tbl) <- NULL
+tbl <- cbind(c("cpp = FALSE", "cpp = TRUE"),
+             tbl)
+colnames(tbl) <- c(" ", "2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the compute\\_centers function. ", 
+                  "Distinction is made between the Rcpp version of the function ",
+                  "(cpp = TRUE) and the R version of this function (cpp = FALSE).")
+
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+
+```
+
 ## moving_options-agent
 
 ```{r moving_options moving_options, echo = FALSE, results = "asis"}
