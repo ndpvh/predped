@@ -537,6 +537,36 @@ testthat::test_that("Testing edge case; agent cannot cross border of an object",
 })
 
 testthat::test_that(
+    "Test known error for compute_cells: Velocities and angles don't match up",
+    {
+        # Create a dummy agent
+        dummy <- predped::agent(center = c(0, 0), radius = 0.25)
+        
+        # Create two sets of velocities and angles that either match up or don't
+        angles_1 <- rep(1, 10)
+        angles_2 <- rep(1, 20)
+
+        speed_1 <- rep(2, 10)
+        speed_2 <- rep(2, 20)
+
+        # Test known errors
+        testthat::expect_error(predped::compute_centers(dummy, 
+                                                        velocities = speed_1, 
+                                                        orientations = angles_2))
+        testthat::expect_error(predped::compute_centers(dummy, 
+                                                        velocities = speed_2, 
+                                                        orientations = angles_1))
+
+        testthat::expect_no_error(predped::compute_centers(dummy, 
+                                                           velocities = speed_1, 
+                                                           orientations = angles_1))
+        testthat::expect_no_error(predped::compute_centers(dummy, 
+                                                           velocities = speed_2, 
+                                                           orientations = angles_2))
+    }
+)
+
+testthat::test_that(
     "Compute cell centers whilst accounting for turning angle works for varying speeds",
     {
         # Create different agents
@@ -775,6 +805,7 @@ testthat::test_that(
         # Create a dummy agent who we'll provide with new things along the way
         dummy <- predped::agent(center = c(0, 0), 
                                 radius = 0.25)
+        parameters(dummy)$b_turning <- 0
 
         # Create velocities and orientations to be used by the functions
         velocities <- c(1.5, 1, 0.5) |>
@@ -797,7 +828,6 @@ testthat::test_that(
 
                 # Compute cell centers through predped
                 centers_1 <- predped::compute_centers(dummy, 
-                                                      b = 0, 
                                                       velocities = velocities,
                                                       orientations = orientations,
                                                       cpp = FALSE)

@@ -22,7 +22,7 @@ parameters.R
 *.drawio*
 
 tmp/
-*.txt
+/*.txt
 *.rtf
 *.zip
 *.pdf
