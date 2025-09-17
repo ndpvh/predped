@@ -17,6 +17,7 @@ minimal_working_example.R
 Train/
 inst/*
 parameters.R
+*.R
 
 *.drawio*
 

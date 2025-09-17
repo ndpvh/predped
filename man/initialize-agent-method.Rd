@@ -18,7 +18,9 @@
   waiting_counter = 0,
   cell = 0,
   parameters = data.frame(),
-  color = "black"
+  color = "black",
+  cell_centers = matrix(0, nrow = 33, ncol = 2),
+  utility_variables = data.frame()
 )
 }
 \arguments{

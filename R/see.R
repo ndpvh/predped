@@ -40,6 +40,7 @@ best_angle <- function(agent,
                        agent_specifications,
                        velocities,
                        orientations,
+                       time_step = 0.5,
                     #    cores = 1,
                        step = 45,
                        cpp = TRUE) {
@@ -54,13 +55,10 @@ best_angle <- function(agent,
     for(i in seq_along(new_angles)){
         orientation(agent) <- new_angles[i]
         # Create centers based on the proposed angle
-        centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                   p1 = position(agent),
-                                   v1 = speed(agent),
-                                   a1 = orientation(agent),
-                                   vels = velocities,
-                                   angles = orientations,
-                                   tStep = 0.5)
+        centers <- compute_centers(agent, 
+                                   velocities = velocities,
+                                   orientations = orientations,
+                                   time_step = time_step)
 
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers)

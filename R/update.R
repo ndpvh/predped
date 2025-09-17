@@ -146,19 +146,16 @@ setMethod("update", "state", function(object,
 #' @param seen Logical indicating whether the agent can see the path point 
 #' to which they are currently moving.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -263,19 +260,16 @@ setMethod("update", "agent", function(object,
 #' communication between the \code{predped} simulation functions and the 
 #' \code{m4ma} utility functions.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -353,6 +347,7 @@ update_position <- function(agent,
                                          agent_specifications, 
                                          velocities, 
                                          orientations,
+                                         time_step = time_step,
                                          cpp = cpp)
 
         # Report the degress that the agent is reorienting to
@@ -371,13 +366,11 @@ update_position <- function(agent,
     # utility of moving to a given location
     } else {
         # Define the centers of the options to move to
-        centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                   p1 = position(agent),
-                                   v1 = speed(agent),
-                                   a1 = orientation(agent),
-                                   vels = velocities,
-                                   angles = orientations,
-                                   tStep = time_step)
+        centers <- compute_centers(agent, 
+                                   velocities = velocities,
+                                   orientations = orientations,
+                                   time_step = time_step,
+                                   cpp = cpp)
         agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to

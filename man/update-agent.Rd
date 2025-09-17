@@ -10,6 +10,7 @@
   state,
   background,
   agent_specifications,
+  seen,
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
@@ -36,6 +37,9 @@
 information of all agents within the current \code{state} and allows for the
 communication between the \code{predped} simulation functions and the 
 \code{m4ma} utility functions.}
+
+\item{seen}{Logical indicating whether the agent can see the path point 
+to which they are currently moving.}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create 

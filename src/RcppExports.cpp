@@ -229,6 +229,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_centers_rcpp
+Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent, double a, double b, Rcpp::NumericVector velocities, Rcpp::NumericVector orientations, double time_step);
+RcppExport SEXP _predped_compute_centers_rcpp(SEXP agentSEXP, SEXP aSEXP, SEXP bSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP time_stepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type agent(agentSEXP);
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type velocities(velocitiesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type orientations(orientationsSEXP);
+    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_centers_rcpp(agent, a, b, velocities, orientations, time_step));
+    return rcpp_result_gen;
+END_RCPP
+}
 // overlap_with_objects_rcpp
 LogicalMatrix overlap_with_objects_rcpp(S4 agent, S4 background, NumericMatrix centers, LogicalMatrix check, double space_between);
 RcppExport SEXP _predped_overlap_with_objects_rcpp(SEXP agentSEXP, SEXP backgroundSEXP, SEXP centersSEXP, SEXP checkSEXP, SEXP space_betweenSEXP) {
@@ -427,6 +443,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_predClose", (DL_FUNC) &_predped_predClose, 8},
     {"_predped_blockedAngle", (DL_FUNC) &_predped_blockedAngle, 6},
     {"_predped_bodyObjectOK", (DL_FUNC) &_predped_bodyObjectOK, 4},
+    {"_predped_compute_centers_rcpp", (DL_FUNC) &_predped_compute_centers_rcpp, 6},
     {"_predped_overlap_with_objects_rcpp", (DL_FUNC) &_predped_overlap_with_objects_rcpp, 5},
     {"_predped_moving_options_rcpp", (DL_FUNC) &_predped_moving_options_rcpp, 4},
     {"_predped_nodes_on_circumference_rcpp", (DL_FUNC) &_predped_nodes_on_circumference_rcpp, 2},

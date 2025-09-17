@@ -4,7 +4,7 @@
 \alias{evaluate_edges}
 \title{Evaluate whether edges pass through objects}
 \usage{
-evaluate_edges(segments, background)
+evaluate_edges(segments, background, space_between)
 }
 \arguments{
 \item{segments}{Named matrix or dataframe containing the ids of the nodes 

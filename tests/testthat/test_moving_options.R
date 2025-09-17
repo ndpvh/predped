@@ -536,6 +536,363 @@ testthat::test_that("Testing edge case; agent cannot cross border of an object",
     #                       color = "green")
 })
 
+testthat::test_that(
+    "Compute cell centers whilst accounting for turning angle works for varying speeds",
+    {
+        # Create different agents
+        slow_agent <- predped::agent(center = c(0, 0), 
+                                     radius = 0.25, 
+                                     speed = 0.5, 
+                                     orientation = 0,
+                                     current_goal = goal(position = c(-2.01, 0)))
+
+        mid_agent <- predped::agent(center = c(0, 0), 
+                                    radius = 0.25, 
+                                    speed = 1, 
+                                    orientation = 0,
+                                    current_goal = goal(position = c(-2.01, 0)))
+
+        fast_agent <- predped::agent(center = c(0, 0), 
+                                     radius = 0.25, 
+                                     speed = 2, 
+                                     orientation = 0,
+                                     current_goal = goal(position = c(-2.01, 0)))
+
+        # Compute cell centers for these agents and a few easy to compute 
+        # orientations and changes in velocity
+        ring <- rep(c(1, 2), each = 5)
+        angles <- rep(c(-90, -45, 0, 45, 90), times = 2)
+
+        tst_slow <- predped::compute_centers(slow_agent, 
+                                             velocities = ring, 
+                                             orientations = angles,
+                                             time_step = 1,
+                                             cpp = FALSE)
+        tst_mid <- predped::compute_centers(mid_agent, 
+                                            velocities = ring, 
+                                            orientations = angles,
+                                            time_step = 1,
+                                            cpp = FALSE)
+        tst_fast <- predped::compute_centers(fast_agent, 
+                                             velocities = ring, 
+                                             orientations = angles,
+                                             time_step = 1,
+                                             cpp = FALSE)
+
+        # Compute references for these tests
+        radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
+        weights <- ring * (1 - 0.2 * sin(radians)^2)
+
+        ref_slow <- 0.5 * cbind(
+            weights * cos(radians),
+            weights * sin(radians)
+        )
+        ref_mid <- 1 * cbind(
+            weights * cos(radians),
+            weights * sin(radians)
+        )
+        ref_fast <- 2 * cbind(
+            weights * cos(radians),
+            weights * sin(radians)
+        )
+
+        # Execute the tests
+        testthat::expect_equal(tst_slow, ref_slow)
+        testthat::expect_equal(tst_mid, ref_mid)
+        testthat::expect_equal(tst_fast, ref_fast)
+    }
+)
+
+testthat::test_that(
+    "Compute cell centers whilst accounting for turning angle works for varying orientations",
+    {
+        # Create different agents
+        agent_0 <- predped::agent(center = c(0, 0), 
+                                  radius = 0.25, 
+                                  speed = 1, 
+                                  orientation = 0,
+                                  current_goal = goal(position = c(-2.01, 0)))
+
+        agent_45 <- predped::agent(center = c(0, 0), 
+                                   radius = 0.25, 
+                                   speed = 1, 
+                                   orientation = 45,
+                                   current_goal = goal(position = c(-2.01, 0)))
+
+        agent_90 <- predped::agent(center = c(0, 0), 
+                                     radius = 0.25, 
+                                     speed = 1, 
+                                     orientation = 90,
+                                     current_goal = goal(position = c(-2.01, 0)))
+
+        # Compute cell centers for these agents and a few easy to compute 
+        # orientations and changes in velocity
+        ring <- rep(c(1, 2), each = 5)
+        angles <- rep(c(-90, -45, 0, 45, 90), times = 2)
+
+        tst_0 <- predped::compute_centers(agent_0, 
+                                          velocities = ring, 
+                                          orientations = angles,
+                                          time_step = 1,
+                                          cpp = FALSE)
+        tst_45 <- predped::compute_centers(agent_45, 
+                                           velocities = ring, 
+                                           orientations = angles,
+                                           time_step = 1,
+                                           cpp = FALSE)
+        tst_90 <- predped::compute_centers(agent_90, 
+                                           velocities = ring, 
+                                           orientations = angles,
+                                           time_step = 1,
+                                           cpp = FALSE)
+
+        # Compute references for these tests
+        radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
+        weights <- ring * (1 - 0.2 * sin(radians)^2)
+
+        ref_0 <- cbind(
+            weights * cos(radians + 0),
+            weights * sin(radians + 0)
+        )
+        ref_45 <- cbind(
+            weights * cos(radians + pi/4),
+            weights * sin(radians + pi/4)
+        )
+        ref_90 <- cbind(
+            weights * cos(radians + pi/2),
+            weights * sin(radians + pi/2)
+        )
+
+        # Execute the tests
+        testthat::expect_equal(tst_0, ref_0)
+        testthat::expect_equal(tst_45, ref_45)
+        testthat::expect_equal(tst_90, ref_90)
+    }
+)
+
+testthat::test_that(
+    "Compute cell centers whilst accounting for turning angle works for varying centers",
+    {
+        # Create different agents
+        agent_1 <- predped::agent(center = c(-1, 1), 
+                                  radius = 0.25, 
+                                  speed = 1, 
+                                  orientation = 0,
+                                  current_goal = goal(position = c(-2.01, 0)))
+
+        agent_2 <- predped::agent(center = c(1, 1), 
+                                  radius = 0.25, 
+                                  speed = 1, 
+                                  orientation = 0,
+                                  current_goal = goal(position = c(-2.01, 0)))
+
+        agent_3 <- predped::agent(center = c(1, -1), 
+                                  radius = 0.25, 
+                                  speed = 1, 
+                                  orientation = 0,
+                                  current_goal = goal(position = c(-2.01, 0)))
+
+        agent_4 <- predped::agent(center = c(-1, -1), 
+                                  radius = 0.25, 
+                                  speed = 1, 
+                                  orientation = 0,
+                                  current_goal = goal(position = c(-2.01, 0)))
+
+        # Compute cell centers for these agents and a few easy to compute 
+        # orientations and changes in velocity
+        ring <- rep(c(1, 2), each = 5)
+        angles <- rep(c(-90, -45, 0, 45, 90), times = 2)
+
+        tst_1 <- predped::compute_centers(agent_1, 
+                                          velocities = ring, 
+                                          orientations = angles,
+                                          time_step = 1,
+                                          cpp = FALSE)
+        tst_2 <- predped::compute_centers(agent_2, 
+                                          velocities = ring, 
+                                          orientations = angles,
+                                          time_step = 1,
+                                          cpp = FALSE)
+        tst_3 <- predped::compute_centers(agent_3, 
+                                          velocities = ring, 
+                                          orientations = angles,
+                                          time_step = 1,
+                                          cpp = FALSE)
+        tst_4 <- predped::compute_centers(agent_4, 
+                                          velocities = ring, 
+                                          orientations = angles,
+                                          time_step = 1,
+                                          cpp = FALSE)
+
+        # Compute references for these tests
+        radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
+        weights <- ring * (1 - 0.2 * sin(radians)^2)
+
+        ref_1 <- cbind(
+            -1 + weights * cos(radians),
+            1 + weights * sin(radians)
+        )
+        ref_2 <- cbind(
+            1 + weights * cos(radians),
+            1 + weights * sin(radians)
+        )
+        ref_3 <- cbind(
+            1 + weights * cos(radians),
+            -1 + weights * sin(radians)
+        )
+        ref_4 <- cbind(
+            -1 + weights * cos(radians),
+            -1 + weights * sin(radians)
+        )
+
+        # Execute the tests
+        testthat::expect_equal(tst_1, ref_1)
+        testthat::expect_equal(tst_2, ref_2)
+        testthat::expect_equal(tst_3, ref_3)
+        testthat::expect_equal(tst_4, ref_4)
+    }
+)
+
+testthat::test_that(
+    "Compute cell centers converges with c_vd when its parameters are tuned to it",
+    {
+        # Create a combination of different original orientations and velocities
+        # to test this with
+        angles <- seq(0, 360, by = 45)
+        speed <- seq(0.1, 2, by = 0.2)
+        combinations <- cbind(
+            rep(angles, each = length(speed)),
+            rep(speed, times = length(angles))
+        )
+
+        # Also create different starting positions, ensuring we're not missing 
+        # anything
+        centers <- cbind(
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4))),
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4)))
+        )
+
+        # Create a dummy agent who we'll provide with new things along the way
+        dummy <- predped::agent(center = c(0, 0), 
+                                radius = 0.25)
+
+        # Create velocities and orientations to be used by the functions
+        velocities <- c(1.5, 1, 0.5) |>
+            rep(each = 11) |>
+            matrix(ncol = 3)
+        orientations <- c(72.5, 50, 32.5, 20, 10, 0,
+                          350, 340, 327.5, 310, 287.5) |>
+            rep(times = 3) |>
+            matrix(ncol = 3)
+
+        # Loop over each of the combinations and each of the cell centers
+        tst <- logical(nrow(combinations) * nrow(centers))
+        idx <- 1
+        for(i in seq_len(nrow(combinations))) {
+            for(j in seq_len(nrow(centers))) {
+                # Assign the conditions to the dummy agent
+                dummy@orientation <- combinations[i, 1]
+                dummy@speed <- combinations[i, 2]
+                dummy@center <- centers[j, ]
+
+                # Compute cell centers through predped
+                centers_1 <- predped::compute_centers(dummy, 
+                                                      b = 0, 
+                                                      velocities = velocities,
+                                                      orientations = orientations,
+                                                      cpp = FALSE)
+
+                # Compute cell centers through m4ma
+                centers_2 <- m4ma::c_vd_rcpp(cells = 1:33,
+                                             p1 = position(dummy),
+                                             v1 = speed(dummy),
+                                             a1 = orientation(dummy),
+                                             vels = velocities,
+                                             angles = orientations,
+                                             tStep = 0.5)
+
+                # Check whether all cell centers are the same (taking into account
+                # some computational error)
+                diff <- centers_1 - centers_2
+
+                tst[idx] <- all(abs(diff) < 1e-4)
+                idx <- idx + 1
+            }
+        }
+
+        # Do the test
+        testthat::expect_true(all(tst))
+    }
+)
+
+testthat::test_that(
+    "R and Rcpp version of compute_centers converge",
+    {
+        # Create a combination of different original orientations and velocities
+        # to test this with
+        angles <- seq(0, 360, by = 45)
+        speed <- seq(0.1, 2, by = 0.2)
+        combinations <- cbind(
+            rep(angles, each = length(speed)),
+            rep(speed, times = length(angles))
+        )
+
+        # Also create different starting positions, ensuring we're not missing 
+        # anything
+        centers <- cbind(
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4))),
+            c(0, 1 * sin(seq(0, 2 * pi, pi/4)))
+        )
+
+        # Create a dummy agent who we'll provide with new things along the way
+        dummy <- predped::agent(center = c(0, 0), 
+                                radius = 0.25)
+
+        # Create velocities and orientations to be used by the functions
+        velocities <- c(1.5, 1, 0.5) |>
+            rep(each = 11) |>
+            matrix(ncol = 3)
+        orientations <- c(72.5, 50, 32.5, 20, 10, 0,
+                          350, 340, 327.5, 310, 287.5) |>
+            rep(times = 3) |>
+            matrix(ncol = 3)
+
+        # Loop over each of the combinations and each of the cell centers
+        tst <- logical(nrow(combinations) * nrow(centers))
+        idx <- 1
+        for(i in seq_len(nrow(combinations))) {
+            for(j in seq_len(nrow(centers))) {
+                # Assign the conditions to the dummy agent
+                dummy@orientation <- combinations[i, 1]
+                dummy@speed <- combinations[i, 2]
+                dummy@center <- centers[j, ]
+
+                # Compute cell centers through predped
+                centers_1 <- predped::compute_centers(dummy,
+                                                      velocities = velocities,
+                                                      orientations = orientations,
+                                                      cpp = FALSE)
+
+                # Compute cell centers through m4ma
+                centers_2 <- predped::compute_centers(dummy,
+                                                      velocities = velocities,
+                                                      orientations = orientations,
+                                                      cpp = TRUE)
+
+                # Check whether all cell centers are the same (taking into account
+                # some computational error)
+                diff <- centers_1 - centers_2
+
+                tst[idx] <- all(abs(diff) < 1e-4)
+                idx <- idx + 1
+            }
+        }
+
+        # Do the test
+        testthat::expect_true(all(tst))
+    }
+)
+
 # Add attempted test: Problem is that when all seesGoalOK are FALSE, it will move
 # back to the initial check, which in this case is all TRUE. 
 #
