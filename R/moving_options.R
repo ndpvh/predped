@@ -58,10 +58,7 @@
 #'                   agents = list())
 #' 
 #' # Generate several locations the agent can move to
-#' centers <- m4ma::c_vd_r(1:33, 
-#'                         position(my_agent), 
-#'                         speed(my_agent), 
-#'                         orientation(my_agent))
+#' centers <- compute_centers(my_agent)
 #' 
 #' # Use moving_options to see which of these possibilities is sound
 #' moving_options(my_agent, 
@@ -504,10 +501,7 @@ agents_between_goal <- function(agent,
 #'                   current_goal = goal(position = c(-2.01, 0)))
 #' 
 #' # Generate several locations the agent can move to
-#' centers <- m4ma::c_vd_r(1:33, 
-#'                         position(my_agent), 
-#'                         speed(my_agent), 
-#'                         orientation(my_agent))
+#' centers <- compute_centers(my_agent)
 #' check <- matrix(TRUE, nrow = 11, ncol = 3)
 #' 
 #' # Use moving_options to see which of these possibilities is sound

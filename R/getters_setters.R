@@ -163,10 +163,7 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' cell_centers(my_agent)
 #' 
 #' # Change the cell centers for the agent
-#' cell_centers(my_agent) <- m4ma::c_vd_r(1:33, 
-#'                                        position(my_agent), 
-#'                                        speed(my_agent),
-#'                                        orientation(my_agent))
+#' cell_centers(my_agent) <- compute_centers(my_agent)
 #' cell_centers(my_agent)
 #' 
 #' @seealso 

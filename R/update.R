@@ -353,6 +353,7 @@ update_position <- function(agent,
                                          agent_specifications, 
                                          velocities, 
                                          orientations,
+                                         time_step = time_step,
                                          cpp = cpp)
 
         # Report the degress that the agent is reorienting to
@@ -371,13 +372,11 @@ update_position <- function(agent,
     # utility of moving to a given location
     } else {
         # Define the centers of the options to move to
-        centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                   p1 = position(agent),
-                                   v1 = speed(agent),
-                                   a1 = orientation(agent),
-                                   vels = velocities,
-                                   angles = orientations,
-                                   tStep = time_step)
+        centers <- compute_centers(agent, 
+                                   velocities = velocities,
+                                   orientations = orientations,
+                                   time_step = time_step,
+                                   cpp = cpp)
         agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to
