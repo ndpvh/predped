@@ -197,19 +197,16 @@ setMethod("moving_options", "agent", function(object,
 #' 0 and 1, where \code{1 - b} denotes the maximal decrease in velocities in 
 #' percentage. The parameters default to \code{a = 2} and \code{b = 0.2}.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create
-#' the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' whenever they move to the respective cell of this matrix. Defaults to a matrix 
+#' in which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
 #' @param orientations Numeric matrix containing the change in direction for an
-#' agent whenever they move to the respective cell of this matrix. Is used to
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350},
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' agent whenever they move to the respective cell of this matrix. 
+#' Defaults to a matrix in which the rows contain \code{72.5}, \code{50}, 
+#' \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, \code{340}, 
+#' \code{327.5}, \code{310}, \code{287.5} (note that the larger angles are 
+#' actually the negative symmetric versions of the smaller angles).
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #'
@@ -279,8 +276,21 @@ compute_centers <- function(agent,
     velocities <- as.numeric(velocities)
     orientations <- as.numeric(orientations)
 
+    # Introduce error if velocities and orientations are not the same length
+    if(length(velocities) != length(orientations)) {
+        stop(paste("The provided velocites and orientations are not the same length.",
+                   "Please ensure values of both arguments match up."))
+    }
+
     # Pass on to cpp if asked for
-    ########
+    if(cpp) {
+        return(compute_centers_rcpp(agent, 
+                                    a, 
+                                    b,
+                                    velocities,
+                                    orientations,
+                                    time_step = time_step))
+    }
 
     # Define a slowing factor that depends on the turning angle or change in 
     # direction
