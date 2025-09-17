@@ -805,6 +805,7 @@ testthat::test_that(
         # Create a dummy agent who we'll provide with new things along the way
         dummy <- predped::agent(center = c(0, 0), 
                                 radius = 0.25)
+        parameters(dummy)$b_turning <- 0
 
         # Create velocities and orientations to be used by the functions
         velocities <- c(1.5, 1, 0.5) |>
@@ -827,7 +828,6 @@ testthat::test_that(
 
                 # Compute cell centers through predped
                 centers_1 <- predped::compute_centers(dummy, 
-                                                      b = 0, 
                                                       velocities = velocities,
                                                       orientations = orientations,
                                                       cpp = FALSE)
