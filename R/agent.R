@@ -187,7 +187,9 @@ setMethod("initialize", "agent", function(.Object,
     # use the defined parameters
     if(nrow(parameters) == 0) {
         params <- params_from_csv[["params_archetypes"]]
-        .Object@parameters <- params[params$name == "BaselineEuropean", ]
+        params <- params[params$name == "BaselineEuropean", ]
+        params$radius <- radius
+        .Object@parameters <- params
     } else {
         .Object@parameters <- parameters
     }
