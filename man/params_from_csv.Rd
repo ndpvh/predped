@@ -66,7 +66,13 @@ decisions pedestrians make when walking around in an environment, namely:
                              by the utility functions).}
     \item{\code{stop_utility}:}{utility value of stopping instead of moving}
     \item{\code{reroute}:}{number of pedestrians that should be in the way for
-                          an agent to consider rerouting 50\% of the time}
+                           an agent to consider rerouting 50\% of the time}
+    \item{\code{b_turning}:}{slope that scales the effect of turning on the 
+                             speed an agent can maintain, where 
+                             \code{1 - b_turning} denotes the maximal decrease
+                             in velocity in percent}
+    \item{\code{a_turning}:}{exponent that determines the shape of the effect
+                             of turning on the speed an agent can maintain}
     \item{\code{b_current_direction}:}{slope that scales the utility of 
                                       continuing waking in the current 
                                       direction}

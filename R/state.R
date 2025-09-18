@@ -9,6 +9,9 @@
 #' enter the \code{setting}.
 #' @slot iteration_variables Dataframe containing values for variables that 
 #' control the simulation under the hood, such as \code{max_agents}.
+#' @slot variables List of user-specified variables that can be used to control 
+#' the simulation, see the \code{fx} argument of 
+#' \code{\link[predped]{simulate,predped-method}}
 #' 
 #' @seealso 
 #' \code{\link[predped]{agents}},

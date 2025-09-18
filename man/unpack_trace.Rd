@@ -16,20 +16,17 @@ unpack_trace(
 }
 \arguments{
 \item{velocities}{Numeric matrix containing the change in speed for an agent
-whenever they move to the respective cell of this matrix. Is used to create 
-the cell positions that the agent might move to, as performed through 
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-and 3 columns (speed). Defaults to a matrix in which the columns contain 
-\code{1.5} (acceleration), \code{1}, and \code{0.5}.}
+whenever they move to the respective cell of this matrix. Is used to create
+the cell positions that the agent might move to. Defaults to a matrix in 
+which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
-\item{orientations}{Numeric matrix containing the change in direction for an 
-agent whenever they move to the respective cell of this matrix. Is used to 
-create the cell positions that the agent might move to, as performed through
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the rows contain 
-\code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-\code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-angles are actually the negative symmetric versions of the smaller angles).}
+\item{orientations}{Numeric matrix containing the change in direction for an
+agent whenever they move to the respective cell of this matrix. Is used to
+create the cell positions that the agent might move to. Defaults to a matrix 
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+\code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+\code{287.5} (note that the larger angles are actually the negative symmetric 
+versions of the smaller angles).}
 
 \item{stay_stopped}{Logical denoting whether agents will predict others that 
 are currently not moving to remain immobile in the next iteration. Defaults 

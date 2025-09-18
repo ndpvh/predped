@@ -54,19 +54,16 @@ social groups).}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to, as performed through
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the columns contain
-\code{1.5} (acceleration), \code{1}, and \code{0.5}.}
+the cell positions that the agent might move to. Defaults to a matrix in 
+which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to, as performed through
-\code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the rows contain
-\code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350},
-\code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger
-angles are actually the negative symmetric versions of the smaller angles).}
+create the cell positions that the agent might move to. Defaults to a matrix 
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+\code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+\code{287.5} (note that the larger angles are actually the negative symmetric 
+versions of the smaller angles).}
 
 \item{close_enough}{Numeric denoting how close (in radii) the agent needs to
 be to an object in order to interact with it. Defaults to \code{2}, meaning the
@@ -82,7 +79,7 @@ are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
-time should mimic. Defaults to `0.5`, or half a second.}
+time should mimic. Defaults to \code{0.5}, or half a second.}
 
 \item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
 containing the nodes and edges the agent can use to plan its path. Defauls
