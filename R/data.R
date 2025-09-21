@@ -273,7 +273,8 @@ to_trace <- function(data,
 #' 
 #' @param data Instance of a data.frame containing the data you want to transform.
 #' @param velocities Numeric vector denoting the changes in speeds as assumed by 
-#' the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
+#' (deceleration).
 #' @param orientations Numeric vector denoting the changes in orientation as 
 #' assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
 #' \code{20}, \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, 
