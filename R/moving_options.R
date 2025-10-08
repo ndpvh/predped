@@ -1,37 +1,37 @@
 #' Check where an object can be moved to
 #'
-#' This method checks where an object can be moved to. It returns a logical 
-#' matrix that codes \code{TRUE} for the cells that are available and 
+#' This method checks where an object can be moved to. It returns a logical
+#' matrix that codes \code{TRUE} for the cells that are available and
 #' \code{FALSE} for those that aren't.
-#' 
+#'
 #' @details
-#' In general, this method works as follows. First, it checks whether any of the 
-#' provided cell centers are freely available, in the sense that they are not 
+#' In general, this method works as follows. First, it checks whether any of the
+#' provided cell centers are freely available, in the sense that they are not
 #' contained inside any objects or fall outside of the setting. This is a crude
-#' measure of whether a particular spot is available and is handled by the 
+#' measure of whether a particular spot is available and is handled by the
 #' \code{\link[m4ma]{free_cells_rcpp}} function of the \code{m4ma} package.
-#' 
-#' Second, we check whether the object itself can be moved to this space, or 
-#' whether it would intersect with any of the objects and/or the outline of the 
-#' setting. This is a more direct measure of availability, as it doesn't only 
-#' account for whether a specific spot can be reached theoretically, but also 
-#' accounts for the size of the object that is being moved there. This is 
-#' handled by the \code{\link[predped]{overlap_with_objects}} function in 
+#'
+#' Second, we check whether the object itself can be moved to this space, or
+#' whether it would intersect with any of the objects and/or the outline of the
+#' setting. This is a more direct measure of availability, as it doesn't only
+#' account for whether a specific spot can be reached theoretically, but also
+#' accounts for the size of the object that is being moved there. This is
+#' handled by the \code{\link[predped]{overlap_with_objects}} function in
 #' \code{predped}.
-#' 
-#' Finally, if the object is an instance of the \code{\link[predped]{agent-class}}, 
+#'
+#' Finally, if the object is an instance of the \code{\link[predped]{agent-class}},
 #' we also check whether the agent can still see there current goal or path-point
 #' when they move to the open spots. They will not move to the spots from which
-#' they cannot see their goal/path-point. This is handled by the 
+#' they cannot see their goal/path-point. This is handled by the
 #' \code{\link[m4ma]{seesGoalOK_rcpp}} function in the \code{m4ma} package.
-#' 
-#' WARNING: Due to its reliance on the \code{m4ma} package, centers needs to be 
-#' of length 33 x 2. This corresponds to the 3 (change in speed) x 11 
+#'
+#' WARNING: Due to its reliance on the \code{m4ma} package, centers needs to be
+#' of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 #' (change in orientation) options that are inherent to M4MA.
 #'
-#' @param object Object of the \code{\link[predped]{agent-class}} or the 
+#' @param object Object of the \code{\link[predped]{agent-class}} or the
 #' \code{\link[predped]{object-class}} (latter not yet supported).
-#' @param state Object of the \code{\link[predped]{state-class}} containing the 
+#' @param state Object of the \code{\link[predped]{state-class}} containing the
 #' current state.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param centers Numerical matrix containing the coordinates at each position
@@ -40,58 +40,58 @@
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #'
 #' @return Logical matrix containing availabilities of the centers.
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Initialize all objects that you need
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(6, 6)), 
-#'                             objects = list(circle(center = c(0, 0), 
+#' my_background <- background(shape = rectangle(center = c(0, 0),
+#'                                               size = c(6, 6)),
+#'                             objects = list(circle(center = c(0, 0),
 #'                                                   radius = 2)))
-#' my_agent <- agent(center = c(-2.75, 0), 
-#'                   radius = 0.25, 
-#'                   speed = 1, 
+#' my_agent <- agent(center = c(-2.75, 0),
+#'                   radius = 0.25,
+#'                   speed = 1,
 #'                   orientation = 0,
 #'                   current_goal = goal(position = c(-2.01, 0)))
-#' 
+#'
 #' my_state <- state(iteration = 1,
-#'                   setting = my_background, 
+#'                   setting = my_background,
 #'                   agents = list())
-#' 
+#'
 #' # Generate several locations the agent can move to
 #' centers <- compute_centers(my_agent)
-#' 
+#'
 #' # Use moving_options to see which of these possibilities is sound
-#' moving_options(my_agent, 
-#'                my_state, 
+#' moving_options(my_agent,
+#'                my_state,
 #'                my_background,
 #'                centers)
-#' 
-#' @seealso 
+#'
+#' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{background-class}},
 #' \code{\link[predped]{object-class}},
 #' \code{\link[predped]{state-class}},
-#' \code{\link[predped]{overlap_with_objects}} 
+#' \code{\link[predped]{overlap_with_objects}}
 #'
 #' @docType methods
-#' 
+#'
 #' @rdname moving_options-methods
 #'
 #' @export
 #
 # TO DO:
-#   - Change so that it can just take in agent and state: No need to have 
+#   - Change so that it can just take in agent and state: No need to have
 #     background in there
-#   - Make none-reliant on m4ma if we want to extend the possibilities of the 
+#   - Make none-reliant on m4ma if we want to extend the possibilities of the
 #     centers
 setGeneric("moving_options", function(object, ...) standardGeneric("moving_options"))
 
 #' @rdname moving_options-methods
-#' 
+#'
 #' @export
-setMethod("moving_options", "agent", function(object, 
-                                              state, 
-                                              background, 
+setMethod("moving_options", "agent", function(object,
+                                              state,
+                                              background,
                                               centers,
                                               cpp = TRUE){
 
@@ -100,34 +100,34 @@ setMethod("moving_options", "agent", function(object,
         return(moving_options_rcpp(object, state, background, centers))
     }
 
-    # Add the other agents to the background objects. This will allow us to 
-    # immediately test whether cells are occupied by other agents instead of 
+    # Add the other agents to the background objects. This will allow us to
+    # immediately test whether cells are occupied by other agents instead of
     # doing this check only later.
-    # 
-    # Differentiate between a list that does contain the other agents 
-    # (slot in background) and a list that does not (obj). This distinction is 
-    # used later when checking the seeing of goals 
+    #
+    # Differentiate between a list that does contain the other agents
+    # (slot in background) and a list that does not (obj). This distinction is
+    # used later when checking the seeing of goals
     ids <- sapply(agents(state), id)
     agents_minus_agent <- agents(state)[ids != id(object)]
 
     obj <- objects(background)
-    objects(background) <- append(objects(background), 
-                                  agents_minus_agent)   
+    objects(background) <- append(objects(background),
+                                  agents_minus_agent)
 
     # Use the `free_cells` function to get all free cells to which the agent
     # might move. Specifically look at whether a cell lies within the background
     # and whether the agent has a direct line of sight to that cell.
     check <- m4ma::free_cells_rcpp(object, background, centers)
 
-    # Additional thing to check: Make sure none of these centers lies within an 
+    # Additional thing to check: Make sure none of these centers lies within an
     # object. Apparently, this is not automatically checked in `free_cells_rcpp`!
-    check_in <- lapply(objects(background), 
+    check_in <- lapply(objects(background),
                        \(x) in_object(x, centers))
     check <- check & !Reduce("|", check_in)
 
-    # If something blocks the way in the previous column, then it should also 
-    # block the way on the columns. Note that we do this twice: Once here and 
-    # once after `overlap_with_objects`. Apparently, the model is sensitive to 
+    # If something blocks the way in the previous column, then it should also
+    # block the way on the columns. Note that we do this twice: Once here and
+    # once after `overlap_with_objects`. Apparently, the model is sensitive to
     # both in their own right: Moving this check to once at the end changes how
     # the pedestrians move around!
     check[!check[,3],2] <- FALSE
@@ -143,7 +143,7 @@ setMethod("moving_options", "agent", function(object,
         check <- overlap_with_objects(object, background, centers, check, cpp = FALSE)
         # check <- bodyObjectOK(size(object), centers, objects(background), as.vector(check))
 
-        # If something blocks the way in the previous column, then it should also 
+        # If something blocks the way in the previous column, then it should also
         # block the way on the columns
         check[!check[,3],2] <- FALSE
         check[!check[,2],1] <- FALSE
@@ -163,7 +163,7 @@ setMethod("moving_options", "agent", function(object,
         goal_list <- list(matrix(goal_position, ncol = 2))
         attr(goal_list[[1]], "i") <- 1
         state_dummy <- list(P = goal_list)
-        
+
         # local_check <- m4ma::seesGoalOK_rcpp(1, objects(background), state_dummy, centers, check)
         local_check <- m4ma::seesGoalOK_rcpp(1, obj, state_dummy, centers, check)
 
@@ -182,23 +182,23 @@ setMethod("moving_options", "agent", function(object,
     return(check)
 })
 
-#' Compute cell centers 
-#' 
-#' Compute cell centers based on a person's current position and velocity, 
-#' accounting for potential changes in speed and direction. Alternative to 
-#' \code{\link[m4ma]{c_vd}} that accounts for biomechanical limitations in the 
-#' speed one can maintain when turning at a greater angle. Defaults are based on 
+#' Compute cell centers
+#'
+#' Compute cell centers based on a person's current position and velocity,
+#' accounting for potential changes in speed and direction. Alternative to
+#' \code{\link[m4ma]{c_vd}} that accounts for biomechanical limitations in the
+#' speed one can maintain when turning at a greater angle. Defaults are based on
 #' Seethapathi et al. (2024), Brown et al. (2020), and Glaister et al. (2007).
-#' 
+#'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Defaults to a matrix 
+#' whenever they move to the respective cell of this matrix. Defaults to a matrix
 #' in which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
 #' @param orientations Numeric matrix containing the change in direction for an
-#' agent whenever they move to the respective cell of this matrix. 
-#' Defaults to a matrix in which the rows contain \code{72.5}, \code{50}, 
-#' \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, \code{340}, 
-#' \code{327.5}, \code{310}, \code{287.5} (note that the larger angles are 
+#' agent whenever they move to the respective cell of this matrix.
+#' Defaults to a matrix in which the rows contain \code{72.5}, \code{50},
+#' \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, \code{340},
+#' \code{327.5}, \code{310}, \code{287.5} (note that the larger angles are
 #' actually the negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
@@ -206,54 +206,54 @@ setMethod("moving_options", "agent", function(object,
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #'
 #' @return Numeric matrix of (x, y) coordinates for each cell
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Create two agents, one fast and one slow
-#' slow_agent <- agent(center = c(-2.75, 0), 
-#'                     radius = 0.25, 
-#'                     speed = 0.5, 
+#' slow_agent <- agent(center = c(-2.75, 0),
+#'                     radius = 0.25,
+#'                     speed = 0.5,
 #'                     orientation = 0,
 #'                     current_goal = goal(position = c(-2.01, 0)))
-#' 
-#' fast_agent <- agent(center = c(-2.75, 0), 
-#'                     radius = 0.25, 
-#'                     speed = 2, 
+#'
+#' fast_agent <- agent(center = c(-2.75, 0),
+#'                     radius = 0.25,
+#'                     speed = 2,
 #'                     orientation = 0,
 #'                     current_goal = goal(position = c(-2.01, 0)))
-#' 
+#'
 #' # Generate the cell centers with predped
 #' slow_centers <- compute_centers(slow_agent)
 #' fast_centers <- compute_centers(fast_agent)
-#' 
+#'
 #' # Generate the cell centers with m4ma
-#' slow_m4ma <- m4ma::c_vd(1:33, 
-#'                         position(slow_agent), 
-#'                         speed(slow_agent), 
+#' slow_m4ma <- m4ma::c_vd(1:33,
+#'                         position(slow_agent),
+#'                         speed(slow_agent),
 #'                         orientation(slow_agent))
-#' fast_m4ma <- m4ma::c_vd(1:33, 
-#'                         position(fast_agent), 
-#'                         speed(fast_agent), 
+#' fast_m4ma <- m4ma::c_vd(1:33,
+#'                         position(fast_agent),
+#'                         speed(fast_agent),
 #'                         orientation(fast_agent))
-#' 
-#' # Compare both through a plot. This should show that the predped variant 
-#' # accounts for an interaction between an agent's speed and change in 
+#'
+#' # Compare both through a plot. This should show that the predped variant
+#' # accounts for an interaction between an agent's speed and change in
 #' # direction when computing the cell centers
 #' base::plot(slow_centers, col = "black")
 #' graphics::points(slow_m4ma[, 1], slow_m4ma[, 2], col = "red")
-#' 
+#'
 #' base::plot(fast_centers, col = "black")
 #' graphics::points(fast_m4ma[, 1], fast_m4ma[, 2], col = "red")
-#' 
-#' 
-#' @seealso 
+#'
+#'
+#' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[m4ma]{c_vd}}
-#' \code{\link[predped]{moving_options-method}} 
-#' 
+#' \code{\link[predped]{moving_options-method}}
+#'
 #' @rdname compute_centers
 #'
 #' @export
-compute_centers <- function(agent, 
+compute_centers <- function(agent,
                             velocities = c(1.5, 1, 0.5) |>
                                rep(each = 11) |>
                                matrix(ncol = 3),
@@ -263,7 +263,7 @@ compute_centers <- function(agent,
                                 matrix(ncol = 3),
                             time_step = 0.5,
                             cpp = TRUE) {
-    
+
     # Transform the velocities and orientations to numerics. Easier to deal with
     # for these computations
     velocities <- as.numeric(velocities)
@@ -282,28 +282,37 @@ compute_centers <- function(agent,
 
     # Pass on to cpp if asked for
     if(cpp) {
-        return(compute_centers_rcpp(agent, 
-                                    a, 
+        return(compute_centers_rcpp(agent,
+                                    a,
                                     b,
                                     velocities,
                                     orientations,
                                     time_step = time_step))
     }
 
-    # Define a slowing factor that depends on the turning angle or change in 
+    # Define a slowing factor that depends on the turning angle or change in
     # direction
     angles <- orientations * pi / 180
-    slow <- 1 - b * sin(abs(angles))^a
+    # slow <- 1 - b * abs(sin(angles))^a
+    slow <- 1-b*sin(pi*abs(orientations)/360)^a
 
-    # Create a matrix of velocities based on the slow factor, the ring multipliers, 
-    # and the agents current speed, furthermore taking into account the time 
+    if (any(is.nan(slow))) {
+        bpi <<- pi
+        bo <<- orientations
+        ba <<- a
+        bb <<- b
+        stop("Slow fucked")
+    }
+
+    # Create a matrix of velocities based on the slow factor, the ring multipliers,
+    # and the agents current speed, furthermore taking into account the time
     # between movements
     velocity <- speed(agent) * slow * velocities * time_step
 
     # Compute the new cell centers based on the computed speeds and velocities
     new_orientation <- orientation(agent) * pi / 180 + angles
     centers <- cbind(
-        position(agent)[1] + velocity * cos(new_orientation), 
+        position(agent)[1] + velocity * cos(new_orientation),
         position(agent)[2] + velocity * sin(new_orientation)
     )
 
@@ -311,67 +320,67 @@ compute_centers <- function(agent,
 }
 
 #' Find number of agents blocking agent
-#' 
-#' This function computes the number of other agents in a particular state who 
-#' are blocking the way between the current agent and their goal. This is done 
-#' so that the current agent can reevaluate whether they want to keep pursuing 
-#' this way to their goal, or whether they want to reroute. 
-#' 
+#'
+#' This function computes the number of other agents in a particular state who
+#' are blocking the way between the current agent and their goal. This is done
+#' so that the current agent can reevaluate whether they want to keep pursuing
+#' this way to their goal, or whether they want to reroute.
+#'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
-#' @param agent_predictions Matrix containing the predicted positions of all 
-#' agents in the simulation, where the id's  of the agents serve as the 
-#' rownames. Is typically handled under the hood. Defaults to \code{NULL}, 
-#' triggering this function to consider where the other agents are right now 
+#' @param agent_predictions Matrix containing the predicted positions of all
+#' agents in the simulation, where the id's  of the agents serve as the
+#' rownames. Is typically handled under the hood. Defaults to \code{NULL},
+#' triggering this function to consider where the other agents are right now
 #' (instead of where they will be in the next iteration).
-#' 
+#'
 #' @return List containing all of the agents that are blocking the path
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Create an agent and a state
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(6, 6)), 
-#'                             objects = list(circle(center = c(0, 0), 
+#' my_background <- background(shape = rectangle(center = c(0, 0),
+#'                                               size = c(6, 6)),
+#'                             objects = list(circle(center = c(0, 0),
 #'                                                   radius = 1)))
-#' my_agent <- agent(center = c(-2.75, 0), 
-#'                   radius = 0.25, 
-#'                   speed = 1, 
+#' my_agent <- agent(center = c(-2.75, 0),
+#'                   radius = 0.25,
+#'                   speed = 1,
 #'                   orientation = 0,
 #'                   current_goal = goal(position = c(-1.01, 0)))
-#' 
+#'
 #' my_state <- state(iteration = 1,
-#'                   setting = my_background, 
-#'                   agents = list(agent(center = c(-2, 0), radius = 0.25), 
-#'                                 agent(center = c(-1.5, 0), radius = 0.25), 
-#'                                 agent(center = c(2, 0), radius = 0.25), 
+#'                   setting = my_background,
+#'                   agents = list(agent(center = c(-2, 0), radius = 0.25),
+#'                                 agent(center = c(-1.5, 0), radius = 0.25),
+#'                                 agent(center = c(2, 0), radius = 0.25),
 #'                                 agent(center = c(1.5, 0), radius = 0.25)))
-#' 
+#'
 #' # Find out how many agents are blocking the way for my_agent
 #' agents_between_goal(my_agent, my_state)
-#' 
-#' @seealso 
+#'
+#' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{moving_options}}
-#' 
+#'
 #' @rdname agents_between_goal
-#' 
+#'
 #' @export
 #
 # TO DO:
-#   - The purpose of `cone_set` is not entirely clear and might have to change if 
+#   - The purpose of `cone_set` is not entirely clear and might have to change if
 #     we wish to consider more or less than 33 choices
 #   - There might be an easier, object-oriented way of finding out how many agents
 #     are blocking the goal
-agents_between_goal <- function(agent, 
-                                state, 
+agents_between_goal <- function(agent,
+                                state,
                                 agent_predictions = NULL) {
 
     # Extract the agent list and delete the agent in question from this list.
     agent_list <- agents(state)
     agent_list <- agent_list[sapply(agent_list, id) != id(agent)]
 
-    # If no predicted positions are delivered to the function, we will use the 
+    # If no predicted positions are delivered to the function, we will use the
     # current positions to find out whether agents are standing inbetween `agent`
     # and its goal. Otherwise, we will use the predicted positions.
     if(is.null(agent_predictions)) {
@@ -389,12 +398,12 @@ agents_between_goal <- function(agent,
     colnames(agent_positions) <- c("x", "y")
 
     # Create a cone from the agent to the goal location
-    goal_cone <- m4ma::Iangle(matrix(position(agent), 
-                                     nrow = 1, 
-                                     ncol = 2), 
-                              orientation(agent), 
+    goal_cone <- m4ma::Iangle(matrix(position(agent),
+                                     nrow = 1,
+                                     ncol = 2),
+                              orientation(agent),
                               matrix(current_goal(agent)@path[1,],
-                                     nrow = 1, 
+                                     nrow = 1,
                                      ncol = 2))
 
     if(is.na(goal_cone)) {
@@ -402,36 +411,36 @@ agents_between_goal <- function(agent,
     }
 
     # The discrete cone bin in which the goal is contained is the same for each
-    # of the velicities. Furhermore retain only those goal cones that fall 
+    # of the velicities. Furhermore retain only those goal cones that fall
     # within view of the agent.
     cone_set <- c(goal_cone - 1, goal_cone, goal_cone + 1)
     cone_set <- cone_set[cone_set > 0 & cone_set < 12]
 
     # Compute the end points of the orthogonal line segments to the line between
-    # the agent and the other agents with a width equal to the radius of the 
-    # agent. 
+    # the agent and the other agents with a width equal to the radius of the
+    # agent.
     #
-    # These lines can be used to check the intersection with the cone drawn from 
-    # the agent to their goal. If there is such an intersection, we can assume 
+    # These lines can be used to check the intersection with the cone drawn from
+    # the agent to their goal. If there is such an intersection, we can assume
     # that agent is blocking the goal.
     #
-    # Important note: Only extract the anticlockwise cone (`ac`), which is also 
+    # Important note: Only extract the anticlockwise cone (`ac`), which is also
     # the direction that Iangle works in
     ends <- m4ma::eObjects(matrix(position(agent),
-                                  nrow = 1, 
+                                  nrow = 1,
                                   ncol = 2),
-                           agent_positions, 
+                           agent_positions,
                            size(agent))$ac
 
     # Create several cones from the agent to these end points
     end_cones <- apply(ends,
-                       1, 
-                       \(x) m4ma::Iangle(matrix(position(agent), ncol = 2), 
+                       1,
+                       \(x) m4ma::Iangle(matrix(position(agent), ncol = 2),
                                          orientation(agent),
                                          matrix(x, ncol = 2)))
 
     # Check whether any of the coordinates fall inside of the cone_set
-    blocking <- sapply(end_cones, 
+    blocking <- sapply(end_cones,
                        function(x) {
                            if(any(is.na(x))) {
                                return(FALSE)
@@ -445,100 +454,100 @@ agents_between_goal <- function(agent,
 }
 
 #' Check agent and object overlap
-#' 
-#' This function checks whether there is an overlap between a given agent and 
-#' the objects in the environment, provided that the agent would move to the 
-#' locations in \code{centers}. Returns a logical matrix as needed in 
+#'
+#' This function checks whether there is an overlap between a given agent and
+#' the objects in the environment, provided that the agent would move to the
+#' locations in \code{centers}. Returns a logical matrix as needed in
 #' \code{\link[predped]{moving_options-method}}.
-#' 
+#'
 #' @details
-#' In this function, we can only approximately check the intersection of agent 
-#' and object. Specifically, we use the following method. First, we sample 
-#' nodes on the circumference of each of the objects in the setting that is 
-#' provided to this function. For this, we depend on the function 
-#' \code{\link[predped]{nodes_on_circumference}} and we currently take these 
-#' nodes to be 5cm. 
-#' 
-#' In the next step, we bind all these coordinates together in a single matrix. 
+#' In this function, we can only approximately check the intersection of agent
+#' and object. Specifically, we use the following method. First, we sample
+#' nodes on the circumference of each of the objects in the setting that is
+#' provided to this function. For this, we depend on the function
+#' \code{\link[predped]{nodes_on_circumference}} and we currently take these
+#' nodes to be 5cm.
+#'
+#' In the next step, we bind all these coordinates together in a single matrix.
 #' This matrix thus consists of nodes that should not be embedded in the agents:
 #' Whenever one of these points is included in the agents, we can conclude that
-#' the agents and objects intersect. [Note, however, that if these points are 
-#' not included in the agents, that we cannot with certainty conclude that agent 
+#' the agents and objects intersect. [Note, however, that if these points are
+#' not included in the agents, that we cannot with certainty conclude that agent
 #' and object do not intersect]
-#' 
-#' This check is then performed by looping over all the centers, changing the 
-#' agents position to the position of this center, and using the 
-#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized 
-#' test: For each position in \code{centers} we have a logical \code{TRUE} or 
-#' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a 
-#' logical matrix with an equal number of rows as \code{centers} and an equal 
-#' number of columns as nodes in the coordinate matrix. In a last step, 
+#'
+#' This check is then performed by looping over all the centers, changing the
+#' agents position to the position of this center, and using the
+#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+#' test: For each position in \code{centers} we have a logical \code{TRUE} or
+#' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
+#' logical matrix with an equal number of rows as \code{centers} and an equal
+#' number of columns as nodes in the coordinate matrix. In a last step,
 #' we aggregate over the columns in this matrix so that we have a single logical
 #' for each center.
-#' 
-#' The reason why we use this approximate method is because of time efficiency. 
-#' Using the \code{\link[predped]{intersects-method}} takes a longer time than 
-#' using the \code{\link[predped]{in_object-method}}, especially as the number 
+#'
+#' The reason why we use this approximate method is because of time efficiency.
+#' Using the \code{\link[predped]{intersects-method}} takes a longer time than
+#' using the \code{\link[predped]{in_object-method}}, especially as the number
 #' of objects in the environment increases.
-#' 
+#'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
+#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
-#' @param space_between Numeric denoting the space to leave between the nodes 
+#' @param space_between Numeric denoting the space to leave between the nodes
 #' put on the circumference of the objects in the space (used for checking the
 #' overlap with an agent). Defaults to \code{0.05} or 5cm.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
-#' 
+#'
 #' @return Logical matrix containing availabilities of the centers (\code{TRUE}
 #' if available, \code{FALSE} if not).
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Initialize all objects that you need
-#' my_background <- background(shape = rectangle(center = c(0, 0), 
-#'                                               size = c(6, 6)), 
-#'                             objects = list(circle(center = c(0, 0), 
+#' my_background <- background(shape = rectangle(center = c(0, 0),
+#'                                               size = c(6, 6)),
+#'                             objects = list(circle(center = c(0, 0),
 #'                                                   radius = 2)))
-#' my_agent <- agent(center = c(-2.75, 0), 
-#'                   radius = 0.25, 
-#'                   speed = 1, 
+#' my_agent <- agent(center = c(-2.75, 0),
+#'                   radius = 0.25,
+#'                   speed = 1,
 #'                   orientation = 0,
 #'                   current_goal = goal(position = c(-2.01, 0)))
-#' 
+#'
 #' # Generate several locations the agent can move to
 #' centers <- compute_centers(my_agent)
 #' check <- matrix(TRUE, nrow = 11, ncol = 3)
-#' 
+#'
 #' # Use moving_options to see which of these possibilities is sound
-#' overlap_with_objects(my_agent, 
+#' overlap_with_objects(my_agent,
 #'                      my_background,
 #'                      centers,
 #'                      check)
-#' 
-#' @seealso 
+#'
+#' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{background-class}},
 #' \code{\link[predped]{in_object}},
 #' \code{\link[predped]{intersects}},
 #' \code{\link[predped]{moving_options}},
 #' \code{\link[predped]{nodes_on_circumference}}
-#' 
+#'
 #' @rdname overlap_with_objects
-#' 
+#'
 #' @export
 #
-# TO DO 
+# TO DO
 #   - Assumes the agent is circular, but we don't want to depend on this.
-overlap_with_objects <- function(agent, 
-                                 background, 
-                                 centers, 
+overlap_with_objects <- function(agent,
+                                 background,
+                                 centers,
                                  check,
                                  space_between = 5e-2,
                                  cpp = FALSE) {
-    
+
     # If the centers are not provided, return an empty logical
     if(length(centers) == 0) {
         return(logical(0))
@@ -550,20 +559,20 @@ overlap_with_objects <- function(agent,
     }
 
     # Transform all background-objects into one big matrix of segments. This will
-    # allow us to vectorize the search for intersections between the agent and 
+    # allow us to vectorize the search for intersections between the agent and
     # an object, hopefully speeding up the search.
-    coords <- lapply(objects(background), 
+    coords <- lapply(objects(background),
                      \(x) nodes_on_circumference(x, space_between = space_between))
     coords <- do.call("rbind", coords)
 
-    # Do the same for the background and bind this together with the other 
-    # coordinates. Saves a lot of time, as the original function that was used 
+    # Do the same for the background and bind this together with the other
+    # coordinates. Saves a lot of time, as the original function that was used
     # (`intersects`) is quite time-inefficient.
-    coords <- rbind(coords, 
-                    nodes_on_circumference(shape(background), 
+    coords <- rbind(coords,
+                    nodes_on_circumference(shape(background),
                                            space_between = space_between))
 
-    # Only retain those coordinates that are within a certain range around the 
+    # Only retain those coordinates that are within a certain range around the
     # agent.
     agent_position <- position(agent)
 
@@ -574,7 +583,7 @@ overlap_with_objects <- function(agent,
     coords <- coords[distances <= cutoff, ] |>
         matrix(ncol = 2)
 
-    # Small check: If none of the objects is even within the same region, we 
+    # Small check: If none of the objects is even within the same region, we
     # can just return the check as is
     if(length(coords) == 0) {
         return(check)
@@ -584,22 +593,22 @@ overlap_with_objects <- function(agent,
     tryCatch(local_check <- matrix(TRUE, nrow = nrow(centers), ncol = nrow(coords)),
              error = function(e) {browser()})
     for(i in seq_len(nrow(centers))) {
-        # If that center is already out of the running, we don't need to do 
+        # If that center is already out of the running, we don't need to do
         # an additional check
         if(!check[i]) {
             local_check[i,] <- TRUE
 
-        # If the center is still in the running, we need to check whether the 
-        # coordinates of the objects lie within the agent's new potential 
+        # If the center is still in the running, we need to check whether the
+        # coordinates of the objects lie within the agent's new potential
         # position.
         } else {
             # Change the center of the agent
             center(agent) <- centers[i,]
 
-            # First check whether there is an intersection with the shape of the 
-            # background. Idea is that none of the coordinates should be within the 
-            # agent, in which case the `any` statement returns FALSE. However, the 
-            # check should read TRUE when one of the coordinates is interpreted as 
+            # First check whether there is an intersection with the shape of the
+            # background. Idea is that none of the coordinates should be within the
+            # agent, in which case the `any` statement returns FALSE. However, the
+            # check should read TRUE when one of the coordinates is interpreted as
             # being okay, hence the reversal of the logical.
             # check[i] <- !any(in_object(agent, coords, outside = FALSE))
             local_check[i,] <- in_object(agent, coords)
