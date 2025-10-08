@@ -296,14 +296,6 @@ compute_centers <- function(agent,
     # slow <- 1 - b * abs(sin(angles))^a
     slow <- 1-b*sin(pi*abs(orientations)/360)^a
 
-    if (any(is.nan(slow))) {
-        bpi <<- pi
-        bo <<- orientations
-        ba <<- a
-        bb <<- b
-        stop("Slow fucked")
-    }
-
     # Create a matrix of velocities based on the slow factor, the ring multipliers,
     # and the agents current speed, furthermore taking into account the time
     # between movements
