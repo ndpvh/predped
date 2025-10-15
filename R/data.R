@@ -186,10 +186,25 @@ unpack_trace <- function(x,
 #' @export
 to_trace <- function(data, 
                      background,
+                     b_turning = NULL, 
+                     a_turning = NULL,
+                     velocities = c(1.5, 1, 0.5),
+                     orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                      -72.5, -50, -32.5, -20, -10),
+                     time_step = 0.5,
+                     threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                     cpp = TRUE,
                      ...) {
 
     # Add the information needed to transform the data to a collection of states.
-    data <- add_motion_variables(data, ...)
+    data <- add_motion_variables(
+        data, 
+        velocities = velocities,
+        orientations = orientations, 
+        time_step = time_step, 
+        threshold = threshold,
+        initial_conditions = TRUE
+    )
 
     # Create some dummy states and agents. These will be adjusted within the 
     # loop. Reason for making them here and adjusting them later is for speed, 
@@ -230,19 +245,55 @@ to_trace <- function(data,
         trace[[i]]@agents <- lapply(
             seq_len(nrow(iter_data)),
             function(j) {
+                # General agent characteristics
                 dummy_agent@id <- iter_data$id[j]
                 dummy_agent@center <- as.numeric(iter_data[j, c("x", "y")])
                 dummy_agent@speed <- iter_data$speed[j]
                 dummy_agent@orientation <- iter_data$orientation[j]
                 dummy_agent@cell <- iter_data$cell[j]
 
+                # Goal characteristics
                 dummy_goal@id <- iter_data$goal_id[j]
                 dummy_goal@position <- coordinate(
                     as.numeric(
                         iter_data[j, c("goal_x", "goal_y")]
                     )
                 )
+                dummy_goal@path <- find_path(
+                    dummy_goal,
+                    dummy_agent,
+                    background,
+                    ...
+                )
                 dummy_agent@current_goal <- dummy_goal
+
+                # Cell centers
+                copy <- dummy_agent
+
+                copy@center <- as.numeric(iter_data[j, c("x0", "y0")])
+                copy@speed <- as.numeric(iter_data$speed0[j])
+                copy@orientation <- as.numeric(iter_data$orientation0[j])
+
+                if(!is.null(b_turning)) {
+                    copy@parameters$b_turning <- b_turning
+                }
+                if(!is.null(a_turning)) {
+                    copy@parameters$a_turning <- a_turning
+                }
+                
+                dummy_agent@cell_centers <- compute_centers(
+                    copy, 
+                    velocities = matrix(
+                        rep(velocities, each = length(orientations)), 
+                        ncol = 3
+                    ),
+                    orientations = matrix(
+                        rep(orientations, times = length(velocities)), 
+                        ncol = 3
+                    ),
+                    time_step = time_step, 
+                    cpp = cpp
+                )
 
                 return(dummy_agent)
             }
@@ -293,11 +344,12 @@ to_trace <- function(data,
 #' 
 #' @export
 add_motion_variables <- function(data, 
-                                 velocities = c(1.5, 1, 0.5) ,
-                                 orientations = c(-72.5, -50, -32.5, -20, -10, 0, 
-                                                  10, 20, 32.5, 50, 72.5),
+                                 velocities = c(1.5, 1, 0.5),
+                                 orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                                  -72.5, -50, -32.5, -20, -10),
                                  time_step = 0.5,
-                                 threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step) {
+                                 threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                                 initial_conditions = FALSE) {
 
     # Define the times at which the simulation ran and define the bins and 
     # iterations that come with it
@@ -323,8 +375,8 @@ add_motion_variables <- function(data,
                     "iteration" = iterations[j - 1],
                     "time" = steps[j - 1],
                     "id" = i,
-                    "x" = mean(agent_data$x[idx]),
-                    "y" = mean(agent_data$y[idx]),
+                    "x0" = mean(agent_data$x[idx]),
+                    "y0" = mean(agent_data$y[idx]),
                     "goal_id" = agent_data$goal_id[idx][1],
                     "goal_x" = agent_data$goal_x[idx][1],
                     "goal_y" = agent_data$goal_y[idx][1]
@@ -336,26 +388,30 @@ add_motion_variables <- function(data,
             as.data.frame()
 
         # Change all numerics to numeric
-        for(j in c("iteration", "time", "x", "y", "goal_x", "goal_y")) {
+        for(j in c("iteration", "time", "x0", "y0", "goal_x", "goal_y")) {
             positions[, j] <- as.numeric(positions[, j])
         }
+
+        # Add ending positions to the data. This will allow us to define the 
+        # initial position, speed, orientation, and ending position at each 
+        # time point
+        positions[, c("x", "y")] <- rbind(
+            positions[2:nrow(positions), c("x0", "y0")] |>
+                as.matrix(),
+            matrix(NA, nrow = 1, ncol = 2)
+        )
+        positions <- positions[-nrow(positions), ]
 
         # Create a speed and orientation vector for these data. The speed is 
         # defined as the distance traveled between two consecutive iterations 
         # divided by the time step. The orientation is defined as the angle 
         # between two consecutive positions in the data. This angle is then 
         # made positive and transformed to degrees
-        positions$speed <- c(
-            NA,
-            sqrt(diff(positions$x)^2 + diff(positions$y)^2) / time_step
-        )
+        positions$speed <- sqrt((positions$x - positions$x0)^2 + (positions$y - positions$y0)^2) / time_step
 
-        positions$orientation <- c(
-            NA, 
-            atan2(
-                positions$y[2:nrow(positions)] - positions$y[2:nrow(positions) - 1],
-                positions$x[2:nrow(positions)] - positions$x[2:nrow(positions) - 1]
-            )
+        positions$orientation <- atan2(
+            positions$y - positions$y0,
+            positions$x - positions$x0
         )
         positions$orientation <- ifelse(
             positions$orientation < 0,
@@ -364,15 +420,17 @@ add_motion_variables <- function(data,
         )
         positions$orientation <- positions$orientation * 180 / pi
 
+        # Adjust so you have initial speeds and orientations coupled to initial 
+        # positions. Is needed in order to accurately compute cell centers
+        positions$speed0 <- c(NA, positions$speed[2:nrow(positions) - 1])
+        positions$orientation0 <- c(NA, positions$orientation[2:nrow(positions) - 1])
+
         # Make some derived changes in speeds and orientation. These will combine
         # into the cells that are chosen. Make sure that the difference in 
         # orientation falls within (-180, 180), thus making an angle relative to 
         # the current direction
-        d_speed <- c(
-            NA,
-            positions$speed[2:nrow(positions) - 1] / positions$speed[2:nrow(positions)]
-        )
-        d_orientation <- c(NA, diff(positions$orientation))
+        d_speed <- positions$speed / positions$speed0
+        d_orientation <- positions$orientation - positions$orientation0
         d_orientation <- ifelse(
             d_orientation > 180, 
             d_orientation - 360,
@@ -425,6 +483,11 @@ add_motion_variables <- function(data,
     # Bind all data together and order according to iterations
     new_data <- do.call("rbind", per_agent)
     new_data <- new_data[order(new_data$iteration), ]
+
+    # If the person does not need initial information, delete the 0-columns
+    if(!initial_conditions) {
+        new_data <- new_data[, !(colnames(new_data) %in% c("x0", "y0", "speed0", "orientation0"))]
+    }
 
     return(new_data)
 }
