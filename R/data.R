@@ -190,7 +190,7 @@ to_trace <- function(data,
                      a_turning = NULL,
                      velocities = c(1.5, 1, 0.5),
                      orientations = c(72.5, 50, 32.5, 20, 10, 0, 
-                                      -72.5, -50, -32.5, -20, -10),
+                                      -10, -20, -32.5, -50, -72.5),
                      time_step = 0.5,
                      threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
                      cpp = TRUE,
@@ -251,6 +251,16 @@ to_trace <- function(data,
                 dummy_agent@speed <- iter_data$speed[j]
                 dummy_agent@orientation <- iter_data$orientation[j]
                 dummy_agent@cell <- iter_data$cell[j]
+
+                # If a person has a low speed, we will invoke a non-moving status
+                #
+                # This may not adequately reflect what the agent is actually 
+                # doing, but this does not matter for our purposes
+                dummy_agent@status <- ifelse(
+                    iter_data$speed[j] == 0,
+                    "wait",
+                    "move"
+                )
 
                 # Goal characteristics
                 dummy_goal@id <- iter_data$goal_id[j]
@@ -348,7 +358,8 @@ add_motion_variables <- function(data,
                                  orientations = c(72.5, 50, 32.5, 20, 10, 0, 
                                                   -72.5, -50, -32.5, -20, -10),
                                  time_step = 0.5,
-                                 threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                                #  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                                 threshold = qlnorm(0.25, -2.95, 0.64) / time_step,
                                  initial_conditions = FALSE) {
 
     # Define the times at which the simulation ran and define the bins and 
@@ -372,11 +383,11 @@ add_motion_variables <- function(data,
             function(j) {
                 idx <- agent_data$time < steps[j] & agent_data$time >= steps[j - 1]
                 return(c(
-                    "iteration" = iterations[j - 1],
-                    "time" = steps[j - 1],
+                    "iteration" = iterations[j],
+                    "time" = steps[j],
                     "id" = i,
-                    "x0" = mean(agent_data$x[idx]),
-                    "y0" = mean(agent_data$y[idx]),
+                    "x" = mean(agent_data$x[idx]),
+                    "y" = mean(agent_data$y[idx]),
                     "goal_id" = agent_data$goal_id[idx][1],
                     "goal_x" = agent_data$goal_x[idx][1],
                     "goal_y" = agent_data$goal_y[idx][1]
@@ -388,19 +399,19 @@ add_motion_variables <- function(data,
             as.data.frame()
 
         # Change all numerics to numeric
-        for(j in c("iteration", "time", "x0", "y0", "goal_x", "goal_y")) {
+        for(j in c("iteration", "time", "x", "y", "goal_x", "goal_y")) {
             positions[, j] <- as.numeric(positions[, j])
         }
 
         # Add ending positions to the data. This will allow us to define the 
         # initial position, speed, orientation, and ending position at each 
         # time point
-        positions[, c("x", "y")] <- rbind(
-            positions[2:nrow(positions), c("x0", "y0")] |>
-                as.matrix(),
-            matrix(NA, nrow = 1, ncol = 2)
+        positions[, c("x0", "y0")] <- rbind(
+            matrix(NA, nrow = 1, ncol = 2),
+            positions[2:nrow(positions) - 1, c("x", "y")] |>
+                as.matrix()
         )
-        positions <- positions[-nrow(positions), ]
+        positions <- positions[-1, ]
 
         # Create a speed and orientation vector for these data. The speed is 
         # defined as the distance traveled between two consecutive iterations 
