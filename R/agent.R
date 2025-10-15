@@ -35,6 +35,10 @@
 #' agent. Should contain all parameters relevant for the utility functions 
 #' (use \code{predped::draw_parameters(1)} for an example).
 #' @slot color Character denoting the color in which the agent should be plotted.
+#' @slot cell_centers Numeric matrix denoting the positions that the agent may 
+#' move to at a particular iteration.
+#' @slot utility_variables Data.frame precomputed containing values for all the 
+#' variables relevant to compute the utilities.
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
@@ -117,6 +121,12 @@ agent <- setClass("agent",
 #' (use \code{predped::draw_parameters(1)} for an example). Defaults to a random 
 #' set of parameters from the default parameter list in \code{predped}.
 #' @param color Character denoting the color in which the agent should be plotted.
+#' @param cell_centers Numeric matrix denoting the positions that the agent may 
+#' move to at a particular iteration. Should usually not be provided or altered
+#' by the user.
+#' @param utility_variables Data.frame precomputed containing values for all the 
+#' variables relevant to compute the utilities. Should usually not be provided 
+#' or altered by the user.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}
 #' 
@@ -189,7 +199,7 @@ setMethod("initialize", "agent", function(.Object,
         params <- params_from_csv[["params_archetypes"]]
         params <- params[params$name == "BaselineEuropean", ]
         params$radius <- radius
-        .Object@parameters <- params
+        .Object@parameters <- params[, -(1:2)]
     } else {
         .Object@parameters <- parameters
     }
