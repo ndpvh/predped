@@ -108,12 +108,6 @@ unpack_trace <- function(x,
     # Create a function that will extract all details of the agents from a 
     # particular state.
     extract_state <- function(y) {
-        # Create the agent-specifications for this state
-        agent_specifications <- create_agent_specifications(y@agents, 
-                                                            stay_stopped = stay_stopped, 
-                                                            time_step = time_step,
-                                                            cpp = FALSE)
-
         # Loop over all of the agents and create their own row in the dataframe.
         # This will consist of all variables included in the time_series function
         # and the utility variables that are used as an input to the utility 
@@ -193,6 +187,7 @@ to_trace <- function(data,
                                       -10, -20, -32.5, -50, -72.5),
                      time_step = 0.5,
                      threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                     stay_stopped = TRUE,
                      cpp = TRUE,
                      ...) {
 
@@ -205,6 +200,14 @@ to_trace <- function(data,
         threshold = threshold,
         initial_conditions = TRUE
     )
+
+    # Assign each person to a group: If provided in the data, use that value. 
+    # If not, make a new one
+    if(!("group" %in% colnames(data))) {
+        data$group <- data$id |>
+            factor() |>
+            as.numeric()
+    }
 
     # Create some dummy states and agents. These will be adjusted within the 
     # loop. Reason for making them here and adjusting them later is for speed, 
@@ -221,6 +224,9 @@ to_trace <- function(data,
         position = c(0, 0),
         counter = 1
     )
+
+    # Make sure agent_specifications is defined
+    agent_specifications <- NULL
 
     # Loop over each of the iterations and add the agents to the states of the 
     # trace.
@@ -241,7 +247,13 @@ to_trace <- function(data,
         }
 
         # If there are agents walking around at that time, we create an agents
-        # list and add it to the state
+        # list and add it to the state. Add the agents that were already in the 
+        # room to the dummy state, will allow us to be more accurate in checks 
+        # etc.
+        if(i > 1) {
+            dummy_state@agents <- trace[[i - 1]]@agents
+        }
+
         trace[[i]]@agents <- lapply(
             seq_len(nrow(iter_data)),
             function(j) {
@@ -251,30 +263,24 @@ to_trace <- function(data,
                 dummy_agent@speed <- iter_data$speed[j]
                 dummy_agent@orientation <- iter_data$orientation[j]
                 dummy_agent@cell <- iter_data$cell[j]
+                dummy_agent@group <- iter_data$group[j]
 
                 # If a person has a low speed, we will invoke a non-moving status
                 #
                 # This may not adequately reflect what the agent is actually 
                 # doing, but this does not matter for our purposes
-                dummy_agent@status <- ifelse(
-                    iter_data$speed[j] == 0,
-                    "wait",
-                    "move"
-                )
+                dummy_agent@status <- ifelse(iter_data$speed[j] == 0,
+                                             "wait",
+                                             "move")
 
                 # Goal characteristics
                 dummy_goal@id <- iter_data$goal_id[j]
-                dummy_goal@position <- coordinate(
-                    as.numeric(
-                        iter_data[j, c("goal_x", "goal_y")]
-                    )
-                )
-                dummy_goal@path <- find_path(
-                    dummy_goal,
-                    dummy_agent,
-                    background,
-                    ...
-                )
+                dummy_goal@position <- coordinate(as.numeric(iter_data[j, c("goal_x", "goal_y")]))
+                dummy_goal@path <- find_path(dummy_goal,
+                                             dummy_agent,
+                                             background,
+                                             ...)
+
                 dummy_agent@current_goal <- dummy_goal
 
                 # Cell centers
@@ -291,23 +297,69 @@ to_trace <- function(data,
                     copy@parameters$a_turning <- a_turning
                 }
                 
-                dummy_agent@cell_centers <- compute_centers(
-                    copy, 
-                    velocities = matrix(
-                        rep(velocities, each = length(orientations)), 
-                        ncol = 3
-                    ),
-                    orientations = matrix(
-                        rep(orientations, times = length(velocities)), 
-                        ncol = 3
-                    ),
-                    time_step = time_step, 
-                    cpp = cpp
-                )
+                dummy_agent@cell_centers <- compute_centers(copy, 
+                                                            velocities = velocities |>
+                                                                rep(each = length(orientations)) |>
+                                                                matrix(ncol = 3),
+                                                            orientations = orientations |>
+                                                                rep(times = length(velocities)) |>
+                                                                matrix(ncol = 3),
+                                                            time_step = time_step, 
+                                                            cpp = cpp)
+
+                # If possible, also compute an agent's utility variables. Only 
+                # possible if one is able to predict the other's movements
+                #
+                # Note that we use the copy for this computation. Is done to 
+                # ensure that the utility variables are computed while accounting 
+                # for the previous, not the current state
+                if(!is.null(agent_specifications) & copy@status == "move") {
+                    # You can only include those agents that are actually in the
+                    # specifications. If not included, we cannot include them in
+                    # the computation (this is the case if this is the first 
+                    # iteration that the agent is present in the room)
+                    if(id(copy) %in% agent_specifications$id) {
+                        # Perform a preliminary check of the different cell positions
+                        # and whether an agent can move there.
+                        #
+                        # Importantly, assumed that almost all positions can be moved 
+                        # to (except for those blocked by an object):
+                        #
+                        # Reasoning is that we wish to estimate a model and that we 
+                        # don't know exactly which cell positions are blocked, even 
+                        # not when we simulated the data (updating happens sequentially, 
+                        # but it is not certain in which sequence)
+                        check <- moving_options(copy,
+                                                dummy_state, 
+                                                background,
+                                                dummy_agent@cell_centers, 
+                                                cpp = cpp)
+
+                        # Compute the utility variables themselves
+                        uv <- compute_utility_variables(copy, 
+                                                        dummy_state, 
+                                                        background,
+                                                        agent_specifications,
+                                                        dummy_agent@cell_centers, 
+                                                        check, 
+                                                        cpp = FALSE)
+                        dummy_agent@utility_variables <- uv
+                    }
+                }
+
+                # Update the list of agents. Obsolete if we would implement random 
+                # order updating of agents
+                dummy_state@agents[[j]] <- dummy_agent
 
                 return(dummy_agent)
             }
         )
+
+        # Update agent_specifications
+        agent_specifications <- create_agent_specifications(trace[[i]]@agents, 
+                                                            stay_stopped = stay_stopped, 
+                                                            time_step = time_step,
+                                                            cpp = cpp)
     }
 
     return(trace)
