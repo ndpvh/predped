@@ -175,5 +175,50 @@ testthat::test_that("Computing cell centers for data works", {
     }
 
     testthat::expect_true(all(result))
-    
 })
+
+# TEST COMMENTED OUT UNTIL LATER:
+#
+# For some reason, the social utility functions do not always get the
+# same results when based on data. It is not entirely clear why this may be,
+# but it seems to be that agents will only be flagged if they move (i.e., 
+# when the predictions seem to point in a given direction), which may be 
+# different in traces inferred from data compared to actual traces.
+#
+# Whenever interpersonal distance, for example, is computed in both, it 
+# seems to correspond quite well.
+#
+# In addition to this difficulty, it seems that the divergence between what we 
+# can infer from data and the information in the traces furthermore provides some
+# other small deviations that are difficult to solve. For example, agent indices
+# are not correctly transformed, and checks are only approximate (based on the 
+# information in the data, not on actual information in the space).
+#
+#
+# testthat::test_that("Computing utility variables for data works", {
+#     # Load in a trace and transform to data
+#     trace <- readRDS(file.path("data", "trace_data.Rds"))
+#     data <- predped::time_series(trace, cpp = TRUE)
+
+#     # Compute the utility variables for the data
+#     tst <- predped::compute_utility_variables(data, trace[[1]]@setting)
+
+#     # Unpack the trace to a data.frame with the utility variables in there
+#     ref <- predped::unpack_trace(trace)
+
+#     # Only select those iterations from those agents that actually exist in both
+#     # datasets
+#     ref$iters <- paste(ref$iteration, ref$id)
+#     tst$iters <- paste(tst$iteration, tst$id)
+
+#     ref <- ref[ref$iters %in% tst$iters, ]
+
+#     ref <- ref[order(ref$iters), ]
+#     tst <- tst[order(tst$iters), ]
+
+#     # There are some known NAs in here, specifically for the first time an agent
+#     # is in the room. These need to be deleted
+#     idx <- c(1, 5)
+#     ref <- ref[-idx, ]
+#     tst <- tst[-idx, ]
+# })
