@@ -47,7 +47,7 @@ NumericVector predict_movement_rcpp(S4 agent,
     // stopped vs when they are actively moving. Also different depending on 
     // whether this is considered in the first place.
     std::string status = agent.slot("status");
-    if(!(stay_stopped & status == "stop")) {
+    if(!(stay_stopped & status != "move")) {
         NumericVector speed = agent.slot("speed");
         NumericVector orientation = agent.slot("orientation");
 

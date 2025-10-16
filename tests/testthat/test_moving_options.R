@@ -611,7 +611,7 @@ testthat::test_that(
 
         # Compute references for these tests
         radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
-        weights <- ring * (1 - 0.2 * sin(radians)^2)
+        weights <- ring * (1 - 0.2 * sin(abs(radians) / 2)^2)
 
         ref_slow <- 0.5 * cbind(
             weights * cos(radians),
@@ -678,7 +678,7 @@ testthat::test_that(
 
         # Compute references for these tests
         radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
-        weights <- ring * (1 - 0.2 * sin(radians)^2)
+        weights <- ring * (1 - 0.2 * sin(abs(radians) / 2)^2)
 
         ref_0 <- cbind(
             weights * cos(radians + 0),
@@ -756,7 +756,7 @@ testthat::test_that(
 
         # Compute references for these tests
         radians <- rep(c(-pi/2, -pi/4, 0, pi/4, pi/2), times = 2)
-        weights <- ring * (1 - 0.2 * sin(radians)^2)
+        weights <- ring * (1 - 0.2 * sin(abs(radians) / 2)^2)
 
         ref_1 <- cbind(
             -1 + weights * cos(radians),

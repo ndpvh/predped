@@ -348,7 +348,7 @@ setMethod("simulate", "predped", function(object,
     trace <- list(state)
 
     # Print that the model is being simulated if no feedback is desired
-    cat(paste0("\rYour model: ", crayon::bold(id(object)), " is being simulated"), paste0(rep(" ", 10), collapse = ""))
+    cat(paste0("\rYour model: ", id(object), " is being simulated"), paste0(rep(" ", 10), collapse = ""))
 
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {

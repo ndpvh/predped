@@ -912,7 +912,7 @@ predict_movement <- function(agent,
     # same speed in the same direction. Different when an agent is currently 
     # stopped vs when they are actively moving. Also different depending on 
     # whether this is considered in the first place.
-    if(stay_stopped & agent@status == "stop") {
+    if(stay_stopped & agent@status != "move") {
         co <- position(agent)
     } else {
         crossed_distance <- m4ma::scaleVel(agent@speed, tStep = time_step) * m4ma::aTOd(agent@orientation)
