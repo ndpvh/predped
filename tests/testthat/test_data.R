@@ -28,10 +28,10 @@ testthat::test_that("Transforming to trace works", {
     )
 
     # Do some checks on the trace itself
-    testthat::expect_equal(length(tst), 9)
+    testthat::expect_equal(length(tst), 10)
     testthat::expect_equal(
         sapply(tst, \(x) length(x@agents)), 
-        c(0, 1, 1, 1, 1, 2, 2, 2, 2)
+        c(0, 0, 1, 1, 1, 1, 2, 2, 2, 2)             # Values here represent: 1 being empty as initial state, 2 being empty due to NA speed and orientation after introduction of agent
     )
 })
 
