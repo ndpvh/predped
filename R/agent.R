@@ -191,7 +191,12 @@ setMethod("initialize", "agent", function(.Object,
     .Object@cell <- cell    
     .Object@color <- color
     .Object@cell_centers <- cell_centers
-    .Object@utility_variables <- data.frame()
+    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 16) |>
+        as.data.frame() |>
+        setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 
+                   "id_distance", "id_check", "id_ingroup", "ba_angle", 
+                   "ba_cones", "fl_leaders", "wb_buddies", "gc_distance", 
+                   "gc_radius", "gc_nped", "vf_angles"))
 
     # If the parameters are empty, add the BaselineEuropean as default. Otherwise
     # use the defined parameters
