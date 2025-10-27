@@ -173,6 +173,9 @@ setMethod("update", "state", function(object,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is 
@@ -213,6 +216,7 @@ setMethod("update", "agent", function(object,
                                       space_between = 1.25,
                                       precomputed_edges = NULL,
                                       many_nodes = !is.null(precomputed_edges),
+                                      adaptive_goal_sorting = TRUE,
                                       standing_start = 0.1,
                                       time_step = 0.5,
                                       report = FALSE,
@@ -229,6 +233,7 @@ setMethod("update", "agent", function(object,
                           space_between = space_between,                     
                           precomputed_edges = precomputed_edges,
                           many_nodes = many_nodes,
+                          adaptive_goal_sorting = adaptive_goal_sorting,
                           report = report,
                           print_iteration = print_iteration,
                           cpp = cpp) 
@@ -769,7 +774,7 @@ update_goal <- function(agent,
         # to the goal. To make sure agents don't get stuck easily, let them 
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
-        if(waiting_counter(agent) < 0 & status(agent) != "move") {
+        if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
             if(length(goals(agent)) != 0) {
                 goals(agent) <- append(current_goal(agent), 
                                        goals(agent))

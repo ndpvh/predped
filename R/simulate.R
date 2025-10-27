@@ -122,6 +122,9 @@
 #' the argument \code{starting_position}. Then, we define each of the next goals
 #' as being the one that is closest to the position of the previous goal.
 #' Defaults to \code{TRUE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param precomputed_goals List of goal stacks from which the agent can be
 #' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 #' in the simulation.
@@ -422,6 +425,9 @@ setMethod("simulate", "predped", function(object,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param plot_live Logical denoting whether to plot each iteration while the
 #' simulation is going on. Defaults to `FALSE`.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
@@ -519,6 +525,7 @@ setMethod("simulate", "state", function(object,
                                         goal_duration = \(x) rnorm(x, 10, 2),
                                         precompute_goal_paths = TRUE,
                                         sort_goals = TRUE,
+                                        adaptive_goal_sorting = TRUE,
                                         precomputed_goals = NULL,
                                         middle_edge = FALSE,
                                         position = NULL,
@@ -602,6 +609,7 @@ setMethod("simulate", "state", function(object,
                      standing_start = standing_start,
                      precomputed_edges = precomputed_edges,
                      many_nodes = many_nodes,
+                     adaptive_goal_sorting = adaptive_goal_sorting,
                      report = report,
                      velocities = velocities,
                      orientations = orientations,
