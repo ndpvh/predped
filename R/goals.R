@@ -89,11 +89,11 @@ setMethod("initialize", "goal", function(.Object,
     .Object@counter <- counter
 
     if(is.null(path)) {
-        .Object@path <- matrix(position, nrow = 1, ncol = 2)
+        .Object@path <- matrix(position, nrow = 0, ncol = 2)
 
     } else if(!is.numeric(path)) {
-        warning("Path that was provided to the goal is not a numeric. Replacing with a straight path to the goal.")
-        .Object@path <- matrix(position, nrow = 1, ncol = 2)
+        warning("Path that was provided to the goal is not a numeric. Replacing with a null path.")
+        .Object@path <- matrix(position, nrow = 0, ncol = 2)
 
     } else if(!is.matrix(path)) {
         warning("Path that was provided to the goal is not a matrix. Transforming to a matrix.")
