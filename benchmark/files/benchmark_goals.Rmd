@@ -151,6 +151,32 @@ tbl %>%
     print()
 ```
 
+## change 
+
+```{r goals change, echo = FALSE, results = "asis"}
+
+# Test
+my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
+
+tbl <- (\() predped:::change(my_goal, setting, counter = 5)) |>
+    test_times() |>
+    rnd() |>
+    matrix(nrow = 1)
+colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
+
+
+caption <- paste0("Benchmark for the change method for goals.")
+tbl |>
+    knitr::kable(format = "latex", 
+                 align = "lll",
+                 caption = caption,
+                 longtable = FALSE,
+                 booktabs = TRUE,
+                 escape = FALSE,  
+                 position = "H" ) |>
+    print()
+```
+
 ## find_path
 ```{r goals find_path, echo = FALSE, results = "asis"}
 
@@ -304,32 +330,6 @@ colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
 
 
 caption <- paste0("Benchmark for the interact method for goals.")
-tbl |>
-    knitr::kable(format = "latex", 
-                 align = "lll",
-                 caption = caption,
-                 longtable = FALSE,
-                 booktabs = TRUE,
-                 escape = FALSE,  
-                 position = "H" ) |>
-    print()
-```
-
-## replace 
-
-```{r goals replace, echo = FALSE, results = "asis"}
-
-# Test
-my_goal <- predped::goal(id = "goal exit", position = c(0, 13), counter = 10)
-
-tbl <- (\() predped:::replace(my_goal, setting, counter = 5)) |>
-    test_times() |>
-    rnd() |>
-    matrix(nrow = 1)
-colnames(tbl) <- c("2.5\\%", "50\\%", "95\\%")
-
-
-caption <- paste0("Benchmark for the replace method for goals.")
 tbl |>
     knitr::kable(format = "latex", 
                  align = "lll",

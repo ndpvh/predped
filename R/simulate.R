@@ -1,8 +1,3 @@
-# Create the generic for simulate, but keep the documentation for simulate
-# for predped and state separate: There is some overlap in arguments, but not
-# as much as one would like for the documentation to be the same
-setGeneric("simulate", function(object,...) standardGeneric("simulate"))
-
 #' Simulate the M4MA
 #'
 #' This function allows users to simulate data from their specified
@@ -212,18 +207,15 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' plt[[1]]
 #'
 #' @seealso
-#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update}}
 #'
-#' @rdname simulate-predped
+#' @rdname simulate
 #'
 #' @export
 #
 # TO DO
 #   - Clean up this function
-#   - Allow for more flexibility for a user, being able to really tune the
-#     simulation function to their use-case (which currently is difficult, as
-#     you always have to create a new simulation function)
 #   - At this moment, setting is kept separate from rest in trace. However, at
 #     some point, agents should be able to move things in the environment, meaning
 #     we should keep a trace of moveable objects as well (either list in
@@ -494,17 +486,14 @@ setMethod("simulate", "predped", function(object,
 #' \code{\link[predped]{simulate,predped-method}},
 #' \code{\link[predped]{update}}
 #'
-#' @rdname simulate-state
+#' @rdname simulate.state
 #'
 #' @export
 #
 # TO DO
 #   - Clean up this function
-#   - Allow for more flexibility for a user, being able to really tune the
-#     simulation function to their use-case (which currently is difficult, as
-#     you always have to create a new simulation function)
 setMethod("simulate", "state", function(object,
-                                        model,
+                                        model = NULL,
                                         add_agent = FALSE,
                                         group_size = matrix(c(1, 1), nrow = 1),
                                         velocities = c(1.5, 1, 0.5) |>
@@ -536,6 +525,11 @@ setMethod("simulate", "state", function(object,
                                         individual_differences = FALSE,
                                         cpp = TRUE,
                                         ...) {
+
+    # If the model is not defined, throw an error
+    if(is.null(model)) {
+        stop("Model is not defined. Cannot run simulation.")
+    }
 
     # Retrieve and update the iteration number in the state
     i <- iteration(object) + 1

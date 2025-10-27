@@ -773,12 +773,7 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' 
 #' @docType method
 #' 
-#' @rdname objects-method
-#' 
-#' @export
-setGeneric("objects", function(object) standardGeneric("objects"))
-
-#' @rdname objects-method
+#' @rdname objects
 #' 
 #' @export
 setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
@@ -936,14 +931,9 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname points-method
+#' @rdname points
 #' 
 #' @export
-setGeneric("points", function(object, ...) standardGeneric("points"))
-
-#' @rdname points-method
-#' 
-#' @export 
 setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 
 

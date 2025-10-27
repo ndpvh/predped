@@ -2404,26 +2404,26 @@ setMethod("orientation<-", signature(object = "segment"), function(object, value
 
 
 
-#' @rdname points-method
-setMethod("points", signature(object = "polygon"), function(object, ...) {
-    return(object@points)
+#' @rdname points
+setMethod("points", signature(x = "polygon"), function(x, ...) {
+    return(x@points)
 })
 
-#' @rdname points-method
+#' @rdname points
 setMethod("points<-", signature(object = "polygon"), function(object, value) {
     object@points <- value 
     return(object)
 })
 
-#' @rdname points-method
-setMethod("points", signature(object = "rectangle"), function(object, ...) {
-    pts <- object@points 
+#' @rdname points
+setMethod("points", signature(x = "rectangle"), function(x, ...) {
+    pts <- x@points 
     dimnames(pts) <- NULL
     return(pts)
 })
 
-#' @rdname points-method
-setMethod("points", signature(object = "circle"), function(object, length.out = 100, ...) {
+#' @rdname points
+setMethod("points", signature(x = "circle"), function(x, length.out = 100, ...) {
     # Create a vector of angles around the circle, allowing us to sample points 
     # at equidistant orientation on the circumference of the circle. Importantly, 
     # we sample length.out + 1 points and then delete the last one so that we 
@@ -2432,17 +2432,17 @@ setMethod("points", signature(object = "circle"), function(object, length.out = 
     angles <- angles[-length(angles)]
 
     # Create the points themselves
-    return(matrix(c(object@center[1] + object@radius * cos(angles),
-                    object@center[2] + object@radius * sin(angles)), 
+    return(matrix(c(x@center[1] + x@radius * cos(angles),
+                    x@center[2] + x@radius * sin(angles)), 
                   ncol = 2))
 })
 
-#' @rdname points-method
-setMethod("points", signature(object = "segment"), function(object, ...) {
-    return(rbind(object@from, object@to))
+#' @rdname points
+setMethod("points", signature(x = "segment"), function(x, ...) {
+    return(rbind(x@from, x@to))
 })
 
-#' @rdname points-method
+#' @rdname points
 setMethod("points<-", signature(object = "segment"), function(object, value) {
     object@from <- value[1,]
     object@to <- value[2,]

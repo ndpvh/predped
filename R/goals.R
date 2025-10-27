@@ -510,7 +510,7 @@ setMethod("interact", "goal", function(object) {
     return(object)
 })
 
-#' Replace a goal
+#' Change a goal
 #' 
 #' Replaces an existing object of \code{\link[predped]{goal-class}} with an 
 #' alternative object of the same class. The new goal is randomly generated or 
@@ -544,28 +544,28 @@ setMethod("interact", "goal", function(object) {
 #'                                               size = c(2, 2)), 
 #'                             objects = list(rectangle(center = c(0, 0), 
 #'                                                      size = c(1, 1))))
-#' replace(my_goal, setting = my_background)
+#' change(my_goal, setting = my_background)
 #' 
 #' # Replace with a random goal drawn from a list of different goals. For this
 #' # to work, we first define this list.
 #' goal_list <- list(goal(position = c(-0.5, 0)), 
 #'                   goal(position = c(0.5, 0)))
-#' replace(my_goal, goal_list = goal_list)
+#' change(my_goal, goal_list = goal_list)
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' \code{\link[predped]{goal-class}}
 #' \code{\link[predped]{generate_goal_stack}}
 #' 
-#' @rdname replace-method
+#' @rdname change-method
 #' 
 #' @export 
-setGeneric("replace", function(object,...) standardGeneric("replace"))
+setGeneric("change", function(object,...) standardGeneric("change"))
 
-setMethod("replace", "goal", function(object, 
-                                      setting = NULL,
-                                      goal_list = NULL,
-                                      counter = \(n) rnorm(n, 10, 2)) {
+setMethod("change", "goal", function(object, 
+                                     setting = NULL,
+                                     goal_list = NULL,
+                                     counter = \(n) rnorm(n, 10, 2)) {
 
     # If neither the background, nor a goal list is provided, we should throw 
     # an error

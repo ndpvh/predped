@@ -83,55 +83,55 @@
 #'
 #' @docType method
 #'
-#' @rdname plot-method
+#' @rdname plot
 #'
 #' @export
-setGeneric("plot", function(object, ...) standardGeneric("plot"))
-
-#'@rdname plot-method
-setMethod("plot", "agent", function(object,
+#
+# Note that R requires the first argument of these functions to be x! Otherwise 
+# it will throw an error
+setMethod("plot", "agent", function(x,
                                     plot_goal = TRUE,
                                     agent.linewidth = 1,
                                     agent.fill = "white",
                                     goal.size = 1,
                                     ...) {
     # Determine the orientation of the agent to be plotted
-    angle <- object@orientation * 2 * pi / 360
+    angle <- x@orientation * 2 * pi / 360
 
     # Extract the points of the agent and plot those here. The reason why we
     # use points here is to ensure that the agent can take on all shapes that
     # they want
-    pts <- points(object)
-    half <- ifelse(inherits(object, "circle"), size(object), 0.5 * size(object)[1])
+    pts <- points(x)
+    half <- ifelse(inherits(x, "circle"), size(x), 0.5 * size(x)[1])
 
     plt <- list(ggplot2::annotate("polygon",
                                   x = pts[,1],
                                   y = pts[,2],
-                                  color = object@color,
+                                  color = x@color,
                                   fill = agent.fill,
                                   linewidth = agent.linewidth),
                 ggplot2::annotate("segment",
-                                  x = object@center[[1]],
-                                  y = object@center[[2]],
-                                  xend = object@center[[1]] + half * cos(angle),
-                                  yend = object@center[[2]] + half * sin(angle),
-                                  color = object@color,
+                                  x = x@center[[1]],
+                                  y = x@center[[2]],
+                                  xend = x@center[[1]] + half * cos(angle),
+                                  yend = x@center[[2]] + half * sin(angle),
+                                  color = x@color,
                                   linewidth = agent.linewidth))
 
     # If the agent's goal should be plotted as well, then do so
     if(plot_goal) {
         plt <- append(plt,
-                      ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
-                                                       y = current_goal(object)@position[2]),
-                                          color = object@color,
+                      ggplot2::geom_point(ggplot2::aes(x = current_goal(x)@position[1],
+                                                       y = current_goal(x)@position[2]),
+                                          color = x@color,
                                           size = goal.size))
     }
 
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "background", function(object,
+#'@rdname plot
+setMethod("plot", "background", function(x,
                                          entry.width = 0.3,
                                          plot_segment = TRUE,
                                          shape.fill = "white",
@@ -162,7 +162,7 @@ setMethod("plot", "background", function(object,
 
     # Create some limits to prevent the limits of the plot changing across
     # iterations.
-    pts <- points(object@shape)
+    pts <- points(x@shape)
     limits <- rbind(range(pts[,1]), range(pts[,2]))
 
     # Check whether you want to optimize the plot. If you do, then the objects
@@ -171,7 +171,7 @@ setMethod("plot", "background", function(object,
     # and agents will all be plotted with their own `plot` functions, leading
     # to a lot of `geom`s being added together.
     if(optimize) {
-        pts <- transform_df(object, 
+        pts <- transform_df(x, 
                             entry.width = entry.width)        
         plt <- ggplot2::ggplot(data = pts, 
                                ggplot2::aes(x = x, 
@@ -192,7 +192,7 @@ setMethod("plot", "background", function(object,
 
         # Also check whether there is something forbidden going on.
         if(plot_forbidden) {
-            segments <- transform_df(object@objects, 
+            segments <- transform_df(x@objects, 
                                      plot_forbidden = TRUE)
 
             # Plot these edges
@@ -228,7 +228,7 @@ setMethod("plot", "background", function(object,
 
         # Step 1: Bind together the entrances and exits: all they need to be handled
         # in the same way
-        entries <- rbind(entrance(object), exit(object))
+        entries <- rbind(entrance(x), exit(x))
 
         # Step 2: Loop over these entries, convert them to points, and only retain
         # those that fall into the shape of the background. Then transform them to
@@ -236,7 +236,7 @@ setMethod("plot", "background", function(object,
         segments <- list()
         for(i in seq_len(nrow(entries))) {
             pts <- points(predped::circle(center = entries[i,], radius = entry.width))
-            pts <- pts[predped::in_object(shape(object), pts),]
+            pts <- pts[predped::in_object(shape(x), pts),]
 
             segments[[i]] <- cbind(pts[2:nrow(pts) - 1,], pts[2:nrow(pts),])
         }
@@ -247,10 +247,10 @@ setMethod("plot", "background", function(object,
         # With all elements in place, we can now create the plot itself
         plt <- ggplot2::ggplot() +
             # Plot the shape and objects of the environment
-            predped::plot(shape(object),
+            predped::plot(shape(x),
                           fill = shape.fill,
                           color = shape.color) +
-            predped::plot(objects(object),
+            predped::plot(objects(x),
                           fill = object.fill,
                           color = object.color,
                           linewidth = object.linewidth,
@@ -283,7 +283,7 @@ setMethod("plot", "background", function(object,
     # If you want to plot the segments as well, add these to the plot
     if(plot_segment) {
         plt <- plt +
-            predped::plot(limited_access(object),
+            predped::plot(limited_access(x),
                           segment.color = segment.color,
                           segment.size = segment.size,
                           segment.linewidth = segment.linewidth,
@@ -294,12 +294,14 @@ setMethod("plot", "background", function(object,
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
+#'@rdname plot
+setMethod("plot", "list", function(x, 
+                                   print_progress = TRUE, 
+                                   ...) {
 
     # First a check of whether anything is contained within this list. Otherwise
     # return an error
-    if(length(object) == 0) {
+    if(length(x) == 0) {
         return(list())
     }
 
@@ -310,19 +312,19 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
     #
     # However, if it is a trace, we would like some information on the iteration
     # of the state, which we need to do some bookkeeping for
-    trace <- inherits(object[[1]], "state")
+    trace <- inherits(x[[1]], "state")
 
     if(trace & print_progress) {
         cat("\n")
     }
 
-    plt <- lapply(seq_along(object),
+    plt <- lapply(seq_along(x),
                   function(i) {
                       if(trace & print_progress) {
-                          cat(paste0("\rMaking plot for state ", object[[i]]@iteration))
+                          cat(paste0("\rMaking plot for state ", x[[i]]@iteration))
                       }
 
-                      return(predped::plot(object[[i]], ...))
+                      return(predped::plot(x[[i]], ...))
                   })
 
     if(trace & print_progress) {
@@ -332,8 +334,8 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "object", function(object,
+#'@rdname plot
+setMethod("plot", "object", function(x,
                                      color = "black",
                                      fill = "gray",
                                      plot_forbidden = FALSE,
@@ -341,7 +343,7 @@ setMethod("plot", "object", function(object,
                                      ...) {
 
     # Extract the points of the object
-    pts <- points(object)
+    pts <- points(x)
 
     # Create the basic geom
     plt <- ggplot2::annotate("polygon",
@@ -356,7 +358,7 @@ setMethod("plot", "object", function(object,
     if(plot_forbidden) {
         # Check whether the object can be interacted with. If not, then we can 
         # just annotate the same polygon but then with the forbidden.color
-        if(!object@interactable) {
+        if(!x@interactable) {
             return(ggplot2::annotate("polygon", 
                                      x = pts[,1], 
                                      y = pts[,2], 
@@ -371,15 +373,15 @@ setMethod("plot", "object", function(object,
 
         # If it is a circle, we need to find the indices of those edges that are
         # forbidden and those who are not.
-        if(inherits(object, "circle")) {
+        if(inherits(x, "circle")) {
             # Get relative angle from center to points and correct so that they
             # are positive
-            angles <- atan2(pts[,2] - center(object)[2],
-                            pts[,1] - center(object)[1])
+            angles <- atan2(pts[,2] - center(x)[2],
+                            pts[,1] - center(x)[1])
             angles <- ifelse(angles < 0, angles + 2 * pi, angles)
 
             # Extract the forbidden angles from the circle
-            forbidden <- forbidden(object)
+            forbidden <- forbidden(x)
 
             if(nrow(forbidden) == 0) {
                 idx <- logical(0)
@@ -389,7 +391,7 @@ setMethod("plot", "object", function(object,
                 idx <- Reduce("|", idx)
             }
         } else {
-            idx <- forbidden(object)
+            idx <- forbidden(x)
         }
 
         # Add another annotate with a different color
@@ -406,8 +408,8 @@ setMethod("plot", "object", function(object,
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "segment", function(object,
+#'@rdname plot
+setMethod("plot", "segment", function(x,
                                       segment.size = 0.6,
                                       segment.color = "black",
                                       segment.linewidth = 1,
@@ -415,11 +417,11 @@ setMethod("plot", "segment", function(object,
                                       segment.hjust = 0.5) {
 
     # Get the orientation of the segment and subtract 90 degrees
-    angle <- orientation(object) - pi / 2
+    angle <- orientation(x) - pi / 2
 
     # Define a line of length `segment.size` centered around a given `center`.
     # To compute this center, you use the `hjust` argument.
-    center <- center(object)
+    center <- center(x)
 
     # Adjust the center if you want the arrow to start at the center of the
     # segment
@@ -438,8 +440,8 @@ setMethod("plot", "segment", function(object,
                              linewidth = segment.linewidth))
 })
 
-#' @rdname plot-method
-setMethod("plot", "state", function(object,
+#' @rdname plot
+setMethod("plot", "state", function(x,
                                     agent.linewidth = 1,
                                     plot.title.size = 10,
                                     plot.title.hjust = 0.5,
@@ -477,7 +479,7 @@ setMethod("plot", "state", function(object,
 
         # If any of the agents have a "black" color, we need to change that to 
         # white. Makes sure agents without specified color can still be seen.
-        agents(object) <- lapply(agents(object),
+        agents(x) <- lapply(agents(x),
                                  function(x) {
                                      if(color(x) == "black") {
                                          color(x) <- "white"
@@ -496,13 +498,13 @@ setMethod("plot", "state", function(object,
 
     if(optimize) {
         # Create all polygons that are needed
-        pts <- transform_df(object,
+        pts <- transform_df(x,
                             plot_goal = plot_goal,
                             goal.size = goal.size,
                             ...)
 
         # Get the limits of the shape
-        tmp <- points(setting(object)@shape)
+        tmp <- points(setting(x)@shape)
         lims <- rbind(range(tmp[,1]), range(tmp[,2]))
 
         # Create the different lists
@@ -536,7 +538,7 @@ setMethod("plot", "state", function(object,
             ggplot2::scale_color_manual(values = colors) +
             ggplot2::scale_linewidth_manual(values = linewidths) +
             # Titles and axes
-            ggplot2::labs(title = paste("iteration", object@iteration), 
+            ggplot2::labs(title = paste("iteration", x@iteration), 
                           x = "x", 
                           y = "y") +
             ggplot2::scale_x_continuous(limits = lims[1,]) +
@@ -555,7 +557,7 @@ setMethod("plot", "state", function(object,
         # Check whether to add the segments to the plot, and if so, add them
         # to the plot
         if(plot_segment) {
-            segments <- transform_df(setting(object)@limited_access,
+            segments <- transform_df(setting(x)@limited_access,
                                      segment.size = segment.size, 
                                      segment.hjust = segment.hjust)
 
@@ -573,7 +575,7 @@ setMethod("plot", "state", function(object,
 
         # Also check whether there is something forbidden going on.
         if(plot_forbidden) {
-            segments <- transform_df(setting(object)@objects, 
+            segments <- transform_df(setting(x)@objects, 
                                      plot_forbidden = TRUE)
 
             # Plot these edges
@@ -592,7 +594,7 @@ setMethod("plot", "state", function(object,
     } else {
 
         # Create the plot for the setting, which will serve as the basis of
-        base_plot <- predped::plot(setting(object),
+        base_plot <- predped::plot(setting(x),
                                    shape.fill = shape.fill,
                                    dark_mode = dark_mode,
                                    optimize = optimize,
@@ -600,7 +602,7 @@ setMethod("plot", "state", function(object,
                                    plot_forbidden = plot_forbidden, 
                                    forbidden.color = forbidden.color,
                                    ...) +
-            ggplot2::labs(title = paste("iteration", object@iteration)) +
+            ggplot2::labs(title = paste("iteration", x@iteration)) +
             ggplot2::theme(legend.position = "none",
                            plot.title = ggplot2::element_text(size = plot.title.size,
                                                               hjust = plot.title.hjust),
@@ -608,13 +610,13 @@ setMethod("plot", "state", function(object,
                            axis.text = ggplot2::element_text(size = axis.text.size))
 
         # If there are currently no agents, then we just return the base_plot
-        if(length(object@agents) == 0) {
+        if(length(x@agents) == 0) {
             return(base_plot)
         }
 
         # Add agents through their innate plot-function
         return(base_plot +
-            predped::plot(agents(object),
+            predped::plot(agents(x),
                           plot_goal = plot_goal,
                           agent.fill = agent.fill,
                           agent.linewidth = agent.linewidth,
