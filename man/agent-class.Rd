@@ -56,6 +56,12 @@ agent. Should contain all parameters relevant for the utility functions
 (use \code{predped::draw_parameters(1)} for an example).}
 
 \item{\code{color}}{Character denoting the color in which the agent should be plotted.}
+
+\item{\code{cell_centers}}{Numeric matrix denoting the positions that the agent may 
+move to at a particular iteration.}
+
+\item{\code{utility_variables}}{Data.frame precomputed containing values for all the 
+variables relevant to compute the utilities.}
 }}
 
 \seealso{

@@ -390,11 +390,12 @@ setMethod("limited_access<-", "background", function(object, value) {
 
 
 
-#' @rdname objects-method
-setMethod("objects", "background", function(object) {
-    return(object@objects)
+#' @rdname objects
+setMethod("objects", "background", function(name) {
+    return(name@objects)
 })
 
+#' @rdname objects
 setMethod("objects<-", "background", function(object, value) {
     object@objects <- value
     return(object)

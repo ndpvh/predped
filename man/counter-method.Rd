@@ -16,6 +16,12 @@ counter(object) <- value
 
 \S4method{counter}{goal}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{goal-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{counter} slot.}
+}
 \description{
 Works for \code{\link[predped]{goal-class}}.
 }

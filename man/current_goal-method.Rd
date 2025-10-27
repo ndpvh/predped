@@ -16,6 +16,12 @@ current_goal(object) <- value
 
 \S4method{current_goal}{agent}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{agent-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{current_goal} slot.}
+}
 \description{
 Works for \code{\link[predped]{agent-class}}.
 }

@@ -28,6 +28,13 @@ orientation(object) <- value
 
 \S4method{orientation}{agent}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{rectangle-class}}, 
+\code{\link[predped]{segment-class}}, or \code{\link[predped]{agent-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{orientation} slot.}
+}
 \description{
 Works for all objects that are extensions of the 
 \code{\link[predped]{object-class}}, except for the 

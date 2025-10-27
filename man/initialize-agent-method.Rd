@@ -74,6 +74,14 @@ agent. Should contain all parameters relevant for the utility functions
 set of parameters from the default parameter list in \code{predped}.}
 
 \item{color}{Character denoting the color in which the agent should be plotted.}
+
+\item{cell_centers}{Numeric matrix denoting the positions that the agent may 
+move to at a particular iteration. Should usually not be provided or altered
+by the user.}
+
+\item{utility_variables}{Data.frame precomputed containing values for all the 
+variables relevant to compute the utilities. Should usually not be provided 
+or altered by the user.}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}

@@ -1,8 +1,3 @@
-# Create the generic for simulate, but keep the documentation for simulate
-# for predped and state separate: There is some overlap in arguments, but not
-# as much as one would like for the documentation to be the same
-setGeneric("simulate", function(object,...) standardGeneric("simulate"))
-
 #' Simulate the M4MA
 #'
 #' This function allows users to simulate data from their specified
@@ -127,6 +122,9 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' the argument \code{starting_position}. Then, we define each of the next goals
 #' as being the one that is closest to the position of the previous goal.
 #' Defaults to \code{TRUE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param precomputed_goals List of goal stacks from which the agent can be
 #' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 #' in the simulation.
@@ -212,18 +210,15 @@ setGeneric("simulate", function(object,...) standardGeneric("simulate"))
 #' plt[[1]]
 #'
 #' @seealso
-#' \code{\link[predped]{simulate,state-method}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update}}
 #'
-#' @rdname simulate-predped
+#' @rdname simulate
 #'
 #' @export
 #
 # TO DO
 #   - Clean up this function
-#   - Allow for more flexibility for a user, being able to really tune the
-#     simulation function to their use-case (which currently is difficult, as
-#     you always have to create a new simulation function)
 #   - At this moment, setting is kept separate from rest in trace. However, at
 #     some point, agents should be able to move things in the environment, meaning
 #     we should keep a trace of moveable objects as well (either list in
@@ -430,6 +425,9 @@ setMethod("simulate", "predped", function(object,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param plot_live Logical denoting whether to plot each iteration while the
 #' simulation is going on. Defaults to `FALSE`.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
@@ -494,17 +492,14 @@ setMethod("simulate", "predped", function(object,
 #' \code{\link[predped]{simulate,predped-method}},
 #' \code{\link[predped]{update}}
 #'
-#' @rdname simulate-state
+#' @rdname simulate.state
 #'
 #' @export
 #
 # TO DO
 #   - Clean up this function
-#   - Allow for more flexibility for a user, being able to really tune the
-#     simulation function to their use-case (which currently is difficult, as
-#     you always have to create a new simulation function)
 setMethod("simulate", "state", function(object,
-                                        model,
+                                        model = NULL,
                                         add_agent = FALSE,
                                         group_size = matrix(c(1, 1), nrow = 1),
                                         velocities = c(1.5, 1, 0.5) |>
@@ -530,12 +525,18 @@ setMethod("simulate", "state", function(object,
                                         goal_duration = \(x) rnorm(x, 10, 2),
                                         precompute_goal_paths = TRUE,
                                         sort_goals = TRUE,
+                                        adaptive_goal_sorting = TRUE,
                                         precomputed_goals = NULL,
                                         middle_edge = FALSE,
                                         position = NULL,
                                         individual_differences = FALSE,
                                         cpp = TRUE,
                                         ...) {
+
+    # If the model is not defined, throw an error
+    if(is.null(model)) {
+        stop("Model is not defined. Cannot run simulation.")
+    }
 
     # Retrieve and update the iteration number in the state
     i <- iteration(object) + 1
@@ -608,6 +609,7 @@ setMethod("simulate", "state", function(object,
                      standing_start = standing_start,
                      precomputed_edges = precomputed_edges,
                      many_nodes = many_nodes,
+                     adaptive_goal_sorting = adaptive_goal_sorting,
                      report = report,
                      velocities = velocities,
                      orientations = orientations,

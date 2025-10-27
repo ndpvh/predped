@@ -263,6 +263,6 @@ plt[[1]]
 
 }
 \seealso{
-\code{\link[predped]{simulate,state-method}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update}}
 }

@@ -28,6 +28,12 @@ forbidden(object) <- value
 
 \S4method{forbidden}{circle}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{object-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{forbidden} slot.}
+}
 \description{
 Works for the all instances of the \code{\link[predped]{object-class}}, 
 except for the \code{\link[predped]{segment-class}}.

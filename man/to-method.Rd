@@ -16,6 +16,12 @@ to(object) <- value
 
 \S4method{to}{segment}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{segment-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{to} slot.}
+}
 \description{
 Works for the \code{\link[predped]{segment-class}}.
 }

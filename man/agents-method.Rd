@@ -16,6 +16,12 @@ agents(object) <- value
 
 \S4method{agents}{state}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{state-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{agents} slot.}
+}
 \description{
 Works for the \code{\link[predped]{state-class}}.
 }

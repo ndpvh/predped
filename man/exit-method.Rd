@@ -16,6 +16,12 @@ exit(object) <- value
 
 \S4method{exit}{background}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{background-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{exit} slot.}
+}
 \description{
 Works for \code{\link[predped]{background-class}}.
 }

@@ -16,6 +16,12 @@ path(object) <- value
 
 \S4method{path}{goal}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{goal-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{path} slot.}
+}
 \description{
 Works for \code{\link[predped]{goal-class}}.
 }

@@ -47,6 +47,13 @@ position(object) <- value
 
 \S4method{position}{agent}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{agent-class}}, 
+\code{\link[predped]{object-class}}, or \code{\link[predped]{goal-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{position} or \code{center} slot.}
+}
 \description{
 Works for \code{\link[predped]{agent-class}}, \code{\link[predped]{circle-class}},
 \code{\link[predped]{goal-class}}, \code{\link[predped]{object-class}}, 

@@ -13,6 +13,12 @@ iteration_variables(object) <- value
 
 \S4method{iteration_variables}{state}(object)
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{state-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{iteration_variables} slot.}
+}
 \description{
 Works for the \code{\link[predped]{state-class}}.
 }
