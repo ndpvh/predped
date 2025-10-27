@@ -21,10 +21,10 @@ overlap_with_objects(
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
 
-\item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
+\item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{space_between}{Numeric denoting the space to leave between the nodes 
+\item{space_between}{Numeric denoting the space to leave between the nodes
 put on the circumference of the objects in the space (used for checking the
 overlap with an agent). Defaults to \code{0.05} or 5cm.}
 
@@ -36,50 +36,50 @@ Logical matrix containing availabilities of the centers (\code{TRUE}
 if available, \code{FALSE} if not).
 }
 \description{
-This function checks whether there is an overlap between a given agent and 
-the objects in the environment, provided that the agent would move to the 
-locations in \code{centers}. Returns a logical matrix as needed in 
+This function checks whether there is an overlap between a given agent and
+the objects in the environment, provided that the agent would move to the
+locations in \code{centers}. Returns a logical matrix as needed in
 \code{\link[predped]{moving_options-method}}.
 }
 \details{
-In this function, we can only approximately check the intersection of agent 
-and object. Specifically, we use the following method. First, we sample 
-nodes on the circumference of each of the objects in the setting that is 
-provided to this function. For this, we depend on the function 
-\code{\link[predped]{nodes_on_circumference}} and we currently take these 
-nodes to be 5cm. 
+In this function, we can only approximately check the intersection of agent
+and object. Specifically, we use the following method. First, we sample
+nodes on the circumference of each of the objects in the setting that is
+provided to this function. For this, we depend on the function
+\code{\link[predped]{nodes_on_circumference}} and we currently take these
+nodes to be 5cm.
 
-In the next step, we bind all these coordinates together in a single matrix. 
+In the next step, we bind all these coordinates together in a single matrix.
 This matrix thus consists of nodes that should not be embedded in the agents:
 Whenever one of these points is included in the agents, we can conclude that
-the agents and objects intersect. [Note, however, that if these points are 
-not included in the agents, that we cannot with certainty conclude that agent 
+the agents and objects intersect. [Note, however, that if these points are
+not included in the agents, that we cannot with certainty conclude that agent
 and object do not intersect]
 
-This check is then performed by looping over all the centers, changing the 
-agents position to the position of this center, and using the 
-\code{\link[predped]{in_object-method}} to do the test. This is a vectorized 
-test: For each position in \code{centers} we have a logical \code{TRUE} or 
-\code{FALSE} for each of the nodes in the coordinate matrix, resulting in a 
-logical matrix with an equal number of rows as \code{centers} and an equal 
-number of columns as nodes in the coordinate matrix. In a last step, 
+This check is then performed by looping over all the centers, changing the
+agents position to the position of this center, and using the
+\code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+test: For each position in \code{centers} we have a logical \code{TRUE} or
+\code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
+logical matrix with an equal number of rows as \code{centers} and an equal
+number of columns as nodes in the coordinate matrix. In a last step,
 we aggregate over the columns in this matrix so that we have a single logical
 for each center.
 
-The reason why we use this approximate method is because of time efficiency. 
-Using the \code{\link[predped]{intersects-method}} takes a longer time than 
-using the \code{\link[predped]{in_object-method}}, especially as the number 
+The reason why we use this approximate method is because of time efficiency.
+Using the \code{\link[predped]{intersects-method}} takes a longer time than
+using the \code{\link[predped]{in_object-method}}, especially as the number
 of objects in the environment increases.
 }
 \examples{
 # Initialize all objects that you need
-my_background <- background(shape = rectangle(center = c(0, 0), 
-                                              size = c(6, 6)), 
-                            objects = list(circle(center = c(0, 0), 
+my_background <- background(shape = rectangle(center = c(0, 0),
+                                              size = c(6, 6)),
+                            objects = list(circle(center = c(0, 0),
                                                   radius = 2)))
-my_agent <- agent(center = c(-2.75, 0), 
-                  radius = 0.25, 
-                  speed = 1, 
+my_agent <- agent(center = c(-2.75, 0),
+                  radius = 0.25,
+                  speed = 1,
                   orientation = 0,
                   current_goal = goal(position = c(-2.01, 0)))
 
@@ -88,7 +88,7 @@ centers <- compute_centers(my_agent)
 check <- matrix(TRUE, nrow = 11, ncol = 3)
 
 # Use moving_options to see which of these possibilities is sound
-overlap_with_objects(my_agent, 
+overlap_with_objects(my_agent,
                      my_background,
                      centers,
                      check)

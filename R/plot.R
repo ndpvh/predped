@@ -7,7 +7,7 @@
 #' \code{\link[predped]{state-class}}. Whenever either is provided in a list,
 #' a list containing the respective geoms or ggplots is returned.
 #'
-#' @param object Object of the \code{\link[predped]{background-class}},
+#' @param x Object of the \code{\link[predped]{background-class}},
 #' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}},
 #' or a list containing multiple of these objects.
 #' @param agent.fill Character denoting the color with which the agent should

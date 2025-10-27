@@ -16,6 +16,12 @@ status(object) <- value
 
 \S4method{status}{agent}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{agent-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{status} slot.}
+}
 \description{
 Works for \code{\link[predped]{agent-class}}.
 }

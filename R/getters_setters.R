@@ -5,6 +5,10 @@
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{agents} slot.
+#' 
 #' @examples 
 #' # Initialize state
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -43,6 +47,11 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' Getter/Setter for the \code{archetypes}-slot
 #' 
 #' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{archetypes} slot. Note that you will get an error if the newly provided
+#' value is not contained within the \code{parameters} slot of the \code{object}.
 #' 
 #' @examples 
 #' # Initialize a predped model
@@ -89,6 +98,10 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{busy} slot.
+#' 
 #' @examples 
 #' # Initialize a goal with a given business status
 #' my_goal <- goal(position = c(0, 0), 
@@ -118,6 +131,10 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' Getter/Setter for the \code{cell}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{cell} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -153,6 +170,10 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{cell_centers} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -187,6 +208,11 @@ setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_cente
 #' 
 #' Is a more specific version of \code{\link[predped]{position-method}} that 
 #' works for all extensions of the \code{\link[predped]{object-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}} or the 
+#' \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{center} slot.
 #' 
 #' @examples
 #' # Initialize a circle
@@ -235,6 +261,10 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{color} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -270,6 +300,10 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{counter} slot.
+#' 
 #' @examples 
 #' # Initialize a goal with a given counter
 #' my_goal <- goal(position = c(0, 0), 
@@ -299,6 +333,10 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' Getter/Setter for the \code{current_goal}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{current_goal} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -335,6 +373,10 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{done} slot.
+#' 
 #' @examples 
 #' # Initialize a goal with a given done argument
 #' my_goal <- goal(position = c(0, 0), 
@@ -364,6 +406,10 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' Getter/Setter for the \code{entrance}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{entrance} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -403,6 +449,10 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' Getter/Setter for the \code{exit}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{exit} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -444,6 +494,10 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' Works for the all instances of the \code{\link[predped]{object-class}}, 
 #' except for the \code{\link[predped]{segment-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{object-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{forbidden} slot.
+#' 
 #' @examples 
 #' # Initialize an object
 #' my_rectangle <- rectangle(center = c(0, 0), 
@@ -477,6 +531,10 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' Getter/Setter for the \code{from}-slot
 #' 
 #' Works for the \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{segment-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{from} slot.
 #' 
 #' @examples 
 #' # Create a segment
@@ -516,6 +574,10 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{goals} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -550,6 +612,10 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' Getter/Setter for the \code{group}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{group} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -586,6 +652,11 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' Works for all objects that have an \code{id}-slot, such as all extensions of 
 #' \code{\link[predped]{object-class}}, the \code{\link[predped]{agent-class}}, 
 #' and the \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{agent-class}}, or \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{id} slot.
 #' 
 #' @details
 #' Note that while the \code{\link[predped]{agent-class}}, 
@@ -635,6 +706,10 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{iteration} slot.
+#' 
 #' @examples 
 #' # Initialize state
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -673,6 +748,10 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{iteration_variables} slot.
+#' 
 #' @examples 
 #' # Initialize state
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -710,6 +789,10 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' Getter/Setter for the \code{limited_access}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' #' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{limited_access} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -750,6 +833,13 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' 
 #' Works for \code{\link[predped]{background-class}}.
 #' 
+#' @param name,object An instance of the \code{\link[predped]{background-class}}.
+#' Note that \code{name} and \code{object} are synonymous for this function: The
+#' former is only used to ensure compatibility with the \code{objects} function 
+#' in base R.
+#' @param value Value with which to replace the original value of the 
+#' \code{objects} slot.
+#' 
 #' @examples
 #' # Initialize background
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -786,6 +876,11 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' \code{\link[predped]{object-class}}, except for the 
 #' \code{\link[predped]{circle-class}} and the 
 #' \code{\link[predped]{polygon-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{segment-class}}, or \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{orientation} slot.
 #' 
 #' @examples
 #' # Initialize a rectangle
@@ -826,6 +921,11 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}} or 
+#' \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{parameters} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -860,6 +960,10 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{path} slot.
+#' 
 #' @examples 
 #' # Initialize a goal with a given path
 #' my_goal <- goal(position = c(0, 0), 
@@ -892,6 +996,13 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' that you can only change the \code{points} slot for the 
 #' \code{\link[predped]{polygon-class}} and the 
 #' \code{\link[predped]{segment-class}}.
+#' 
+#' @param x,object An instance of the \code{\link[predped]{object-class}}. Note
+#' that for this function \code{x} and \code{object} are synonymous: The \code{x}
+#' argument is included to ensure compatibility with the \code{points} function 
+#' from base R.
+#' @param value Value with which to replace the original value of the 
+#' \code{points} slot.
 #' 
 #' @details 
 #' Note that for the \code{\link[predped]{circle-class}}, you can only access
@@ -944,6 +1055,11 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' \code{\link[predped]{goal-class}}, \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{polygon-class}}, \code{\link[predped]{rectangle-class}},
 #' and \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}, 
+#' \code{\link[predped]{object-class}}, or \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{position} or \code{center} slot.
 #' 
 #' @examples
 #' # Initialize all objects for which this getter works
@@ -1008,6 +1124,10 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{potential_agents} slot.
+#' 
 #' @examples 
 #' # Initialize state
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -1047,6 +1167,10 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' 
 #' Works for the \code{\link[predped]{circle-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{circle-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{radius} slot.
+#' 
 #' @examples 
 #' # Initialize a circle
 #' my_circle <- circle(center = c(0, 0), 
@@ -1080,6 +1204,10 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' Getter/Setter for the \code{setting}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{setting} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -1124,6 +1252,10 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' 
 #' Works for \code{\link[predped]{background-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{shape} slot.
+#' 
 #' @examples
 #' # Initialize background
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -1163,6 +1295,11 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' \code{\link[predped]{object-method}},
 #' \code{\link[predped]{rectangle-method}}, and
 #' \code{\link[predped]{segment-method}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}} or 
+#' \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{size} slot.
 #' 
 #' @details 
 #' Note that for \code{\link[predped]{circle-method}}, this getter outputs the 
@@ -1215,6 +1352,10 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{speed} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -1249,6 +1390,10 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{status} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -1282,6 +1427,10 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' Getter/Setter for the \code{to}-slot
 #' 
 #' Works for the \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{segment-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{to} slot.
 #' 
 #' @examples 
 #' # Create a segment
@@ -1321,6 +1470,10 @@ setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{utility_variables} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -1355,6 +1508,10 @@ setGeneric("utility_variables<-", function(object, value) standardGeneric("utili
 #' Getter/Setter for the \code{variables}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{variables} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -1394,6 +1551,10 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{waiting_counter} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
@@ -1428,6 +1589,10 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' Getter/Setter for the \code{weights}-slot
 #' 
 #' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{weights} slot.
 #' 
 #' @examples
 #' # Initialize a predped model

@@ -16,8 +16,15 @@ limited_access(object) <- value
 
 \S4method{limited_access}{background}(object) <- value
 }
+\arguments{
+\item{value}{Value with which to replace the original value of the 
+\code{limited_access} slot.}
+}
 \description{
 Works for \code{\link[predped]{background-class}}.
+}
+\details{
+#' @param object An instance of the \code{\link[predped]{background-class}}.
 }
 \examples{
 # Initialize background

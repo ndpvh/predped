@@ -16,6 +16,12 @@ from(object) <- value
 
 \S4method{from}{segment}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{segment-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{from} slot.}
+}
 \description{
 Works for the \code{\link[predped]{segment-class}}.
 }

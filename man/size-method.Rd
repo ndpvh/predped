@@ -34,6 +34,13 @@ size(object) <- value
 
 \S4method{size}{agent}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{object-class}} or 
+\code{\link[predped]{agent-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{size} slot.}
+}
 \description{
 Works for the \code{\link[predped]{agent-method}},
 \code{\link[predped]{circle-method}},

@@ -35,6 +35,13 @@ id(object) <- value
 
 \S4method{id}{predped}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{object-class}}, 
+\code{\link[predped]{agent-class}}, or \code{\link[predped]{goal-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{id} slot.}
+}
 \description{
 Works for all objects that have an \code{id}-slot, such as all extensions of 
 \code{\link[predped]{object-class}}, the \code{\link[predped]{agent-class}}, 

@@ -9,10 +9,10 @@ compute_centers_rcpp(agent, a, b, velocities, orientations, time_step = 0.5)
 \arguments{
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
 
-\item{a, b}{Numerics denoting the parameters of the weighting function, where 
-\code{a} is used for the power of the function and \code{b} for the slope of 
-function. \code{a} is required to be positive and \code{b} should lie between 
-0 and 1, where \code{1 - b} denotes the maximal decrease in velocities in 
+\item{a, b}{Numerics denoting the parameters of the weighting function, where
+\code{a} is used for the power of the function and \code{b} for the slope of
+function. \code{a} is required to be positive and \code{b} should lie between
+0 and 1, where \code{1 - b} denotes the maximal decrease in velocities in
 percentage.}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
@@ -31,23 +31,23 @@ Numeric matrix of (x, y) coordinates for each cell
 Rcpp alternative to \code{\link[predped]{compute_centers}}.
 }
 \details{
-Compute cell centers based on a person's current position and velocity, 
-accounting for potential changes in speed and direction. Alternative to 
-\code{\link[m4ma]{c_vd}} that accounts for biomechanical limitations in the 
-speed one can maintain when turning at a greater angle. Defaults are based on 
+Compute cell centers based on a person's current position and velocity,
+accounting for potential changes in speed and direction. Alternative to
+\code{\link[m4ma]{c_vd}} that accounts for biomechanical limitations in the
+speed one can maintain when turning at a greater angle. Defaults are based on
 Seethapathi et al. (2024), Brown et al. (2020), and Glaister et al. (2007).
 }
 \examples{
 # Create two agents, one fast and one slow
-slow_agent <- agent(center = c(-2.75, 0), 
-                    radius = 0.25, 
-                    speed = 0.5, 
+slow_agent <- agent(center = c(-2.75, 0),
+                    radius = 0.25,
+                    speed = 0.5,
                     orientation = 0,
                     current_goal = goal(position = c(-2.01, 0)))
 
-fast_agent <- agent(center = c(-2.75, 0), 
-                    radius = 0.25, 
-                    speed = 2, 
+fast_agent <- agent(center = c(-2.75, 0),
+                    radius = 0.25,
+                    speed = 2,
                     orientation = 0,
                     current_goal = goal(position = c(-2.01, 0)))
 
@@ -58,17 +58,17 @@ fast_centers <- compute_centers(fast_agent
                                 cpp = TRUE)
 
 # Generate the cell centers with m4ma
-slow_m4ma <- m4ma::c_vd(1:33, 
-                        position(slow_agent), 
-                        speed(slow_agent), 
+slow_m4ma <- m4ma::c_vd(1:33,
+                        position(slow_agent),
+                        speed(slow_agent),
                         orientation(slow_agent))
-fast_m4ma <- m4ma::c_vd(1:33, 
-                        position(fast_agent), 
-                        speed(fast_agent), 
+fast_m4ma <- m4ma::c_vd(1:33,
+                        position(fast_agent),
+                        speed(fast_agent),
                         orientation(fast_agent))
 
-# Compare both through a plot. This should show that the predped variant 
-# accounts for an interaction between an agent's speed and change in 
+# Compare both through a plot. This should show that the predped variant
+# accounts for an interaction between an agent's speed and change in
 # direction when computing the cell centers
 base::plot(slow_centers, col = "black")
 graphics::points(slow_m4ma[, 1], slow_m4ma[, 2], col = "red")

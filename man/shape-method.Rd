@@ -16,6 +16,12 @@ shape(object) <- value
 
 \S4method{shape}{background}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{background-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{shape} slot.}
+}
 \description{
 Works for \code{\link[predped]{background-class}}.
 }

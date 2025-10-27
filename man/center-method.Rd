@@ -34,6 +34,13 @@ center(object) <- value
 
 \S4method{center}{segment}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{object-class}} or the 
+\code{\link[predped]{agent-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{center} slot.}
+}
 \description{
 Is a more specific version of \code{\link[predped]{position-method}} that 
 works for all extensions of the \code{\link[predped]{object-class}}.

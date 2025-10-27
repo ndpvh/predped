@@ -16,6 +16,12 @@ radius(object) <- value
 
 \S4method{radius}{circle}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{circle-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{radius} slot.}
+}
 \description{
 Works for the \code{\link[predped]{circle-class}}.
 }

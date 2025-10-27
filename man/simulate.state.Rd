@@ -6,7 +6,7 @@
 \usage{
 \S4method{simulate}{state}(
   object,
-  model,
+  model = NULL,
   add_agent = FALSE,
   group_size = matrix(c(1, 1), nrow = 1),
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),

@@ -16,6 +16,13 @@ archetypes(object) <- value
 
 \S4method{archetypes}{predped}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{predped-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{archetypes} slot. Note that you will get an error if the newly provided
+value is not contained within the \code{parameters} slot of the \code{object}.}
+}
 \description{
 Works for \code{\link[predped]{predped-class}}.
 }

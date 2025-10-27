@@ -11,10 +11,10 @@ moving_options(object, ...)
 \S4method{moving_options}{agent}(object, state, background, centers, cpp = TRUE)
 }
 \arguments{
-\item{object}{Object of the \code{\link[predped]{agent-class}} or the 
+\item{object}{Object of the \code{\link[predped]{agent-class}} or the
 \code{\link[predped]{object-class}} (latter not yet supported).}
 
-\item{state}{Object of the \code{\link[predped]{state-class}} containing the 
+\item{state}{Object of the \code{\link[predped]{state-class}} containing the
 current state.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -29,57 +29,57 @@ or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 Logical matrix containing availabilities of the centers.
 }
 \description{
-This method checks where an object can be moved to. It returns a logical 
-matrix that codes \code{TRUE} for the cells that are available and 
+This method checks where an object can be moved to. It returns a logical
+matrix that codes \code{TRUE} for the cells that are available and
 \code{FALSE} for those that aren't.
 }
 \details{
-In general, this method works as follows. First, it checks whether any of the 
-provided cell centers are freely available, in the sense that they are not 
+In general, this method works as follows. First, it checks whether any of the
+provided cell centers are freely available, in the sense that they are not
 contained inside any objects or fall outside of the setting. This is a crude
-measure of whether a particular spot is available and is handled by the 
+measure of whether a particular spot is available and is handled by the
 \code{\link[m4ma]{free_cells_rcpp}} function of the \code{m4ma} package.
 
-Second, we check whether the object itself can be moved to this space, or 
-whether it would intersect with any of the objects and/or the outline of the 
-setting. This is a more direct measure of availability, as it doesn't only 
-account for whether a specific spot can be reached theoretically, but also 
-accounts for the size of the object that is being moved there. This is 
-handled by the \code{\link[predped]{overlap_with_objects}} function in 
+Second, we check whether the object itself can be moved to this space, or
+whether it would intersect with any of the objects and/or the outline of the
+setting. This is a more direct measure of availability, as it doesn't only
+account for whether a specific spot can be reached theoretically, but also
+accounts for the size of the object that is being moved there. This is
+handled by the \code{\link[predped]{overlap_with_objects}} function in
 \code{predped}.
 
-Finally, if the object is an instance of the \code{\link[predped]{agent-class}}, 
+Finally, if the object is an instance of the \code{\link[predped]{agent-class}},
 we also check whether the agent can still see there current goal or path-point
 when they move to the open spots. They will not move to the spots from which
-they cannot see their goal/path-point. This is handled by the 
+they cannot see their goal/path-point. This is handled by the
 \code{\link[m4ma]{seesGoalOK_rcpp}} function in the \code{m4ma} package.
 
-WARNING: Due to its reliance on the \code{m4ma} package, centers needs to be 
-of length 33 x 2. This corresponds to the 3 (change in speed) x 11 
+WARNING: Due to its reliance on the \code{m4ma} package, centers needs to be
+of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 (change in orientation) options that are inherent to M4MA.
 }
 \examples{
 # Initialize all objects that you need
-my_background <- background(shape = rectangle(center = c(0, 0), 
-                                              size = c(6, 6)), 
-                            objects = list(circle(center = c(0, 0), 
+my_background <- background(shape = rectangle(center = c(0, 0),
+                                              size = c(6, 6)),
+                            objects = list(circle(center = c(0, 0),
                                                   radius = 2)))
-my_agent <- agent(center = c(-2.75, 0), 
-                  radius = 0.25, 
-                  speed = 1, 
+my_agent <- agent(center = c(-2.75, 0),
+                  radius = 0.25,
+                  speed = 1,
                   orientation = 0,
                   current_goal = goal(position = c(-2.01, 0)))
 
 my_state <- state(iteration = 1,
-                  setting = my_background, 
+                  setting = my_background,
                   agents = list())
 
 # Generate several locations the agent can move to
 centers <- compute_centers(my_agent)
 
 # Use moving_options to see which of these possibilities is sound
-moving_options(my_agent, 
-               my_state, 
+moving_options(my_agent,
+               my_state,
                my_background,
                centers)
 

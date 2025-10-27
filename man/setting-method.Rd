@@ -22,6 +22,12 @@ setting(object) <- value
 
 \S4method{setting}{predped}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{state-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{setting} slot.}
+}
 \description{
 Works for the \code{\link[predped]{state-class}}.
 }

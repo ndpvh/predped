@@ -16,6 +16,12 @@ weights(object) <- value
 
 \S4method{weights}{predped}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{predped-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{weights} slot.}
+}
 \description{
 Works for \code{\link[predped]{predped-class}}.
 }

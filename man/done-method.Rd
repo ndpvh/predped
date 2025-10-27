@@ -16,6 +16,12 @@ done(object) <- value
 
 \S4method{done}{goal}(object) <- value
 }
+\arguments{
+\item{object}{An instance of the \code{\link[predped]{goal-class}}.}
+
+\item{value}{Value with which to replace the original value of the 
+\code{done} slot.}
+}
 \description{
 Works for \code{\link[predped]{goal-class}}.
 }
