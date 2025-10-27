@@ -77,7 +77,7 @@ goal <- setClass("goal", list(id = "character",
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
                                          position = numeric(2),
-                                         path = matrix(nrow = 0, ncol = 2),
+                                         path = NULL,
                                          busy = FALSE,
                                          done = FALSE,
                                          counter = 5) {
@@ -87,7 +87,21 @@ setMethod("initialize", "goal", function(.Object,
     .Object@busy <- busy
     .Object@done <- done
     .Object@counter <- counter
-    .Object@path <- path
+
+    if(is.null(path)) {
+        .Object@path <- matrix(position, nrow = 1, ncol = 2)
+
+    } else if(!is.numeric(path)) {
+        warning("Path that was provided to the goal is not a numeric. Replacing with a straight path to the goal.")
+        .Object@path <- matrix(position, nrow = 1, ncol = 2)
+
+    } else if(!is.matrix(path)) {
+        warning("Path that was provided to the goal is not a matrix. Transforming to a matrix.")
+        .Object@path <- matrix(path, ncol = 2)
+
+    } else {
+        .Object@path <- path
+    }
 
     return(.Object)
 })
