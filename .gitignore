@@ -17,7 +17,8 @@ minimal_working_example.R
 Train/
 inst/*
 parameters.R
-*.R
+turning.R
+tests/testthat/data/*.R
 
 *.drawio*
 
