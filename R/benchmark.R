@@ -43,7 +43,8 @@
 #' @export 
 benchmark <- function(x = NULL, 
                       iterations = 100,
-                      summarize = TRUE) {
+                      summarize = TRUE,
+                      progress = TRUE) {
 
     # Define the functions to include in the benchmark. If x is NULL, then we 
     # include all functions in the benchmark
@@ -59,11 +60,16 @@ benchmark <- function(x = NULL,
         x <- x[idx]
     }
 
-    # Perform the benchmark 
-    results <- lapply(x, 
-                      function(fx_name) {
+    # Perform the benchmark and print progress if asked for
+    if(progress) {
+        cat("\n")
+        progress_bar(0, length(x))
+    }
+
+    results <- lapply(seq_along(x), 
+                      function(i) {
                           # Select all cases for this function
-                          fx_test <- benchmark_test[[fx_name]]
+                          fx_test <- benchmark_test[[x[i]]]
 
                           # Perform benchmark per case
                           case_result <- lapply(names(fx_test), 
@@ -73,9 +79,18 @@ benchmark <- function(x = NULL,
                                                 })
                           names(case_result) <- names(fx_test)
 
+                          # If progress is asked for, adjust
+                          if(progress) {
+                              progress_bar(i, length(x))
+                          }
+
                           return(case_result)
                       })
     names(results) <- x
+
+    if(progress) {
+        cat("\n")
+    }
 
     # Return result like this if asked for raw results
     if(!summarize) {
@@ -116,6 +131,30 @@ test_times <- function(fx,
     }
 
     return(times)
+}
+
+# Create a progress bar for the benchmarks
+#
+# @param iteration The iteration number you're currently on
+# @param max The maximal iteration number you can be on
+# @param width The number of vertical bars that make up the progress bar
+#
+# @return NULL
+progress_bar <- function(iteration,
+                         max,
+                         width = 20) {
+    
+    n_bars <- round(width * iteration / max)
+    cat(
+        paste0(
+            "\rRunning benchmark: |", 
+            paste(rep("|", n_bars), collapse = ""), 
+            paste(rep(" ", width - n_bars), collapse = ""), 
+            "|"
+        )
+    )
+
+    return(NULL)
 }
 
 
@@ -305,21 +344,6 @@ benchmark_args <- list(
                 path = matrix(c(0, 13), nrow = 1)
             )
         ),
-        state(
-            iteration = 0,
-            setting = supermarket,
-            agents = append(
-                agent(
-                    center = c(1, 1), 
-                    radius = 0.25, 
-                    current_goal = goal(
-                        position = c(0, 13), 
-                        path = matrix(c(0, 13), nrow = 1)
-                    )
-                ),
-                lapply(1:10, \(x) agent(center = runif(2, 1, 20), radius = 0.25))
-            )
-        ),
         compute_centers(
             agent(
                 center = c(1, 1), 
@@ -330,7 +354,8 @@ benchmark_args <- list(
                 )
             ),
             cpp = FALSE
-        )
+        ),
+        matrix(TRUE, nrow = 11, ncol = 3)
     ),
 
     # objects.R
@@ -492,7 +517,7 @@ benchmark_test <- list(
         " | " = function() {
             return(
                 compute_limited_access(
-                    benchmark_ars[["compute_limited_access"]][[1]]
+                    benchmark_args[["compute_limited_access"]][[1]]
                 )
             )
         }
@@ -760,7 +785,7 @@ benchmark_test <- list(
         " | " = function() {
             return(
                 goal(
-                    benchmark_args[["goal"]][[1]]
+                    position = benchmark_args[["goal"]][[1]]
                 )
             )
         }
@@ -769,7 +794,7 @@ benchmark_test <- list(
         " | " = function() {
             return(
                 interact(
-                    benchmark_args[["goal"]][[1]]
+                    benchmark_args[["interact"]][[1]]
                 )
             )
         }
@@ -925,8 +950,8 @@ benchmark_test <- list(
             return(
                 overlap_with_objects(
                     benchmark_args[["overlap_with_objects"]][[1]],
-                    benchmark_args[["overlap_with_objects"]][[2]],
                     supermarket,
+                    benchmark_args[["overlap_with_objects"]][[2]],
                     benchmark_args[["overlap_with_objects"]][[3]],
                     cpp = FALSE
                 )
@@ -936,8 +961,8 @@ benchmark_test <- list(
             return(
                 overlap_with_objects(
                     benchmark_args[["overlap_with_objects"]][[1]],
-                    benchmark_args[["overlap_with_objects"]][[2]],
                     supermarket,
+                    benchmark_args[["overlap_with_objects"]][[2]],
                     benchmark_args[["overlap_with_objects"]][[3]],
                     cpp = TRUE
                 )
@@ -1633,7 +1658,8 @@ benchmark_test <- list(
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[1]],
-                    supermarket
+                    supermarket,
+                    0.5
                 )
             )
         },
@@ -1641,7 +1667,8 @@ benchmark_test <- list(
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[1]],
-                    benchmark_args[["evaluate_edges"]][[3]]
+                    benchmark_args[["evaluate_edges"]][[3]],
+                    0.5
                 )
             )
         },
@@ -1649,7 +1676,8 @@ benchmark_test <- list(
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[2]],
-                    supermarket
+                    supermarket,
+                    0.5
                 )
             )
         },
@@ -1657,7 +1685,8 @@ benchmark_test <- list(
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[2]],
-                    benchmark_args[["evaluate_edges"]][[3]]
+                    benchmark_args[["evaluate_edges"]][[3]],
+                    0.5
                 )
             )
         }
@@ -1677,49 +1706,57 @@ benchmark_test <- list(
     "simulate" = list(
         "precompute_edges = FALSE | many_nodes = FALSE" = function() {
             return(
-                simulate(
-                    benchmark_args[["simulate"]][[1]],
-                    iterations = benchmark_args[["simulate"]][[2]],
-                    max_agents = 70,
-                    initial_agents = benchmark_args[["simulate"]][[3]],
-                    precompute_edges = FALSE,
-                    many_nodes = FALSE
+                capture.output(
+                    simulate(
+                        benchmark_args[["simulate"]][[1]],
+                        iterations = benchmark_args[["simulate"]][[2]],
+                        max_agents = 70,
+                        initial_agents = benchmark_args[["simulate"]][[3]],
+                        precompute_edges = FALSE,
+                        many_nodes = FALSE
+                    )
                 )
             )
         },
         "precompute_edges = TRUE | many_nodes = FALSE" = function() {
             return(
-                simulate(
-                    benchmark_args[["simulate"]][[1]],
-                    iterations = benchmark_args[["simulate"]][[2]],
-                    max_agents = 70,
-                    initial_agents = benchmark_args[["simulate"]][[3]],
-                    precompute_edges = TRUE,
-                    many_nodes = FALSE
+                capture.output(
+                    simulate(
+                        benchmark_args[["simulate"]][[1]],
+                        iterations = benchmark_args[["simulate"]][[2]],
+                        max_agents = 70,
+                        initial_agents = benchmark_args[["simulate"]][[3]],
+                        precompute_edges = TRUE,
+                        many_nodes = FALSE
+                    )
                 )
             )
         },
         "precompute_edges = FALSE | many_nodes = TRUE" = function() {
             return(
-                simulate(
-                    benchmark_args[["simulate"]][[1]],
-                    iterations = benchmark_args[["simulate"]][[2]],
-                    max_agents = 70,
-                    initial_agents = benchmark_args[["simulate"]][[3]],
-                    precompute_edges = FALSE,
-                    many_nodes = TRUE
+                capture.output(
+                    simulate(
+                        benchmark_args[["simulate"]][[1]],
+                        iterations = benchmark_args[["simulate"]][[2]],
+                        max_agents = 70,
+                        initial_agents = benchmark_args[["simulate"]][[3]],
+                        precompute_edges = FALSE,
+                        many_nodes = TRUE
+                    )
                 )
             )
         },
         "precompute_edges = TRUE | many_nodes = TRUE" = function() {
             return(
-                simulate(
-                    benchmark_args[["simulate"]][[1]],
-                    iterations = benchmark_args[["simulate"]][[2]],
-                    max_agents = 70,
-                    initial_agents = benchmark_args[["simulate"]][[3]],
-                    precompute_edges = TRUE,
-                    many_nodes = TRUE
+                capture.output(
+                    simulate(
+                        benchmark_args[["simulate"]][[1]],
+                        iterations = benchmark_args[["simulate"]][[2]],
+                        max_agents = 70,
+                        initial_agents = benchmark_args[["simulate"]][[3]],
+                        precompute_edges = TRUE,
+                        many_nodes = TRUE
+                    )
                 )
             )
         }
