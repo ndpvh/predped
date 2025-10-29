@@ -1078,10 +1078,42 @@ create_initial_condition <- function(agent_number,
     }
     group_indices <- cumsum(groups)
 
+    # Extract the edges from the background. Will help in determining the locations
+    # at which the agents can be gathered. Importantly, dense network created so
+    # that there are many potential positions for the agents, even when there
+    # are not many objects in the environment
+    max_size <- max(params_from_csv[["params_bounds"]]["radius", ])
+
+    edges <- compute_edges(setting,
+                           space_between = space_between * max_size,
+                           many_nodes = TRUE)
+    edges <- edges$edges_with_coords
+
+    # Create different coordinates on which agents can be found along each of 
+    # the edges
+    n_agents_fit <- sqrt((edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2) / max_size
+    n_agents_fit <- floor(n_agents_fit)
+
+    if(any(is.na(n_agents_fit))) {
+        browser()
+    }
+
+    alternatives <- lapply(seq_along(n_agents_fit), 
+                           \(i) cbind(seq(edges$from_x[i], 
+                                          edges$to_x[i], 
+                                          length.out = n_agents_fit[i]),
+                                      seq(edges$from_y[i], 
+                                          edges$to_y[i], 
+                                          length.out = n_agents_fit[i])))
+    alternatives <- do.call("rbind", alternatives)
+
+
     # Create a dummy agent. This will allow for faster generation of the initial
     # condition, as changing an agent's characteristics is faster than the 
     # generation of one
     dummy <- agent(center = c(0, 0), radius = 0.25)
+    dummy_big <- dummy
+    radius(dummy_big) <- 2 * max_size
 
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents,
@@ -1102,98 +1134,28 @@ create_initial_condition <- function(agent_number,
         speed(dummy) <- new_agent$speed
         orientation(dummy) <- new_agent$orientation
         parameters(dummy) <- new_agent$parameters
-        goals(dummy) <- new_agent$goals
-        current_goal(dummy) <- new_agent$current_goal
         color(dummy) <- new_agent$color
         status(dummy) <- new_agent$status
         group(dummy) <- group_number
 
         # Update the group number for the future if `i` is in the indices that
-        # indicate a change in group membership
+        # indicate a change in group membership. If the agent belongs to a 
+        # particular group, then they will receive the goals of the agent before
+        # them, otherwise they will receive their own set of goals
         if(i %in% group_indices) {
             group_number <- group_number + 1
+
+            goals(dummy) <- new_agent$goals
+            current_goal(dummy) <- new_agent$current_goal
+        } else {
+            goals(dummy) <- goals(agents[[i - 1]])
+            current_goal(dummy) <- current_goal(agents[[i - 1]])
         }
 
-        # Extract the edges from the background. Will help in determining the locations
-        # at which the agents can be gathered. Importantly, dense network created so
-        # that there are many potential positions for the agents, even when there
-        # are not many objects in the environment
-        edges <- compute_edges(setting,
-                               space_between = space_between * size(dummy),
-                               many_nodes = TRUE)
-
-        # Additional check to see if there are enough edges to place agents on
-        if(is.null(edges$edges)) {
-            stop <- TRUE
-        } else if(nrow(edges$edges) == 0) {
-            stop <- TRUE
-        }
-
-        if(stop) {
-            message(paste0("Couldn't add any new agents after ",
-                           length(agents),
-                           " due to crowdiness."))
-            break
-        }
-
-        # Choose a random edge on which the agent will stand and create the
-        # exact position.
-        success <- FALSE ; iter <- 0
-        position <- NULL
-        while(!success) {
-            # Check whether you overflow the number of iterations. If so, then
-            # we stop in our tracks, break out of the loop, and give a message
-            # on this
-            if(iter > 10) {
-                message(paste0("Couldn't add new agent after 10 attempts. ",
-                               "Instead of creating an initial condition with ",
-                               agent_number,
-                               " agents, only ",
-                               length(agents),
-                               " agents will be used in the initial condition."))
-                stop <- TRUE
-                break
-            }
-
-            # Sample a random edge on which the agent will stand
-            idx <- sample(1:nrow(edges$edges_with_coords), 1)
-
-            # Get the coordinates of the two points that make up this edge
-            coords <- edges$edges_with_coords[idx,]
-
-            # Generate several alternative positions along this edge on which the
-            # agent can stand and bind them into a matrix
-            n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / size(dummy)
-
-            if(any(is.na(n_agents_fit))) {
-                browser()
-            }
-
-            alternatives <- cbind(seq(coords$from_x, coords$to_x, length.out = floor(n_agents_fit)),
-                                  seq(coords$from_y, coords$to_y, length.out = floor(n_agents_fit)))
-
-            # Check which position are accessible for the agent
-            dummy <- agent(center = c(0, 0), radius = size(dummy))
-
-            check <- rep(TRUE, each = nrow(alternatives))
-            check <- overlap_with_objects(dummy,
-                                          setting,
-                                          alternatives,
-                                          check)
-
-            if(any(check)) {
-                idx <- which(check)
-                idx <- sample(idx, 1)
-
-                new_position <- alternatives[idx,]
-
-                success <- TRUE
-            }
-
-            # Increase the iteration number
-            iter <- iter + 1
-        }
-        position(dummy) <- new_position
+        # Sample a random position on which the agent will stand and adjust the
+        # dummy
+        idx <- sample(1:nrow(alternatives), 1)
+        position(dummy) <- alternatives[idx, ]
 
         # Let the agent face the way of its goal
         co_1 <- position(dummy)
@@ -1205,32 +1167,24 @@ create_initial_condition <- function(agent_number,
 
         orientation(dummy) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
 
-        # If you need to stop, break out of the loop
-        if(stop) {
-            break
-        }
-
-        # Put the agent in the `agents` list and continue
+        # Put the agent in the `agents` list
         agents[[i]] <- dummy
-        setting@objects <- append(setting@objects, dummy)
-    }
 
-    # Loop over those individuals who belong to the same group and give them
-    # the same set of goals
-    group_id <- sapply(agents, group)
-    for(i in unique(group_id)) {
-        idx <- group_id == i
+        # Update the alternatives: Make sure that agents can stand at a provided
+        # location provided that we need double their radius (no overlap with
+        # other agents)
+        position(dummy_big) <- position(dummy)
 
-        if(sum(idx) == 1) {
-            next
-        } else {
-            grouped_agents <- agents[idx]
-            for(j in 2:length(grouped_agents)) {
-                current_goal(grouped_agents[[j]]) <- current_goal(grouped_agents[[1]])
-                goals(grouped_agents[[j]]) <- goals(grouped_agents[[1]])
-            }
+        idx <- out_object(dummy_big, alternatives)
+        alternatives <- alternatives[idx, ]
 
-            agents[idx] <- grouped_agents
+        # Check whether we can still add some agents to the list based on the 
+        # positions that are left.
+        if(nrow(alternatives) == 0) {
+            message(paste0("Couldn't add any new agents after ",
+                           length(agents),
+                           " due to crowdiness."))
+            break
         }
     }
 
