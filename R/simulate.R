@@ -349,7 +349,7 @@ setMethod("simulate", "predped", function(object,
     for(i in seq_len(iterations)) {
         altered_state <- fx(trace[[i]])
         trace[[i + 1]] <- simulate(altered_state,
-                                   object,
+                                   model = object,
                                    add_agent = (i %in% iteration_variables(altered_state)$add_agent_index) &
                                                (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
                                    group_size = group_size,
