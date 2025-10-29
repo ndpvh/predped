@@ -1047,6 +1047,7 @@ create_initial_condition <- function(agent_number,
                                      goal_number = \(n) rnorm(n, 10, 2),
                                      group_size = matrix(1, nrow = 1, ncol = 2),
                                      space_between = 1.25,
+                                     precomputed_edges = NULL,
                                      ...) {
 
     # Copy the setting
@@ -1085,10 +1086,12 @@ create_initial_condition <- function(agent_number,
     # are not many objects in the environment
     max_size <- max(params_from_csv[["params_bounds"]]["radius", ])
 
-    edges <- compute_edges(setting,
-                           space_between = space_between * max_size,
-                           many_nodes = TRUE)
-    coords <- edges$edges_with_coords
+    if(is.null(precomputed_edges)) {
+        precomputed_edges <- compute_edges(setting,
+                                           space_between = space_between * max_size,
+                                           many_nodes = TRUE)
+    }
+    coords <- precomputed_edges$edges_with_coords
 
     # Create different coordinates on which agents can be found along each of 
     # the edges
@@ -1121,7 +1124,7 @@ create_initial_condition <- function(agent_number,
     # namely their location and their orientation, as `add_agent` assumes that
     # agents start at the entrance walking into the setting.
     group_number <- 1
-    agents <- list() ; stop <- FALSE
+    agents <- list()
     for(i in seq_len(agent_number)) {
         # Sample a random position on which the agent will stand and adjust the
         # dummy
@@ -1130,7 +1133,7 @@ create_initial_condition <- function(agent_number,
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number = goal_number[i],
-                               precomputed_edges = edges,
+                               precomputed_edges = precomputed_edges,
                                position = alternatives[idx, ],
                                return_characteristics = TRUE,
                                ...)
