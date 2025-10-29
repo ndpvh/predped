@@ -944,7 +944,8 @@ add_agent <- function(model,
     # them. Note that we put status as "plan" so that agents can find their 
     # path
     if(return_characteristics) {
-        return(list(radius = radius, 
+        return(list(position = position, 
+                    radius = radius, 
                     speed = standing_start * params[["preferred_speed"]],
                     orientation = angle,
                     parameters = params, 
@@ -1122,16 +1123,23 @@ create_initial_condition <- function(agent_number,
     group_number <- 1
     agents <- list() ; stop <- FALSE
     for(i in seq_len(agent_number)) {
+        # Sample a random position on which the agent will stand and adjust the
+        # dummy
+        idx <- sample(1:nrow(alternatives), 1)
+
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number = goal_number[i],
                                precomputed_edges = edges,
+                               position = alternatives[idx, ],
                                return_characteristics = TRUE,
                                ...)
 
         # Adjust the dummy's characteristics based on the random ones produced 
         # here. Also add a group number
+        position(dummy) <- new_agent$position
         radius(dummy) <- new_agent$radius
+        orientation(dummy) <- new_agent$orientation
         speed(dummy) <- new_agent$speed
         orientation(dummy) <- new_agent$orientation
         parameters(dummy) <- new_agent$parameters
@@ -1152,21 +1160,6 @@ create_initial_condition <- function(agent_number,
             goals(dummy) <- goals(agents[[i - 1]])
             current_goal(dummy) <- current_goal(agents[[i - 1]])
         }
-
-        # Sample a random position on which the agent will stand and adjust the
-        # dummy
-        idx <- sample(1:nrow(alternatives), 1)
-        position(dummy) <- alternatives[idx, ]
-
-        # Let the agent face the way of its goal
-        co_1 <- position(dummy)
-        if(nrow(current_goal(dummy)@path) == 0) {
-            co_2 <- current_goal(dummy)@position
-        } else {
-            co_2 <- current_goal(dummy)@path[1,]
-        }
-
-        orientation(dummy) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
 
         # Put the agent in the `agents` list
         agents[[i]] <- dummy
