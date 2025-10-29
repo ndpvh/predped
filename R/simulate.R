@@ -1087,11 +1087,11 @@ create_initial_condition <- function(agent_number,
     edges <- compute_edges(setting,
                            space_between = space_between * max_size,
                            many_nodes = TRUE)
-    edges <- edges$edges_with_coords
+    coords <- edges$edges_with_coords
 
     # Create different coordinates on which agents can be found along each of 
     # the edges
-    n_agents_fit <- sqrt((edges$from_x - edges$to_x)^2 + (edges$from_y - edges$to_y)^2) / max_size
+    n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / max_size
     n_agents_fit <- floor(n_agents_fit)
 
     if(any(is.na(n_agents_fit))) {
@@ -1099,11 +1099,11 @@ create_initial_condition <- function(agent_number,
     }
 
     alternatives <- lapply(seq_along(n_agents_fit), 
-                           \(i) cbind(seq(edges$from_x[i], 
-                                          edges$to_x[i], 
+                           \(i) cbind(seq(coords$from_x[i], 
+                                          coords$to_x[i], 
                                           length.out = n_agents_fit[i]),
-                                      seq(edges$from_y[i], 
-                                          edges$to_y[i], 
+                                      seq(coords$from_y[i], 
+                                          coords$to_y[i], 
                                           length.out = n_agents_fit[i])))
     alternatives <- do.call("rbind", alternatives)
 
@@ -1125,6 +1125,7 @@ create_initial_condition <- function(agent_number,
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number = goal_number[i],
+                               precomputed_edges = edges,
                                return_characteristics = TRUE,
                                ...)
 
