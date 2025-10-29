@@ -1715,12 +1715,10 @@ benchmark_test <- list(
     "create_initial_condition" = list(
         " | " = function() {
             return(
-                capture.output(
-                    create_initial_condition(
-                        benchmark_args[["create_initial_condition"]][[1]],
-                        benchmark_args[["create_initial_condition"]][[2]],
-                        goal_number = benchmark_args[["create_initial_condition"]][[3]]
-                    )
+                create_initial_condition(
+                    benchmark_args[["create_initial_condition"]][[1]],
+                    benchmark_args[["create_initial_condition"]][[2]],
+                    goal_number = benchmark_args[["create_initial_condition"]][[3]]
                 )
             )
         }
