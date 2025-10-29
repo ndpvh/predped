@@ -475,6 +475,15 @@ benchmark_args <- list(
     ),
 
     # simulate.R
+    "create_initial_condition" = list(
+        10, 
+        predped(
+            id = "benchmark",
+            setting = supermarket,
+            archetypes = "BaselineEuropean"
+        ),
+        10
+    ),
     "simulate" = list(
         predped(
             id = "benchmark",
@@ -1703,6 +1712,19 @@ benchmark_test <- list(
     ),
 
     # simulate.R
+    "create_initial_condition" = list(
+        " | " = function() {
+            return(
+                capture.output(
+                    create_initial_condition(
+                        benchmark_args[["create_initial_condition"]][[1]],
+                        benchmark_args[["create_initial_condition"]][[2]],
+                        goal_number = benchmark_args[["create_initial_condition"]][[3]]
+                    )
+                )
+            )
+        }
+    ),
     "simulate" = list(
         "precompute_edges = FALSE | many_nodes = FALSE" = function() {
             return(
@@ -1923,6 +1945,7 @@ benchmark_hierarchy <- list(
     "evaluate_edges" = "routing.R",
     "prune_edges" = "routing.R",
 
+    "create_initial_condition" = "simulate.R",
     "simulate" = "simulate.R",
 
     "create_agent_specifications" = "update.R",
