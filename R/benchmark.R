@@ -475,6 +475,13 @@ benchmark_args <- list(
     ),
 
     # simulate.R
+    "add_agent" = list(
+        predped(
+            id = "benchmark",
+            setting = supermarket,
+            archetypes = "BaselineEuropean"
+        )
+    ),
     "create_initial_condition" = list(
         10, 
         predped(
@@ -1712,6 +1719,44 @@ benchmark_test <- list(
     ),
 
     # simulate.R
+    "add_agent" = list(
+        "sort_goals = FALSE | individual_differences = FALSE" = function() {
+            return(
+                add_agent(
+                    benchmark_args[["add_agent"]][[1]],
+                    sort_goals = FALSE,
+                    individual_differences = FALSE
+                )
+            )
+        },
+        "sort_goals = TRUE | individual_differences = FALSE" = function() {
+            return(
+                add_agent(
+                    benchmark_args[["add_agent"]][[1]],
+                    sort_goals = TRUE,
+                    individual_differences = FALSE
+                )
+            )
+        },
+        "sort_goals = FALSE | individual_differences = TRUE" = function() {
+            return(
+                add_agent(
+                    benchmark_args[["add_agent"]][[1]],
+                    sort_goals = FALSE,
+                    individual_differences = TRUE
+                )
+            )
+        },
+        "sort_goals = TRUE | individual_differences = TRUE" = function() {
+            return(
+                add_agent(
+                    benchmark_args[["add_agent"]][[1]],
+                    sort_goals = TRUE,
+                    individual_differences = TRUE
+                )
+            )
+        }
+    ),
     "create_initial_condition" = list(
         " | " = function() {
             return(
@@ -1943,6 +1988,7 @@ benchmark_hierarchy <- list(
     "evaluate_edges" = "routing.R",
     "prune_edges" = "routing.R",
 
+    "add_agent" = "simulate.R",
     "create_initial_condition" = "simulate.R",
     "simulate" = "simulate.R",
 
