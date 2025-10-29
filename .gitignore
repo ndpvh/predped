@@ -30,6 +30,7 @@ tmp/
 *.out
 *.dll
 docs/*
+benchmark/*
 
 R/*_depr.R
 
