@@ -150,7 +150,9 @@ progress_bar <- function(iteration,
             "\rRunning benchmark: |", 
             paste(rep("|", n_bars), collapse = ""), 
             paste(rep(" ", width - n_bars), collapse = ""), 
-            "|"
+            "| ",
+            round(100 * iteration / max), 
+            "%"
         )
     )
 
@@ -188,7 +190,7 @@ data_bench <- do.call("rbind", data_bench)
 
 # Finally, load the initial condition for the simulate benchmark
 inx <- readRDS(file.path("tests", "testthat", "data", "benchmark_inx.Rds"))
-data_inx <- time_series(list(inx), cpp = FALSE)
+data_inx <- unpack_trace(list(inx), cpp = FALSE)
 
 # Create a variable that provides arguments to the tests. These are precomputed,
 # meaning that they should not influence the speed of the tests themselves
@@ -497,7 +499,7 @@ benchmark_args <- list(
             setting = supermarket, 
             archetypes = "BaselineEuropean"
         ),
-        10,
+        1,
         inx@agents
     ),
 
@@ -517,7 +519,7 @@ benchmark_args <- list(
         matrix(TRUE, nrow = 11, ncol = 3)
     ),
     "utility" = list(
-        data_inx,
+        data_inx[data_inx$status == "move", ],
         params_bounded,
         inx,
         create_agent_specifications(inx@agents, cpp = FALSE),
@@ -1898,7 +1900,7 @@ benchmark_test <- list(
         "data | cpp = FALSE" = function() {
             return(
                 utility(
-                    benchmark_args[["utility"]][[1]],
+                    benchmark_args[["utility"]][[1]][1, ],
                     benchmark_args[["utility"]][[2]],
                     cpp = FALSE
                 )
@@ -1907,7 +1909,7 @@ benchmark_test <- list(
         "trace | cpp = FALSE" = function() {
             return(
                 utility(
-                    benchmark_args[["utility"]][[3]]@agents[[3]],
+                    benchmark_args[["utility"]][[3]]@agents[[1]],
                     benchmark_args[["utility"]][[3]],
                     benchmark_args[["utility"]][[3]]@setting,
                     benchmark_args[["utility"]][[4]],
@@ -1920,7 +1922,7 @@ benchmark_test <- list(
         "data | cpp = TRUE" = function() {
             return(
                 utility(
-                    benchmark_args[["utility"]][[1]],
+                    benchmark_args[["utility"]][[1]][1, ],
                     benchmark_args[["utility"]][[2]],
                     cpp = TRUE
                 )
@@ -1929,7 +1931,7 @@ benchmark_test <- list(
         "trace | cpp = TRUE" = function() {
             return(
                 utility(
-                    benchmark_args[["utility"]][[3]]@agents[[3]],
+                    benchmark_args[["utility"]][[3]]@agents[[1]],
                     benchmark_args[["utility"]][[3]],
                     benchmark_args[["utility"]][[3]]@setting,
                     benchmark_args[["utility"]][[4]],
@@ -1995,5 +1997,6 @@ benchmark_hierarchy <- list(
     "create_agent_specifications" = "update.R",
     "predict_movement" = "update.R",
 
-    "compute_utility_variables" = "utility.R"
+    "compute_utility_variables" = "utility.R",
+    "utility" = "utility.R"
 )
