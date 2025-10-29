@@ -944,7 +944,8 @@ add_agent <- function(model,
     # them. Note that we put status as "plan" so that agents can find their 
     # path
     if(return_characteristics) {
-        return(list(position = position, 
+        return(list(id = paste(sample(letters, 5, replace = TRUE), collapse = ""),
+                    position = position, 
                     radius = radius, 
                     speed = standing_start * params[["preferred_speed"]],
                     orientation = angle,
@@ -1140,6 +1141,7 @@ create_initial_condition <- function(agent_number,
 
         # Adjust the dummy's characteristics based on the random ones produced 
         # here. Also add a group number
+        id(dummy) <- new_agent$id
         position(dummy) <- new_agent$position
         radius(dummy) <- new_agent$radius
         orientation(dummy) <- new_agent$orientation
