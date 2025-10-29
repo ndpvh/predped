@@ -801,6 +801,9 @@ add_group <- function(model,
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
+#' @param return_characteristics Logical denoting whether to return the 
+#' characteristics of the generated agents in a list (\code{TRUE}) or as part 
+#' of an agent (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.
 #'
@@ -847,7 +850,8 @@ add_agent <- function(model,
                       space_between = 1.25,
                       position = NULL,
                       standing_start = 0.1,
-                      individual_differences = FALSE) {
+                      individual_differences = FALSE,
+                      return_characteristics = FALSE) {
 
     # Extract the background from the `predped` model and determine where the
     # agent will enter the space
@@ -934,6 +938,21 @@ add_agent <- function(model,
         co_2 <- goal_stack[[1]]@position
 
         angle <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+    }
+
+    # If the person wants only the characteristics of the agent, then provide 
+    # them. Note that we put status as "plan" so that agents can find their 
+    # path
+    if(return_characteristics) {
+        return(list(radius = radius, 
+                    speed = standing_start * params[["preferred_speed"]],
+                    orientation = angle,
+                    parameters = params, 
+                    goals = goal_stack[-1],
+                    current_goal = goal_stack[[1]],
+                    color = color,
+                    status = "plan",
+                    group = group_number))
     }
 
     # Create the agent itself
@@ -1059,6 +1078,11 @@ create_initial_condition <- function(agent_number,
     }
     group_indices <- cumsum(groups)
 
+    # Create a dummy agent. This will allow for faster generation of the initial
+    # condition, as changing an agent's characteristics is faster than the 
+    # generation of one
+    dummy <- agent(center = c(0, 0), radius = 0.25)
+
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents,
     # namely their location and their orientation, as `add_agent` assumes that
@@ -1069,8 +1093,20 @@ create_initial_condition <- function(agent_number,
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number = goal_number[i],
+                               return_characteristics = TRUE,
                                ...)
-        group(new_agent) <- group_number
+
+        # Adjust the dummy's characteristics based on the random ones produced 
+        # here. Also add a group number
+        radius(dummy) <- new_agent$radius
+        speed(dummy) <- new_agent$speed
+        orientation(dummy) <- new_agent$orientation
+        parameters(dummy) <- new_agent$parameters
+        goals(dummy) <- new_agent$goals
+        current_goal(dummy) <- new_agent$current_goal
+        color(dummy) <- new_agent$color
+        status(dummy) <- new_agent$status
+        group(dummy) <- group_number
 
         # Update the group number for the future if `i` is in the indices that
         # indicate a change in group membership
@@ -1083,7 +1119,7 @@ create_initial_condition <- function(agent_number,
         # that there are many potential positions for the agents, even when there
         # are not many objects in the environment
         edges <- compute_edges(setting,
-                               space_between = space_between * size(new_agent),
+                               space_between = space_between * size(dummy),
                                many_nodes = TRUE)
 
         # Additional check to see if there are enough edges to place agents on
@@ -1127,7 +1163,7 @@ create_initial_condition <- function(agent_number,
 
             # Generate several alternative positions along this edge on which the
             # agent can stand and bind them into a matrix
-            n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / size(new_agent)
+            n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / size(dummy)
 
             if(any(is.na(n_agents_fit))) {
                 browser()
@@ -1137,7 +1173,7 @@ create_initial_condition <- function(agent_number,
                                   seq(coords$from_y, coords$to_y, length.out = floor(n_agents_fit)))
 
             # Check which position are accessible for the agent
-            dummy <- agent(center = c(0, 0), radius = size(new_agent))
+            dummy <- agent(center = c(0, 0), radius = size(dummy))
 
             check <- rep(TRUE, each = nrow(alternatives))
             check <- overlap_with_objects(dummy,
@@ -1157,17 +1193,17 @@ create_initial_condition <- function(agent_number,
             # Increase the iteration number
             iter <- iter + 1
         }
-        position(new_agent) <- new_position
+        position(dummy) <- new_position
 
         # Let the agent face the way of its goal
-        co_1 <- position(new_agent)
-        if(nrow(current_goal(new_agent)@path) == 0) {
-            co_2 <- current_goal(new_agent)@position
+        co_1 <- position(dummy)
+        if(nrow(current_goal(dummy)@path) == 0) {
+            co_2 <- current_goal(dummy)@position
         } else {
-            co_2 <- current_goal(new_agent)@path[1,]
+            co_2 <- current_goal(dummy)@path[1,]
         }
 
-        orientation(new_agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+        orientation(dummy) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
 
         # If you need to stop, break out of the loop
         if(stop) {
@@ -1175,8 +1211,8 @@ create_initial_condition <- function(agent_number,
         }
 
         # Put the agent in the `agents` list and continue
-        agents[[i]] <- new_agent
-        setting@objects <- append(setting@objects, new_agent)
+        agents[[i]] <- dummy
+        setting@objects <- append(setting@objects, dummy)
     }
 
     # Loop over those individuals who belong to the same group and give them
