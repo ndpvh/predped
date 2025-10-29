@@ -32,6 +32,7 @@ LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
     'imports.R'
+    'RcppExports.R'
     'getters_setters.R'
     'objects.R'
     'background.R'
@@ -50,7 +51,6 @@ Collate:
     'data.R'
     'likelihood.R'
     'simulate.R'
-    'RcppExports.R'
     'benchmark.R'
 Suggests: 
     fs,
