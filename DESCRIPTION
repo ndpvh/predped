@@ -44,13 +44,13 @@ Collate:
     'parameters.R'
     'plot.R'
     'see.R'
-    'RcppExports.R'
     'update.R'
     'utility_model.R'
     'predped.R'
-    'simulate.R'
     'data.R'
     'likelihood.R'
+    'simulate.R'
+    'RcppExports.R'
     'benchmark.R'
 Suggests: 
     fs,
