@@ -164,6 +164,146 @@ progress_bar <- function(iteration,
 
 
 ################################################################################
+# UTILITY FUNCTIONS FOR CREATING THE HTML
+
+# Create table
+#
+# Use the input of a function list to create a table as defined through 
+# knitr.
+#
+# @param x List containing the entries of the benchmark
+# @param caption Caption to include in the table
+# @param digits Integer denoting the number to which to round the results
+#
+# @return String containing the table as defined by knitr
+knitr_table <- function(x, 
+                        caption = "",
+                        digits = 2) {
+
+    rnd <- function(y) {
+        return(format(y, scientific = TRUE, digits = digits))
+    }
+
+    # Define the number of levels for the table
+    levels <- strsplit(names(x)[1], " | ", fixed = TRUE)[[1]]
+
+    # Create different cases:
+    #   - No variable was manipulated
+    #   - 1 or more variables were manipulated
+    n <- length(levels)
+    if(n == 1 & levels[1] == "") {
+        x <- x[[1]]
+
+        tbl <- cbind(M = rnd(mean(x)),
+                     SD = rnd(sd(x)),
+                     Q025 = rnd(quantile(x, prob = 0.025)),
+                     Q975 = rnd(quantile(x, prob = 0.975)))
+        rownames(tbl) <- NULL
+
+        tbl <- knitr::kable(tbl,
+                            format = "latex",
+                            align = "llll",
+                            caption = caption, 
+                            longtable = FALSE,
+                            booktabs = TRUE,
+                            escape = FALSE,
+                            position = "H")
+
+    } else if(n == 1) {
+        levels <- names(x)
+
+        tbl <- matrix(" ", nrow = 1, ncol = length(levels))
+        for(i in seq_along(levels)) {
+            tbl[, i] <- paste0(rnd(mean(x[[levels[i]]])), 
+                               " [",
+                               rnd(quantile(x[[levels[i]]], prob = 0.025)),
+                               rnd(quantile(x[[levels[i]]], prob = 0.975)),
+                               "]")
+        }
+        colnames(tbl) <- levels
+        rownames(tbl) <- NULL
+
+        tbl <- knitr::kable(tbl,
+                            format = "latex",
+                            align = paste(rep("c", ncol(tbl)), collapse = ""),
+                            caption = caption, 
+                            longtable = FALSE,
+                            booktabs = TRUE,
+                            escape = FALSE,
+                            position = "H")
+
+        
+    } else if(n > 1) {
+        # Get all levels in a data.frame
+        levels <- lapply(names(x),
+                         \(y) matrix(strsplit(y, " | ", fixed = TRUE)[[1]], nrow = 1))
+        levels <- do.call("rbind", levels)
+
+        # Get unique levels for all parts
+        levels <- lapply(seq_len(ncol(levels)),
+                         \(i) unique(levels[, i]))
+
+        # Create a matrix of the correct size
+        tbl <- matrix(" ", 
+                      nrow = prod(sapply(levels[2:length(levels)], length)), 
+                      ncol = length(levels[[1]]) + length(levels) - 1)
+
+        # Fill first columns of the matrix with info on the levels that appear 
+        # in the rows
+        by <- nrow(tbl)
+        for(i in seq_len(length(levels) - 1)) {
+            # Get info on the level of choice here
+            info <- levels[[i + 1]]
+
+            # Define the indices at which we should put the info
+            by <- by / length(info)
+            idx <- seq(1, nrow(tbl), by = by)
+            
+            # Add the info the the table
+            tbl[idx, i] <- info
+        }
+
+        # Double loop: Each of the rows and each of the columns
+        rows <- expand.grid(levels[2:length(levels)], stringsAsFactors = FALSE)
+        for(i in 1:nrow(rows)) {
+            for(j in seq_along(levels[[1]])) {
+                # Find out where the info for this particular cell is held
+                idx <- sapply(c(levels[[1]][j], rows[i, ]),
+                              \(y) grepl(y, names(x), fixed = TRUE))
+                idx <- which(sapply(1:nrow(idx), \(k) all(idx[k, ])))
+
+                # Add that info to the table
+                tbl[i, j + length(levels) - 1] <- paste0(rnd(mean(x[[idx]])), 
+                                                         " [",
+                                                         rnd(quantile(x[[idx]], prob = 0.025)),
+                                                         rnd(quantile(x[[idx]], prob = 0.975)),
+                                                         "]")
+            }
+        }
+        colnames(tbl) <- c(rep(" ", length(levels) - 1), levels[[1]])
+        rownames(tbl) <- NULL
+
+        tbl <- knitr::kable(tbl,
+                            format = "latex",
+                            align = paste(c(rep("l", length(levels) - 1), 
+                                            rep("c", length(levels[[1]]))), 
+                                          collapse = ""),
+                            caption = caption, 
+                            longtable = FALSE,
+                            booktabs = TRUE,
+                            escape = FALSE,
+                            position = "H")
+
+    }
+
+    return(tbl)
+}
+
+
+
+
+
+################################################################################
 # SPECIFICATIONS OF THE BENCHMARK
 
 # Load in the supermarket environment and its precomputed edges that serve as 
@@ -765,7 +905,7 @@ benchmark_test <- list(
                 )
             )
         },
-        "not precomputed | many_nodes = FALSE | " = function() {
+        "not precomputed | many_nodes = FALSE | reevaluate = FALSE" = function() {
             return(
                 find_path(
                     benchmark_args[["find_path"]][[1]],
@@ -776,7 +916,29 @@ benchmark_test <- list(
                 )
             )
         },
-        "not precomputed | many_nodes = TRUE | " = function() {
+        "not precomputed | many_nodes = TRUE | reevaluate = FALSE" = function() {
+            return(
+                find_path(
+                    benchmark_args[["find_path"]][[1]],
+                    benchmark_args[["find_path"]][[2]],
+                    supermarket,
+                    precomputed_edges = NULL,
+                    many_nodes = TRUE
+                )
+            )
+        },
+        "not precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
+            return(
+                find_path(
+                    benchmark_args[["find_path"]][[1]],
+                    benchmark_args[["find_path"]][[2]],
+                    supermarket,
+                    precomputed_edges = NULL,
+                    many_nodes = FALSE
+                )
+            )
+        },
+        "not precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
             return(
                 find_path(
                     benchmark_args[["find_path"]][[1]],
