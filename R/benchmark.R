@@ -2108,57 +2108,77 @@ benchmark_test <- list(
                            
 # Create a variable that tells us what the hierarchy between the functions is
 benchmark_hierarchy <- list(
-    "compute_limited_access" = "background.R", 
-    "background" = "background.R",
-    "limit_access" = "background.R",
+    "background.R" = c(
+        "compute_limited_access", 
+        "background",
+        "limit_access"
+    ),
 
-    "time_series" = "data.R",
-    "unpack_trace" = "data.R",
+    "data.R" = c(
+        "time_series",
+        "unpack_trace"
+    ),
+    
+    "general.R" = c(
+        "line_line_intersection",
+        "perpendicular_orientation"
+    ),
 
-    "line_line_intersection" = "general.R",
-    "perpendicular_orientation" = "general.R",
+    "goals.R" = c(
+        "add_goal",
+        "change",
+        "find_path",
+        "goal_stack",
+        "goal",
+        "interact"
+    ),
 
-    "add_goal" = "goals.R",
-    "change" = "goals.R",
-    "find_path" = "goals.R",
-    "goal_stack" = "goals.R",
-    "goal" = "goals.R",
-    "interact" = "goals.R",
+    "likelihood.R" = c("mll"),
 
-    "mll" = "likelihood.R",
+    "moving_options.R" = c(
+        "agents_between_goal",
+        "compute_centers",
+        "moving_options"
+    ),
 
-    "agents_between_goal" = "moving_options.R",
-    "compute_centers" = "moving_options.R",
-    "moving_options" = "moving_options.R",
+    "objects.R" = c(
+        "add_nodes",
+        "enlarge",
+        "in_object",
+        "polygon",
+        "rectangle",
+        "circle",
+        "intersects",
+        "nodes_on_circumference",
+        "out_object",
+        "rng_point"
+    ),
 
-    "add_nodes" = "objects.R",
-    "enlarge" = "objects.R",
-    "in_object" = "objects.R",
-    "polygon" = "objects.R",
-    "rectangle" = "objects.R",
-    "circle" = "objects.R",
-    "intersects" = "objects.R",
-    "nodes_on_circumference" = "objects.R",
-    "out_object" = "objects.R",
-    "rng_point" = "objects.R",
+    "plot.R" = c("plot"),
 
-    "plot" = "plot.R",
+    "routing.R" = c(
+        "adjust_edges",
+        "combine_nodes",
+        "compute_edges",
+        "create_edges",
+        "create_nodes",
+        "evaluate_edges",
+        "prune_edges"
+    ),
+    
+    "simulate.R" = c(
+        "add_agent",
+        "create_initial_condition",
+        "simulate"
+    ),
 
-    "adjust_edges" = "routing.R",
-    "combine_nodes" = "routing.R",
-    "compute_edges" = "routing.R",
-    "create_edges" = "routing.R",
-    "create_nodes" = "routing.R",
-    "evaluate_edges" = "routing.R",
-    "prune_edges" = "routing.R",
+    "update.R" = c(
+        "create_agent_specifications",
+        "predict_movement"
+    ),
 
-    "add_agent" = "simulate.R",
-    "create_initial_condition" = "simulate.R",
-    "simulate" = "simulate.R",
-
-    "create_agent_specifications" = "update.R",
-    "predict_movement" = "update.R",
-
-    "compute_utility_variables" = "utility.R",
-    "utility" = "utility.R"
+    "utility.R" = c(
+        "compute_utility_variables",
+        "utility"
+    )
 )
