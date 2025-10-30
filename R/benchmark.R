@@ -147,11 +147,11 @@ benchmark <- function(x = NULL,
     }
 
     # Render the markdown and provide a message telling the user what to look for.
-    capture.output(rmarkdown::render("benchmark.Rmd"))
-    message("Results have been saved to 'benchmark.pdf'.")
+    suppressMessages(capture.output(rmarkdown::render("benchmark.Rmd")))
+    message("Results have been saved to 'benchmark.html'.")
 
     # Remove the Rmd
-
+    file.remove("benchmark.Rmd")
 
     return(NULL)
 }
@@ -2200,7 +2200,8 @@ benchmark_hierarchy <- list(
     "moving_options.R" = c(
         "agents_between_goal",
         "compute_centers",
-        "moving_options"
+        "moving_options",
+        "overlap_with_objects"
     ),
 
     "objects.R" = c(
@@ -2211,6 +2212,7 @@ benchmark_hierarchy <- list(
         "rectangle",
         "circle",
         "intersects",
+        "line_intersection",
         "nodes_on_circumference",
         "out_object",
         "rng_point"
