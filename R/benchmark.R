@@ -44,6 +44,7 @@
 benchmark <- function(x = NULL, 
                       iterations = 100,
                       summarize = TRUE,
+                      digits = 2,
                       progress = TRUE) {
 
     # Define the functions to include in the benchmark. If x is NULL, then we 
@@ -97,8 +98,62 @@ benchmark <- function(x = NULL,
         return(results)
     }
 
-    # Otherwise, create an HTML file that summarizes the results
-    browser()
+    # Otherwise, create an HTML file that summarizes the results. Start with the 
+    # preamble.
+    cat(paste0("---\n",
+               "title: \"Benchmarks for predped\"\n",
+               "author: \"Niels Vanhasbroeck\"\n",
+               "date: '`r Sys.Date()`'\n",
+               "output: html_document\n",
+               "---\n\n",
+               "\`\`\`{r setup, include=FALSE}\n",
+               "knitr::opts_chunk$set(echo = TRUE)\n",
+               "\`\`\`\n\n",
+               "\`\`\`{css, echo=FALSE}\n",
+               ".table caption {font-style: italic; font-size: 25px}\n",
+               "\`\`\`\n\n"), 
+        file = "benchmark.Rmd")
+
+    # Loop over all R-files that make up predped
+    for(i in names(benchmark_hierarchy)) {
+        # Check whether there are any functions tested for that specific file. 
+        # If so, we will add them to the Rmd file.
+        if(any(names(results) %in% benchmark_hierarchy[[i]])) {
+            # Add a title for this file
+            cat(paste0("## ", i, "\n\n"), 
+                file = "benchmark.Rmd",
+                append = TRUE)
+
+            # Loop over the functions that have been benchmarked
+            benchmarked <- results[names(results) %in% benchmark_hierarchy[[i]]]
+            for(j in seq_along(benchmarked)) {
+                # Add a title for this function
+                fx <- names(benchmarked)[j]
+                cat(paste0("### ", fx, "\n\n"),
+                    file = "benchmark.Rmd", 
+                    append = TRUE)
+
+                # Create the table for this function
+                tbl <- knitr_table(benchmarked[[fx]],
+                                   caption = benchmark_caption[[fx]],
+                                   digits = digits)
+
+                cat(paste0(tbl, "\n\n"), 
+                    file = "benchmark.Rmd",
+                    append = TRUE)
+            }
+            
+        }
+    }
+
+    # Render the markdown and provide a message telling the user what to look for.
+    capture.output(rmarkdown::render("benchmark.Rmd"))
+    message("Results have been saved to 'benchmark.pdf'.")
+
+    # Remove the Rmd
+
+
+    return(NULL)
 }
 
 # Function that times the functions user-time
@@ -201,13 +256,13 @@ knitr_table <- function(x,
         rownames(tbl) <- NULL
 
         tbl <- knitr::kable(tbl,
-                            format = "latex",
-                            align = "llll",
+                            format = "html",
+                            align = "cccc",
                             caption = caption, 
                             longtable = FALSE,
                             booktabs = TRUE,
                             escape = FALSE,
-                            position = "H")
+                            position = "h")
 
     } else if(n == 1) {
         levels <- names(x)
@@ -224,13 +279,13 @@ knitr_table <- function(x,
         rownames(tbl) <- NULL
 
         tbl <- knitr::kable(tbl,
-                            format = "latex",
+                            format = "html",
                             align = paste(rep("c", ncol(tbl)), collapse = ""),
                             caption = caption, 
                             longtable = FALSE,
                             booktabs = TRUE,
                             escape = FALSE,
-                            position = "H")
+                            position = "h")
 
         
     } else if(n > 1) {
@@ -284,7 +339,7 @@ knitr_table <- function(x,
         rownames(tbl) <- NULL
 
         tbl <- knitr::kable(tbl,
-                            format = "latex",
+                            format = "html",
                             align = paste(c(rep("l", length(levels) - 1), 
                                             rep("c", length(levels[[1]]))), 
                                           collapse = ""),
@@ -292,9 +347,16 @@ knitr_table <- function(x,
                             longtable = FALSE,
                             booktabs = TRUE,
                             escape = FALSE,
-                            position = "H")
+                            position = "h")
 
     }
+
+    tbl <- kableExtra::kable_styling(tbl,
+                                     full_width = TRUE, 
+                                     html_font = "Cambria",
+                                     font_size = 20,
+                                     position = "left",
+                                     bootstrap_options = c("striped", "hover"))
 
     return(tbl)
 }
@@ -2181,4 +2243,139 @@ benchmark_hierarchy <- list(
         "compute_utility_variables",
         "utility"
     )
+)
+
+# And provide the captions for each of the benchmarks
+benchmark_caption <- list(    
+    "compute_limited_access" = "Benchmark for the compute\\_limited\\_access function, evaluated for a single segment.", 
+    "background" = paste("Benchmark for the initialization function for background.",
+                         "The background has a rectangular shape and consists of 10 rectangular objects as well as", 
+                         "10 segments that limit access."),
+    "limit_access" = paste("Benchmark for the limit\\_access function for background.",
+                           "The background has a rectangular shape and consists of 10 rectangular objects as well as", 
+                           "10 segments that limit access.",
+                           "We placed an agent or coordinate at a location so that all segments block access."),
+    "time_series" = paste("Benchmark for the time\\_series function.",
+                          "A trace of length 10 and containing 3 agents is transformed to a dataset.",
+                          "We distinguish between the R and the Rcpp version of this function."),
+    "unpack_trace" = paste("Benchmark for the unpack\\_trace function.",
+                           "A trace of length 10 and containing 3 agents is transformed to a dataset containing",
+                           "all information that is contained within the trace.", 
+                           "We distinguish between the R and the Rcpp version of this function."),   
+    "line_line_intersection" = paste("Benchmark for the line\\_line\\_intersection function.",
+                                     "Intersections between two matrices of 100 segments are evaluated."),
+    "perpendicular_orientation" = paste("Benchmark for the perpendicular\\_orientation function.",
+                                        "The perpendicular orientation is evaluated for a single coordinate across",
+                                        "the different objects that are exported by predped."),
+    "add_goal" = paste("Benchmark for the add\\_goal function with a single goal being added to an object.", 
+                       "We distinguish between adding a goal for each object that is exported by predped.",
+                       "We additionally distinguish between adding a goal at a random location on the object's",
+                       "circumference (middle\\_edge = FALSE) or at predefined locations (middle\\_edge = TRUE)."),
+    "change" = paste("Benchmark for the change function, changing a single goal for another one."),
+    "find_path" = paste("Benchmark for the find\\_path function.", 
+                        "A distinction is made between finding a path using only a few or many edges along which the",
+                        "agent can walk (many\\_nodes = FALSE or TRUE), whether the edges are precomputed or not",
+                        "(precomputed\\_edges is either NULL or not), and whether to reevaluate the validity of the",
+                        "provided edges (reevaluate = FALSE or TRUE).",
+                        "Note that if precomputed\\_edge is NULL, reevaluate is not used as an argument."),
+    "goal_stack" = paste("Benchmark for the goal\\_stack function, used to generate a list of 10 goals."),
+    "goal" = paste("Benchmark for the initialization function for goal using its default settings."),
+    "interact" = paste("Benchmark for the interact function, allowing the interaction for only a single goal."),
+    "mll" = paste("Benchmark for the mll function.",
+                  "The function evaluates the likelihood of datapoints of 10 different agents.",
+                  "We distinguish between providing parameters on the real or the bounded scale",
+                  "(transform = TRUE or FALSE) and between using the R or Rcpp version of this function", 
+                  "(cpp = FALSE or TRUE)."),
+    "agents_between_goal" = paste("Benchmark for the agents\\_between\\_goal function with 10 other agents in the room."), 
+    "compute_centers" = paste("Benchmark for the compute\\_centers function.", 
+                              "We distinguish between the R and Rcpp versions of this function (cpp = FALSE or TRUE)."), 
+    "moving_options" = paste("Benchmark for the moving\\_options function. ", 
+                             "The environment consisted of the default supermarket containing 10 other agents.",
+                             "We distinguish between the R and Rcpp versions of this function (cpp = FALSE or TRUE)."),
+    "overlap_with_objects" = paste("Benchmark for the overlap\\_with\\_objects function.", 
+                                   "Objects consisted of those in the default supermarket.",
+                                   "We distinguish between the R and Rcpp versions of this function (cpp = FALSE or TRUE)."),
+    "add_nodes" = paste("Benchmark for the add\\_nodes function.",
+                        "We distinguish between the different types of objects that nodes can be added to as well as",
+                        "between having either only nodes on the corners or on the complete circumference of the object",
+                        "(only\\_corners = TRUE or FALSE)."),
+    "enlarge" = paste("Benchmark for the enlarge function.",
+                      "We distinguish between the different types of objects that can be enlarged."),
+    "in_object" = paste("Benchmark for the in\\_object function.",
+                        "For the benchmark, we evaluate whether one or more of 100 points fall inside of an object.",
+                        "We distinguish between the different types of objects that are exported by predped as well as",
+                        "between whether we use the R or Rcpp version of this function (cpp = FALSE or TRUE)."),
+    "polygon" = paste("Benchmark for the initialization function of the polygon, providing it with four points."),
+    "rectangle" = paste("Benchmark for the initialization function of the rectangle, providing it with a center and a size."),
+    "circle" = paste("Benchmark for the initialization function of the circle, providing it with a center and a radius."),
+    "intersects" = paste("Benchmark for the intersects function.",
+                         "We distinguish between different combinations of objects that can intersect."),
+    "line_intersection" = paste("Benchmark for the line\\_intersection function.", 
+                                "We evaluate whether one or more of 100 segments intersects with the provided object.",
+                                "We distinguish between the different objects that are exported by predped."),
+    "nodes_on_circumference" = paste("Benchmark for the nodes\\_on\\_circumference function using the default space_between.",
+                                     "We distinguish between adding nodes on the circumference of the different",
+                                     "objects that are exported by predped as well as between whether we use the R or",
+                                     "Rcpp version of this function (cpp = FALSE or TRUE)."),
+    "out_object" = paste("Benchmark for the out\\_object function.",
+                         "For the benchmark, we evaluate whether one or more of 100 points fall outside of an object.",
+                         "We distinguish between the different types of objects that are exported by predped as well as",
+                         "between whether we use the R or Rcpp version of this function (cpp = FALSE or TRUE)."),
+    "rng_point" = paste("Benchmark for the rng\\_point function. ", 
+                        "We distinguish between the different types of objects that are exported by predped as well as",
+                        "between whether a point is generated at a random location on the object's circumference or at",
+                        "one of the prespecified locations (middle\\_edge = FALSE or TRUE)."),
+    "plot" = paste("Benchmark for the plot function.",
+                   "We distinguish between all different objects that can be plotted - using the default supermarket for",
+                   "plotting a background and the same supermarket with 70 agents for plotting a state - and between ",
+                   "whether we optimize the plotting or not (optimize = TRUE or FALSE)."),
+    "adjust_edges" = paste("Benchmark for the adjust\\_edges function.", 
+                           "We use the default supermarket with 10 agents for this benchmark.",
+                           "We distinguish between few or many edges that need adjusting as well as between",
+                           "whether these edges are reevaluated as a whole (reevaluate = TRUE or FALSE)."),
+    "combine_nodes" = paste("Benchmark for the combine\\_nodes function.", 
+                            "Input consisted of one or two matrices of 100 nodes, depending on whether we wanted to",
+                            "combine nodes within a single matrix or across two matrices (single or pair)."),
+    "compute_edges" = paste("Benchmark for the compute\\_edges function using the default supermarket environment.", 
+                            "We distinguish between computing few or many edges (many_nodes = FALSE or TRUE) and between", 
+                            "the presence of 10 segments that limit access in the environment."), 
+    "create_edges" = paste("Benchmark for the create\\_edges function using the default supermarket environment.", 
+                           "We distinguish between computing few or many edges (many_nodes = FALSE or TRUE) and between",
+                           "the presence of 10 segments that limit access in the environment."), 
+    "create_nodes" = paste("Benchmark for the create\\_nodes function using the default supermarket environment.", 
+                           "We distinguish between computing few or many nodes (many_nodes = FALSE or TRUE)."),
+    "evaluate_edges" = paste("Benchmark for the evaluate\\_edges function using the default supermarket environment.", 
+                             "We distinguish between computing few or many edges (many_nodes = FALSE or TRUE) and between",
+                             "the presence of 10 segments that limit access in the environment."),
+    "prune_edges" = paste("Benchmark for the prune\\_edges function using the objects in the default supermarket environment.",
+                          "We evaluated or pruned 100 segments provided in a matrix."),
+    "add_agent" = paste("Benchmark for the add\\_agent function.",
+                        "A BaselineEuropean was added in the default supermarket environment.",
+                        "We distinguish between goals being sorted according to distance to one another or being", 
+                        "scattered randomly across the environment (sort\\_goals = TRUE or FALSE) and between parameters", 
+                        "being drawn from a stochastic distribution or provided as is (individual\\_differences = TRUE", 
+                        "or FALSE)."),
+    "create_initial_condition" = paste("Benchmark for the create\\_initial\\_condition function.",
+                                       "The supermarket environment is filled with 10 agents with 10 goals each."),
+    "simulate" = paste("Benchmark for the simulate function.",
+                       "We run the simulation for 1 iteration, having 70 agents in the default supermarket",
+                       "environment.",
+                       "We distinguish between asking for precomputation of the edges (precompute_edges = TRUE or FALSE)",
+                       "and between these edges making use of few or many nodes (many_nodes = FALSE or TRUE)."),
+    "create_agent_specifications" = paste("Benchmark for the create\\_agent\\_specifications function.",
+                                          "Function computes the simulation-relevant specifications of 100 agents.",
+                                          "We distinguish between using the R and Rcpp version of this function", 
+                                          "(cpp = FALSE or TRUE)."),
+    "predict_movement" = paste("Benchmark for the predict\\_movement function.",
+                               "Movement is predicted for a single agent.",
+                               "We distinguish between using the R and Rcpp version of this function (cpp = FALSE or TRUE)."),
+    "compute_utility_variables" = paste("Benchmark for the compute\\_utility\\_variables function.", 
+                                        "Does so for a single agent in the default supermarket environment, which", 
+                                        "contains 70 agents in total.", 
+                                        "We distinguish between using the R and Rcpp version of this function", 
+                                        "(cpp = FALSE or TRUE)."),
+    "utility" = paste("Benchmark for the utility function.",
+                      "Does so for a single agent in the default supermarket environment, which contains 70 agents in total.",
+                      "We distinguish between using a dataset or a trace for the computation as well as between",
+                      "using the R or Rcpp verion of this function (cpp = FALSE or TRUE).")
 )
