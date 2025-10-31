@@ -1240,23 +1240,26 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' @rdname enlarge-method
 #' 
 #' @export
-setGeneric("enlarge", function(object, extension) standardGeneric("enlarge"))
+setGeneric("enlarge", function(object, extension, ...) standardGeneric("enlarge"))
 
 #' @rdname enlarge-method
 setMethod("enlarge", signature(object = "polygon"), function(object, 
-                                                             extension) {
+                                                             extension,
+                                                             cpp = TRUE) {
 
     # Find the nodes of the polygon and use these new nodes as the points of 
     # the enlarged polygon.
     object@points <- add_nodes(object, 
                                space_between = extension, 
-                               only_corners = TRUE)
+                               only_corners = TRUE,
+                               cpp = TRUE)
     return(object)
 })
 
 #' @rdname enlarge-method
 setMethod("enlarge", signature(object = "rectangle"), function(object, 
-                                                               extension) {
+                                                               extension, 
+                                                               ...) {
 
     # Extend the size of the rectangle with the factor sqrt{space_between^2 / 2}, 
     # as we do in the `add_nodes` function.
@@ -1267,7 +1270,8 @@ setMethod("enlarge", signature(object = "rectangle"), function(object,
 
 #' @rdname enlarge-method
 setMethod("enlarge", signature(object = "circle"), function(object, 
-                                                            extension) {
+                                                            extension,
+                                                            ...) {
 
     # Extend the radius with extension.
     radius(object) <- radius(object) + extension
@@ -1499,7 +1503,8 @@ setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 setMethod("add_nodes", signature(object = "polygon"), function(object, 
                                                                space_between = 0.5,
                                                                only_corners = FALSE,
-                                                               outside = TRUE) {
+                                                               outside = TRUE,
+                                                               cpp = TRUE) {
     
     # Create a local function that will take in two coordinates and will return
     # the location of the new coordinate
@@ -1560,7 +1565,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
                     \(x) find_location(edges[x,], edges[x + 1,]))
     nodes <- do.call("rbind", nodes)
 
-    idx <- in_object(object, nodes)
+    idx <- in_object(object, nodes, cpp = cpp)
     if(outside) {
         idx <- !idx
     }
@@ -1938,12 +1943,12 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' @rdname intersects-method
 #' 
 #' @export
-setGeneric("intersects", function(object, other_object) standardGeneric("intersects"))
+setGeneric("intersects", function(object, other_object, ...) standardGeneric("intersects"))
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "polygon", other_object = "polygon"), 
-          function(object, other_object) {
+          function(object, other_object, cpp = TRUE) {
               
     # Extract the points of the objects and create the edges to be 
     # evaluated
@@ -1951,27 +1956,27 @@ setMethod("intersects",
     edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
 
     # Use the line_line_intersection function
-    return(line_line_intersection(edges_1, edges_2))
+    return(line_line_intersection(edges_1, edges_2, cpp = cpp))
 })
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "polygon", other_object = "circle"), 
-          function(object, other_object) intersects(other_object, object))
+          function(object, other_object, ...) intersects(other_object, object, ...))
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "polygon", other_object = "segment"), 
-          function(object, other_object) intersects(other_object, object))
+          function(object, other_object, ...) intersects(other_object, object, ...))
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "circle", other_object = "polygon"), 
-          function(object, other_object) {
+          function(object, other_object, cpp = TRUE) {
 
     # Add nodes to the other object
-    other <- add_nodes(other_object, space_between = 1e-2)
-    return(any(in_object(object, other)))
+    other <- add_nodes(other_object, space_between = 1e-2, cpp = cpp)
+    return(any(in_object(object, other, cpp = cpp)))
 
     # Commented out because of mistakes: Does not adequately find the 
     # intersection between a line segment and a circle, leading agents to 
@@ -1991,7 +1996,7 @@ setMethod("intersects",
 #' @rdname intersects-method
 setMethod("intersects", 
           signature(object = "circle", other_object = "circle"), 
-          function(object, other_object) {
+          function(object, other_object, ...) {
 
     # This case is rather easy, as we just need to determine whether the 
     # distance between the centers of the circles is smaller or bigger than 
@@ -2010,12 +2015,12 @@ setMethod("intersects",
 #' @rdname intersects-method
 setMethod("intersects", 
           signature(object = "circle", other_object = "segment"), 
-          function(object, other_object) return(other_object, object))
+          function(object, other_object, ...) return(intersects(other_object, object, ...)))
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "segment", other_object = "polygon"), 
-          function(object, other_object) {
+          function(object, other_object, cpp = TRUE) {
 
     # Here, we will loop over all points that make up the edges of the polygon
     # or rectangle and check whether they intersect with the 
@@ -2023,7 +2028,8 @@ setMethod("intersects",
     edges <- cbind(other_object@points, 
                    other_object@points[c(2:nrow(points), 1),])
     return(line_line_intersection(matrix(c(object@from, object@to), nrow = 1),
-                                  edges))
+                                  edges, 
+                                  cpp = cpp))
 
     return(any(idx)) 
 })
@@ -2031,7 +2037,7 @@ setMethod("intersects",
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "segment", other_object = "circle"), 
-          function(object, other_object) {
+          function(object, other_object, cpp = TRUE) {
 
     # Originally, this made use of some very difficult calculations. However, 
     # when trying to maximize speed and simplicity, it might be more 
@@ -2043,17 +2049,17 @@ setMethod("intersects",
     steps <- matrix(seq(0, 1, by = by), ncol = 1) 
     coords <- rep(object@from, each = length(steps)) + steps %*% matrix(object@to - object@from, nrow = 1)
 
-    return(any(in_object(other_object, coords)))
+    return(any(in_object(other_object, coords, cpp = cpp)))
 })
 
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "segment", other_object = "segment"), 
-          function(object, other_object) m4ma::line.line.intersection(object@from, 
-                                                                      object@to, 
-                                                                      other_object@from,
-                                                                      other_object@to,
-                                                                      interior.only = TRUE))
+          function(object, other_object, ...) m4ma::line.line.intersection(object@from, 
+                                                                           object@to, 
+                                                                           other_object@from,
+                                                                           other_object@to,
+                                                                           interior.only = TRUE))
 
 
 
@@ -2109,14 +2115,18 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 #'@rdname line_intersection-method
 setMethod("line_intersection", signature(object = "polygon"), function(object, 
                                                                        segments, 
-                                                                       return_all = FALSE) {
+                                                                       return_all = FALSE,
+                                                                       cpp = TRUE) {
     
     # Extract the points of the objects and create the edges to be 
     # evaluated
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
 
     # Use the line_line_intersection function
-    intersections <- line_line_intersection(edges, segments, return_all = return_all)
+    intersections <- line_line_intersection(edges, 
+                                            segments, 
+                                            return_all = return_all, 
+                                            cpp = cpp)
 
     # If you want to return all of the segments, then we need to rework the 
     # vector to a matrix with the edges in its columns. Then we can take the 
@@ -2133,7 +2143,8 @@ setMethod("line_intersection", signature(object = "polygon"), function(object,
 #'@rdname line_intersection-method
 setMethod("line_intersection", signature(object = "circle"), function(object, 
                                                                       segments,
-                                                                      return_all = FALSE) {
+                                                                      return_all = FALSE,
+                                                                      cpp = TRUE) {
 
     if(is.data.frame(segments)) {
         segments <- as.matrix(segments)
@@ -2150,7 +2161,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
     # might also just fall completely within the circle, which is fine for our
     # purposes.
     coords <- rbind(segments[,1:2], segments[nrow(segments), 3:4])
-    idx <- in_object(object, coords)
+    idx <- in_object(object, coords, cpp = cpp)
     idy <- idx[1:(length(idx) - 1)] != idx[2:length(idx)] # Do the actual check: One point within, the other outside
     if(any(idy) & !return_all) {
         return(TRUE)
@@ -2237,9 +2248,10 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 #'@rdname line_intersection-method
 setMethod("line_intersection", 
           signature(object = "segment"), 
-          function(object, segments, return_all = FALSE) line_line_intersection(matrix(c(object@from, object@to), nrow = 1), 
-                                                                                segments, 
-                                                                                return_all = return_all))
+          function(object, segments, return_all = FALSE, cpp = TRUE) line_line_intersection(matrix(c(object@from, object@to), nrow = 1), 
+                                                                                            segments, 
+                                                                                            return_all = return_all,
+                                                                                            cpp = cpp))
 
 
 

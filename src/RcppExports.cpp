@@ -49,6 +49,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// line_line_intersection_rcpp
+LogicalVector line_line_intersection_rcpp(NumericMatrix segments_1, NumericMatrix segments_2);
+RcppExport SEXP _predped_line_line_intersection_rcpp(SEXP segments_1SEXP, SEXP segments_2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type segments_1(segments_1SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type segments_2(segments_2SEXP);
+    rcpp_result_gen = Rcpp::wrap(line_line_intersection_rcpp(segments_1, segments_2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mll_rcpp
 List mll_rcpp(List data, List parameters, CharacterVector ids, IntegerVector idx, IntegerVector cells, IntegerVector sizes, bool summed);
 RcppExport SEXP _predped_mll_rcpp(SEXP dataSEXP, SEXP parametersSEXP, SEXP idsSEXP, SEXP idxSEXP, SEXP cellsSEXP, SEXP sizesSEXP, SEXP summedSEXP) {
@@ -431,6 +443,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 2},
     {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 5},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
+    {"_predped_line_line_intersection_rcpp", (DL_FUNC) &_predped_line_line_intersection_rcpp, 2},
     {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 7},
     {"_predped_psUtility", (DL_FUNC) &_predped_psUtility, 6},
     {"_predped_gaUtility", (DL_FUNC) &_predped_gaUtility, 3},

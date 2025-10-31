@@ -179,13 +179,32 @@ perpendicular_orientation <- function(object, co) {
 #' @param return_all Logical denoting whether it should return the intersection 
 #' of all segments to each other. If true, will include indicators of which segments
 #' were compared. Defaults to `FALSE`.
+#' @param cpp Logical denoting whether to use the R (\code{cpp = FALSE}) or 
+#' Rcpp version (\code{cpp = TRUE}) of this function. Defaults to \code{TRUE}
 #'
 #' @return Returns a logical denoting whether any of the segments in 
 #' 
 #' @export
 line_line_intersection <- function(segments_1, 
                                    segments_2,
-                                   return_all = FALSE) {
+                                   return_all = FALSE,
+                                   cpp = TRUE) {
+
+    if(cpp) {
+        # Check whether the input arguments are of the correct type
+        segments_1 <- as.matrix(segments_1)
+        segments_2 <- as.matrix(segments_2)
+
+        # Pass down to Rcpp version
+        result <- line_line_intersection_rcpp(segments_1, segments_2)
+
+        # Check what to provide as output
+        if(return_all) {
+            return(result)
+        } else {
+            return(any(result))
+        }
+    }
 
     # Check which of the two sequences is shortest. Whichever is shortest will 
     # go into the loop, the other will serve as the vectorized set of segments

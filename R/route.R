@@ -85,14 +85,16 @@ create_edges <- function(from,
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_nodes = FALSE) {
+                         many_nodes = FALSE,
+                         cpp = TRUE) {
 
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
                           to, 
                           background, 
                           space_between = space_between,
-                          many_nodes = many_nodes)
+                          many_nodes = many_nodes,
+                          cpp = cpp)
 
     # If there are no nodes, then we will have to return NULL
     if(is.null(nodes)) {
@@ -106,7 +108,7 @@ create_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background 
     # and return the required list of edges and nodes
-    return(append(evaluate_edges(segments, background, space_between - 1e-4), 
+    return(append(evaluate_edges(segments, background, space_between - 1e-4, cpp = cpp), 
                   list(nodes = nodes)))
 }
 
@@ -189,7 +191,8 @@ adjust_edges <- function(from,
                          precomputed_edges,                  
                          space_between = 0.5,
                          new_objects = NULL, 
-                         reevaluate = !is.null(new_objects)) {
+                         reevaluate = !is.null(new_objects),
+                         cpp = TRUE) {
 
     nodes <- precomputed_edges$nodes
     edges_with_coords <- precomputed_edges$edges_with_coords
@@ -216,7 +219,8 @@ adjust_edges <- function(from,
         obj_nodes <- lapply(new_objects, 
                             \(x) add_nodes(x, 
                                            space_between = space_between, 
-                                           only_corners = TRUE))
+                                           only_corners = TRUE,
+                                           cpp = cpp))
         obj_nodes <- do.call("rbind", obj_nodes)
 
         # Delete these nodes if they are already the same as those in `nodes`
@@ -296,7 +300,7 @@ adjust_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background
     objects(background) <- obj
-    edges <- evaluate_edges(segments, background, space_between - 1e-4)
+    edges <- evaluate_edges(segments, background, space_between - 1e-4, cpp = cpp)
 
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
@@ -372,7 +376,8 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_nodes = FALSE) {
+                         many_nodes = FALSE,
+                         cpp = TRUE) {
                             
     # Create a matrix of coordinates that fill up the complete space. This will 
     # allow agents to take whatever route to their destination 
@@ -401,11 +406,13 @@ create_nodes <- function(from,
     obj_nodes <- lapply(obj, 
                         \(x) add_nodes(x, 
                                        space_between = space_between,
-                                       only_corners = TRUE))
+                                       only_corners = TRUE,
+                                       cpp = cpp))
     shp_nodes <- add_nodes(shp, 
                            space_between = space_between, 
                            only_corners = TRUE,
-                           outside = FALSE)
+                           outside = FALSE,
+                           cpp = cpp)
 
     if(many_nodes) {
         nodes <- rbind(nodes,
@@ -424,11 +431,11 @@ create_nodes <- function(from,
     extension <- space_between - 1e-4
 
     if(length(obj) == 0) {
-        to_delete <- out_object(shp, nodes)
+        to_delete <- out_object(shp, nodes, cpp = cpp)
     } else {
         to_delete <- lapply(obj, 
-                        \(x) in_object(enlarge(x, extension), nodes))
-        to_delete <- Reduce("|", to_delete) | out_object(shp, nodes)
+                        \(x) in_object(enlarge(x, extension, cpp = cpp), nodes, cpp = cpp))
+        to_delete <- Reduce("|", to_delete) | out_object(shp, nodes, cpp = cpp)
     }   
 
     nodes <- nodes[!to_delete,] |> 
@@ -521,7 +528,8 @@ create_nodes <- function(from,
 #' @export
 evaluate_edges <- function(segments, 
                            background,
-                           space_between) {
+                           space_between,
+                           cpp = TRUE) {
 
     obj <- lapply(objects(background),
                   \(x) enlarge(x, space_between))
@@ -537,9 +545,9 @@ evaluate_edges <- function(segments,
         idx <- rep(TRUE, nrow(segments))
     } else {
         idx <- prune_edges(
-            obj, 
+            objects(background), 
             segments[, c("from_x", "from_y", "to_x", "to_y")],
-            coord_specific = objects(background)
+            cpp = cpp
         )
     }
 
@@ -559,7 +567,10 @@ evaluate_edges <- function(segments,
         # Loop over the limited access and look at the interactions between 
         # these and the edges 
         intersections <- sapply(background@precomputed_limited_access, 
-                                \(x) line_intersection(x, segments[, c("from_x", "from_y", "to_x", "to_y")], return_all = TRUE))
+                                \(x) line_intersection(x, 
+                                                       segments[, c("from_x", "from_y", "to_x", "to_y")], 
+                                                       return_all = TRUE,
+                                                       cpp = cpp))
 
         # First check whether the intersections matter, which amounts to having 
         # a TRUE in both idy and in intersections. Then, we can check whether 
@@ -638,7 +649,7 @@ evaluate_edges <- function(segments,
 #
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
-prune_edges <- function(objects, segments, coord_specific = NULL) {
+prune_edges <- function(objects, segments, cpp = TRUE) {
     # If there are no objects, then there can be no intersections
     if(length(objects) == 0) {
         return(rep(TRUE, nrow(segments)))
@@ -649,47 +660,16 @@ prune_edges <- function(objects, segments, coord_specific = NULL) {
         return(logical(0))
     }
 
-    # Loop over the objects in the environment and check their intersections 
-    # with the lines in `segments`
-    #
-    # Also check whether the coordinates themselves fall within the objects. If 
-    # so, then we make an exception: None of the nodes that make up the edges 
-    # should themselves be contained within the enlarged object except when these
-    # represent goals and agents. For these cases, we make exceptions whenever 
-    # there is an intersection.
-    #
-    # In practice comes down to also checking whether the coordinates lie outside
-    # of the objects that you intersect them with (in `all_intersections`) and
-    # later checking only for these exceptions with an alternative set of 
-    # objects (in `coord_intersection`)
-    if(is.null(coord_specific)) {
-        all_intersections <- lapply(objects, 
-                                    \(x) line_intersection(x, segments, return_all = TRUE))
-
-        test_1 <- Reduce("|", all_intersections)
-        test_2 <- logical(nrow(segments))
-    } else {
-        all_intersections <- lapply(objects, 
-                                    \(x) line_intersection(x, segments, return_all = TRUE) &
-                                         (out_object(x, segments[, 1:2]) & 
-                                          out_object(x, segments[, 3:4])))
-        test_1 <- Reduce("|", all_intersections)
-
-        if(length(coord_specific) != length(objects)) {
-            test_2 <- logical(nrow(segments))
-        } else { 
-            coord_intersection <- lapply(seq_along(coord_specific), 
-                                         \(i) line_intersection(coord_specific[[i]], segments, return_all = TRUE) &
-                                              (in_object(objects[[i]], segments[, 1:2]) | 
-                                               in_object(objects[[i]], segments[, 3:4])))
-            test_2 <- Reduce("|", coord_intersection)
-        }
-    }
+    # Loop over the objects in the environment and check their intersections
+    # with the segments in `segments`. 
+    test <- lapply(objects, 
+                   \(x) line_intersection(x, segments, return_all = TRUE, cpp = cpp))
+    test <- Reduce("|", test)
 
     # I want to only retain those that do not intersect, meaning that the complete
     # row should be FALSE. We therefore check whether any of the sides is TRUE and 
     # then reverse the operation, so that none of them can be
-    return(!(test_1 | test_2))
+    return(!test)
 }
 
 #' Make combinations of different nodes
@@ -872,14 +852,16 @@ combine_nodes <- function(nodes_1,
 #' @export 
 compute_edges <- function(background, 
                           space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius",]),
-                          many_nodes = TRUE) {
+                          many_nodes = TRUE,
+                          cpp = TRUE) {
                             
     # Create the edges themselves with mock-positions of agent and goal
     edges <- create_edges(c(0, 0), 
                           c(0, 0), 
                           background,
                           space_between = space_between,
-                          many_nodes = many_nodes)
+                          many_nodes = many_nodes,
+                          cpp = cpp)
 
     # Delete agent and goal positions from these edges, as these should be 
     # dynamic. 

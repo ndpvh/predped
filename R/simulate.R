@@ -247,7 +247,8 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          fx = \(x) x,                                          
+                                          fx = \(x) x,         
+                                          cpp = TRUE,                                 
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -277,7 +278,8 @@ setMethod("simulate", "predped", function(object,
         cat("\nPrecomputing edges")
         edges <- compute_edges(object@setting,
                                space_between = space_between * max(params_from_csv[["params_bounds"]]["radius",]),
-                               many_nodes = many_nodes)
+                               many_nodes = many_nodes,
+                               cpp = cpp)
     } else {
         edges <- NULL
     }
@@ -298,7 +300,8 @@ setMethod("simulate", "predped", function(object,
                                                    sort_goals = sort_goals,
                                                    precomputed_goals = precomputed_goals,
                                                    individual_differences = individual_differences,
-                                                   group_size = group_size)
+                                                   group_size = group_size,
+                                                   cpp = cpp)
 
         # First index deleted here so that agents don't immediately get added
         # to the environment when the initial condition is to be generated
@@ -349,7 +352,7 @@ setMethod("simulate", "predped", function(object,
     for(i in seq_len(iterations)) {
         altered_state <- fx(trace[[i]])
         trace[[i + 1]] <- simulate(altered_state,
-                                   object,
+                                   model = object,
                                    add_agent = (i %in% iteration_variables(altered_state)$add_agent_index) &
                                                (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
                                    group_size = group_size,
@@ -363,6 +366,7 @@ setMethod("simulate", "predped", function(object,
                                    precompute_goal_paths = precompute_goal_paths,
                                    middle_edge = middle_edge,
                                    individual_differences = individual_differences,
+                                   cpp = cpp,
                                    ...)
     }
 
@@ -801,6 +805,9 @@ add_group <- function(model,
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
+#' @param return_characteristics Logical denoting whether to return the 
+#' characteristics of the generated agents in a list (\code{TRUE}) or as part 
+#' of an agent (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.
 #'
@@ -847,7 +854,8 @@ add_agent <- function(model,
                       space_between = 1.25,
                       position = NULL,
                       standing_start = 0.1,
-                      individual_differences = FALSE) {
+                      individual_differences = FALSE,
+                      return_characteristics = FALSE) {
 
     # Extract the background from the `predped` model and determine where the
     # agent will enter the space
@@ -934,6 +942,23 @@ add_agent <- function(model,
         co_2 <- goal_stack[[1]]@position
 
         angle <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+    }
+
+    # If the person wants only the characteristics of the agent, then provide 
+    # them. Note that we put status as "plan" so that agents can find their 
+    # path
+    if(return_characteristics) {
+        return(list(id = paste(sample(letters, 5, replace = TRUE), collapse = ""),
+                    position = position, 
+                    radius = radius, 
+                    speed = standing_start * params[["preferred_speed"]],
+                    orientation = angle,
+                    parameters = params, 
+                    goals = goal_stack[-1],
+                    current_goal = goal_stack[[1]],
+                    color = color,
+                    status = "plan",
+                    group = group_number))
     }
 
     # Create the agent itself
@@ -1027,6 +1052,8 @@ create_initial_condition <- function(agent_number,
                                      goal_number = \(n) rnorm(n, 10, 2),
                                      group_size = matrix(1, nrow = 1, ncol = 2),
                                      space_between = 1.25,
+                                     precomputed_edges = NULL,
+                                     cpp = TRUE,
                                      ...) {
 
     # Copy the setting
@@ -1059,142 +1086,110 @@ create_initial_condition <- function(agent_number,
     }
     group_indices <- cumsum(groups)
 
+    # Extract the edges from the background. Will help in determining the locations
+    # at which the agents can be gathered. Importantly, dense network created so
+    # that there are many potential positions for the agents, even when there
+    # are not many objects in the environment
+    max_size <- max(params_from_csv[["params_bounds"]]["radius", ])
+
+    if(is.null(precomputed_edges)) {
+        precomputed_edges <- compute_edges(setting,
+                                           space_between = space_between * max_size,
+                                           many_nodes = TRUE,
+                                           cpp = cpp)
+    }
+    coords <- precomputed_edges$edges_with_coords
+
+    # Create different coordinates on which agents can be found along each of 
+    # the edges
+    n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / max_size
+    n_agents_fit <- floor(n_agents_fit)
+
+    if(any(is.na(n_agents_fit))) {
+        browser()
+    }
+
+    alternatives <- lapply(seq_along(n_agents_fit), 
+                           \(i) cbind(seq(coords$from_x[i], 
+                                          coords$to_x[i], 
+                                          length.out = n_agents_fit[i]),
+                                      seq(coords$from_y[i], 
+                                          coords$to_y[i], 
+                                          length.out = n_agents_fit[i])))
+    alternatives <- do.call("rbind", alternatives)
+
+
+    # Create a dummy agent. This will allow for faster generation of the initial
+    # condition, as changing an agent's characteristics is faster than the 
+    # generation of one
+    dummy <- agent(center = c(0, 0), radius = 0.25)
+    dummy_big <- dummy
+    radius(dummy_big) <- 2 * max_size
+
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents,
     # namely their location and their orientation, as `add_agent` assumes that
     # agents start at the entrance walking into the setting.
     group_number <- 1
-    agents <- list() ; stop <- FALSE
+    agents <- list()
     for(i in seq_len(agent_number)) {
+        # Sample a random position on which the agent will stand and adjust the
+        # dummy
+        idx <- sample(1:nrow(alternatives), 1)
+
         # Initial agent to create
         new_agent <- add_agent(model,
                                goal_number = goal_number[i],
+                               precomputed_edges = precomputed_edges,
+                               position = alternatives[idx, ],
+                               return_characteristics = TRUE,
                                ...)
-        group(new_agent) <- group_number
+
+        # Adjust the dummy's characteristics based on the random ones produced 
+        # here. Also add a group number
+        id(dummy) <- new_agent$id
+        position(dummy) <- new_agent$position
+        radius(dummy) <- new_agent$radius
+        orientation(dummy) <- new_agent$orientation
+        speed(dummy) <- new_agent$speed
+        orientation(dummy) <- new_agent$orientation
+        parameters(dummy) <- new_agent$parameters
+        color(dummy) <- new_agent$color
+        status(dummy) <- new_agent$status
+        group(dummy) <- group_number
 
         # Update the group number for the future if `i` is in the indices that
-        # indicate a change in group membership
+        # indicate a change in group membership. If the agent belongs to a 
+        # particular group, then they will receive the goals of the agent before
+        # them, otherwise they will receive their own set of goals
         if(i %in% group_indices) {
             group_number <- group_number + 1
+
+            goals(dummy) <- new_agent$goals
+            current_goal(dummy) <- new_agent$current_goal
+        } else {
+            goals(dummy) <- goals(agents[[i - 1]])
+            current_goal(dummy) <- current_goal(agents[[i - 1]])
         }
 
-        # Extract the edges from the background. Will help in determining the locations
-        # at which the agents can be gathered. Importantly, dense network created so
-        # that there are many potential positions for the agents, even when there
-        # are not many objects in the environment
-        edges <- compute_edges(setting,
-                               space_between = space_between * size(new_agent),
-                               many_nodes = TRUE)
+        # Put the agent in the `agents` list
+        agents[[i]] <- dummy
 
-        # Additional check to see if there are enough edges to place agents on
-        if(is.null(edges$edges)) {
-            stop <- TRUE
-        } else if(nrow(edges$edges) == 0) {
-            stop <- TRUE
-        }
+        # Update the alternatives: Make sure that agents can stand at a provided
+        # location provided that we need double their radius (no overlap with
+        # other agents)
+        position(dummy_big) <- position(dummy)
 
-        if(stop) {
+        idx <- out_object(dummy_big, alternatives)
+        alternatives <- alternatives[idx, ]
+
+        # Check whether we can still add some agents to the list based on the 
+        # positions that are left.
+        if(nrow(alternatives) == 0) {
             message(paste0("Couldn't add any new agents after ",
                            length(agents),
                            " due to crowdiness."))
             break
-        }
-
-        # Choose a random edge on which the agent will stand and create the
-        # exact position.
-        success <- FALSE ; iter <- 0
-        position <- NULL
-        while(!success) {
-            # Check whether you overflow the number of iterations. If so, then
-            # we stop in our tracks, break out of the loop, and give a message
-            # on this
-            if(iter > 10) {
-                message(paste0("Couldn't add new agent after 10 attempts. ",
-                               "Instead of creating an initial condition with ",
-                               agent_number,
-                               " agents, only ",
-                               length(agents),
-                               " agents will be used in the initial condition."))
-                stop <- TRUE
-                break
-            }
-
-            # Sample a random edge on which the agent will stand
-            idx <- sample(1:nrow(edges$edges_with_coords), 1)
-
-            # Get the coordinates of the two points that make up this edge
-            coords <- edges$edges_with_coords[idx,]
-
-            # Generate several alternative positions along this edge on which the
-            # agent can stand and bind them into a matrix
-            n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / size(new_agent)
-
-            if(any(is.na(n_agents_fit))) {
-                browser()
-            }
-
-            alternatives <- cbind(seq(coords$from_x, coords$to_x, length.out = floor(n_agents_fit)),
-                                  seq(coords$from_y, coords$to_y, length.out = floor(n_agents_fit)))
-
-            # Check which position are accessible for the agent
-            dummy <- agent(center = c(0, 0), radius = size(new_agent))
-
-            check <- rep(TRUE, each = nrow(alternatives))
-            check <- overlap_with_objects(dummy,
-                                          setting,
-                                          alternatives,
-                                          check)
-
-            if(any(check)) {
-                idx <- which(check)
-                idx <- sample(idx, 1)
-
-                new_position <- alternatives[idx,]
-
-                success <- TRUE
-            }
-
-            # Increase the iteration number
-            iter <- iter + 1
-        }
-        position(new_agent) <- new_position
-
-        # Let the agent face the way of its goal
-        co_1 <- position(new_agent)
-        if(nrow(current_goal(new_agent)@path) == 0) {
-            co_2 <- current_goal(new_agent)@position
-        } else {
-            co_2 <- current_goal(new_agent)@path[1,]
-        }
-
-        orientation(new_agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
-
-        # If you need to stop, break out of the loop
-        if(stop) {
-            break
-        }
-
-        # Put the agent in the `agents` list and continue
-        agents[[i]] <- new_agent
-        setting@objects <- append(setting@objects, new_agent)
-    }
-
-    # Loop over those individuals who belong to the same group and give them
-    # the same set of goals
-    group_id <- sapply(agents, group)
-    for(i in unique(group_id)) {
-        idx <- group_id == i
-
-        if(sum(idx) == 1) {
-            next
-        } else {
-            grouped_agents <- agents[idx]
-            for(j in 2:length(grouped_agents)) {
-                current_goal(grouped_agents[[j]]) <- current_goal(grouped_agents[[1]])
-                goals(grouped_agents[[j]]) <- goals(grouped_agents[[1]])
-            }
-
-            agents[idx] <- grouped_agents
         }
     }
 
