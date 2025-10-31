@@ -247,7 +247,8 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          fx = \(x) x,                                          
+                                          fx = \(x) x,         
+                                          cpp = TRUE,                                 
                                           ...) {
 
     # Simulate the iterations after which agents should be added to the simulation
@@ -277,7 +278,8 @@ setMethod("simulate", "predped", function(object,
         cat("\nPrecomputing edges")
         edges <- compute_edges(object@setting,
                                space_between = space_between * max(params_from_csv[["params_bounds"]]["radius",]),
-                               many_nodes = many_nodes)
+                               many_nodes = many_nodes,
+                               cpp = cpp)
     } else {
         edges <- NULL
     }
@@ -298,7 +300,8 @@ setMethod("simulate", "predped", function(object,
                                                    sort_goals = sort_goals,
                                                    precomputed_goals = precomputed_goals,
                                                    individual_differences = individual_differences,
-                                                   group_size = group_size)
+                                                   group_size = group_size,
+                                                   cpp = cpp)
 
         # First index deleted here so that agents don't immediately get added
         # to the environment when the initial condition is to be generated
@@ -363,6 +366,7 @@ setMethod("simulate", "predped", function(object,
                                    precompute_goal_paths = precompute_goal_paths,
                                    middle_edge = middle_edge,
                                    individual_differences = individual_differences,
+                                   cpp = cpp,
                                    ...)
     }
 
@@ -1049,6 +1053,7 @@ create_initial_condition <- function(agent_number,
                                      group_size = matrix(1, nrow = 1, ncol = 2),
                                      space_between = 1.25,
                                      precomputed_edges = NULL,
+                                     cpp = TRUE,
                                      ...) {
 
     # Copy the setting
@@ -1090,7 +1095,8 @@ create_initial_condition <- function(agent_number,
     if(is.null(precomputed_edges)) {
         precomputed_edges <- compute_edges(setting,
                                            space_between = space_between * max_size,
-                                           many_nodes = TRUE)
+                                           many_nodes = TRUE,
+                                           cpp = cpp)
     }
     coords <- precomputed_edges$edges_with_coords
 
