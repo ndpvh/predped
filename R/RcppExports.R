@@ -65,6 +65,25 @@ unique <- function(x) {
     .Call('_predped_unique', PACKAGE = 'predped', x)
 }
 
+#' Rcpp version of line_line_intersection. Computes the  between several segments. Is a vectorized 
+#' function with minimal loss of time when the number of segments to test 
+#' increases.
+#'
+#' @param segments_1 Matrix with four columns denoting the x- and y-coordinates
+#' that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
+#' @param segments_2 Matrix of line segments that `segments_1` should be tested
+#' with. Should have the same structure as `segments_1`
+#' @param return_all Logical denoting whether it should return the intersection 
+#' of all segments to each other. If true, will include indicators of which segments
+#' were compared. Defaults to `FALSE`.
+#'
+#' @return Returns a logical denoting whether any of the segments in 
+#' 
+#' @export
+line_line_intersection_rcpp <- function(segments_1, segments_2) {
+    .Call('_predped_line_line_intersection_rcpp', PACKAGE = 'predped', segments_1, segments_2)
+}
+
 #' Compute the min-log-likelihood
 #' 
 #' Rcpp alternative to \code{\link[predped]{mll}}. Be wary: This version does 

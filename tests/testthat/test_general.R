@@ -175,6 +175,36 @@ testthat::test_that("Vectorized line-line intersections are interchangeable", {
     testthat::expect_equal(tst_2, ref_2)
 })
 
+testthat::test_that("R and Rcpp version of line-line intersection converge", {
+    tst1 <- rbind(c(1, 1, 4, 4), 
+                  c(3, -2, 6, -2),
+                  c(-3, -1, -3, -5))
+    tst2 <- rbind(c(1, 2, 5, 2),
+                  c(8, 3, 8, 6),
+                  c(3, -2, 3, -5))
+    tst3 <- rbind(c(-3, 2, 1, 5),
+                  c(-4, -1, -4, -4),
+                  c(7, -1, 10, -1))
+    tst4 <- rbind(c(-3, -5, -3, -8),
+                  c(6, -2, 9, -2),
+                  c(4, 4, 7, 7))
+
+    # R version
+    r1 <- predped::line_line_intersection(tst1, tst2, return_all = TRUE, cpp = FALSE)
+    r2 <- predped::line_line_intersection(tst1, tst3, return_all = TRUE, cpp = FALSE)
+    r3 <- predped::line_line_intersection(tst1, tst4, return_all = TRUE, cpp = FALSE)
+
+    # Rcpp version
+    c1 <- predped::line_line_intersection(tst1, tst2, return_all = TRUE, cpp = TRUE)
+    c2 <- predped::line_line_intersection(tst1, tst3, return_all = TRUE, cpp = TRUE)
+    c3 <- predped::line_line_intersection(tst1, tst4, return_all = TRUE, cpp = TRUE)
+
+    # Do the test
+    testthat::expect_equal(r1, c1)
+    testthat::expect_equal(r2, c2)
+    testthat::expect_equal(r3, c3)
+})
+
 testthat::test_that("Perpendicular orientation making works", {
     settings <- list(predped::background(shape = predped::rectangle(center = c(0, 0),
                                                                     size = c(10, 10)), 

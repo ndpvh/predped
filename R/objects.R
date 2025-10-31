@@ -1948,7 +1948,7 @@ setGeneric("intersects", function(object, other_object, ...) standardGeneric("in
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "polygon", other_object = "polygon"), 
-          function(object, other_object, ...) {
+          function(object, other_object, cpp = TRUE) {
               
     # Extract the points of the objects and create the edges to be 
     # evaluated
@@ -1956,7 +1956,7 @@ setMethod("intersects",
     edges_2 <- cbind(other_object@points, other_object@points[c(2:nrow(other_object@points), 1), ])
 
     # Use the line_line_intersection function
-    return(line_line_intersection(edges_1, edges_2))
+    return(line_line_intersection(edges_1, edges_2, cpp = cpp))
 })
 
 #'@rdname intersects-method
@@ -2020,7 +2020,7 @@ setMethod("intersects",
 #'@rdname intersects-method
 setMethod("intersects", 
           signature(object = "segment", other_object = "polygon"), 
-          function(object, other_object, ...) {
+          function(object, other_object, cpp = TRUE) {
 
     # Here, we will loop over all points that make up the edges of the polygon
     # or rectangle and check whether they intersect with the 
@@ -2028,7 +2028,8 @@ setMethod("intersects",
     edges <- cbind(other_object@points, 
                    other_object@points[c(2:nrow(points), 1),])
     return(line_line_intersection(matrix(c(object@from, object@to), nrow = 1),
-                                  edges))
+                                  edges, 
+                                  cpp = cpp))
 
     return(any(idx)) 
 })
@@ -2115,14 +2116,17 @@ setGeneric("line_intersection", function(object, segments, ...) standardGeneric(
 setMethod("line_intersection", signature(object = "polygon"), function(object, 
                                                                        segments, 
                                                                        return_all = FALSE,
-                                                                       ...) {
+                                                                       cpp = TRUE) {
     
     # Extract the points of the objects and create the edges to be 
     # evaluated
     edges <- cbind(object@points, object@points[c(2:nrow(object@points), 1), ])
 
     # Use the line_line_intersection function
-    intersections <- line_line_intersection(edges, segments, return_all = return_all)
+    intersections <- line_line_intersection(edges, 
+                                            segments, 
+                                            return_all = return_all, 
+                                            cpp = cpp)
 
     # If you want to return all of the segments, then we need to rework the 
     # vector to a matrix with the edges in its columns. Then we can take the 
@@ -2244,9 +2248,10 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
 #'@rdname line_intersection-method
 setMethod("line_intersection", 
           signature(object = "segment"), 
-          function(object, segments, return_all = FALSE, ...) line_line_intersection(matrix(c(object@from, object@to), nrow = 1), 
-                                                                                     segments, 
-                                                                                     return_all = return_all))
+          function(object, segments, return_all = FALSE, cpp = TRUE) line_line_intersection(matrix(c(object@from, object@to), nrow = 1), 
+                                                                                            segments, 
+                                                                                            return_all = return_all,
+                                                                                            cpp = cpp))
 
 
 
