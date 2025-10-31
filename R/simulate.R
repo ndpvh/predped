@@ -1084,7 +1084,7 @@ create_initial_condition <- function(agent_number,
                          replace = TRUE,
                          prob = group_size[,2])
     }
-    group_indices <- cumsum(groups)
+    group_indices <- 1 + cumsum(groups) # +1 done here to ensure that the group index is only changed after x agents
 
     # Extract the edges from the background. Will help in determining the locations
     # at which the agents can be gathered. Importantly, dense network created so
@@ -1130,7 +1130,7 @@ create_initial_condition <- function(agent_number,
     # that we have to change some of the characteristics of these agents,
     # namely their location and their orientation, as `add_agent` assumes that
     # agents start at the entrance walking into the setting.
-    group_number <- 1
+    group_number <- 0
     agents <- list()
     for(i in seq_len(agent_number)) {
         # Sample a random position on which the agent will stand and adjust the
@@ -1156,13 +1156,12 @@ create_initial_condition <- function(agent_number,
         parameters(dummy) <- new_agent$parameters
         color(dummy) <- new_agent$color
         status(dummy) <- new_agent$status
-        group(dummy) <- group_number
 
         # Update the group number for the future if `i` is in the indices that
         # indicate a change in group membership. If the agent belongs to a 
         # particular group, then they will receive the goals of the agent before
         # them, otherwise they will receive their own set of goals
-        if(i %in% group_indices) {
+        if(i %in% group_indices | i == 1) {
             group_number <- group_number + 1
 
             goals(dummy) <- new_agent$goals
@@ -1171,6 +1170,7 @@ create_initial_condition <- function(agent_number,
             goals(dummy) <- goals(agents[[i - 1]])
             current_goal(dummy) <- current_goal(agents[[i - 1]])
         }
+        group(dummy) <- group_number
 
         # Put the agent in the `agents` list
         agents[[i]] <- dummy
