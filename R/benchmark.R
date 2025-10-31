@@ -327,6 +327,10 @@ knitr_table <- function(x,
                               \(y) grepl(y, names(x), fixed = TRUE))
                 idx <- which(sapply(1:nrow(idx), \(k) all(idx[k, ])))
 
+                if(length(idx) > 1) {
+                    browser()
+                }
+
                 # Add that info to the table
                 tbl[i, j + length(levels) - 1] <- paste0(rnd(mean(x[[idx]])), 
                                                          " [",
@@ -373,6 +377,14 @@ knitr_table <- function(x,
 supermarket <- readRDS(file.path("tests", "testthat", "data", "supermarket.Rds"))
 few_edges <- readRDS(file.path("tests", "testthat", "data", "few_edges_bench.Rds"))
 many_edges <- readRDS(file.path("tests", "testthat", "data", "many_edges_bench.Rds"))
+
+# Introduce unevaluated edges as well: More representative of what's going on 
+# down below
+few_uneval_edges <- create_nodes(c(0, 13), c(0.3, 0.5), supermarket, many_nodes = FALSE)
+few_uneval_edges <- combine_nodes(few_uneval_edges)
+
+many_uneval_edges <- create_nodes(c(0, 13), c(0.3, 0.5), supermarket, many_nodes = TRUE)
+many_uneval_edges <- combine_nodes(many_uneval_edges)
 
 # Do the same for a dataset and parameters that will serve as input to some 
 # benchmarks
@@ -665,8 +677,8 @@ benchmark_args <- list(
         c(0, 13)
     ),
     "evaluate_edges" = list(
-        subset(few_edges$edges_with_coords, select = -cost),
-        subset(many_edges$edges_with_coords, select = -cost),
+        few_uneval_edges, 
+        many_uneval_edges,
         background(
             shape = shape(supermarket),
             objects = objects(supermarket),
@@ -990,26 +1002,10 @@ benchmark_test <- list(
             )
         },
         "not precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = NULL,
-                    many_nodes = FALSE
-                )
-            )
+            return(NA)
         },
         "not precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = NULL,
-                    many_nodes = TRUE
-                )
-            )
+            return(NA)
         }
     ),
     "goal_stack" = list(
@@ -1798,7 +1794,7 @@ benchmark_test <- list(
         }
     ),
     "compute_edges" = list(
-        "no limited access | many_nodes = FALSE" = function() {
+        "unlimited | many_nodes = FALSE" = function() {
             return(
                 compute_edges(
                     supermarket, 
@@ -1814,7 +1810,7 @@ benchmark_test <- list(
                 )
             )
         },
-        "no limited access | many_nodes = TRUE" = function() {
+        "unlimited | many_nodes = TRUE" = function() {
             return(
                 compute_edges(
                     supermarket, 
@@ -1832,7 +1828,7 @@ benchmark_test <- list(
         }
     ),
     "create_edges" = list(
-        "no limited access | many_nodes = FALSE" = function() {
+        "unlimited | many_nodes = FALSE" = function() {
             return(
                 create_edges(
                     benchmark_args[["create_edges"]][[1]],
@@ -1852,7 +1848,7 @@ benchmark_test <- list(
                 )
             )
         },
-        "no limited access | many_nodes = TRUE" = function() {
+        "unlimited | many_nodes = TRUE" = function() {
             return(
                 create_edges(
                     benchmark_args[["create_edges"]][[1]],
@@ -1876,9 +1872,9 @@ benchmark_test <- list(
     "create_nodes" = list(
         "many_nodes = FALSE" = function() {
             return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
+                create_nodes(
+                    benchmark_args[["create_nodes"]][[1]],
+                    benchmark_args[["create_nodes"]][[2]],
                     supermarket, 
                     many_nodes = FALSE
                 )
@@ -1886,9 +1882,9 @@ benchmark_test <- list(
         },
         "many_nodes = TRUE" = function() {
             return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
+                create_nodes(
+                    benchmark_args[["create_nodes"]][[1]],
+                    benchmark_args[["create_nodes"]][[2]],
                     supermarket, 
                     many_nodes = TRUE
                 )
@@ -1896,7 +1892,7 @@ benchmark_test <- list(
         }
     ),
     "evaluate_edges" = list(
-        "no limited access | few nodes" = function() {
+        "unlimited | few nodes" = function() {
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[1]],
@@ -1914,7 +1910,7 @@ benchmark_test <- list(
                 )
             )
         },
-        "no limited access | many nodes" = function() {
+        "unlimited | many nodes" = function() {
             return(
                 evaluate_edges(
                     benchmark_args[["evaluate_edges"]][[2]],
