@@ -164,7 +164,7 @@ setMethod("show", "predped", function(object) {
     cat("Model object:\n")
     cat("ID:", object@id, "\n")
     cat("Parameters: \n")
-    cat(write.table(object[["params_archetypes"]]@parameters), "\n")
+    cat(write.table(object@parameters[["params_archetypes"]]), "\n")
 })
 
 
