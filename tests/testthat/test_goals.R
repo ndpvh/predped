@@ -233,7 +233,7 @@ testthat::test_that("Goal replacement works", {
     goal_stack <- goal_stack(3, setting, counter = 5)
     updated_goal_stack <- goal_stack
 
-    updated_goal_stack[[1]] <- predped::replace(goal_stack[[1]], setting, counter = 4)
+    updated_goal_stack[[1]] <- predped::change(goal_stack[[1]], setting, counter = 4)
 
     testthat::expect_equal(updated_goal_stack[[1]]@position@.Data, c(-1.01, 1.37), tolerance = 1e-2)
     testthat::expect_equal(updated_goal_stack[[1]]@counter, 4)
