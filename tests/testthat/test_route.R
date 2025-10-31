@@ -62,7 +62,8 @@ testthat::test_that("Creating nodes works (few)", {
     tst <- predped::create_nodes(c(-1.5, 1.5), 
                                  c(1.5, -1.5),
                                  setting, 
-                                 many_nodes = FALSE)
+                                 many_nodes = FALSE, 
+                                 cpp = FALSE)
 
     # Create the reference (from a previous run that looked right)
     ref <- readRDS(file.path(".", "data", "ref_nodes_few.Rds"))
