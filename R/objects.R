@@ -1702,7 +1702,8 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
 setMethod("add_nodes", signature(object = "circle"), function(object, 
                                                               space_between = 0.5,
                                                               only_corners = FALSE,
-                                                              outside = TRUE) {
+                                                              outside = TRUE,
+                                                              cpp = TRUE) {
     
     
     # Number of default nodes depends on a small calculation we made. Specifically,
