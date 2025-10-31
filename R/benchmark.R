@@ -270,8 +270,9 @@ knitr_table <- function(x,
         tbl <- matrix(" ", nrow = 1, ncol = length(levels))
         for(i in seq_along(levels)) {
             tbl[, i] <- paste0(rnd(mean(x[[levels[i]]])), 
-                               " [",
+                               "  [",
                                rnd(quantile(x[[levels[i]]], prob = 0.025)),
+                               ", ",
                                rnd(quantile(x[[levels[i]]], prob = 0.975)),
                                "]")
         }
@@ -333,8 +334,9 @@ knitr_table <- function(x,
 
                 # Add that info to the table
                 tbl[i, j + length(levels) - 1] <- paste0(rnd(mean(x[[idx]])), 
-                                                         " [",
+                                                         "  [",
                                                          rnd(quantile(x[[idx]], prob = 0.025)),
+                                                         ", ",
                                                          rnd(quantile(x[[idx]], prob = 0.975)),
                                                          "]")
             }
