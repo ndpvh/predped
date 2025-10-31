@@ -10,11 +10,11 @@
 \usage{
 line_intersection(object, segments, ...)
 
-\S4method{line_intersection}{polygon}(object, segments, return_all = FALSE)
+\S4method{line_intersection}{polygon}(object, segments, return_all = FALSE, cpp = TRUE)
 
-\S4method{line_intersection}{circle}(object, segments, return_all = FALSE)
+\S4method{line_intersection}{circle}(object, segments, return_all = FALSE, cpp = TRUE)
 
-\S4method{line_intersection}{segment}(object, segments, return_all = FALSE)
+\S4method{line_intersection}{segment}(object, segments, return_all = FALSE, cpp = TRUE)
 }
 \arguments{
 \item{object}{Object of a type that extends \code{\link[predped]{object-class}}.}

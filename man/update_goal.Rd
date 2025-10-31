@@ -14,6 +14,7 @@ update_goal(
   space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
+  adaptive_goal_sorting = TRUE,
   report = FALSE,
   print_iteration = FALSE,
   cpp = TRUE
@@ -48,6 +49,10 @@ needed.}
 \item{many_nodes}{Logical denoting whether to use the minimal number of nodes
 or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
+
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
 
 \item{report}{Logical denoting whether to report whenever an agent is 
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}

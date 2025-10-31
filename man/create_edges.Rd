@@ -4,7 +4,14 @@
 \alias{create_edges}
 \title{Create edges of graph to walk on}
 \usage{
-create_edges(from, to, background, space_between = 0.5, many_nodes = FALSE)
+create_edges(
+  from,
+  to,
+  background,
+  space_between = 0.5,
+  many_nodes = FALSE,
+  cpp = TRUE
+)
 }
 \arguments{
 \item{from}{Numeric denoting the coordinate from which to begin routes.}

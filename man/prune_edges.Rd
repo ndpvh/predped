@@ -4,7 +4,7 @@
 \alias{prune_edges}
 \title{Evaluate intersections with objects}
 \usage{
-prune_edges(objects, segments, coord_specific = NULL)
+prune_edges(objects, segments, cpp = TRUE)
 }
 \arguments{
 \item{objects}{List of objects that extend the 

@@ -4,7 +4,14 @@
 \alias{create_nodes}
 \title{Create nodes that serve as path points}
 \usage{
-create_nodes(from, to, background, space_between = 0.5, many_nodes = FALSE)
+create_nodes(
+  from,
+  to,
+  background,
+  space_between = 0.5,
+  many_nodes = FALSE,
+  cpp = TRUE
+)
 }
 \arguments{
 \item{from}{Numeric denoting the coordinate from which to begin routes.}

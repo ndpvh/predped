@@ -14,25 +14,25 @@
 \alias{intersects,segment,segment-method}
 \title{Check whether an Object intersects with Other Object}
 \usage{
-intersects(object, other_object)
+intersects(object, other_object, ...)
 
-\S4method{intersects}{polygon,polygon}(object, other_object)
+\S4method{intersects}{polygon,polygon}(object, other_object, cpp = TRUE)
 
-\S4method{intersects}{polygon,circle}(object, other_object)
+\S4method{intersects}{polygon,circle}(object, other_object, ...)
 
-\S4method{intersects}{polygon,segment}(object, other_object)
+\S4method{intersects}{polygon,segment}(object, other_object, ...)
 
-\S4method{intersects}{circle,polygon}(object, other_object)
+\S4method{intersects}{circle,polygon}(object, other_object, cpp = TRUE)
 
-\S4method{intersects}{circle,circle}(object, other_object)
+\S4method{intersects}{circle,circle}(object, other_object, ...)
 
-\S4method{intersects}{circle,segment}(object, other_object)
+\S4method{intersects}{circle,segment}(object, other_object, ...)
 
-\S4method{intersects}{segment,polygon}(object, other_object)
+\S4method{intersects}{segment,polygon}(object, other_object, cpp = TRUE)
 
-\S4method{intersects}{segment,circle}(object, other_object)
+\S4method{intersects}{segment,circle}(object, other_object, cpp = TRUE)
 
-\S4method{intersects}{segment,segment}(object, other_object)
+\S4method{intersects}{segment,segment}(object, other_object, ...)
 }
 \arguments{
 \item{object}{Object of \code{\link[predped]{object-class}}.}

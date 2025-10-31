@@ -7,7 +7,8 @@
 compute_edges(
   background,
   space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius", ]),
-  many_nodes = TRUE
+  many_nodes = TRUE,
+  cpp = TRUE
 )
 }
 \arguments{

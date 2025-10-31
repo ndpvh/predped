@@ -8,13 +8,13 @@
 \alias{enlarge,circle-method}
 \title{Make an Object Larger}
 \usage{
-enlarge(object, extension)
+enlarge(object, extension, ...)
 
-\S4method{enlarge}{polygon}(object, extension)
+\S4method{enlarge}{polygon}(object, extension, cpp = TRUE)
 
-\S4method{enlarge}{rectangle}(object, extension)
+\S4method{enlarge}{rectangle}(object, extension, ...)
 
-\S4method{enlarge}{circle}(object, extension)
+\S4method{enlarge}{circle}(object, extension, ...)
 }
 \arguments{
 \item{object}{An object of a type that extends 

@@ -18,6 +18,7 @@
   space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
+  adaptive_goal_sorting = TRUE,
   standing_start = 0.1,
   time_step = 0.5,
   report = FALSE,
@@ -71,6 +72,10 @@ needed.}
 \item{many_nodes}{Logical denoting whether to use the minimal number of nodes
 or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
+
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed 
 that agents move when they just came from standing still. Defaults to 

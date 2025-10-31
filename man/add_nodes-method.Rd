@@ -10,9 +10,21 @@
 \usage{
 add_nodes(object, ...)
 
-\S4method{add_nodes}{polygon}(object, space_between = 0.5, only_corners = FALSE, outside = TRUE)
+\S4method{add_nodes}{polygon}(
+  object,
+  space_between = 0.5,
+  only_corners = FALSE,
+  outside = TRUE,
+  cpp = TRUE
+)
 
-\S4method{add_nodes}{circle}(object, space_between = 0.5, only_corners = FALSE, outside = TRUE)
+\S4method{add_nodes}{circle}(
+  object,
+  space_between = 0.5,
+  only_corners = FALSE,
+  outside = TRUE,
+  cpp = TRUE
+)
 
 \S4method{add_nodes}{segment}(object, ...)
 }

@@ -11,7 +11,8 @@ adjust_edges(
   precomputed_edges,
   space_between = 0.5,
   new_objects = NULL,
-  reevaluate = !is.null(new_objects)
+  reevaluate = !is.null(new_objects),
+  cpp = TRUE
 )
 }
 \arguments{

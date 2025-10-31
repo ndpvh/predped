@@ -26,6 +26,7 @@
   individual_differences = FALSE,
   group_size = matrix(1, nrow = 1, ncol = 2),
   fx = function(x) x,
+  cpp = TRUE,
   ...
 )
 }
@@ -132,6 +133,10 @@ remains unaltered.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{simulate,state-method}}
 function.}
+
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
 
 \item{plot_live}{Logical denoting whether to plot each iteration while the
 simulation is going on. Defaults to \code{FALSE}.}

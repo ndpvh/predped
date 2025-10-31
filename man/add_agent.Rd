@@ -18,7 +18,8 @@ add_agent(
   space_between = 1.25,
   position = NULL,
   standing_start = 0.1,
-  individual_differences = FALSE
+  individual_differences = FALSE,
+  return_characteristics = FALSE
 )
 }
 \arguments{
@@ -76,6 +77,10 @@ that agents move when they just came from standing still. Defaults to
 \item{individual_differences}{Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.
 Defaults to \code{FALSE}.}
+
+\item{return_characteristics}{Logical denoting whether to return the 
+characteristics of the generated agents in a list (\code{TRUE}) or as part 
+of an agent (\code{FALSE}). Defaults to \code{FALSE}.}
 
 \item{object}{Object of the \code{\link[predped]{predped-class}}.}
 }

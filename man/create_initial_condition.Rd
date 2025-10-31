@@ -10,6 +10,8 @@ create_initial_condition(
   goal_number = function(n) rnorm(n, 10, 2),
   group_size = matrix(1, nrow = 1, ncol = 2),
   space_between = 1.25,
+  precomputed_edges = NULL,
+  cpp = TRUE,
   ...
 )
 }

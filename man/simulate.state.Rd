@@ -28,6 +28,7 @@
   goal_duration = function(x) rnorm(x, 10, 2),
   precompute_goal_paths = TRUE,
   sort_goals = TRUE,
+  adaptive_goal_sorting = TRUE,
   precomputed_goals = NULL,
   middle_edge = FALSE,
   position = NULL,
@@ -107,6 +108,10 @@ iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 current iteration in the simulation & the number of agents present 
 at the current iteration in the simulation. Defaults to 1, which
 represents each iteration to be reported.}
+
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
 
 \item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
 of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
