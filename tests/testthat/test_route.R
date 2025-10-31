@@ -241,21 +241,25 @@ testthat::test_that("Adjusting edges works", {
     tst_2 <- predped::adjust_edges(agent, goal, setting, precomputed_edges = edges, reevaluate = TRUE)
 
     # Before evaluating, put all matrices in alphabetical order
-    tst_1 <- list(edges = dplyr::arrange(tst_1$edges, from, to),
-                  edges_with_coords = dplyr::arrange(tst_1$edges_with_coords, from, to),
-                  nodes = dplyr::arrange(tst_1$nodes, node_ID))
+    arrange <- function(x) {
+        return(x[order(x$from, x$to), ])
+    }
 
-    ref_1 <- list(edges = dplyr::arrange(ref_1$edges, from, to),
-                  edges_with_coords = dplyr::arrange(ref_1$edges_with_coords, from, to),
-                  nodes = dplyr::arrange(ref_1$nodes, node_ID))
+    tst_1 <- list(edges = arrange(tst_1$edges),
+                  edges_with_coords = arrange(tst_1$edges_with_coords),
+                  nodes = tst_1$nodes[order(tst_1$nodes$node_ID), ])
 
-    tst_2 <- list(edges = dplyr::arrange(tst_2$edges, from, to),
-                  edges_with_coords = dplyr::arrange(tst_2$edges_with_coords, from, to),
-                  nodes = dplyr::arrange(tst_2$nodes, node_ID))
+    ref_1 <- list(edges = arrange(ref_1$edges),
+                  edges_with_coords = arrange(ref_1$edges_with_coords),
+                  nodes = ref_1$nodes[order(ref_1$nodes$node_ID), ])
 
-    ref_2 <- list(edges = dplyr::arrange(ref_2$edges, from, to),
-                  edges_with_coords = dplyr::arrange(ref_2$edges_with_coords, from, to),
-                  nodes = dplyr::arrange(ref_2$nodes, node_ID))
+    tst_2 <- list(edges = arrange(tst_2$edges),
+                  edges_with_coords = arrange(tst_2$edges_with_coords),
+                  nodes = tst_2$nodes[order(tst_2$nodes$node_ID), ])
+
+    ref_2 <- list(edges = arrange(ref_2$edges),
+                  edges_with_coords = arrange(ref_2$edges_with_coords),
+                  nodes = ref_2$nodes[order(ref_2$nodes$node_ID), ])
 
     # For the evaluation, we are going to put them in matrix format with no 
     # dimension names. Makes things easier for us
@@ -363,12 +367,16 @@ testthat::test_that("Creating edges with one-directional flow works", {
                                  many_nodes = FALSE)
 
     # Put in alphabetical order
-    ref<- list(edges = dplyr::arrange(ref$edges, from, to),
-               edges_with_coords = dplyr::arrange(ref$edges_with_coords, from, to),
-               nodes = dplyr::arrange(ref$nodes, node_ID))
-    tst <- list(edges = dplyr::arrange(tst$edges, from, to),
-                edges_with_coords = dplyr::arrange(tst$edges_with_coords, from, to),
-                nodes = dplyr::arrange(tst$nodes, node_ID))
+    arrange <- function(x) {
+        return(x[order(x$from, x$to), ])
+    }
+
+    ref <- list(edges = arrange(ref$edges), 
+                edges_with_coords = arrange(ref$edges_with_coords),
+                nodes = ref$nodes[order(ref$nodes$node_ID), ])
+    tst <- list(edges = arrange(tst$edges), 
+                edges_with_coords = arrange(tst$edges_with_coords),
+                nodes = tst$nodes[order(tst$nodes$node_ID), ])
 
     # For the evaluation, we are going to put them in matrix format with no 
     # dimension names. Makes things easier for us. For the tst, also round the 
