@@ -62,7 +62,7 @@ testthat::test_that("General characteristics for `to_trace` works", {
     ref <- predped::time_series(trace, cpp = TRUE)
     tst <- predped::time_series(
         predped::to_trace(
-            data,
+            ref,
             trace[[1]]@setting
         ),
         cpp = TRUE
