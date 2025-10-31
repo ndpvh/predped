@@ -19,6 +19,10 @@
 #' @param step Numeric denoting the change in angle for looking around in 
 #' degrees. Defaults to \code{45}, meaning that the agent looks around 
 #' exhaustively in 8 different directions (360 / 45) by default. 
+#' @param time_step Numeric denoting the time step in seconds. Defaults to 
+#' \code{0.5}
+#' @param cpp Logical denoting whether to use the R or Rcpp version of the 
+#' function. Defaults to \code{TRUE}.
 #'
 #' @return Numeric denoting the angle or direction that had the highest utility
 #' (in degrees).

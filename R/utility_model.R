@@ -12,7 +12,7 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' \code{\link[predped]{utility,data.frame}} for the actual computation 
 #' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -34,11 +34,11 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{utility,data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 
@@ -100,11 +100,11 @@ setMethod("utility", "agent", function(object,
 #' cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{utility,agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -275,10 +275,10 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -459,10 +459,10 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 

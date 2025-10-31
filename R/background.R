@@ -15,7 +15,7 @@
 #' @slot limited_access List of objects of the \code{\link[predped]{segment-class}}
 #' which define the routes that can only be taken in one direction (see the 
 #' documentation of \code{\link[predped]{segment-class}}).
-#' @slot precomputed_segment_class List of non-penetrable objects based on the 
+#' @slot precomputed_limited_access List of non-penetrable objects based on the 
 #' values of slot \code{limited_access}. Is not meant to be changed by the user,
 #' but is used as a slot to significantly speed up computations.
 #' @slot entrance Numeric matrix specifying the location(s) of the entrance(s), 
@@ -36,7 +36,7 @@
 #' \code{\link[predped]{limited_access}},
 #' \code{\link[predped]{objects}},
 #' \code{\link[predped]{shape}},
-#' \code{\link[predped]{initialize,background-method}},
+#' \code{\link[predped]{initialize,background}},
 #' 
 #' @rdname background-class
 #' 
@@ -95,7 +95,7 @@ background <- setClass("background", list(shape = "object",
 #' \code{\link[predped]{objects}},
 #' \code{\link[predped]{shape}}
 #' 
-#' @rdname initialize-background-method
+#' @rdname initialize-background
 #' 
 #' @export
 setMethod("initialize", "background", function(.Object, 
@@ -234,7 +234,7 @@ setMethod("show", "background", function(object) {
 #' \code{\link[predped]{agent-class}}
 #' \code{\link[predped]{background-class}}
 #'  
-#' @rdname limit_access-method
+#' @rdname limit_access
 #' 
 #' @export 
 setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
@@ -340,12 +340,12 @@ compute_limited_access <- function(segment) {
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname entrance-method
+#' @rdname entrance
 setMethod("entrance", "background", function(object) {
     return(object@entrance)
 })
 
-#' @rdname entrance-method
+#' @rdname entrance
 setMethod("entrance<-", "background", function(object, value) {
     if(!is.matrix(value)) {
         value <- matrix(value, ncol = 2)
@@ -357,12 +357,12 @@ setMethod("entrance<-", "background", function(object, value) {
 
 
 
-#' @rdname exit-method
+#' @rdname exit
 setMethod("exit", "background", function(object) {
     return(object@exit)
 })
 
-#' @rdname exit-method
+#' @rdname exit
 setMethod("exit<-", "background", function(object, value) {
     if(!is.matrix(value)) {
         value <- matrix(value, ncol = 2)
@@ -374,12 +374,12 @@ setMethod("exit<-", "background", function(object, value) {
 
 
 
-#' @rdname limited_access-method
+#' @rdname limited_access
 setMethod("limited_access", "background", function(object) {
     return(object@limited_access)
 })
 
-#' @rdname limited_access-method
+#' @rdname limited_access
 setMethod("limited_access<-", "background", function(object, value) {
     object@limited_access <- value
     object@precomputed_limited_access <- lapply(value, 
@@ -403,12 +403,12 @@ setMethod("objects<-", "background", function(object, value) {
 
 
 
-#' @rdname shape-method
+#' @rdname shape
 setMethod("shape", "background", function(object) {
     return(object@shape)
 })
 
-#' @rdname shape-method
+#' @rdname shape
 setMethod("shape<-", "background", function(object, value) {
     object@shape <- value
     return(object)

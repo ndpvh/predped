@@ -6,7 +6,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -76,7 +76,7 @@ time_series <- function(x,
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -394,10 +394,15 @@ to_trace <- function(data,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the 
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
-#' @param treshold Numeric denoting under which observed value for speed the 
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' @param threshold Numeric denoting under which observed value for speed the 
 #' cell to which an agent has moved should be put to `0`. Defaults to a value 
 #' based on the observed measurement error in our system.
+#' @param initial_conditions Logical denoting whether the added columns should 
+#' include the initial conditions (that is, speed, orientation, and position at
+#' the previous time point) alongside their current alternatives. Useful when 
+#' one wants to compute the values of the utility-related variables from the 
+#' data. Defaults to \code{FALSE}. 
 #' 
 #' @examples
 #' # This is my example

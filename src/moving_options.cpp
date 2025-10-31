@@ -48,7 +48,7 @@ using namespace Rcpp;
 //' # Generate the cell centers with predped
 //' slow_centers <- compute_centers(slow_agent,
 //'                                 cpp = TRUE)
-//' fast_centers <- compute_centers(fast_agent
+//' fast_centers <- compute_centers(fast_agent,
 //'                                 cpp = TRUE)
 //'
 //' # Generate the cell centers with m4ma
@@ -75,7 +75,7 @@ using namespace Rcpp;
 //' \code{\link[predped]{agent-class}},
 //' \code{\link[m4ma]{c_vd}}
 //' \code{\link[predped]{compute_centers}}
-//' \code{\link[predped]{moving_options-method}}
+//' \code{\link[predped]{moving_options}}
 //'
 //' @rdname compute_centers_rcpp
 //'
@@ -132,7 +132,7 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
 //' This function checks whether there is an overlap between a given agent and
 //' the objects in the environment, provided that the agent would move to the
 //' locations in \code{centers}. Returns a logical matrix as needed in
-//' \code{\link[predped]{moving_options-method}}.
+//' \code{\link[predped]{moving_options}}.
 //'
 //' @details
 //' In this function, we can only approximately check the intersection of agent
@@ -151,7 +151,7 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
 //'
 //' This check is then performed by looping over all the centers, changing the
 //' agents position to the position of this center, and using the
-//' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+//' \code{\link[predped]{in_object}} to do the test. This is a vectorized
 //' test: For each position in \code{centers} we have a logical \code{TRUE} or
 //' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
 //' logical matrix with an equal number of rows as \code{centers} and an equal
@@ -160,8 +160,8 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
 //' for each center.
 //'
 //' The reason why we use this approximate method is because of time efficiency.
-//' Using the \code{\link[predped]{intersects-method}} takes a longer time than
-//' using the \code{\link[predped]{in_object-method}}, especially as the number
+//' Using the \code{\link[predped]{intersects}} takes a longer time than
+//' using the \code{\link[predped]{in_object}}, especially as the number
 //' of objects in the environment increases.
 //'
 //' @param agent Object of the \code{\link[predped]{agent-class}}.

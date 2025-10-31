@@ -4,7 +4,7 @@
 #' \code{\link[predped]{predped-class}}.
 #'
 #' @details
-#' Heavily depends on \code{\link[predped]{simulate,state-method}} and
+#' Heavily depends on \code{\link[predped]{simulate,state}} and
 #' \code{\link[predped]{update}}.
 #'
 #' The arguments that can be used to influence the simulation behavior might
@@ -12,7 +12,7 @@
 #' arguments in this sections. Roughly speaking, this function has multiple
 #' arguments that influence a same aspect of the simulation. These are the
 #' following (note that here all arguments are provided; some of these may
-#' only appear in the documentation of \code{\link[predped]{simulate,state-method}}).
+#' only appear in the documentation of \code{\link[predped]{simulate,state}}).
 #'
 #' Arguments that directly influence the general characteristics of the
 #' simulation and the model itself.
@@ -113,7 +113,7 @@
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param precompute_goal_paths Logical denoting whether to run the
-#' \code{\link[predped]{find_path-method}} for each of the generated goals
+#' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
 #' goal stack. Defaults to \code{FALSE}.
 #' @param sort_goals Logical denoting whether to order the goal stack in a logical
@@ -167,7 +167,7 @@
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
 #' between iterations, i.e., the time between updating the plot. Defaults to
 #' \code{0.2}.
-#' @param ... Arguments passed on to the \code{\link[predped]{simulate,state-method}}
+#' @param ... Arguments passed on to the \code{\link[predped]{simulate,state}}
 #' function.
 #'
 #' @return List of objects of the \code{\link{state-class}} containing the
@@ -384,7 +384,7 @@ setMethod("simulate", "predped", function(object,
 #' Heavily depends on \code{\link[predped]{update}}.
 #'
 #' Many of the arguments here are either shared or derived from the upper-level
-#' \code{\link[predped]{simulate,predped-method}} function. Please refer to the
+#' \code{\link[predped]{simulate,predped}} function. Please refer to the
 #' Details in its documentation to see a breakdown of the most important
 #' arguments.
 #'
@@ -392,7 +392,7 @@ setMethod("simulate", "predped", function(object,
 #' @param model Object of the \code{\link[predped]{predped-class}}.
 #' @param add_agent Logical denoting whether an agent should be added to the
 #' simulation. Defaults to \code{FALSE} and is typically handled by the
-#' \code{\link[predped]{simulate,predped-method}} function, where it accounts for the
+#' \code{\link[predped]{simulate,predped}} function, where it accounts for the
 #' variables \code{add_agent_after} and \code{max_agents}.
 #' @param group_size Numeric matrix with two columns where the first column
 #' denotes the number of people in a social group and the second column the
@@ -493,7 +493,7 @@ setMethod("simulate", "predped", function(object,
 #' @seealso
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{state-class}},
-#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,predped}},
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate.state
@@ -651,7 +651,7 @@ setMethod("simulate", "state", function(object,
 #' might all be different (either in archetype or in parameter values), but
 #' will share the same goals.
 #'
-#' @param object Object of the \code{\link[predped]{predped-class}}.
+#' @param model Object of the \code{\link[predped]{predped-class}}.
 #' @param agent_number Numeric denoting the number of agents to add. Defaults
 #' to \code{1}.
 #' @param standing_start Numeric denoting the factor of their preferred speed
@@ -689,8 +689,8 @@ setMethod("simulate", "state", function(object,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}}
 #'
 #' @rdname add_group
 #'
@@ -761,7 +761,7 @@ add_group <- function(model,
 
 #' Add a single agent to the simulation
 #'
-#' @param object Object of the \code{\link[predped]{predped-class}}.
+#' @param model Object of the \code{\link[predped]{predped-class}}.
 #' @param group_number Numeric denoting the group to which the agent belongs.
 #' Defaults to \code{1}.
 #' @param goal_number Numeric, vector, or function that defines the number of
@@ -770,7 +770,7 @@ add_group <- function(model,
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param precompute_goal_paths Logical denoting whether to run the
-#' \code{\link[predped]{find_path-method}} for each of the generated goals
+#' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
 #' goal stack. Defaults to \code{FALSE}.
 #' @param sort_goals Logical denoting whether to order the goal stack in a logical
@@ -790,6 +790,8 @@ add_group <- function(model,
 #' containing the nodes and edges the agent can use to plan its path. Defauls
 #' to \code{NULL}, triggering the creation of these edges whenever they are
 #' needed.
+#' @param many_nodes Logical denoting whether to use many nodes when computing 
+#' the edges. Defaults to \code{FALSE} if \code{precomputed_edges = FALSE}.
 #' @param space_between Numeric denoting the space that should be left between
 #' an object and the created path points for the agents (in radii). Defaults to
 #' \code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
@@ -830,8 +832,8 @@ add_group <- function(model,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_group}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}}
 #'
 #' @rdname add_agent
 #'
@@ -1038,7 +1040,7 @@ add_agent <- function(model,
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate,predped-method}},
+#' \code{\link[predped]{simulate,predped}},
 #' \code{\link[predped]{simulate_state}}
 #'
 #' @rdname create_initial_condition

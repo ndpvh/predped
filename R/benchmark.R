@@ -23,6 +23,10 @@
 #' 2.5% and 97.5% quantiles of the times in seconds). If \code{FALSE}, the output
 #' will be a list of lists containing the raw execution times per function and 
 #' per benchmark case for the function. Defaults to \code{TRUE}.
+#' @param digits Integer denoting the decimal points to which to round to. 
+#' Ignored if \code{summarize = FALSE}. Defaults to \code{2}.
+#' @param progress Logical denoting whether to add a progress bar for the 
+#' benchmarks. Defaults to \code{TRUE}.
 #' 
 #' @return Either a list of lists containing the raw execution times per 
 #' benchmark case per function (if \code{summarize = FALSE}) or an HTML file 

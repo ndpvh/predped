@@ -12,7 +12,7 @@
 #' 
 #' @seealso 
 #' \code{\link[predped]{rotate}},
-#' \code{\link[predped]{initialize,coordinate-method}}
+#' \code{\link[predped]{initialize,coordinate}}
 #' 
 #' @rdname coordinate-class
 #'
@@ -21,7 +21,7 @@ coordinate <- setClass("coordinate", contains = "numeric")
 
 #' Constructor for the \code{\link[predped]{coordinate-class}}
 #' 
-#' @param x Numerical vector of size 2 denoting the coordinate.
+#' @param .Object Numerical vector of size 2 denoting the coordinate.
 #' 
 #' @return Object of the \code{\link[predped]{coordinate-class}}
 #' 
@@ -36,7 +36,7 @@ coordinate <- setClass("coordinate", contains = "numeric")
 #' \code{\link[predped]{coordinate-class}},
 #' \code{\link[predped]{rotate}}
 #' 
-#' @rdname initialize-coordinate-method
+#' @rdname initialize-coordinate
 #' 
 #' @export
 setMethod("initialize", "coordinate", function(.Object, ...) {
@@ -93,7 +93,7 @@ setClass("object",
 #' \code{\link[predped]{polygon-class}},
 #' \code{\link[predped]{rectangle-class}}
 #' 
-#' @rdname initialize-object-method
+#' @rdname initialize-object
 #' 
 #' @export
 setMethod("initialize", "object", function(.Object, 
@@ -140,7 +140,7 @@ setMethod("initialize", "object", function(.Object,
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{rectangle-class}},
-#' \code{\link[predped]{initialize,polygon-method}}
+#' \code{\link[predped]{initialize,polygon}}
 #'
 #' @rdname polygon-class
 #' @family objects
@@ -165,7 +165,7 @@ polygon <- setClass("polygon",
 #' the \code{\link[predped]{points}} of the object. Defaults to an empty 
 #' vector, making all edges worthy of goal generation.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object-method}}.
+#' \code{\link[predped]{initialize,object}}.
 #' 
 #' @return Object of the \code{\link[predped]{polygon-class}}
 #' 
@@ -183,9 +183,9 @@ polygon <- setClass("polygon",
 #' @seealso 
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{polygon-class}}
-#' \code{\link[predped]{initialize,object-method}}
+#' \code{\link[predped]{initialize,object}}
 #' 
-#' @rdname initialize-polygon-method
+#' @rdname initialize-polygon
 #' 
 #' @export
 setMethod("initialize", "polygon", function(.Object, 
@@ -257,9 +257,9 @@ rectangle <- setClass("rectangle",
 #' @param orientation Numeric denoting the orientation of the rectangle in 
 #' radians. Defauls to \code{0}.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object-method}}. Note that if the 
+#' \code{\link[predped]{initialize,object}}. Note that if the 
 #' \code{points} or \code{clock_wise} arguments of the 
-#' \code{\link[predped]{initialize,polygon-method}} are provided, that they will
+#' \code{\link[predped]{initialize,polygon}} are provided, that they will
 #' not be used in the creation of the rectangle.
 #' 
 #' @return Object of the \code{\link[predped]{rectangle-class}}
@@ -278,10 +278,10 @@ rectangle <- setClass("rectangle",
 #' @seealso 
 #' \code{\link[predped]{object-class}},
 #' \code{\link[predped]{polygon-class}},
-#' \code{\link[predped]{initialize,object-method}}
-#' \code{\link[predped]{initialize,polygon-method}}
+#' \code{\link[predped]{initialize,object}}
+#' \code{\link[predped]{initialize,polygon}}
 #' 
-#' @rdname initialize-rectangle-method
+#' @rdname initialize-rectangle
 #' 
 #' @export
 # 
@@ -363,7 +363,7 @@ setMethod("initialize", "rectangle", function(.Object,
 #'
 #' @seealso 
 #' \code{\link[predped]{object-class}}, 
-#' \code{\link[predped]{initialize,circle-method}}
+#' \code{\link[predped]{initialize,circle}}
 #' 
 #' @rdname circle-class
 #' @family objects
@@ -385,7 +385,7 @@ circle <- setClass("circle",
 #' and should be contained within the interval 0 and 2 * pi. Defaults to an 
 #' empty matrix, making all angles worthy of goal generation.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object-method}}.
+#' \code{\link[predped]{initialize,object}}.
 #' 
 #' @return Object of the \code{\link[predped]{circle-class}}
 #' 
@@ -403,9 +403,9 @@ circle <- setClass("circle",
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,object-method}}
+#' \code{\link[predped]{initialize,object}}
 #' 
-#' @rdname initialize-circle-method
+#' @rdname initialize-circle
 #' 
 #' @export
 setMethod("initialize", "circle", function(.Object, 
@@ -492,7 +492,7 @@ setMethod("initialize", "circle", function(.Object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,segment-method}},
+#' \code{\link[predped]{initialize,segment}},
 #' \code{\link[predped]{limit_access}}
 #' 
 #' @rdname segment-class
@@ -513,7 +513,7 @@ segment <- setClass("segment",
 #' @param to Numeric vector denoting the coordinates of the where the segment 
 #' ends.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object-method}}.
+#' \code{\link[predped]{initialize,object}}.
 #' 
 #' @return Object of the \code{\link[predped]{segment-class}}
 #' 
@@ -531,9 +531,9 @@ segment <- setClass("segment",
 #' @seealso 
 #' \code{\link[predped]{segment-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,object-method}}
+#' \code{\link[predped]{initialize,object}}
 #' 
-#' @rdname initialize-segment-method
+#' @rdname initialize-segment
 #' 
 #' @export
 setMethod("initialize", "segment", function(.Object, 
@@ -615,7 +615,7 @@ setMethod("initialize", "segment", function(.Object,
 #' 
 #' @docType method
 #' 
-#' @rdname rotate-method
+#' @rdname rotate
 #' 
 #' @export
 # 
@@ -626,7 +626,7 @@ setGeneric("rotate",
            function(object, ...) standardGeneric("rotate"),
            signature = "object")
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "numeric"), function(object, 
                                                             radians = 0, 
                                                             degrees = NULL,
@@ -670,7 +670,7 @@ setMethod("rotate", signature(object = "numeric"), function(object,
 # Make sure coordinate is handled in the same way as numerics for this method
 setAs("numeric", "coordinate", function(from) new("coordinate", from))
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "matrix"), function(object, 
                                                            radians = 0,
                                                            degrees = NULL,
@@ -728,7 +728,7 @@ setMethod("rotate", signature(object = "matrix"), function(object,
     return(y)
 })
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "polygon"), function(object, 
                                                             center = object@center,
                                                             ...) {
@@ -741,7 +741,7 @@ setMethod("rotate", signature(object = "polygon"), function(object,
     return(object)
 })
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "rectangle"), function(object, 
                                                               radians = 0, 
                                                               degrees = NULL,
@@ -766,7 +766,7 @@ setMethod("rotate", signature(object = "rectangle"), function(object,
     return(object)
 })
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "circle"), function(object, 
                                                            center = object@center,
                                                            ...) {
@@ -786,7 +786,7 @@ setMethod("rotate", signature(object = "circle"), function(object,
     return(object)
 })
 
-#' @rdname rotate-method
+#' @rdname rotate
 setMethod("rotate", signature(object = "segment"), function(object, 
                                                             center = object@center,
                                                             ...) {
@@ -857,12 +857,12 @@ setMethod("rotate", signature(object = "segment"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname move-method
+#' @rdname move
 #' 
 #' @export
 setGeneric("move", function(object, ...) standardGeneric("move"))
 
-#' @rdname move-method
+#' @rdname move
 setMethod("move", signature(object = "polygon"), function(object, 
                                                           coord) {
 
@@ -885,7 +885,7 @@ setMethod("move", signature(object = "polygon"), function(object,
     return(object)
 })
 
-#' @rdname move-method
+#' @rdname move
 setMethod("move", signature(object = "rectangle"), function(object, 
                                                             coord) {
     
@@ -906,7 +906,7 @@ setMethod("move", signature(object = "rectangle"), function(object,
     return(object)
 })
 
-#' @rdname move-method
+#' @rdname move
 setMethod("move", signature(object = "circle"), function(object, 
                                                          coord) {
     
@@ -923,7 +923,7 @@ setMethod("move", signature(object = "circle"), function(object,
     return(object)
 })
 
-#' @rdname move-method
+#' @rdname move
 setMethod("move", signature(object = "segment"), function(object, 
                                                           coord) {
 
@@ -970,15 +970,15 @@ setMethod("move", signature(object = "segment"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname area-method
+#' @rdname area
 #' 
 #' @export
 setGeneric("area", function(object) standardGeneric("area"))
 
-#' @rdname area-method
+#' @rdname area
 setMethod("area", signature(object = "rectangle"), function(object) prod(object@size))
 
-#' @rdname area-method
+#' @rdname area
 setMethod("area", signature(object = "circle"), function(object) pi * object@radius^2)
 
 
@@ -1020,12 +1020,12 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' 
 #' @docType method
 #' 
-#' @rdname in_object-method
+#' @rdname in_object
 #' 
 #' @export
 setGeneric("in_object", function(object, x, ...) standardGeneric("in_object"))
 
-#' @rdname in_object-method
+#' @rdname in_object
 setMethod("in_object", signature(object = "polygon"), function(object, 
                                                                x,
                                                                cpp = TRUE) {
@@ -1050,7 +1050,7 @@ setMethod("in_object", signature(object = "polygon"), function(object,
     return(raycasting(object@points, x))
 })
 
-#' @rdname in_object-method
+#' @rdname in_object
 setMethod("in_object", signature(object = "rectangle"), function(object, 
                                                                  x,
                                                                  cpp = TRUE) {
@@ -1095,7 +1095,7 @@ setMethod("in_object", signature(object = "rectangle"), function(object,
     # return(check) # Important: Benchmark shows that the other algorithm is faster
 })
 
-#' @rdname in_object-method
+#' @rdname in_object
 setMethod("in_object", signature(object = "circle"), function(object, 
                                                               x,
                                                               cpp = TRUE) {
@@ -1123,7 +1123,7 @@ setMethod("in_object", signature(object = "circle"), function(object,
     return((x[,1] - y[1])^2 + (x[,2] - y[2])^2 < radius(object)^2)
 })
 
-#' @rdname in_object-method
+#' @rdname in_object
 setMethod("in_object", signature(object = "segment"), function(object, 
                                                                x,
                                                                ...) {
@@ -1151,7 +1151,7 @@ setMethod("in_object", signature(object = "segment"), function(object,
 
 #' Check Whether a Point Lies Outside of an Object
 #' 
-#' Returns the opposite of the \code{\link[predped]{in_object-method}}. 
+#' Returns the opposite of the \code{\link[predped]{in_object}}. 
 #' Currently works for all classes inside of the \code{\link[predped]{object-class}}.
 #'
 #' @param object Object of the \code{\link[predped]{object-class}}.
@@ -1187,12 +1187,12 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname out_object-method
+#' @rdname out_object
 #' 
 #' @export
 setGeneric("out_object", function(object, x, ...) standardGeneric("out_object"))
 
-#' @rdname out_object-method
+#' @rdname out_object
 setMethod("out_object", signature(object = "object"), function(object, x, ...) !in_object(object, x, ...))
 
 
@@ -1211,6 +1211,8 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' \code{\link[predped]{segment-class}}.
 #' @param extension Numeric denoting the length with which to extend the object 
 #' in all directions.
+#' @param cpp Logical denoting whether to use the R or Rcpp version of the 
+#' function. Defaults to \code{TRUE}.
 #'
 #' @return Object of the same class as the original, but with a larger 
 #' size.
@@ -1237,12 +1239,12 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' 
 #' @docType method
 #' 
-#' @rdname enlarge-method
+#' @rdname enlarge
 #' 
 #' @export
 setGeneric("enlarge", function(object, extension, ...) standardGeneric("enlarge"))
 
-#' @rdname enlarge-method
+#' @rdname enlarge
 setMethod("enlarge", signature(object = "polygon"), function(object, 
                                                              extension,
                                                              cpp = TRUE) {
@@ -1256,7 +1258,7 @@ setMethod("enlarge", signature(object = "polygon"), function(object,
     return(object)
 })
 
-#' @rdname enlarge-method
+#' @rdname enlarge
 setMethod("enlarge", signature(object = "rectangle"), function(object, 
                                                                extension, 
                                                                ...) {
@@ -1268,7 +1270,7 @@ setMethod("enlarge", signature(object = "rectangle"), function(object,
     return(object)
 })
 
-#' @rdname enlarge-method
+#' @rdname enlarge
 setMethod("enlarge", signature(object = "circle"), function(object, 
                                                             extension,
                                                             ...) {
@@ -1294,16 +1296,6 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' @param object Object of \code{\link[predped]{object-class}}.
 #' @param middle_edge Logical denoting whether the point should lie in the middle
 #' of a random edge. Ignored for circles. Defaults to \code{TRUE}.
-#' @param forbidden Numeric indicating where the random point cannot be drawn.
-#' For \code{\link[predped]{polygon-class}} and 
-#' \code{\link[predped]{rectangle-class}}, this is the edge number on which the 
-#' point should not be generated. The edge number is determined through the 
-#' \code{points} slot, where two coordinates create an edge. For 
-#' \code{\link[predped]{circle-method}}, this is either a vector or a matrix of 
-#' angles between which the point should not be sampled (in radians). For the 
-#' latter, it is important to note that the intervals created by the angles 
-#' should not overlap. Defaults to \code{NULL}, ensuring that a point can be 
-#' sampled anywhere on the circumference of the object.
 #'
 #' @return Numerical vector denoting a coordinate on the circumference of the 
 #' provided object.
@@ -1333,7 +1325,7 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname rng_point-method
+#' @rdname rng_point
 #' 
 #' @export
 # 
@@ -1342,7 +1334,7 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #     can be accounted for when sampling goals from them
 setGeneric("rng_point", function(object, middle_edge = TRUE) standardGeneric("rng_point"))
 
-#'@rdname rng_point-method
+#'@rdname rng_point
 setMethod("rng_point", signature(object = "polygon"), function(object, 
                                                                middle_edge = TRUE) {
 
@@ -1380,7 +1372,7 @@ setMethod("rng_point", signature(object = "polygon"), function(object,
     return(as.numeric(edges[idx, 1:2] + a * (edges[idx, 3:4] - edges[idx, 1:2])))
 })   
 
-#'@rdname rng_point-method
+#'@rdname rng_point
 setMethod("rng_point", signature(object = "circle"), function(object, 
                                                               middle_edge = TRUE) {
 
@@ -1413,7 +1405,7 @@ setMethod("rng_point", signature(object = "circle"), function(object,
     return(as.numeric(object@center + object@radius * c(cos(angle), sin(angle))))
 })   
 
-#'@rdname rng_point-method
+#'@rdname rng_point
 setMethod("rng_point", signature(object = "segment"), function(object,
                                                                middle_edge = TRUE) {
 
@@ -1435,9 +1427,9 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' \code{NULL} for the \code{\link[predped]{segment-class}}.
 #' 
 #' @details 
-#' This method is related to the \code{\link[predped]{nodes_on_circumference-method}},
+#' This method is related to the \code{\link[predped]{nodes_on_circumference}},
 #' but differs in the respect that 
-#' \code{\link[predped]{nodes_on_circumference-method}} adds nodes directly on the 
+#' \code{\link[predped]{nodes_on_circumference}} adds nodes directly on the 
 #' circumference of an object, while \code{add_nodes} adds nodes on the outside 
 #' of inside of an object.
 #' 
@@ -1464,6 +1456,8 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' Defaults to \code{FALSE}.
 #' @param outside Logical denoting whether the nodes should lie on the outside 
 #' (\code{TRUE}) or inside (\code{FALSE}) of the object. Defaults to \code{TRUE}. 
+#' @param cpp Logical denoting whether to use the R or Rcpp version of the 
+#' function. Defaults to \code{TRUE}.
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.
@@ -1490,12 +1484,12 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname add_nodes-method
+#' @rdname add_nodes
 #' 
 #' @export
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
 
-#'@rdname add_nodes-method
+#'@rdname add_nodes
 #
 # Important; assumes that the intersection point between the two edges is on 
 # the third and fourth column of `edge_1` or on the first and second column of 
@@ -1625,7 +1619,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
     return(nodes)
 })
 
-# #'@rdname add_nodes-method
+# #'@rdname add_nodes
 # setMethod("add_nodes", signature(object = "rectangle"), function(object, 
 #                                                                  space_between = 0.5,
 #                                                                  only_corners = FALSE,
@@ -1698,7 +1692,7 @@ setMethod("add_nodes", signature(object = "polygon"), function(object,
 #     return(nodes)
 # })
 
-#'@rdname add_nodes-method
+#'@rdname add_nodes
 setMethod("add_nodes", signature(object = "circle"), function(object, 
                                                               space_between = 0.5,
                                                               only_corners = FALSE,
@@ -1772,7 +1766,7 @@ setMethod("add_nodes", signature(object = "circle"), function(object,
     return(nodes)
 })
 
-#'@rdname add_nodes-method
+#'@rdname add_nodes
 setMethod("add_nodes", signature(object = "segment"), function(object, 
                                                                ...) {
     
@@ -1786,14 +1780,14 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' 
 #' Used in the \code{\link[predped]{overlap_with_objects}} function for creating 
 #' nodes of which their presence within an agent can be checked in an efficient 
-#' way (see \code{\link[predped]{moving_options-method}} and 
-#' \code{\link[predped]{in_object-method}}). Currently works for all 
+#' way (see \code{\link[predped]{moving_options}} and 
+#' \code{\link[predped]{in_object}}). Currently works for all 
 #' instances of \code{\link[predped]{object-class}}, but only returns 
 #' \code{NULL} for the \code{\link[predped]{segment-class}}.
 #' 
 #' @details 
-#' Related to the \code{\link[predped]{add_nodes-method}} with the main difference
-#' being that the \code{\link[predped]{add_nodes-method}} adds nodes around or 
+#' Related to the \code{\link[predped]{add_nodes}} with the main difference
+#' being that the \code{\link[predped]{add_nodes}} adds nodes around or 
 #' within an object, while \code{nodes_on_circumference} adds nodes directly on
 #' the circumference of an object.
 #' 
@@ -1835,12 +1829,12 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' 
 #' @docType method
 #' 
-#' @rdname nodes_on_circumference-method
+#' @rdname nodes_on_circumference
 #' 
 #' @export
 setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("nodes_on_circumference"))
 
-#'@rdname nodes_on_circumference-method
+#'@rdname nodes_on_circumference
 setMethod("nodes_on_circumference", signature(object = "polygon"), function(object, 
                                                                             space_between = 5e-2,
                                                                             cpp = FALSE) {
@@ -1870,7 +1864,7 @@ setMethod("nodes_on_circumference", signature(object = "polygon"), function(obje
     return(nodes)
 })
 
-#'@rdname nodes_on_circumference-method
+#'@rdname nodes_on_circumference
 setMethod("nodes_on_circumference", signature(object = "circle"), function(object, 
                                                                            space_between = 5e-2,
                                                                            cpp = FALSE) {
@@ -1882,7 +1876,7 @@ setMethod("nodes_on_circumference", signature(object = "circle"), function(objec
     return(points(object, length.out = ceiling(2 * pi * radius(object) / space_between)))
 })
 
-#'@rdname nodes_on_circumference-method
+#'@rdname nodes_on_circumference
 setMethod("nodes_on_circumference", signature(object = "segment"), function(object, 
                                                                             ...) {
 
@@ -1899,8 +1893,8 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' 
 #' @details 
 #' Note that this function is less efficient than the combination of 
-#' \code{\link[predped]{nodes_on_circumference-method}} and 
-#' \code{\link[predped]{in_object-method}}, which is why this combination is 
+#' \code{\link[predped]{nodes_on_circumference}} and 
+#' \code{\link[predped]{in_object}}, which is why this combination is 
 #' used in \code{\link[predped]{overlap_with_objects}} instead of the 
 #' \code{intersects} method
 #' 
@@ -1941,12 +1935,12 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' 
 #' @docType method
 #' 
-#' @rdname intersects-method
+#' @rdname intersects
 #' 
 #' @export
 setGeneric("intersects", function(object, other_object, ...) standardGeneric("intersects"))
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "polygon", other_object = "polygon"), 
           function(object, other_object, cpp = TRUE) {
@@ -1960,17 +1954,17 @@ setMethod("intersects",
     return(line_line_intersection(edges_1, edges_2, cpp = cpp))
 })
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "polygon", other_object = "circle"), 
           function(object, other_object, ...) intersects(other_object, object, ...))
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "polygon", other_object = "segment"), 
           function(object, other_object, ...) intersects(other_object, object, ...))
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "circle", other_object = "polygon"), 
           function(object, other_object, cpp = TRUE) {
@@ -1994,7 +1988,7 @@ setMethod("intersects",
     # return(line_intersection(object, edges))   
 })
 
-#' @rdname intersects-method
+#' @rdname intersects
 setMethod("intersects", 
           signature(object = "circle", other_object = "circle"), 
           function(object, other_object, ...) {
@@ -2013,12 +2007,12 @@ setMethod("intersects",
            (distance >= abs(radius(object) - radius(other_object))))
 })
 
-#' @rdname intersects-method
+#' @rdname intersects
 setMethod("intersects", 
           signature(object = "circle", other_object = "segment"), 
           function(object, other_object, ...) return(intersects(other_object, object, ...)))
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "segment", other_object = "polygon"), 
           function(object, other_object, cpp = TRUE) {
@@ -2035,7 +2029,7 @@ setMethod("intersects",
     return(any(idx)) 
 })
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "segment", other_object = "circle"), 
           function(object, other_object, cpp = TRUE) {
@@ -2053,7 +2047,7 @@ setMethod("intersects",
     return(any(in_object(other_object, coords, cpp = cpp)))
 })
 
-#'@rdname intersects-method
+#'@rdname intersects
 setMethod("intersects", 
           signature(object = "segment", other_object = "segment"), 
           function(object, other_object, ...) m4ma::line.line.intersection(object@from, 
@@ -2066,9 +2060,9 @@ setMethod("intersects",
 
 #' Check whether an Object intersects with Line Segments
 #'
-#' Generalization of the \code{\link[predped]{intersects-method}} for segments, 
+#' Generalization of the \code{\link[predped]{intersects}} for segments, 
 #' allowing for vectorized checking of intersections with segments. Is often 
-#' used within the \code{\link[predped]{intersects-method}}, especially when 
+#' used within the \code{\link[predped]{intersects}}, especially when 
 #' checking the intersections of \code{\link[predped]{polygon-class}} and 
 #' \code{\link[predped]{rectangle-class}}. Currently works for all instances 
 #' of \code{\link[predped]{object-class}}.
@@ -2108,12 +2102,12 @@ setMethod("intersects",
 #' 
 #' @docType method
 #' 
-#' @rdname line_intersection-method
+#' @rdname line_intersection
 #' 
 #' @export
 setGeneric("line_intersection", function(object, segments, ...) standardGeneric("line_intersection"))
 
-#'@rdname line_intersection-method
+#'@rdname line_intersection
 setMethod("line_intersection", signature(object = "polygon"), function(object, 
                                                                        segments, 
                                                                        return_all = FALSE,
@@ -2141,7 +2135,7 @@ setMethod("line_intersection", signature(object = "polygon"), function(object,
     }
 })
 
-#'@rdname line_intersection-method
+#'@rdname line_intersection
 setMethod("line_intersection", signature(object = "circle"), function(object, 
                                                                       segments,
                                                                       return_all = FALSE,
@@ -2246,7 +2240,7 @@ setMethod("line_intersection", signature(object = "circle"), function(object,
     }
 })
 
-#'@rdname line_intersection-method
+#'@rdname line_intersection
 setMethod("line_intersection", 
           signature(object = "segment"), 
           function(object, segments, return_all = FALSE, cpp = TRUE) line_line_intersection(matrix(c(object@from, object@to), nrow = 1), 
@@ -2261,12 +2255,12 @@ setMethod("line_intersection",
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center", signature(object = "polygon"), function(object) {
     return(object@center)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center<-", signature(object = "polygon"), function(object, value) {
     object@points <- cbind(object@points[,1] + value[1] - center(object)[1], 
                            object@points[,2] + value[2] - center(object)[2])
@@ -2274,12 +2268,12 @@ setMethod("center<-", signature(object = "polygon"), function(object, value) {
     return(object)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center", signature(object = "rectangle"), function(object) {
     return(object@center)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center<-", signature(object = "rectangle"), function(object, value) {
     object@center <- as(value, "coordinate")
     object@points <- cbind(object@points[,1] + value[1],
@@ -2287,23 +2281,23 @@ setMethod("center<-", signature(object = "rectangle"), function(object, value) {
     return(object)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center", signature(object = "circle"), function(object) {
     return(object@center)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center<-", signature(object = "circle"), function(object, value) {
     object@center <- as(value, "coordinate")
     return(object)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center", signature(object = "segment"), function(object) {
     return(object@center)
 })
 
-#' @rdname center-method
+#' @rdname center
 setMethod("center<-", signature(object = "segment"), function(object, value) {
     diff <- object@center - value
 
@@ -2317,34 +2311,34 @@ setMethod("center<-", signature(object = "segment"), function(object, value) {
 
 
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden", signature(object = "polygon"), function(object) {
     return(object@forbidden)
 })
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden<-", signature(object = "polygon"), function(object, value) {
     object@forbidden <- value
     return(object)
 })
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden", signature(object = "rectangle"), function(object) {
     return(object@forbidden)
 })
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden<-", signature(object = "rectangle"), function(object, value) {
     object@forbidden <- value
     return(object)
 })
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden", signature(object = "circle"), function(object) {
     return(object@forbidden)
 })
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 setMethod("forbidden<-", signature(object = "circle"), function(object, value) {
     object@forbidden <- value
     return(object)
@@ -2352,12 +2346,12 @@ setMethod("forbidden<-", signature(object = "circle"), function(object, value) {
 
 
 
-#' @rdname from-method
+#' @rdname from
 setMethod("from", signature(object = "segment"), function(object, ...) {
     return(object@from)
 })
 
-#' @rdname from-method
+#' @rdname from
 setMethod("from<-", signature(object = "segment"), function(object, value) {
     object@from <- value
     object@size <- sqrt((object@from[1] - object@to[1])^2 + (object@from[2] - object@to[2])^2)
@@ -2367,12 +2361,12 @@ setMethod("from<-", signature(object = "segment"), function(object, value) {
 
 
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id", signature(object = "object"), function(object) {
     return(object@id)
 })
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id<-", signature(object = "object"), function(object, value) {
     object@id <- value
     return(object)
@@ -2380,12 +2374,12 @@ setMethod("id<-", signature(object = "object"), function(object, value) {
 
 
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation", signature(object = "rectangle"), function(object) {
     return(object@orientation)
 })
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation<-", signature(object = "rectangle"), function(object, value) {
     original_value <- object@orientation
     object@orientation <- value
@@ -2395,12 +2389,12 @@ setMethod("orientation<-", signature(object = "rectangle"), function(object, val
     return(object)
 })
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation", signature(object = "segment"), function(object) {
     return(object@orientation)
 })
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation<-", signature(object = "segment"), function(object, value) {
     angle <- value - object@orientation
     object@orientation <- value   
@@ -2465,45 +2459,45 @@ setMethod("points<-", signature(object = "segment"), function(object, value) {
 
 
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", signature(object = "polygon"), function(object) {
     return(object@center)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", signature(object = "polygon"), function(object, value) {
     center(object) <- value
     return(object)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", signature(object = "rectangle"), function(object) {
     return(object@center)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", signature(object = "rectangle"), function(object, value) {
     center(object) <- value
     return(object)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", signature(object = "circle"), function(object) {
     return(object@center)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", signature(object = "circle"), function(object, value) {
     center(object) <- value
     return(object)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", signature(object = "segment"), function(object) {
     return(object@center)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", signature(object = "segment"), function(object, value) {
     center(object) <- value
     return(object)
@@ -2511,12 +2505,12 @@ setMethod("position<-", signature(object = "segment"), function(object, value) {
 
 
 
-#' @rdname radius-method
+#' @rdname radius
 setMethod("radius", signature(object = "circle"), function(object) {
     return(object@radius)
 })
 
-#' @rdname radius-method
+#' @rdname radius
 setMethod("radius<-", signature(object = "circle"), function(object, value) {
     object@radius <- value
     return(object)
@@ -2524,12 +2518,12 @@ setMethod("radius<-", signature(object = "circle"), function(object, value) {
 
 
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size", signature(object = "rectangle"), function(object) {
     return(object@size)
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size<-", signature(object = "rectangle"), function(object, value) {
     object@size <- value
 
@@ -2555,23 +2549,23 @@ setMethod("size<-", signature(object = "rectangle"), function(object, value) {
     return(object)
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size", signature(object = "circle"), function(object) {
     return(object@radius)
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size<-", signature(object = "circle"), function(object, value) {
     object@radius <- value
     return(object)
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size", signature(object = "segment"), function(object) {
     return(object@size)
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size<-", signature(object = "segment"), function(object, value) {
     # Assumption: The `from` coordinate remains the same. Then we can use an 
     # imaginary circle to get the new coordinate of `to`
@@ -2586,12 +2580,12 @@ setMethod("size<-", signature(object = "segment"), function(object, value) {
 
 
 
-#' @rdname to-method
+#' @rdname to
 setMethod("to", signature(object = "segment"), function(object, ...) {
     return(object@to)
 })
 
-#' @rdname to-method
+#' @rdname to
 setMethod("to<-", signature(object = "segment"), function(object, value) {
     object@to <- value
     object@size <- sqrt((object@from[1] - object@to[1])^2 + (object@from[2] - object@to[2])^2)

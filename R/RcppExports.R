@@ -7,7 +7,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -49,7 +49,7 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -207,7 +207,7 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' # Generate the cell centers with predped
 #' slow_centers <- compute_centers(slow_agent,
 #'                                 cpp = TRUE)
-#' fast_centers <- compute_centers(fast_agent
+#' fast_centers <- compute_centers(fast_agent,
 #'                                 cpp = TRUE)
 #'
 #' # Generate the cell centers with m4ma
@@ -234,7 +234,7 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[m4ma]{c_vd}}
 #' \code{\link[predped]{compute_centers}}
-#' \code{\link[predped]{moving_options-method}}
+#' \code{\link[predped]{moving_options}}
 #'
 #' @rdname compute_centers_rcpp
 #'
@@ -250,7 +250,7 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #' This function checks whether there is an overlap between a given agent and
 #' the objects in the environment, provided that the agent would move to the
 #' locations in \code{centers}. Returns a logical matrix as needed in
-#' \code{\link[predped]{moving_options-method}}.
+#' \code{\link[predped]{moving_options}}.
 #'
 #' @details
 #' In this function, we can only approximately check the intersection of agent
@@ -269,7 +269,7 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #'
 #' This check is then performed by looping over all the centers, changing the
 #' agents position to the position of this center, and using the
-#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+#' \code{\link[predped]{in_object}} to do the test. This is a vectorized
 #' test: For each position in \code{centers} we have a logical \code{TRUE} or
 #' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
 #' logical matrix with an equal number of rows as \code{centers} and an equal
@@ -278,8 +278,8 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #' for each center.
 #'
 #' The reason why we use this approximate method is because of time efficiency.
-#' Using the \code{\link[predped]{intersects-method}} takes a longer time than
-#' using the \code{\link[predped]{in_object-method}}, especially as the number
+#' Using the \code{\link[predped]{intersects}} takes a longer time than
+#' using the \code{\link[predped]{in_object}}, especially as the number
 #' of objects in the environment increases.
 #'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
@@ -429,14 +429,14 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' 
 #' Used in the \code{\link[predped]{overlap_with_objects}} function for creating 
 #' nodes of which their presence within an agent can be checked in an efficient 
-#' way (see \code{\link[predped]{moving_options-method}} and 
-#' \code{\link[predped]{in_object-method}}). Currently works for all 
+#' way (see \code{\link[predped]{moving_options}} and 
+#' \code{\link[predped]{in_object}}). Currently works for all 
 #' instances of \code{\link[predped]{object-class}}, but only returns 
 #' \code{NULL} for the \code{\link[predped]{segment-class}}.
 #' 
 #' @details 
-#' Related to the \code{\link[predped]{add_nodes-method}} with the main difference
-#' being that the \code{\link[predped]{add_nodes-method}} adds nodes around or 
+#' Related to the \code{\link[predped]{add_nodes}} with the main difference
+#' being that the \code{\link[predped]{add_nodes}} adds nodes around or 
 #' within an object, while \code{nodes_on_circumference} adds nodes directly on
 #' the circumference of an object.
 #' 
@@ -542,10 +542,10 @@ in_object_rcpp <- function(object, x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}}
 #' 
 #' @rdname predict_movement_rcpp
 #' 
@@ -577,10 +577,10 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}}
 #' 
 #' @rdname create_agent_specifications_rcpp
 #' 
@@ -681,10 +681,10 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -771,11 +771,11 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' potential cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{utility,agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -794,7 +794,7 @@ utility_rcpp <- function(data, parameters) {
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' \code{\link[predped]{utility,data.frame}} for the actual computation 
 #' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -816,11 +816,11 @@ utility_rcpp <- function(data, parameters) {
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{utility,data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 

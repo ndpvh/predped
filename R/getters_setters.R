@@ -32,12 +32,12 @@
 #' 
 #' @docType method
 #' 
-#' @rdname agents-method
+#' @rdname agents
 #' 
 #' @export
 setGeneric("agents", function(object) standardGeneric("agents"))
 
-#' @rdname agents-method
+#' @rdname agents
 #' 
 #' @export
 setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
@@ -82,12 +82,12 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname archetypes-method
+#' @rdname archetypes
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 
-#' @rdname archetypes-method
+#' @rdname archetypes
 #'
 #' @export
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
@@ -116,12 +116,12 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' 
 #' @docType method
 #' 
-#' @rdname busy-method
+#' @rdname busy
 #' 
 #' @export
 setGeneric("busy", function(object) standardGeneric("busy"))
 
-#' @rdname busy-method
+#' @rdname busy
 #' 
 #' @export
 setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
@@ -154,12 +154,12 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname cell-method
+#' @rdname cell
 #' 
 #' @export
 setGeneric("cell", function(object) standardGeneric("cell"))
 
-#' @rdname cell-method
+#' @rdname cell
 #' 
 #' @export
 setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
@@ -192,12 +192,12 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname cell_centers-method
+#' @rdname cell_centers
 #' 
 #' @export
 setGeneric("cell_centers", function(object) standardGeneric("cell_centers"))
 
-#' @rdname cell_centers-method
+#' @rdname cell_centers
 #' 
 #' @export
 setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_centers<-"))
@@ -206,7 +206,7 @@ setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_cente
 
 #' Getter/Setter for the \code{center}-slot
 #' 
-#' Is a more specific version of \code{\link[predped]{position-method}} that 
+#' Is a more specific version of \code{\link[predped]{position}} that 
 #' works for all extensions of the \code{\link[predped]{object-class}}.
 #' 
 #' @param object An instance of the \code{\link[predped]{object-class}} or the 
@@ -245,12 +245,12 @@ setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_cente
 #' 
 #' @docType method 
 #' 
-#' @rdname center-method
+#' @rdname center
 #' 
 #' @export
 setGeneric("center", function(object) standardGeneric("center"))
 
-#' @rdname center-method
+#' @rdname center
 #' 
 #' @export 
 setGeneric("center<-", function(object, value) standardGeneric("center<-"))
@@ -284,12 +284,12 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname color-method
+#' @rdname color
 #' 
 #' @export
 setGeneric("color", function(object) standardGeneric("color"))
 
-#' @rdname color-method
+#' @rdname color
 #' 
 #' @export
 setGeneric("color<-", function(object, value) standardGeneric("color<-"))
@@ -318,12 +318,12 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname counter-method
+#' @rdname counter
 #' 
 #' @export
 setGeneric("counter", function(object) standardGeneric("counter"))
 
-#' @rdname counter-method
+#' @rdname counter
 #' 
 #' @export
 setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
@@ -357,12 +357,12 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname current_goal-method
+#' @rdname current_goal
 #' 
 #' @export
 setGeneric("current_goal", function(object) standardGeneric("current_goal"))
 
-#' @rdname current_goal-method
+#' @rdname current_goal
 #' 
 #' @export
 setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
@@ -391,12 +391,12 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' 
 #' @docType method
 #' 
-#' @rdname done-method
+#' @rdname done
 #' 
 #' @export
 setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
 
-#' @rdname done-method
+#' @rdname done
 #' 
 #' @export
 setGeneric("done<-", function(object, value) standardGeneric("done<-"))
@@ -434,12 +434,12 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname entrance-method
+#' @rdname entrance
 #' 
 #' @export
 setGeneric("entrance", function(object) standardGeneric("entrance"))
 
-#' @rdname entrance-method
+#' @rdname entrance
 #' 
 #' @export
 setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
@@ -477,12 +477,12 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname exit-method
+#' @rdname exit
 #' 
 #' @export
 setGeneric("exit", function(object) standardGeneric("exit"))
 
-#' @rdname exit-method
+#' @rdname exit
 #' 
 #' @export
 setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
@@ -516,12 +516,12 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname forbidden-method
+#' @rdname forbidden
 #' 
 #' @export
 setGeneric("forbidden", function(object) standardGeneric("forbidden"))
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 #' 
 #' @export
 setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-"))
@@ -558,12 +558,12 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' 
 #' @docType method
 #' 
-#' @rdname from-method
+#' @rdname from
 #' 
 #' @export 
 setGeneric("from", function(object, ...) standardGeneric("from"))
 
-#' @rdname from-method
+#' @rdname from
 #' 
 #' @export 
 setGeneric("from<-", function(object, value) standardGeneric("from<-"))
@@ -597,12 +597,12 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname goals-method
+#' @rdname goals
 #' 
 #' @export
 setGeneric("goals", function(object) standardGeneric("goals"))
 
-#' @rdname goals-method
+#' @rdname goals
 #' 
 #' @export
 setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
@@ -635,12 +635,12 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' 
 #' @docType method 
 #' 
-#' @rdname group-method
+#' @rdname group
 #' 
 #' @export
 setGeneric("group", function(object) standardGeneric("group"))
 
-#' @rdname group-method
+#' @rdname group
 #' 
 #' @export
 setGeneric("group<-", function(object, value) standardGeneric("group<-"))
@@ -690,12 +690,12 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' 
 #' @docType method 
 #' 
-#' @rdname id-method
+#' @rdname id
 #' 
 #' @export
 setGeneric("id", function(object) standardGeneric("id"))
 
-#' @rdname id-method
+#' @rdname id
 #' 
 #' @export
 setGeneric("id<-", function(object, value) standardGeneric("id<-"))
@@ -732,12 +732,12 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname iteration-method
+#' @rdname iteration
 #' 
 #' @export
 setGeneric("iteration", function(object) standardGeneric("iteration"))
 
-#' @rdname iteration-method
+#' @rdname iteration
 #' 
 #' @export
 setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-"))
@@ -774,12 +774,12 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' 
 #' @docType method
 #' 
-#' @rdname iteration_variables-method
+#' @rdname iteration_variables
 #' 
 #' @export
 setGeneric("iteration_variables", function(object) standardGeneric("iteration_variables"))
 
-#' @rdname iteration_variables-method
+#' @rdname iteration_variables
 #' 
 #' @export
 setGeneric("iteration_variables<-", function(object, value) standardGeneric("iteration_variables<-"))
@@ -817,12 +817,12 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' 
 #' @docType method
 #' 
-#' @rdname limited_access-method
+#' @rdname limited_access
 #' 
 #' @export
 setGeneric("limited_access", function(object) standardGeneric("limited_access"))
 
-#' @rdname limited_access-method
+#' @rdname limited_access
 #' 
 #' @export
 setGeneric("limited_access<-", function(object, value) standardGeneric("limited_access<-"))
@@ -905,12 +905,12 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' 
 #' @docType method 
 #' 
-#' @rdname orientation-method
+#' @rdname orientation
 #' 
 #' @export
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
-#' @rdname orientation-method
+#' @rdname orientation
 #' 
 #' @export 
 setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
@@ -944,12 +944,12 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' 
 #' @docType method
 #' 
-#' @rdname parameters-method
+#' @rdname parameters
 #' 
 #' @export
 setGeneric("parameters", function(object) standardGeneric("parameters"))
 
-#' @rdname parameters-method
+#' @rdname parameters
 #' 
 #' @export
 setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
@@ -978,12 +978,12 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' 
 #' @docType method
 #' 
-#' @rdname path-method
+#' @rdname path
 #' 
 #' @export
 setGeneric("path", function(object) standardGeneric("path"))
 
-#' @rdname path-method
+#' @rdname path
 #' 
 #' @export
 setGeneric("path<-", function(object, value) standardGeneric("path<-"))
@@ -1108,12 +1108,12 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname position-method
+#' @rdname position
 #' 
 #' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
-#' @rdname position-method
+#' @rdname position
 #' 
 #' @export
 setGeneric("position<-", function(object, value) standardGeneric("position<-"))
@@ -1151,12 +1151,12 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
 #' 
 #' @export
 setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
 #' 
 #' @export
 setGeneric("potential_agents<-", function(object, value) standardGeneric("potential_agents<-"))
@@ -1189,12 +1189,12 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' 
 #' @docType method
 #' 
-#' @rdname radius-method
+#' @rdname radius
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
 
-#' @rdname radius-method
+#' @rdname radius
 #' 
 #' @export
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
@@ -1236,12 +1236,12 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname setting-method
+#' @rdname setting
 #' 
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
-#' @rdname setting-method
+#' @rdname setting
 #' 
 #' @export
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
@@ -1276,12 +1276,12 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname shape-method
+#' @rdname shape
 #' 
 #' @export
 setGeneric("shape", function(object) standardGeneric("shape"))
 
-#' @rdname shape-method
+#' @rdname shape
 #' 
 #' @export
 setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
@@ -1290,11 +1290,11 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 
 #' Getter/Setter for the \code{size}-slot
 #' 
-#' Works for the \code{\link[predped]{agent-method}},
-#' \code{\link[predped]{circle-method}},
-#' \code{\link[predped]{object-method}},
-#' \code{\link[predped]{rectangle-method}}, and
-#' \code{\link[predped]{segment-method}}.
+#' Works for the \code{\link[predped]{agent}},
+#' \code{\link[predped]{circle}},
+#' \code{\link[predped]{object}},
+#' \code{\link[predped]{rectangle}}, and
+#' \code{\link[predped]{segment}}.
 #' 
 #' @param object An instance of the \code{\link[predped]{object-class}} or 
 #' \code{\link[predped]{agent-class}}.
@@ -1302,7 +1302,7 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' \code{size} slot.
 #' 
 #' @details 
-#' Note that for \code{\link[predped]{circle-method}}, this getter outputs the 
+#' Note that for \code{\link[predped]{circle}}, this getter outputs the 
 #' radius (and similarly, the setter changes the radius).
 #' 
 #' @examples 
@@ -1336,12 +1336,12 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname size-method
+#' @rdname size
 #' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
-#' @rdname size-method
+#' @rdname size
 #' 
 #' @export 
 setGeneric("size<-", function(object, value) standardGeneric("size<-"))
@@ -1374,12 +1374,12 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname speed-method
+#' @rdname speed
 #' 
 #' @export
 setGeneric("speed", function(object) standardGeneric("speed"))
 
-#' @rdname speed-method
+#' @rdname speed
 #' 
 #' @export
 setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
@@ -1412,12 +1412,12 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname status-method
+#' @rdname status
 #' 
 #' @export
 setGeneric("status", function(object) standardGeneric("status"))
 
-#' @rdname status-method
+#' @rdname status
 #' 
 #' @export
 setGeneric("status<-", function(object, value) standardGeneric("status<-"))
@@ -1454,12 +1454,12 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname to-method
+#' @rdname to
 #' 
 #' @export 
 setGeneric("to", function(object, ...) standardGeneric("to"))
 
-#' @rdname to-method
+#' @rdname to
 #' 
 #' @export 
 setGeneric("to<-", function(object, value) standardGeneric("to<-"))
@@ -1493,12 +1493,12 @@ setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 #' 
 #' @docType method
 #' 
-#' @rdname utility_variables-method
+#' @rdname utility_variables
 #' 
 #' @export
 setGeneric("utility_variables", function(object) standardGeneric("utility_variables"))
 
-#' @rdname utility_variables-method
+#' @rdname utility_variables
 #' 
 #' @export
 setGeneric("utility_variables<-", function(object, value) standardGeneric("utility_variables<-"))
@@ -1535,12 +1535,12 @@ setGeneric("utility_variables<-", function(object, value) standardGeneric("utili
 #' 
 #' @docType method
 #' 
-#' @rdname variables-method
+#' @rdname variables
 #' 
 #' @export
 setGeneric("variables", function(object) standardGeneric("variables"))
 
-#' @rdname variables-method
+#' @rdname variables
 #' 
 #' @export
 setGeneric("variables<-", function(object, value) standardGeneric("variables<-"))
@@ -1574,12 +1574,12 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' 
 #' @docType method
 #' 
-#' @rdname waiting_counter-method
+#' @rdname waiting_counter
 #' 
 #' @export
 setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
 
-#' @rdname waiting_counter-method
+#' @rdname waiting_counter
 #' 
 #' @export
 setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))
@@ -1616,12 +1616,12 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' 
 #' @docType method
 #' 
-#' @rdname weights-method
+#' @rdname weights
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 
-#' @rdname weights-method
+#' @rdname weights
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))

@@ -162,7 +162,7 @@ RObject get_angles_rcpp(int agent_idx,
 //' 
 //' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
 //' 
-//' @param object Object of the \code{\link[predped]{agent-class}}.
+//' @param agent Object of the \code{\link[predped]{agent-class}}.
 //' @param state Object of the \code{\link[predped]{state-class}}.
 //' @param background Object of the \code{\link[predped]{background-class}}.
 //' @param agent_specifications List created by the 
@@ -172,17 +172,17 @@ RObject get_angles_rcpp(int agent_idx,
 //' \code{m4ma} utility functions.
 //' @param centers Numerical matrix containing the coordinates at each position
 //' the object can be moved to. Should have one row for each cell.
-//' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-//' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+//' @param check_original Logical matrix of dimensions 11 x 3 denoting whether an 
+//' agent can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
 //' 
 //' @return Data.frame containing all of the needed variables to be able to 
 //' compute the values of the utility functions.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped-method}},
-//' \code{\link[predped]{simulate,state-method}},
-//' \code{\link[predped]{update,agent-method}},
-//' \code{\link[predped]{update,state-method}},
+//' \code{\link[predped]{simulate,predped}},
+//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{update,agent}},
+//' \code{\link[predped]{update,state}},
 //' \code{\link[predped]{update_position}},
 //' \code{\link[predped]{update}}
 //' 
@@ -576,11 +576,11 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' potential cells.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped-method}},
-//' \code{\link[predped]{simulate,state-method}},
-//' \code{\link[predped]{update,agent-method}},
-//' \code{\link[predped]{update,state-method}},
-//' \code{\link[predped]{utility,agent-method}},
+//' \code{\link[predped]{simulate,predped}},
+//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{update,agent}},
+//' \code{\link[predped]{update,state}},
+//' \code{\link[predped]{utility,agent}},
 //' \code{\link[predped]{compute_utility_variables}},
 //' \code{\link[predped]{params_from_csv}},
 //' \code{\link[predped]{update_position}}
@@ -772,7 +772,7 @@ NumericVector utility_rcpp(DataFrame data,
 //' assume that none of the utility variables (i.e., the variables that serve as 
 //' input to the utility functions) is precomputed, so that it will first compute
 //' their values. This input is then provided to 
-//' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+//' \code{\link[predped]{utility,data.frame}} for the actual computation 
 //' of the utility.
 //' 
 //' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -794,11 +794,11 @@ NumericVector utility_rcpp(DataFrame data,
 //' cells in \code{centers}.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped-method}},
-//' \code{\link[predped]{simulate,state-method}},
-//' \code{\link[predped]{update,agent-method}},
-//' \code{\link[predped]{update,state-method}},
-//' \code{\link[predped]{utility,data.frame-method}},
+//' \code{\link[predped]{simulate,predped}},
+//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{update,agent}},
+//' \code{\link[predped]{update,state}},
+//' \code{\link[predped]{utility,data.frame}},
 //' \code{\link[predped]{compute_utility_variables}},
 //' \code{\link[predped]{update_position}}
 //' 

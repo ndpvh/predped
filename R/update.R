@@ -27,9 +27,9 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}}
 #' 
 #' @rdname update-state
 #' 
@@ -189,9 +189,9 @@ setMethod("update", "state", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
@@ -291,10 +291,10 @@ setMethod("update", "agent", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_goal}}
 #' 
 #' @rdname update_position
@@ -516,10 +516,10 @@ update_position <- function(agent,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname update_goal
@@ -898,10 +898,10 @@ update_goal <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}}
 #' 
 #' @rdname predict_movement
 #' 
@@ -951,10 +951,10 @@ predict_movement <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{update,agent}},
+#' \code{\link[predped]{update,state}}
 #' 
 #' @rdname create_agent_specifications
 #' 

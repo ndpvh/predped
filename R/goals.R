@@ -23,7 +23,7 @@
 #' \code{\link[predped]{id}},
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}},
-#' \code{\link[predped]{initialize,goal-method}}
+#' \code{\link[predped]{initialize,goal}}
 #'
 #' @export
 #
@@ -71,7 +71,7 @@ goal <- setClass("goal", list(id = "character",
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}}
 #' 
-#' @rdname initialize-goal-method
+#' @rdname initialize-goal
 #' 
 #' @export
 setMethod("initialize", "goal", function(.Object,
@@ -143,7 +143,7 @@ setMethod("show", "goal", function(object) {
 #' an empty character, triggering the random generation of an id.
 #' @param counter Numeric denoting the number of time steps the agent should 
 #' interact with the goal before the goal has been completed. Defaults to \code{5}.
-#' @param ... Arguments passed on to \code{\link[predped]{rng_point-method}}
+#' @param ... Arguments passed on to \code{\link[predped]{rng_point}}
 #'
 #' @return Object of \code{\link[predped]{goal-class}}.
 #' 
@@ -173,7 +173,7 @@ setMethod("show", "goal", function(object) {
 #' \code{\link[predped]{segment-class}}
 #' \code{\link[predped]{rng_point}}
 #' 
-#' @rdname add_goal-method
+#' @rdname add_goal
 #' 
 #' @export
 # 
@@ -274,7 +274,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' which the goal and agent are contained.
 #' @param space_between Numeric denoting the amount of space to leave between 
 #' an object and a path point. Within this function, the default is the radius 
-#' of the agent that is provided. However, in the \code{\link[predped]{simulate-method}}
+#' of the agent that is provided. However, in the \code{\link[predped]{simulate}}
 #' function, this default is overwritten to be equal to \code{2.5} times this 
 #' radius.
 #' @param many_nodes Logical denoting whether to create many nodes or leave 
@@ -327,7 +327,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' \code{\link[predped]{compute_edges}}
 #' \code{\link[predped]{create_edges}}
 #'
-#' @rdname find_path-method
+#' @rdname find_path
 #' 
 #' @export
 setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
@@ -497,7 +497,7 @@ setMethod("find_path", "goal", function(object,
 #' @seealso 
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @rdname interact-method
+#' @rdname interact
 #'
 #' @export
 setGeneric("interact", function(object) standardGeneric("interact"))
@@ -557,7 +557,7 @@ setMethod("interact", "goal", function(object) {
 #' \code{\link[predped]{goal-class}}
 #' \code{\link[predped]{generate_goal_stack}}
 #' 
-#' @rdname change-method
+#' @rdname change
 #' 
 #' @export 
 setGeneric("change", function(object,...) standardGeneric("change"))
@@ -609,14 +609,14 @@ setMethod("change", "goal", function(object,
 #' @param starting_position Numeric vector denoting the position at which the 
 #' agent starts in the room. Defaults to the first entrance of the \code{setting}.
 #' @param precompute_goal_paths Logical denoting whether to run the
-#' \code{\link[predped]{find_path-method}} for each of the generated goals 
+#' \code{\link[predped]{find_path}} for each of the generated goals 
 #' beforehand. Assumes that the agent does all of the goals in the order of the 
 #' goal stack. Defaults to \code{FALSE}. 
 #' @param middle_edge Logical denoting whether to sample the goals from the 
 #' middle of the edge of the objects in the \code{link[predped]{background-class}}
 #' (\code{TRUE}) or to allow the goal locations to fall on all points on these 
 #' edges (\code{FALSE}). Defaults to \code{FALSE}.
-#' @param ... Arguments provided to \code{\link[predped]{find_path-method}} to 
+#' @param ... Arguments provided to \code{\link[predped]{find_path}} to 
 #' precompute the paths that the agents should take to reach their goals. Only
 #' used when \code{precompute_goal_paths = TRUE}.
 #' 
@@ -848,12 +848,12 @@ multiple_goal_stacks <- function(n,
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname busy-method
+#' @rdname busy
 setMethod("busy", "goal", function(object) {
     return(object@busy)
 })
 
-#' @rdname busy-method
+#' @rdname busy
 setMethod("busy<-", "goal", function(object, value) {
     object@busy <- value
     return(object)
@@ -861,12 +861,12 @@ setMethod("busy<-", "goal", function(object, value) {
 
 
 
-#' @rdname counter-method
+#' @rdname counter
 setMethod("counter", "goal", function(object) {
     return(object@counter)
 })
 
-#' @rdname counter-method
+#' @rdname counter
 setMethod("counter<-", "goal", function(object, value) {
     object@counter <- value
     return(object)
@@ -874,12 +874,12 @@ setMethod("counter<-", "goal", function(object, value) {
 
 
 
-#' @rdname done-method
+#' @rdname done
 setMethod("done", "goal", function(object) {
     return(object@done)
 })
 
-#' @rdname done-method
+#' @rdname done
 setMethod("done<-", "goal", function(object, value) {
     object@done <- value
     return(object)
@@ -887,12 +887,12 @@ setMethod("done<-", "goal", function(object, value) {
 
 
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id", "goal", function(object) {
     return(object@id)
 })
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id<-", "goal", function(object, value) {
     object@id <- value
     return(object)
@@ -900,12 +900,12 @@ setMethod("id<-", "goal", function(object, value) {
 
 
 
-#' @rdname path-method
+#' @rdname path
 setMethod("path", "goal", function(object) {
     return(object@path)
 })
 
-#' @rdname path-method
+#' @rdname path
 setMethod("path<-", "goal", function(object, value) {
     object@path <- value
     return(object)
@@ -913,12 +913,12 @@ setMethod("path<-", "goal", function(object, value) {
 
 
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", "goal", function(object) {
     return(object@position)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", "goal", function(object, value) {
     object@position <- as(value, "coordinate")
     return(object)

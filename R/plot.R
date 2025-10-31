@@ -743,10 +743,10 @@ plot_edges <- function(setting,
 
 #' Transform to dataframe of segments
 #'
-#' @rdname transform_df-method
+#' @rdname transform_df
 setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "agent", function(object,
                                             plot_goal = TRUE,
                                             goal.size = 1) {
@@ -789,7 +789,7 @@ setMethod("transform_df", "agent", function(object,
                       kind = rep(object@color, each = nrow(pts))))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "background", function(object, 
                                                  entry.width = 0.3,
                                                  ...) {
@@ -832,7 +832,7 @@ setMethod("transform_df", "background", function(object,
                  transform_df(object@objects)))
 })
 
-#'@rdname transform_df-method
+#'@rdname transform_df
 setMethod("transform_df", "list", function(object,
                                            ...) {
 
@@ -843,7 +843,7 @@ setMethod("transform_df", "list", function(object,
     return(do.call("rbind", pts))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "object", function(object,
                                              kind = "object",
                                              plot_forbidden = FALSE,
@@ -913,7 +913,7 @@ setMethod("transform_df", "object", function(object,
     return(data)
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "segment", function(object,
                                               kind = "segment",
                                               segment.hjust = 0.5,
@@ -942,7 +942,7 @@ setMethod("transform_df", "segment", function(object,
                       kind = kind))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "state", function(object, 
                                             entry.width = 0.3, 
                                             plot_goal = TRUE,

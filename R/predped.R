@@ -18,7 +18,7 @@
 #' weights should be in the same length as the \code{archetypes}-slot. 
 #' 
 #' @seealso 
-#' \code{\link[predped]{initialize,predped-method}}
+#' \code{\link[predped]{initialize,predped}}
 #' 
 #' @rdname predped-class
 #' 
@@ -72,7 +72,7 @@ predped <- setClass("predped", list(id = "character",
 #' \code{\link[predped]{load_parameters}},
 #' \code{\link[predped]{params_from_csv}}
 #' 
-#' @rdname initialize-predped-method
+#' @rdname initialize-predped
 #' 
 #' @export
 setMethod("initialize", "predped", function(.Object,
@@ -174,12 +174,12 @@ setMethod("show", "predped", function(object) {
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id", "predped", function(object) {
     return(object@id)
 })
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id<-", "predped", function(object, value) {
     object@id <- value
     return(object)
@@ -187,12 +187,12 @@ setMethod("id<-", "predped", function(object, value) {
 
 
 
-#' @rdname setting-method
+#' @rdname setting
 setMethod("setting", "predped", function(object) {
     return(object@setting)
 })
 
-#' @rdname setting-method
+#' @rdname setting
 setMethod("setting<-", "predped", function(object, value) {
     object@setting <- value
     return(object)
@@ -200,12 +200,12 @@ setMethod("setting<-", "predped", function(object, value) {
 
 
 
-#' @rdname parameters-method
+#' @rdname parameters
 setMethod("parameters", "predped", function(object) {
     return(object@parameters)
 })
 
-#' @rdname parameters-method
+#' @rdname parameters
 setMethod("parameters<-", "predped", function(object, value) {
     # First check whether the archetypes still add up
     if(!all(object@archetypes %in% value[["params_archetypes"]]$name) |
@@ -219,12 +219,12 @@ setMethod("parameters<-", "predped", function(object, value) {
 
 
 
-#' @rdname archetypes-method
+#' @rdname archetypes
 setMethod("archetypes", "predped", function(object) {
     return(object@archetypes)
 })
 
-#' @rdname archetypes-method
+#' @rdname archetypes
 setMethod("archetypes<-", "predped", function(object, value) {
     # Throw an error if you don't have the parameters for the provided 
     # archetypes in your data.frame already
@@ -245,12 +245,12 @@ setMethod("archetypes<-", "predped", function(object, value) {
 
 
 
-#' @rdname weights-method
+#' @rdname weights
 setMethod("weights", "predped", function(object) {
     return(object@weights)
 })
 
-#' @rdname weights-method
+#' @rdname weights
 setMethod("weights<-", "predped", function(object, value) {
     if(length(value) != length(object@weights)) {
         stop("Provided weights should be of equal size as the provided archetypes.")
