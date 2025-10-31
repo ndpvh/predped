@@ -380,11 +380,8 @@ many_edges <- readRDS(file.path("tests", "testthat", "data", "many_edges_bench.R
 
 # Introduce unevaluated edges as well: More representative of what's going on 
 # down below
-few_uneval_edges <- create_nodes(c(0, 13), c(0.3, 0.5), supermarket, many_nodes = FALSE)
-few_uneval_edges <- combine_nodes(few_uneval_edges)
-
-many_uneval_edges <- create_nodes(c(0, 13), c(0.3, 0.5), supermarket, many_nodes = TRUE)
-many_uneval_edges <- combine_nodes(many_uneval_edges)
+few_uneval_edges <- readRDS(file.path("tests", "testthat", "data", "few_uneval_edges_bench.Rds"))
+many_uneval_edges <- readRDS(file.path("tests", "testthat", "data", "many_uneval_edges_bench.Rds"))
 
 # Do the same for a dataset and parameters that will serve as input to some 
 # benchmarks
@@ -832,11 +829,21 @@ benchmark_test <- list(
 
     # general.R
     "line_line_intersection" = list(
-        " | " = function() {
+        "cpp = FALSE" = function() {
             return(
                 line_line_intersection(
                     benchmark_args[["line_line_intersection"]][[1]],
-                    benchmark_args[["line_line_intersection"]][[2]]
+                    benchmark_args[["line_line_intersection"]][[2]],
+                    cpp = FALSE
+                )
+            )
+        },
+        "cpp = TRUE" = function() {
+            return(
+                line_line_intersection(
+                    benchmark_args[["line_line_intersection"]][[1]],
+                    benchmark_args[["line_line_intersection"]][[2]],
+                    cpp = TRUE
                 )
             )
         }
@@ -1451,27 +1458,57 @@ benchmark_test <- list(
         }
     ),
     "line_intersection" = list(
-        "polygon" = function() {
+        "polygon | cpp = FALSE" = function() {
             return(
                 line_intersection(
                     benchmark_args[["line_intersection"]][[1]],
-                    benchmark_args[["line_intersection"]][[4]]
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = FALSE
                 )
             )
         },
-        "rectangle" = function() {
+        "rectangle | cpp = FALSE" = function() {
             return(
                 line_intersection(
                     benchmark_args[["line_intersection"]][[2]],
-                    benchmark_args[["line_intersection"]][[4]]
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = FALSE
                 )
             )
         },
-        "circle" = function() {
+        "circle | cpp = FALSE" = function() {
             return(
                 line_intersection(
                     benchmark_args[["line_intersection"]][[3]],
-                    benchmark_args[["line_intersection"]][[4]]
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = FALSE
+                )
+            )
+        },
+        "polygon | cpp = TRUE" = function() {
+            return(
+                line_intersection(
+                    benchmark_args[["line_intersection"]][[1]],
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = TRUE
+                )
+            )
+        },
+        "rectangle | cpp = TRUE" = function() {
+            return(
+                line_intersection(
+                    benchmark_args[["line_intersection"]][[2]],
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = TRUE
+                )
+            )
+        },
+        "circle | cpp = TRUE" = function() {
+            return(
+                line_intersection(
+                    benchmark_args[["line_intersection"]][[3]],
+                    benchmark_args[["line_intersection"]][[4]],
+                    cpp = TRUE
                 )
             )
         }
@@ -1930,11 +1967,21 @@ benchmark_test <- list(
         }
     ),
     "prune_edges" = list(
-        " | " = function() {
+        "cpp = FALSE" = function() {
             return(
                 prune_edges(
                     benchmark_args[["prune_edges"]][[1]],
-                    benchmark_args[["prune_edges"]][[2]]
+                    benchmark_args[["prune_edges"]][[2]],
+                    cpp = FALSE
+                )
+            )
+        },
+        "cpp = TRUE" = function() {
+            return(
+                prune_edges(
+                    benchmark_args[["prune_edges"]][[1]],
+                    benchmark_args[["prune_edges"]][[2]],
+                    cpp = TRUE
                 )
             )
         }
