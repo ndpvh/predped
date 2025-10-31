@@ -32,7 +32,7 @@
 #' benchmark case per function (if \code{summarize = FALSE}) or an HTML file 
 #' summarizing the results of the benchmark (if \code{summarize = TRUE})
 #' 
-#' @example 
+#' @examples
 #' # Run benchmark for simulate with 1000 iterations
 #' benchmark(
 #'     x = "simulate",

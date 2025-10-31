@@ -14,6 +14,8 @@ compute_utility_variables_rcpp(
 )
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -27,10 +29,8 @@ communication between the \code{predped} simulation functions and the
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
 
-\item{object}{Object of the \code{\link[predped]{agent-class}}.}
-
-\item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
-can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
+\item{check_original}{Logical matrix of dimensions 11 x 3 denoting whether an 
+agent can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
 }
 \value{
 Data.frame containing all of the needed variables to be able to 
@@ -40,10 +40,10 @@ compute the values of the utility functions.
 Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
+\code{\link[predped]{simulate,predped}},
+\code{\link[predped]{simulate,state}},
+\code{\link[predped]{update,agent}},
+\code{\link[predped]{update,state}},
 \code{\link[predped]{update_position}},
 \code{\link[predped]{update}}
 }

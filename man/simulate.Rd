@@ -75,7 +75,7 @@ goals the agents should accomplish. It's exact value is handled by
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
-\code{\link[predped]{find_path-method}} for each of the generated goals
+\code{\link[predped]{find_path}} for each of the generated goals
 beforehand. Assumes that the agent does all of the goals in the order of the
 goal stack. Defaults to \code{FALSE}.}
 
@@ -131,7 +131,7 @@ useful when simulating evacuations (giving everyone "goal exit") or trying
 to guide behavior in any other way. Defaults to "\(x) x", meaning the state
 remains unaltered.}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{simulate,state-method}}
+\item{...}{Arguments passed on to the \code{\link[predped]{simulate,state}}
 function.}
 
 \item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
@@ -154,7 +154,7 @@ This function allows users to simulate data from their specified
 \code{\link[predped]{predped-class}}.
 }
 \details{
-Heavily depends on \code{\link[predped]{simulate,state-method}} and
+Heavily depends on \code{\link[predped]{simulate,state}} and
 \code{\link[predped]{update}}.
 
 The arguments that can be used to influence the simulation behavior might
@@ -162,7 +162,7 @@ be overwhelming, which is why we include a small categorization of the
 arguments in this sections. Roughly speaking, this function has multiple
 arguments that influence a same aspect of the simulation. These are the
 following (note that here all arguments are provided; some of these may
-only appear in the documentation of \code{\link[predped]{simulate,state-method}}).
+only appear in the documentation of \code{\link[predped]{simulate,state}}).
 
 Arguments that directly influence the general characteristics of the
 simulation and the model itself.

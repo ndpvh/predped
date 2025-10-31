@@ -45,6 +45,9 @@ Defaults to \code{FALSE}.}
 
 \item{outside}{Logical denoting whether the nodes should lie on the outside 
 (\code{TRUE}) or inside (\code{FALSE}) of the object. Defaults to \code{TRUE}.}
+
+\item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
+function. Defaults to \code{TRUE}.}
 }
 \value{
 Numerical matrix containing the nodes that were created around/within
@@ -57,9 +60,9 @@ instances of \code{\link[predped]{object-class}}, but only returns
 \code{NULL} for the \code{\link[predped]{segment-class}}.
 }
 \details{
-This method is related to the \code{\link[predped]{nodes_on_circumference-method}},
+This method is related to the \code{\link[predped]{nodes_on_circumference}},
 but differs in the respect that 
-\code{\link[predped]{nodes_on_circumference-method}} adds nodes directly on the 
+\code{\link[predped]{nodes_on_circumference}} adds nodes directly on the 
 circumference of an object, while \code{add_nodes} adds nodes on the outside 
 of inside of an object.
 

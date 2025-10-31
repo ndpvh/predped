@@ -10,7 +10,7 @@ time_series_rcpp(trace, time_step = 0.5)
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
+to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).}
 }
 \description{
 Rcpp alternative for \code{\link[predped]{time_series}}.

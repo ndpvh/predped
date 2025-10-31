@@ -42,14 +42,14 @@ size(object) <- value
 \code{size} slot.}
 }
 \description{
-Works for the \code{\link[predped]{agent-method}},
-\code{\link[predped]{circle-method}},
-\code{\link[predped]{object-method}},
-\code{\link[predped]{rectangle-method}}, and
-\code{\link[predped]{segment-method}}.
+Works for the \code{\link[predped]{agent}},
+\code{\link[predped]{circle}},
+\code{\link[predped]{object}},
+\code{\link[predped]{rectangle}}, and
+\code{\link[predped]{segment}}.
 }
 \details{
-Note that for \code{\link[predped]{circle-method}}, this getter outputs the 
+Note that for \code{\link[predped]{circle}}, this getter outputs the 
 radius (and similarly, the setter changes the radius).
 }
 \examples{

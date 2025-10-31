@@ -42,7 +42,7 @@ center(object) <- value
 \code{center} slot.}
 }
 \description{
-Is a more specific version of \code{\link[predped]{position-method}} that 
+Is a more specific version of \code{\link[predped]{position}} that 
 works for all extensions of the \code{\link[predped]{object-class}}.
 }
 \examples{

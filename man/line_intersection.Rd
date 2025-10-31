@@ -34,9 +34,9 @@ provided object. Whenever there is an intersection, the logical is \code{TRUE}
 and otherwise, the logical is \code{FALSE}.
 }
 \description{
-Generalization of the \code{\link[predped]{intersects-method}} for segments, 
+Generalization of the \code{\link[predped]{intersects}} for segments, 
 allowing for vectorized checking of intersections with segments. Is often 
-used within the \code{\link[predped]{intersects-method}}, especially when 
+used within the \code{\link[predped]{intersects}}, especially when 
 checking the intersections of \code{\link[predped]{polygon-class}} and 
 \code{\link[predped]{rectangle-class}}. Currently works for all instances 
 of \code{\link[predped]{object-class}}.

@@ -37,8 +37,8 @@ in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 }
 \seealso{
 \code{\link[predped]{create_agent_specifications}},
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}}
+\code{\link[predped]{simulate,predped}},
+\code{\link[predped]{simulate,state}},
+\code{\link[predped]{update,agent}},
+\code{\link[predped]{update,state}}
 }

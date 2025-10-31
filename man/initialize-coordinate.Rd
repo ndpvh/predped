@@ -7,7 +7,7 @@
 \S4method{initialize}{coordinate}(.Object, ...)
 }
 \arguments{
-\item{x}{Numerical vector of size 2 denoting the coordinate.}
+\item{.Object}{Numerical vector of size 2 denoting the coordinate.}
 }
 \value{
 Object of the \code{\link[predped]{coordinate-class}}

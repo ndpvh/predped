@@ -24,7 +24,7 @@ Logical whether the point is outside of the object (\code{TRUE}) or
 inside of the object (\code{FALSE}).
 }
 \description{
-Returns the opposite of the \code{\link[predped]{in_object-method}}. 
+Returns the opposite of the \code{\link[predped]{in_object}}. 
 Currently works for all classes inside of the \code{\link[predped]{object-class}}.
 }
 \examples{

@@ -21,17 +21,6 @@ rng_point(object, middle_edge = TRUE)
 
 \item{middle_edge}{Logical denoting whether the point should lie in the middle
 of a random edge. Ignored for circles. Defaults to \code{TRUE}.}
-
-\item{forbidden}{Numeric indicating where the random point cannot be drawn.
-For \code{\link[predped]{polygon-class}} and 
-\code{\link[predped]{rectangle-class}}, this is the edge number on which the 
-point should not be generated. The edge number is determined through the 
-\code{points} slot, where two coordinates create an edge. For 
-\code{\link[predped]{circle-method}}, this is either a vector or a matrix of 
-angles between which the point should not be sampled (in radians). For the 
-latter, it is important to note that the intervals created by the angles 
-should not overlap. Defaults to \code{NULL}, ensuring that a point can be 
-sampled anywhere on the circumference of the object.}
 }
 \value{
 Numerical vector denoting a coordinate on the circumference of the 

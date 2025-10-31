@@ -9,7 +9,7 @@ add_goal(object, ...)
 \arguments{
 \item{object}{Object or instance of the \code{\link[predped]{object-class}}.}
 
-\item{...}{Arguments passed on to \code{\link[predped]{rng_point-method}}}
+\item{...}{Arguments passed on to \code{\link[predped]{rng_point}}}
 
 \item{background}{Object of \code{\link[predped]{background-class}} containing
 all objects in the environment that can have a goal attached to them in its 

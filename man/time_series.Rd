@@ -8,7 +8,7 @@ time_series(x, time_step = 0.5, cpp = TRUE)
 }
 \arguments{
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
+to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).}
 
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}
 }

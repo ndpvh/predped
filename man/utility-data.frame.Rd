@@ -28,11 +28,11 @@ utility functions to derive the utility for each of the different moving
 options.
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
-\code{\link[predped]{utility,agent-method}},
+\code{\link[predped]{simulate,predped}},
+\code{\link[predped]{simulate,state}},
+\code{\link[predped]{update,agent}},
+\code{\link[predped]{update,state}},
+\code{\link[predped]{utility,agent}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{update_position}}

@@ -27,11 +27,17 @@ assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
 negative symmetric versions of the smaller angles).}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
+to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).}
 
-\item{treshold}{Numeric denoting under which observed value for speed the 
+\item{threshold}{Numeric denoting under which observed value for speed the 
 cell to which an agent has moved should be put to `0`. Defaults to a value 
 based on the observed measurement error in our system.}
+
+\item{initial_conditions}{Logical denoting whether the added columns should 
+include the initial conditions (that is, speed, orientation, and position at
+the previous time point) alongside their current alternatives. Useful when 
+one wants to compute the values of the utility-related variables from the 
+data. Defaults to \code{FALSE}.}
 }
 \description{
 This function adds several motion variables to an already existing dataset. 

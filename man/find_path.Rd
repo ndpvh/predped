@@ -18,7 +18,7 @@ which the goal and agent are contained.}
 
 \item{space_between}{Numeric denoting the amount of space to leave between 
 an object and a path point. Within this function, the default is the radius 
-of the agent that is provided. However, in the \code{\link[predped]{simulate-method}}
+of the agent that is provided. However, in the \code{\link[predped]{simulate}}
 function, this default is overwritten to be equal to \code{2.5} times this 
 radius.}
 

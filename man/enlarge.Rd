@@ -24,6 +24,9 @@ Works for all objects of the
 
 \item{extension}{Numeric denoting the length with which to extend the object 
 in all directions.}
+
+\item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
+function. Defaults to \code{TRUE}.}
 }
 \value{
 Object of the same class as the original, but with a larger 

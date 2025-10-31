@@ -50,8 +50,8 @@ Currently works for all combinations of instances of
 }
 \details{
 Note that this function is less efficient than the combination of 
-\code{\link[predped]{nodes_on_circumference-method}} and 
-\code{\link[predped]{in_object-method}}, which is why this combination is 
+\code{\link[predped]{nodes_on_circumference}} and 
+\code{\link[predped]{in_object}}, which is why this combination is 
 used in \code{\link[predped]{overlap_with_objects}} instead of the 
 \code{intersects} method
 

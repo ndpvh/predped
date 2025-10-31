@@ -664,7 +664,7 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' 
 #' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -674,8 +674,8 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' \code{m4ma} utility functions.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param check_original Logical matrix of dimensions 11 x 3 denoting whether an 
+#' agent can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.

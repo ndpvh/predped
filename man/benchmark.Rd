@@ -28,6 +28,12 @@ the summarized results of the benchmark (mean, standard deviation, and
 2.5% and 97.5% quantiles of the times in seconds). If \code{FALSE}, the output
 will be a list of lists containing the raw execution times per function and 
 per benchmark case for the function. Defaults to \code{TRUE}.}
+
+\item{digits}{Integer denoting the decimal points to which to round to. 
+Ignored if \code{summarize = FALSE}. Defaults to \code{2}.}
+
+\item{progress}{Logical denoting whether to add a progress bar for the 
+benchmarks. Defaults to \code{TRUE}.}
 }
 \value{
 Either a list of lists containing the raw execution times per 
@@ -40,4 +46,17 @@ measured through repeated assessments with \code{Sys.time()}, providing us
 with a measure of the user-based time for the functions. Importantly, this is
 different from pure execution time of the function, which may be less than 
 the user time.
+}
+\examples{
+# Run benchmark for simulate with 1000 iterations
+benchmark(
+    x = "simulate",
+    iterations = 1000
+)
+
+# Run benchmark for all functions with 10 iterations
+benchmark(
+   iterations = 10
+)
+
 }

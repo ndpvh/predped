@@ -35,9 +35,15 @@ cell that the agent might move to.}
 \item{orientations}{Numerical matrix that contains the change in orientation 
 per cell that the agent might move to.}
 
+\item{time_step}{Numeric denoting the time step in seconds. Defaults to 
+\code{0.5}}
+
 \item{step}{Numeric denoting the change in angle for looking around in 
 degrees. Defaults to \code{45}, meaning that the agent looks around 
 exhaustively in 8 different directions (360 / 45) by default.}
+
+\item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
+function. Defaults to \code{TRUE}.}
 }
 \value{
 Numeric denoting the angle or direction that had the highest utility

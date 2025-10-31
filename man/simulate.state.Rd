@@ -44,7 +44,7 @@
 
 \item{add_agent}{Logical denoting whether an agent should be added to the
 simulation. Defaults to \code{FALSE} and is typically handled by the
-\code{\link[predped]{simulate,predped-method}} function, where it accounts for the
+\code{\link[predped]{simulate,predped}} function, where it accounts for the
 variables \code{add_agent_after} and \code{max_agents}.}
 
 \item{group_size}{Numeric matrix with two columns where the first column
@@ -131,7 +131,7 @@ a single previous state.
 Heavily depends on \code{\link[predped]{update}}.
 
 Many of the arguments here are either shared or derived from the upper-level
-\code{\link[predped]{simulate,predped-method}} function. Please refer to the
+\code{\link[predped]{simulate,predped}} function. Please refer to the
 Details in its documentation to see a breakdown of the most important
 arguments.
 }
@@ -176,6 +176,6 @@ plot(next_state)
 \seealso{
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{state-class}},
-\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate,predped}},
 \code{\link[predped]{update}}
 }
