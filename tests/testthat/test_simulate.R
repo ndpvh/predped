@@ -83,7 +83,8 @@ testthat::test_that("Creating initial condition works", {
     #
     # Check this test, stops prematurely for some reason
     set.seed(1)
-    agents_many <- predped::create_initial_condition(50, model, goal_number = 5, individual_differences = FALSE)
+    agents_many <- predped::create_initial_condition(50, model, goal_number = 5, individual_differences = FALSE) |>
+        suppressMessages()
 
     testthat::expect_equal(length(agents_few), 3)
     testthat::expect_equal(length(agents_many), 7)
