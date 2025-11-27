@@ -95,6 +95,9 @@ setMethod("plot", "agent", function(x,
                                     agent.fill = "white",
                                     goal.size = 1,
                                     ...) {
+
+    agent <- x
+
     # Determine the orientation of the agent to be plotted
     angle <- x@orientation * 2 * pi / 360
 
@@ -121,8 +124,8 @@ setMethod("plot", "agent", function(x,
     # If the agent's goal should be plotted as well, then do so
     if(plot_goal) {
         plt <- append(plt,
-                      ggplot2::geom_point(ggplot2::aes(x = current_goal(x)@position[1],
-                                                       y = current_goal(x)@position[2]),
+                      ggplot2::geom_point(ggplot2::aes(x = current_goal(agent)@position[1],
+                                                       y = current_goal(agent)@position[2]),
                                           color = x@color,
                                           size = goal.size))
     }
