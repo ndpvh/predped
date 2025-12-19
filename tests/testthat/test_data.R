@@ -1,6 +1,10 @@
 testthat::test_that("Transforming to time series works", {
     trace <- readRDS(file.path(".", "data", "example_trace.Rds"))
-    ref <- read.table(file.path(".", "data", "example_time_series.csv"))
+    ref <- read.table(
+        file.path(".", "data", "example_time_series.csv"),
+        sep = ",",
+        header = TRUE
+    )
 
     tst <- predped::time_series(trace)
 
