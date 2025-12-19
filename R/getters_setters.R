@@ -30,7 +30,6 @@
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname agents
 #' 
@@ -80,7 +79,6 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' @seealso 
 #' \code{\link[predped]{predped-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname archetypes
 #'
@@ -114,7 +112,6 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' busy(my_goal) <- FALSE
 #' busy(my_goal)
 #' 
-#' @docType method
 #' 
 #' @rdname busy
 #' 
@@ -152,7 +149,6 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname cell
 #' 
@@ -190,7 +186,6 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname cell_centers
 #' 
@@ -243,7 +238,6 @@ setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_cente
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
 #' @rdname center
 #' 
@@ -282,7 +276,6 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname color
 #' 
@@ -316,7 +309,6 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' counter(my_goal) <- 10
 #' counter(my_goal)
 #' 
-#' @docType method
 #' 
 #' @rdname counter
 #' 
@@ -355,7 +347,6 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname current_goal
 #' 
@@ -389,7 +380,6 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' done(my_goal) <- TRUE
 #' done(my_goal)
 #' 
-#' @docType method
 #' 
 #' @rdname done
 #' 
@@ -432,7 +422,6 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname entrance
 #' 
@@ -475,7 +464,6 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname exit
 #' 
@@ -514,7 +502,6 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' @seealso 
 #' \code{\link[predped]{object-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname forbidden
 #' 
@@ -556,7 +543,6 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname from
 #' 
@@ -595,7 +581,6 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname goals
 #' 
@@ -633,7 +618,6 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method 
 #' 
 #' @rdname group
 #' 
@@ -688,7 +672,6 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
 #' @rdname id
 #' 
@@ -730,7 +713,6 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname iteration
 #' 
@@ -772,7 +754,6 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname iteration_variables
 #' 
@@ -815,7 +796,6 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname limited_access
 #' 
@@ -861,7 +841,6 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' objects(my_background) <- list(circle(center = c(1, 0), radius = 0.5))
 #' objects(my_background)
 #' 
-#' @docType method
 #' 
 #' @rdname objects
 #' 
@@ -903,7 +882,6 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
 #' @rdname orientation
 #' 
@@ -942,7 +920,6 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname parameters
 #' 
@@ -976,7 +953,6 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' path(my_goal) <- matrix(5:8, nrow = 2, ncol = 2)
 #' path(my_goal)
 #' 
-#' @docType method
 #' 
 #' @rdname path
 #' 
@@ -1040,7 +1016,6 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname points
 #' 
@@ -1106,7 +1081,6 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname position
 #' 
@@ -1149,7 +1123,6 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname potential_agents
 #' 
@@ -1187,7 +1160,6 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{circle-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname radius
 #' 
@@ -1234,7 +1206,6 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname setting
 #' 
@@ -1274,7 +1245,6 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' shape(my_background) <- circle(center = c(1, 0), radius = 1)
 #' shape(my_background)
 #' 
-#' @docType method
 #' 
 #' @rdname shape
 #' 
@@ -1334,7 +1304,6 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname size
 #' 
@@ -1372,7 +1341,6 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname speed
 #' 
@@ -1410,7 +1378,6 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname status
 #' 
@@ -1452,7 +1419,6 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname to
 #' 
@@ -1491,7 +1457,6 @@ setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname utility_variables
 #' 
@@ -1533,7 +1498,6 @@ setGeneric("utility_variables<-", function(object, value) standardGeneric("utili
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname variables
 #' 
@@ -1572,7 +1536,6 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname waiting_counter
 #' 
@@ -1614,7 +1577,6 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' @seealso 
 #' \code{\link[predped]{predped-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname weights
 #'

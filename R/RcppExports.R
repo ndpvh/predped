@@ -414,8 +414,6 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{overlap_with_objects}}
 #'
-#' @docType methods
-#'
 #' @rdname moving_options_rcpp
 #'
 #' @export
@@ -470,7 +468,6 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' \code{\link[predped]{in_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
 #' 
 #' @rdname nodes_on_circumference_rcpp
 #' 
@@ -512,7 +509,6 @@ nodes_on_circumference_rcpp <- function(object, space_between) {
 #' \code{\link[predped]{out_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
 #' 
 #' @rdname in_object_rcpp
 #' 

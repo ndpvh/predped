@@ -390,7 +390,7 @@ to_trace <- function(data,
 #' (deceleration).
 #' @param orientations Numeric vector denoting the changes in orientation as 
 #' assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
-#' \code{20}, \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, 
+#' \code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
 #' \code{310}, \code{287.5} (note that the larger angles are actually the 
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults 

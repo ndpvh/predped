@@ -28,12 +28,14 @@ Imports:
     cppRouting,
     m4ma,
     ggplot2,
+    ggpubr,
+    knitr,
     rmarkdown,
     kableExtra
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
-    'imports.R'
+    'predped-package.R'
     'RcppExports.R'
     'getters_setters.R'
     'objects.R'
@@ -56,7 +58,9 @@ Collate:
     'benchmark.R'
 Suggests: 
     fs,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    RSQLite,
+    DBI
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3

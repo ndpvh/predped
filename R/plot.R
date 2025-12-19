@@ -81,7 +81,6 @@
 #' @return Either a geom or a ggplot, depending on the object provided (see
 #' Details).
 #'
-#' @docType method
 #'
 #' @rdname plot
 #'

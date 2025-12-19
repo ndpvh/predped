@@ -613,7 +613,6 @@ setMethod("initialize", "segment", function(.Object,
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname rotate
 #' 
@@ -855,7 +854,6 @@ setMethod("rotate", signature(object = "segment"), function(object,
 #' \code{\link[predped]{center<-}},
 #' \code{\link[predped]{position<-}}
 #' 
-#' @docType method
 #' 
 #' @rdname move
 #' 
@@ -968,7 +966,6 @@ setMethod("move", signature(object = "segment"), function(object,
 #' \code{\link[predped]{objects-class}},
 #' \code{\link[predped]{rectangle-class}}
 #' 
-#' @docType method
 #' 
 #' @rdname area
 #' 
@@ -1018,7 +1015,6 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' \code{\link[predped]{out_object}},
 #' \code{\link[predped]{raycasting}}
 #' 
-#' @docType method
 #' 
 #' @rdname in_object
 #' 
@@ -1185,7 +1181,6 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' \code{\link[predped]{in_object}},
 #' \code{\link[predped]{raycasting}}
 #' 
-#' @docType method
 #' 
 #' @rdname out_object
 #' 
@@ -1237,7 +1232,6 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' \code{\link[predped]{segment-class}},
 #' \code{\link[predped]{size<-}}
 #' 
-#' @docType method
 #' 
 #' @rdname enlarge
 #' 
@@ -1323,7 +1317,6 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' \code{\link[predped]{add_nodes}},
 #' \code{\link[predped]{nodes_on_circumference}}
 #' 
-#' @docType method
 #' 
 #' @rdname rng_point
 #' 
@@ -1482,7 +1475,6 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' \code{\link[predped]{nodes_on_circumference}},
 #' \code{\link[predped]{create_nodes}}
 #' 
-#' @docType method
 #' 
 #' @rdname add_nodes
 #' 
@@ -1827,7 +1819,6 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' \code{\link[predped]{in_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
 #' 
 #' @rdname nodes_on_circumference
 #' 
@@ -1933,7 +1924,6 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' \code{\link[predped]{nodes_on_circumference}},
 #' \code{\link[predped]{overlap_with_objects}}
 #' 
-#' @docType method
 #' 
 #' @rdname intersects
 #' 
@@ -2100,7 +2090,6 @@ setMethod("intersects",
 #' \code{\link[predped]{segment-class}},
 #' \code{\link[predped]{intersects}}
 #' 
-#' @docType method
 #' 
 #' @rdname line_intersection
 #' 

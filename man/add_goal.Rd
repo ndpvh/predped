@@ -45,14 +45,17 @@ my_background <- background(shape = rectangle(center = c(0, 0),
 # Adjust the objects in the background for each of the different objects to 
 # showcase how add_goals works for each
 objects(my_background) <- list(circle(center = c(0, 0), radius = 0.5))
-add_goal(my_background)
+add_goal(my_background@objects[[1]], 
+         my_background)
 
 objects(my_background) <- list(rectangle(center = c(0, 0), size = c(1, 1)))
-add_goal(my_background)
+add_goal(my_background@objects[[1]], 
+         my_background)
 
 objects(my_background) <- list(polygon(points = cbind(c(0.5, 0.5, -0.5, -0.5), 
                                                       c(0.5, -0.5, -0.5, 0.5))))
-add_goal(my_background)
+add_goal(my_background@objects[[1]], 
+         my_background)
 
 }
 \seealso{

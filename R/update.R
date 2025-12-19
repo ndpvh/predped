@@ -23,7 +23,7 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}.
 #' 
-#' @docType method
+
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
@@ -195,7 +195,7 @@ setMethod("update", "state", function(object,
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @docType method
+
 #' 
 #' @rdname update-agent
 #' 

@@ -73,9 +73,8 @@
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{overlap_with_objects}}
 #'
-#' @docType methods
 #'
-#' @rdname moving_optionss
+#' @rdname moving_options
 #'
 #' @export
 #
@@ -86,7 +85,7 @@
 #     centers
 setGeneric("moving_options", function(object, ...) standardGeneric("moving_options"))
 
-#' @rdname moving_optionss
+#' @rdname moving_options
 #'
 #' @export
 setMethod("moving_options", "agent", function(object,
@@ -197,7 +196,7 @@ setMethod("moving_options", "agent", function(object,
 #' @param orientations Numeric matrix containing the change in direction for an
 #' agent whenever they move to the respective cell of this matrix.
 #' Defaults to a matrix in which the rows contain \code{72.5}, \code{50},
-#' \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, \code{340},
+#' \code{32.5}, \code{20}, \code{10}, \code{0}, \code{350}, \code{340},
 #' \code{327.5}, \code{310}, \code{287.5} (note that the larger angles are
 #' actually the negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the number of seconds each discrete step in
