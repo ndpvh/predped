@@ -18,4 +18,20 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Niels Vanhasbroeck \email{niels.vanhasbroeck@gmail.com} (-7515)
+
+Authors:
+\itemize{
+  \item Andrew Heathcote \email{ajheathcote@gmail.com} [contributor, funder]
+}
+
+Other contributors:
+\itemize{
+  \item Malte Lüken [contributor]
+  \item Alexander Anderson [contributor]
+  \item Ece Yatıkçı [contributor]
+}
+
+}
 \keyword{internal}
