@@ -110,7 +110,7 @@ setMethod("initialize", "goal", function(.Object,
 #' 
 #' @export
 setMethod("show", "goal", function(object) {
-    cat(crayon::bold("Goal Attributes"), "\n")
+    cat("Goal Attributes", "\n")
     cat("busy:", object@busy, "\n")
     cat("counter:", object@counter, "\n")
     cat("done:", object@done, "\n")

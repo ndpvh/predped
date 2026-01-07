@@ -227,7 +227,7 @@ setMethod("show", "agent", function(object) {
     names(params) <- cols
     params <- as.matrix(params)
 
-    cat(crayon::bold("Agent Attributes"), "\n")
+    cat("Agent Attributes", "\n")
     cat("center:", object@center, "\n")
     cat("cell:", object@cell, "\n")
     cat("color:", object@color, "\n")

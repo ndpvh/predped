@@ -166,7 +166,7 @@ setMethod("initialize", "background", function(.Object,
 #' 
 #' @export
 setMethod("show", "background", function(object) {
-    cat(crayon::bold("Background Attributes"), "\n")
+    cat("Background Attributes", "\n")
     cat("entrance:", "\n")
     print(object@entrance)
     cat("\nexit:", object@exit, "\n")
