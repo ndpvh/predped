@@ -39,7 +39,7 @@ which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 agent whenever they move to the respective cell of this matrix. Is used to
 create the cell positions that the agent might move to. Defaults to a matrix 
 in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 \code{287.5} (note that the larger angles are actually the negative symmetric 
 versions of the smaller angles).}
 
@@ -69,8 +69,8 @@ Object of the \code{\link[predped]{agent-class}}.
 Update the Position of an Agent
 }
 \seealso{
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{update_goal}}

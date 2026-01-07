@@ -26,8 +26,8 @@ utility, as well as a dataframe containing the parameters. Heavily depends
 on the \code{m4ma} package.
 }
 \seealso{
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{utility,agent}},

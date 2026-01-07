@@ -24,32 +24,7 @@ Numeric vector containing values based on the input.
 Determine iterated values from various arguments
 }
 \details{
-Takes in a numeric, numeric vector, or function and transforms this input to 
-a numeric vector that contains values based on the input. When a numeric is 
-provided, this function will output this same numeric repeated an
-\code{iterations} number of times. Similarly, when a numeric vector is 
-provided, this numeric vector will also be repeated an \code{iterations}
-number of times. When a function is provided, \code{iterations} will be 
-provided as an argument of this function.
 
-This function is used to enhance the generalizability of how certain values 
-are determined, and is used for determining:
-\itemize{
-   \item{}{the number of goals to simulate in each goal stack in the 
-           \code{\link[predped]{multiple_goal_stacks}} function}
-   \item{}{the counter for each goal in a goal stack in the 
-           \code{\link[predped]{goal_stack}} function}
-   \item{}{the number of agents that can maximally be in the simulation at 
-           each time point in the \code{\link[predped]{simulate-predped}}}
-   \item{}{the iteration number at which an agent can be added to the
-           simulation in the \code{\link[predped]{simulate-predped}}}
-}
-
-Note that for this function to work, one should correctly define their 
-own function when provided to the argument \code{x}. Specifically, this 
-function should take in a single argument \code{n} which defines the number 
-of values to generate. For example, a typical default for this function is 
-\code{\(n) rnorm(n, 10, 2)}.
 }
 \examples{
 # Generate several variables to be tested with determine_values

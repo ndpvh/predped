@@ -40,8 +40,8 @@ compute the values of the utility functions.
 Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
 }
 \seealso{
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{update_position}},

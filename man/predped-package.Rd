@@ -10,4 +10,12 @@ Mobile Agents (M4MA) pedestrian model. Contains functions to generate
 environments, adapt pedestrian characteristics, and allow for a wide range of 
 different kinds of simulation studies.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ndpvh/predped}
+  \item Report bugs at \url{https://github.com/ndpvh/predped/issues}
+}
+
+}
 \keyword{internal}

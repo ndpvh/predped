@@ -131,7 +131,7 @@ useful when simulating evacuations (giving everyone "goal exit") or trying
 to guide behavior in any other way. Defaults to "\(x) x", meaning the state
 remains unaltered.}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{simulate,state}}
+\item{...}{Arguments passed on to the \code{\link[predped]{simulate.state}}
 function.}
 
 \item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
@@ -154,7 +154,7 @@ This function allows users to simulate data from their specified
 \code{\link[predped]{predped-class}}.
 }
 \details{
-Heavily depends on \code{\link[predped]{simulate,state}} and
+Heavily depends on \code{\link[predped]{simulate.state}} and
 \code{\link[predped]{update}}.
 
 The arguments that can be used to influence the simulation behavior might
@@ -162,11 +162,11 @@ be overwhelming, which is why we include a small categorization of the
 arguments in this sections. Roughly speaking, this function has multiple
 arguments that influence a same aspect of the simulation. These are the
 following (note that here all arguments are provided; some of these may
-only appear in the documentation of \code{\link[predped]{simulate,state}}).
+only appear in the documentation of \code{\link[predped]{simulate.state}}).
 
 Arguments that directly influence the general characteristics of the
 simulation and the model itself.
-\itemize{
+\describe{
     \item{\code{max_agent}:}{How many agents that can be in the room.}
     \item{\code{iterations}:}{How long the simulation should last.}
     \item{\code{add_agent_after}:}{How many iterations to leave between
@@ -181,14 +181,14 @@ simulation and the model itself.
 }
 
 Arguments that influence general characteristics of the agents.
-\itemize{
+\describe{
     \item{\code{individual_differences}:}{Whether agents should have
                                           continuous individual differences.}
     \item{\code{standing_start}:}{How fast agents are after standing still.}
 }
 
 Arguments controlling whether an initial condition should be used.
-\itemize{
+\describe{
     \item{\code{initial_agents}:}{An initial list of agents.}
     \item{\code{initial_number_agents}:}{An initial number of agents with
                                          which you want to start the
@@ -199,7 +199,7 @@ Preferably, only one is used at a time.
 
 Arguments controlling the goals, which can be easily traced back to the
 \code{\link[predped]{goal_stack}} function.
-\itemize{
+\describe{
     \item{\code{goal_number}:}{The number of goals the agents should have.}
     \item{\code{goal_duration}:}{How long each goal should take.}
     \item{\code{precompute_goal_paths}:}{Whether the paths to the goals should
@@ -213,7 +213,7 @@ Arguments controlling the goals, which can be easily traced back to the
 }
 
 Arguments controlling how path points and edges are handled.
-\itemize{
+\describe{
     \item{\code{precomputed_edges}:}{List containing nodes and edges.}
     \item{\code{many_nodes}:}{Whether to have many or few path points.}
     \item{\code{space_between}:}{Space to leave between objects and nodes.}
@@ -223,7 +223,7 @@ Arguments controlling how path points and edges are handled.
 }
 
 Arguments that handle feedback during the simulation.
-\itemize{
+\describe{
     \item{\code{plot_live}:}{Whether to make these plots.}
     \item{\code{plot_time}:}{How much time to leave between the plotting of
                              each state.}

@@ -56,15 +56,15 @@ values of a whole range of variables that are used within the utility
 functions.
 }
 \seealso{
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{update_position}},
 \code{\link[predped]{update}}
 
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{update_position}},

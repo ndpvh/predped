@@ -73,8 +73,8 @@ Object of the \code{\link[predped]{agent-class}}.
 Update the Goal of an Agent
 }
 \seealso{
-\code{\link[predped]{simulate,predped}},
-\code{\link[predped]{simulate,state}},
+\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update,agent}},
 \code{\link[predped]{update,state}},
 \code{\link[predped]{update_position}}
