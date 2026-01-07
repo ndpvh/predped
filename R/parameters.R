@@ -46,7 +46,7 @@
 #' 
 #' Each of the parameters in \code{params_archetypes} controls an aspect of the 
 #' decisions pedestrians make when walking around in an environment, namely:
-#' \itemize{
+#' \describe{
 #'     \item{\code{radius}:}{the radius of the agent}
 #'     \item{\code{slowing_time}:}{the number of seconds the agent needs to slow
 #'                                down when approaching a goal}

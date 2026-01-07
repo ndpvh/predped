@@ -9,6 +9,7 @@
 
 ## usethis namespace: start
 # #' @useDynLib predped
+#' @import MASS
 #' @importFrom Rcpp evalCpp
 #' @exportPattern "^[[:alpha:]]+"
 ## usethis namespace: end

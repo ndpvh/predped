@@ -7,7 +7,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -49,7 +49,7 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -538,8 +538,8 @@ in_object_rcpp <- function(object, x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}}
 #' 
@@ -573,8 +573,8 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}}
 #' 
@@ -677,8 +677,8 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
@@ -767,8 +767,8 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' potential cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{utility,agent}},
@@ -812,8 +812,8 @@ utility_rcpp <- function(data, parameters) {
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{utility,data.frame}},

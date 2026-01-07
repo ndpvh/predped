@@ -179,8 +179,8 @@ RObject get_angles_rcpp(int agent_idx,
 //' compute the values of the utility functions.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped}},
-//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{simulate.predped}},
+//' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update,agent}},
 //' \code{\link[predped]{update,state}},
 //' \code{\link[predped]{update_position}},
@@ -576,8 +576,8 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' potential cells.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped}},
-//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{simulate.predped}},
+//' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update,agent}},
 //' \code{\link[predped]{update,state}},
 //' \code{\link[predped]{utility,agent}},
@@ -794,8 +794,8 @@ NumericVector utility_rcpp(DataFrame data,
 //' cells in \code{centers}.
 //' 
 //' @seealso 
-//' \code{\link[predped]{simulate,predped}},
-//' \code{\link[predped]{simulate,state}},
+//' \code{\link[predped]{simulate.predped}},
+//' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update,agent}},
 //' \code{\link[predped]{update,state}},
 //' \code{\link[predped]{utility,data.frame}},

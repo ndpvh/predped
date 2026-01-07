@@ -34,8 +34,8 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{utility,data.frame}},
@@ -100,8 +100,8 @@ setMethod("utility", "agent", function(object,
 #' cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{utility,agent}},
@@ -275,8 +275,8 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
@@ -459,8 +459,8 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}},
