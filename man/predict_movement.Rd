@@ -35,5 +35,5 @@ go to avoid collisions.
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},
-\code{\link[predped]{update-state}}
+\code{\link[predped]{update}}
 }

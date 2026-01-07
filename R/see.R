@@ -28,10 +28,10 @@
 #' (in degrees).
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate-predped}},
-#' \code{\link[predped]{simulate-state}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname best_angle
 #' 

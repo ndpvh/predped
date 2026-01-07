@@ -20,7 +20,7 @@ Numeric vector denoting the (dis)utility of moving to each of the
 potential cells.
 }
 \description{
-This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. It
+This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. It
 takes in a dataframe containing all of the relevant values for computing the
 utility, as well as a dataframe containing the parameters. Heavily depends 
 on the \code{m4ma} package.
@@ -29,8 +29,8 @@ on the \code{m4ma} package.
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},
-\code{\link[predped]{update-state}},
-\code{\link[predped]{utility,agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{utility-agent}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{update_position}}

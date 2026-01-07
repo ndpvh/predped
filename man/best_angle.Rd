@@ -55,8 +55,8 @@ possible direction. Used in \code{\link[predped]{update_position}} when
 the agent has to reorient itself.
 }
 \seealso{
-\code{\link[predped]{simulate-predped}},
-\code{\link[predped]{simulate-state}},
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
 \code{\link[predped]{update}},
-\code{\link[predped]{utility-state}}
+\code{\link[predped]{utility-agent}}
 }

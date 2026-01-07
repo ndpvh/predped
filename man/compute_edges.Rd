@@ -63,6 +63,6 @@ head(edges$edges_with_coords)
 \code{\link[predped]{create_edges}}
 \code{\link[predped]{create_nodes}}
 \code{\link[predped]{find_path}}
-\code{\link[predped]{simulate-predped}}
-\code{\link[predped]{simulate-state}}
+\code{\link[predped]{simulate}}
+\code{\link[predped]{simulate.state}}
 }

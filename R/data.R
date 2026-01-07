@@ -170,7 +170,7 @@ unpack_trace <- function(x,
 #' @param data Instance of a data.frame containing the data you want to transform.
 #' @param background Instance of the \code{\link[predped]{background-class}} 
 #' containing the setting in which the data were gathered.
-#' @param ... Arguments passed to \code{\link[predped]{add_cells}}.
+#' @param ... Arguments passed to \code{\link[predped]{add_motion_variables}}.
 #' 
 #' @examples
 #' # This is my example

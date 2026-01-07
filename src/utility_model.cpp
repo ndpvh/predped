@@ -40,7 +40,7 @@ using namespace Rcpp;
 //' 
 //' @seealso 
 //' \code{\link[predped]{gc_utility}},
-//' \code{\link[predped]{utility-state}}
+//' \code{\link[predped]{utility-agent}}
 //' 
 //' @rdname distance_group_centroid_rcpp
 //'
@@ -88,7 +88,7 @@ RObject distance_group_centroid_rcpp(NumericMatrix predictions,
 //' compared to the orientation of the agent within a given cell in \code{centers}.
 //' 
 //' @seealso 
-//' \code{\link[predped]{utility-state}}
+//' \code{\link[predped]{utility-agent}}
 //' \code{\link[predped]{vf_utility_continuous}}
 //' \code{\link[predped]{vf_utility_discrete}}
 //' 
@@ -182,7 +182,7 @@ RObject get_angles_rcpp(int agent_idx,
 //' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update-agent}},
-//' \code{\link[predped]{update-state}},
+//' \code{\link[predped]{update}},
 //' \code{\link[predped]{update_position}},
 //' \code{\link[predped]{update}}
 //' 
@@ -471,7 +471,7 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
 //' @seealso 
 //' \code{\link[predped]{distance_group_centroid}},
 //' \code{\link[predped]{params_from_csv}},
-//' \code{\link[predped]{utility-state}}
+//' \code{\link[predped]{utility-agent}}
 //' 
 //' @rdname gc_utility_rcpp
 //' 
@@ -521,7 +521,7 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
 //' @param b_vf Numeric denoting the slope of the utility function. 
 //' @param rel_angles Numeric vector containing the relative angle from each cell 
 //' center to the predicted positions of the group members. Typically output of 
-//' \code{\link[predped]{get_angle}}. 
+//' \code{\link[predped]{get_angles}}. 
 //' 
 //' @return Numeric vector containing the utility attributed to keeping the 
 //' group members within your visual field. Returns 0's if the agent does not 
@@ -529,7 +529,7 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
 //' 
 //' @seealso 
 //' \code{\link[predped]{get_angles}},
-//' \code{\link[predped]{utility-state}},
+//' \code{\link[predped]{utility-agent}},
 //' \code{\link[predped]{vf_utility_continuous}}
 //' 
 //' @rdname vf_utility_rcpp
@@ -560,7 +560,7 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 
 //' Utility
 //'
-//' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. It
+//' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. It
 //' takes in a dataframe containing all of the relevant values for computing the
 //' utility, as well as a dataframe containing the parameters. Heavily depends 
 //' on the \code{m4ma} package.
@@ -579,8 +579,8 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update-agent}},
-//' \code{\link[predped]{update-state}},
-//' \code{\link[predped]{utility,agent}},
+//' \code{\link[predped]{update}},
+//' \code{\link[predped]{utility-agent}},
 //' \code{\link[predped]{compute_utility_variables}},
 //' \code{\link[predped]{params_from_csv}},
 //' \code{\link[predped]{update_position}}
@@ -766,13 +766,13 @@ NumericVector utility_rcpp(DataFrame data,
 
 //' Utility
 //'
-//' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. 
+//' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. 
 //' This function uses the operational-level utility functions to compute the 
 //' utility of moving to any given potential cell in \code{centers}. Here, we 
 //' assume that none of the utility variables (i.e., the variables that serve as 
 //' input to the utility functions) is precomputed, so that it will first compute
 //' their values. This input is then provided to 
-//' \code{\link[predped]{utility,data.frame}} for the actual computation 
+//' \code{\link[predped]{utility-data.frame}} for the actual computation 
 //' of the utility.
 //' 
 //' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -797,8 +797,8 @@ NumericVector utility_rcpp(DataFrame data,
 //' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update-agent}},
-//' \code{\link[predped]{update-state}},
-//' \code{\link[predped]{utility,data.frame}},
+//' \code{\link[predped]{update}},
+//' \code{\link[predped]{utility-data.frame}},
 //' \code{\link[predped]{compute_utility_variables}},
 //' \code{\link[predped]{update_position}}
 //' 

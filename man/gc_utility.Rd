@@ -33,5 +33,5 @@ The parameters that are used by this function -- and which are defined in
 \seealso{
 \code{\link[predped]{distance_group_centroid}},
 \code{\link[predped]{params_from_csv}},
-\code{\link[predped]{utility-state}}
+\code{\link[predped]{utility-agent}}
 }

@@ -848,8 +848,8 @@ combine_nodes <- function(nodes_1,
 #' \code{\link[predped]{create_edges}}
 #' \code{\link[predped]{create_nodes}}
 #' \code{\link[predped]{find_path}}
-#' \code{\link[predped]{simulate-predped}}
-#' \code{\link[predped]{simulate-state}}
+#' \code{\link[predped]{simulate}}
+#' \code{\link[predped]{simulate.state}}
 #' 
 #' @rdname compute_edges 
 #' 

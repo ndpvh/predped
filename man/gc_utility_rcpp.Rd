@@ -38,5 +38,5 @@ Rcpp alternative for the group centroid utility function.
 \seealso{
 \code{\link[predped]{distance_group_centroid}},
 \code{\link[predped]{params_from_csv}},
-\code{\link[predped]{utility-state}}
+\code{\link[predped]{utility-agent}}
 }

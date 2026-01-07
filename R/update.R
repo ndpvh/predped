@@ -31,7 +31,7 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}}
 #' 
-#' @rdname update-state
+#' @rdname update
 #' 
 #' @export 
 setMethod("update", "state", function(object,
@@ -191,7 +191,7 @@ setMethod("update", "state", function(object,
 #' @seealso 
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
@@ -294,7 +294,7 @@ setMethod("update", "agent", function(object,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}}
 #' 
 #' @rdname update_position
@@ -519,7 +519,7 @@ update_position <- function(agent,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname update_goal
@@ -901,7 +901,7 @@ update_goal <- function(agent,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}}
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement
 #' 
@@ -954,7 +954,7 @@ predict_movement <- function(agent,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}}
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications
 #' 

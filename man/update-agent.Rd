@@ -105,7 +105,7 @@ determine where the agent will move next).
 \seealso{
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
-\code{\link[predped]{update-state}},
+\code{\link[predped]{update}},
 \code{\link[predped]{update_goal}},
 \code{\link[predped]{update_position}}
 }

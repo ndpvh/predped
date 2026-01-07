@@ -1041,7 +1041,7 @@ add_agent <- function(model,
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{add_agent}},
 #' \code{\link[predped]{simulate}},
-#' \code{\link[predped]{simulate_state}}
+#' \code{\link[predped]{simulate}}
 #'
 #' @rdname create_initial_condition
 #'

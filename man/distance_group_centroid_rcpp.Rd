@@ -37,5 +37,5 @@ utility functions.
 }
 \seealso{
 \code{\link[predped]{gc_utility}},
-\code{\link[predped]{utility-state}}
+\code{\link[predped]{utility-agent}}
 }

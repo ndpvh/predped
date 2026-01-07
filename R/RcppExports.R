@@ -539,7 +539,7 @@ in_object_rcpp <- function(object, x) {
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}}
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement_rcpp
 #' 
@@ -574,7 +574,7 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}}
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications_rcpp
 #' 
@@ -609,7 +609,7 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname distance_group_centroid_rcpp
 #'
@@ -643,7 +643,7 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
@@ -678,7 +678,7 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -708,7 +708,7 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility_rcpp
 #' 
@@ -729,7 +729,7 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' @param b_vf Numeric denoting the slope of the utility function. 
 #' @param rel_angles Numeric vector containing the relative angle from each cell 
 #' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' \code{\link[predped]{get_angles}}. 
 #' 
 #' @return Numeric vector containing the utility attributed to keeping the 
 #' group members within your visual field. Returns 0's if the agent does not 
@@ -737,7 +737,7 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility-state}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_rcpp
@@ -749,7 +749,7 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. It
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. It
 #' takes in a dataframe containing all of the relevant values for computing the
 #' utility, as well as a dataframe containing the parameters. Heavily depends 
 #' on the \code{m4ma} package.
@@ -768,8 +768,8 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
-#' \code{\link[predped]{utility,agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -782,13 +782,13 @@ utility_rcpp <- function(data, parameters) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. 
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. 
 #' This function uses the operational-level utility functions to compute the 
 #' utility of moving to any given potential cell in \code{centers}. Here, we 
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame}} for the actual computation 
+#' \code{\link[predped]{utility-data.frame}} for the actual computation 
 #' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -813,8 +813,8 @@ utility_rcpp <- function(data, parameters) {
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
-#' \code{\link[predped]{utility,data.frame}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 

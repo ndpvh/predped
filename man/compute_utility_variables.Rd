@@ -59,14 +59,14 @@ functions.
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},
-\code{\link[predped]{update-state}},
+\code{\link[predped]{update}},
 \code{\link[predped]{update_position}},
 \code{\link[predped]{update}}
 
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},
-\code{\link[predped]{update-state}},
+\code{\link[predped]{update}},
 \code{\link[predped]{update_position}},
 \code{\link[predped]{update}}
 }

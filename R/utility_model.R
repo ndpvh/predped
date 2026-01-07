@@ -12,7 +12,7 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame}} for the actual computation 
+#' \code{\link[predped]{utility-data.frame}} for the actual computation 
 #' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -37,8 +37,8 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
-#' \code{\link[predped]{utility,data.frame}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 
@@ -103,8 +103,8 @@ setMethod("utility", "agent", function(object,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
-#' \code{\link[predped]{utility,agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -278,7 +278,7 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -462,7 +462,7 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update-agent}},
-#' \code{\link[predped]{update-state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -508,7 +508,7 @@ setMethod("compute_utility_variables", "data.frame", function(object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname distance_group_centroid 
 #'
@@ -552,7 +552,7 @@ distance_group_centroid <- function(p_pred,
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility
 #' 
@@ -616,7 +616,7 @@ gc_utility <- function(a_gc,
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
@@ -705,7 +705,7 @@ get_angles <- function (agent_idx,
 #' @param b_vf Numeric denoting the slope of the utility function. 
 #' @param rel_angles Numeric vector containing the relative angle from each cell 
 #' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' \code{\link[predped]{get_angles}}. 
 #' @param fx Trigonometric function applied to the relative angles defining what
 #' their effect is (scaled by \code{b_vf}). Defaults to \code{cos}, saying that 
 #' the maximal utility stems from directly looking at a person (orientation 0).
@@ -718,7 +718,7 @@ get_angles <- function (agent_idx,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility-state}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname vf_utility_continuous
@@ -750,7 +750,7 @@ vf_utility_continuous <- function(b_vf,
 #' @param b_vf Numeric denoting the slope of the utility function. 
 #' @param rel_angles Numeric vector containing the relative angle from each cell 
 #' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' \code{\link[predped]{get_angles}}. 
 #'
 #' @return Numeric vector containing the utility attributed to keeping the 
 #' group members within your visual field. Returns 0's if the agent does not 
@@ -758,7 +758,7 @@ vf_utility_continuous <- function(b_vf,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility-state}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_discrete

@@ -24,7 +24,7 @@ to_trace(
 \item{background}{Instance of the \code{\link[predped]{background-class}} 
 containing the setting in which the data were gathered.}
 
-\item{...}{Arguments passed to \code{\link[predped]{add_cells}}.}
+\item{...}{Arguments passed to \code{\link[predped]{add_motion_variables}}.}
 }
 \description{
 This function does the opposite of \code{\link[predped]{unpack_trace}}. It

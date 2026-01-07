@@ -29,7 +29,7 @@ using namespace Rcpp;
 //' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update-agent}},
-//' \code{\link[predped]{update-state}}
+//' \code{\link[predped]{update}}
 //' 
 //' @rdname predict_movement_rcpp
 //' 
@@ -89,7 +89,7 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
 //' \code{\link[predped]{update-agent}},
-//' \code{\link[predped]{update-state}}
+//' \code{\link[predped]{update}}
 //' 
 //' @rdname create_agent_specifications_rcpp
 //' 

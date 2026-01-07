@@ -11,7 +11,7 @@ vf_utility_rcpp(b_visual_field, relative_angles)
 
 \item{rel_angles}{Numeric vector containing the relative angle from each cell 
 center to the predicted positions of the group members. Typically output of 
-\code{\link[predped]{get_angle}}.}
+\code{\link[predped]{get_angles}}.}
 }
 \value{
 Numeric vector containing the utility attributed to keeping the 
@@ -29,6 +29,6 @@ falls inside the non-visual zone behind the agent.
 }
 \seealso{
 \code{\link[predped]{get_angles}},
-\code{\link[predped]{utility-state}},
+\code{\link[predped]{utility-agent}},
 \code{\link[predped]{vf_utility_continuous}}
 }
