@@ -62,6 +62,6 @@ sapply(agents, \(x) length(goals(x)))
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{add_agent}},
-\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}}
 }

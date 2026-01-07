@@ -26,6 +26,6 @@ falls inside the non-visual zone behind the agent.
 }
 \seealso{
 \code{\link[predped]{get_angles}},
-\code{\link[predped]{utility}},
+\code{\link[predped]{utility-state}},
 \code{\link[predped]{vf_utility_continuous}}
 }

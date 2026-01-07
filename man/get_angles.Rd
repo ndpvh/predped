@@ -46,7 +46,7 @@ Finds the angle at which the group members are located compared to the agent.
 Uses the predicted positions of the group members for this.
 }
 \seealso{
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-state}}
 \code{\link[predped]{vf_utility_continuous}}
 \code{\link[predped]{vf_utility_discrete}}
 }

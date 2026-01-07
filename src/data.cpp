@@ -38,7 +38,7 @@ using namespace Rcpp;
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
@@ -193,7 +193,7 @@ DataFrame time_series_rcpp(List trace,
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example

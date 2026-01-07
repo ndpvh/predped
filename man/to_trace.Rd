@@ -21,7 +21,7 @@ to_trace(
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
 
-\item{background}{Instance of the \code{\link[predped]background-class} 
+\item{background}{Instance of the \code{\link[predped]{background-class}} 
 containing the setting in which the data were gathered.}
 
 \item{...}{Arguments passed to \code{\link[predped]{add_cells}}.}

@@ -6,7 +6,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -76,7 +76,7 @@ time_series <- function(x,
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -168,7 +168,7 @@ unpack_trace <- function(x,
 #' saved under "goal_x" and "goal_y", and their id to "goal_id".
 #' 
 #' @param data Instance of a data.frame containing the data you want to transform.
-#' @param background Instance of the \code{\link[predped]background-class} 
+#' @param background Instance of the \code{\link[predped]{background-class}} 
 #' containing the setting in which the data were gathered.
 #' @param ... Arguments passed to \code{\link[predped]{add_cells}}.
 #' 
@@ -394,7 +394,7 @@ to_trace <- function(data,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the 
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' @param threshold Numeric denoting under which observed value for speed the 
 #' cell to which an agent has moved should be put to `0`. Defaults to a value 
 #' based on the observed measurement error in our system.

@@ -12,7 +12,7 @@
 #' 
 #' @seealso 
 #' \code{\link[predped]{rotate}},
-#' \code{\link[predped]{initialize,coordinate}}
+#' \code{\link[predped]{initialize-coordinate}}
 #' 
 #' @rdname coordinate-class
 #'
@@ -140,7 +140,7 @@ setMethod("initialize", "object", function(.Object,
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{rectangle-class}},
-#' \code{\link[predped]{initialize,polygon}}
+#' \code{\link[predped]{initialize-polygon}}
 #'
 #' @rdname polygon-class
 #' @family objects
@@ -165,7 +165,7 @@ polygon <- setClass("polygon",
 #' the \code{\link[predped]{points}} of the object. Defaults to an empty 
 #' vector, making all edges worthy of goal generation.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object}}.
+#' \code{\link[predped]{initialize-object}}.
 #' 
 #' @return Object of the \code{\link[predped]{polygon-class}}
 #' 
@@ -183,7 +183,7 @@ polygon <- setClass("polygon",
 #' @seealso 
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{polygon-class}}
-#' \code{\link[predped]{initialize,object}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-polygon
 #' 
@@ -257,9 +257,9 @@ rectangle <- setClass("rectangle",
 #' @param orientation Numeric denoting the orientation of the rectangle in 
 #' radians. Defauls to \code{0}.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object}}. Note that if the 
+#' \code{\link[predped]{initialize-object}}. Note that if the 
 #' \code{points} or \code{clock_wise} arguments of the 
-#' \code{\link[predped]{initialize,polygon}} are provided, that they will
+#' \code{\link[predped]{initialize-polygon}} are provided, that they will
 #' not be used in the creation of the rectangle.
 #' 
 #' @return Object of the \code{\link[predped]{rectangle-class}}
@@ -278,8 +278,8 @@ rectangle <- setClass("rectangle",
 #' @seealso 
 #' \code{\link[predped]{object-class}},
 #' \code{\link[predped]{polygon-class}},
-#' \code{\link[predped]{initialize,object}}
-#' \code{\link[predped]{initialize,polygon}}
+#' \code{\link[predped]{initialize-object}}
+#' \code{\link[predped]{initialize-polygon}}
 #' 
 #' @rdname initialize-rectangle
 #' 
@@ -363,7 +363,7 @@ setMethod("initialize", "rectangle", function(.Object,
 #'
 #' @seealso 
 #' \code{\link[predped]{object-class}}, 
-#' \code{\link[predped]{initialize,circle}}
+#' \code{\link[predped]{initialize-circle}}
 #' 
 #' @rdname circle-class
 #' @family objects
@@ -385,7 +385,7 @@ circle <- setClass("circle",
 #' and should be contained within the interval 0 and 2 * pi. Defaults to an 
 #' empty matrix, making all angles worthy of goal generation.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object}}.
+#' \code{\link[predped]{initialize-object}}.
 #' 
 #' @return Object of the \code{\link[predped]{circle-class}}
 #' 
@@ -403,7 +403,7 @@ circle <- setClass("circle",
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,object}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-circle
 #' 
@@ -492,7 +492,7 @@ setMethod("initialize", "circle", function(.Object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,segment}},
+#' \code{\link[predped]{initialize-segment}},
 #' \code{\link[predped]{limit_access}}
 #' 
 #' @rdname segment-class
@@ -513,7 +513,7 @@ segment <- setClass("segment",
 #' @param to Numeric vector denoting the coordinates of the where the segment 
 #' ends.
 #' @param ... Additional arguments passed to 
-#' \code{\link[predped]{initialize,object}}.
+#' \code{\link[predped]{initialize-object}}.
 #' 
 #' @return Object of the \code{\link[predped]{segment-class}}
 #' 
@@ -531,7 +531,7 @@ segment <- setClass("segment",
 #' @seealso 
 #' \code{\link[predped]{segment-class}},
 #' \code{\link[predped]{object-class}},
-#' \code{\link[predped]{initialize,object}}
+#' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-segment
 #' 

@@ -28,7 +28,6 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Imports: 
     Rcpp (>= 1.0.14),
-    matrixStats,
     methods,
     cppRouting,
     m4ma,
@@ -36,7 +35,10 @@ Imports:
     ggpubr,
     knitr,
     rmarkdown,
-    kableExtra
+    kableExtra,
+    methods,
+    stats,
+    utils
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
@@ -65,7 +67,8 @@ Suggests:
     fs,
     testthat (>= 3.0.0),
     RSQLite,
-    DBI
+    DBI,
+    dplyr
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3

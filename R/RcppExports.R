@@ -7,7 +7,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -49,7 +49,7 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -414,8 +414,6 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{overlap_with_objects}}
 #'
-#' @docType methods
-#'
 #' @rdname moving_options_rcpp
 #'
 #' @export
@@ -470,8 +468,6 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' \code{\link[predped]{in_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
-#' 
 #' @rdname nodes_on_circumference_rcpp
 #' 
 #' @export
@@ -512,8 +508,6 @@ nodes_on_circumference_rcpp <- function(object, space_between) {
 #' \code{\link[predped]{out_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
-#' 
 #' @rdname in_object_rcpp
 #' 
 #' @export
@@ -542,10 +536,10 @@ in_object_rcpp <- function(object, x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}}
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}}
 #' 
 #' @rdname predict_movement_rcpp
 #' 
@@ -577,10 +571,10 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}}
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}}
 #' 
 #' @rdname create_agent_specifications_rcpp
 #' 
@@ -615,7 +609,7 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' 
 #' @rdname distance_group_centroid_rcpp
 #'
@@ -649,7 +643,7 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
@@ -681,10 +675,10 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -714,7 +708,7 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' 
 #' @rdname gc_utility_rcpp
 #' 
@@ -743,7 +737,7 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-state}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_rcpp
@@ -755,7 +749,7 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. It
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. It
 #' takes in a dataframe containing all of the relevant values for computing the
 #' utility, as well as a dataframe containing the parameters. Heavily depends 
 #' on the \code{m4ma} package.
@@ -771,10 +765,10 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' potential cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{utility,agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
@@ -788,7 +782,7 @@ utility_rcpp <- function(data, parameters) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. 
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. 
 #' This function uses the operational-level utility functions to compute the 
 #' utility of moving to any given potential cell in \code{centers}. Here, we 
 #' assume that none of the utility variables (i.e., the variables that serve as 
@@ -816,10 +810,10 @@ utility_rcpp <- function(data, parameters) {
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{utility,data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}

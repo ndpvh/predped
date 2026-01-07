@@ -11,11 +11,11 @@
 #' control the simulation under the hood, such as \code{max_agents}.
 #' @slot variables List of user-specified variables that can be used to control 
 #' the simulation, see the \code{fx} argument of 
-#' \code{\link[predped]{simulate.predped}}
+#' \code{\link[predped]{simulate}}
 #' 
 #' @seealso 
 #' \code{\link[predped]{agents}},
-#' \code{\link[predped]{initialize,state}},
+#' \code{\link[predped]{initialize-state}},
 #' \code{\link[predped]{iteration}},
 #' \code{\link[predped]{potential_agents}},
 #' \code{\link[predped]{setting}}
@@ -47,7 +47,7 @@ state <- setClass("state", list(iteration = "numeric",
 #' to an empty data.frame.
 #' @param variables Named list containing variables that you want to use to 
 #' control the simulation in the \code{fx} argument of the 
-#' \code{\link[predped]{simulate.predped}}. Defaults to an empty list.
+#' \code{\link[predped]{simulate}}. Defaults to an empty list.
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}
 #' 

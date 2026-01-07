@@ -31,7 +31,7 @@ in it.
 }
 \seealso{
 \code{\link[predped]{create_agent_specifications}},
-\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
-\code{\link[predped]{update,agent}}
+\code{\link[predped]{update-agent}}
 }

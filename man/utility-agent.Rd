@@ -50,10 +50,10 @@ their values. This input is then provided to
 of the utility.
 }
 \seealso{
-\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
-\code{\link[predped]{update,agent}},
-\code{\link[predped]{update,state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update-state}},
 \code{\link[predped]{utility,data.frame}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{update_position}}

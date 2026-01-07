@@ -40,7 +40,7 @@ Numeric vector denoting the (dis)utility of moving to each of the
 cells in \code{centers}.
 }
 \description{
-This function is the Rcpp equivalent of \code{\link[predped]{utility}}. 
+This function is the Rcpp equivalent of \code{\link[predped]{utility-state}}. 
 This function uses the operational-level utility functions to compute the 
 utility of moving to any given potential cell in \code{centers}. Here, we 
 assume that none of the utility variables (i.e., the variables that serve as 
@@ -50,10 +50,10 @@ their values. This input is then provided to
 of the utility.
 }
 \seealso{
-\code{\link[predped]{simulate.predped}},
+\code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
-\code{\link[predped]{update,agent}},
-\code{\link[predped]{update,state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update-state}},
 \code{\link[predped]{utility,data.frame}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{update_position}}

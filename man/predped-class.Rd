@@ -32,5 +32,5 @@ weights should be in the same length as the \code{archetypes}-slot.}
 }}
 
 \seealso{
-\code{\link[predped]{initialize,predped}}
+\code{\link[predped]{initialize-predped}}
 }

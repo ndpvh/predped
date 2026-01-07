@@ -35,7 +35,7 @@ to an empty data.frame.}
 
 \item{variables}{Named list containing variables that you want to use to 
 control the simulation in the \code{fx} argument of the 
-\code{\link[predped]{simulate.predped}}. Defaults to an empty list.}
+\code{\link[predped]{simulate}}. Defaults to an empty list.}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}

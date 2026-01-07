@@ -376,8 +376,6 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
 //' \code{\link[predped]{state-class}},
 //' \code{\link[predped]{overlap_with_objects}}
 //'
-//' @docType methods
-//'
 //' @rdname moving_options_rcpp
 //'
 //' @export

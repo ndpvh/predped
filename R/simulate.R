@@ -384,7 +384,7 @@ setMethod("simulate", "predped", function(object,
 #' Heavily depends on \code{\link[predped]{update}}.
 #'
 #' Many of the arguments here are either shared or derived from the upper-level
-#' \code{\link[predped]{simulate.predped}} function. Please refer to the
+#' \code{\link[predped]{simulate}} function. Please refer to the
 #' Details in its documentation to see a breakdown of the most important
 #' arguments.
 #'
@@ -392,7 +392,7 @@ setMethod("simulate", "predped", function(object,
 #' @param model Object of the \code{\link[predped]{predped-class}}.
 #' @param add_agent Logical denoting whether an agent should be added to the
 #' simulation. Defaults to \code{FALSE} and is typically handled by the
-#' \code{\link[predped]{simulate.predped}} function, where it accounts for the
+#' \code{\link[predped]{simulate}} function, where it accounts for the
 #' variables \code{add_agent_after} and \code{max_agents}.
 #' @param group_size Numeric matrix with two columns where the first column
 #' denotes the number of people in a social group and the second column the
@@ -493,7 +493,7 @@ setMethod("simulate", "predped", function(object,
 #' @seealso
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{state-class}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate.state
@@ -689,7 +689,7 @@ setMethod("simulate", "state", function(object,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_group
@@ -832,7 +832,7 @@ add_group <- function(model,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_group}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_agent
@@ -1040,7 +1040,7 @@ add_agent <- function(model,
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate_state}}
 #'
 #' @rdname create_initial_condition

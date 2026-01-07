@@ -36,6 +36,6 @@ member or the group member behind the agent.
 }
 \seealso{
 \code{\link[predped]{get_angles}},
-\code{\link[predped]{utility}},
+\code{\link[predped]{utility-state}},
 \code{\link[predped]{vf_utility_discrete}}
 }

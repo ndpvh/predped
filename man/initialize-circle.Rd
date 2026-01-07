@@ -13,7 +13,7 @@ and should be contained within the interval 0 and 2 * pi. Defaults to an
 empty matrix, making all angles worthy of goal generation.}
 
 \item{...}{Additional arguments passed to 
-\code{\link[predped]{initialize,object}}.}
+\code{\link[predped]{initialize-object}}.}
 
 \item{center}{Numeric vector denoting the coordinates of the center or 
 position of the circle}
@@ -41,5 +41,5 @@ my_circle@id
 \seealso{
 \code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize,object}}
+\code{\link[predped]{initialize-object}}
 }

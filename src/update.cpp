@@ -26,10 +26,10 @@ using namespace Rcpp;
 //' 
 //' @seealso 
 //' \code{\link[predped]{create_agent_specifications}},
-//' \code{\link[predped]{simulate.predped}},
+//' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
-//' \code{\link[predped]{update,agent}},
-//' \code{\link[predped]{update,state}}
+//' \code{\link[predped]{update-agent}},
+//' \code{\link[predped]{update-state}}
 //' 
 //' @rdname predict_movement_rcpp
 //' 
@@ -86,10 +86,10 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' 
 //' @seealso 
 //' \code{\link[predped]{create_agent_specifications}},
-//' \code{\link[predped]{simulate.predped}},
+//' \code{\link[predped]{simulate}},
 //' \code{\link[predped]{simulate.state}},
-//' \code{\link[predped]{update,agent}},
-//' \code{\link[predped]{update,state}}
+//' \code{\link[predped]{update-agent}},
+//' \code{\link[predped]{update-state}}
 //' 
 //' @rdname create_agent_specifications_rcpp
 //' 

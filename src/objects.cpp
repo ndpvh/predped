@@ -53,8 +53,6 @@ using namespace Rcpp;
 //' \code{\link[predped]{in_object}}, 
 //' \code{\link[predped]{moving_options}}
 //' 
-//' @docType method
-//' 
 //' @rdname nodes_on_circumference_rcpp
 //' 
 //' @export
@@ -184,8 +182,6 @@ NumericMatrix nodes_on_circumference_rcpp(S4 object,
 //' \code{\link[predped]{segment-class}},
 //' \code{\link[predped]{out_object}}, 
 //' \code{\link[predped]{moving_options}}
-//' 
-//' @docType method
 //' 
 //' @rdname in_object_rcpp
 //' 

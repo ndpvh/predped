@@ -10,6 +10,13 @@
 ## usethis namespace: start
 #' @useDynLib predped
 #' @import MASS
+#' @import methods
+#' @import stats
+#' @importFrom utils write.table
+#' @importFrom utils capture.output
+#' @importFrom cppRouting get_path_pair
+#' @importFrom dplyr tbl
+#' @importFrom dplyr collect
 #' @importFrom Rcpp evalCpp
 #' @exportPattern "^[[:alpha:]]+"
 ## usethis namespace: end

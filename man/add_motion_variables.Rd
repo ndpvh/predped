@@ -27,7 +27,7 @@ assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
 negative symmetric versions of the smaller angles).}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).}
+to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
 \item{threshold}{Numeric denoting under which observed value for speed the 
 cell to which an agent has moved should be put to `0`. Defaults to a value 

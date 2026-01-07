@@ -34,10 +34,10 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{utility,data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
@@ -100,10 +100,10 @@ setMethod("utility", "agent", function(object,
 #' cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{utility,agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
@@ -275,10 +275,10 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -459,10 +459,10 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate}},
 #' \code{\link[predped]{simulate.state}},
-#' \code{\link[predped]{update,agent}},
-#' \code{\link[predped]{update,state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update-state}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -508,7 +508,7 @@ setMethod("compute_utility_variables", "data.frame", function(object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' 
 #' @rdname distance_group_centroid 
 #'
@@ -552,7 +552,7 @@ distance_group_centroid <- function(p_pred,
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' 
 #' @rdname gc_utility
 #' 
@@ -616,7 +616,7 @@ gc_utility <- function(a_gc,
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-state}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
@@ -718,7 +718,7 @@ get_angles <- function (agent_idx,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-state}},
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname vf_utility_continuous
@@ -758,7 +758,7 @@ vf_utility_continuous <- function(b_vf,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-state}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_discrete

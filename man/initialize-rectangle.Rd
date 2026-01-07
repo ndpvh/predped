@@ -16,9 +16,9 @@ position of the rectangle.}
 radians. Defauls to \code{0}.}
 
 \item{...}{Additional arguments passed to 
-\code{\link[predped]{initialize,object}}. Note that if the 
+\code{\link[predped]{initialize-object}}. Note that if the 
 \code{points} or \code{clock_wise} arguments of the 
-\code{\link[predped]{initialize,polygon}} are provided, that they will
+\code{\link[predped]{initialize-polygon}} are provided, that they will
 not be used in the creation of the rectangle.}
 }
 \value{
@@ -42,6 +42,6 @@ my_rectangle@id
 \seealso{
 \code{\link[predped]{object-class}},
 \code{\link[predped]{polygon-class}},
-\code{\link[predped]{initialize,object}}
-\code{\link[predped]{initialize,polygon}}
+\code{\link[predped]{initialize-object}}
+\code{\link[predped]{initialize-polygon}}
 }

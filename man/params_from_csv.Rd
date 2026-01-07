@@ -144,6 +144,6 @@ decisions pedestrians make when walking around in an environment, namely:
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{generate_parameters}},
 \code{\link[predped]{load_parameters}},
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-state}}
 }
 \keyword{datasets}

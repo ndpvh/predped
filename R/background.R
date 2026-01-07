@@ -36,7 +36,7 @@
 #' \code{\link[predped]{limited_access}},
 #' \code{\link[predped]{objects}},
 #' \code{\link[predped]{shape}},
-#' \code{\link[predped]{initialize,background}},
+#' \code{\link[predped]{initialize-background}},
 #' 
 #' @rdname background-class
 #' 

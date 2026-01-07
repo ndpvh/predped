@@ -58,5 +58,5 @@ the agent has to reorient itself.
 \code{\link[predped]{simulate-predped}},
 \code{\link[predped]{simulate-state}},
 \code{\link[predped]{update}},
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-state}}
 }

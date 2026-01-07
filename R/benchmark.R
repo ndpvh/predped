@@ -739,7 +739,7 @@ benchmark_args <- list(
         inx@agents
     ),
 
-    # update.R
+    # update-R
     "create_agent_specifications" = list(
         lapply(1:100, \(x) agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0))
     ),
@@ -2141,7 +2141,7 @@ benchmark_test <- list(
         }
     ),
 
-    # update.R
+    # update-R
     "create_agent_specifications" = list(
         "cpp = FALSE" = function() {
             return(
@@ -2325,7 +2325,7 @@ benchmark_hierarchy <- list(
         "simulate"
     ),
 
-    "update.R" = c(
+    "update-R" = c(
         "create_agent_specifications",
         "predict_movement"
     ),
