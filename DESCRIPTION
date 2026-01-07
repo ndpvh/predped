@@ -7,20 +7,25 @@ Description:
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
     Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of 
     different kinds of simulation studies.
-Author: c(
+Authors@R: c(
     person("Niels", 
            "Vanhasbroeck", 
            email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090)), 
+           comment = c(ORCID = 0000-0002-7423-0090),
+           role = c("aut", "cre")), 
     person("Malte", 
-           "Lüken"), 
+           "Lüken",
+           role = "ctb"), 
     person("Alexander",
-           "Anderson"), 
+           "Anderson",
+           role = "ctb"), 
     person("Ece",
-           "Yatıkçı"), 
+           "Yatıkçı",
+           role = "ctb"), 
     person("Andrew",
            "Heathcote", 
-           email = "ajheathcote@gmail.com"))
+           email = "ajheathcote@gmail.com",
+           role = c("aut", "ctb", "fnd")))
 Maintainer: Niels Vanhasbroeck <niels.vanhasbroeck@gmail.com>
 URL: https://github.com/ndpvh/predped
 BugReports: https://github.com/ndpvh/predped/issues
