@@ -43,7 +43,9 @@ Imports:
     kableExtra,
     methods,
     stats,
-    utils
+    utils,
+    dplyr,
+    MASS
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
