@@ -8,7 +8,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @useDynLib predped
+# #' @useDynLib predped
 #' @importFrom Rcpp evalCpp
 #' @exportPattern "^[[:alpha:]]+"
 ## usethis namespace: end
