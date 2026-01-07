@@ -48,15 +48,17 @@ different from pure execution time of the function, which may be less than
 the user time.
 }
 \examples{
-# Run benchmark for simulate with 1000 iterations
+\dontrun{
+# Run benchmark for in_object with 100 iterations
 benchmark(
-    x = "simulate",
-    iterations = 1000
+    x = "in_object",
+    iterations = 100
 )
 
 # Run benchmark for all functions with 10 iterations
 benchmark(
    iterations = 10
 )
+}
 
 }
