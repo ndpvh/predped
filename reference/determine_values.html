@@ -111,9 +111,9 @@ are determined, and is used for determining:</p><ul><li><p>the number of goals t
 <li><p>the counter for each goal in a goal stack in the
          <code><a href="goal_stack.html">goal_stack</a></code> function</p></li>
 <li><p>the number of agents that can maximally be in the simulation at
-         each time point in the <code>simulate-predped</code></p></li>
+         each time point in the <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code></p></li>
 <li><p>the iteration number at which an agent can be added to the
-         simulation in the <code>simulate-predped</code></p></li>
+         simulation in the <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code></p></li>
 </ul><p>Note that for this function to work, one should correctly define their
 own function when provided to the argument <code>x</code>. Specifically, this
 function should take in a single argument <code>n</code> which defines the number
@@ -122,7 +122,7 @@ of values to generate. For example, a typical default for this function is
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code>simulate-predped</code>
+    <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>
 <code><a href="goal_stack.html">goal_stack</a></code>
 <code><a href="multiple_goal_stack.html">multiple_goal_stacks</a></code></p></div>
     </div>
@@ -140,7 +140,7 @@ of values to generate. For example, a typical default for this function is
 <span class="r-in"><span><span class="fu">determine_values</span><span class="op">(</span><span class="va">numeric_vector</span>, <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1 2 1 2 1 2 1 2 1 2</span>
 <span class="r-in"><span><span class="fu">determine_values</span><span class="op">(</span><span class="va">generating_function</span>, <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2 9 4 3 9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10  2  5  6  9</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

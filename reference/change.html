@@ -123,11 +123,11 @@ Defaults to <code>\() rnorm(1, 10, 2)</code>.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create a goal</span></span></span>
 <span class="r-in"><span><span class="va">my_goal</span> <span class="op">&lt;-</span> <span class="fu"><a href="goal-class.html">goal</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">my_goal</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Goal Attributes</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goal Attributes </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> busy: FALSE </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> counter: 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> done: FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal fjgfc </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal kpmyi </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> path:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -142,15 +142,15 @@ Defaults to <code>\() rnorm(1, 10, 2)</code>.</p></dd>
 <span class="r-in"><span>                            objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                                                     size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">change</span><span class="op">(</span><span class="va">my_goal</span>, setting <span class="op">=</span> <span class="va">my_background</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Goal Attributes</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goal Attributes </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> busy: FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> counter: 13 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> counter: 14 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> done: FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal rsjmq </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal pgwxp </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> path:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> position: 0.4301149 -0.5070711 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> position: -0.5070711 -0.04143884 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For more detailed information, please extract the wanted information from the background directly.</span>
 <span class="r-in"><span></span></span>
@@ -159,11 +159,11 @@ Defaults to <code>\() rnorm(1, 10, 2)</code>.</p></dd>
 <span class="r-in"><span><span class="va">goal_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="goal-class.html">goal</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                  <span class="fu"><a href="goal-class.html">goal</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">change</span><span class="op">(</span><span class="va">my_goal</span>, goal_list <span class="op">=</span> <span class="va">goal_list</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Goal Attributes</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goal Attributes </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> busy: FALSE </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> counter: 5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> done: FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal ekpgw </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal eemau </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> path:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
