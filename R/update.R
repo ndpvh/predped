@@ -27,8 +27,8 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}}
 #' 
 #' @rdname update-state
@@ -153,7 +153,7 @@ setMethod("update", "state", function(object,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
@@ -189,8 +189,8 @@ setMethod("update", "state", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
@@ -272,7 +272,7 @@ setMethod("update", "agent", function(object,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
@@ -291,8 +291,8 @@ setMethod("update", "agent", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_goal}}
@@ -516,8 +516,8 @@ update_position <- function(agent,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}},
 #' \code{\link[predped]{update_position}}
@@ -898,8 +898,8 @@ update_goal <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}}
 #' 
@@ -951,8 +951,8 @@ predict_movement <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}},
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}},
 #' \code{\link[predped]{update,agent}},
 #' \code{\link[predped]{update,state}}
 #' 

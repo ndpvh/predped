@@ -6,7 +6,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -69,14 +69,14 @@ time_series <- function(x,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
 #' 
 #' @examples
 #' # This is my example
@@ -394,7 +394,7 @@ to_trace <- function(data,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the 
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate.predped}}).
 #' @param threshold Numeric denoting under which observed value for speed the 
 #' cell to which an agent has moved should be put to `0`. Defaults to a value 
 #' based on the observed measurement error in our system.

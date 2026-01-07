@@ -4,7 +4,7 @@
 #' \code{\link[predped]{predped-class}}.
 #'
 #' @details
-#' Heavily depends on \code{\link[predped]{simulate,state}} and
+#' Heavily depends on \code{\link[predped]{simulate.state}} and
 #' \code{\link[predped]{update}}.
 #'
 #' The arguments that can be used to influence the simulation behavior might
@@ -12,11 +12,11 @@
 #' arguments in this sections. Roughly speaking, this function has multiple
 #' arguments that influence a same aspect of the simulation. These are the
 #' following (note that here all arguments are provided; some of these may
-#' only appear in the documentation of \code{\link[predped]{simulate,state}}).
+#' only appear in the documentation of \code{\link[predped]{simulate.state}}).
 #'
 #' Arguments that directly influence the general characteristics of the
 #' simulation and the model itself.
-#' \itemize{
+#' \describe{
 #'     \item{\code{max_agent}:}{How many agents that can be in the room.}
 #'     \item{\code{iterations}:}{How long the simulation should last.}
 #'     \item{\code{add_agent_after}:}{How many iterations to leave between
@@ -31,14 +31,14 @@
 #' }
 #'
 #' Arguments that influence general characteristics of the agents.
-#' \itemize{
+#' \describe{
 #'     \item{\code{individual_differences}:}{Whether agents should have
 #'                                           continuous individual differences.}
 #'     \item{\code{standing_start}:}{How fast agents are after standing still.}
 #' }
 #'
 #' Arguments controlling whether an initial condition should be used.
-#' \itemize{
+#' \describe{
 #'     \item{\code{initial_agents}:}{An initial list of agents.}
 #'     \item{\code{initial_number_agents}:}{An initial number of agents with
 #'                                          which you want to start the
@@ -49,7 +49,7 @@
 #'
 #' Arguments controlling the goals, which can be easily traced back to the
 #' \code{\link[predped]{goal_stack}} function.
-#' \itemize{
+#' \describe{
 #'     \item{\code{goal_number}:}{The number of goals the agents should have.}
 #'     \item{\code{goal_duration}:}{How long each goal should take.}
 #'     \item{\code{precompute_goal_paths}:}{Whether the paths to the goals should
@@ -63,7 +63,7 @@
 #' }
 #'
 #' Arguments controlling how path points and edges are handled.
-#' \itemize{
+#' \describe{
 #'     \item{\code{precomputed_edges}:}{List containing nodes and edges.}
 #'     \item{\code{many_nodes}:}{Whether to have many or few path points.}
 #'     \item{\code{space_between}:}{Space to leave between objects and nodes.}
@@ -73,7 +73,7 @@
 #' }
 #'
 #' Arguments that handle feedback during the simulation.
-#' \itemize{
+#' \describe{
 #'     \item{\code{plot_live}:}{Whether to make these plots.}
 #'     \item{\code{plot_time}:}{How much time to leave between the plotting of
 #'                              each state.}
@@ -167,7 +167,7 @@
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
 #' between iterations, i.e., the time between updating the plot. Defaults to
 #' \code{0.2}.
-#' @param ... Arguments passed on to the \code{\link[predped]{simulate,state}}
+#' @param ... Arguments passed on to the \code{\link[predped]{simulate.state}}
 #' function.
 #'
 #' @return List of objects of the \code{\link{state-class}} containing the
@@ -384,7 +384,7 @@ setMethod("simulate", "predped", function(object,
 #' Heavily depends on \code{\link[predped]{update}}.
 #'
 #' Many of the arguments here are either shared or derived from the upper-level
-#' \code{\link[predped]{simulate,predped}} function. Please refer to the
+#' \code{\link[predped]{simulate.predped}} function. Please refer to the
 #' Details in its documentation to see a breakdown of the most important
 #' arguments.
 #'
@@ -392,7 +392,7 @@ setMethod("simulate", "predped", function(object,
 #' @param model Object of the \code{\link[predped]{predped-class}}.
 #' @param add_agent Logical denoting whether an agent should be added to the
 #' simulation. Defaults to \code{FALSE} and is typically handled by the
-#' \code{\link[predped]{simulate,predped}} function, where it accounts for the
+#' \code{\link[predped]{simulate.predped}} function, where it accounts for the
 #' variables \code{add_agent_after} and \code{max_agents}.
 #' @param group_size Numeric matrix with two columns where the first column
 #' denotes the number of people in a social group and the second column the
@@ -407,7 +407,7 @@ setMethod("simulate", "predped", function(object,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param close_enough Numeric denoting how close (in radii) the agent needs to
@@ -493,7 +493,7 @@ setMethod("simulate", "predped", function(object,
 #' @seealso
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{state-class}},
-#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate.predped}},
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate.state
@@ -689,8 +689,8 @@ setMethod("simulate", "state", function(object,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}}
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_group
 #'
@@ -832,8 +832,8 @@ add_group <- function(model,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{add_group}},
-#' \code{\link[predped]{simulate,predped}},
-#' \code{\link[predped]{simulate,state}}
+#' \code{\link[predped]{simulate.predped}},
+#' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_agent
 #'
@@ -1040,7 +1040,7 @@ add_agent <- function(model,
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{add_agent}},
-#' \code{\link[predped]{simulate,predped}},
+#' \code{\link[predped]{simulate.predped}},
 #' \code{\link[predped]{simulate_state}}
 #'
 #' @rdname create_initial_condition

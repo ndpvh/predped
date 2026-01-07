@@ -336,7 +336,8 @@ compute_centers <- function(agent,
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-1.01, 0)))
+#'                   current_goal = goal(position = c(-1.01, 0),
+#'                                       path = matrix(c(-1.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,

@@ -12,14 +12,14 @@
 #' This function is used to enhance the generalizability of how certain values 
 #' are determined, and is used for determining:
 #' \itemize{
-#'    \item{}{the number of goals to simulate in each goal stack in the 
-#'            \code{\link[predped]{multiple_goal_stacks}} function}
-#'    \item{}{the counter for each goal in a goal stack in the 
-#'            \code{\link[predped]{goal_stack}} function}
-#'    \item{}{the number of agents that can maximally be in the simulation at 
-#'            each time point in the \code{\link[predped]{simulate-predped}}}
-#'    \item{}{the iteration number at which an agent can be added to the
-#'            simulation in the \code{\link[predped]{simulate-predped}}}
+#'    \item the number of goals to simulate in each goal stack in the 
+#'          \code{\link[predped]{multiple_goal_stacks}} function}
+#'    \item the counter for each goal in a goal stack in the 
+#'          \code{\link[predped]{goal_stack}} function}
+#'    \item the number of agents that can maximally be in the simulation at 
+#'          each time point in the \code{\link[predped]{simulate-predped}}}
+#'    \item the iteration number at which an agent can be added to the
+#'          simulation in the \code{\link[predped]{simulate-predped}}}
 #' }
 #' 
 #' Note that for this function to work, one should correctly define their 
