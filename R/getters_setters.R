@@ -174,7 +174,7 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
 #'                   radius = 0.25, 
-#'                   cell_centeres = matrix(1, nrow = 33, ncol = 2))
+#'                   cell_centers = matrix(1, nrow = 33, ncol = 2))
 #' 
 #' # Access the cell centers for the agent
 #' cell_centers(my_agent)
