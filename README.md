@@ -1,4 +1,6 @@
 <!-- badges: start --> 
+[![version](https://img.shields.io/badge/version-v0.1.0-blue)](https://github.com/ndpvh/predped/releases)
+[![documentation](https://img.shields.io/badge/documentation-v0.1.0-blue)](https://ndpvh.github.io/predped)
 [![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
 [![coverage](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml)
 [![license: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -25,31 +27,25 @@ Critically, and different from other pedestrian models, M4MA assigns each pedest
 
 This package allows its users to simulate pedestrian behavior as expected by M4MA. Users can specify the environment, the characterstics the pedestrians, and the characteristics of the simulation itself (e.g., maximal number of agents, initial conditions,...), therefore allowing for a great variety of potential research questions that can be answered. For more information on the workflow of this package, see _Getting started_.
 
-An unofficial benchmark is available through the repository. This package depends heavily on the [```m4ma```](https://github.com/m4ma/m4ma) package.
+This package depends heavily on the [```m4ma```](https://github.com/m4ma/m4ma) package.
 
 ## Installation
 
-One can install ```predped``` through ```devtools``` in the following way:
+One can install ```predped``` through the ```remotes``` package in the following way:
 
 ```R
-install.packages('devtools')
-
-devtools::install_github('ndpvh/predped', auth_token = "PERSONAL_ACCESS_TOKEN")
+remotes::install_github("ndpvh/predped")
 ```
 
-Note that currently, ```predped``` is still a private package. This means that you should input your own personal access token to be able to download the package.
+To use the package, you should load it through ```library```:
 
-It is also useful to be mindful of the dependencies of ```predped```. Currently, it imports ```matrixStats```, ```methods```, ```m4ma```, and ```ggplot2```. Of these, [```m4ma```](https://github.com/m4ma/m4ma) has also been developed by our lab.
+```R
+library(predped)
+```
 
 ## Getting started
 
-The explanation in this section will follow the code contained within _getting\_started.R_. A more elaborate example of how to use the package is contained within _demo.R_. Both scripts adhere to the same workflow. 
-
-Before you can get started, you should load the package:
-
-```R
-library(prepded)
-```
+Within ```predped```, we use a particular workflow. 
 
 In the first step, you should define the environment in which you want pedestrians to walk around. For this, you will use the ```background``` class. This S4 class contains slots for the ```shape``` (i.e., the shape of the room), the ```objects``` (i.e., which objects are contained within the room), and a potential ```entrance``` and/or ```exit```. The ```shape``` and ```objects``` should all consist of instances of the ```object``` class, that is they should be either a ```rectangle```, ```polygon```, or ```circle```. The ```entrance```/```exit``` should be instances of the ```coordinate``` class.
 
@@ -108,9 +104,9 @@ plots <- plot(trace,
 
 The variable ```plots``` is a list containing a plot for each state in ```trace```.
 
-## Documentation
+## Getting help
 
-The documentation of m4ma is build with ```roxygen2``` and ```pkgdown``` and is currently only locally available.
+You can find the documentation for this package [here](https://ndpvh.github.io/predped). If you encounter a bug, you can report the bug with a minimal working example as an [Issue](https://github.com/ndpvh/predped/issues).
 
 ## Contribute
 
