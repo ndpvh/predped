@@ -916,7 +916,7 @@ testthat::test_that(
                 # some computational error)
                 diff <- centers_1 - centers_2
 
-                tmp[[idx]] <- range(diff)
+                tmp[[idx]] <- range(velocities)
 
                 tst[idx] <- all(abs(diff) < 1e-2)
                 idx <- idx + 1
@@ -925,8 +925,6 @@ testthat::test_that(
 
         if(!all(tst)) {
             print(do.call("rbind", tmp))
-            print(Rcpp::evalCpp("std::pow(2.5, 2.5)"), digits = 20)
-            print(2.5^(2.5), digits = 20)
         }
 
         # Do the test
