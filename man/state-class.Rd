@@ -27,12 +27,12 @@ control the simulation under the hood, such as \code{max_agents}.}
 
 \item{\code{variables}}{List of user-specified variables that can be used to control 
 the simulation, see the \code{fx} argument of 
-\code{\link[predped]{simulate,predped-method}}}
+\code{\link[predped]{simulate}}}
 }}
 
 \seealso{
 \code{\link[predped]{agents}},
-\code{\link[predped]{initialize,state-method}},
+\code{\link[predped]{initialize-state}},
 \code{\link[predped]{iteration}},
 \code{\link[predped]{potential_agents}},
 \code{\link[predped]{setting}}

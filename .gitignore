@@ -56,3 +56,4 @@ tests/testthat/data/trace_mll_full.Rds
 
 testing_items/
 examples/*
+supermarket.R

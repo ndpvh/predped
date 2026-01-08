@@ -1,0 +1,43 @@
+url: https://github.com/ndpvh/predped
+
+template:
+  light-switch: true 
+  theme: github-light
+  theme-dark: github-dark
+  includes:
+    in_header: |
+      <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+authors:
+  Niels Vanhasbroeck:
+    href: https://ndpvh.github.io
+  Andrew Heathcote:
+    href: https://www.ampl-psych.com/team/andrew-heathcote/
+
+repo:
+  url:
+    home: https://ndpvh.github.io/predped
+    source: https://github.com/ndpvh/predped/tree/main/
+    issue: https://github.com/ndpvh/predped/issues/
+    branch: main
+
+navbar:
+  structure:
+    left: [reference, articles]
+    right: [search, github]
+  components:
+    articles:
+      text: Usage
+      menu:
+      - text: M4MA
+        href: articles/m4ma.html
+      - text: Workflow
+        href: articles/workflow.html
+      - text: Advanced Simulation
+        href: articles/simulation.html
+      - text: Estimation
+        href: articles/estimation.html
+    github:
+      icon: fa-github
+      href: https://github.com/ndpvh/predped/
+      aria-label: Github

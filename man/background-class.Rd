@@ -27,7 +27,7 @@ be of the \code{\link[predped]{segment-class}}.}
 which define the routes that can only be taken in one direction (see the 
 documentation of \code{\link[predped]{segment-class}}).}
 
-\item{\code{precomputed_segment_class}}{List of non-penetrable objects based on the 
+\item{\code{precomputed_limited_access}}{List of non-penetrable objects based on the 
 values of slot \code{limited_access}. Is not meant to be changed by the user,
 but is used as a slot to significantly speed up computations.}
 
@@ -51,5 +51,5 @@ y-coordinate.}
 \code{\link[predped]{limited_access}},
 \code{\link[predped]{objects}},
 \code{\link[predped]{shape}},
-\code{\link[predped]{initialize,background-method}},
+\code{\link[predped]{initialize-background}},
 }

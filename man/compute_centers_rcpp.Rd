@@ -54,7 +54,7 @@ fast_agent <- agent(center = c(-2.75, 0),
 # Generate the cell centers with predped
 slow_centers <- compute_centers(slow_agent,
                                 cpp = TRUE)
-fast_centers <- compute_centers(fast_agent
+fast_centers <- compute_centers(fast_agent,
                                 cpp = TRUE)
 
 # Generate the cell centers with m4ma
@@ -82,5 +82,5 @@ graphics::points(fast_m4ma[, 1], fast_m4ma[, 2], col = "red")
 \code{\link[predped]{agent-class}},
 \code{\link[m4ma]{c_vd}}
 \code{\link[predped]{compute_centers}}
-\code{\link[predped]{moving_options-method}}
+\code{\link[predped]{moving_options}}
 }

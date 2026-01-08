@@ -46,7 +46,7 @@
 #' 
 #' Each of the parameters in \code{params_archetypes} controls an aspect of the 
 #' decisions pedestrians make when walking around in an environment, namely:
-#' \itemize{
+#' \describe{
 #'     \item{\code{radius}:}{the radius of the agent}
 #'     \item{\code{slowing_time}:}{the number of seconds the agent needs to slow
 #'                                down when approaching a goal}
@@ -137,7 +137,8 @@
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{generate_parameters}},
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
+#' \code{\link[predped]{utility-data.frame}}
 #' 
 #' @rdname params_from_csv
 #' 
@@ -380,7 +381,7 @@ utility_parameters <- function(x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{params_to_csv}},
+#' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{plot_distribution}},
 #' \code{\link[predped]{to_bounded}},
 #' \code{\link[predped]{to_covariance}},
@@ -663,7 +664,7 @@ transform_mu <- function(parameters) {
 #' @seealso 
 #' \code{\link[predped]{generate_parameters}},
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{params_to_csv}},
+#' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{to_bounded}},
 #' \code{\link[predped]{to_covariance}},
 #' \code{\link[predped]{to_unbounded}}

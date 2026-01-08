@@ -4,16 +4,17 @@
 \alias{distance_group_centroid}
 \title{Distances to group centroid}
 \usage{
-distance_group_centroid(p_pred, centers, nped, fx = mean)
+distance_group_centroid(predictions, centers, number_agents, fx = mean)
 }
 \arguments{
-\item{p_pred}{Numeric matrix with shape N x 2 containing predicted positions
-of all pedestrians that belong to the social group of the agent.}
+\item{predictions}{Numeric matrix with shape N x 2 containing predicted 
+positions of all pedestrians that belong to the social group of the agent.}
 
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
 
-\item{nped}{Numeric integer indicating number of people in pedestrian `n`'s social group.}
+\item{number_agents}{Integer indicating number of people in the pedestrian's 
+social group.}
 
 \item{fx}{Function used to find the group centroid. Defaults to \code{mean}}
 }
@@ -35,5 +36,5 @@ utility functions.
 }
 \seealso{
 \code{\link[predped]{gc_utility}},
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-agent}}
 }

@@ -7,7 +7,7 @@
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -32,24 +32,22 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+#' of speed), and \code{0.5} (deceleration).
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -73,9 +71,6 @@ unique <- function(x) {
 #' that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
 #' @param segments_2 Matrix of line segments that `segments_1` should be tested
 #' with. Should have the same structure as `segments_1`
-#' @param return_all Logical denoting whether it should return the intersection 
-#' of all segments to each other. If true, will include indicators of which segments
-#' were compared. Defaults to `FALSE`.
 #'
 #' @return Returns a logical denoting whether any of the segments in 
 #' 
@@ -207,7 +202,7 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' # Generate the cell centers with predped
 #' slow_centers <- compute_centers(slow_agent,
 #'                                 cpp = TRUE)
-#' fast_centers <- compute_centers(fast_agent
+#' fast_centers <- compute_centers(fast_agent,
 #'                                 cpp = TRUE)
 #'
 #' # Generate the cell centers with m4ma
@@ -234,7 +229,7 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[m4ma]{c_vd}}
 #' \code{\link[predped]{compute_centers}}
-#' \code{\link[predped]{moving_options-method}}
+#' \code{\link[predped]{moving_options}}
 #'
 #' @rdname compute_centers_rcpp
 #'
@@ -250,7 +245,7 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #' This function checks whether there is an overlap between a given agent and
 #' the objects in the environment, provided that the agent would move to the
 #' locations in \code{centers}. Returns a logical matrix as needed in
-#' \code{\link[predped]{moving_options-method}}.
+#' \code{\link[predped]{moving_options}}.
 #'
 #' @details
 #' In this function, we can only approximately check the intersection of agent
@@ -269,7 +264,7 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #'
 #' This check is then performed by looping over all the centers, changing the
 #' agents position to the position of this center, and using the
-#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+#' \code{\link[predped]{in_object}} to do the test. This is a vectorized
 #' test: For each position in \code{centers} we have a logical \code{TRUE} or
 #' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
 #' logical matrix with an equal number of rows as \code{centers} and an equal
@@ -278,8 +273,8 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #' for each center.
 #'
 #' The reason why we use this approximate method is because of time efficiency.
-#' Using the \code{\link[predped]{intersects-method}} takes a longer time than
-#' using the \code{\link[predped]{in_object-method}}, especially as the number
+#' Using the \code{\link[predped]{intersects}} takes a longer time than
+#' using the \code{\link[predped]{in_object}}, especially as the number
 #' of objects in the environment increases.
 #'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.
@@ -305,7 +300,8 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0),
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' # Generate several locations the agent can move to
 #' centers <- m4ma::c_vd_r(1:33,
@@ -368,7 +364,7 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #' of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 #' (change in orientation) options that are inherent to M4MA.
 #'
-#' @param object Object of the \code{\link[predped]{agent-class}} or the
+#' @param agent Object of the \code{\link[predped]{agent-class}} or the
 #' \code{\link[predped]{object-class}} (latter not yet supported).
 #' @param state Object of the \code{\link[predped]{state-class}} containing the
 #' current state.
@@ -388,7 +384,8 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0),
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,
@@ -414,8 +411,6 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{overlap_with_objects}}
 #'
-#' @docType methods
-#'
 #' @rdname moving_options_rcpp
 #'
 #' @export
@@ -429,14 +424,14 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' 
 #' Used in the \code{\link[predped]{overlap_with_objects}} function for creating 
 #' nodes of which their presence within an agent can be checked in an efficient 
-#' way (see \code{\link[predped]{moving_options-method}} and 
-#' \code{\link[predped]{in_object-method}}). Currently works for all 
+#' way (see \code{\link[predped]{moving_options}} and 
+#' \code{\link[predped]{in_object}}). Currently works for all 
 #' instances of \code{\link[predped]{object-class}}, but only returns 
 #' \code{NULL} for the \code{\link[predped]{segment-class}}.
 #' 
 #' @details 
-#' Related to the \code{\link[predped]{add_nodes-method}} with the main difference
-#' being that the \code{\link[predped]{add_nodes-method}} adds nodes around or 
+#' Related to the \code{\link[predped]{add_nodes}} with the main difference
+#' being that the \code{\link[predped]{add_nodes}} adds nodes around or 
 #' within an object, while \code{nodes_on_circumference} adds nodes directly on
 #' the circumference of an object.
 #' 
@@ -469,8 +464,6 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' \code{\link[predped]{add_nodes}},
 #' \code{\link[predped]{in_object}}, 
 #' \code{\link[predped]{moving_options}}
-#' 
-#' @docType method
 #' 
 #' @rdname nodes_on_circumference_rcpp
 #' 
@@ -512,8 +505,6 @@ nodes_on_circumference_rcpp <- function(object, space_between) {
 #' \code{\link[predped]{out_object}}, 
 #' \code{\link[predped]{moving_options}}
 #' 
-#' @docType method
-#' 
 #' @rdname in_object_rcpp
 #' 
 #' @export
@@ -542,10 +533,10 @@ in_object_rcpp <- function(object, x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement_rcpp
 #' 
@@ -565,7 +556,7 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' objects. Allows for a translation from the object-oriented way of doing things
 #' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 #'
-#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
@@ -577,10 +568,10 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications_rcpp
 #' 
@@ -602,12 +593,12 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' Note that this function has been defined to be in line with the \code{m4ma}
 #' utility functions.
 #'
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-#' of all pedestrians that belong to the social group of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
-#' @param fx Function used to find the group centroid. Defaults to \code{mean}
+#' @param number_agents Integer indicating number of people in the pedestrian's 
+#' social group. 
 #'
 #' @return Numeric vector containing the distance from each cell in the `center`
 #' to the group centroid. If not other agents belong to the same group as the 
@@ -615,7 +606,7 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname distance_group_centroid_rcpp
 #'
@@ -635,8 +626,8 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' pedestrians.
 #' @param position Numeric vector denoting the current position of the agent.
 #' @param orientation Numeric denoting the current orientation of the agent.
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-#' of all pedestrians that belong to the social group of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
 #' @param any_member Logical denoting whether to consider the angles of all 
@@ -649,22 +640,22 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname get_angles_rcpp
 #' 
 #' @export 
-get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, predictions, centers, any_member = TRUE) {
-    .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_groups, position, orientation, predictions, centers, any_member)
+get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predictions, centers, any_member = TRUE) {
+    .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers, any_member)
 }
 
 #' Compute utility variables
 #' 
 #' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -674,17 +665,17 @@ get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, pred
 #' \code{m4ma} utility functions.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @param check_original Logical matrix of dimensions 11 x 3 denoting whether an 
+#' agent can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -699,14 +690,15 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #'
 #' Rcpp alternative for the group centroid utility function. 
 #' 
-#' @param a_gc Numeric denoting the power to which to take the utility.
-#' @param b_gc Numeric denoting the slope of the utility function.
+#' @param a_group_centroid Numeric denoting the power to which to take the 
+#' utility.
+#' @param b_group_centroid Numeric denoting the slope of the utility function.
 #' @param radius Numeric denoting the radius of the agent.
-#' @param cell_dist Numeric vector denoting the distance of each cell in the 
-#' \code{centers} to the predicted group centroid.
+#' @param cell_distances Numeric vector denoting the distance of each cell in  
+#' the \code{centers} to the predicted group centroid.
 #' @param stop_utility Numeric denoting the utility of stopping. Is used to 
 #' ensure the agents do not freeze when they are too far away from each other. 
-#' @param nped Numeric denoting the number of ingroup members. 
+#' @param number_agents Numeric denoting the number of ingroup members. 
 #' 
 #' @return Numeric vector containing the group-centroid-related utility for each 
 #' cell. 
@@ -714,13 +706,13 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility_rcpp
 #' 
 #' @export
-gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped) {
-    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped)
+gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, number_agents) {
+    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, number_agents)
 }
 
 #' Discrete visual field utility
@@ -732,10 +724,10 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' This translates to a discrete added disutility whenever the group member 
 #' falls inside the non-visual zone behind the agent.
 #' 
-#' @param b_vf Numeric denoting the slope of the utility function. 
-#' @param rel_angles Numeric vector containing the relative angle from each cell 
-#' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' @param b_visual_field Numeric denoting the slope of the utility function. 
+#' @param relative_angles Numeric vector containing the relative angle from 
+#' each cell center to the predicted positions of the group members. Typically 
+#' output of \code{\link[predped]{get_angles}}. 
 #' 
 #' @return Numeric vector containing the utility attributed to keeping the 
 #' group members within your visual field. Returns 0's if the agent does not 
@@ -743,7 +735,7 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_rcpp
@@ -755,12 +747,12 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. It
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. It
 #' takes in a dataframe containing all of the relevant values for computing the
 #' utility, as well as a dataframe containing the parameters. Heavily depends 
 #' on the \code{m4ma} package.
 #' 
-#' @param object Dataframe containing all of the needed information to compute 
+#' @param data Dataframe containing all of the needed information to compute 
 #' the utilities. Typically output of the 
 #' \code{\link[predped]{compute_utility_variables}} function.
 #' @param parameters Dataframe containing the parameters of the agent. Should 
@@ -771,11 +763,11 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' potential cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -788,16 +780,16 @@ utility_rcpp <- function(data, parameters) {
 
 #' Utility
 #'
-#' This function is the Rcpp equivalent of \code{\link[predped]{utility}}. 
+#' This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. 
 #' This function uses the operational-level utility functions to compute the 
 #' utility of moving to any given potential cell in \code{centers}. Here, we 
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' \code{\link[predped]{utility-data.frame}} for the actual computation 
 #' of the utility.
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -809,18 +801,16 @@ utility_rcpp <- function(data, parameters) {
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
-#' @param cpp Logical denoting whether to use the Rcpp version of the function
-#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 

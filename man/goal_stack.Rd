@@ -40,7 +40,7 @@ Defaults to \code{TRUE}.}
 agent starts in the room. Defaults to the first entrance of the \code{setting}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
-\code{\link[predped]{find_path-method}} for each of the generated goals 
+\code{\link[predped]{find_path}} for each of the generated goals 
 beforehand. Assumes that the agent does all of the goals in the order of the 
 goal stack. Defaults to \code{FALSE}.}
 
@@ -49,7 +49,7 @@ middle of the edge of the objects in the \code{link[predped]{background-class}}
 (\code{TRUE}) or to allow the goal locations to fall on all points on these 
 edges (\code{FALSE}). Defaults to \code{FALSE}.}
 
-\item{...}{Arguments provided to \code{\link[predped]{find_path-method}} to 
+\item{...}{Arguments provided to \code{\link[predped]{find_path}} to 
 precompute the paths that the agents should take to reach their goals. Only
 used when \code{precompute_goal_paths = TRUE}.}
 }
@@ -65,15 +65,15 @@ complete. This function outputs a list of different instances of the
 # Create a setting
 my_background <- background(shape = rectangle(center = c(0, 0), 
                                               size = c(2, 2)), 
-                            objects = list(cirlce(center = c(0, 0), 
+                            objects = list(circle(center = c(0, 0), 
                                                   radius = 0.5)))
 
 # Create a goal stack containing two goals
-goal_stack <- goal_stack(2, my_background)
+stack <- goal_stack(2, my_background)
 
 # Two goals
-length(goal_stack)
-goal_stack
+length(stack)
+stack
 
 }
 \seealso{

@@ -11,14 +11,14 @@ create_agent_specifications_rcpp(
 )
 }
 \arguments{
+\item{agent_list}{List of objects of the \code{\link[predped]{agent-class}}.}
+
 \item{stay_stopped}{Logical denoting whether agents will predict others that 
 are currently not moving to remain immobile in the next iteration. Defaults 
 to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
-
-\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
 }
 \value{
 List containing all information of all agents within the current 
@@ -37,8 +37,8 @@ in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 }
 \seealso{
 \code{\link[predped]{create_agent_specifications}},
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}}
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}}
 }

@@ -12,7 +12,7 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' assume that none of the utility variables (i.e., the variables that serve as 
 #' input to the utility functions) is precomputed, so that it will first compute
 #' their values. This input is then provided to 
-#' \code{\link[predped]{utility,data.frame-method}} for the actual computation 
+#' \code{\link[predped]{utility-data.frame}} for the actual computation 
 #' of the utility.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
@@ -34,11 +34,11 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' cells in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,data.frame-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-data.frame}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{update_position}}
 #' 
@@ -100,11 +100,11 @@ setMethod("utility", "agent", function(object,
 #' cells.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
-#' \code{\link[predped]{utility,agent-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{compute_utility_variables}},
 #' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{update_position}}
@@ -275,10 +275,10 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -459,10 +459,10 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' compute the values of the utility functions.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}},
 #' \code{\link[predped]{update}}
 #' 
@@ -495,11 +495,12 @@ setMethod("compute_utility_variables", "data.frame", function(object,
 #' Note that this function has been defined to be in line with the \code{m4ma}
 #' utility functions.
 #'
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-#' of all pedestrians that belong to the social group of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
+#' @param number_agents Integer indicating number of people in the pedestrian's 
+#' social group. 
 #' @param fx Function used to find the group centroid. Defaults to \code{mean}
 #'
 #' @return Numeric vector containing the distance from each cell in the `center`
@@ -508,24 +509,24 @@ setMethod("compute_utility_variables", "data.frame", function(object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{gc_utility}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname distance_group_centroid 
 #'
 #' @export 
-distance_group_centroid <- function(p_pred, 
+distance_group_centroid <- function(predictions, 
                                     centers, 
-                                    nped,
+                                    number_agents,
                                     fx = mean) {
    
     # First need to identify whether a pedestrian belongs to a social group    
-    if (nped == 0) {
+    if (number_agents == 0) {
         return(NULL)    
     }
 
     # All of the positions of all in-group pedestrians need to be averaged
     # Which represents the group centroid
-    centroid <- c(fx(p_pred[,1]), fx(p_pred[,2]))
+    centroid <- c(fx(predictions[,1]), fx(predictions[,2]))
 
     # Euclidean distance for pedestrian_i is calculated for each cell
     return(m4ma::dist1_rcpp(centroid, centers))
@@ -537,14 +538,15 @@ distance_group_centroid <- function(p_pred,
 #' \code{\link[predped]{params_from_csv}} -- are \code{a_group_centroid} and 
 #' \code{b_group_centroid}.
 #'
-#' @param a_gc Numeric denoting the power to which to take the utility.
-#' @param b_gc Numeric denoting the slope of the utility function.
+#' @param a_group_centroid Numeric denoting the power to which to take the 
+#' utility.
+#' @param b_group_centroid Numeric denoting the slope of the utility function.
 #' @param radius Numeric denoting the radius of the agent.
-#' @param cell_dist Numeric vector denoting the distance of each cell in the 
-#' \code{centers} to the predicted group centroid.
+#' @param cell_distances Numeric vector denoting the distance of each cell in  
+#' the \code{centers} to the predicted group centroid.
 #' @param stop_utility Numeric denoting the utility of stopping. Is used to 
 #' ensure the agents do not freeze when they are too far away from each other. 
-#' @param nped Numeric denoting the number of ingroup members. 
+#' @param number_agents Numeric denoting the number of ingroup members. 
 #' 
 #' @return Numeric vector containing the group-centroid-related utility for each 
 #' cell. 
@@ -552,29 +554,31 @@ distance_group_centroid <- function(p_pred,
 #' @seealso 
 #' \code{\link[predped]{distance_group_centroid}},
 #' \code{\link[predped]{params_from_csv}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility
 #' 
 #' @export
-gc_utility <- function(a_gc, 
-                       b_gc, 
+gc_utility <- function(a_group_centroid, 
+                       b_group_centroid, 
                        radius, 
-                       cell_dist, 
+                       cell_distances, 
                        stop_utility, 
-                       nped) {
+                       number_agents) {
     
     # No utilities to be added whenever there are is no group centroid to 
     # account for (see `distance_group_centroid`).
-    if (is.null(cell_dist)) {
+    if (is.null(cell_distances)) {
         return(numeric(33))
     }
 
-    optimal_distance <- 1.5 * nped * radius
+    optimal_distance <- 1.5 * number_agents * radius
     
     # Calculate centroid 
-    centroid_util <- -sapply(cell_dist, 
-                                \(x) ifelse(x < optimal_distance, 0, b_gc * abs(x - optimal_distance)^a_gc))
+    centroid_util <- -sapply(cell_distances, 
+                             \(x) ifelse(x < optimal_distance, 
+                                         0, 
+                                         b_group_centroid * abs(x - optimal_distance)^a_group_centroid))
 
     if (all(centroid_util < stop_utility)) {
         return(numeric(33))
@@ -602,7 +606,7 @@ gc_utility <- function(a_gc,
 #' pedestrians.
 #' @param position Numeric vector denoting the current position of the agent.
 #' @param orientation Numeric denoting the current orientation of the agent.
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions
 #' of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
@@ -616,7 +620,7 @@ gc_utility <- function(a_gc,
 #' compared to the orientation of the agent within a given cell in \code{centers}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
 #' \code{\link[predped]{vf_utility_continuous}}
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
@@ -628,15 +632,15 @@ get_angles <- function (agent_idx,
                         agent_group, 
                         position, 
                         orientation,  
-                        p_pred, 
+                        predictions, 
                         centers,
                         any_member = TRUE) {
     
     # First need to identify whether a pedestrian belongs to a social group
-    p_pred <- p_pred[-agent_idx, , drop = FALSE]
+    predictions <- predictions[-agent_idx, , drop = FALSE]
     ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
-    p_pred <- p_pred[ingroup, , drop = FALSE]
-    nped <- dim(p_pred)[1]
+    predictions <- predictions[ingroup, , drop = FALSE]
+    nped <- dim(predictions)[1]
     
     if (nped == 0) {
         return(NULL)    
@@ -651,8 +655,8 @@ get_angles <- function (agent_idx,
 
         # Get angles from cell centers to positions of other pedestrians
         # belonging to the group of pedestrian `n`.
-        rel_angles <- lapply(seq_len(nrow(p_pred)),
-                         \(i) atan2(p_pred[i, 2] - centers[,2], p_pred[i, 1] - centers[,1]) - orientations) 
+        rel_angles <- lapply(seq_len(nrow(predictions)),
+                         \(i) atan2(predictions[i, 2] - centers[,2], predictions[i, 1] - centers[,1]) - orientations) 
         rel_angles <- do.call(cbind, rel_angles)
     
         # Get location of angle on unit circle
@@ -673,8 +677,8 @@ get_angles <- function (agent_idx,
         # Find out which pedestrian will be closest to pedestrian `n` at the next iteration.
         # This means extracting the current_position and calculating the distance 
         # to other pedestrians in the group at the next time step.
-        nearest_ped <- m4ma::dist1_rcpp(position, p_pred)
-        nearest_ped <- p_pred[which.min(nearest_ped),]
+        nearest_ped <- m4ma::dist1_rcpp(position, predictions)
+        nearest_ped <- predictions[which.min(nearest_ped),]
         orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
 
         # Get angle from cell centers of pedestrian `n`
@@ -705,7 +709,7 @@ get_angles <- function (agent_idx,
 #' @param b_vf Numeric denoting the slope of the utility function. 
 #' @param rel_angles Numeric vector containing the relative angle from each cell 
 #' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' \code{\link[predped]{get_angles}}. 
 #' @param fx Trigonometric function applied to the relative angles defining what
 #' their effect is (scaled by \code{b_vf}). Defaults to \code{cos}, saying that 
 #' the maximal utility stems from directly looking at a person (orientation 0).
@@ -718,7 +722,7 @@ get_angles <- function (agent_idx,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname vf_utility_continuous
@@ -750,7 +754,7 @@ vf_utility_continuous <- function(b_vf,
 #' @param b_vf Numeric denoting the slope of the utility function. 
 #' @param rel_angles Numeric vector containing the relative angle from each cell 
 #' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angle}}. 
+#' \code{\link[predped]{get_angles}}. 
 #'
 #' @return Numeric vector containing the utility attributed to keeping the 
 #' group members within your visual field. Returns 0's if the agent does not 
@@ -758,7 +762,7 @@ vf_utility_continuous <- function(b_vf,
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_angles}},
-#' \code{\link[predped]{utility}},
+#' \code{\link[predped]{utility-agent}},
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_discrete

@@ -38,7 +38,7 @@ using namespace Rcpp;
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
@@ -176,24 +176,22 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
 //' @param velocities Numeric matrix containing the change in speed for an agent
-//' whenever they move to the respective cell of this matrix. Is used to create 
-//' the cell positions that the agent might move to, as performed through 
-//' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-//' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-//' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-//' @param orientations Numeric matrix containing the change in direction for an 
-//' agent whenever they move to the respective cell of this matrix. Is used to 
-//' create the cell positions that the agent might move to, as performed through
-//' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-//' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-//' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-//' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-//' angles are actually the negative symmetric versions of the smaller angles).
+//' whenever they move to the respective cell of this matrix. Is used to create
+//' the cell positions that the agent might move to. Defaults to a matrix in 
+//' which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+//' of speed), and \code{0.5} (deceleration).
+//' @param orientations Numeric matrix containing the change in direction for an
+//' agent whenever they move to the respective cell of this matrix. Is used to
+//' create the cell positions that the agent might move to. Defaults to a matrix 
+//' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+//' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+//' \code{287.5} (note that the larger angles are actually the negative symmetric 
+//' versions of the smaller angles).
 //' @param stay_stopped Logical denoting whether agents will predict others that 
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example

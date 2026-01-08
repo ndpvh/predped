@@ -14,6 +14,8 @@ utility_agent_rcpp(
 )
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -29,32 +31,27 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{object}{Object of the \code{\link[predped]{agent-class}}.}
-
-\item{cpp}{Logical denoting whether to use the Rcpp version of the function
-(\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 
 cells in \code{centers}.
 }
 \description{
-This function is the Rcpp equivalent of \code{\link[predped]{utility}}. 
+This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. 
 This function uses the operational-level utility functions to compute the 
 utility of moving to any given potential cell in \code{centers}. Here, we 
 assume that none of the utility variables (i.e., the variables that serve as 
 input to the utility functions) is precomputed, so that it will first compute
 their values. This input is then provided to 
-\code{\link[predped]{utility,data.frame-method}} for the actual computation 
+\code{\link[predped]{utility-data.frame}} for the actual computation 
 of the utility.
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
-\code{\link[predped]{utility,data.frame-method}},
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{utility-data.frame}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{update_position}}
 }

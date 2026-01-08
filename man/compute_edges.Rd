@@ -7,7 +7,8 @@
 compute_edges(
   background,
   space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius", ]),
-  many_nodes = TRUE
+  many_nodes = TRUE,
+  cpp = TRUE
 )
 }
 \arguments{
@@ -18,12 +19,15 @@ circumference of the object and the nodes created under the hood (see
 \code{\link[predped]{add_nodes}}). Defaults to 2.5 times the maximal 
 possible radius from the default \code{\link[predped]{params_from_csv}}.}
 
-\item{many_nodes}{ogical denoting whether to create many nodes or leave 
+\item{many_nodes}{Logical denoting whether to create many nodes or leave 
 it at the minimum. If \code{FALSE}, nodes are only added at the outlines of 
 the objects contained within the \code{objects} slot of \code{background}. 
 If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.}
+
+\item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
+function. Defaults to \code{TRUE}.}
 }
 \value{
 List containing a dataframe with the surviving nodes under 
@@ -59,6 +63,6 @@ head(edges$edges_with_coords)
 \code{\link[predped]{create_edges}}
 \code{\link[predped]{create_nodes}}
 \code{\link[predped]{find_path}}
-\code{\link[predped]{simulate-predped}}
-\code{\link[predped]{simulate-state}}
+\code{\link[predped]{simulate}}
+\code{\link[predped]{simulate.state}}
 }

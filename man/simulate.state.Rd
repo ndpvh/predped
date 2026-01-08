@@ -28,6 +28,7 @@
   goal_duration = function(x) rnorm(x, 10, 2),
   precompute_goal_paths = TRUE,
   sort_goals = TRUE,
+  adaptive_goal_sorting = TRUE,
   precomputed_goals = NULL,
   middle_edge = FALSE,
   position = NULL,
@@ -43,7 +44,7 @@
 
 \item{add_agent}{Logical denoting whether an agent should be added to the
 simulation. Defaults to \code{FALSE} and is typically handled by the
-\code{\link[predped]{simulate,predped-method}} function, where it accounts for the
+\code{\link[predped]{simulate}} function, where it accounts for the
 variables \code{add_agent_after} and \code{max_agents}.}
 
 \item{group_size}{Numeric matrix with two columns where the first column
@@ -61,9 +62,13 @@ which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 agent whenever they move to the respective cell of this matrix. Is used to
 create the cell positions that the agent might move to. Defaults to a matrix 
 in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 \code{287.5} (note that the larger angles are actually the negative symmetric 
 versions of the smaller angles).}
+
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
+\code{0.1}.}
 
 \item{close_enough}{Numeric denoting how close (in radii) the agent needs to
 be to an object in order to interact with it. Defaults to \code{2}, meaning the
@@ -108,6 +113,47 @@ current iteration in the simulation & the number of agents present
 at the current iteration in the simulation. Defaults to 1, which
 represents each iteration to be reported.}
 
+\item{goal_number}{Numeric, vector, or function that defines the number of
+goals the agents should accomplish. It's exact value is handled by
+\code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
+
+\item{goal_duration}{Numeric, vector, or function that defines the duration of
+the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
+
+\item{precompute_goal_paths}{Logical denoting whether to run the
+\code{\link[predped]{find_path}} for each of the generated goals
+beforehand. Assumes that the agent does all of the goals in the order of the
+goal stack. Defaults to \code{FALSE}.}
+
+\item{sort_goals}{Logical denoting whether to order the goal stack in a logical
+way. Currently implemented in the following way. First, we select the first
+goal as being the one that is closest by the starting position provided in
+the argument \code{starting_position}. Then, we define each of the next goals
+as being the one that is closest to the position of the previous goal.
+Defaults to \code{TRUE}.}
+
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
+
+\item{precomputed_goals}{List of goal stacks from which the agent can be
+assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
+in the simulation.}
+
+\item{middle_edge}{Logical denoting whether to sample the goals from the
+middle of the edge of the objects in the \code{link[predped]{background-class}}
+(\code{TRUE}) or to allow the goal locations to fall on all points on these
+edges (\code{FALSE}). Defaults to \code{FALSE}.}
+
+\item{position}{Numeric denoting the position you would like to assign to an
+agent if they are added to the simulation. Defaults to \code{NULL}, making 
+the agent start at the entrance. Note that this is an experimental feature 
+that has not been tested yet, and therefore might not work for the moment.}
+
+\item{individual_differences}{Logical denoting whether to use the standard
+deviations in the parameter list to create some variation in the parameters.
+Defaults to \code{FALSE}.}
+
 \item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
 of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 instead (\code{FALSE}). Defaults to \code{TRUE}.}
@@ -126,7 +172,7 @@ a single previous state.
 Heavily depends on \code{\link[predped]{update}}.
 
 Many of the arguments here are either shared or derived from the upper-level
-\code{\link[predped]{simulate,predped-method}} function. Please refer to the
+\code{\link[predped]{simulate}} function. Please refer to the
 Details in its documentation to see a breakdown of the most important
 arguments.
 }
@@ -158,7 +204,7 @@ my_state <- state(iteration = 0,
 
 # Simulate the next state
 next_state <- simulate(my_state,
-                       my_model,
+                       model = my_model,
                        add_agent = TRUE)
 
 # Check the number of agents in the next state
@@ -171,6 +217,6 @@ plot(next_state)
 \seealso{
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{state-class}},
-\code{\link[predped]{simulate,predped-method}},
+\code{\link[predped]{simulate}},
 \code{\link[predped]{update}}
 }

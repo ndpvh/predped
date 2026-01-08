@@ -23,22 +23,28 @@
 #' 2.5% and 97.5% quantiles of the times in seconds). If \code{FALSE}, the output
 #' will be a list of lists containing the raw execution times per function and 
 #' per benchmark case for the function. Defaults to \code{TRUE}.
+#' @param digits Integer denoting the decimal points to which to round to. 
+#' Ignored if \code{summarize = FALSE}. Defaults to \code{2}.
+#' @param progress Logical denoting whether to add a progress bar for the 
+#' benchmarks. Defaults to \code{TRUE}.
 #' 
 #' @return Either a list of lists containing the raw execution times per 
 #' benchmark case per function (if \code{summarize = FALSE}) or an HTML file 
 #' summarizing the results of the benchmark (if \code{summarize = TRUE})
 #' 
-#' @example 
-#' # Run benchmark for simulate with 1000 iterations
+#' @examples
+#' \dontrun{
+#' # Run benchmark for in_object with 100 iterations
 #' benchmark(
-#'     x = "simulate",
-#'     iterations = 1000
+#'     x = "in_object",
+#'     iterations = 100
 #' )
 #' 
 #' # Run benchmark for all functions with 10 iterations
 #' benchmark(
 #'    iterations = 10
 #' )
+#' }
 #' 
 #' @export 
 benchmark <- function(x = NULL, 
@@ -446,6 +452,10 @@ benchmark_args <- list(
     "time_series" = list(
         readRDS(file.path("tests", "testthat", "data", "trace_mll_bench.Rds"))[1:10]
     ),
+    "to_trace" = list(
+        data_bench[data_bench$iteration <= 14, ],
+        supermarket
+    ),
     "unpack_trace" = list(
         readRDS(file.path("tests", "testthat", "data", "trace_mll_bench.Rds"))[1:10]
     ),
@@ -731,7 +741,7 @@ benchmark_args <- list(
         inx@agents
     ),
 
-    # update.R
+    # update-R
     "create_agent_specifications" = list(
         lapply(1:100, \(x) agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0))
     ),
@@ -820,6 +830,26 @@ benchmark_test <- list(
             return(
                 time_series(
                     benchmark_args[["time_series"]][[1]], 
+                    cpp = TRUE
+                )
+            )
+        }
+    ),
+    "to_trace" = list(
+        "cpp = FALSE" = function() {
+            return(
+                to_trace(
+                    benchmark_args[["to_trace"]][[1]],
+                    benchmark_args[["to_trace"]][[2]], 
+                    cpp = FALSE
+                )
+            )
+        },
+        "cpp = TRUE" = function() {
+            return(
+                to_trace(
+                    benchmark_args[["to_trace"]][[1]],
+                    benchmark_args[["to_trace"]][[2]], 
                     cpp = TRUE
                 )
             )
@@ -2113,7 +2143,7 @@ benchmark_test <- list(
         }
     ),
 
-    # update.R
+    # update-R
     "create_agent_specifications" = list(
         "cpp = FALSE" = function() {
             return(
@@ -2238,6 +2268,7 @@ benchmark_hierarchy <- list(
 
     "data.R" = c(
         "time_series",
+        "to_trace",
         "unpack_trace"
     ),
     
@@ -2296,7 +2327,7 @@ benchmark_hierarchy <- list(
         "simulate"
     ),
 
-    "update.R" = c(
+    "update-R" = c(
         "create_agent_specifications",
         "predict_movement"
     ),
@@ -2320,6 +2351,10 @@ benchmark_caption <- list(
     "time_series" = paste("Benchmark for the time\\_series function.",
                           "A trace of length 10 and containing 3 agents is transformed to a dataset.",
                           "We distinguish between the R and the Rcpp version of this function."),
+    "to_trace" = paste("Benchmark for the to\\_trace function.", 
+                       "Transformed data consist of 10 datapoints of 10 different agents within the default supermarket",
+                       "environment.",
+                       "We distinguish between the R and Rcpp version of this function."),
     "unpack_trace" = paste("Benchmark for the unpack\\_trace function.",
                            "A trace of length 10 and containing 3 agents is transformed to a dataset containing",
                            "all information that is contained within the trace.", 
@@ -2344,7 +2379,7 @@ benchmark_caption <- list(
     "goal" = paste("Benchmark for the initialization function for goal using its default settings."),
     "interact" = paste("Benchmark for the interact function, allowing the interaction for only a single goal."),
     "mll" = paste("Benchmark for the mll function.",
-                  "The function evaluates the likelihood of datapoints of 10 different agents.",
+                  "The function evaluates the likelihood of 10 datapoints of 10 different agents.",
                   "We distinguish between providing parameters on the real or the bounded scale",
                   "(transform = TRUE or FALSE) and between using the R or Rcpp version of this function", 
                   "(cpp = FALSE or TRUE)."),

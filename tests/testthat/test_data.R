@@ -1,7 +1,10 @@
 testthat::test_that("Transforming to time series works", {
     trace <- readRDS(file.path(".", "data", "example_trace.Rds"))
-    ref <- data.table::fread(file.path(".", "data", "example_time_series.csv"), 
-                             data.table = FALSE)
+    ref <- read.table(
+        file.path(".", "data", "example_time_series.csv"),
+        sep = ",",
+        header = TRUE
+    )
 
     tst <- predped::time_series(trace)
 
@@ -62,7 +65,7 @@ testthat::test_that("General characteristics for `to_trace` works", {
     ref <- predped::time_series(trace, cpp = TRUE)
     tst <- predped::time_series(
         predped::to_trace(
-            data,
+            ref,
             trace[[1]]@setting
         ),
         cpp = TRUE
@@ -117,10 +120,11 @@ testthat::test_that("Computing cell centers for data works", {
     ref <- readRDS(file.path("data", "trace_data.Rds"))
 
     # Transform to data and back to a trace
-    data <- predped::time_series(ref, cpp = TRUE)
+    data <- predped::time_series(ref, cpp = FALSE)
     tst <- predped::to_trace(
         data,
-        ref[[1]]@setting
+        ref[[1]]@setting,
+        cpp = FALSE
     )
     back <- predped::time_series(tst, cpp = FALSE)
 

@@ -6,7 +6,7 @@
 function with minimal loss of time when the number of segments to test 
 increases.}
 \usage{
-line_line_intersection(segments_1, segments_2, return_all = FALSE)
+line_line_intersection(segments_1, segments_2, return_all = FALSE, cpp = TRUE)
 }
 \arguments{
 \item{segments_1}{Matrix with four columns denoting the x- and y-coordinates
@@ -18,6 +18,9 @@ with. Should have the same structure as `segments_1`}
 \item{return_all}{Logical denoting whether it should return the intersection 
 of all segments to each other. If true, will include indicators of which segments
 were compared. Defaults to `FALSE`.}
+
+\item{cpp}{Logical denoting whether to use the R (\code{cpp = FALSE}) or 
+Rcpp version (\code{cpp = TRUE}) of this function. Defaults to \code{TRUE}}
 }
 \value{
 Returns a logical denoting whether any of the segments in

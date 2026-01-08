@@ -46,15 +46,15 @@ utility of moving to any given potential cell in \code{centers}. Here, we
 assume that none of the utility variables (i.e., the variables that serve as 
 input to the utility functions) is precomputed, so that it will first compute
 their values. This input is then provided to 
-\code{\link[predped]{utility,data.frame-method}} for the actual computation 
+\code{\link[predped]{utility-data.frame}} for the actual computation 
 of the utility.
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
-\code{\link[predped]{utility,data.frame-method}},
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{utility-data.frame}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{update_position}}
 }

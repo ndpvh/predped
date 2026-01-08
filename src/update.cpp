@@ -26,10 +26,10 @@ using namespace Rcpp;
 //' 
 //' @seealso 
 //' \code{\link[predped]{create_agent_specifications}},
-//' \code{\link[predped]{simulate,predped-method}},
-//' \code{\link[predped]{simulate,state-method}},
-//' \code{\link[predped]{update,agent-method}},
-//' \code{\link[predped]{update,state-method}}
+//' \code{\link[predped]{simulate}},
+//' \code{\link[predped]{simulate.state}},
+//' \code{\link[predped]{update-agent}},
+//' \code{\link[predped]{update}}
 //' 
 //' @rdname predict_movement_rcpp
 //' 
@@ -74,7 +74,7 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' objects. Allows for a translation from the object-oriented way of doing things
 //' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 //'
-//' @param agent Object of the \code{\link[predped]{agent-class}}.
+//' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 //' @param stay_stopped Logical denoting whether agents will predict others that 
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.
@@ -86,10 +86,10 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' 
 //' @seealso 
 //' \code{\link[predped]{create_agent_specifications}},
-//' \code{\link[predped]{simulate,predped-method}},
-//' \code{\link[predped]{simulate,state-method}},
-//' \code{\link[predped]{update,agent-method}},
-//' \code{\link[predped]{update,state-method}}
+//' \code{\link[predped]{simulate}},
+//' \code{\link[predped]{simulate.state}},
+//' \code{\link[predped]{update-agent}},
+//' \code{\link[predped]{update}}
 //' 
 //' @rdname create_agent_specifications_rcpp
 //' 

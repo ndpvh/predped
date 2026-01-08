@@ -26,6 +26,7 @@
   individual_differences = FALSE,
   group_size = matrix(1, nrow = 1, ncol = 2),
   fx = function(x) x,
+  cpp = TRUE,
   ...
 )
 }
@@ -74,7 +75,7 @@ goals the agents should accomplish. It's exact value is handled by
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
-\code{\link[predped]{find_path-method}} for each of the generated goals
+\code{\link[predped]{find_path}} for each of the generated goals
 beforehand. Assumes that the agent does all of the goals in the order of the
 goal stack. Defaults to \code{FALSE}.}
 
@@ -130,15 +131,11 @@ useful when simulating evacuations (giving everyone "goal exit") or trying
 to guide behavior in any other way. Defaults to "\(x) x", meaning the state
 remains unaltered.}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{simulate,state-method}}
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+(\code{FALSE}) versions of the lower-level functions. Defaults to \code{TRUE}.}
+
+\item{...}{Arguments passed on to the \code{\link[predped]{simulate.state}}
 function.}
-
-\item{plot_live}{Logical denoting whether to plot each iteration while the
-simulation is going on. Defaults to \code{FALSE}.}
-
-\item{plot_time}{Numeric denoting the amount of time (in seconds) to wait
-between iterations, i.e., the time between updating the plot. Defaults to
-\code{0.2}.}
 }
 \value{
 List of objects of the \code{\link{state-class}} containing the
@@ -149,7 +146,7 @@ This function allows users to simulate data from their specified
 \code{\link[predped]{predped-class}}.
 }
 \details{
-Heavily depends on \code{\link[predped]{simulate,state-method}} and
+Heavily depends on \code{\link[predped]{simulate.state}} and
 \code{\link[predped]{update}}.
 
 The arguments that can be used to influence the simulation behavior might
@@ -157,11 +154,11 @@ be overwhelming, which is why we include a small categorization of the
 arguments in this sections. Roughly speaking, this function has multiple
 arguments that influence a same aspect of the simulation. These are the
 following (note that here all arguments are provided; some of these may
-only appear in the documentation of \code{\link[predped]{simulate,state-method}}).
+only appear in the documentation of \code{\link[predped]{simulate.state}}).
 
 Arguments that directly influence the general characteristics of the
 simulation and the model itself.
-\itemize{
+\describe{
     \item{\code{max_agent}:}{How many agents that can be in the room.}
     \item{\code{iterations}:}{How long the simulation should last.}
     \item{\code{add_agent_after}:}{How many iterations to leave between
@@ -176,14 +173,14 @@ simulation and the model itself.
 }
 
 Arguments that influence general characteristics of the agents.
-\itemize{
+\describe{
     \item{\code{individual_differences}:}{Whether agents should have
                                           continuous individual differences.}
     \item{\code{standing_start}:}{How fast agents are after standing still.}
 }
 
 Arguments controlling whether an initial condition should be used.
-\itemize{
+\describe{
     \item{\code{initial_agents}:}{An initial list of agents.}
     \item{\code{initial_number_agents}:}{An initial number of agents with
                                          which you want to start the
@@ -194,7 +191,7 @@ Preferably, only one is used at a time.
 
 Arguments controlling the goals, which can be easily traced back to the
 \code{\link[predped]{goal_stack}} function.
-\itemize{
+\describe{
     \item{\code{goal_number}:}{The number of goals the agents should have.}
     \item{\code{goal_duration}:}{How long each goal should take.}
     \item{\code{precompute_goal_paths}:}{Whether the paths to the goals should
@@ -208,7 +205,7 @@ Arguments controlling the goals, which can be easily traced back to the
 }
 
 Arguments controlling how path points and edges are handled.
-\itemize{
+\describe{
     \item{\code{precomputed_edges}:}{List containing nodes and edges.}
     \item{\code{many_nodes}:}{Whether to have many or few path points.}
     \item{\code{space_between}:}{Space to leave between objects and nodes.}
@@ -218,7 +215,7 @@ Arguments controlling how path points and edges are handled.
 }
 
 Arguments that handle feedback during the simulation.
-\itemize{
+\describe{
     \item{\code{plot_live}:}{Whether to make these plots.}
     \item{\code{plot_time}:}{How much time to leave between the plotting of
                              each state.}

@@ -17,9 +17,6 @@ std::unordered_set<std::string> unique(CharacterVector x) {
 //' that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
 //' @param segments_2 Matrix of line segments that `segments_1` should be tested
 //' with. Should have the same structure as `segments_1`
-//' @param return_all Logical denoting whether it should return the intersection 
-//' of all segments to each other. If true, will include indicators of which segments
-//' were compared. Defaults to `FALSE`.
 //'
 //' @return Returns a logical denoting whether any of the segments in 
 //' 

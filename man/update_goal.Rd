@@ -14,12 +14,15 @@ update_goal(
   space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
+  adaptive_goal_sorting = TRUE,
   report = FALSE,
   print_iteration = FALSE,
   cpp = TRUE
 )
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -49,6 +52,10 @@ needed.}
 or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
 
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
+to change the order of their goals adaptively throughout the simulation. 
+Defaults to \code{TRUE}.}
+
 \item{report}{Logical denoting whether to report whenever an agent is 
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
@@ -58,8 +65,6 @@ iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 \item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
 of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 instead (\code{FALSE}). Defaults to \code{TRUE}.}
-
-\item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}.
@@ -68,9 +73,9 @@ Object of the \code{\link[predped]{agent-class}}.
 Update the Goal of an Agent
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
 \code{\link[predped]{update_position}}
 }

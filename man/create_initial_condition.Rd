@@ -10,6 +10,8 @@ create_initial_condition(
   goal_number = function(n) rnorm(n, 10, 2),
   group_size = matrix(1, nrow = 1, ncol = 2),
   space_between = 1.25,
+  precomputed_edges = NULL,
+  cpp = TRUE,
   ...
 )
 }
@@ -33,6 +35,15 @@ an object and the created path points for the agents (in radii). Defaults to
 \code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
 object and the path points agents use in their strategy. Ignored if
 \code{precomputed_edges} is provided.}
+
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
+needed.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+(\code{FALSE}) alternatives for the lower-level functions. Defaults to 
+\code{TRUE}.}
 
 \item{...}{Additional arguments provided to \code{\link[predped]{add_agent}}.}
 }
@@ -67,6 +78,6 @@ Finally, group members are identified and given the same set of goals.
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{add_agent}},
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate_state}}
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate}}
 }

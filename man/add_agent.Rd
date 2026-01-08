@@ -18,10 +18,13 @@ add_agent(
   space_between = 1.25,
   position = NULL,
   standing_start = 0.1,
-  individual_differences = FALSE
+  individual_differences = FALSE,
+  return_characteristics = FALSE
 )
 }
 \arguments{
+\item{model}{Object of the \code{\link[predped]{predped-class}}.}
+
 \item{group_number}{Numeric denoting the group to which the agent belongs.
 Defaults to \code{1}.}
 
@@ -33,7 +36,7 @@ goals the agents should accomplish. It's exact value is handled by
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
-\code{\link[predped]{find_path-method}} for each of the generated goals
+\code{\link[predped]{find_path}} for each of the generated goals
 beforehand. Assumes that the agent does all of the goals in the order of the
 goal stack. Defaults to \code{FALSE}.}
 
@@ -58,6 +61,9 @@ containing the nodes and edges the agent can use to plan its path. Defauls
 to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
+\item{many_nodes}{Logical denoting whether to use many nodes when computing 
+the edges. Defaults to \code{FALSE} if \code{precomputed_edges = FALSE}.}
+
 \item{space_between}{Numeric denoting the space that should be left between
 an object and the created path points for the agents (in radii). Defaults to
 \code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
@@ -77,7 +83,9 @@ that agents move when they just came from standing still. Defaults to
 deviations in the parameter list to create some variation in the parameters.
 Defaults to \code{FALSE}.}
 
-\item{object}{Object of the \code{\link[predped]{predped-class}}.}
+\item{return_characteristics}{Logical denoting whether to return the 
+characteristics of the generated agents in a list (\code{TRUE}) or as part 
+of an agent (\code{FALSE}). Defaults to \code{FALSE}.}
 }
 \value{
 List of instances of the \code{\link[predped]{agent-class}}.
@@ -105,6 +113,6 @@ my_agent
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{add_group}},
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}}
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}}
 }

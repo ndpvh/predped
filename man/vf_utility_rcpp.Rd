@@ -7,11 +7,11 @@
 vf_utility_rcpp(b_visual_field, relative_angles)
 }
 \arguments{
-\item{b_vf}{Numeric denoting the slope of the utility function.}
+\item{b_visual_field}{Numeric denoting the slope of the utility function.}
 
-\item{rel_angles}{Numeric vector containing the relative angle from each cell 
-center to the predicted positions of the group members. Typically output of 
-\code{\link[predped]{get_angle}}.}
+\item{relative_angles}{Numeric vector containing the relative angle from 
+each cell center to the predicted positions of the group members. Typically 
+output of \code{\link[predped]{get_angles}}.}
 }
 \value{
 Numeric vector containing the utility attributed to keeping the 
@@ -29,6 +29,6 @@ falls inside the non-visual zone behind the agent.
 }
 \seealso{
 \code{\link[predped]{get_angles}},
-\code{\link[predped]{utility}},
+\code{\link[predped]{utility-agent}},
 \code{\link[predped]{vf_utility_continuous}}
 }

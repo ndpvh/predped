@@ -6,6 +6,9 @@
 \usage{
 \S4method{show}{agent}(object)
 }
+\arguments{
+\item{object}{Object of the \code{\link[predped]{agent-class}}}
+}
 \description{
 Show method for the \code{\link[predped]{agent-class}}
 }

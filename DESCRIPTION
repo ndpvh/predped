@@ -1,37 +1,57 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 1.0
-Date: 2023-12-06
-Author: c(
+Version: 0.1.0
+Date: 2026-01-07
+Description: 
+    Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
+    Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of 
+    different kinds of simulation studies.
+Authors@R: c(
     person("Niels", 
            "Vanhasbroeck", 
            email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090)), 
+           comment = c(ORCID = 0000-0002-7423-0090),
+           role = c("aut", "cre")), 
     person("Malte", 
-           "Lüken"), 
+           "Lüken",
+           role = "ctb"), 
     person("Alexander",
-           "Anderson"), 
+           "Anderson",
+           role = "ctb"), 
     person("Ece",
-           "Yatıkçı"), 
+           "Yatıkçı",
+           role = "ctb"), 
     person("Andrew",
            "Heathcote", 
-           email = "ajheathcote@gmail.com"))
+           email = "ajheathcote@gmail.com",
+           role = c("aut", "ctb", "fnd")))
 Maintainer: Niels Vanhasbroeck <niels.vanhasbroeck@gmail.com>
-Description: Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of different kinds of simulation studies.
-License: GPL v3
+URL: https://github.com/ndpvh/predped
+BugReports: https://github.com/ndpvh/predped/issues
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
+Depends:
+    R (>= 4.3.0)
 Imports: 
     Rcpp (>= 1.0.14),
-    matrixStats,
     methods,
     cppRouting,
     m4ma,
-    ggplot2
+    ggplot2,
+    ggpubr,
+    knitr,
+    rmarkdown,
+    kableExtra,
+    stats,
+    utils,
+    dplyr,
+    MASS,
+    matrixStats
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
-    'imports.R'
+    'predped-package.R'
     'RcppExports.R'
     'getters_setters.R'
     'objects.R'
@@ -54,7 +74,9 @@ Collate:
     'benchmark.R'
 Suggests: 
     fs,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    RSQLite,
+    DBI
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3

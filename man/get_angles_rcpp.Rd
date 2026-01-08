@@ -6,7 +6,7 @@
 \usage{
 get_angles_rcpp(
   agent_idx,
-  agent_groups,
+  agent_group,
   position,
   orientation,
   predictions,
@@ -18,9 +18,15 @@ get_angles_rcpp(
 \item{agent_idx}{Numeric denoting the position of the agent in the prediction 
 matrix \code{p_pred}.}
 
+\item{agent_group}{Numeric vector with the group membership of all 
+pedestrians.}
+
 \item{position}{Numeric vector denoting the current position of the agent.}
 
 \item{orientation}{Numeric denoting the current orientation of the agent.}
+
+\item{predictions}{Numeric matrix with shape N x 2 containing predicted 
+positions of all pedestrians that belong to the social group of the agent.}
 
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
@@ -30,12 +36,6 @@ group members (\code{TRUE}) -- effectively saying that it doesn't matter
 which group member the agent can see, as long as they can see one -- or 
 whether to only consider the nearest group member (\code{FALSE}). Defaults 
 to \code{TRUE}.}
-
-\item{agent_group}{Numeric vector with the group membership of all 
-pedestrians.}
-
-\item{p_pred}{Numeric matrix with shape N x 2 containing predicted positions
-of all pedestrians that belong to the social group of the agent.}
 }
 \value{
 Numeric vector containing the relative angle of the group member(s)
@@ -46,7 +46,7 @@ Finds the angle at which the group members are located compared to the agent.
 Uses the predicted positions of the group members for this.
 }
 \seealso{
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-agent}}
 \code{\link[predped]{vf_utility_continuous}}
 \code{\link[predped]{vf_utility_discrete}}
 }

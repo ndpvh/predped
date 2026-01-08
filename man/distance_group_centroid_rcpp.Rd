@@ -7,15 +7,14 @@
 distance_group_centroid_rcpp(predictions, centers, number_agents)
 }
 \arguments{
+\item{predictions}{Numeric matrix with shape N x 2 containing predicted 
+positions of all pedestrians that belong to the social group of the agent.}
+
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
 
-\item{p_pred}{Numeric matrix with shape N x 2 containing predicted positions
-of all pedestrians that belong to the social group of the agent.}
-
-\item{nped}{Numeric integer indicating number of people in pedestrian `n`'s social group.}
-
-\item{fx}{Function used to find the group centroid. Defaults to \code{mean}}
+\item{number_agents}{Integer indicating number of people in the pedestrian's 
+social group.}
 }
 \value{
 Numeric vector containing the distance from each cell in the `center`
@@ -37,5 +36,5 @@ utility functions.
 }
 \seealso{
 \code{\link[predped]{gc_utility}},
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-agent}}
 }

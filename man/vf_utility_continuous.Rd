@@ -11,7 +11,7 @@ vf_utility_continuous(b_vf, rel_angles, fx = cos)
 
 \item{rel_angles}{Numeric vector containing the relative angle from each cell 
 center to the predicted positions of the group members. Typically output of 
-\code{\link[predped]{get_angle}}.}
+\code{\link[predped]{get_angles}}.}
 
 \item{fx}{Trigonometric function applied to the relative angles defining what
 their effect is (scaled by \code{b_vf}). Defaults to \code{cos}, saying that 
@@ -36,6 +36,6 @@ member or the group member behind the agent.
 }
 \seealso{
 \code{\link[predped]{get_angles}},
-\code{\link[predped]{utility}},
+\code{\link[predped]{utility-agent}},
 \code{\link[predped]{vf_utility_discrete}}
 }

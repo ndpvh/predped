@@ -10,5 +10,6 @@ library(testthat)
 library(predped)
 
 RNGkind(kind = "Mersenne-Twister")
+RNGversion("4.3.0")
 
 test_check("predped")

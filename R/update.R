@@ -23,15 +23,15 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}.
 #' 
-#' @docType method
+
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}}
 #' 
-#' @rdname update-state
+#' @rdname update
 #' 
 #' @export 
 setMethod("update", "state", function(object,
@@ -153,7 +153,7 @@ setMethod("update", "state", function(object,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
@@ -189,13 +189,13 @@ setMethod("update", "state", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @docType method
+
 #' 
 #' @rdname update-agent
 #' 
@@ -256,7 +256,7 @@ setMethod("update", "agent", function(object,
 
 #' Update the Position of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -272,7 +272,7 @@ setMethod("update", "agent", function(object,
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
 #' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
 #' \code{287.5} (note that the larger angles are actually the negative symmetric 
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
@@ -291,10 +291,10 @@ setMethod("update", "agent", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}}
 #' 
 #' @rdname update_position
@@ -480,7 +480,7 @@ update_position <- function(agent,
 
 #' Update the Goal of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param seen Logical indicating whether the agent can see the path point 
@@ -516,10 +516,10 @@ update_position <- function(agent,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname update_goal
@@ -898,10 +898,10 @@ update_goal <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement
 #' 
@@ -939,22 +939,24 @@ predict_movement <- function(agent,
 #' objects. Allows for a translation from the object-oriented way of doing things
 #' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 #'
-#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing all information of all agents within the current 
 #' state.
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications
 #' 

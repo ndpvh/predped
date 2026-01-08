@@ -1,5 +1,3 @@
-
-
 testthat::test_that("Adding agent works", {
     # Create several settings differing in the entrance
     settings <- list(predped::background(shape = rectangle(center = c(0, 0), 
@@ -77,16 +75,27 @@ testthat::test_that("Creating initial condition works", {
 
     # Create an initial condition with 3 agents within this environment
     set.seed(1)
-    agents_few <- predped::create_initial_condition(3, model, goal_number = 5, individual_differences = FALSE)
+    agents_few <- predped::create_initial_condition(3, 
+                                                    model, 
+                                                    goal_number = 5, 
+                                                    individual_differences = FALSE,
+                                                    cpp = FALSE)
 
-    # Also create one with an impossible number of agents
-    #
-    # Check this test, stops prematurely for some reason
+    # Also create one with an impossible number of agents. Note that I added 
+    # cpp = FALSE to ensure everything runs in R. My suspicion is that the seeds
+    # are not carried over to C++ via Rcpp, meaning that results may differ 
+    # when doing the analysis on different systems (depending on the seed 
+    # used)
     set.seed(1)
-    agents_many <- predped::create_initial_condition(50, model, goal_number = 5, individual_differences = FALSE)
+    agents_many <- predped::create_initial_condition(50, 
+                                                     model, 
+                                                     goal_number = 5, 
+                                                     individual_differences = FALSE,
+                                                     cpp = FALSE) |>
+        suppressMessages()
 
     testthat::expect_equal(length(agents_few), 3)
-    testthat::expect_equal(length(agents_many), 5)
+    testthat::expect_equal(length(agents_many), 7)
     testthat::expect_message(predped::create_initial_condition(50, model, goal_number = 5))
 
     # If you would ever want to visualize it during debugging

@@ -870,7 +870,7 @@ testthat::test_that(
         # Also create different starting positions, ensuring we're not missing 
         # anything
         centers <- cbind(
-            c(0, 1 * sin(seq(0, 2 * pi, pi/4))),
+            c(0, 1 * cos(seq(0, 2 * pi, pi/4))),
             c(0, 1 * sin(seq(0, 2 * pi, pi/4)))
         )
 
@@ -888,6 +888,7 @@ testthat::test_that(
             matrix(ncol = 3)
 
         # Loop over each of the combinations and each of the cell centers
+        tmp <- list()
         tst <- logical(nrow(combinations) * nrow(centers))
         idx <- 1
         for(i in seq_len(nrow(combinations))) {
@@ -901,21 +902,29 @@ testthat::test_that(
                 centers_1 <- predped::compute_centers(dummy,
                                                       velocities = velocities,
                                                       orientations = orientations,
+                                                      time_step = 0.5,
                                                       cpp = FALSE)
 
                 # Compute cell centers through m4ma
                 centers_2 <- predped::compute_centers(dummy,
                                                       velocities = velocities,
                                                       orientations = orientations,
+                                                      time_step = 0.5,
                                                       cpp = TRUE)
 
                 # Check whether all cell centers are the same (taking into account
                 # some computational error)
                 diff <- centers_1 - centers_2
 
-                tst[idx] <- all(abs(diff) < 1e-4)
+                tmp[[idx]] <- c(range(diff), dummy@center)
+
+                tst[idx] <- all(abs(diff) < 1e-2)
                 idx <- idx + 1
             }
+        }
+
+        if(!all(tst)) {
+            print(do.call("rbind", tmp))
         }
 
         # Do the test

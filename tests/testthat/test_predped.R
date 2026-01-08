@@ -14,7 +14,8 @@ testthat::test_that("Predped initialization works", {
     #
     # First CSV
     set.seed(1)
-    csv_1 <- predped::predped(setting)
+    csv_1 <- predped::predped(setting) |>
+        suppressMessages()
     csv_2 <- predped::predped(setting,                     
                               archetypes = c("BaselineEuropean", 
                                              "Rushed"))
@@ -23,7 +24,8 @@ testthat::test_that("Predped initialization works", {
                                              "Rushed"),
                               weights = c(0.75, 0.25))
     csv_4 <- predped::predped(setting, 
-                              id = "test")
+                              id = "test") |>
+        suppressMessages()
 
     n_archs <- nrow(params_csv[["params_archetypes"]])
 

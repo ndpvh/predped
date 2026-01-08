@@ -53,7 +53,7 @@ also be equal to 0, allowing no variation in the selected parameters.
 
 Each of the parameters in \code{params_archetypes} controls an aspect of the 
 decisions pedestrians make when walking around in an environment, namely:
-\itemize{
+\describe{
     \item{\code{radius}:}{the radius of the agent}
     \item{\code{slowing_time}:}{the number of seconds the agent needs to slow
                                down when approaching a goal}
@@ -144,6 +144,7 @@ decisions pedestrians make when walking around in an environment, namely:
 \code{\link[predped]{predped-class}},
 \code{\link[predped]{generate_parameters}},
 \code{\link[predped]{load_parameters}},
-\code{\link[predped]{utility}}
+\code{\link[predped]{utility-agent}}
+\code{\link[predped]{utility-data.frame}}
 }
 \keyword{datasets}

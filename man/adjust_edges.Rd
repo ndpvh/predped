@@ -11,7 +11,8 @@ adjust_edges(
   precomputed_edges,
   space_between = 0.5,
   new_objects = NULL,
-  reevaluate = !is.null(new_objects)
+  reevaluate = !is.null(new_objects),
+  cpp = TRUE
 )
 }
 \arguments{
@@ -39,6 +40,9 @@ only \code{from} and \code{to} are added to the already existing edges.}
 of the edges that are contained in the \code{precomputed_edges}. Defaults to 
 \code{TRUE} when \code{new_objects} is not empty, and to \code{FALSE} 
 whenever it is.}
+
+\item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
+function. Defaults to \code{TRUE}.}
 }
 \value{
 List containing a dataframe with the surviving nodes under 

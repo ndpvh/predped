@@ -12,14 +12,14 @@ using namespace Rcpp;
 //' 
 //' Used in the \code{\link[predped]{overlap_with_objects}} function for creating 
 //' nodes of which their presence within an agent can be checked in an efficient 
-//' way (see \code{\link[predped]{moving_options-method}} and 
-//' \code{\link[predped]{in_object-method}}). Currently works for all 
+//' way (see \code{\link[predped]{moving_options}} and 
+//' \code{\link[predped]{in_object}}). Currently works for all 
 //' instances of \code{\link[predped]{object-class}}, but only returns 
 //' \code{NULL} for the \code{\link[predped]{segment-class}}.
 //' 
 //' @details 
-//' Related to the \code{\link[predped]{add_nodes-method}} with the main difference
-//' being that the \code{\link[predped]{add_nodes-method}} adds nodes around or 
+//' Related to the \code{\link[predped]{add_nodes}} with the main difference
+//' being that the \code{\link[predped]{add_nodes}} adds nodes around or 
 //' within an object, while \code{nodes_on_circumference} adds nodes directly on
 //' the circumference of an object.
 //' 
@@ -52,8 +52,6 @@ using namespace Rcpp;
 //' \code{\link[predped]{add_nodes}},
 //' \code{\link[predped]{in_object}}, 
 //' \code{\link[predped]{moving_options}}
-//' 
-//' @docType method
 //' 
 //' @rdname nodes_on_circumference_rcpp
 //' 
@@ -184,8 +182,6 @@ NumericMatrix nodes_on_circumference_rcpp(S4 object,
 //' \code{\link[predped]{segment-class}},
 //' \code{\link[predped]{out_object}}, 
 //' \code{\link[predped]{moving_options}}
-//' 
-//' @docType method
 //' 
 //' @rdname in_object_rcpp
 //' 

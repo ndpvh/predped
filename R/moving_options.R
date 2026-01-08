@@ -38,6 +38,7 @@
 #' the object can be moved to. Should have one row for each cell.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Logical matrix containing availabilities of the centers.
 #'
@@ -51,7 +52,8 @@
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0), 
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,
@@ -73,9 +75,8 @@
 #' \code{\link[predped]{state-class}},
 #' \code{\link[predped]{overlap_with_objects}}
 #'
-#' @docType methods
 #'
-#' @rdname moving_options-methods
+#' @rdname moving_options
 #'
 #' @export
 #
@@ -86,7 +87,7 @@
 #     centers
 setGeneric("moving_options", function(object, ...) standardGeneric("moving_options"))
 
-#' @rdname moving_options-methods
+#' @rdname moving_options
 #'
 #' @export
 setMethod("moving_options", "agent", function(object,
@@ -197,7 +198,7 @@ setMethod("moving_options", "agent", function(object,
 #' @param orientations Numeric matrix containing the change in direction for an
 #' agent whenever they move to the respective cell of this matrix.
 #' Defaults to a matrix in which the rows contain \code{72.5}, \code{50},
-#' \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, \code{340},
+#' \code{32.5}, \code{20}, \code{10}, \code{0}, \code{350}, \code{340},
 #' \code{327.5}, \code{310}, \code{287.5} (note that the larger angles are
 #' actually the negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the number of seconds each discrete step in
@@ -248,7 +249,7 @@ setMethod("moving_options", "agent", function(object,
 #' @seealso
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[m4ma]{c_vd}}
-#' \code{\link[predped]{moving_options-method}}
+#' \code{\link[predped]{moving_options}}
 #'
 #' @rdname compute_centers
 #'
@@ -337,7 +338,8 @@ compute_centers <- function(agent,
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-1.01, 0)))
+#'                   current_goal = goal(position = c(-1.01, 0),
+#'                                       path = matrix(c(-1.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,
@@ -449,7 +451,7 @@ agents_between_goal <- function(agent,
 #' This function checks whether there is an overlap between a given agent and
 #' the objects in the environment, provided that the agent would move to the
 #' locations in \code{centers}. Returns a logical matrix as needed in
-#' \code{\link[predped]{moving_options-method}}.
+#' \code{\link[predped]{moving_options}}.
 #'
 #' @details
 #' In this function, we can only approximately check the intersection of agent
@@ -468,7 +470,7 @@ agents_between_goal <- function(agent,
 #'
 #' This check is then performed by looping over all the centers, changing the
 #' agents position to the position of this center, and using the
-#' \code{\link[predped]{in_object-method}} to do the test. This is a vectorized
+#' \code{\link[predped]{in_object}} to do the test. This is a vectorized
 #' test: For each position in \code{centers} we have a logical \code{TRUE} or
 #' \code{FALSE} for each of the nodes in the coordinate matrix, resulting in a
 #' logical matrix with an equal number of rows as \code{centers} and an equal
@@ -477,8 +479,8 @@ agents_between_goal <- function(agent,
 #' for each center.
 #'
 #' The reason why we use this approximate method is because of time efficiency.
-#' Using the \code{\link[predped]{intersects-method}} takes a longer time than
-#' using the \code{\link[predped]{in_object-method}}, especially as the number
+#' Using the \code{\link[predped]{intersects}} takes a longer time than
+#' using the \code{\link[predped]{in_object}}, especially as the number
 #' of objects in the environment increases.
 #'
 #' @param agent Object of the \code{\link[predped]{agent-class}}.

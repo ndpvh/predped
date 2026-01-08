@@ -12,14 +12,14 @@
 #' This function is used to enhance the generalizability of how certain values 
 #' are determined, and is used for determining:
 #' \itemize{
-#'    \item{}{the number of goals to simulate in each goal stack in the 
-#'            \code{\link[predped]{multiple_goal_stacks}} function}
-#'    \item{}{the counter for each goal in a goal stack in the 
-#'            \code{\link[predped]{goal_stack}} function}
-#'    \item{}{the number of agents that can maximally be in the simulation at 
-#'            each time point in the \code{\link[predped]{simulate-predped-method}}}
-#'    \item{}{the iteration number at which an agent can be added to the
-#'            simulation in the \code{\link[predped]{simulate-predped-method}}}
+#'    \item the number of goals to simulate in each goal stack in the 
+#'          \code{\link[predped]{multiple_goal_stacks}} function
+#'    \item the counter for each goal in a goal stack in the 
+#'          \code{\link[predped]{goal_stack}} function
+#'    \item the number of agents that can maximally be in the simulation at 
+#'          each time point in the \code{\link[predped]{simulate}}
+#'    \item the iteration number at which an agent can be added to the
+#'          simulation in the \code{\link[predped]{simulate}}
 #' }
 #' 
 #' Note that for this function to work, one should correctly define their 
@@ -50,7 +50,7 @@
 #' determine_values(generating_function, 5)
 #' 
 #' @seealso
-#' \code{\link[predped]{simulate-predped}}
+#' \code{\link[predped]{simulate}}
 #' \code{\link[predped]{goal_stack}}
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 

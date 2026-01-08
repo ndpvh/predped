@@ -7,30 +7,30 @@
 utility_rcpp(data, parameters)
 }
 \arguments{
+\item{data}{Dataframe containing all of the needed information to compute 
+the utilities. Typically output of the 
+\code{\link[predped]{compute_utility_variables}} function.}
+
 \item{parameters}{Dataframe containing the parameters of the agent. Should 
 conform to the naming conventions mentioned in 
 \code{\link[predped]{params_from_csv}}.}
-
-\item{object}{Dataframe containing all of the needed information to compute 
-the utilities. Typically output of the 
-\code{\link[predped]{compute_utility_variables}} function.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 
 potential cells.
 }
 \description{
-This function is the Rcpp equivalent of \code{\link[predped]{utility}}. It
+This function is the Rcpp equivalent of \code{\link[predped]{utility-agent}}. It
 takes in a dataframe containing all of the relevant values for computing the
 utility, as well as a dataframe containing the parameters. Heavily depends 
 on the \code{m4ma} package.
 }
 \seealso{
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}},
-\code{\link[predped]{update,agent-method}},
-\code{\link[predped]{update,state-method}},
-\code{\link[predped]{utility,agent-method}},
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{utility-agent}},
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{update_position}}

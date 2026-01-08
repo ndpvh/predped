@@ -13,6 +13,8 @@ add_group(
 )
 }
 \arguments{
+\item{model}{Object of the \code{\link[predped]{predped-class}}.}
+
 \item{agent_number}{Numeric denoting the number of agents to add. Defaults
 to \code{1}.}
 
@@ -25,8 +27,6 @@ deviations in the parameter list to create some variation in the parameters.
 Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_agent}}.}
-
-\item{object}{Object of the \code{\link[predped]{predped-class}}.}
 }
 \value{
 List of instances of the \code{\link[predped]{agent-class}}.
@@ -62,6 +62,6 @@ sapply(agents, \(x) length(goals(x)))
 \seealso{
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{add_agent}},
-\code{\link[predped]{simulate,predped-method}},
-\code{\link[predped]{simulate,state-method}}
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}}
 }
