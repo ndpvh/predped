@@ -916,7 +916,7 @@ testthat::test_that(
                 # some computational error)
                 diff <- centers_1 - centers_2
 
-                tmp[[idx]] <- range(velocities)
+                tmp[[idx]] <- c(range(diff), dummy@center)
 
                 tst[idx] <- all(abs(diff) < 1e-2)
                 idx <- idx + 1
