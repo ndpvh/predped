@@ -108,7 +108,7 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
     for(int i = 0; i < velocities.length(); i++) {
         // Define a slowing factor that depends on the turning angle or change in
         // direction
-        slow = 1 - b * pow(sin(abs(angles[i]) / 2), a);
+        slow = 1. - b * pow(sin(abs(angles[i]) / 2), a);
 
         // Adjust the velocity of the agent
         velocity = speed * slow * velocities[i] * time_step;
