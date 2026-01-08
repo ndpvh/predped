@@ -11,8 +11,13 @@ evaluate_edges(segments, background, space_between, cpp = TRUE)
 under column names \code{"from"} and \code{"to"}, and their coordinates under 
 \code{"from_x"}, \code{"from_y"}, \code{"to_x"}, and \code{"to_y"}.}
 
-\item{objects}{List of objects that extend the 
-\code{\link[predped]{object-class}}.}
+\item{background}{Object of the \code{\link[predped]{background-class}}.}
+
+\item{space_between}{Numeric denoting the space that should be left between 
+an object and the created path points for the agents.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 List containing a dataframe with the surviving connections between 
@@ -32,12 +37,12 @@ In this function, a lot of the heavy lifting is done by the
 }
 \examples{
 # Let's create a background
-my_background <- background(shape = rectangle(shape = c(0, 0), 
+my_background <- background(shape = rectangle(center = c(0, 0), 
                                               size = c(2, 2)), 
-                            objects = list(rectangle(shape = c(0, 0), 
+                            objects = list(rectangle(center = c(0, 0), 
                                                      size = c(1, 1))))
 
-# Create some segments that do and do not go though the objects in the 
+# Create some segments that do and do not go through the objects in the 
 # background
 potential_edges <- data.frame(from = c("node 1", "node 2", "node 3"), 
                               from_x = c(-0.75, -0.75, -0.75), 
@@ -48,7 +53,9 @@ potential_edges <- data.frame(from = c("node 1", "node 2", "node 3"),
 head(potential_edges)
 
 # Only retain the edges that don't intersect the object
-surviving_edges <- evaluate_edges(potential_edges, my_background)
+surviving_edges <- evaluate_edges(potential_edges, 
+                                  my_background,
+                                  space_between = 0)
 head(surviving_edges$edges_with_coords)
 
 }

@@ -131,19 +131,11 @@ useful when simulating evacuations (giving everyone "goal exit") or trying
 to guide behavior in any other way. Defaults to "\(x) x", meaning the state
 remains unaltered.}
 
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+(\code{FALSE}) versions of the lower-level functions. Defaults to \code{TRUE}.}
+
 \item{...}{Arguments passed on to the \code{\link[predped]{simulate.state}}
 function.}
-
-\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
-to change the order of their goals adaptively throughout the simulation. 
-Defaults to \code{TRUE}.}
-
-\item{plot_live}{Logical denoting whether to plot each iteration while the
-simulation is going on. Defaults to \code{FALSE}.}
-
-\item{plot_time}{Numeric denoting the amount of time (in seconds) to wait
-between iterations, i.e., the time between updating the plot. Defaults to
-\code{0.2}.}
 }
 \value{
 List of objects of the \code{\link{state-class}} containing the

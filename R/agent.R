@@ -79,6 +79,7 @@ agent <- setClass("agent",
 
 #' Constructor for the \code{\link[predped]{agent-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param center Numerical vector of two elements denoting the current position
 #' of the agent (x and y coordinate).
 #' @param radius Numeric denoting the size of agent. As agents are circular, this 
@@ -218,6 +219,8 @@ setMethod("initialize", "agent", function(.Object,
 })
 
 #' Show method for the \code{\link[predped]{agent-class}}
+#' 
+#' @param object Object of the \code{\link[predped]{agent-class}}
 #' 
 #' @export
 setMethod("show", "agent", function(object) {

@@ -15,6 +15,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{shape}{Object of a type that extends \code{\link[predped]{object-class}}
 defining the shape of the background. Importantly, the shape cannot be of 
 the \code{\link[predped]{segment-class}}.}

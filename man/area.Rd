@@ -32,6 +32,6 @@ area(my_circle)
 }
 \seealso{
 \code{\link[predped]{circle-class}},
-\code{\link[predped]{objects-class}},
+\code{\link[predped]{object-class}},
 \code{\link[predped]{rectangle-class}}
 }

@@ -36,6 +36,15 @@ an object and the created path points for the agents (in radii). Defaults to
 object and the path points agents use in their strategy. Ignored if
 \code{precomputed_edges} is provided.}
 
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
+needed.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+(\code{FALSE}) alternatives for the lower-level functions. Defaults to 
+\code{TRUE}.}
+
 \item{...}{Additional arguments provided to \code{\link[predped]{add_agent}}.}
 }
 \value{

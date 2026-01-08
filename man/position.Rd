@@ -50,6 +50,9 @@ position(object) <- value
 \item{object}{An instance of the \code{\link[predped]{agent-class}}, 
 \code{\link[predped]{object-class}}, or \code{\link[predped]{goal-class}}.}
 
+\item{return_matrix}{Logical denoting whether to return the position in a 
+matrix of size 1 x 2. Defaults to \code{FALSE}.}
+
 \item{value}{Value with which to replace the original value of the 
 \code{position} or \code{center} slot.}
 }

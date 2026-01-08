@@ -12,7 +12,7 @@
 \usage{
 transform_df(object, ...)
 
-\S4method{transform_df}{agent}(object, plot_goal = TRUE, goal.size = 1)
+\S4method{transform_df}{agent}(object, plot_goal = TRUE, goal.size = 2/100)
 
 \S4method{transform_df}{background}(object, entry.width = 0.3, ...)
 
@@ -30,6 +30,44 @@ transform_df(object, ...)
 
 \S4method{transform_df}{state}(object, entry.width = 0.3, plot_goal = TRUE, goal.size = 2/100)
 }
+\arguments{
+\item{object}{Instance of the \code{\link[predped]{agent-class}},
+\code{\link[predped]{background-class}}, \code{list},
+\code{\link[predped]{object-class}}, \code{\link[predped]{segment-class}}, or
+\code{\link[predped]{state-class}} to be transformed for plotting purposes}
+
+\item{...}{Arguments passed on to lower-level functions.}
+
+\item{plot_goal}{Logical denoting whether to plot the goal together with the 
+agent. Defaults to \code{TRUE}.}
+
+\item{goal.size}{Radius of the circle that should be plotted at the location
+of the agent's goal. Ignored if \code{plot_goal} is \code{FALSE}. Defaults to
+\code{2/100}.}
+
+\item{entry.width}{Radius of the circle that should be plotted at the 
+location of the entries and exits of the background. Defaults to \code{0.3}.}
+
+\item{kind}{Character denoting what the category of the objects are. Defaults
+to \code{"object"} for instances of \code{\link[predped]{object-class}} or
+\code{"segment"} for instances of \code{\link[predped]{segment-class}}. 
+Is otherwise handled under the hood.}
+
+\item{plot_forbidden}{Logical denoting wether to plot the forbidden edges or
+regions of objects. Defaults to \code{FALSE}.}
+
+\item{segment.hjust}{Numeric between 0 and 1 denoting the horizontal 
+justification of the arrow denoting one-directional movement. Defaults to 
+\code{0.5}}
+
+\item{segment.size}{Numeric denoting the size of the arrow denoting 
+one-directional movement. Defaults to \code{0.6}.}
+}
 \description{
-Transform to dataframe of segments
+Lower-level functions that transform the provided information into rows within
+a \code{data.frame}. Is used when the \code{optimize} argument of 
+\code{\link[predped]{plot}} is set to \code{TRUE}, as it ensures that 
+\code{ggplot2} only has to look at one big \code{data.frame} instead of many
+smaller ones, which greatly reduces the computational load for making the 
+plots.
 }

@@ -30,6 +30,8 @@ add_nodes(object, ...)
 \arguments{
 \item{object}{Object of \code{\link[predped]{object-class}}.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{space_between}{Numeric denoting the space to leave between the 
 circumference of the object and the nodes to create. When \code{outside = TRUE},
 \code{space_between} distance is created to the outside of the object, while

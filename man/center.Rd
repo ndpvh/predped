@@ -49,12 +49,12 @@ works for all extensions of the \code{\link[predped]{object-class}}.
 my_circle <- circle(center = c(0, 0), 
                     radius = 1)
 
-# Access the center slot for the agent
-center(my_agent)
+# Access the center slot for the circle
+center(my_circle)
 
-# Change the center slot for the agent
-center(my_agent) <- c(1, 1)
-center(my_agent)
+# Change the center slot for the circle
+center(my_circle) <- c(1, 1)
+center(my_circle)
 
 # Note that for some object, changing the center also changes other slots
 my_rectangle <- rectangle(center = c(0, 0), 

@@ -31,6 +31,7 @@ predped <- setClass("predped", list(id = "character",
 
 #' Constructor for the \code{\link[predped]{predped-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param setting Object of the \code{\link[predped]{background-class}}.
 #' @param id Character that serves as an identifier for the agent. Defaults to 
 #' an empty character, triggering the random generation of an id.
@@ -158,6 +159,8 @@ setMethod("initialize", "predped", function(.Object,
 })
 
 #' Show method for the \code{\link[predped]{predped-class}}
+#' 
+#' @param object Object of the \code{\link[predped]{predped-class}}
 #' 
 #' @export
 setMethod("show", "predped", function(object) {

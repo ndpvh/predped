@@ -137,7 +137,8 @@
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{generate_parameters}},
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{utility-state}}
+#' \code{\link[predped]{utility-agent}}
+#' \code{\link[predped]{utility-data.frame}}
 #' 
 #' @rdname params_from_csv
 #' 

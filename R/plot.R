@@ -76,6 +76,8 @@
 #' @param print_progress Logical that denotes whether to print the iteration of 
 #' the state that is currently being plotted. Only applies when plotting a trace.
 #' Defaults to \code{TRUE}.
+#' @param fill,color Character denoting the lower-level definition of the fill 
+#' and color of an instance of \code{\link[predped]{object-class}}
 #' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
 #' @return Either a geom or a ggplot, depending on the object provided (see
@@ -744,6 +746,37 @@ plot_edges <- function(setting,
 
 
 #' Transform to dataframe of segments
+#' 
+#' Lower-level functions that transform the provided information into rows within
+#' a \code{data.frame}. Is used when the \code{optimize} argument of 
+#' \code{\link[predped]{plot}} is set to \code{TRUE}, as it ensures that 
+#' \code{ggplot2} only has to look at one big \code{data.frame} instead of many
+#' smaller ones, which greatly reduces the computational load for making the 
+#' plots.
+#' 
+#' @param object Instance of the \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{background-class}}, \code{list},
+#' \code{\link[predped]{object-class}}, \code{\link[predped]{segment-class}}, or
+#' \code{\link[predped]{state-class}} to be transformed for plotting purposes
+#' @param plot_goal Logical denoting whether to plot the goal together with the 
+#' agent. Defaults to \code{TRUE}.
+#' @param goal.size Radius of the circle that should be plotted at the location
+#' of the agent's goal. Ignored if \code{plot_goal} is \code{FALSE}. Defaults to
+#' \code{2/100}.
+#' @param entry.width Radius of the circle that should be plotted at the 
+#' location of the entries and exits of the background. Defaults to \code{0.3}.
+#' @param kind Character denoting what the category of the objects are. Defaults
+#' to \code{"object"} for instances of \code{\link[predped]{object-class}} or
+#' \code{"segment"} for instances of \code{\link[predped]{segment-class}}. 
+#' Is otherwise handled under the hood.
+#' @param plot_forbidden Logical denoting wether to plot the forbidden edges or
+#' regions of objects. Defaults to \code{FALSE}.
+#' @param segment.hjust Numeric between 0 and 1 denoting the horizontal 
+#' justification of the arrow denoting one-directional movement. Defaults to 
+#' \code{0.5}
+#' @param segment.size Numeric denoting the size of the arrow denoting 
+#' one-directional movement. Defaults to \code{0.6}.
+#' @param ... Arguments passed on to lower-level functions.
 #'
 #' @rdname transform_df
 setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))
@@ -751,7 +784,7 @@ setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))
 #' @rdname transform_df
 setMethod("transform_df", "agent", function(object,
                                             plot_goal = TRUE,
-                                            goal.size = 1) {
+                                            goal.size = 2/100) {
 
     # Determine the orientation of the agent to be plotted
     angle <- object@orientation * 2 * pi / 360

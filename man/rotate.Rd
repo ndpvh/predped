@@ -31,6 +31,8 @@ rotate(object, ...)
 \code{\link[predped]{rectangle-class}}, or, alternatively, a numeric vector 
 or matrix containing coordinates.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{radians}{Numeric denoting the degrees with which to rotate the object 
 in radians. Defaults to \code{0}.}
 

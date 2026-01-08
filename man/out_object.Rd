@@ -15,8 +15,7 @@ out_object(object, x, ...)
 \item{x}{Numeric vector or matrix containing x- and y-coordinates to be 
 checked.}
 
-\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
-or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.}
+\item{...}{Arguments passed on to \code{\link[predped]{in_object}}}
 }
 \value{
 Logical whether the point is outside of the object (\code{TRUE}) or 

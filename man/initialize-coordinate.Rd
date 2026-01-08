@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{.Object}{Numerical vector of size 2 denoting the coordinate.}
+
+\item{...}{Additional arguments specified in the other objects.}
 }
 \value{
 Object of the \code{\link[predped]{coordinate-class}}

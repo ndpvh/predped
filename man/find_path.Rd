@@ -2,13 +2,28 @@
 % Please edit documentation in R/goals.R
 \name{find_path}
 \alias{find_path}
+\alias{find_path,goal-method}
 \title{Find path to a goal}
 \usage{
 find_path(object, ...)
+
+\S4method{find_path}{goal}(
+  object,
+  agent,
+  background,
+  space_between = radius(agent),
+  many_nodes = FALSE,
+  algorithm = "Dijkstra",
+  precomputed_edges = NULL,
+  new_objects = NULL,
+  reevaluate = FALSE
+)
 }
 \arguments{
 \item{object}{Object of \code{\link[predped]{goal-class}} for which the path
 should be computed.}
+
+\item{...}{Arguments passed on to the methods of this generic}
 
 \item{agent}{Object of \code{\link[predped]{agent-class}} who wants to move 
 towards the goal defined in argument \code{object}.}

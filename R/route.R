@@ -46,6 +46,8 @@
 #' If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 #' x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 #' making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving nodes under 
 #' \code{"nodes"}, a dataframe with the surviving connections between nodes 
@@ -339,6 +341,8 @@ adjust_edges <- function(from,
 #' If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 #' x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 #' making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Dataframe with the surviving nodes, containing the node id under 
 #' \code{"node_ID"} and its coordinates under \code{"X"} and \code{"Y"}.
@@ -491,8 +495,11 @@ create_nodes <- function(from,
 #' @param segments Named matrix or dataframe containing the ids of the nodes 
 #' under column names \code{"from"} and \code{"to"}, and their coordinates under 
 #' \code{"from_x"}, \code{"from_y"}, \code{"to_x"}, and \code{"to_y"}.
-#' @param objects List of objects that extend the 
-#' \code{\link[predped]{object-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving connections between 
 #' the nodes under \code{"edges"} and a similar dataframe also containing the 
@@ -500,12 +507,12 @@ create_nodes <- function(from,
 #' 
 #' @examples 
 #' # Let's create a background
-#' my_background <- background(shape = rectangle(shape = c(0, 0), 
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(rectangle(shape = c(0, 0), 
+#'                             objects = list(rectangle(center = c(0, 0), 
 #'                                                      size = c(1, 1))))
 #' 
-#' # Create some segments that do and do not go though the objects in the 
+#' # Create some segments that do and do not go through the objects in the 
 #' # background
 #' potential_edges <- data.frame(from = c("node 1", "node 2", "node 3"), 
 #'                               from_x = c(-0.75, -0.75, -0.75), 
@@ -516,7 +523,9 @@ create_nodes <- function(from,
 #' head(potential_edges)
 #' 
 #' # Only retain the edges that don't intersect the object
-#' surviving_edges <- evaluate_edges(potential_edges, my_background)
+#' surviving_edges <- evaluate_edges(potential_edges, 
+#'                                   my_background,
+#'                                   space_between = 0)
 #' head(surviving_edges$edges_with_coords)
 #' 
 #' @seealso 
@@ -620,13 +629,15 @@ evaluate_edges <- function(segments,
 #' \code{\link[predped]{object-class}}.
 #' @param segments Numerical matrix of size N x 4 containing the coordinates of 
 #' the line segments in order x_1, y_1, x_2, y_2.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Logical vector denoting whether a given edge can be retained 
 #' (\code{TRUE}) or should be discarded (\code{FALSE})
 #' 
 #' @examples 
 #' # Let's create a list of objects
-#' objects <- list(rectangle(shape = c(0, 0), size = c(1, 1)))
+#' objects <- list(rectangle(center = c(0, 0), size = c(1, 1)))
 #' 
 #' # Create some segments that do and do not go though the objects in the 
 #' # background
@@ -651,7 +662,10 @@ evaluate_edges <- function(segments,
 #
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
-prune_edges <- function(objects, segments, cpp = TRUE) {
+prune_edges <- function(objects, 
+                        segments, 
+                        cpp = TRUE) {
+
     # If there are no objects, then there can be no intersections
     if(length(objects) == 0) {
         return(rep(TRUE, nrow(segments)))

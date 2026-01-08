@@ -18,6 +18,8 @@ to(object) <- value
 \arguments{
 \item{object}{An instance of the \code{\link[predped]{segment-class}}.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{value}{Value with which to replace the original value of the 
 \code{to} slot.}
 }

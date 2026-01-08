@@ -15,6 +15,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{id}{Character that serves as an identifier for the goal. Defaults to 
 an empty character, triggering the random generation of an id.}
 

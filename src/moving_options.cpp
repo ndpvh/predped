@@ -187,7 +187,8 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
 //'                   radius = 0.25,
 //'                   speed = 1,
 //'                   orientation = 0,
-//'                   current_goal = goal(position = c(-2.01, 0)))
+//'                   current_goal = goal(position = c(-2.01, 0),
+//'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 //'
 //' # Generate several locations the agent can move to
 //' centers <- m4ma::c_vd_r(1:33,
@@ -330,7 +331,7 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
 //' of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 //' (change in orientation) options that are inherent to M4MA.
 //'
-//' @param object Object of the \code{\link[predped]{agent-class}} or the
+//' @param agent Object of the \code{\link[predped]{agent-class}} or the
 //' \code{\link[predped]{object-class}} (latter not yet supported).
 //' @param state Object of the \code{\link[predped]{state-class}} containing the
 //' current state.
@@ -350,7 +351,8 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
 //'                   radius = 0.25,
 //'                   speed = 1,
 //'                   orientation = 0,
-//'                   current_goal = goal(position = c(-2.01, 0)))
+//'                   current_goal = goal(position = c(-2.01, 0),
+//'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 //'
 //' my_state <- state(iteration = 1,
 //'                   setting = my_background,

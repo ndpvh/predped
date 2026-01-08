@@ -6,6 +6,9 @@
 \usage{
 \S4method{show}{background}(object)
 }
+\arguments{
+\item{object}{Object of the \code{\link[predped]{background-class}}}
+}
 \description{
 Show method for the \code{\link[predped]{background-class}}
 }

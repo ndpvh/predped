@@ -5,7 +5,7 @@
 \title{Transform trace to comprehensive data.frame}
 \usage{
 unpack_trace(
-  x,
+  trace,
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
@@ -15,10 +15,13 @@ unpack_trace(
 )
 }
 \arguments{
+\item{trace}{List of objects of the \code{\link[predped]{state-class}}}
+
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
 the cell positions that the agent might move to. Defaults to a matrix in 
-which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
+which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+of speed), and \code{0.5} (deceleration).}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
@@ -35,7 +38,8 @@ to \code{TRUE}.}
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
 to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{trace}{List of objects of the \code{\link[predped]{state-class}}}
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+(\code{FALSE}) version of this function. Defaults to \code{TRUE}.}
 }
 \description{
 This function will take a trace and return a data.frame containing all 

@@ -24,6 +24,8 @@ Works for all objects of the
 \item{extension}{Numeric denoting the length with which to extend the object 
 in all directions.}
 
+\item{...}{Arguments passed on to the methods for the generic.}
+
 \item{cpp}{Logical denoting whether to use the R or Rcpp version of the 
 function. Defaults to \code{TRUE}.}
 }
@@ -41,15 +43,15 @@ the objects in the environment. Works for all objects of the
 \examples{
 # Create an object
 my_circle <- circle(center = c(0, 0), radius = 1)
-my_circle@size
+my_circle@radius
 
 # Increase the size of the object
 larger_circle <- enlarge(my_circle, extension = 1)
-larger_circle@size
+larger_circle@radius
 
 # Decrease the size of the object
 smaller_circle <- enlarge(my_circle, extension = -0.5)
-smaller_circle@size
+smaller_circle@radius
 
 }
 \seealso{

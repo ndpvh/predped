@@ -27,12 +27,12 @@ using namespace Rcpp;
 //' Note that this function has been defined to be in line with the \code{m4ma}
 //' utility functions.
 //'
-//' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-//' of all pedestrians that belong to the social group of the agent.
+//' @param predictions Numeric matrix with shape N x 2 containing predicted 
+//' positions of all pedestrians that belong to the social group of the agent.
 //' @param centers Numerical matrix containing the coordinates at each position
 //' the object can be moved to. Should have one row for each cell.
-//' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
-//' @param fx Function used to find the group centroid. Defaults to \code{mean}
+//' @param number_agents Integer indicating number of people in the pedestrian's 
+//' social group. 
 //'
 //' @return Numeric vector containing the distance from each cell in the `center`
 //' to the group centroid. If not other agents belong to the same group as the 
@@ -74,8 +74,8 @@ RObject distance_group_centroid_rcpp(NumericMatrix predictions,
 //' pedestrians.
 //' @param position Numeric vector denoting the current position of the agent.
 //' @param orientation Numeric denoting the current orientation of the agent.
-//' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-//' of all pedestrians that belong to the social group of the agent.
+//' @param predictions Numeric matrix with shape N x 2 containing predicted 
+//' positions of all pedestrians that belong to the social group of the agent.
 //' @param centers Numerical matrix containing the coordinates at each position
 //' the object can be moved to. Should have one row for each cell.
 //' @param any_member Logical denoting whether to consider the angles of all 
@@ -97,7 +97,7 @@ RObject distance_group_centroid_rcpp(NumericMatrix predictions,
 //' @export 
 // [[Rcpp::export]]
 RObject get_angles_rcpp(int agent_idx, 
-                        NumericVector agent_groups, 
+                        NumericVector agent_group, 
                         NumericVector position, 
                         double orientation,  
                         NumericMatrix predictions, 
@@ -456,14 +456,15 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
 //'
 //' Rcpp alternative for the group centroid utility function. 
 //' 
-//' @param a_gc Numeric denoting the power to which to take the utility.
-//' @param b_gc Numeric denoting the slope of the utility function.
+//' @param a_group_centroid Numeric denoting the power to which to take the 
+//' utility.
+//' @param b_group_centroid Numeric denoting the slope of the utility function.
 //' @param radius Numeric denoting the radius of the agent.
-//' @param cell_dist Numeric vector denoting the distance of each cell in the 
-//' \code{centers} to the predicted group centroid.
+//' @param cell_distances Numeric vector denoting the distance of each cell in  
+//' the \code{centers} to the predicted group centroid.
 //' @param stop_utility Numeric denoting the utility of stopping. Is used to 
 //' ensure the agents do not freeze when they are too far away from each other. 
-//' @param nped Numeric denoting the number of ingroup members. 
+//' @param number_agents Numeric denoting the number of ingroup members. 
 //' 
 //' @return Numeric vector containing the group-centroid-related utility for each 
 //' cell. 
@@ -482,12 +483,12 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
                               double radius, 
                               NumericVector cell_distances, 
                               double stop_utility, 
-                              int nped) {
+                              int number_agents) {
     
     // Compute the optimal distance to keep from the group. Within the radius 
     // of this distance, all utilities are equal to 0. Otherwise, they are 
     // equal to the output of the group centroid utility function
-    double optimal_distance = 1.5 * nped * radius;
+    double optimal_distance = 1.5 * number_agents * radius;
     LogicalVector optimal = cell_distances >= optimal_distance;
     double difference = 0;
     
@@ -518,10 +519,10 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
 //' This translates to a discrete added disutility whenever the group member 
 //' falls inside the non-visual zone behind the agent.
 //' 
-//' @param b_vf Numeric denoting the slope of the utility function. 
-//' @param rel_angles Numeric vector containing the relative angle from each cell 
-//' center to the predicted positions of the group members. Typically output of 
-//' \code{\link[predped]{get_angles}}. 
+//' @param b_visual_field Numeric denoting the slope of the utility function. 
+//' @param relative_angles Numeric vector containing the relative angle from 
+//' each cell center to the predicted positions of the group members. Typically 
+//' output of \code{\link[predped]{get_angles}}. 
 //' 
 //' @return Numeric vector containing the utility attributed to keeping the 
 //' group members within your visual field. Returns 0's if the agent does not 
@@ -565,7 +566,7 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' utility, as well as a dataframe containing the parameters. Heavily depends 
 //' on the \code{m4ma} package.
 //' 
-//' @param object Dataframe containing all of the needed information to compute 
+//' @param data Dataframe containing all of the needed information to compute 
 //' the utilities. Typically output of the 
 //' \code{\link[predped]{compute_utility_variables}} function.
 //' @param parameters Dataframe containing the parameters of the agent. Should 
@@ -775,7 +776,7 @@ NumericVector utility_rcpp(DataFrame data,
 //' \code{\link[predped]{utility-data.frame}} for the actual computation 
 //' of the utility.
 //' 
-//' @param object Object of the \code{\link[predped]{agent-class}}.
+//' @param agent Object of the \code{\link[predped]{agent-class}}.
 //' @param state Object of the \code{\link[predped]{state-class}}.
 //' @param background Object of the \code{\link[predped]{background-class}}.
 //' @param agent_specifications List created by the 
@@ -787,8 +788,6 @@ NumericVector utility_rcpp(DataFrame data,
 //' the object can be moved to. Should have one row for each cell.
 //' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 //' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
-//' @param cpp Logical denoting whether to use the Rcpp version of the function
-//' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 //' 
 //' @return Numeric vector denoting the (dis)utility of moving to each of the 
 //' cells in \code{centers}.

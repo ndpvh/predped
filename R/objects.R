@@ -22,6 +22,7 @@ coordinate <- setClass("coordinate", contains = "numeric")
 #' Constructor for the \code{\link[predped]{coordinate-class}}
 #' 
 #' @param .Object Numerical vector of size 2 denoting the coordinate.
+#' @param ... Additional arguments specified in the other objects.
 #' 
 #' @return Object of the \code{\link[predped]{coordinate-class}}
 #' 
@@ -78,12 +79,14 @@ setClass("object",
 
 #' Constructor for the \code{\link[predped]{object-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param id Character denoting the identifier of the object Defaults to an 
 #' empty string, triggering the creation of a random identifier.
 #' @param moveable Logical denoting whether the position of the object can be 
 #' changed. Defaults to \code{FALSE}.
 #' @param interactable Logical denoting whether the object can be interacted 
 #' with. Defaults to \code{TRUE}.
+#' @param ... Arguments passed on up in the hierarchy
 #' 
 #' @return Object of the \code{\link[predped]{object-class}}
 #' 
@@ -97,10 +100,10 @@ setClass("object",
 #' 
 #' @export
 setMethod("initialize", "object", function(.Object, 
-                                            id = character(0),
-                                            moveable = FALSE, 
-                                            interactable = TRUE,
-                                            ...) {
+                                           id = character(0),
+                                           moveable = FALSE, 
+                                           interactable = TRUE,
+                                           ...) {
 
     .Object <- callNextMethod(.Object, ...)
 
@@ -155,6 +158,7 @@ polygon <- setClass("polygon",
 
 #' Constructor for the \code{\link[predped]{polygon-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param points Numerical matrix containing the coordinates that make up the 
 #' polygon.
 #' @param clock_wise Logical denoting whether the coordinates in \code{points} 
@@ -189,12 +193,15 @@ polygon <- setClass("polygon",
 #' 
 #' @export
 setMethod("initialize", "polygon", function(.Object, 
+                                            points, 
                                             clock_wise = TRUE, 
                                             forbidden = numeric(0),
                                             ...) {
     
     # Create the polygon as defined in VIRTUAL and in the object-class
-    .Object <- callNextMethod(.Object, ...)
+    .Object <- callNextMethod(.Object, 
+                              points = points, 
+                              ...)
 
     # Do a check of whether the points are accurately defined.
     if(ncol(.Object@points) != 2) {
@@ -251,6 +258,9 @@ rectangle <- setClass("rectangle",
 
 #' Constructor for the \code{\link[predped]{rectangle-class}}
 #' 
+#' @param .Object Numerical matrix containing the coordinates that make up the 
+#' polygon. Best left unspecified, as this numerical matrix will be derived from
+#' \code{center} and \code{size}.
 #' @param center Numeric vector denoting the coordinates of the center or 
 #' position of the rectangle.
 #' @param size Numeric vector denoting the width and height of the rectangle.
@@ -377,6 +387,7 @@ circle <- setClass("circle",
 
 #' Constructor for the \code{\link[predped]{circle-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param center Numeric vector denoting the coordinates of the center or 
 #' position of the circle
 #' @param radius Numeric denoting the radius of the circle.
@@ -393,11 +404,11 @@ circle <- setClass("circle",
 #' # Initialize a circle
 #' my_circle <- circle(id = "my circle", 
 #'                     center = c(0, 0), 
-#'                     size = c(2, 2))
+#'                     radius = 1)
 #' 
 #' # Access slots that are inherited from object and circle
-#' my_circle@size
-#' my_circle@points 
+#' my_circle@radius
+#' my_circle@center 
 #' my_circle@id
 #' 
 #' @seealso 
@@ -409,11 +420,16 @@ circle <- setClass("circle",
 #' 
 #' @export
 setMethod("initialize", "circle", function(.Object, 
+                                           center, 
+                                           radius,
                                            forbidden = matrix(nrow = 0, ncol = 0),
                                            ...) {
 
     # Pass inherited arguments to the VIRTUAL and object class
-    .Object <- callNextMethod(.Object, ...)
+    .Object <- callNextMethod(.Object, 
+                              center = center, 
+                              radius = radius,
+                              ...)
 
     # Transform the center to a coordinate
     .Object@center <- as(.Object@center, "coordinate")
@@ -508,6 +524,8 @@ segment <- setClass("segment",
 
 #' Constructor for the \code{\link[predped]{segment-class}}
 #' 
+#' @param .Object The class you wish to initialize. See the example for how you 
+#' can initialize an instance of a class within this package.
 #' @param from Numeric vector denoting the coordinates of the where the segment 
 #' begins.
 #' @param to Numeric vector denoting the coordinates of the where the segment 
@@ -587,6 +605,7 @@ setMethod("initialize", "segment", function(.Object,
 #' \code{\link[predped]{coordinate-class}}, numerics, and matrices, this defaults 
 #' to the origin (0, 0). For the other objects defined under 
 #' \code{\link[predped]{object-class}}, this defaults to their own centers.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @return Object of the same class as the one provided
 #' 
@@ -825,6 +844,7 @@ setMethod("rotate", signature(object = "segment"), function(object,
 #' \code{\link[predped]{segment-class}}.
 #' @param coord Numeric denoting the location to which the object should be 
 #' moved.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @return Object of the same class as the one provided.
 #' 
@@ -963,7 +983,7 @@ setMethod("move", signature(object = "segment"), function(object,
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
-#' \code{\link[predped]{objects-class}},
+#' \code{\link[predped]{object-class}},
 #' \code{\link[predped]{rectangle-class}}
 #' 
 #' 
@@ -989,6 +1009,7 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' checked.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Logical whether the point is inside of the object (\code{TRUE}) or 
 #' outside of the object (\code{FALSE}).
@@ -1153,8 +1174,7 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' @param object Object of the \code{\link[predped]{object-class}}.
 #' @param x Numeric vector or matrix containing x- and y-coordinates to be 
 #' checked.
-#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
-#' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
+#' @param ... Arguments passed on to \code{\link[predped]{in_object}}
 #'
 #' @return Logical whether the point is outside of the object (\code{TRUE}) or 
 #' inside of the object (\code{FALSE}).
@@ -1208,6 +1228,7 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' in all directions.
 #' @param cpp Logical denoting whether to use the R or Rcpp version of the 
 #' function. Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to the methods for the generic.
 #'
 #' @return Object of the same class as the original, but with a larger 
 #' size.
@@ -1215,15 +1236,15 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' @examples 
 #' # Create an object
 #' my_circle <- circle(center = c(0, 0), radius = 1)
-#' my_circle@size
+#' my_circle@radius
 #' 
 #' # Increase the size of the object
 #' larger_circle <- enlarge(my_circle, extension = 1)
-#' larger_circle@size
+#' larger_circle@radius
 #' 
 #' # Decrease the size of the object
 #' smaller_circle <- enlarge(my_circle, extension = -0.5)
-#' smaller_circle@size
+#' smaller_circle@radius
 #' 
 #' @seealso
 #' \code{\link[predped]{circle-class}}, 
@@ -1296,18 +1317,19 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' 
 #' @examples 
 #' # Create an object
-#' my_circle <- circle(center = c(0, 0), radius = 1)
-#' 
-#' # Generate a point on the circumference of the circle without limitations
+#' my_circle <- circle(center = c(0, 0), 
+#'                     radius = 1)
 #' rng_point(my_circle)
 #' 
 #' # Generate a point on the circumference of the circle with limitations, so 
 #' # that it cannot lie between the angles (0, pi/2) and (pi, 3 * pi/2), 
 #' # meaning the coordinate cannot have both positive or both negative values 
 #' # in its coordinates (one always has to be positive, the other negative).
-#' rng_point(my_circle, 
-#'           forbidden = rbind(c(0, pi/2), 
-#'                             c(pi, 3 * pi/2)))
+#' my_circle <- circle(center = c(0, 0), 
+#'                     radius = 1,
+#'                     forbidden = rbind(c(0, pi/2), 
+#'                                       c(pi, 3 * pi/2)))
+#' rng_point(my_circle)
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}}, 
@@ -1451,6 +1473,7 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' (\code{TRUE}) or inside (\code{FALSE}) of the object. Defaults to \code{TRUE}. 
 #' @param cpp Logical denoting whether to use the R or Rcpp version of the 
 #' function. Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.
@@ -1794,6 +1817,7 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' of the object. Defaults to \code{5e-2}.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.
@@ -1895,6 +1919,9 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' @param object Object of \code{\link[predped]{object-class}}.
 #' @param other_object Object of \code{\link[predped]{object-class}} to check 
 #' intersection with. 
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to methods of this generic
 #'
 #' @return Numerical matrix containing the nodes that were created around/within
 #' the provided object.
@@ -2068,6 +2095,9 @@ setMethod("intersects",
 #' that denote intersections of each line separately (\code{TRUE}) or whether 
 #' to only return a single logical denoting whether any intersections 
 #' occurred (\code{FALSE}). Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+#' (\code{FALSE}) alternative of this function. Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Logical vector (\code{return_all = TRUE}) or logical 
 #' (\code{return_all = FALSE}) denoting whether the lines intersect with the 

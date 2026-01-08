@@ -384,7 +384,7 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' @rdname done
 #' 
 #' @export
-setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
+setGeneric("done", function(object) standardGeneric("done"))
 
 #' @rdname done
 #' 
@@ -522,6 +522,7 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' @param object An instance of the \code{\link[predped]{segment-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{from} slot.
+#' @param ... Arguments passed on to the methods of this generic.
 #' 
 #' @examples 
 #' # Create a segment
@@ -771,7 +772,7 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' 
 #' Works for \code{\link[predped]{background-class}}.
 #' 
-#' #' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param object An instance of the \code{\link[predped]{background-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{limited_access} slot.
 #' 
@@ -908,13 +909,13 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
 #'                   radius = 0.25, 
-#'                   parameters = draw_parameters(1))
+#'                   parameters = generate_parameters(1))
 #' 
 #' # Access the parameters slot for the agent
 #' parameters(my_agent)
 #' 
 #' # Change the parameters slot for the agent
-#' parameters(my_agent) <- draw_parameters(1)
+#' parameters(my_agent) <- generate_parameters(1)
 #' parameters(my_agent)
 #' 
 #' @seealso 
@@ -979,6 +980,10 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' from base R.
 #' @param value Value with which to replace the original value of the 
 #' \code{points} slot.
+#' @param length.out Numeric denoting the number of points to create when the 
+#' provided object is of an instance \code{\link[predped]{circle-class}}. 
+#' Defaults to \code{100}
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @details 
 #' Note that for the \code{\link[predped]{circle-class}}, you can only access
@@ -1035,6 +1040,8 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' \code{\link[predped]{object-class}}, or \code{\link[predped]{goal-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{position} or \code{center} slot.
+#' @param return_matrix Logical denoting whether to return the position in a 
+#' matrix of size 1 x 2. Defaults to \code{FALSE}.
 #' 
 #' @examples
 #' # Initialize all objects for which this getter works
@@ -1260,11 +1267,11 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 
 #' Getter/Setter for the \code{size}-slot
 #' 
-#' Works for the \code{\link[predped]{agent}},
-#' \code{\link[predped]{circle}},
-#' \code{\link[predped]{object}},
-#' \code{\link[predped]{rectangle}}, and
-#' \code{\link[predped]{segment}}.
+#' Works for the \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{circle-class}},
+#' \code{\link[predped]{object-class}},
+#' \code{\link[predped]{rectangle-class}}, and
+#' \code{\link[predped]{segment-class}}.
 #' 
 #' @param object An instance of the \code{\link[predped]{object-class}} or 
 #' \code{\link[predped]{agent-class}}.
@@ -1272,7 +1279,7 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' \code{size} slot.
 #' 
 #' @details 
-#' Note that for \code{\link[predped]{circle}}, this getter outputs the 
+#' Note that for \code{\link[predped]{circle-class}}, this getter outputs the 
 #' radius (and similarly, the setter changes the radius).
 #' 
 #' @examples 
@@ -1398,6 +1405,7 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' @param object An instance of the \code{\link[predped]{segment-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{to} slot.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @examples 
 #' # Create a segment
@@ -1556,6 +1564,7 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' @param object An instance of the \code{\link[predped]{predped-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{weights} slot.
+#' @param ... Arguments passed to the methods of this generic
 #' 
 #' @examples
 #' # Initialize a predped model

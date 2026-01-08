@@ -37,6 +37,7 @@ goal <- setClass("goal", list(id = "character",
 
 #' Constructor for the \code{\link[predped]{goal-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param id Character that serves as an identifier for the goal. Defaults to 
 #' an empty character, triggering the random generation of an id.
 #' @param position Numerical vector denoting the position of the goal. Defaults 
@@ -107,6 +108,8 @@ setMethod("initialize", "goal", function(.Object,
 })
 
 #' Show method for the \code{\link[predped]{goal-class}}
+#' 
+#' @param object Object of the \code{\link[predped]{goal-class}}
 #' 
 #' @export
 setMethod("show", "goal", function(object) {
@@ -184,6 +187,7 @@ setMethod("show", "goal", function(object) {
 # even though it is not a method of the `goal` class.
 setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 
+#' @rdname add_goal
 setMethod("add_goal", signature(object = "object"), function(object, 
                                                              background,
                                                              id = character(0),
@@ -299,6 +303,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' provided in \code{precomputed_edges}. Is useful whenever \code{new_objects}
 #' is not \code{NULL}, allowing us to check whether some nodes and edges are now
 #' occluded by the new objects. Defaults to \code{FALSE}.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @return Numerical matrix of coordinates representing the path points the 
 #' agent will have to move to to reach the goal.
@@ -335,6 +340,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' @export
 setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
 
+#' @rdname find_path
 setMethod("find_path", "goal", function(object, 
                                         agent,
                                         background,
@@ -505,6 +511,7 @@ setMethod("find_path", "goal", function(object,
 #' @export
 setGeneric("interact", function(object) standardGeneric("interact"))
 
+#' @rdname interact
 setMethod("interact", "goal", function(object) {
     # Decrease the counter and adjust the done slot
     object@counter <- object@counter - 1
@@ -529,10 +536,11 @@ setMethod("interact", "goal", function(object) {
 #' @param goal_list List containing instances of \code{\link[predped]{goal-class}}
 #' from which the new goal should be chosen. Defaults to \code{NULL}, triggering 
 #' the generation of a random goal.
-#' @param counter_generator Function that takes in no arguments and generates 
+#' @param counter Function that takes in no arguments and generates 
 #' a single numerical value that will be used as the counter of the goal. 
-#' See \code{\link[predped]{generate_goal_stack}} for details on this argument.
+#' See \code{\link[predped]{goal_stack}} for details on this argument.
 #' Defaults to \code{\() rnorm(1, 10, 2)}.
+#' @param ... Arguments provided to the method implementations of the generic.
 #' 
 #' @return Object of \code{\link[predped]{goal-class}}.
 #' 
@@ -558,13 +566,15 @@ setMethod("interact", "goal", function(object) {
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' \code{\link[predped]{goal-class}}
-#' \code{\link[predped]{generate_goal_stack}}
+#' \code{\link[predped]{goal_stack}}
+#' \code{\link[predped]{multiple_goal_stacks}}
 #' 
 #' @rdname change
 #' 
 #' @export 
-setGeneric("change", function(object,...) standardGeneric("change"))
+setGeneric("change", function(object, ...) standardGeneric("change"))
 
+#' @rdname change
 setMethod("change", "goal", function(object, 
                                      setting = NULL,
                                      goal_list = NULL,
@@ -629,15 +639,15 @@ setMethod("change", "goal", function(object,
 #' # Create a setting
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(cirlce(center = c(0, 0), 
+#'                             objects = list(circle(center = c(0, 0), 
 #'                                                   radius = 0.5)))
 #' 
 #' # Create a goal stack containing two goals
-#' goal_stack <- goal_stack(2, my_background)
+#' stack <- goal_stack(2, my_background)
 #' 
 #' # Two goals
-#' length(goal_stack)
-#' goal_stack
+#' length(stack)
+#' stack
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
@@ -805,7 +815,7 @@ goal_stack <- function(n,
 #' # Create a setting
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(cirlce(center = c(0, 0), 
+#'                             objects = list(circle(center = c(0, 0), 
 #'                                                   radius = 0.5)))
 #' 
 #' # Create two goal stacks containing two goals each
@@ -826,7 +836,7 @@ goal_stack <- function(n,
 #' \code{\link[predped]{determine_values}}
 #' \code{\link[predped]{goal_stack}}
 #' 
-#' @rdname multiple_goal_stack
+#' @rdname multiple_goal_stacks
 #' 
 #' @export 
 multiple_goal_stacks <- function(n, 

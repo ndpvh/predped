@@ -24,6 +24,8 @@ in_object(object, x, ...)
 \item{x}{Numeric vector or matrix containing x- and y-coordinates to be 
 checked.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 or the R alternative of this function (\code{FALSE}). Defaults to \code{FALSE}.}
 }

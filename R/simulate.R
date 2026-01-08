@@ -122,9 +122,6 @@
 #' the argument \code{starting_position}. Then, we define each of the next goals
 #' as being the one that is closest to the position of the previous goal.
 #' Defaults to \code{TRUE}.
-#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
-#' to change the order of their goals adaptively throughout the simulation. 
-#' Defaults to \code{TRUE}.
 #' @param precomputed_goals List of goal stacks from which the agent can be
 #' assigned one. Defaults to \code{NULL}, triggering the creation of goal stacks
 #' in the simulation.
@@ -162,11 +159,8 @@
 #' useful when simulating evacuations (giving everyone "goal exit") or trying
 #' to guide behavior in any other way. Defaults to "\(x) x", meaning the state
 #' remains unaltered.
-#' @param plot_live Logical denoting whether to plot each iteration while the
-#' simulation is going on. Defaults to \code{FALSE}.
-#' @param plot_time Numeric denoting the amount of time (in seconds) to wait
-#' between iterations, i.e., the time between updating the plot. Defaults to
-#' \code{0.2}.
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+#' (\code{FALSE}) versions of the lower-level functions. Defaults to \code{TRUE}.
 #' @param ... Arguments passed on to the \code{\link[predped]{simulate.state}}
 #' function.
 #'
@@ -432,6 +426,10 @@ setMethod("simulate", "predped", function(object,
 #' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
 #' to change the order of their goals adaptively throughout the simulation. 
 #' Defaults to \code{TRUE}.
+#' @param position Numeric denoting the position you would like to assign to an
+#' agent if they are added to the simulation. Defaults to \code{NULL}, making 
+#' the agent start at the entrance. Note that this is an experimental feature 
+#' that has not been tested yet, and therefore might not work for the moment.
 #' @param plot_live Logical denoting whether to plot each iteration while the
 #' simulation is going on. Defaults to `FALSE`.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
@@ -450,6 +448,7 @@ setMethod("simulate", "predped", function(object,
 #' instead (\code{FALSE}). Defaults to \code{TRUE}.
 #' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
 #' \code{plot_live = TRUE}).
+#' @inheritParams simulate,predped-method
 #'
 #' @return Object of the \code{\link[predped]{state-class}}.
 #'
@@ -481,7 +480,7 @@ setMethod("simulate", "predped", function(object,
 #'
 #' # Simulate the next state
 #' next_state <- simulate(my_state,
-#'                        my_model,
+#'                        model = my_model,
 #'                        add_agent = TRUE)
 #'
 #' # Check the number of agents in the next state
@@ -1032,6 +1031,13 @@ add_agent <- function(model,
 #' \code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
 #' object and the path points agents use in their strategy. Ignored if
 #' \code{precomputed_edges} is provided.
+#' @param precomputed_edges Output of \code{\link[predped]{compute_edges}}
+#' containing the nodes and edges the agent can use to plan its path. Defauls
+#' to \code{NULL}, triggering the creation of these edges whenever they are
+#' needed.
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
+#' (\code{FALSE}) alternatives for the lower-level functions. Defaults to 
+#' \code{TRUE}.
 #' @param ... Additional arguments provided to \code{\link[predped]{add_agent}}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.

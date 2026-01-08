@@ -13,6 +13,8 @@ moving_options(object, ...)
 \item{object}{Object of the \code{\link[predped]{agent-class}} or the
 \code{\link[predped]{object-class}} (latter not yet supported).}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{state}{Object of the \code{\link[predped]{state-class}} containing the
 current state.}
 
@@ -67,7 +69,8 @@ my_agent <- agent(center = c(-2.75, 0),
                   radius = 0.25,
                   speed = 1,
                   orientation = 0,
-                  current_goal = goal(position = c(-2.01, 0)))
+                  current_goal = goal(position = c(-2.01, 0), 
+                                      path = matrix(c(-2.01, 0), nrow = 1)))
 
 my_state <- state(iteration = 1,
                   setting = my_background,

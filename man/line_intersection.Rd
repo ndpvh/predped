@@ -21,10 +21,15 @@ line_intersection(object, segments, ...)
 \item{segments}{Numerical matrix of size N x 4 containing the coordinates of 
 the line segments in order x_1, y_1, x_2, y_2.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{return_all}{Logical denoting whether to return a vector of logicals 
 that denote intersections of each line separately (\code{TRUE}) or whether 
 to only return a single logical denoting whether any intersections 
 occurred (\code{FALSE}). Defaults to \code{FALSE}.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+(\code{FALSE}) alternative of this function. Defaults to \code{TRUE}.}
 }
 \value{
 Logical vector (\code{return_all = TRUE}) or logical 

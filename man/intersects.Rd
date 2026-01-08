@@ -38,6 +38,11 @@ intersects(object, other_object, ...)
 
 \item{other_object}{Object of \code{\link[predped]{object-class}} to check 
 intersection with.}
+
+\item{...}{Arguments passed on to methods of this generic}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Numerical matrix containing the nodes that were created around/within

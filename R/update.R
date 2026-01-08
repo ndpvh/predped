@@ -256,7 +256,7 @@ setMethod("update", "agent", function(object,
 
 #' Update the Position of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -480,7 +480,7 @@ update_position <- function(agent,
 
 #' Update the Goal of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param seen Logical indicating whether the agent can see the path point 
@@ -939,12 +939,14 @@ predict_movement <- function(agent,
 #' objects. Allows for a translation from the object-oriented way of doing things
 #' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 #'
-#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing all information of all agents within the current 
 #' state.

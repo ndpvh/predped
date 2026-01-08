@@ -14,6 +14,8 @@ utility_agent_rcpp(
 )
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -29,11 +31,6 @@ the object can be moved to. Should have one row for each cell.}
 
 \item{check}{Logical matrix of dimensions 11 x 3 denoting whether an agent 
 can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
-
-\item{object}{Object of the \code{\link[predped]{agent-class}}.}
-
-\item{cpp}{Logical denoting whether to use the Rcpp version of the function
-(\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 

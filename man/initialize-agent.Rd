@@ -24,6 +24,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{center}{Numerical vector of two elements denoting the current position
 of the agent (x and y coordinate).}
 

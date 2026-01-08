@@ -6,6 +6,9 @@
 \usage{
 \S4method{show}{predped}(object)
 }
+\arguments{
+\item{object}{Object of the \code{\link[predped]{predped-class}}}
+}
 \description{
 Show method for the \code{\link[predped]{predped-class}}
 }

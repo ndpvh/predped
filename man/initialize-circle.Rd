@@ -4,9 +4,22 @@
 \alias{initialize,circle-method}
 \title{Constructor for the \code{\link[predped]{circle-class}}}
 \usage{
-\S4method{initialize}{circle}(.Object, forbidden = matrix(nrow = 0, ncol = 0), ...)
+\S4method{initialize}{circle}(
+  .Object,
+  center,
+  radius,
+  forbidden = matrix(nrow = 0, ncol = 0),
+  ...
+)
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
+\item{center}{Numeric vector denoting the coordinates of the center or 
+position of the circle}
+
+\item{radius}{Numeric denoting the radius of the circle.}
+
 \item{forbidden}{Numerical matrix containing the angles for which you cannot 
 generate goals (in radians). These angles are computed in the Euclidian space
 and should be contained within the interval 0 and 2 * pi. Defaults to an 
@@ -14,11 +27,6 @@ empty matrix, making all angles worthy of goal generation.}
 
 \item{...}{Additional arguments passed to 
 \code{\link[predped]{initialize-object}}.}
-
-\item{center}{Numeric vector denoting the coordinates of the center or 
-position of the circle}
-
-\item{radius}{Numeric denoting the radius of the circle.}
 }
 \value{
 Object of the \code{\link[predped]{circle-class}}
@@ -30,11 +38,11 @@ Constructor for the \code{\link[predped]{circle-class}}
 # Initialize a circle
 my_circle <- circle(id = "my circle", 
                     center = c(0, 0), 
-                    size = c(2, 2))
+                    radius = 1)
 
 # Access slots that are inherited from object and circle
-my_circle@size
-my_circle@points 
+my_circle@radius
+my_circle@center 
 my_circle@id
 
 }

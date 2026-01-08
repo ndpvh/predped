@@ -38,6 +38,7 @@
 #' the object can be moved to. Should have one row for each cell.
 #' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 #' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
+#' @param ... Arguments passed on to the methods of this generic
 #'
 #' @return Logical matrix containing availabilities of the centers.
 #'
@@ -51,7 +52,8 @@
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0), 
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,

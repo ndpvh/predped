@@ -25,6 +25,8 @@ move(object, ...)
 \code{\link[predped]{rectangle-class}}, or, 
 \code{\link[predped]{segment-class}}.}
 
+\item{...}{Arguments passed on to the methods of this generic}
+
 \item{coord}{Numeric denoting the location to which the object should be 
 moved.}
 }

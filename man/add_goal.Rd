@@ -2,9 +2,12 @@
 % Please edit documentation in R/goals.R
 \name{add_goal}
 \alias{add_goal}
+\alias{add_goal,object-method}
 \title{Add a goal to an object}
 \usage{
 add_goal(object, ...)
+
+\S4method{add_goal}{object}(object, background, id = character(0), counter = 5, ...)
 }
 \arguments{
 \item{object}{Object or instance of the \code{\link[predped]{object-class}}.}

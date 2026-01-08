@@ -7,6 +7,9 @@
 \S4method{initialize}{segment}(.Object, from, to, ...)
 }
 \arguments{
+\item{.Object}{The class you wish to initialize. See the example for how you 
+can initialize an instance of a class within this package.}
+
 \item{from}{Numeric vector denoting the coordinates of the where the segment 
 begins.}
 

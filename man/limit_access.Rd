@@ -11,6 +11,8 @@ limit_access(object, x, ...)
 
 \item{x}{Either a numeric vector or matrix containing x- and y-coordinates, 
 or an object of the \code{\link[predped]{agent-class}}}
+
+\item{...}{Arguments passed on to methods of this generic}
 }
 \value{
 Logical vector or matrix denoting whether \code{segment}s can be 

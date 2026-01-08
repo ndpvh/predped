@@ -7,13 +7,13 @@
 utility_rcpp(data, parameters)
 }
 \arguments{
+\item{data}{Dataframe containing all of the needed information to compute 
+the utilities. Typically output of the 
+\code{\link[predped]{compute_utility_variables}} function.}
+
 \item{parameters}{Dataframe containing the parameters of the agent. Should 
 conform to the naming conventions mentioned in 
 \code{\link[predped]{params_from_csv}}.}
-
-\item{object}{Dataframe containing all of the needed information to compute 
-the utilities. Typically output of the 
-\code{\link[predped]{compute_utility_variables}} function.}
 }
 \value{
 Numeric vector denoting the (dis)utility of moving to each of the 

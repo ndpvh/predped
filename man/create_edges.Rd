@@ -30,6 +30,9 @@ the objects contained within the \code{objects} slot of \code{background}.
 If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 List containing a dataframe with the surviving nodes under 

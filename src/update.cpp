@@ -74,7 +74,7 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' objects. Allows for a translation from the object-oriented way of doing things
 //' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 //'
-//' @param agent Object of the \code{\link[predped]{agent-class}}.
+//' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 //' @param stay_stopped Logical denoting whether agents will predict others that 
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.

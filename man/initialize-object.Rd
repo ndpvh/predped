@@ -13,6 +13,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{id}{Character denoting the identifier of the object Defaults to an 
 empty string, triggering the creation of a random identifier.}
 
@@ -21,6 +23,8 @@ changed. Defaults to \code{FALSE}.}
 
 \item{interactable}{Logical denoting whether the object can be interacted 
 with. Defaults to \code{TRUE}.}
+
+\item{...}{Arguments passed on up in the hierarchy}
 }
 \value{
 Object of the \code{\link[predped]{object-class}}

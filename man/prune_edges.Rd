@@ -12,6 +12,9 @@ prune_edges(objects, segments, cpp = TRUE)
 
 \item{segments}{Numerical matrix of size N x 4 containing the coordinates of 
 the line segments in order x_1, y_1, x_2, y_2.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 Logical vector denoting whether a given edge can be retained 
@@ -32,7 +35,7 @@ same purposes as \code{\link[m4ma]{seesGoal}} was originally used for.
 }
 \examples{
 # Let's create a list of objects
-objects <- list(rectangle(shape = c(0, 0), size = c(1, 1)))
+objects <- list(rectangle(center = c(0, 0), size = c(1, 1)))
 
 # Create some segments that do and do not go though the objects in the 
 # background

@@ -15,6 +15,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{setting}{Object of the \code{\link[predped]{background-class}}.}
 
 \item{id}{Character that serves as an identifier for the agent. Defaults to 

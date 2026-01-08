@@ -20,6 +20,8 @@ update_position(
 )
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+
 \item{state}{Object of the \code{\link[predped]{state-class}}.}
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
@@ -59,8 +61,6 @@ iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 \item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
 of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 instead (\code{FALSE}). Defaults to \code{TRUE}.}
-
-\item{object}{Object of the \code{\link[predped]{agent-class}}.}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}.

@@ -15,6 +15,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{iteration}{Numeric denoting the iteration number that this state 
 represents. Makes it possible to order states into one coherent trace, showing
 how agents walked around over time.}

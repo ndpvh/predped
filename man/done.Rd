@@ -7,7 +7,7 @@
 \alias{done<-,goal-method}
 \title{Getter/Setter for the \code{done}-slot}
 \usage{
-done(object, return_matrix = FALSE)
+done(object)
 
 done(object) <- value
 

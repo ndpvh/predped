@@ -9,7 +9,7 @@ get_angles(
   agent_group,
   position,
   orientation,
-  p_pred,
+  predictions,
   centers,
   any_member = TRUE
 )
@@ -25,7 +25,7 @@ pedestrians.}
 
 \item{orientation}{Numeric denoting the current orientation of the agent.}
 
-\item{p_pred}{Numeric matrix with shape N x 2 containing predicted positions
+\item{predictions}{Numeric matrix with shape N x 2 containing predicted positions
 of all pedestrians that belong to the social group of the agent.}
 
 \item{centers}{Numerical matrix containing the coordinates at each position

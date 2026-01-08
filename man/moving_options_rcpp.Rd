@@ -7,6 +7,9 @@
 moving_options_rcpp(agent, state, background, centers)
 }
 \arguments{
+\item{agent}{Object of the \code{\link[predped]{agent-class}} or the
+\code{\link[predped]{object-class}} (latter not yet supported).}
+
 \item{state}{Object of the \code{\link[predped]{state-class}} containing the
 current state.}
 
@@ -14,9 +17,6 @@ current state.}
 
 \item{centers}{Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.}
-
-\item{object}{Object of the \code{\link[predped]{agent-class}} or the
-\code{\link[predped]{object-class}} (latter not yet supported).}
 }
 \value{
 Logical matrix containing availabilities of the centers.
@@ -62,7 +62,8 @@ my_agent <- agent(center = c(-2.75, 0),
                   radius = 0.25,
                   speed = 1,
                   orientation = 0,
-                  current_goal = goal(position = c(-2.01, 0)))
+                  current_goal = goal(position = c(-2.01, 0),
+                                      path = matrix(c(-2.01, 0), nrow = 1)))
 
 my_state <- state(iteration = 1,
                   setting = my_background,

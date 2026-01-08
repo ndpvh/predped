@@ -35,13 +35,13 @@ Works for \code{\link[predped]{agent-class}}.
 # Initialize agent
 my_agent <- agent(center = c(0, 0), 
                   radius = 0.25, 
-                  parameters = draw_parameters(1))
+                  parameters = generate_parameters(1))
 
 # Access the parameters slot for the agent
 parameters(my_agent)
 
 # Change the parameters slot for the agent
-parameters(my_agent) <- draw_parameters(1)
+parameters(my_agent) <- generate_parameters(1)
 parameters(my_agent)
 
 }

@@ -10,23 +10,24 @@ gc_utility_rcpp(
   radius,
   cell_distances,
   stop_utility,
-  nped
+  number_agents
 )
 }
 \arguments{
+\item{a_group_centroid}{Numeric denoting the power to which to take the 
+utility.}
+
+\item{b_group_centroid}{Numeric denoting the slope of the utility function.}
+
 \item{radius}{Numeric denoting the radius of the agent.}
+
+\item{cell_distances}{Numeric vector denoting the distance of each cell in
+the \code{centers} to the predicted group centroid.}
 
 \item{stop_utility}{Numeric denoting the utility of stopping. Is used to 
 ensure the agents do not freeze when they are too far away from each other.}
 
-\item{nped}{Numeric denoting the number of ingroup members.}
-
-\item{a_gc}{Numeric denoting the power to which to take the utility.}
-
-\item{b_gc}{Numeric denoting the slope of the utility function.}
-
-\item{cell_dist}{Numeric vector denoting the distance of each cell in the 
-\code{centers} to the predicted group centroid.}
+\item{number_agents}{Numeric denoting the number of ingroup members.}
 }
 \value{
 Numeric vector containing the group-centroid-related utility for each 

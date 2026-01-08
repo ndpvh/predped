@@ -175,6 +175,9 @@ the plotting or an unoptimized version. Defaults to \code{TRUE}.}
 the state that is currently being plotted. Only applies when plotting a trace.
 Defaults to \code{TRUE}.}
 
+\item{fill, color}{Character denoting the lower-level definition of the fill 
+and color of an instance of \code{\link[predped]{object-class}}}
+
 \item{plot.title.size}{Numeric denoting the text size of the plot title.
 Defaults to \code{10}.}
 

@@ -2,9 +2,12 @@
 % Please edit documentation in R/goals.R
 \name{interact}
 \alias{interact}
+\alias{interact,goal-method}
 \title{Interact with goal}
 \usage{
 interact(object)
+
+\S4method{interact}{goal}(object)
 }
 \arguments{
 \item{object}{Object of \code{\link[predped]{goal-class}}.}

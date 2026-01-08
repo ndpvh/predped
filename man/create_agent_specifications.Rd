@@ -12,6 +12,8 @@ create_agent_specifications(
 )
 }
 \arguments{
+\item{agent_list}{List of objects of the \code{\link[predped]{agent-class}}.}
+
 \item{stay_stopped}{Logical denoting whether agents will predict others that 
 are currently not moving to remain immobile in the next iteration. Defaults 
 to \code{TRUE}.}
@@ -19,7 +21,8 @@ to \code{TRUE}.}
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
-\item{agent}{Object of the \code{\link[predped]{agent-class}}.}
+\item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 List containing all information of all agents within the current 

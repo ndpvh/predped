@@ -65,15 +65,15 @@ complete. This function outputs a list of different instances of the
 # Create a setting
 my_background <- background(shape = rectangle(center = c(0, 0), 
                                               size = c(2, 2)), 
-                            objects = list(cirlce(center = c(0, 0), 
+                            objects = list(circle(center = c(0, 0), 
                                                   radius = 0.5)))
 
 # Create a goal stack containing two goals
-goal_stack <- goal_stack(2, my_background)
+stack <- goal_stack(2, my_background)
 
 # Two goals
-length(goal_stack)
-goal_stack
+length(stack)
+stack
 
 }
 \seealso{

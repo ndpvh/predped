@@ -7,11 +7,11 @@
 vf_utility_rcpp(b_visual_field, relative_angles)
 }
 \arguments{
-\item{b_vf}{Numeric denoting the slope of the utility function.}
+\item{b_visual_field}{Numeric denoting the slope of the utility function.}
 
-\item{rel_angles}{Numeric vector containing the relative angle from each cell 
-center to the predicted positions of the group members. Typically output of 
-\code{\link[predped]{get_angles}}.}
+\item{relative_angles}{Numeric vector containing the relative angle from 
+each cell center to the predicted positions of the group members. Typically 
+output of \code{\link[predped]{get_angles}}.}
 }
 \value{
 Numeric vector containing the utility attributed to keeping the 

@@ -32,6 +32,12 @@ points(object) <- value
 that for this function \code{x} and \code{object} are synonymous: The \code{x}
 argument is included to ensure compatibility with the \code{points} function 
 from base R.}
+
+\item{...}{Arguments passed on to the methods of this generic}
+
+\item{length.out}{Numeric denoting the number of points to create when the 
+provided object is of an instance \code{\link[predped]{circle-class}}. 
+Defaults to \code{100}}
 }
 \description{
 Works for all extensions of the \code{\link[predped]{object-class}}. Note

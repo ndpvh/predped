@@ -80,7 +80,8 @@ my_agent <- agent(center = c(-2.75, 0),
                   radius = 0.25,
                   speed = 1,
                   orientation = 0,
-                  current_goal = goal(position = c(-2.01, 0)))
+                  current_goal = goal(position = c(-2.01, 0),
+                                      path = matrix(c(-2.01, 0), nrow = 1)))
 
 # Generate several locations the agent can move to
 centers <- m4ma::c_vd_r(1:33,

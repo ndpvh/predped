@@ -4,9 +4,14 @@
 \alias{initialize,polygon-method}
 \title{Constructor for the \code{\link[predped]{polygon-class}}}
 \usage{
-\S4method{initialize}{polygon}(.Object, clock_wise = TRUE, forbidden = numeric(0), ...)
+\S4method{initialize}{polygon}(.Object, points, clock_wise = TRUE, forbidden = numeric(0), ...)
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
+\item{points}{Numerical matrix containing the coordinates that make up the 
+polygon.}
+
 \item{clock_wise}{Logical denoting whether the coordinates in \code{points} 
 are defined in clockwise (\code{TRUE}) or counter-clockwise fashion 
 (\code{FALSE}). Defaults to \code{TRUE}.}
@@ -18,9 +23,6 @@ vector, making all edges worthy of goal generation.}
 
 \item{...}{Additional arguments passed to 
 \code{\link[predped]{initialize-object}}.}
-
-\item{points}{Numerical matrix containing the coordinates that make up the 
-polygon.}
 }
 \value{
 Object of the \code{\link[predped]{polygon-class}}

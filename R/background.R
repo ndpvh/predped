@@ -50,6 +50,7 @@ background <- setClass("background", list(shape = "object",
 
 #' Constructor for the \code{\link[predped]{background-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param shape Object of a type that extends \code{\link[predped]{object-class}}
 #' defining the shape of the background. Importantly, the shape cannot be of 
 #' the \code{\link[predped]{segment-class}}.
@@ -164,6 +165,8 @@ setMethod("initialize", "background", function(.Object,
 
 #' Show method for the \code{\link[predped]{background-class}}
 #' 
+#' @param object Object of the \code{\link[predped]{background-class}}
+#' 
 #' @export
 setMethod("show", "background", function(object) {
     cat("Background Attributes", "\n")
@@ -205,6 +208,7 @@ setMethod("show", "background", function(object) {
 #' @param object Object of the \code{\link[predped]{background-class}}.
 #' @param x Either a numeric vector or matrix containing x- and y-coordinates, 
 #' or an object of the \code{\link[predped]{agent-class}}
+#' @param ... Arguments passed on to methods of this generic
 #' 
 #' @return Logical vector or matrix denoting whether \code{segment}s can be 
 #' passed through or not.

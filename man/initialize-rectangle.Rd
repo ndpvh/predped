@@ -7,6 +7,10 @@
 \S4method{initialize}{rectangle}(.Object, center, size, orientation = 0, ...)
 }
 \arguments{
+\item{.Object}{Numerical matrix containing the coordinates that make up the 
+polygon. Best left unspecified, as this numerical matrix will be derived from
+\code{center} and \code{size}.}
+
 \item{center}{Numeric vector denoting the coordinates of the center or 
 position of the rectangle.}
 

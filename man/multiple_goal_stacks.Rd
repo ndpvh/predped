@@ -41,7 +41,7 @@ lists with different instances of the \code{\link[predped]{goal-class}}.
 # Create a setting
 my_background <- background(shape = rectangle(center = c(0, 0), 
                                               size = c(2, 2)), 
-                            objects = list(cirlce(center = c(0, 0), 
+                            objects = list(circle(center = c(0, 0), 
                                                   radius = 0.5)))
 
 # Create two goal stacks containing two goals each

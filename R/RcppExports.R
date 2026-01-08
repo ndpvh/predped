@@ -32,19 +32,17 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+#' of speed), and \code{0.5} (deceleration).
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
@@ -73,9 +71,6 @@ unique <- function(x) {
 #' that make up the line segment. Should be in order x_1, y_1, x_2, y_2.
 #' @param segments_2 Matrix of line segments that `segments_1` should be tested
 #' with. Should have the same structure as `segments_1`
-#' @param return_all Logical denoting whether it should return the intersection 
-#' of all segments to each other. If true, will include indicators of which segments
-#' were compared. Defaults to `FALSE`.
 #'
 #' @return Returns a logical denoting whether any of the segments in 
 #' 
@@ -305,7 +300,8 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0),
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' # Generate several locations the agent can move to
 #' centers <- m4ma::c_vd_r(1:33,
@@ -368,7 +364,7 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #' of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 #' (change in orientation) options that are inherent to M4MA.
 #'
-#' @param object Object of the \code{\link[predped]{agent-class}} or the
+#' @param agent Object of the \code{\link[predped]{agent-class}} or the
 #' \code{\link[predped]{object-class}} (latter not yet supported).
 #' @param state Object of the \code{\link[predped]{state-class}} containing the
 #' current state.
@@ -388,7 +384,8 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #'                   radius = 0.25,
 #'                   speed = 1,
 #'                   orientation = 0,
-#'                   current_goal = goal(position = c(-2.01, 0)))
+#'                   current_goal = goal(position = c(-2.01, 0),
+#'                                       path = matrix(c(-2.01, 0), nrow = 1)))
 #'
 #' my_state <- state(iteration = 1,
 #'                   setting = my_background,
@@ -559,7 +556,7 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' objects. Allows for a translation from the object-oriented way of doing things
 #' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 #'
-#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
@@ -596,12 +593,12 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' Note that this function has been defined to be in line with the \code{m4ma}
 #' utility functions.
 #'
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-#' of all pedestrians that belong to the social group of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
-#' @param nped Numeric integer indicating number of people in pedestrian `n`'s social group. 
-#' @param fx Function used to find the group centroid. Defaults to \code{mean}
+#' @param number_agents Integer indicating number of people in the pedestrian's 
+#' social group. 
 #'
 #' @return Numeric vector containing the distance from each cell in the `center`
 #' to the group centroid. If not other agents belong to the same group as the 
@@ -629,8 +626,8 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' pedestrians.
 #' @param position Numeric vector denoting the current position of the agent.
 #' @param orientation Numeric denoting the current orientation of the agent.
-#' @param p_pred Numeric matrix with shape N x 2 containing predicted positions
-#' of all pedestrians that belong to the social group of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
 #' @param centers Numerical matrix containing the coordinates at each position
 #' the object can be moved to. Should have one row for each cell.
 #' @param any_member Logical denoting whether to consider the angles of all 
@@ -650,8 +647,8 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' @rdname get_angles_rcpp
 #' 
 #' @export 
-get_angles_rcpp <- function(agent_idx, agent_groups, position, orientation, predictions, centers, any_member = TRUE) {
-    .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_groups, position, orientation, predictions, centers, any_member)
+get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predictions, centers, any_member = TRUE) {
+    .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers, any_member)
 }
 
 #' Compute utility variables
@@ -693,14 +690,15 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #'
 #' Rcpp alternative for the group centroid utility function. 
 #' 
-#' @param a_gc Numeric denoting the power to which to take the utility.
-#' @param b_gc Numeric denoting the slope of the utility function.
+#' @param a_group_centroid Numeric denoting the power to which to take the 
+#' utility.
+#' @param b_group_centroid Numeric denoting the slope of the utility function.
 #' @param radius Numeric denoting the radius of the agent.
-#' @param cell_dist Numeric vector denoting the distance of each cell in the 
-#' \code{centers} to the predicted group centroid.
+#' @param cell_distances Numeric vector denoting the distance of each cell in  
+#' the \code{centers} to the predicted group centroid.
 #' @param stop_utility Numeric denoting the utility of stopping. Is used to 
 #' ensure the agents do not freeze when they are too far away from each other. 
-#' @param nped Numeric denoting the number of ingroup members. 
+#' @param number_agents Numeric denoting the number of ingroup members. 
 #' 
 #' @return Numeric vector containing the group-centroid-related utility for each 
 #' cell. 
@@ -713,8 +711,8 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #' @rdname gc_utility_rcpp
 #' 
 #' @export
-gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped) {
-    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, nped)
+gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, number_agents) {
+    .Call('_predped_gc_utility_rcpp', PACKAGE = 'predped', a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, number_agents)
 }
 
 #' Discrete visual field utility
@@ -726,10 +724,10 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' This translates to a discrete added disutility whenever the group member 
 #' falls inside the non-visual zone behind the agent.
 #' 
-#' @param b_vf Numeric denoting the slope of the utility function. 
-#' @param rel_angles Numeric vector containing the relative angle from each cell 
-#' center to the predicted positions of the group members. Typically output of 
-#' \code{\link[predped]{get_angles}}. 
+#' @param b_visual_field Numeric denoting the slope of the utility function. 
+#' @param relative_angles Numeric vector containing the relative angle from 
+#' each cell center to the predicted positions of the group members. Typically 
+#' output of \code{\link[predped]{get_angles}}. 
 #' 
 #' @return Numeric vector containing the utility attributed to keeping the 
 #' group members within your visual field. Returns 0's if the agent does not 
@@ -754,7 +752,7 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' utility, as well as a dataframe containing the parameters. Heavily depends 
 #' on the \code{m4ma} package.
 #' 
-#' @param object Dataframe containing all of the needed information to compute 
+#' @param data Dataframe containing all of the needed information to compute 
 #' the utilities. Typically output of the 
 #' \code{\link[predped]{compute_utility_variables}} function.
 #' @param parameters Dataframe containing the parameters of the agent. Should 
@@ -791,7 +789,7 @@ utility_rcpp <- function(data, parameters) {
 #' \code{\link[predped]{utility-data.frame}} for the actual computation 
 #' of the utility.
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -803,8 +801,6 @@ utility_rcpp <- function(data, parameters) {
 #' the object can be moved to. Should have one row for each cell.
 #' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
 #' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
-#' @param cpp Logical denoting whether to use the Rcpp version of the function
-#' (\code{TRUE}) or the R version (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Numeric vector denoting the (dis)utility of moving to each of the 
 #' cells in \code{centers}.

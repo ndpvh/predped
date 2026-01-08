@@ -37,18 +37,19 @@ Furthermore note that \code{forbidden} is ignored for the
 }
 \examples{
 # Create an object
-my_circle <- circle(center = c(0, 0), radius = 1)
-
-# Generate a point on the circumference of the circle without limitations
+my_circle <- circle(center = c(0, 0), 
+                    radius = 1)
 rng_point(my_circle)
 
 # Generate a point on the circumference of the circle with limitations, so 
 # that it cannot lie between the angles (0, pi/2) and (pi, 3 * pi/2), 
 # meaning the coordinate cannot have both positive or both negative values 
 # in its coordinates (one always has to be positive, the other negative).
-rng_point(my_circle, 
-          forbidden = rbind(c(0, pi/2), 
-                            c(pi, 3 * pi/2)))
+my_circle <- circle(center = c(0, 0), 
+                    radius = 1,
+                    forbidden = rbind(c(0, pi/2), 
+                                      c(pi, 3 * pi/2)))
+rng_point(my_circle)
 
 }
 \seealso{

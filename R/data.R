@@ -7,6 +7,8 @@
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+#' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #' 
 #' @examples
 #' # This is my example
@@ -14,12 +16,12 @@
 #' @rdname time_series
 #' 
 #' @export
-time_series <- function(x, 
+time_series <- function(trace, 
                         time_step = 0.5,
                         cpp = TRUE) {
 
     if(cpp) {
-        return(time_series_rcpp(x, time_step))
+        return(time_series_rcpp(trace, time_step))
     }
 
     # Create a function that will extract all details of the agents from a 
@@ -44,7 +46,7 @@ time_series <- function(x,
     }
 
     # Iterate over each object in the list and extract the state. 
-    x <- lapply(x, extract_state)
+    x <- lapply(trace, extract_state)
     x <- do.call("rbind", x)
     rownames(x) <- NULL
 
@@ -64,7 +66,8 @@ time_series <- function(x,
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Is used to create
 #' the cell positions that the agent might move to. Defaults to a matrix in 
-#' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+#' of speed), and \code{0.5} (deceleration).
 #' @param orientations Numeric matrix containing the change in direction for an
 #' agent whenever they move to the respective cell of this matrix. Is used to
 #' create the cell positions that the agent might move to. Defaults to a matrix 
@@ -77,6 +80,8 @@ time_series <- function(x,
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the time between each iteration. Defaults 
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+#' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #' 
 #' @examples
 #' # This is my example
@@ -84,7 +89,7 @@ time_series <- function(x,
 #' @rdname unpack_trace
 #' 
 #' @export
-unpack_trace <- function(x, 
+unpack_trace <- function(trace, 
                          velocities = c(1.5, 1, 0.5) |>
                             rep(each = 11) |>
                             matrix(ncol = 3),
@@ -98,7 +103,7 @@ unpack_trace <- function(x,
 
     # If Rcpp alternative requested, then let them use it
     if(cpp) {
-        return(unpack_trace_rcpp(x, 
+        return(unpack_trace_rcpp(trace, 
                                  velocities,
                                  orientations,
                                  stay_stopped,
@@ -140,7 +145,7 @@ unpack_trace <- function(x,
     }
 
     # Iterate over each object in the list and extract the state. 
-    x <- lapply(x, extract_state)
+    x <- lapply(trace, extract_state)
     x <- do.call("rbind", x)
     rownames(x) <- NULL
 
@@ -170,7 +175,30 @@ unpack_trace <- function(x,
 #' @param data Instance of a data.frame containing the data you want to transform.
 #' @param background Instance of the \code{\link[predped]{background-class}} 
 #' containing the setting in which the data were gathered.
-#' @param ... Arguments passed to \code{\link[predped]{add_motion_variables}}.
+#' @param b_turning,a_turning Numeric denoting the values of the parameters 
+#' \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
+#' For more information, see the documentation of 
+#' \code{\link[predped]{compute_centers}}. Defaults to \code{NULL}, meaning that 
+#' this relationship takes on the default values of \code{predped}.
+#' @param velocities Numeric vector denoting the changes in speeds as assumed by 
+#' the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
+#' (deceleration).
+#' @param orientations Numeric vector denoting the changes in orientation as 
+#' assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
+#' \code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
+#' \code{310}, \code{287.5} (note that the larger angles are actually the 
+#' negative symmetric versions of the smaller angles).
+#' @param time_step Numeric denoting the time between each iteration. Defaults 
+#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' @param threshold Numeric denoting under which observed value for speed the 
+#' cell to which an agent has moved should be put to `0`. Defaults to a value 
+#' based on the observed measurement error in our system.
+#' @param stay_stopped Logical denoting whether agents will predict others that
+#' are currently not moving to remain immobile in the next iteration. Is needed
+#' to compute the utility variables accurately. Defaults to \code{TRUE}.
+#' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+#' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
+#' @param ... Arguments passed to \code{\link[predped]{find_path}}.
 #' 
 #' @examples
 #' # This is my example
