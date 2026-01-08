@@ -121,7 +121,7 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
         centers(i, 1) = position[1] + velocity * sin(new_orientation);
     }
 
-    return(centers);
+    return(Rcpp::clone(centers));
 }
 
 
