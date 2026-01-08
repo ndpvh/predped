@@ -120,10 +120,11 @@ testthat::test_that("Computing cell centers for data works", {
     ref <- readRDS(file.path("data", "trace_data.Rds"))
 
     # Transform to data and back to a trace
-    data <- predped::time_series(ref, cpp = TRUE)
+    data <- predped::time_series(ref, cpp = FALSE)
     tst <- predped::to_trace(
         data,
-        ref[[1]]@setting
+        ref[[1]]@setting,
+        cpp = FALSE
     )
     back <- predped::time_series(tst, cpp = FALSE)
 
