@@ -1,5 +1,3 @@
-
-
 testthat::test_that("Adding agent works", {
     # Create several settings differing in the entrance
     settings <- list(predped::background(shape = rectangle(center = c(0, 0), 
