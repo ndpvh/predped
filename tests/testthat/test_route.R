@@ -364,7 +364,8 @@ testthat::test_that("Creating edges with one-directional flow works", {
                                  c(0.75, 0),
                                  setting,
                                  space_between = spc,
-                                 many_nodes = FALSE)
+                                 many_nodes = FALSE,
+                                 cpp = FALSE)
 
     # Put in alphabetical order
     arrange <- function(x) {
