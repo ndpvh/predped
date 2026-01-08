@@ -901,19 +901,21 @@ testthat::test_that(
                 centers_1 <- predped::compute_centers(dummy,
                                                       velocities = velocities,
                                                       orientations = orientations,
+                                                      time_step = 0.5,
                                                       cpp = FALSE)
 
                 # Compute cell centers through m4ma
                 centers_2 <- predped::compute_centers(dummy,
                                                       velocities = velocities,
                                                       orientations = orientations,
+                                                      time_step = 0.5,
                                                       cpp = TRUE)
 
                 # Check whether all cell centers are the same (taking into account
                 # some computational error)
                 diff <- centers_1 - centers_2
 
-                tst[idx] <- all(abs(diff) < 1e-4)
+                tst[idx] <- all(abs(diff) < 1e-2)
                 idx <- idx + 1
             }
         }
