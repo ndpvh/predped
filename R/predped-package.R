@@ -12,6 +12,7 @@
 #' @import MASS
 #' @import methods
 #' @import stats
+#' @import matrixStats
 #' @importFrom utils write.table
 #' @importFrom utils capture.output
 #' @importFrom cppRouting get_path_pair

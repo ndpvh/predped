@@ -45,7 +45,8 @@ Imports:
     stats,
     utils,
     dplyr,
-    MASS
+    MASS,
+    matrixStats
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Collate:
