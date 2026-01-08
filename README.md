@@ -2,8 +2,8 @@
 [![version](https://img.shields.io/badge/version-v0.1.0-blue)](https://github.com/ndpvh/predped/releases)
 [![documentation](https://img.shields.io/badge/documentation-v0.1.0-blue)](https://ndpvh.github.io/predped)
 [![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
-[![coverage](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml)
-[![license: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![coverage](https://codecov.io/gh/ndpvh/predped/graph/badge.svg)](https://app.codecov.io/gh/ndpvh/predped)
+[![license: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
 # predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
