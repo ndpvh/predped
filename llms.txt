@@ -1,0 +1,908 @@
+# predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
+
+This project serves as a tool to simulate pedestrian movement using the
+Minds for Mobile Agents (M4MA) model. It contains several helper
+functions for people who wish to use the model to investigate pedestrian
+flow in their own settings. Before delving into how to use the package,
+we will first provide the reader with some background on the model.
+
+## Background
+
+Pedestrian models are popular tools to investigate how people navigate
+the complex world that we live in. While these models have certainly
+been useful to understand, for example, evacuation behavior, they most
+often assume that pedestrians are homogeneous – that is, that all
+pedestrians are one and the same. Because of this assumption, these
+pedestrian models are not suited to capture the variety of walking
+behaviors we observe in most low-density situations, such as those
+observed in the supermarket, in the train station, or even on the
+street.
+
+To alleviate these difficulties, Andrew Heathcote and Dora Matzke
+recently proposed M4MA to capture pedestrian movement. This model is
+based on the pedestrian model developed by Robin et al. (2009) and,
+similarly, proposes that pedestrian movement is determined on three
+levels:
+
+- *Strategic level*: Consists of planning where the pedestrian wants to
+  go to and via which route. Typically, a pedestrian will have to
+  fulfill a goal, which will serve as the destination of the route. To
+  get to this goal, pedestrians will walk along so-called “path-points”:
+  Waypoints along which the pedestrian can walk, serving as intermediate
+  steps to get to their destination.
+- *Tactical level*: Once their route is determined, pedestrians will
+  still be able to adapt if their original plan does not seem feasible.
+  For example, other pedestrians can block your route, which makes
+  avoiding the crowd more attractive when trying to get to your goal.
+  These adaptations are handled on this level.
+- *Operational level*: This final level handles the low-level,
+  moment-to-moment decisions about where to walk to. In practice, this
+  constitutes a choice between one of 34 movement options, created by 11
+  angular directions in which a pedestrian can move (going from -72.5 to
+  72.5 degrees) and 3 changes in velocity (deceleration, constant speed,
+  or acceleration), with the $34^{st}$ option representing stopping. The
+  probability with which a pedestrian will move to a given location is
+  determined by a utility function that combines several moving
+  components, namely (a) preferred speed, (b) current direction, (c)
+  goal direction, (d) interpersonal distance, and (e) blocked angles, as
+  well as several social components, namely (a) following a person
+  heading in the same direction (follow-the-leader) and (b) walking
+  besides someone heading in the same direction (walk-besides-buddy).
+
+Critically, and different from other pedestrian models, M4MA assigns
+each pedestrian a “personality”, in that all pedestrians have their own
+unique values for the parameters that are defined on the operational
+level. These individual differences are implemented in two ways:
+
+- *Qualitative differences*: We define several “archetypes” of
+  pedestrians, each of which have different discrete values for their
+  parameters. These archetypes were created through trial-and-error by
+  the researchers in this project and are contained in *archetypes.csv*.
+  In no way should these archetypes be interpreted as ground truth or
+  real differences between individuals.
+- *Quantitative differences*: Each of the parameter values that are
+  defined in the archetypes CSV-file serves as a mean around which each
+  pedestrian’s actual parameter value fluctuates. Without going into
+  detail, each archetype has their own matrix that contains standard
+  deviations for each parameter on the diagonal and correlations between
+  parameters on the off-diagonal. These matrices are stored in
+  *archetypes_sigma.Rds*.
+
+## How to use
+
+This package allows its users to simulate pedestrian behavior as
+expected by M4MA. Users can specify the environment, the characterstics
+the pedestrians, and the characteristics of the simulation itself (e.g.,
+maximal number of agents, initial conditions,…), therefore allowing for
+a great variety of potential research questions that can be answered.
+For more information on the workflow of this package, see *Getting
+started*.
+
+This package depends heavily on the
+[`m4ma`](https://github.com/m4ma/m4ma) package.
+
+## Installation
+
+One can install `predped` through the `remotes` package in the following
+way:
+
+``` r
+remotes::install_github("ndpvh/predped")
+```
+
+To use the package, you should load it through `library`:
+
+``` r
+library(predped)
+```
+
+## Getting started
+
+Within `predped`, we use a particular workflow.
+
+In the first step, you should define the environment in which you want
+pedestrians to walk around. For this, you will use the `background`
+class. This S4 class contains slots for the `shape` (i.e., the shape of
+the room), the `objects` (i.e., which objects are contained within the
+room), and a potential `entrance` and/or `exit`. The `shape` and
+`objects` should all consist of instances of the `object` class, that is
+they should be either a `rectangle`, `polygon`, or `circle`. The
+`entrance`/`exit` should be instances of the `coordinate` class.
+
+A simple example of an environment is the following circular room with a
+square placed in the middle.
+
+``` r
+setting <- background(shape = circle(center = c(0, 0), 
+                                     radius = 2), 
+                      objects = list(rectangle(center = c(0, 0), 
+                                               size = c(1, 1), 
+                                               interactable = TRUE)),
+                      entrance = coordinate(c(-2, 0)),
+                      same_exit = TRUE)
+```
+
+In this chunk of code, the argument `interactable = TRUE` makes sure
+that the square in the middle of the room can contain goals for the
+pedestrians to fulfill. If none of the objects in the `objects` list are
+interactable, then the model will not be able to run. The argument
+`same_exit` defines whether the entrance and exit are at the same
+coordinate. If `same_exit = FALSE`, then a coordinate for the exit
+should also be provided.
+
+It is good practice to visualize what the environment looks like. For
+this, we can use the `plot` function.
+
+``` r
+plot(setting)
+```
+
+Now that we have defined the environment in which pedestrians will walk
+around, we have to define the characteristics of the pedestrians and
+link these with the environment in what is called a `predped` model.
+This is another S4 class with slots `setting` (the environment we just
+created), `parameters` (dataframe of parameter values), `archetypes` (a
+character string of pedestrians to include), and `weights` (the
+probability of each archetype entering the room).
+
+For legacy reasons, the current package works with a dataframe that
+contains parameter values for a given “class” of people. One such
+dataframe is provided by us in *archetypes.csv* and can be called in the
+package through the variable `params_archetypes`. As you can see, this
+dataframe consists of different parameter values, as well as a “name”
+and “color”. The provided color will be the color that is used to plot
+the pedestrians when plotting out the results of the simulation. The
+name is what will be used to distinguish between different parameter
+sets, and concerns the variable that is selected upon based on the
+values of `archetypes` in the `predped` model. For example, if we only
+wish to have a simulation with `"BaselineEuropean"`s, then we can
+specify the model like.
+
+``` r
+model <- predped(id = "my model", 
+                 setting = setting, 
+                 archetypes = "BaselineEuropean")
+```
+
+Of course, you are free to specify whichever combination of archetypes
+you wish. Note that if you use more than one archetype and you want the
+probability of entering the room to be different for each of those, you
+should also provide values to the `weights` slot.
+
+With the model defined, we can now finally simulate pedestrian movement.
+For this, we use the function `simulate` as follows.
+
+``` r
+trace <- simulate(model,
+                  max_agents = 25, 
+                  iterations = 50,
+                  plot_live = TRUE)
+```
+
+In this piece of code, we specify that within this simulation: - There
+can only be a maximum of 25 agents in the room; - It can only run for 50
+iterations; - We want the pedestrian movement to be plotted to our plot
+while running the simulation (disclaimer: This is useful, but runs
+significantly slower than when `plot_live = FALSE`).
+
+Once the simulation is done, the variable `trace` will be a list of
+different so-called intermediate “states” of the environment. Each state
+is another list containing the environment (under slot `setting`) and
+the pedestrians themselves (under slot `agents`). If you wish to
+visualize this trace, you can again use the `plot` function, this time
+with the additional argument `trace = TRUE`.
+
+``` r
+plots <- plot(trace, 
+              trace = TRUE)
+```
+
+The variable `plots` is a list containing a plot for each state in
+`trace`.
+
+## Getting help
+
+You can find the documentation for this package
+[here](https://ndpvh.github.io/predped). If you encounter a bug, you can
+report the bug with a minimal working example as an
+[Issue](https://github.com/ndpvh/predped/issues).
+
+## Contribute
+
+While this model already came far, there are still many gaps in the
+behaviors it can capture. Some of these are currently being implemented,
+such as queueing and walking in group. Others may be missing without us
+knowing. If you want to give us pointers as to which behaviors should be
+implemented next, or if you otherwise wish to contribute to this
+project, feel free to reach out to Niels Vanhasbroeck
+(<niels.vanhasbroeck@gmail.com>) and Andrew Heathcote
+(<ajheathcote@gmail.com>).
+
+## Credits
+
+The development of this package would not have been possible without the
+help of its many contributors. For the development of the `m4ma`
+package, we thank (in alphabetical order):
+
+- [Andrew Heathcote](https://github.com/andrewheathcote)
+- [Malte Lüken](https://github.com/maltelueken)
+- [Charlotte Tanis](https://github.com/CharlotteTanis)
+
+For the creation of the `predped`, we thank several permanent project
+members (in alphabetical order):
+
+- [Andrew Heathcote](https://github.com/andrewheathcote)
+- [Niels Vanhasbroeck](https://github.com/ndpvh)
+
+as well as many who worked with us temporarily (in alphabetical order):
+
+- [Alexander Anderson](https://github.com/Alexanderson31)
+- [Joris Goossen](https://github.com/JorisGoosen)
+- [Malte Lüken](https://github.com/maltelueken)
+- [Ece Yatıkçı](https://github.com/eceyatikci)
+
+## See also
+
+For more information on the project, please see its dedicated section on
+the lab website:
+<https://www.ampl-psych.com/projects/minds-for-mobile-agents/>.
+
+## References
+
+Robin, T., Antonini, G., Beirlaire, M., & Cruz, J. (2009).
+Specification, estimation, and validation of a pedestrian walking
+behavior model. *Transportation Research Part B, 43*, 36-56. doi:
+[10.1016/j.trb.2008.06.010](https://github.com/ndpvh/predped/doi.org/10.1016/j.trb.2008.06.010)
+
+# Package index
+
+## All functions
+
+- [`add_agent()`](https://github.com/ndpvh/predped/reference/add_agent.md)
+  : Add a single agent to the simulation
+
+- [`add_goal()`](https://github.com/ndpvh/predped/reference/add_goal.md)
+  : Add a goal to an object
+
+- [`add_group()`](https://github.com/ndpvh/predped/reference/add_group.md)
+  : Add a group of agents to the simulation
+
+- [`add_motion_variables()`](https://github.com/ndpvh/predped/reference/add_motion_variables.md)
+  : Add motion variables to data
+
+- [`add_nodes()`](https://github.com/ndpvh/predped/reference/add_nodes.md)
+  : Add Nodes along the Outside or Inside of an Object
+
+- [`adjust_edges()`](https://github.com/ndpvh/predped/reference/adjust_edges.md)
+  : Adjust edges of graph to walk on
+
+- [`agent-class`](https://github.com/ndpvh/predped/reference/agent-class.md)
+  [`agent`](https://github.com/ndpvh/predped/reference/agent-class.md) :
+  An S4 Class to Represent Agents.
+
+- [`agents()`](https://github.com/ndpvh/predped/reference/agents.md)
+  [`` `agents<-`() ``](https://github.com/ndpvh/predped/reference/agents.md)
+  :
+
+  Getter/Setter for the `agents`-slot
+
+- [`agents_between_goal()`](https://github.com/ndpvh/predped/reference/agents_between_goal.md)
+  : Find number of agents blocking agent
+
+- [`archetypes()`](https://github.com/ndpvh/predped/reference/archetypes.md)
+  [`` `archetypes<-`() ``](https://github.com/ndpvh/predped/reference/archetypes.md)
+  :
+
+  Getter/Setter for the `archetypes`-slot
+
+- [`area()`](https://github.com/ndpvh/predped/reference/area.md) :
+  Calculate the Area of an Object
+
+- [`background-class`](https://github.com/ndpvh/predped/reference/background-class.md)
+  [`background`](https://github.com/ndpvh/predped/reference/background-class.md)
+  : An S4 Class to Represent the Background
+
+- [`benchmark()`](https://github.com/ndpvh/predped/reference/benchmark.md)
+  : Benchmark the package
+
+- [`best_angle()`](https://github.com/ndpvh/predped/reference/best_angle.md)
+  : Look for the best direction to head in
+
+- [`busy()`](https://github.com/ndpvh/predped/reference/busy.md)
+  [`` `busy<-`() ``](https://github.com/ndpvh/predped/reference/busy.md)
+  :
+
+  Getter/Setter for the `busy`-slot
+
+- [`cell()`](https://github.com/ndpvh/predped/reference/cell.md)
+  [`` `cell<-`() ``](https://github.com/ndpvh/predped/reference/cell.md)
+  :
+
+  Getter/Setter for the `cell`-slot
+
+- [`cell_centers()`](https://github.com/ndpvh/predped/reference/cell_centers.md)
+  [`` `cell_centers<-`() ``](https://github.com/ndpvh/predped/reference/cell_centers.md)
+  :
+
+  Getter/Setter for the `cell_centers`-slot
+
+- [`center()`](https://github.com/ndpvh/predped/reference/center.md)
+  [`` `center<-`() ``](https://github.com/ndpvh/predped/reference/center.md)
+  :
+
+  Getter/Setter for the `center`-slot
+
+- [`change()`](https://github.com/ndpvh/predped/reference/change.md) :
+  Change a goal
+
+- [`circle-class`](https://github.com/ndpvh/predped/reference/circle-class.md)
+  [`circle`](https://github.com/ndpvh/predped/reference/circle-class.md)
+  : An S4 Class to Represent Circle Objects
+
+- [`color()`](https://github.com/ndpvh/predped/reference/color.md)
+  [`` `color<-`() ``](https://github.com/ndpvh/predped/reference/color.md)
+  :
+
+  Getter/Setter for the `color`-slot
+
+- [`combine_nodes()`](https://github.com/ndpvh/predped/reference/combine_nodes.md)
+  : Make combinations of different nodes
+
+- [`compute_centers()`](https://github.com/ndpvh/predped/reference/compute_centers.md)
+  : Compute cell centers
+
+- [`compute_centers_rcpp()`](https://github.com/ndpvh/predped/reference/compute_centers_rcpp.md)
+  : Compute cell centers
+
+- [`compute_edges()`](https://github.com/ndpvh/predped/reference/compute_edges.md)
+  : Compute the edges within a given setting
+
+- [`compute_limited_access()`](https://github.com/ndpvh/predped/reference/compute_limited_access.md)
+  :
+
+  Transform `segment`s to `polygon`s
+
+- [`compute_utility_variables(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/compute_utility_variables.md)
+  [`compute_utility_variables(`*`<data.frame>`*`)`](https://github.com/ndpvh/predped/reference/compute_utility_variables.md)
+  : Compute utility variables
+
+- [`compute_utility_variables_rcpp()`](https://github.com/ndpvh/predped/reference/compute_utility_variables_rcpp.md)
+  : Compute utility variables
+
+- [`coordinate-class`](https://github.com/ndpvh/predped/reference/coordinate-class.md)
+  [`coordinate`](https://github.com/ndpvh/predped/reference/coordinate-class.md)
+  : An S4 Class to Represent Coordinate Vectors
+
+- [`counter()`](https://github.com/ndpvh/predped/reference/counter.md)
+  [`` `counter<-`() ``](https://github.com/ndpvh/predped/reference/counter.md)
+  :
+
+  Getter/Setter for the `counter`-slot
+
+- [`create_agent_specifications()`](https://github.com/ndpvh/predped/reference/create_agent_specifications.md)
+  : Create agent specifications
+
+- [`create_agent_specifications_rcpp()`](https://github.com/ndpvh/predped/reference/create_agent_specifications_rcpp.md)
+  : Create agent specifications
+
+- [`create_edges()`](https://github.com/ndpvh/predped/reference/create_edges.md)
+  : Create edges of graph to walk on
+
+- [`create_initial_condition()`](https://github.com/ndpvh/predped/reference/create_initial_condition.md)
+  : Create initial condition
+
+- [`create_nodes()`](https://github.com/ndpvh/predped/reference/create_nodes.md)
+  : Create nodes that serve as path points
+
+- [`current_goal()`](https://github.com/ndpvh/predped/reference/current_goal.md)
+  [`` `current_goal<-`() ``](https://github.com/ndpvh/predped/reference/current_goal.md)
+  :
+
+  Getter/Setter for the `current_goal`-slot
+
+- [`determine_values()`](https://github.com/ndpvh/predped/reference/determine_values.md)
+  : Determine iterated values from various arguments
+
+- [`distance_group_centroid()`](https://github.com/ndpvh/predped/reference/distance_group_centroid.md)
+  : Distances to group centroid
+
+- [`distance_group_centroid_rcpp()`](https://github.com/ndpvh/predped/reference/distance_group_centroid_rcpp.md)
+  : Distances to group centroid
+
+- [`done()`](https://github.com/ndpvh/predped/reference/done.md)
+  [`` `done<-`() ``](https://github.com/ndpvh/predped/reference/done.md)
+  :
+
+  Getter/Setter for the `done`-slot
+
+- [`enlarge()`](https://github.com/ndpvh/predped/reference/enlarge.md) :
+  Make an Object Larger
+
+- [`entrance()`](https://github.com/ndpvh/predped/reference/entrance.md)
+  [`` `entrance<-`() ``](https://github.com/ndpvh/predped/reference/entrance.md)
+  :
+
+  Getter/Setter for the `entrance`-slot
+
+- [`evaluate_edges()`](https://github.com/ndpvh/predped/reference/evaluate_edges.md)
+  : Evaluate whether edges pass through objects
+
+- [`exit()`](https://github.com/ndpvh/predped/reference/exit.md)
+  [`` `exit<-`() ``](https://github.com/ndpvh/predped/reference/exit.md)
+  :
+
+  Getter/Setter for the `exit`-slot
+
+- [`find_class()`](https://github.com/ndpvh/predped/reference/find_class.md)
+  : Find all objects of a given class
+
+- [`find_path()`](https://github.com/ndpvh/predped/reference/find_path.md)
+  : Find path to a goal
+
+- [`forbidden()`](https://github.com/ndpvh/predped/reference/forbidden.md)
+  [`` `forbidden<-`() ``](https://github.com/ndpvh/predped/reference/forbidden.md)
+  :
+
+  Getter/Setter for the `forbidden`-slot
+
+- [`from()`](https://github.com/ndpvh/predped/reference/from.md)
+  [`` `from<-`() ``](https://github.com/ndpvh/predped/reference/from.md)
+  :
+
+  Getter/Setter for the `from`-slot
+
+- [`gc_utility()`](https://github.com/ndpvh/predped/reference/gc_utility.md)
+  : Group centroid utility
+
+- [`gc_utility_rcpp()`](https://github.com/ndpvh/predped/reference/gc_utility_rcpp.md)
+  : Group centroid utility
+
+- [`generate_parameters()`](https://github.com/ndpvh/predped/reference/generate_parameters.md)
+  : Generate parameters
+
+- [`get_angles()`](https://github.com/ndpvh/predped/reference/get_angles.md)
+  : Angle between agent and group members
+
+- [`get_angles_rcpp()`](https://github.com/ndpvh/predped/reference/get_angles_rcpp.md)
+  : Angle between agent and group members
+
+- [`goal-class`](https://github.com/ndpvh/predped/reference/goal-class.md)
+  [`goal`](https://github.com/ndpvh/predped/reference/goal-class.md) :
+  An S4 Class to Represent Goals
+
+- [`goal_stack()`](https://github.com/ndpvh/predped/reference/goal_stack.md)
+  : Generate a goal stack
+
+- [`goals()`](https://github.com/ndpvh/predped/reference/goals.md)
+  [`` `goals<-`() ``](https://github.com/ndpvh/predped/reference/goals.md)
+  :
+
+  Getter/Setter for the `goals`-slot
+
+- [`group()`](https://github.com/ndpvh/predped/reference/group.md)
+  [`` `group<-`() ``](https://github.com/ndpvh/predped/reference/group.md)
+  :
+
+  Getter/Setter for the `group`-slot
+
+- [`id()`](https://github.com/ndpvh/predped/reference/id.md)
+  [`` `id<-`() ``](https://github.com/ndpvh/predped/reference/id.md) :
+
+  Getter/Setter for the `id`-slot
+
+- [`in_object()`](https://github.com/ndpvh/predped/reference/in_object.md)
+  : Check Whether a Point Lies Within an Object
+
+- [`in_object_rcpp()`](https://github.com/ndpvh/predped/reference/in_object_rcpp.md)
+  : Check Whether a Point Lies Within an Object
+
+- [`initialize(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/initialize-agent.md)
+  :
+
+  Constructor for the
+  [`agent-class`](https://rdrr.io/pkg/predped/man/agent-class.html)
+
+- [`initialize(`*`<background>`*`)`](https://github.com/ndpvh/predped/reference/initialize-background.md)
+  :
+
+  Constructor for the
+  [`background-class`](https://rdrr.io/pkg/predped/man/background-class.html)
+
+- [`initialize(`*`<circle>`*`)`](https://github.com/ndpvh/predped/reference/initialize-circle.md)
+  :
+
+  Constructor for the
+  [`circle-class`](https://rdrr.io/pkg/predped/man/circle-class.html)
+
+- [`initialize(`*`<coordinate>`*`)`](https://github.com/ndpvh/predped/reference/initialize-coordinate.md)
+  :
+
+  Constructor for the
+  [`coordinate-class`](https://rdrr.io/pkg/predped/man/coordinate-class.html)
+
+- [`initialize(`*`<goal>`*`)`](https://github.com/ndpvh/predped/reference/initialize-goal.md)
+  :
+
+  Constructor for the
+  [`goal-class`](https://rdrr.io/pkg/predped/man/goal-class.html)
+
+- [`initialize(`*`<object>`*`)`](https://github.com/ndpvh/predped/reference/initialize-object.md)
+  :
+
+  Constructor for the
+  [`object-class`](https://rdrr.io/pkg/predped/man/object-class.html)
+
+- [`initialize(`*`<polygon>`*`)`](https://github.com/ndpvh/predped/reference/initialize-polygon.md)
+  :
+
+  Constructor for the
+  [`polygon-class`](https://rdrr.io/pkg/predped/man/polygon-class.html)
+
+- [`initialize(`*`<predped>`*`)`](https://github.com/ndpvh/predped/reference/initialize-predped.md)
+  :
+
+  Constructor for the
+  [`predped-class`](https://rdrr.io/pkg/predped/man/predped-class.html)
+
+- [`initialize(`*`<rectangle>`*`)`](https://github.com/ndpvh/predped/reference/initialize-rectangle.md)
+  :
+
+  Constructor for the
+  [`rectangle-class`](https://rdrr.io/pkg/predped/man/rectangle-class.html)
+
+- [`initialize(`*`<segment>`*`)`](https://github.com/ndpvh/predped/reference/initialize-segment.md)
+  :
+
+  Constructor for the
+  [`segment-class`](https://rdrr.io/pkg/predped/man/segment-class.html)
+
+- [`initialize(`*`<state>`*`)`](https://github.com/ndpvh/predped/reference/initialize-state.md)
+  :
+
+  Constructor for the
+  [`state-class`](https://rdrr.io/pkg/predped/man/state-class.html)
+
+- [`interact()`](https://github.com/ndpvh/predped/reference/interact.md)
+  : Interact with goal
+
+- [`intersects()`](https://github.com/ndpvh/predped/reference/intersects.md)
+  : Check whether an Object intersects with Other Object
+
+- [`iteration()`](https://github.com/ndpvh/predped/reference/iteration.md)
+  [`` `iteration<-`() ``](https://github.com/ndpvh/predped/reference/iteration.md)
+  [`` `iteration_variables<-`( ``*`<state>`*`)`](https://github.com/ndpvh/predped/reference/iteration.md)
+  :
+
+  Getter/Setter for the `iteration`-slot
+
+- [`iteration_variables()`](https://github.com/ndpvh/predped/reference/iteration_variables.md)
+  [`` `iteration_variables<-`() ``](https://github.com/ndpvh/predped/reference/iteration_variables.md)
+  :
+
+  Getter/Setter for the `iteration_variables`-slot
+
+- [`limit_access()`](https://github.com/ndpvh/predped/reference/limit_access.md)
+  : Compute which segments can be crossed
+
+- [`limited_access()`](https://github.com/ndpvh/predped/reference/limited_access.md)
+  [`` `limited_access<-`() ``](https://github.com/ndpvh/predped/reference/limited_access.md)
+  :
+
+  Getter/Setter for the `limited_access`-slot
+
+- [`line_intersection()`](https://github.com/ndpvh/predped/reference/line_intersection.md)
+  : Check whether an Object intersects with Line Segments
+
+- [`line_line_intersection()`](https://github.com/ndpvh/predped/reference/line_line_intersection.md)
+  : Compute the line-line intersection between several segments. Is a
+  vectorized function with minimal loss of time when the number of
+  segments to test increases.
+
+- [`line_line_intersection_rcpp()`](https://github.com/ndpvh/predped/reference/line_line_intersection_rcpp.md)
+  : Rcpp version of line_line_intersection. Computes the between several
+  segments. Is a vectorized function with minimal loss of time when the
+  number of segments to test increases.
+
+- [`load_parameters()`](https://github.com/ndpvh/predped/reference/load_parameters.md)
+  : Load parameters
+
+- [`mll()`](https://github.com/ndpvh/predped/reference/mll.md) : Compute
+  the min-log-likelihood
+
+- [`mll_rcpp()`](https://github.com/ndpvh/predped/reference/mll_rcpp.md)
+  : Compute the min-log-likelihood
+
+- [`move()`](https://github.com/ndpvh/predped/reference/move.md) : Move
+  object to new location
+
+- [`moving_options()`](https://github.com/ndpvh/predped/reference/moving_options.md)
+  : Check where an object can be moved to
+
+- [`moving_options_rcpp()`](https://github.com/ndpvh/predped/reference/moving_options_rcpp.md)
+  : Check where an object can be moved to
+
+- [`multiple_goal_stacks()`](https://github.com/ndpvh/predped/reference/multiple_goal_stacks.md)
+  : Generate multiple goal stacks
+
+- [`nodes_on_circumference()`](https://github.com/ndpvh/predped/reference/nodes_on_circumference.md)
+  : Add Nodes on the Circumference of an Object
+
+- [`nodes_on_circumference_rcpp()`](https://github.com/ndpvh/predped/reference/nodes_on_circumference_rcpp.md)
+  : Add Nodes on the Circumference of an Object
+
+- [`object-class`](https://github.com/ndpvh/predped/reference/object-class.md)
+  : An S4 Abstract Base Class to Represent Objects
+
+- [`` `objects<-`() ``](https://github.com/ndpvh/predped/reference/objects.md)
+  [`objects(`*`<background>`*`)`](https://github.com/ndpvh/predped/reference/objects.md)
+  :
+
+  Getter/Setter for the `objects`-slot
+
+- [`orientation()`](https://github.com/ndpvh/predped/reference/orientation.md)
+  [`` `orientation<-`() ``](https://github.com/ndpvh/predped/reference/orientation.md)
+  :
+
+  Getter/Setter for the `orientation`-slot
+
+- [`out_object()`](https://github.com/ndpvh/predped/reference/out_object.md)
+  : Check Whether a Point Lies Outside of an Object
+
+- [`overlap_with_objects()`](https://github.com/ndpvh/predped/reference/overlap_with_objects.md)
+  : Check agent and object overlap
+
+- [`overlap_with_objects_rcpp()`](https://github.com/ndpvh/predped/reference/overlap_with_objects_rcpp.md)
+  : Check agent and object overlap
+
+- [`parameters()`](https://github.com/ndpvh/predped/reference/parameters.md)
+  [`` `parameters<-`() ``](https://github.com/ndpvh/predped/reference/parameters.md)
+  :
+
+  Getter/Setter for the `parameters`-slot
+
+- [`params_from_csv`](https://github.com/ndpvh/predped/reference/params_from_csv.md)
+  : Default Parameter List
+
+- [`path()`](https://github.com/ndpvh/predped/reference/path.md)
+  [`` `path<-`() ``](https://github.com/ndpvh/predped/reference/path.md)
+  :
+
+  Getter/Setter for the `path`-slot
+
+- [`perpendicular_orientation()`](https://github.com/ndpvh/predped/reference/perpendicular_orientation.md)
+  : Find the perpendicular orientation
+
+- [`plot(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<background>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<list>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<object>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<segment>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<state>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  : Plot an object
+
+- [`plot_distribution()`](https://github.com/ndpvh/predped/reference/plot_distribution.md)
+  : Plot prior parameter distributions
+
+- [`plot_edges()`](https://github.com/ndpvh/predped/reference/plot_edges.md)
+  :
+
+  Plot the edges in a
+  [`background-class`](https://rdrr.io/pkg/predped/man/background-class.html)
+
+- [`` `points<-`() ``](https://github.com/ndpvh/predped/reference/points.md)
+  [`points(`*`<polygon>`*`)`](https://github.com/ndpvh/predped/reference/points.md)
+  [`points(`*`<rectangle>`*`)`](https://github.com/ndpvh/predped/reference/points.md)
+  [`points(`*`<circle>`*`)`](https://github.com/ndpvh/predped/reference/points.md)
+  [`points(`*`<segment>`*`)`](https://github.com/ndpvh/predped/reference/points.md)
+  :
+
+  Getter/Setter for the `points`-slot
+
+- [`polygon-class`](https://github.com/ndpvh/predped/reference/polygon-class.md)
+  [`polygon`](https://github.com/ndpvh/predped/reference/polygon-class.md)
+  : An S4 class to Represent Polygon Objects
+
+- [`position()`](https://github.com/ndpvh/predped/reference/position.md)
+  [`` `position<-`() ``](https://github.com/ndpvh/predped/reference/position.md)
+  :
+
+  Getter/Setter for the `position`-slot
+
+- [`potential_agents()`](https://github.com/ndpvh/predped/reference/potential_agents.md)
+  [`` `potential_agents<-`() ``](https://github.com/ndpvh/predped/reference/potential_agents.md)
+  :
+
+  Getter/Setter for the `potential_agents`-slot
+
+- [`predict_movement()`](https://github.com/ndpvh/predped/reference/predict_movement.md)
+  : Predict agents' movement
+
+- [`predict_movement_rcpp()`](https://github.com/ndpvh/predped/reference/predict_movement_rcpp.md)
+  : Predict agents' movement
+
+- [`predped-class`](https://github.com/ndpvh/predped/reference/predped-class.md)
+  [`predped`](https://github.com/ndpvh/predped/reference/predped-class.md)
+  : An S4 Class to Represent the M4MA model.
+
+- [`prune_edges()`](https://github.com/ndpvh/predped/reference/prune_edges.md)
+  : Evaluate intersections with objects
+
+- [`radius()`](https://github.com/ndpvh/predped/reference/radius.md)
+  [`` `radius<-`() ``](https://github.com/ndpvh/predped/reference/radius.md)
+  :
+
+  Getter/Setter for the `radius`-slot
+
+- [`raycasting()`](https://github.com/ndpvh/predped/reference/raycasting.md)
+  : Raycasting algorithm
+
+- [`rectangle-class`](https://github.com/ndpvh/predped/reference/rectangle-class.md)
+  [`rectangle`](https://github.com/ndpvh/predped/reference/rectangle-class.md)
+  : An S4 Class to Represent Rectangle Objects
+
+- [`rng_point()`](https://github.com/ndpvh/predped/reference/rng_point.md)
+  : Sample a Random Point on the Circumference
+
+- [`rotate()`](https://github.com/ndpvh/predped/reference/rotate.md) :
+  Rotate object around center
+
+- [`segment-class`](https://github.com/ndpvh/predped/reference/segment-class.md)
+  [`segment`](https://github.com/ndpvh/predped/reference/segment-class.md)
+  : An S4 class to Represent Lines
+
+- [`setting()`](https://github.com/ndpvh/predped/reference/setting.md)
+  [`` `setting<-`() ``](https://github.com/ndpvh/predped/reference/setting.md)
+  :
+
+  Getter/Setter for the `setting`-slot
+
+- [`shape()`](https://github.com/ndpvh/predped/reference/shape.md)
+  [`` `shape<-`() ``](https://github.com/ndpvh/predped/reference/shape.md)
+  :
+
+  Getter/Setter for the `shape`-slot
+
+- [`show(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/show-agent-method.md)
+  :
+
+  Show method for the
+  [`agent-class`](https://rdrr.io/pkg/predped/man/agent-class.html)
+
+- [`show(`*`<background>`*`)`](https://github.com/ndpvh/predped/reference/show-background-method.md)
+  :
+
+  Show method for the
+  [`background-class`](https://rdrr.io/pkg/predped/man/background-class.html)
+
+- [`show(`*`<goal>`*`)`](https://github.com/ndpvh/predped/reference/show-goal-method.md)
+  :
+
+  Show method for the
+  [`goal-class`](https://rdrr.io/pkg/predped/man/goal-class.html)
+
+- [`show(`*`<predped>`*`)`](https://github.com/ndpvh/predped/reference/show-predped-method.md)
+  :
+
+  Show method for the
+  [`predped-class`](https://rdrr.io/pkg/predped/man/predped-class.html)
+
+- [`simulate(`*`<predped>`*`)`](https://github.com/ndpvh/predped/reference/simulate.md)
+  : Simulate the M4MA
+
+- [`simulate(`*`<state>`*`)`](https://github.com/ndpvh/predped/reference/simulate.state.md)
+  : Simulate a single state for the M4MA
+
+- [`size()`](https://github.com/ndpvh/predped/reference/size.md)
+  [`` `size<-`() ``](https://github.com/ndpvh/predped/reference/size.md)
+  :
+
+  Getter/Setter for the `size`-slot
+
+- [`speed()`](https://github.com/ndpvh/predped/reference/speed.md)
+  [`` `speed<-`() ``](https://github.com/ndpvh/predped/reference/speed.md)
+  :
+
+  Getter/Setter for the `speed`-slot
+
+- [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+  [`state`](https://github.com/ndpvh/predped/reference/state-class.md) :
+  An S4 Class to Represent the State
+
+- [`status()`](https://github.com/ndpvh/predped/reference/status.md)
+  [`` `status<-`() ``](https://github.com/ndpvh/predped/reference/status.md)
+  :
+
+  Getter/Setter for the `status`-slot
+
+- [`time_series()`](https://github.com/ndpvh/predped/reference/time_series.md)
+  : Transform trace to time-series
+
+- [`time_series_rcpp()`](https://github.com/ndpvh/predped/reference/time_series_rcpp.md)
+  : Transform trace to time-series
+
+- [`to()`](https://github.com/ndpvh/predped/reference/to.md)
+  [`` `to<-`() ``](https://github.com/ndpvh/predped/reference/to.md) :
+
+  Getter/Setter for the `to`-slot
+
+- [`to_bounded()`](https://github.com/ndpvh/predped/reference/to_bounded.md)
+  : Transform to positive axis
+
+- [`to_covariance()`](https://github.com/ndpvh/predped/reference/to_covariance.md)
+  : Transform user-provided matrix to covariance matrix
+
+- [`to_trace()`](https://github.com/ndpvh/predped/reference/to_trace.md)
+  : Transform data to a trace
+
+- [`to_unbounded()`](https://github.com/ndpvh/predped/reference/to_unbounded.md)
+  : Transform to real axis
+
+- [`transform_df()`](https://github.com/ndpvh/predped/reference/transform_df.md)
+  : Transform to dataframe of segments
+
+- [`transform_mu()`](https://github.com/ndpvh/predped/reference/transform_mu.md)
+  : Transform nest association to precision (mu)
+
+- [`unpack_trace()`](https://github.com/ndpvh/predped/reference/unpack_trace.md)
+  : Transform trace to comprehensive data.frame
+
+- [`unpack_trace_rcpp()`](https://github.com/ndpvh/predped/reference/unpack_trace_rcpp.md)
+  : Transform trace to comprehensive data.frame
+
+- [`update(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/update-agent.md)
+  : Update Agent
+
+- [`update(`*`<state>`*`)`](https://github.com/ndpvh/predped/reference/update.md)
+  : Update State
+
+- [`update_goal()`](https://github.com/ndpvh/predped/reference/update_goal.md)
+  : Update the Goal of an Agent
+
+- [`update_position()`](https://github.com/ndpvh/predped/reference/update_position.md)
+  : Update the Position of an Agent
+
+- [`utility(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/utility-agent.md)
+  : Compute the utilities on the agent level
+
+- [`utility(`*`<data.frame>`*`)`](https://github.com/ndpvh/predped/reference/utility-data.frame.md)
+  : Compute the utilities with all utility variables known
+
+- [`utility_agent_rcpp()`](https://github.com/ndpvh/predped/reference/utility_agent_rcpp.md)
+  : Utility
+
+- [`utility_rcpp()`](https://github.com/ndpvh/predped/reference/utility_rcpp.md)
+  : Utility
+
+- [`utility_variables()`](https://github.com/ndpvh/predped/reference/utility_variables.md)
+  [`` `utility_variables<-`() ``](https://github.com/ndpvh/predped/reference/utility_variables.md)
+  :
+
+  Getter/Setter for the `utility_variables`-slot
+
+- [`variables()`](https://github.com/ndpvh/predped/reference/variables.md)
+  [`` `variables<-`() ``](https://github.com/ndpvh/predped/reference/variables.md)
+  :
+
+  Getter/Setter for the `variables`-slot
+
+- [`vf_utility_continuous()`](https://github.com/ndpvh/predped/reference/vf_utility_continuous.md)
+  : Continuous visual field utility
+
+- [`vf_utility_discrete()`](https://github.com/ndpvh/predped/reference/vf_utility_discrete.md)
+  : Discrete visual field utility
+
+- [`vf_utility_rcpp()`](https://github.com/ndpvh/predped/reference/vf_utility_rcpp.md)
+  : Discrete visual field utility
+
+- [`waiting_counter()`](https://github.com/ndpvh/predped/reference/waiting_counter.md)
+  [`` `waiting_counter<-`() ``](https://github.com/ndpvh/predped/reference/waiting_counter.md)
+  :
+
+  Getter/Setter for the `waiting_counter`-slot
+
+- [`weights()`](https://github.com/ndpvh/predped/reference/weights.md)
+  [`` `weights<-`() ``](https://github.com/ndpvh/predped/reference/weights.md)
+  :
+
+  Getter/Setter for the `weights`-slot
+
