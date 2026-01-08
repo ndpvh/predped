@@ -130,15 +130,16 @@ works for all extensions of the <code><a href="object-class.html">object-class</
 <span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                    radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access the center slot for the agent</span></span></span>
-<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'center': object 'my_agent' not found</span>
+<span class="r-in"><span><span class="co"># Access the center slot for the circle</span></span></span>
+<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_circle</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class "coordinate"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0 0</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Change the center slot for the agent</span></span></span>
-<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_agent' not found</span>
-<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'center': object 'my_agent' not found</span>
+<span class="r-in"><span><span class="co"># Change the center slot for the circle</span></span></span>
+<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_circle</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">my_circle</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class "coordinate"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Note that for some object, changing the center also changes other slots</span></span></span>
 <span class="r-in"><span><span class="va">my_rectangle</span> <span class="op">&lt;-</span> <span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>

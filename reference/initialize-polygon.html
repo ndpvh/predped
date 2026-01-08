@@ -70,14 +70,23 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'polygon'</span></span>
-<span><span class="fu">initialize</span><span class="op">(</span><span class="va">.Object</span>, clock_wise <span class="op">=</span> <span class="cn">TRUE</span>, forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">initialize</span><span class="op">(</span><span class="va">.Object</span>, <span class="va">points</span>, clock_wise <span class="op">=</span> <span class="cn">TRUE</span>, forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-clock-wise">clock_wise<a class="anchor" aria-label="anchor" href="#arg-clock-wise"></a></dt>
+<dl><dt id="arg--object">.Object<a class="anchor" aria-label="anchor" href="#arg--object"></a></dt>
+<dd><p>For this class, should be left unspecified (see Example).</p></dd>
+
+
+<dt id="arg-points">points<a class="anchor" aria-label="anchor" href="#arg-points"></a></dt>
+<dd><p>Numerical matrix containing the coordinates that make up the
+polygon.</p></dd>
+
+
+<dt id="arg-clock-wise">clock_wise<a class="anchor" aria-label="anchor" href="#arg-clock-wise"></a></dt>
 <dd><p>Logical denoting whether the coordinates in <code>points</code>
 are defined in clockwise (<code>TRUE</code>) or counter-clockwise fashion
 (<code>FALSE</code>). Defaults to <code>TRUE</code>.</p></dd>
@@ -93,11 +102,6 @@ vector, making all edges worthy of goal generation.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to
 <code>initialize-object</code>.</p></dd>
-
-
-<dt id="arg-points">points<a class="anchor" aria-label="anchor" href="#arg-points"></a></dt>
-<dd><p>Numerical matrix containing the coordinates that make up the
-polygon.</p></dd>
 
 </dl></div>
     <div id="value">

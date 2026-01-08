@@ -77,16 +77,16 @@ specified by the user through the argument <code>fx</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">distance_group_centroid</span><span class="op">(</span><span class="va">p_pred</span>, <span class="va">centers</span>, <span class="va">nped</span>, fx <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">distance_group_centroid</span><span class="op">(</span><span class="va">predictions</span>, <span class="va">centers</span>, <span class="va">number_agents</span>, fx <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-p-pred">p_pred<a class="anchor" aria-label="anchor" href="#arg-p-pred"></a></dt>
-<dd><p>Numeric matrix with shape N x 2 containing predicted positions
-of all pedestrians that belong to the social group of the agent.</p></dd>
+<dl><dt id="arg-predictions">predictions<a class="anchor" aria-label="anchor" href="#arg-predictions"></a></dt>
+<dd><p>Numeric matrix with shape N x 2 containing predicted
+positions of all pedestrians that belong to the social group of the agent.</p></dd>
 
 
 <dt id="arg-centers">centers<a class="anchor" aria-label="anchor" href="#arg-centers"></a></dt>
@@ -94,8 +94,9 @@ of all pedestrians that belong to the social group of the agent.</p></dd>
 the object can be moved to. Should have one row for each cell.</p></dd>
 
 
-<dt id="arg-nped">nped<a class="anchor" aria-label="anchor" href="#arg-nped"></a></dt>
-<dd><p>Numeric integer indicating number of people in pedestrian `n`'s social group.</p></dd>
+<dt id="arg-number-agents">number_agents<a class="anchor" aria-label="anchor" href="#arg-number-agents"></a></dt>
+<dd><p>Integer indicating number of people in the pedestrian's
+social group.</p></dd>
 
 
 <dt id="arg-fx">fx<a class="anchor" aria-label="anchor" href="#arg-fx"></a></dt>

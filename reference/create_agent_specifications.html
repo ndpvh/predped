@@ -89,7 +89,11 @@ in <code>predped</code> to the vectorized way of doing things in <code>m4ma</cod
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-stay-stopped">stay_stopped<a class="anchor" aria-label="anchor" href="#arg-stay-stopped"></a></dt>
+<dl><dt id="arg-agent-list">agent_list<a class="anchor" aria-label="anchor" href="#arg-agent-list"></a></dt>
+<dd><p>List of objects of the <code><a href="agent-class.html">agent-class</a></code>.</p></dd>
+
+
+<dt id="arg-stay-stopped">stay_stopped<a class="anchor" aria-label="anchor" href="#arg-stay-stopped"></a></dt>
 <dd><p>Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Defaults
 to <code>TRUE</code>.</p></dd>
@@ -100,8 +104,9 @@ to <code>TRUE</code>.</p></dd>
 time should mimic. Defaults to <code>0.5</code>, or half a second.</p></dd>
 
 
-<dt id="arg-agent">agent<a class="anchor" aria-label="anchor" href="#arg-agent"></a></dt>
-<dd><p>Object of the <code><a href="agent-class.html">agent-class</a></code>.</p></dd>
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp alternative (<code>TRUE</code>)
+or the R alternative of this function (<code>FALSE</code>). Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div id="value">

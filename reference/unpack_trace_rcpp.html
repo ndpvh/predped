@@ -89,21 +89,19 @@
 <dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
 <dd><p>Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to, as performed through
-<code><a href="https://rdrr.io/pkg/m4ma/man/c_vd_rcpp.html" class="external-link">c_vd_rcpp</a></code>. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the columns contain
-<code>1.5</code> (acceleration), <code>1</code>, and <code>0.5</code>.</p></dd>
+the cell positions that the agent might move to. Defaults to a matrix in
+which the columns contain <code>1.5</code> (acceleration), <code>1</code> (maintenance
+of speed), and <code>0.5</code> (deceleration).</p></dd>
 
 
 <dt id="arg-orientations">orientations<a class="anchor" aria-label="anchor" href="#arg-orientations"></a></dt>
 <dd><p>Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to, as performed through
-<code><a href="https://rdrr.io/pkg/m4ma/man/c_vd_rcpp.html" class="external-link">c_vd_rcpp</a></code>. Currently limited to having 11 rows (direction)
-and 3 columns (speed). Defaults to a matrix in which the rows contain
-<code>72.5</code>, <code>50</code>, <code>32.5</code>, <code>20</code>, <code>10</code>, code0, <code>350</code>,
-<code>340</code>, <code>327.5</code>, <code>310</code>, <code>287.5</code> (note that the larger
-angles are actually the negative symmetric versions of the smaller angles).</p></dd>
+create the cell positions that the agent might move to. Defaults to a matrix
+in which the rows contain <code>72.5</code>, <code>50</code>, <code>32.5</code>, <code>20</code>,
+<code>10</code>, <code>0</code>, <code>350</code>, <code>340</code>, <code>327.5</code>, <code>310</code>,
+<code>287.5</code> (note that the larger angles are actually the negative symmetric
+versions of the smaller angles).</p></dd>
 
 
 <dt id="arg-stay-stopped">stay_stopped<a class="anchor" aria-label="anchor" href="#arg-stay-stopped"></a></dt>

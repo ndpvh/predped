@@ -111,6 +111,16 @@ that for this function <code>x</code> and <code>object</code> are synonymous: Th
 argument is included to ensure compatibility with the <code>points</code> function
 from base R.</p></dd>
 
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Arguments passed on to the methods of this generic</p></dd>
+
+
+<dt id="arg-length-out">length.out<a class="anchor" aria-label="anchor" href="#arg-length-out"></a></dt>
+<dd><p>Numeric denoting the number of points to create when the
+provided object is of an instance <code><a href="circle-class.html">circle-class</a></code>.
+Defaults to <code>100</code></p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -135,18 +145,24 @@ method.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Initialize a rectangle</span></span></span>
 <span class="r-in"><span><span class="va">my_polygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="polygon-class.html">polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(.Object, ...):</span> All points must have an x- and y-coordinate (two-column matrix).</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the points slot</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">my_polygon</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'points': object 'my_polygon' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    1   -1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   -1   -1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   -1    1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change the points slot</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">my_polygon</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_polygon' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">my_polygon</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'points': object 'my_polygon' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    2    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    2   -2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]   -2   -2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]   -2    2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># For circles, we can only access the points slot and provide an argument </span></span></span>
 <span class="r-in"><span><span class="co"># denoting how many points we want to sample from the circle's </span></span></span>

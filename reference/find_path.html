@@ -75,7 +75,20 @@ level (when performed in response to blockages).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_path</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_path</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'goal'</span></span>
+<span><span class="fu">find_path</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">agent</span>,</span>
+<span>  <span class="va">background</span>,</span>
+<span>  space_between <span class="op">=</span> <span class="fu"><a href="radius.html">radius</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span>,</span>
+<span>  many_nodes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  algorithm <span class="op">=</span> <span class="st">"Dijkstra"</span>,</span>
+<span>  precomputed_edges <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  new_objects <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  reevaluate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -85,6 +98,10 @@ level (when performed in response to blockages).</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>Object of <code><a href="goal-class.html">goal-class</a></code> for which the path
 should be computed.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Arguments passed on to the methods of this generic</p></dd>
 
 
 <dt id="arg-agent">agent<a class="anchor" aria-label="anchor" href="#arg-agent"></a></dt>
@@ -205,7 +222,8 @@ the path points are contained in an n x 2 matrix.</p>
 <span class="r-in"><span><span class="fu">find_path</span><span class="op">(</span><span class="va">my_goal</span>, </span></span>
 <span class="r-in"><span>          <span class="va">my_agent</span>,</span></span>
 <span class="r-in"><span>          <span class="va">my_background</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in loadNamespace(x):</span> there is no package called ‘matrixStats’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              x         y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.205821 0.4666237</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

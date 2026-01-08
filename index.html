@@ -100,26 +100,22 @@
 <h2 id="how-to-use">How to use<a class="anchor" aria-label="anchor" href="#how-to-use"></a>
 </h2>
 <p>This package allows its users to simulate pedestrian behavior as expected by M4MA. Users can specify the environment, the characterstics the pedestrians, and the characteristics of the simulation itself (e.g., maximal number of agents, initial conditions,…), therefore allowing for a great variety of potential research questions that can be answered. For more information on the workflow of this package, see <em>Getting started</em>.</p>
-<p>An unofficial benchmark is available through the repository. This package depends heavily on the <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> package.</p>
+<p>This package depends heavily on the <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> package.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>One can install <code>predped</code> through <code>devtools</code> in the following way:</p>
+<p>One can install <code>predped</code> through the <code>remotes</code> package in the following way:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'devtools'</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'ndpvh/predped'</span>, auth_token <span class="op">=</span> <span class="st">"PERSONAL_ACCESS_TOKEN"</span><span class="op">)</span></span></code></pre></div>
-<p>Note that currently, <code>predped</code> is still a private package. This means that you should input your own personal access token to be able to download the package.</p>
-<p>It is also useful to be mindful of the dependencies of <code>predped</code>. Currently, it imports <code>matrixStats</code>, <code>methods</code>, <code>m4ma</code>, and <code>ggplot2</code>. Of these, <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> has also been developed by our lab.</p>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ndpvh/predped"</span><span class="op">)</span></span></code></pre></div>
+<p>To use the package, you should load it through <code>library</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>The explanation in this section will follow the code contained within <em>getting_started.R</em>. A more elaborate example of how to use the package is contained within <em>demo.R</em>. Both scripts adhere to the same workflow.</p>
-<p>Before you can get started, you should load the package:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">prepded</span><span class="op">)</span></span></code></pre></div>
+<p>Within <code>predped</code>, we use a particular workflow.</p>
 <p>In the first step, you should define the environment in which you want pedestrians to walk around. For this, you will use the <code>background</code> class. This S4 class contains slots for the <code>shape</code> (i.e., the shape of the room), the <code>objects</code> (i.e., which objects are contained within the room), and a potential <code>entrance</code> and/or <code>exit</code>. The <code>shape</code> and <code>objects</code> should all consist of instances of the <code>object</code> class, that is they should be either a <code>rectangle</code>, <code>polygon</code>, or <code>circle</code>. The <code>entrance</code>/<code>exit</code> should be instances of the <code>coordinate</code> class.</p>
 <p>A simple example of an environment is the following circular room with a square placed in the middle.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -155,9 +151,9 @@
 <p>The variable <code>plots</code> is a list containing a plot for each state in <code>trace</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p>The documentation of m4ma is build with <code>roxygen2</code> and <code>pkgdown</code> and is currently only locally available.</p>
+<p>You can find the documentation for this package <a href="https://ndpvh.github.io/predped" class="external-link">here</a>. If you encounter a bug, you can report the bug with a minimal working example as an <a href="https://github.com/ndpvh/predped/issues">Issue</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="contribute">Contribute<a class="anchor" aria-label="anchor" href="#contribute"></a>
@@ -240,6 +236,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
+<li><a href="https://github.com/ndpvh/predped/releases"><img src="https://img.shields.io/badge/version-v0.1.0-blue" alt="version"></a></li>
+<li><a href="https://ndpvh.github.io/predped" class="external-link"><img src="https://img.shields.io/badge/documentation-v0.1.0-blue" alt="documentation"></a></li>
 <li><a href="https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg" alt="build"></a></li>
 <li><a href="https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml"><img src="https://github.com/ndpvh/predped/actions/workflows/test-coverage.yaml/badge.svg" alt="coverage"></a></li>
 <li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="license: GPL v3"></a></li>

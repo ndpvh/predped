@@ -110,18 +110,42 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Initialize agent</span></span></span>
 <span class="r-in"><span><span class="va">my_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="agent-class.html">agent</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                  radius <span class="op">=</span> <span class="fl">0.25</span>, </span></span>
-<span class="r-in"><span>                  parameters <span class="op">=</span> <span class="fu">draw_parameters</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in draw_parameters(1):</span> could not find function "draw_parameters"</span>
+<span class="r-in"><span>                  parameters <span class="op">=</span> <span class="fu"><a href="generate_parameters.html">generate_parameters</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the parameters slot for the agent</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'parameters': object 'my_agent' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2489568     1.119115        1.206566  0.0959197      9765.43 9.677835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2317959         2            0.972154                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         9.419334                2   3.57686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        3.079064               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          2.580374                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change the parameters slot for the agent</span></span></span>
-<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">draw_parameters</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in draw_parameters(1):</span> could not find function "draw_parameters"</span>
+<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_parameters.html">generate_parameters</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'parameters': object 'my_agent' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2360799    0.9427001         1.28486 0.08026931     9921.571 9.522834</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius  0.227726         2            1.353963                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         10.50696                2  5.283771</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        2.029752               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          1.968734                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

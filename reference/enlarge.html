@@ -105,6 +105,10 @@ Works for all objects of the
 in all directions.</p></dd>
 
 
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Arguments passed on to the methods for the generic.</p></dd>
+
+
 <dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
 <dd><p>Logical denoting whether to use the R or Rcpp version of the
 function. Defaults to <code>TRUE</code>.</p></dd>
@@ -128,18 +132,18 @@ size.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create an object</span></span></span>
 <span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">size</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> no slot of name "size" for this object of class "circle"</span>
+<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">radius</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Increase the size of the object</span></span></span>
 <span class="r-in"><span><span class="va">larger_circle</span> <span class="op">&lt;-</span> <span class="fu">enlarge</span><span class="op">(</span><span class="va">my_circle</span>, extension <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">larger_circle</span><span class="op">@</span><span class="va">size</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> no slot of name "size" for this object of class "circle"</span>
+<span class="r-in"><span><span class="va">larger_circle</span><span class="op">@</span><span class="va">radius</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Decrease the size of the object</span></span></span>
 <span class="r-in"><span><span class="va">smaller_circle</span> <span class="op">&lt;-</span> <span class="fu">enlarge</span><span class="op">(</span><span class="va">my_circle</span>, extension <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">smaller_circle</span><span class="op">@</span><span class="va">size</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> no slot of name "size" for this object of class "circle"</span>
+<span class="r-in"><span><span class="va">smaller_circle</span><span class="op">@</span><span class="va">radius</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

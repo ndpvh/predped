@@ -73,7 +73,7 @@ Uses the predicted positions of the group members for this.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_angles_rcpp</span><span class="op">(</span></span>
 <span>  <span class="va">agent_idx</span>,</span>
-<span>  <span class="va">agent_groups</span>,</span>
+<span>  <span class="va">agent_group</span>,</span>
 <span>  <span class="va">position</span>,</span>
 <span>  <span class="va">orientation</span>,</span>
 <span>  <span class="va">predictions</span>,</span>
@@ -91,12 +91,22 @@ Uses the predicted positions of the group members for this.</p>
 matrix <code>p_pred</code>.</p></dd>
 
 
+<dt id="arg-agent-group">agent_group<a class="anchor" aria-label="anchor" href="#arg-agent-group"></a></dt>
+<dd><p>Numeric vector with the group membership of all
+pedestrians.</p></dd>
+
+
 <dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
 <dd><p>Numeric vector denoting the current position of the agent.</p></dd>
 
 
 <dt id="arg-orientation">orientation<a class="anchor" aria-label="anchor" href="#arg-orientation"></a></dt>
 <dd><p>Numeric denoting the current orientation of the agent.</p></dd>
+
+
+<dt id="arg-predictions">predictions<a class="anchor" aria-label="anchor" href="#arg-predictions"></a></dt>
+<dd><p>Numeric matrix with shape N x 2 containing predicted
+positions of all pedestrians that belong to the social group of the agent.</p></dd>
 
 
 <dt id="arg-centers">centers<a class="anchor" aria-label="anchor" href="#arg-centers"></a></dt>
@@ -110,16 +120,6 @@ group members (<code>TRUE</code>) – effectively saying that it doesn't matter
 which group member the agent can see, as long as they can see one – or
 whether to only consider the nearest group member (<code>FALSE</code>). Defaults
 to <code>TRUE</code>.</p></dd>
-
-
-<dt id="arg-agent-group">agent_group<a class="anchor" aria-label="anchor" href="#arg-agent-group"></a></dt>
-<dd><p>Numeric vector with the group membership of all
-pedestrians.</p></dd>
-
-
-<dt id="arg-p-pred">p_pred<a class="anchor" aria-label="anchor" href="#arg-p-pred"></a></dt>
-<dd><p>Numeric matrix with shape N x 2 containing predicted positions
-of all pedestrians that belong to the social group of the agent.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -80,7 +80,7 @@ M4MA-based estimations.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unpack_trace</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">trace</span>,</span>
 <span>  velocities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
 <span>  orientations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">72.5</span>, <span class="fl">50</span>, <span class="fl">32.5</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">350</span>, <span class="fl">340</span>, <span class="fl">327.5</span>, <span class="fl">310</span>, <span class="fl">287.5</span><span class="op">)</span>,</span>
 <span>    times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
@@ -94,11 +94,16 @@ M4MA-based estimations.</p>
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
+<dl><dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
+<dd><p>List of objects of the <code><a href="state-class.html">state-class</a></code></p></dd>
+
+
+<dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
 <dd><p>Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
 the cell positions that the agent might move to. Defaults to a matrix in
-which the columns contain <code>1.5</code> (acceleration), <code>1</code>, and <code>0.5</code>.</p></dd>
+which the columns contain <code>1.5</code> (acceleration), <code>1</code> (maintenance
+of speed), and <code>0.5</code> (deceleration).</p></dd>
 
 
 <dt id="arg-orientations">orientations<a class="anchor" aria-label="anchor" href="#arg-orientations"></a></dt>
@@ -122,8 +127,9 @@ to <code>TRUE</code>.</p></dd>
 to <code>0.5</code> (the same as in <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>).</p></dd>
 
 
-<dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
-<dd><p>List of objects of the <code><a href="state-class.html">state-class</a></code></p></dd>
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp (<code>TRUE</code>) or R
+(<code>FALSE</code>) version of this function. Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
 

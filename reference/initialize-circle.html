@@ -70,23 +70,21 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'circle'</span></span>
-<span><span class="fu">initialize</span><span class="op">(</span><span class="va">.Object</span>, forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">0</span>, ncol <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">initialize</span><span class="op">(</span></span>
+<span>  <span class="va">.Object</span>,</span>
+<span>  <span class="va">center</span>,</span>
+<span>  <span class="va">radius</span>,</span>
+<span>  forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">0</span>, ncol <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-forbidden">forbidden<a class="anchor" aria-label="anchor" href="#arg-forbidden"></a></dt>
-<dd><p>Numerical matrix containing the angles for which you cannot
-generate goals (in radians). These angles are computed in the Euclidian space
-and should be contained within the interval 0 and 2 * pi. Defaults to an
-empty matrix, making all angles worthy of goal generation.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to
-<code>initialize-object</code>.</p></dd>
+<dl><dt id="arg--object">.Object<a class="anchor" aria-label="anchor" href="#arg--object"></a></dt>
+<dd><p>For this class, should be left unspecified (see Example).</p></dd>
 
 
 <dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>
@@ -96,6 +94,18 @@ position of the circle</p></dd>
 
 <dt id="arg-radius">radius<a class="anchor" aria-label="anchor" href="#arg-radius"></a></dt>
 <dd><p>Numeric denoting the radius of the circle.</p></dd>
+
+
+<dt id="arg-forbidden">forbidden<a class="anchor" aria-label="anchor" href="#arg-forbidden"></a></dt>
+<dd><p>Numerical matrix containing the angles for which you cannot
+generate goals (in radians). These angles are computed in the Euclidian space
+and should be contained within the interval 0 and 2 * pi. Defaults to an
+empty matrix, making all angles worthy of goal generation.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments passed to
+<code>initialize-object</code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -114,16 +124,16 @@ position of the circle</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Initialize a circle</span></span></span>
 <span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"my circle"</span>, </span></span>
 <span class="r-in"><span>                    center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>                    size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .nextMethod(.Object, ...):</span> invalid name for slot of class “circle”: size</span>
+<span class="r-in"><span>                    radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access slots that are inherited from object and circle</span></span></span>
-<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">size</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_circle' not found</span>
-<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">points</span> </span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_circle' not found</span>
+<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">radius</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">center</span> </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class "coordinate"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0 0</span>
 <span class="r-in"><span><span class="va">my_circle</span><span class="op">@</span><span class="va">id</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_circle' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "my circle"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

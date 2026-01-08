@@ -82,7 +82,12 @@ aren't.</p>
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-state">state<a class="anchor" aria-label="anchor" href="#arg-state"></a></dt>
+<dl><dt id="arg-agent">agent<a class="anchor" aria-label="anchor" href="#arg-agent"></a></dt>
+<dd><p>Object of the <code><a href="agent-class.html">agent-class</a></code> or the
+<code><a href="object-class.html">object-class</a></code> (latter not yet supported).</p></dd>
+
+
+<dt id="arg-state">state<a class="anchor" aria-label="anchor" href="#arg-state"></a></dt>
 <dd><p>Object of the <code><a href="state-class.html">state-class</a></code> containing the
 current state.</p></dd>
 
@@ -94,11 +99,6 @@ current state.</p></dd>
 <dt id="arg-centers">centers<a class="anchor" aria-label="anchor" href="#arg-centers"></a></dt>
 <dd><p>Numerical matrix containing the coordinates at each position
 the object can be moved to. Should have one row for each cell.</p></dd>
-
-
-<dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>Object of the <code><a href="agent-class.html">agent-class</a></code> or the
-<code><a href="object-class.html">object-class</a></code> (latter not yet supported).</p></dd>
 
 </dl></div>
     <div id="value">
@@ -148,7 +148,8 @@ of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 <span class="r-in"><span>                  radius <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
 <span class="r-in"><span>                  speed <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                  orientation <span class="op">=</span> <span class="fl">0</span>,</span></span>
-<span class="r-in"><span>                  current_goal <span class="op">=</span> <span class="fu"><a href="goal-class.html">goal</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.01</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                  current_goal <span class="op">=</span> <span class="fu"><a href="goal-class.html">goal</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.01</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                      path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2.01</span>, <span class="fl">0</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">my_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="state-class.html">state</a></span><span class="op">(</span>iteration <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                  setting <span class="op">=</span> <span class="va">my_background</span>,</span></span>
@@ -166,7 +167,18 @@ of length 33 x 2. This corresponds to the 3 (change in speed) x 11
 <span class="r-in"><span>               <span class="va">my_background</span>,</span></span>
 <span class="r-in"><span>               <span class="va">centers</span>,</span></span>
 <span class="r-in"><span>               cpp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Row index is out of bounds: [index=0; row extent=0].</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        [,1]  [,2] [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  TRUE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  TRUE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] FALSE FALSE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] FALSE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  TRUE  TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  TRUE  TRUE TRUE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

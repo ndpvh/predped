@@ -73,7 +73,15 @@ randomly drawn from a list of options (if provided).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">change</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">change</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'goal'</span></span>
+<span><span class="fu">change</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  setting <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  goal_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  counter <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -83,6 +91,10 @@ randomly drawn from a list of options (if provided).</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>Object of <code><a href="goal-class.html">goal-class</a></code> which should be
 replaced by this function.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Arguments provided to the method implementations of the generic.</p></dd>
 
 
 <dt id="arg-setting">setting<a class="anchor" aria-label="anchor" href="#arg-setting"></a></dt>
@@ -96,10 +108,10 @@ from which the new goal should be chosen. Defaults to <code>NULL</code>, trigger
 the generation of a random goal.</p></dd>
 
 
-<dt id="arg-counter-generator">counter_generator<a class="anchor" aria-label="anchor" href="#arg-counter-generator"></a></dt>
+<dt id="arg-counter">counter<a class="anchor" aria-label="anchor" href="#arg-counter"></a></dt>
 <dd><p>Function that takes in no arguments and generates
 a single numerical value that will be used as the counter of the goal.
-See <code>generate_goal_stack</code> for details on this argument.
+See <code><a href="goal_stack.html">goal_stack</a></code> for details on this argument.
 Defaults to <code>\() rnorm(1, 10, 2)</code>.</p></dd>
 
 </dl></div>
@@ -115,7 +127,8 @@ Defaults to <code>\() rnorm(1, 10, 2)</code>.</p></dd>
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="background-class.html">background-class</a></code>
 <code><a href="goal-class.html">goal-class</a></code>
-<code>generate_goal_stack</code></p></div>
+<code><a href="goal_stack.html">goal_stack</a></code>
+<code><a href="multiple_goal_stacks.html">multiple_goal_stacks</a></code></p></div>
     </div>
 
     <div id="ref-examples">

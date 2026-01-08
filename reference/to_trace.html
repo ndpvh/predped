@@ -111,8 +111,52 @@ saved under "goal_x" and "goal_y", and their id to "goal_id".</p>
 containing the setting in which the data were gathered.</p></dd>
 
 
+<dt id="arg-b-turning-a-turning">b_turning, a_turning<a class="anchor" aria-label="anchor" href="#arg-b-turning-a-turning"></a></dt>
+<dd><p>Numeric denoting the values of the parameters
+\(b\) and \(a\) for the relationship between orientation and velocity.
+For more information, see the documentation of
+<code><a href="compute_centers.html">compute_centers</a></code>. Defaults to <code>NULL</code>, meaning that
+this relationship takes on the default values of <code>predped</code>.</p></dd>
+
+
+<dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
+<dd><p>Numeric vector denoting the changes in speeds as assumed by
+the M4MA. Defaults to <code>1.5</code> (acceleration), <code>1</code>, and <code>0.5</code>
+(deceleration).</p></dd>
+
+
+<dt id="arg-orientations">orientations<a class="anchor" aria-label="anchor" href="#arg-orientations"></a></dt>
+<dd><p>Numeric vector denoting the changes in orientation as
+assumed by the M4MA. Defaults to <code>72.5</code>, <code>50</code>, <code>32.5</code>,
+<code>20</code>, <code>10</code>, <code>0</code>, <code>350</code>, <code>340</code>, <code>327.5</code>,
+<code>310</code>, <code>287.5</code> (note that the larger angles are actually the
+negative symmetric versions of the smaller angles).</p></dd>
+
+
+<dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
+<dd><p>Numeric denoting the time between each iteration. Defaults
+to <code>0.5</code> (the same as in <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>).</p></dd>
+
+
+<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
+<dd><p>Numeric denoting under which observed value for speed the
+cell to which an agent has moved should be put to `0`. Defaults to a value
+based on the observed measurement error in our system.</p></dd>
+
+
+<dt id="arg-stay-stopped">stay_stopped<a class="anchor" aria-label="anchor" href="#arg-stay-stopped"></a></dt>
+<dd><p>Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Is needed
+to compute the utility variables accurately. Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp (<code>TRUE</code>) or R
+(<code>FALSE</code>) version of this function. Defaults to <code>TRUE</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Arguments passed to <code><a href="add_motion_variables.html">add_motion_variables</a></code>.</p></dd>
+<dd><p>Arguments passed to <code><a href="find_path.html">find_path</a></code>.</p></dd>
 
 </dl></div>
 

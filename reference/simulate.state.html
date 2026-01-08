@@ -150,6 +150,12 @@ in which the rows contain <code>72.5</code>, <code>50</code>, <code>32.5</code>,
 versions of the smaller angles).</p></dd>
 
 
+<dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
+<dd><p>Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
+<code>0.1</code>.</p></dd>
+
+
 <dt id="arg-close-enough">close_enough<a class="anchor" aria-label="anchor" href="#arg-close-enough"></a></dt>
 <dd><p>Numeric denoting how close (in radii) the agent needs to
 be to an object in order to interact with it. Defaults to <code>2</code>, meaning the
@@ -215,10 +221,63 @@ at the current iteration in the simulation. Defaults to 1, which
 represents each iteration to be reported.</p></dd>
 
 
+<dt id="arg-goal-number">goal_number<a class="anchor" aria-label="anchor" href="#arg-goal-number"></a></dt>
+<dd><p>Numeric, vector, or function that defines the number of
+goals the agents should accomplish. It's exact value is handled by
+<code><a href="determine_values.html">determine_values</a></code>. Defaults to <code>\(n) rnorm(n, 10, 2)</code>.</p></dd>
+
+
+<dt id="arg-goal-duration">goal_duration<a class="anchor" aria-label="anchor" href="#arg-goal-duration"></a></dt>
+<dd><p>Numeric, vector, or function that defines the duration of
+the goals of the agents. Defaults to <code>\(n) rnorm(n, 10, 2)</code>.</p></dd>
+
+
+<dt id="arg-precompute-goal-paths">precompute_goal_paths<a class="anchor" aria-label="anchor" href="#arg-precompute-goal-paths"></a></dt>
+<dd><p>Logical denoting whether to run the
+<code><a href="find_path.html">find_path</a></code> for each of the generated goals
+beforehand. Assumes that the agent does all of the goals in the order of the
+goal stack. Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-sort-goals">sort_goals<a class="anchor" aria-label="anchor" href="#arg-sort-goals"></a></dt>
+<dd><p>Logical denoting whether to order the goal stack in a logical
+way. Currently implemented in the following way. First, we select the first
+goal as being the one that is closest by the starting position provided in
+the argument <code>starting_position</code>. Then, we define each of the next goals
+as being the one that is closest to the position of the previous goal.
+Defaults to <code>TRUE</code>.</p></dd>
+
+
 <dt id="arg-adaptive-goal-sorting">adaptive_goal_sorting<a class="anchor" aria-label="anchor" href="#arg-adaptive-goal-sorting"></a></dt>
 <dd><p>Logical denoting whether agents have the ability
 to change the order of their goals adaptively throughout the simulation.
 Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-precomputed-goals">precomputed_goals<a class="anchor" aria-label="anchor" href="#arg-precomputed-goals"></a></dt>
+<dd><p>List of goal stacks from which the agent can be
+assigned one. Defaults to <code>NULL</code>, triggering the creation of goal stacks
+in the simulation.</p></dd>
+
+
+<dt id="arg-middle-edge">middle_edge<a class="anchor" aria-label="anchor" href="#arg-middle-edge"></a></dt>
+<dd><p>Logical denoting whether to sample the goals from the
+middle of the edge of the objects in the <code>link[predped]{background-class}</code>
+(<code>TRUE</code>) or to allow the goal locations to fall on all points on these
+edges (<code>FALSE</code>). Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
+<dd><p>Numeric denoting the position you would like to assign to an
+agent if they are added to the simulation. Defaults to <code>NULL</code>, making
+the agent start at the entrance. Note that this is an experimental feature
+that has not been tested yet, and therefore might not work for the moment.</p></dd>
+
+
+<dt id="arg-individual-differences">individual_differences<a class="anchor" aria-label="anchor" href="#arg-individual-differences"></a></dt>
+<dd><p>Logical denoting whether to use the standard
+deviations in the parameter list to create some variation in the parameters.
+Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
@@ -281,17 +340,16 @@ arguments.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Simulate the next state</span></span></span>
 <span class="r-in"><span><span class="va">next_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">my_state</span>,</span></span>
-<span class="r-in"><span>                       <span class="va">my_model</span>,</span></span>
+<span class="r-in"><span>                       model <span class="op">=</span> <span class="va">my_model</span>,</span></span>
 <span class="r-in"><span>                       add_agent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(object, ...):</span> Model is not defined. Cannot run simulation.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Check the number of agents in the next state</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">next_state</span><span class="op">@</span><span class="va">agents</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'next_state' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># If you wish to plot the new state, you can use the plot function.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">next_state</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'next_state' not found</span>
+<span class="r-plt img"><img src="simulate.state-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

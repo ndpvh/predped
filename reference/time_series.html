@@ -69,20 +69,25 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">time_series</span><span class="op">(</span><span class="va">x</span>, time_step <span class="op">=</span> <span class="fl">0.5</span>, cpp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">time_series</span><span class="op">(</span><span class="va">trace</span>, time_step <span class="op">=</span> <span class="fl">0.5</span>, cpp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
+<dl><dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
+<dd><p>List of objects of the <code><a href="state-class.html">state-class</a></code></p></dd>
+
+
+<dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
 <dd><p>Numeric denoting the time between each iteration. Defaults
 to <code>0.5</code> (the same as in <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>).</p></dd>
 
 
-<dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
-<dd><p>List of objects of the <code><a href="state-class.html">state-class</a></code></p></dd>
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp (<code>TRUE</code>) or R
+(<code>FALSE</code>) version of this function. Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
 

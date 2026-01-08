@@ -153,7 +153,7 @@ used when <code>precompute_goal_paths = TRUE</code>.</p></dd>
 <code><a href="compute_edges.html">compute_edges</a></code>
 <code><a href="create_edges.html">create_edges</a></code>
 <code><a href="determine_values.html">determine_values</a></code>
-<code><a href="multiple_goal_stack.html">multiple_goal_stacks</a></code></p></div>
+<code><a href="multiple_goal_stacks.html">multiple_goal_stacks</a></code></p></div>
     </div>
 
     <div id="ref-examples">
@@ -161,76 +161,42 @@ used when <code>precompute_goal_paths = TRUE</code>.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create a setting</span></span></span>
 <span class="r-in"><span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="background-class.html">background</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                                              size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>                            objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">cirlce</span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                            objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                                                  radius <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cirlce(center = c(0, 0), radius = 0.5):</span> could not find function "cirlce"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create a goal stack containing two goals</span></span></span>
-<span class="r-in"><span><span class="va">goal_stack</span> <span class="op">&lt;-</span> <span class="fu">goal_stack</span><span class="op">(</span><span class="fl">2</span>, <span class="va">my_background</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'name' in selecting a method for function 'objects': object 'my_background' not found</span>
+<span class="r-in"><span><span class="va">stack</span> <span class="op">&lt;-</span> <span class="fu">goal_stack</span><span class="op">(</span><span class="fl">2</span>, <span class="va">my_background</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Two goals</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">goal_stack</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-in"><span><span class="va">goal_stack</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function (n, setting, counter = function(n) rnorm(n, 10, 2), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sort = TRUE, starting_position = entrance(setting)[1, ], </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     precompute_goal_paths = FALSE, middle_edge = FALSE, ...) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     counter &lt;- determine_values(counter, n)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     idx &lt;- sapply(objects(setting), function(x) x@interactable)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     obj &lt;- objects(setting)[idx]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     if (length(obj) == 0) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         stop("None of the objects in the environment can contain a goal.")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     obj &lt;- sample(obj, n, replace = TRUE)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     goal_stack &lt;- lapply(seq_along(obj), function(i) add_goal(obj[[i]], </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         setting, counter = counter[i], middle_edge = middle_edge))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     if (sort &amp; length(goal_stack) &gt; 1 &amp; !is.null(starting_position)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         closest_goal &lt;- function(goal_stack, start) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             dist &lt;- sapply(goal_stack, function(x) (start[1] - </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 position(x)[1])^2 + (start[2] - position(x)[2])^2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             return(dist == min(dist))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         idx &lt;- closest_goal(goal_stack, starting_position)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         ordered_goal_stack &lt;- goal_stack[idx]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         goal_stack &lt;- goal_stack[!idx]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (length(goal_stack) != 0) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             for (i in seq_along(n)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 if (length(goal_stack) == 0) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   break</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 N &lt;- length(ordered_goal_stack)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 idx &lt;- closest_goal(goal_stack, position(ordered_goal_stack[[N]]))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 ordered_goal_stack &lt;- append(ordered_goal_stack, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   goal_stack[idx])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 goal_stack &lt;- goal_stack[!idx]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (length(goal_stack) != 0) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             ordered_goal_stack &lt;- append(ordered_goal_stack, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 goal_stack)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         goal_stack &lt;- ordered_goal_stack</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     if (!precompute_goal_paths | length(goal_stack) == 1) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         return(goal_stack)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     dummy &lt;- agent(center = c(0, 0), radius = 0.25)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in seq_along(goal_stack)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (i == 1) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             position(dummy) &lt;- starting_position</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             position(dummy) &lt;- position(goal_stack[[i - 1]])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         goal_stack[[i]]@path &lt;- find_path(goal_stack[[i]], dummy, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             setting, ...)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     return(goal_stack)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x55d14b8bb958&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:predped&gt;</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">stack</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-in"><span><span class="va">stack</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goal Attributes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> busy: FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> counter: 9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> done: FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal tpwnt </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> path:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> position: -0.4004846 -0.3157721 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> For more detailed information, please extract the wanted information from the background directly.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Goal Attributes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> busy: FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> counter: 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> done: FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id: goal kdxbw </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> path:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> position: 0.4129072 0.2993453 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> For more detailed information, please extract the wanted information from the background directly.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

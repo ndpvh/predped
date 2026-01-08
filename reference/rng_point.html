@@ -119,20 +119,21 @@ mentioned here, this method does work for this class of objects.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create an object</span></span></span>
-<span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Generate a point on the circumference of the circle without limitations</span></span></span>
+<span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                    radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">rng_point</span><span class="op">(</span><span class="va">my_circle</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8784941 0.4777532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.1443180  0.9895314</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate a point on the circumference of the circle with limitations, so </span></span></span>
 <span class="r-in"><span><span class="co"># that it cannot lie between the angles (0, pi/2) and (pi, 3 * pi/2), </span></span></span>
 <span class="r-in"><span><span class="co"># meaning the coordinate cannot have both positive or both negative values </span></span></span>
 <span class="r-in"><span><span class="co"># in its coordinates (one always has to be positive, the other negative).</span></span></span>
-<span class="r-in"><span><span class="fu">rng_point</span><span class="op">(</span><span class="va">my_circle</span>, </span></span>
-<span class="r-in"><span>          forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">pi</span>, <span class="fl">3</span> <span class="op">*</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rng_point(my_circle, forbidden = rbind(c(0, pi/2), c(pi, 3 *     pi/2))):</span> unused argument (forbidden = rbind(c(0, pi/2), c(pi, 3 * pi/2)))</span>
+<span class="r-in"><span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                    radius <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>                    forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                                      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">pi</span>, <span class="fl">3</span> <span class="op">*</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rng_point</span><span class="op">(</span><span class="va">my_circle</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.1086277 -0.9940825</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

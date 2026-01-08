@@ -89,6 +89,11 @@ between the edges that were created and the objects in the environment.</p>
 <dd><p>Numerical matrix of size N x 4 containing the coordinates of
 the line segments in order x_1, y_1, x_2, y_2.</p></dd>
 
+
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp alternative (<code>TRUE</code>)
+or the R alternative of this function (<code>FALSE</code>). Defaults to <code>TRUE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -114,8 +119,7 @@ same purposes as <code><a href="https://rdrr.io/pkg/m4ma/man/seesGoal_rcpp.html"
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Let's create a list of objects</span></span></span>
-<span class="r-in"><span><span class="va">objects</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(.Object, ...):</span> argument "center" is missing, with no default</span>
+<span class="r-in"><span><span class="va">objects</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create some segments that do and do not go though the objects in the </span></span></span>
 <span class="r-in"><span><span class="co"># background</span></span></span>
@@ -131,7 +135,7 @@ same purposes as <code><a href="https://rdrr.io/pkg/m4ma/man/seesGoal_rcpp.html"
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Do the test</span></span></span>
 <span class="r-in"><span><span class="fu">prune_edges</span><span class="op">(</span><span class="va">objects</span>, <span class="va">segments</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> unable to find an inherited method for function ‘line_intersection’ for signature ‘object = "name"’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  TRUE FALSE  TRUE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

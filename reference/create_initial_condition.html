@@ -123,6 +123,19 @@ object and the path points agents use in their strategy. Ignored if
 <code>precomputed_edges</code> is provided.</p></dd>
 
 
+<dt id="arg-precomputed-edges">precomputed_edges<a class="anchor" aria-label="anchor" href="#arg-precomputed-edges"></a></dt>
+<dd><p>Output of <code><a href="compute_edges.html">compute_edges</a></code>
+containing the nodes and edges the agent can use to plan its path. Defauls
+to <code>NULL</code>, triggering the creation of these edges whenever they are
+needed.</p></dd>
+
+
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp (<code>TRUE</code>) or R
+(<code>FALSE</code>) alternatives for the lower-level functions. Defaults to
+<code>TRUE</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments provided to <code><a href="add_agent.html">add_agent</a></code>.</p></dd>
 

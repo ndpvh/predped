@@ -88,9 +88,18 @@ under column names <code>"from"</code> and <code>"to"</code>, and their coordina
 <code>"from_x"</code>, <code>"from_y"</code>, <code>"to_x"</code>, and <code>"to_y"</code>.</p></dd>
 
 
-<dt id="arg-objects">objects<a class="anchor" aria-label="anchor" href="#arg-objects"></a></dt>
-<dd><p>List of objects that extend the
-<code><a href="object-class.html">object-class</a></code>.</p></dd>
+<dt id="arg-background">background<a class="anchor" aria-label="anchor" href="#arg-background"></a></dt>
+<dd><p>Object of the <code><a href="background-class.html">background-class</a></code>.</p></dd>
+
+
+<dt id="arg-space-between">space_between<a class="anchor" aria-label="anchor" href="#arg-space-between"></a></dt>
+<dd><p>Numeric denoting the space that should be left between
+an object and the created path points for the agents.</p></dd>
+
+
+<dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
+<dd><p>Logical denoting whether to use the Rcpp alternative (<code>TRUE</code>)
+or the R alternative of this function (<code>FALSE</code>). Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -116,13 +125,12 @@ coordinates under <code>"edges_with_coords"</code>.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Let's create a background</span></span></span>
-<span class="r-in"><span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="background-class.html">background</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="background-class.html">background</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                                              size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>                            objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                            objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                                                     size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(.Object, ...):</span> argument "center" is missing, with no default</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create some segments that do and do not go though the objects in the </span></span></span>
+<span class="r-in"><span><span class="co"># Create some segments that do and do not go through the objects in the </span></span></span>
 <span class="r-in"><span><span class="co"># background</span></span></span>
 <span class="r-in"><span><span class="va">potential_edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"node 1"</span>, <span class="st">"node 2"</span>, <span class="st">"node 3"</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>                              from_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.75</span>, <span class="op">-</span><span class="fl">0.75</span>, <span class="op">-</span><span class="fl">0.75</span><span class="op">)</span>, </span></span>
@@ -137,10 +145,13 @@ coordinates under <code>"edges_with_coords"</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 node 3  -0.75      0 node 6  0.95 0.95</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Only retain the edges that don't intersect the object</span></span></span>
-<span class="r-in"><span><span class="va">surviving_edges</span> <span class="op">&lt;-</span> <span class="fu">evaluate_edges</span><span class="op">(</span><span class="va">potential_edges</span>, <span class="va">my_background</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'name' in selecting a method for function 'objects': object 'my_background' not found</span>
+<span class="r-in"><span><span class="va">surviving_edges</span> <span class="op">&lt;-</span> <span class="fu">evaluate_edges</span><span class="op">(</span><span class="va">potential_edges</span>, </span></span>
+<span class="r-in"><span>                                  <span class="va">my_background</span>,</span></span>
+<span class="r-in"><span>                                  space_between <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">surviving_edges</span><span class="op">$</span><span class="va">edges_with_coords</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'surviving_edges' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     from from_x from_y     to  to_x to_y   cost</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 node 1  -0.75      0 node 4 -0.75 0.75 0.5625</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 node 3  -0.75      0 node 6  0.95 0.95 3.7925</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
