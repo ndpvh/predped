@@ -888,6 +888,7 @@ testthat::test_that(
             matrix(ncol = 3)
 
         # Loop over each of the combinations and each of the cell centers
+        tmp <- list()
         tst <- logical(nrow(combinations) * nrow(centers))
         idx <- 1
         for(i in seq_len(nrow(combinations))) {
@@ -915,9 +916,15 @@ testthat::test_that(
                 # some computational error)
                 diff <- centers_1 - centers_2
 
+                tmp[[idx]] <- as.numeric(diff)
+
                 tst[idx] <- all(abs(diff) < 1e-2)
                 idx <- idx + 1
             }
+        }
+
+        if(!all(tst)) {
+            print(tmp)
         }
 
         # Do the test
