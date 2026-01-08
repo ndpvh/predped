@@ -870,7 +870,7 @@ testthat::test_that(
         # Also create different starting positions, ensuring we're not missing 
         # anything
         centers <- cbind(
-            c(0, 1 * sin(seq(0, 2 * pi, pi/4))),
+            c(0, 1 * cos(seq(0, 2 * pi, pi/4))),
             c(0, 1 * sin(seq(0, 2 * pi, pi/4)))
         )
 
