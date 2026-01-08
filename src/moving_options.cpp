@@ -91,9 +91,9 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
     // Preallocate some variables, including the matrix in which the centers
     // will be saved
     NumericMatrix centers(velocities.length(), 2);
-    double slow = 0.;
-    double velocity = 0.;
-    double new_orientation = 0.;
+    // double slow = 0.;
+    // double velocity = 0.;
+    // double new_orientation = 0.;
 
     // Retrieve the current speed, orientation, and position of the agent
     NumericVector position = agent.slot("center");
@@ -108,13 +108,13 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
     for(int i = 0; i < velocities.length(); i++) {
         // Define a slowing factor that depends on the turning angle or change in
         // direction
-        slow = 1. - b * pow(sin(abs(angles[i]) / 2), a);
+        double slow = 1. - b * pow(sin(abs(angles[i]) / 2), a);
 
         // Adjust the velocity of the agent
-        velocity = speed * slow * velocities[i] * time_step;
+        double velocity = speed * slow * velocities[i] * time_step;
 
         // Compute the new orientation of the agent
-        new_orientation = orientation + angles[i];
+        double new_orientation = orientation + angles[i];
 
         // Compute the centers themselves
         centers(i, 0) = position[0] + velocity * cos(new_orientation);
