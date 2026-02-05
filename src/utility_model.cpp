@@ -495,7 +495,7 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
     NumericVector V(cell_distances.length());
     for(int i = 0; i < cell_distances.length(); i++) {
         if(optimal[i]) {
-            difference = std::abs(cell_distances[i] - optimal_distance);
+            difference = std::fabs(cell_distances[i] - optimal_distance);
             V[i] -= b_group_centroid * std::pow(difference, a_group_centroid);
         }
     }

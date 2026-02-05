@@ -70,7 +70,7 @@ LogicalVector line_line_intersection_rcpp(NumericMatrix segments_1,
                 u = -u;
             }
 
-            result[i * n + j] = (0 < t) && (t <= abs(t_max)) && (0 < u) && (u <= abs(u_max)); 
+            result[i * n + j] = (0 < t) && (t <= fabs(t_max)) && (0 < u) && (u <= fabs(u_max)); 
         }
     }
     
