@@ -101,122 +101,149 @@ library(predped)
 Within `predped`, we use a particular workflow.
 
 In the first step, you should define the environment in which you want
-pedestrians to walk around. For this, you will use the `background`
+pedestrians to walk around. For this, you will use the
+[`background`](https://ndpvh.github.io/reference/background-class.html)
 class. This S4 class contains slots for the `shape` (i.e., the shape of
 the room), the `objects` (i.e., which objects are contained within the
 room), and a potential `entrance` and/or `exit`. The `shape` and
-`objects` should all consist of instances of the `object` class, that is
-they should be either a `rectangle`, `polygon`, or `circle`. The
-`entrance`/`exit` should be instances of the `coordinate` class.
+`objects` should all consist of instances of the
+[`object`](https://ndpvh.github.io/reference/object-class.html) class,
+that is they should be either a
+[`rectangle`](https://ndpvh.github.io/reference/rectangle-class.html),
+[`polygon`](https://ndpvh.github.io/reference/polygon-class.html), or
+[`circle`](https://ndpvh.github.io/reference/circle-class.html). The
+`entrance`/`exit` should be either a numeric vector or a numeric matrix
+with two columns specifying their coordinates.
 
 A simple example of an environment is the following circular room with a
-square placed in the middle.
+square object placed in the middle:
 
 ``` r
-setting <- background(shape = circle(center = c(0, 0), 
-                                     radius = 2), 
-                      objects = list(rectangle(center = c(0, 0), 
-                                               size = c(1, 1), 
-                                               interactable = TRUE)),
-                      entrance = coordinate(c(-2, 0)),
-                      same_exit = TRUE)
+setting <- background(
+  shape = circle(
+    center = c(0, 0), 
+    radius = 2
+  ), 
+  objects = list(
+    rectangle(
+      center = c(0, 0), 
+      size = c(1, 1)
+    )
+  ),
+  entrance = c(-2, 0)
+)
 ```
 
-In this chunk of code, the argument `interactable = TRUE` makes sure
-that the square in the middle of the room can contain goals for the
-pedestrians to fulfill. If none of the objects in the `objects` list are
-interactable, then the model will not be able to run. The argument
-`same_exit` defines whether the entrance and exit are at the same
-coordinate. If `same_exit = FALSE`, then a coordinate for the exit
-should also be provided.
-
 It is good practice to visualize what the environment looks like. For
-this, we can use the `plot` function.
+this, we can use the
+[`plot`](https://ndpvh.github.io/reference/plot.html) function:
 
 ``` r
 plot(setting)
 ```
 
-Now that we have defined the environment in which pedestrians will walk
-around, we have to define the characteristics of the pedestrians and
-link these with the environment in what is called a `predped` model.
-This is another S4 class with slots `setting` (the environment we just
-created), `parameters` (dataframe of parameter values), `archetypes` (a
-character string of pedestrians to include), and `weights` (the
-probability of each archetype entering the room).
+![One sees a plot visualizing a circular room with a square gray object
+in the middle. This represents the room in which the agents will walk
+around if the room is used for a
+simulation.](reference/figures/README-unnamed-chunk-5-1.png)
 
-For legacy reasons, the current package works with a dataframe that
-contains parameter values for a given “class” of people. One such
-dataframe is provided by us in *archetypes.csv* and can be called in the
-package through the variable `params_archetypes`. As you can see, this
-dataframe consists of different parameter values, as well as a “name”
-and “color”. The provided color will be the color that is used to plot
-the pedestrians when plotting out the results of the simulation. The
-name is what will be used to distinguish between different parameter
-sets, and concerns the variable that is selected upon based on the
-values of `archetypes` in the `predped` model. For example, if we only
-wish to have a simulation with `"BaselineEuropean"`s, then we can
-specify the model like.
+Once an environment has been defined, on should link this environment
+with the characteristics of the agents who are expected to walk around
+in this environment. This is achieved through the definition of a
+[`predped`](https://ndpvh.github.io/reference/predped.html) model,
+another S4 class with slots `setting` (the environment we just created),
+`parameters` (dataframe of parameter values), `archetypes` (a character
+string of pedestrians to include), and `weights` (the probability of
+each archetype entering the room).
 
-``` r
-model <- predped(id = "my model", 
-                 setting = setting, 
-                 archetypes = "BaselineEuropean")
-```
-
-Of course, you are free to specify whichever combination of archetypes
-you wish. Note that if you use more than one archetype and you want the
-probability of entering the room to be different for each of those, you
-should also provide values to the `weights` slot.
-
-With the model defined, we can now finally simulate pedestrian movement.
-For this, we use the function `simulate` as follows.
+Agent characteristics are defined through a `data.frame` that contains
+parameter values for a given “class” of people. One such dataframe is
+provided by us in *archetypes.csv* and can be called in the package
+through the variable
+[`params_from_csv`](https://ndpvh.github.io/reference/params_from_csv.html)
+or through calling the function
+[`load_parameters()`](https://ndpvh.github.io/reference/load_parameters.html).
+In this example, we wish to use the `"BaselineEuropean"`, specifying the
+model as:
 
 ``` r
-trace <- simulate(model,
-                  max_agents = 25, 
-                  iterations = 50,
-                  plot_live = TRUE)
+model <- predped(
+  id = "my model", 
+  setting = setting, 
+  archetypes = "BaselineEuropean"
+)
 ```
 
-In this piece of code, we specify that within this simulation: - There
-can only be a maximum of 25 agents in the room; - It can only run for 50
-iterations; - We want the pedestrian movement to be plotted to our plot
-while running the simulation (disclaimer: This is useful, but runs
-significantly slower than when `plot_live = FALSE`).
-
-Once the simulation is done, the variable `trace` will be a list of
-different so-called intermediate “states” of the environment. Each state
-is another list containing the environment (under slot `setting`) and
-the pedestrians themselves (under slot `agents`). If you wish to
-visualize this trace, you can again use the `plot` function, this time
-with the additional argument `trace = TRUE`.
+Now that the model has been defined, we can now simulate pedestrian
+movement by calling the function
+[`simulate`](https://ndpvh.github.io/reference/simulate.html):
 
 ``` r
-plots <- plot(trace, 
-              trace = TRUE)
+set.seed(1)
+trace <- simulate(
+  model,
+  max_agents = 25, 
+  iterations = 50
+)
 ```
 
-The variable `plots` is a list containing a plot for each state in
-`trace`.
+The variable `trace` will be a list consisting of
+[`state`](https://ndpvh.github.io/reference/state.html)s of the
+environment, each state itself consisting of a copy of the environment
+(under slot `setting`) and of a list of pedestrians walking around in
+the environment (under slot `agents`). If you wish to visualize this
+trace, you can again use the
+[`plot`](https://ndpvh.github.io/reference/plot.html) function:
+
+``` r
+plots <- plot(
+  trace,
+  print_progress = FALSE
+)
+```
+
+The [`plot`](https://ndpvh.github.io/reference/plot.html) outputs a list
+of plots. For research purposes, it is useful to transform this list to
+a gif, which can be achieved by using the `gifski` package:
+
+``` r
+gifski::save_gif(
+  lapply(plots, print), 
+  file.path("readme.gif"),
+  delay = 1/10
+)
+#> [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/readme.gif"
+```
+
+Looking at the created `.gif` then gives us an idea of how the agents
+walked around in the room:
+
+![A .gif displaying how an agent comes in through the entrance on the
+left side, interacts with a goal on the left side of the object,
+completes it, and then moves to a next goal on the bottom side of the
+rectangle.](./readme.gif)
 
 ## Getting help
 
-You can find the documentation for this package
-[here](https://ndpvh.github.io/predped). If you encounter a bug, you can
-report the bug with a minimal working example as an
-[Issue](https://github.com/ndpvh/predped/issues).
+You can find the documentation for this package on its dedicated
+[documentation site](https://ndpvh.github.io/predped). This site
+includes additional information on the [theoretical
+background](https://ndpvh.github.io/predped/articles/theory.html), on
+[running
+minimal](https://ndpvh.github.io/predped/articles/simulation.html) and
+[advanced
+simulations](https://ndpvh.github.io/predped/articles/advanced_simulation.html),
+and on [estimating the model on
+data](https://ndpvh.github.io/predped/articles/estimation.html).
+
+If you encounter a bug, you can report the bug with a minimal working
+example as an [Issue](https://github.com/ndpvh/predped/issues).
 
 ## Contribute
 
-While this model already came far, there are still many gaps in the
-behaviors it can capture. Some of these are currently being implemented,
-such as queueing and walking in group. Others may be missing without us
-knowing. If you want to give us pointers as to which behaviors should be
-implemented next, or if you otherwise wish to contribute to this
-project, feel free to reach out to Niels Vanhasbroeck
-(<niels.vanhasbroeck@gmail.com>) and Andrew Heathcote
-(<ajheathcote@gmail.com>).
+If you otherwise wish to contribute to this project, feel free to reach
+out to Niels Vanhasbroeck (<niels.vanhasbroeck@gmail.com>) and Andrew
+Heathcote (<ajheathcote@gmail.com>).
 
 ## Credits
 

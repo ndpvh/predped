@@ -9,7 +9,7 @@ parameters to be used in simulation."><script type="text/javascript" async="" sr
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,9 +20,9 @@ parameters to be used in simulation."><script type="text/javascript" async="" sr
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-usage" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Usage</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/m4ma.html">M4MA</a></li>
-    <li><a class="dropdown-item" href="../articles/workflow.html">Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/simulation.html">Advanced Simulation</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/theory.html">Theoretical Background</a></li>
+    <li><a class="dropdown-item" href="../articles/simulation.html">Simulations</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_simulation.html">Advanced Simulations</a></li>
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -168,29 +168,29 @@ function.</p>
 <span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">generate_parameters</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      radius slowing_time preferred_speed randomness stop_utility   reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2497494    1.0290669        1.223390 0.12067322     9985.042 11.284263</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2529646    1.0321090        1.245826 0.07869997     9370.402  9.001964</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2553749    1.0508140        1.150269 0.12367257     9834.622  8.876580</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.2595961    1.1004671        1.224505 0.11996416     9769.105 10.081027</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2522666    0.8914884        1.255042 0.11684838    10076.284 10.562248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2476285    1.1082649        1.281888 0.10444394    10031.062  9.491371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2386299    1.0243900        1.229275 0.11267521    10340.805 10.480950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2370365    0.9893258        1.189598 0.07260163    10280.482  9.960191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.2585052    0.9661647        1.355738 0.11972814     9744.742 10.478425</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2485657    0.9122877        1.195922 0.09370872    10104.520 10.878481</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2351750         2           1.2336753                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.1541278         2           0.8154379                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2226909         2           1.0832204                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.1879825         2           1.1317461                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.1902989         2           0.8105162                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.1950871         2           0.9496390                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2421611         2           0.9580037                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.1652041         2           1.1813542                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.1982872         2           1.1537426                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2026871         2           0.9678876                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   blr_current_direction b_goal_direction a_goal_direction b_blocked a_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    10         8.461964                2  3.066141         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    10        10.901383                2  6.003480         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    10         9.680135                2  3.156509         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    10        10.767273                2  4.097720         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    10         9.500859                2  5.132192         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    10        11.705623                2  4.141124         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    10         8.420216                2  5.051235         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    10        10.210274                2  5.389299         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    10        10.629605                2  3.546915         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    10         9.793571                2  4.251361         2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   b_interpersonal a_interpersonal d_interpersonal b_preferred_speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.391249               2               0          1.912503</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        1.967896               2               0          1.729086</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        2.050794               2               0          1.337107</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        1.728848               2               0          2.096606</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        2.275155               2               0          2.274829</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.994146               2               0         1.9845856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        1.665658               2               0         0.8855753</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1.817663               2               0         1.6584604</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        2.335323               2               0         2.0701238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1.632801               2               0         2.1780386</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a_preferred_speed b_leader a_leader d_leader b_buddy a_buddy a_group_centroid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                 2        0        0        0       0       0                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                 2        0        0        0       0       0                0</span>

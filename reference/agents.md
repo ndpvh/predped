@@ -55,7 +55,7 @@ agents(my_state)
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
 #> group: 0 
-#> id: ymbwm 
+#> id: kxgzu 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]
@@ -111,7 +111,7 @@ agents(my_state)
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
 #> group: 0 
-#> id: aipjj 
+#> id: sdaym 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]

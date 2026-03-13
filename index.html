@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,9 +36,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-usage" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Usage</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-usage">
-<li><a class="dropdown-item" href="articles/m4ma.html">M4MA</a></li>
-    <li><a class="dropdown-item" href="articles/workflow.html">Workflow</a></li>
-    <li><a class="dropdown-item" href="articles/simulation.html">Advanced Simulation</a></li>
+<li><a class="dropdown-item" href="articles/theory.html">Theoretical Background</a></li>
+    <li><a class="dropdown-item" href="articles/simulation.html">Simulations</a></li>
+    <li><a class="dropdown-item" href="articles/advanced_simulation.html">Advanced Simulations</a></li>
     <li><a class="dropdown-item" href="articles/estimation.html">Estimation</a></li>
   </ul>
 </li>
@@ -101,49 +101,69 @@
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
 <p>Within <code>predped</code>, we use a particular workflow.</p>
-<p>In the first step, you should define the environment in which you want pedestrians to walk around. For this, you will use the <code>background</code> class. This S4 class contains slots for the <code>shape</code> (i.e., the shape of the room), the <code>objects</code> (i.e., which objects are contained within the room), and a potential <code>entrance</code> and/or <code>exit</code>. The <code>shape</code> and <code>objects</code> should all consist of instances of the <code>object</code> class, that is they should be either a <code>rectangle</code>, <code>polygon</code>, or <code>circle</code>. The <code>entrance</code>/<code>exit</code> should be instances of the <code>coordinate</code> class.</p>
-<p>A simple example of an environment is the following circular room with a square placed in the middle.</p>
+<p>In the first step, you should define the environment in which you want pedestrians to walk around. For this, you will use the <a href="https://ndpvh.github.io/reference/background-class.html" class="external-link"><code>background</code></a> class. This S4 class contains slots for the <code>shape</code> (i.e., the shape of the room), the <code>objects</code> (i.e., which objects are contained within the room), and a potential <code>entrance</code> and/or <code>exit</code>. The <code>shape</code> and <code>objects</code> should all consist of instances of the <a href="https://ndpvh.github.io/reference/object-class.html" class="external-link"><code>object</code></a> class, that is they should be either a <a href="https://ndpvh.github.io/reference/rectangle-class.html" class="external-link"><code>rectangle</code></a>, <a href="https://ndpvh.github.io/reference/polygon-class.html" class="external-link"><code>polygon</code></a>, or <a href="https://ndpvh.github.io/reference/circle-class.html" class="external-link"><code>circle</code></a>. The <code>entrance</code>/<code>exit</code> should be either a numeric vector or a numeric matrix with two columns specifying their coordinates.</p>
+<p>A simple example of an environment is the following circular room with a square object placed in the middle:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">setting</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/background-class.html">background</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fu"><a href="reference/circle-class.html">circle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
-<span>                                     radius <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>                      objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
-<span>                                               size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, </span>
-<span>                                               interactable <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                      entrance <span class="op">=</span> <span class="fu"><a href="reference/coordinate-class.html">coordinate</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                      same_exit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>In this chunk of code, the argument <code>interactable = TRUE</code> makes sure that the square in the middle of the room can contain goals for the pedestrians to fulfill. If none of the objects in the <code>objects</code> list are interactable, then the model will not be able to run. The argument <code>same_exit</code> defines whether the entrance and exit are at the same coordinate. If <code>same_exit = FALSE</code>, then a coordinate for the exit should also be provided.</p>
-<p>It is good practice to visualize what the environment looks like. For this, we can use the <code>plot</code> function.</p>
+<code class="sourceCode R"><span><span class="va">setting</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/background-class.html">background</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>    center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>    radius <span class="op">=</span> <span class="fl">2</span></span>
+<span>  <span class="op">)</span>, </span>
+<span>  objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  entrance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>It is good practice to visualize what the environment looks like. For this, we can use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">setting</span><span class="op">)</span></span></code></pre></div>
-<p>Now that we have defined the environment in which pedestrians will walk around, we have to define the characteristics of the pedestrians and link these with the environment in what is called a <code>predped</code> model. This is another S4 class with slots <code>setting</code> (the environment we just created), <code>parameters</code> (dataframe of parameter values), <code>archetypes</code> (a character string of pedestrians to include), and <code>weights</code> (the probability of each archetype entering the room).</p>
-<p>For legacy reasons, the current package works with a dataframe that contains parameter values for a given “class” of people. One such dataframe is provided by us in <em>archetypes.csv</em> and can be called in the package through the variable <code>params_archetypes</code>. As you can see, this dataframe consists of different parameter values, as well as a “name” and “color”. The provided color will be the color that is used to plot the pedestrians when plotting out the results of the simulation. The name is what will be used to distinguish between different parameter sets, and concerns the variable that is selected upon based on the values of <code>archetypes</code> in the <code>predped</code> model. For example, if we only wish to have a simulation with <code>"BaselineEuropean"</code>s, then we can specify the model like.</p>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;"></p>
+<p>Once an environment has been defined, on should link this environment with the characteristics of the agents who are expected to walk around in this environment. This is achieved through the definition of a <a href="https://ndpvh.github.io/reference/predped.html" class="external-link"><code>predped</code></a> model, another S4 class with slots <code>setting</code> (the environment we just created), <code>parameters</code> (dataframe of parameter values), <code>archetypes</code> (a character string of pedestrians to include), and <code>weights</code> (the probability of each archetype entering the room).</p>
+<p>Agent characteristics are defined through a <code>data.frame</code> that contains parameter values for a given “class” of people. One such dataframe is provided by us in <em>archetypes.csv</em> and can be called in the package through the variable <a href="https://ndpvh.github.io/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a> or through calling the function <a href="https://ndpvh.github.io/reference/load_parameters.html" class="external-link"><code>load_parameters()</code></a>. In this example, we wish to use the <code>"BaselineEuropean"</code>, specifying the model as:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predped-class.html">predped</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"my model"</span>, </span>
-<span>                 setting <span class="op">=</span> <span class="va">setting</span>, </span>
-<span>                 archetypes <span class="op">=</span> <span class="st">"BaselineEuropean"</span><span class="op">)</span></span></code></pre></div>
-<p>Of course, you are free to specify whichever combination of archetypes you wish. Note that if you use more than one archetype and you want the probability of entering the room to be different for each of those, you should also provide values to the <code>weights</code> slot.</p>
-<p>With the model defined, we can now finally simulate pedestrian movement. For this, we use the function <code>simulate</code> as follows.</p>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predped-class.html">predped</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="st">"my model"</span>, </span>
+<span>  setting <span class="op">=</span> <span class="va">setting</span>, </span>
+<span>  archetypes <span class="op">=</span> <span class="st">"BaselineEuropean"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Now that the model has been defined, we can now simulate pedestrian movement by calling the function <a href="https://ndpvh.github.io/reference/simulate.html" class="external-link"><code>simulate</code></a>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">model</span>,</span>
-<span>                  max_agents <span class="op">=</span> <span class="fl">25</span>, </span>
-<span>                  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>                  plot_live <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>In this piece of code, we specify that within this simulation: - There can only be a maximum of 25 agents in the room; - It can only run for 50 iterations; - We want the pedestrian movement to be plotted to our plot while running the simulation (disclaimer: This is useful, but runs significantly slower than when <code>plot_live = FALSE</code>).</p>
-<p>Once the simulation is done, the variable <code>trace</code> will be a list of different so-called intermediate “states” of the environment. Each state is another list containing the environment (under slot <code>setting</code>) and the pedestrians themselves (under slot <code>agents</code>). If you wish to visualize this trace, you can again use the <code>plot</code> function, this time with the additional argument <code>trace = TRUE</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  max_agents <span class="op">=</span> <span class="fl">25</span>, </span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The variable <code>trace</code> will be a list consisting of <a href="https://ndpvh.github.io/reference/state.html" class="external-link"><code>state</code></a>s of the environment, each state itself consisting of a copy of the environment (under slot <code>setting</code>) and of a list of pedestrians walking around in the environment (under slot <code>agents</code>). If you wish to visualize this trace, you can again use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trace</span>, </span>
-<span>              trace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>The variable <code>plots</code> is a list containing a plot for each state in <code>trace</code>.</p>
+<code class="sourceCode R"><span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">trace</span>,</span>
+<span>  print_progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> outputs a list of plots. For research purposes, it is useful to transform this list to a gif, which can be achieved by using the <code>gifski</code> package:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">gifski</span><span class="fu">::</span><span class="fu">save_gif</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">plots</span>, <span class="va">print</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"readme.gif"</span><span class="op">)</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/readme.gif"</span></span></code></pre></div>
+<p>Looking at the created <code>.gif</code> then gives us an idea of how the agents walked around in the room:</p>
+<p><img src="./readme.gif" alt="A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle." width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p>You can find the documentation for this package <a href="https://ndpvh.github.io/predped" class="external-link">here</a>. If you encounter a bug, you can report the bug with a minimal working example as an <a href="https://github.com/ndpvh/predped/issues">Issue</a>.</p>
+<p>You can find the documentation for this package on its dedicated <a href="https://ndpvh.github.io/predped" class="external-link">documentation site</a>. This site includes additional information on the <a href="https://ndpvh.github.io/predped/articles/theory.html" class="external-link">theoretical background</a>, on <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link">running minimal</a> and <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link">advanced simulations</a>, and on <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link">estimating the model on data</a>.</p>
+<p>If you encounter a bug, you can report the bug with a minimal working example as an <a href="https://github.com/ndpvh/predped/issues">Issue</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="contribute">Contribute<a class="anchor" aria-label="anchor" href="#contribute"></a>
 </h2>
-<p>While this model already came far, there are still many gaps in the behaviors it can capture. Some of these are currently being implemented, such as queueing and walking in group. Others may be missing without us knowing. If you want to give us pointers as to which behaviors should be implemented next, or if you otherwise wish to contribute to this project, feel free to reach out to Niels Vanhasbroeck (<a href="mailto:niels.vanhasbroeck@gmail.com" class="email">niels.vanhasbroeck@gmail.com</a>) and Andrew Heathcote (<a href="mailto:ajheathcote@gmail.com" class="email">ajheathcote@gmail.com</a>).</p>
+<p>If you otherwise wish to contribute to this project, feel free to reach out to Niels Vanhasbroeck (<a href="mailto:niels.vanhasbroeck@gmail.com" class="email">niels.vanhasbroeck@gmail.com</a>) and Andrew Heathcote (<a href="mailto:ajheathcote@gmail.com" class="email">ajheathcote@gmail.com</a>).</p>
 </div>
 <div class="section level2">
 <h2 id="credits">Credits<a class="anchor" aria-label="anchor" href="#credits"></a>
@@ -170,7 +190,7 @@
 <div class="section level2">
 <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a>
 </h2>
-<p>For more information on the project, please see its dedicated section on the lab website: <a href="https://www.ampl-psych.com/projects/minds-for-mobile-agents/" class="external-link">https://www.ampl-psych.com/projects/minds-for-mobile-agents/</a>.</p>
+<p>For more information on the project, please see its dedicated section on the lab website: <a href="https://www.ampl-psych.com/projects/minds-for-mobile-agents/" class="external-link uri">https://www.ampl-psych.com/projects/minds-for-mobile-agents/</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

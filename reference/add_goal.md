@@ -88,11 +88,11 @@ add_goal(my_background@objects[[1]],
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal qmfaa 
+#> id: goal lqeqm 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.3893627 -0.3293884 
+#> position: -0.1306111 -0.4929916 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 
@@ -103,11 +103,11 @@ add_goal(my_background@objects[[1]],
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal dgwxb 
+#> id: goal ewkad 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: -0.5070711 0 
+#> position: 0 -0.5070711 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 
@@ -119,7 +119,7 @@ add_goal(my_background@objects[[1]],
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal myucm 
+#> id: goal sifmm 
 #> path:
 #>      [,1] [,2]
 #> 

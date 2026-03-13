@@ -55,11 +55,11 @@ setting(my_state)
 #> Background Attributes 
 #> entrance: 
 #>      [,1] [,2]
-#> [1,]   -1    0
+#> [1,]    0    1
 #> 
-#> exit: -1 0 
+#> exit: 0 1 
 #>      [,1] [,2]
-#> [1,]   -1    0
+#> [1,]    0    1
 #> 
 #> limited_access (number): 0 
 #> objects (number): 1 

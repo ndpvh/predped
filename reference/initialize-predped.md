@@ -86,7 +86,7 @@ my_model <- predped(setting = my_background,
 
 # Access the two slots that were specified
 my_model@id
-#> [1] "model hzgsd"
+#> [1] "model efxwn"
 head(my_model@parameters)
 #> $params_archetypes
 #>               name          color radius slowing_time preferred_speed

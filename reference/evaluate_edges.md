@@ -86,4 +86,5 @@ surviving_edges <- evaluate_edges(potential_edges,
 head(surviving_edges$edges_with_coords)
 #>     from from_x from_y     to  to_x to_y   cost
 #> 1 node 1  -0.75      0 node 4 -0.75 0.75 0.5625
+#> 3 node 3  -0.75      0 node 6  0.95 0.95 3.7925
 ```

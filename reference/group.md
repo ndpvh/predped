@@ -42,12 +42,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the speed slot for the agent
 group(my_agent)
-#> cunkn 
+#> cwhwu 
 #>     1 
 
 # Change the speed slot for the agent
 group(my_agent) <- 2
 group(my_agent)
-#> cunkn 
+#> cwhwu 
 #>     2 
 ```

@@ -114,24 +114,24 @@ stack
 #> busy: FALSE 
 #> counter: 9 
 #> done: FALSE 
-#> id: goal tpwnt 
+#> id: goal qcvyr 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: -0.4004846 -0.3157721 
+#> position: 0.480211 -0.1717481 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 
 #> [[2]]
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 4 
+#> counter: 9 
 #> done: FALSE 
-#> id: goal kdxbw 
+#> id: goal hucjy 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.4129072 0.2993453 
+#> position: 0.267297 0.4343412 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 

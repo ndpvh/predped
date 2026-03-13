@@ -68,7 +68,7 @@ shape(my_background)
 #> numeric(0)
 #> 
 #> Slot "id":
-#> [1] "object otiti"
+#> [1] "object jisce"
 #> 
 #> Slot "moveable":
 #> [1] FALSE
@@ -92,7 +92,7 @@ shape(my_background)
 #> <0 x 0 matrix>
 #> 
 #> Slot "id":
-#> [1] "object bmxcw"
+#> [1] "object vtekd"
 #> 
 #> Slot "moveable":
 #> [1] FALSE

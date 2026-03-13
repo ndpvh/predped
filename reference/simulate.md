@@ -365,7 +365,7 @@ trace <- simulate(my_model,
                   iterations = 10,
                   add_agent_after = 5)
 #> 
-#> Precomputing edgesYour model: model kpmlg is being simulated           
+#> Precomputing edgesYour model: model qtgcu is being simulated           
 
 # Check some interesting statistics, such as the length of the trace and the
 # number of agents in the room.

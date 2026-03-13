@@ -48,7 +48,7 @@ current_goal(my_agent)
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal zwshw 
+#> id: goal mulxt 
 #> path:
 #>      [,1] [,2]
 #> 
@@ -63,7 +63,7 @@ current_goal(my_agent)
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal bqqij 
+#> id: goal lvmdh 
 #> path:
 #>      [,1] [,2]
 #> 

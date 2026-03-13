@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-usage" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Usage</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/m4ma.html">M4MA</a></li>
-    <li><a class="dropdown-item" href="../articles/workflow.html">Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/simulation.html">Advanced Simulation</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/theory.html">Theoretical Background</a></li>
+    <li><a class="dropdown-item" href="../articles/simulation.html">Simulations</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_simulation.html">Advanced Simulations</a></li>
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -91,15 +91,15 @@
 <span class="r-in"><span><span class="co"># Access the parameters slot for the agent</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2489568     1.119115        1.206566  0.0959197      9765.43 9.677835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2463262    0.9494592        1.263288  0.1623876     10192.85 8.657848</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2317959         2            0.972154                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1810312         2           0.9485869                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         9.419334                2   3.57686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         8.505427                2  4.412557</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        3.079064               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        1.926026               2               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius          2.580374                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          1.400041                 2        0        0        0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>
@@ -109,15 +109,15 @@
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_parameters.html">generate_parameters</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2360799    0.9427001         1.28486 0.08026931     9921.571 9.522834</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2538798    0.9946231        1.181065  0.1166939     10401.98 10.24248</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius  0.227726         2            1.353963                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1891056         2           0.9392615                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         10.50696                2  5.283771</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         11.93149                2  4.750318</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        2.029752               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        1.955604               2               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius          1.968734                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          2.585462                 2        0        0        0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>

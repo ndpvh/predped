@@ -42,12 +42,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the status slot for the agent
 status(my_agent)
-#>  zeahr 
+#>  iwqrj 
 #> "move" 
 
 # Change the status slot for the agent
 status(my_agent) <- "reroute"
 status(my_agent)
-#>     zeahr 
+#>     iwqrj 
 #> "reroute" 
 ```

@@ -80,26 +80,26 @@ goal_stack[[1]]
 #> [[1]]
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 13 
+#> counter: 11 
 #> done: FALSE 
-#> id: goal shgiz 
+#> id: goal nimgm 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.4810857 -0.1692824 
+#> position: 0.001633454 -0.5099974 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 
 #> [[2]]
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 9 
+#> counter: 11 
 #> done: FALSE 
-#> id: goal qmlio 
+#> id: goal qhtbj 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.3848236 -0.3346802 
+#> position: 0.206347 -0.4663914 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 
@@ -110,26 +110,26 @@ goal_stack[[2]]
 #> [[1]]
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 9 
+#> counter: 11 
 #> done: FALSE 
-#> id: goal pzrux 
+#> id: goal izhgu 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.4396041 -0.2585503 
+#> position: 0.1053587 -0.4989985 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 
 #> [[2]]
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 13 
+#> counter: 12 
 #> done: FALSE 
-#> id: goal ijagd 
+#> id: goal iqmvc 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: -0.3123016 -0.4031968 
+#> position: -0.3120898 0.4033608 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 #> 

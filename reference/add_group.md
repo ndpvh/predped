@@ -75,8 +75,8 @@ agents <- add_group(my_model,
 
 # Get id's, parameters, and number of goals
 sapply(agents, id)
-#>   shlcp   grzau   zbiyk   apwok   tayyj 
-#> "shlcp" "grzau" "zbiyk" "apwok" "tayyj" 
+#>   tkovh   hlcph   lxbgr   zauzb   iykap 
+#> "tkovh" "hlcph" "lxbgr" "zauzb" "iykap" 
 sapply(agents, parameters)
 #>                       [,1]  [,2]  [,3]  [,4]  [,5] 
 #> radius                0.25  0.25  0.25  0.25  0.25 

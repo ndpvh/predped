@@ -43,12 +43,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the color slot for the agent
 color(my_agent)
-#>   csahe 
+#>   mqnmk 
 #> "black" 
 
 # Change the color slot for the agent
 color(my_agent) <- "blue"
 color(my_agent)
-#>  csahe 
+#>  mqnmk 
 #> "blue" 
 ```

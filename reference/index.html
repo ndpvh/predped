@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-usage" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Usage</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/m4ma.html">M4MA</a></li>
-    <li><a class="dropdown-item" href="../articles/workflow.html">Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/simulation.html">Advanced Simulation</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-usage"><li><a class="dropdown-item" href="../articles/theory.html">Theoretical Background</a></li>
+    <li><a class="dropdown-item" href="../articles/simulation.html">Simulations</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_simulation.html">Advanced Simulations</a></li>
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -38,7 +38,7 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="classes">Classes<a class="anchor" aria-label="anchor" href="#classes"></a></h2>
 
 
 
@@ -49,80 +49,10 @@
 
       <dl><dt>
 
-          <code><a href="add_agent.html">add_agent()</a></code>
-
-        </dt>
-        <dd>Add a single agent to the simulation</dd>
-
-        <dt>
-
-          <code><a href="add_goal.html">add_goal()</a></code>
-
-        </dt>
-        <dd>Add a goal to an object</dd>
-
-        <dt>
-
-          <code><a href="add_group.html">add_group()</a></code>
-
-        </dt>
-        <dd>Add a group of agents to the simulation</dd>
-
-        <dt>
-
-          <code><a href="add_motion_variables.html">add_motion_variables()</a></code>
-
-        </dt>
-        <dd>Add motion variables to data</dd>
-
-        <dt>
-
-          <code><a href="add_nodes.html">add_nodes()</a></code>
-
-        </dt>
-        <dd>Add Nodes along the Outside or Inside of an Object</dd>
-
-        <dt>
-
-          <code><a href="adjust_edges.html">adjust_edges()</a></code>
-
-        </dt>
-        <dd>Adjust edges of graph to walk on</dd>
-
-        <dt>
-
           <code><a href="agent-class.html">agent-class</a></code> <code><a href="agent-class.html">agent</a></code>
 
         </dt>
         <dd>An S4 Class to Represent Agents.</dd>
-
-        <dt>
-
-          <code><a href="agents.html">agents()</a></code> <code><a href="agents.html">`agents&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>agents</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="agents_between_goal.html">agents_between_goal()</a></code>
-
-        </dt>
-        <dd>Find number of agents blocking agent</dd>
-
-        <dt>
-
-          <code><a href="archetypes.html">archetypes()</a></code> <code><a href="archetypes.html">`archetypes&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>archetypes</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="area.html">area()</a></code>
-
-        </dt>
-        <dd>Calculate the Area of an Object</dd>
 
         <dt>
 
@@ -133,115 +63,10 @@
 
         <dt>
 
-          <code><a href="benchmark.html">benchmark()</a></code>
-
-        </dt>
-        <dd>Benchmark the package</dd>
-
-        <dt>
-
-          <code><a href="best_angle.html">best_angle()</a></code>
-
-        </dt>
-        <dd>Look for the best direction to head in</dd>
-
-        <dt>
-
-          <code><a href="busy.html">busy()</a></code> <code><a href="busy.html">`busy&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>busy</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="cell.html">cell()</a></code> <code><a href="cell.html">`cell&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>cell</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="cell_centers.html">cell_centers()</a></code> <code><a href="cell_centers.html">`cell_centers&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>cell_centers</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="center.html">center()</a></code> <code><a href="center.html">`center&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>center</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="change.html">change()</a></code>
-
-        </dt>
-        <dd>Change a goal</dd>
-
-        <dt>
-
           <code><a href="circle-class.html">circle-class</a></code> <code><a href="circle-class.html">circle</a></code>
 
         </dt>
         <dd>An S4 Class to Represent Circle Objects</dd>
-
-        <dt>
-
-          <code><a href="color.html">color()</a></code> <code><a href="color.html">`color&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>color</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="combine_nodes.html">combine_nodes()</a></code>
-
-        </dt>
-        <dd>Make combinations of different nodes</dd>
-
-        <dt>
-
-          <code><a href="compute_centers.html">compute_centers()</a></code>
-
-        </dt>
-        <dd>Compute cell centers</dd>
-
-        <dt>
-
-          <code><a href="compute_centers_rcpp.html">compute_centers_rcpp()</a></code>
-
-        </dt>
-        <dd>Compute cell centers</dd>
-
-        <dt>
-
-          <code><a href="compute_edges.html">compute_edges()</a></code>
-
-        </dt>
-        <dd>Compute the edges within a given setting</dd>
-
-        <dt>
-
-          <code><a href="compute_limited_access.html">compute_limited_access()</a></code>
-
-        </dt>
-        <dd>Transform <code>segment</code>s to <code>polygon</code>s</dd>
-
-        <dt>
-
-          <code><a href="compute_utility_variables.html">compute_utility_variables(<i>&lt;agent&gt;</i>)</a></code> <code><a href="compute_utility_variables.html">compute_utility_variables(<i>&lt;data.frame&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Compute utility variables</dd>
-
-        <dt>
-
-          <code><a href="compute_utility_variables_rcpp.html">compute_utility_variables_rcpp()</a></code>
-
-        </dt>
-        <dd>Compute utility variables</dd>
 
         <dt>
 
@@ -252,220 +77,10 @@
 
         <dt>
 
-          <code><a href="counter.html">counter()</a></code> <code><a href="counter.html">`counter&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>counter</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="create_agent_specifications.html">create_agent_specifications()</a></code>
-
-        </dt>
-        <dd>Create agent specifications</dd>
-
-        <dt>
-
-          <code><a href="create_agent_specifications_rcpp.html">create_agent_specifications_rcpp()</a></code>
-
-        </dt>
-        <dd>Create agent specifications</dd>
-
-        <dt>
-
-          <code><a href="create_edges.html">create_edges()</a></code>
-
-        </dt>
-        <dd>Create edges of graph to walk on</dd>
-
-        <dt>
-
-          <code><a href="create_initial_condition.html">create_initial_condition()</a></code>
-
-        </dt>
-        <dd>Create initial condition</dd>
-
-        <dt>
-
-          <code><a href="create_nodes.html">create_nodes()</a></code>
-
-        </dt>
-        <dd>Create nodes that serve as path points</dd>
-
-        <dt>
-
-          <code><a href="current_goal.html">current_goal()</a></code> <code><a href="current_goal.html">`current_goal&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>current_goal</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="determine_values.html">determine_values()</a></code>
-
-        </dt>
-        <dd>Determine iterated values from various arguments</dd>
-
-        <dt>
-
-          <code><a href="distance_group_centroid.html">distance_group_centroid()</a></code>
-
-        </dt>
-        <dd>Distances to group centroid</dd>
-
-        <dt>
-
-          <code><a href="distance_group_centroid_rcpp.html">distance_group_centroid_rcpp()</a></code>
-
-        </dt>
-        <dd>Distances to group centroid</dd>
-
-        <dt>
-
-          <code><a href="done.html">done()</a></code> <code><a href="done.html">`done&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>done</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="enlarge.html">enlarge()</a></code>
-
-        </dt>
-        <dd>Make an Object Larger</dd>
-
-        <dt>
-
-          <code><a href="entrance.html">entrance()</a></code> <code><a href="entrance.html">`entrance&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>entrance</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="evaluate_edges.html">evaluate_edges()</a></code>
-
-        </dt>
-        <dd>Evaluate whether edges pass through objects</dd>
-
-        <dt>
-
-          <code><a href="exit.html">exit()</a></code> <code><a href="exit.html">`exit&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>exit</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="find_class.html">find_class()</a></code>
-
-        </dt>
-        <dd>Find all objects of a given class</dd>
-
-        <dt>
-
-          <code><a href="find_path.html">find_path()</a></code>
-
-        </dt>
-        <dd>Find path to a goal</dd>
-
-        <dt>
-
-          <code><a href="forbidden.html">forbidden()</a></code> <code><a href="forbidden.html">`forbidden&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>forbidden</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="from.html">from()</a></code> <code><a href="from.html">`from&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>from</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="gc_utility.html">gc_utility()</a></code>
-
-        </dt>
-        <dd>Group centroid utility</dd>
-
-        <dt>
-
-          <code><a href="gc_utility_rcpp.html">gc_utility_rcpp()</a></code>
-
-        </dt>
-        <dd>Group centroid utility</dd>
-
-        <dt>
-
-          <code><a href="generate_parameters.html">generate_parameters()</a></code>
-
-        </dt>
-        <dd>Generate parameters</dd>
-
-        <dt>
-
-          <code><a href="get_angles.html">get_angles()</a></code>
-
-        </dt>
-        <dd>Angle between agent and group members</dd>
-
-        <dt>
-
-          <code><a href="get_angles_rcpp.html">get_angles_rcpp()</a></code>
-
-        </dt>
-        <dd>Angle between agent and group members</dd>
-
-        <dt>
-
           <code><a href="goal-class.html">goal-class</a></code> <code><a href="goal-class.html">goal</a></code>
 
         </dt>
         <dd>An S4 Class to Represent Goals</dd>
-
-        <dt>
-
-          <code><a href="goal_stack.html">goal_stack()</a></code>
-
-        </dt>
-        <dd>Generate a goal stack</dd>
-
-        <dt>
-
-          <code><a href="goals.html">goals()</a></code> <code><a href="goals.html">`goals&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>goals</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="group.html">group()</a></code> <code><a href="group.html">`group&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>group</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="id.html">id()</a></code> <code><a href="id.html">`id&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>id</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="in_object.html">in_object()</a></code>
-
-        </dt>
-        <dd>Check Whether a Point Lies Within an Object</dd>
-
-        <dt>
-
-          <code><a href="in_object_rcpp.html">in_object_rcpp()</a></code>
-
-        </dt>
-        <dd>Check Whether a Point Lies Within an Object</dd>
 
         <dt>
 
@@ -546,227 +161,10 @@
 
         <dt>
 
-          <code><a href="interact.html">interact()</a></code>
-
-        </dt>
-        <dd>Interact with goal</dd>
-
-        <dt>
-
-          <code><a href="intersects.html">intersects()</a></code>
-
-        </dt>
-        <dd>Check whether an Object intersects with Other Object</dd>
-
-        <dt>
-
-          <code><a href="iteration.html">iteration()</a></code> <code><a href="iteration.html">`iteration&lt;-`()</a></code> <code><a href="iteration.html">`iteration_variables&lt;-`(<i>&lt;state&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>iteration</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="iteration_variables.html">iteration_variables()</a></code> <code><a href="iteration_variables.html">`iteration_variables&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>iteration_variables</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="limit_access.html">limit_access()</a></code>
-
-        </dt>
-        <dd>Compute which segments can be crossed</dd>
-
-        <dt>
-
-          <code><a href="limited_access.html">limited_access()</a></code> <code><a href="limited_access.html">`limited_access&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>limited_access</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="line_intersection.html">line_intersection()</a></code>
-
-        </dt>
-        <dd>Check whether an Object intersects with Line Segments</dd>
-
-        <dt>
-
-          <code><a href="line_line_intersection.html">line_line_intersection()</a></code>
-
-        </dt>
-        <dd>Compute the line-line intersection between several segments. Is a vectorized function with minimal loss of time when the number of segments to test increases.</dd>
-
-        <dt>
-
-          <code><a href="line_line_intersection_rcpp.html">line_line_intersection_rcpp()</a></code>
-
-        </dt>
-        <dd>Rcpp version of line_line_intersection. Computes the between several segments. Is a vectorized function with minimal loss of time when the number of segments to test increases.</dd>
-
-        <dt>
-
-          <code><a href="load_parameters.html">load_parameters()</a></code>
-
-        </dt>
-        <dd>Load parameters</dd>
-
-        <dt>
-
-          <code><a href="mll.html">mll()</a></code>
-
-        </dt>
-        <dd>Compute the min-log-likelihood</dd>
-
-        <dt>
-
-          <code><a href="mll_rcpp.html">mll_rcpp()</a></code>
-
-        </dt>
-        <dd>Compute the min-log-likelihood</dd>
-
-        <dt>
-
-          <code><a href="move.html">move()</a></code>
-
-        </dt>
-        <dd>Move object to new location</dd>
-
-        <dt>
-
-          <code><a href="moving_options.html">moving_options()</a></code>
-
-        </dt>
-        <dd>Check where an object can be moved to</dd>
-
-        <dt>
-
-          <code><a href="moving_options_rcpp.html">moving_options_rcpp()</a></code>
-
-        </dt>
-        <dd>Check where an object can be moved to</dd>
-
-        <dt>
-
-          <code><a href="multiple_goal_stacks.html">multiple_goal_stacks()</a></code>
-
-        </dt>
-        <dd>Generate multiple goal stacks</dd>
-
-        <dt>
-
-          <code><a href="nodes_on_circumference.html">nodes_on_circumference()</a></code>
-
-        </dt>
-        <dd>Add Nodes on the Circumference of an Object</dd>
-
-        <dt>
-
-          <code><a href="nodes_on_circumference_rcpp.html">nodes_on_circumference_rcpp()</a></code>
-
-        </dt>
-        <dd>Add Nodes on the Circumference of an Object</dd>
-
-        <dt>
-
           <code><a href="object-class.html">object-class</a></code>
 
         </dt>
         <dd>An S4 Abstract Base Class to Represent Objects</dd>
-
-        <dt>
-
-          <code><a href="objects.html">`objects&lt;-`()</a></code> <code><a href="objects.html">objects(<i>&lt;background&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>objects</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="orientation.html">orientation()</a></code> <code><a href="orientation.html">`orientation&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>orientation</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="out_object.html">out_object()</a></code>
-
-        </dt>
-        <dd>Check Whether a Point Lies Outside of an Object</dd>
-
-        <dt>
-
-          <code><a href="overlap_with_objects.html">overlap_with_objects()</a></code>
-
-        </dt>
-        <dd>Check agent and object overlap</dd>
-
-        <dt>
-
-          <code><a href="overlap_with_objects_rcpp.html">overlap_with_objects_rcpp()</a></code>
-
-        </dt>
-        <dd>Check agent and object overlap</dd>
-
-        <dt>
-
-          <code><a href="parameters.html">parameters()</a></code> <code><a href="parameters.html">`parameters&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>parameters</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="params_from_csv.html">params_from_csv</a></code>
-
-        </dt>
-        <dd>Default Parameter List</dd>
-
-        <dt>
-
-          <code><a href="path.html">path()</a></code> <code><a href="path.html">`path&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>path</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="perpendicular_orientation.html">perpendicular_orientation()</a></code>
-
-        </dt>
-        <dd>Find the perpendicular orientation</dd>
-
-        <dt>
-
-          <code><a href="plot.html">plot(<i>&lt;agent&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;background&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;list&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;object&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;segment&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;state&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot an object</dd>
-
-        <dt>
-
-          <code><a href="plot_distribution.html">plot_distribution()</a></code>
-
-        </dt>
-        <dd>Plot prior parameter distributions</dd>
-
-        <dt>
-
-          <code><a href="plot_edges.html">plot_edges()</a></code>
-
-        </dt>
-        <dd>Plot the edges in a <code><a href="https://rdrr.io/pkg/predped/man/background-class.html" class="external-link">background-class</a></code></dd>
-
-        <dt>
-
-          <code><a href="points.html">`points&lt;-`()</a></code> <code><a href="points.html">points(<i>&lt;polygon&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;rectangle&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;circle&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;segment&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>points</code>-slot</dd>
 
         <dt>
 
@@ -777,59 +175,10 @@
 
         <dt>
 
-          <code><a href="position.html">position()</a></code> <code><a href="position.html">`position&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>position</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="potential_agents.html">potential_agents()</a></code> <code><a href="potential_agents.html">`potential_agents&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>potential_agents</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="predict_movement.html">predict_movement()</a></code>
-
-        </dt>
-        <dd>Predict agents' movement</dd>
-
-        <dt>
-
-          <code><a href="predict_movement_rcpp.html">predict_movement_rcpp()</a></code>
-
-        </dt>
-        <dd>Predict agents' movement</dd>
-
-        <dt>
-
           <code><a href="predped-class.html">predped-class</a></code> <code><a href="predped-class.html">predped</a></code>
 
         </dt>
         <dd>An S4 Class to Represent the M4MA model.</dd>
-
-        <dt>
-
-          <code><a href="prune_edges.html">prune_edges()</a></code>
-
-        </dt>
-        <dd>Evaluate intersections with objects</dd>
-
-        <dt>
-
-          <code><a href="radius.html">radius()</a></code> <code><a href="radius.html">`radius&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>radius</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="raycasting.html">raycasting()</a></code>
-
-        </dt>
-        <dd>Raycasting algorithm</dd>
 
         <dt>
 
@@ -840,20 +189,6 @@
 
         <dt>
 
-          <code><a href="rng_point.html">rng_point()</a></code>
-
-        </dt>
-        <dd>Sample a Random Point on the Circumference</dd>
-
-        <dt>
-
-          <code><a href="rotate.html">rotate()</a></code>
-
-        </dt>
-        <dd>Rotate object around center</dd>
-
-        <dt>
-
           <code><a href="segment-class.html">segment-class</a></code> <code><a href="segment-class.html">segment</a></code>
 
         </dt>
@@ -861,17 +196,26 @@
 
         <dt>
 
-          <code><a href="setting.html">setting()</a></code> <code><a href="setting.html">`setting&lt;-`()</a></code>
+          <code><a href="state-class.html">state-class</a></code> <code><a href="state-class.html">state</a></code>
 
         </dt>
-        <dd>Getter/Setter for the <code>setting</code>-slot</dd>
+        <dd>An S4 Class to Represent the State</dd>
+      </dl></div><div class="section level2">
+      <h2 id="general-methods">General Methods<a class="anchor" aria-label="anchor" href="#general-methods"></a></h2>
 
-        <dt>
 
-          <code><a href="shape.html">shape()</a></code> <code><a href="shape.html">`shape&lt;-`()</a></code>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plot.html">plot(<i>&lt;agent&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;background&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;list&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;object&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;segment&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;state&gt;</i>)</a></code>
 
         </dt>
-        <dd>Getter/Setter for the <code>shape</code>-slot</dd>
+        <dd>Plot an object</dd>
 
         <dt>
 
@@ -900,6 +244,180 @@
 
         </dt>
         <dd>Show method for the <code><a href="https://rdrr.io/pkg/predped/man/predped-class.html" class="external-link">predped-class</a></code></dd>
+      </dl></div><div class="section level2">
+      <h2 id="object-manipulation">Object Manipulation<a class="anchor" aria-label="anchor" href="#object-manipulation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="add_nodes.html">add_nodes()</a></code>
+
+        </dt>
+        <dd>Add Nodes along the Outside or Inside of an Object</dd>
+
+        <dt>
+
+          <code><a href="area.html">area()</a></code>
+
+        </dt>
+        <dd>Calculate the Area of an Object</dd>
+
+        <dt>
+
+          <code><a href="enlarge.html">enlarge()</a></code>
+
+        </dt>
+        <dd>Make an Object Larger</dd>
+
+        <dt>
+
+          <code><a href="in_object.html">in_object()</a></code>
+
+        </dt>
+        <dd>Check Whether a Point Lies Within an Object</dd>
+
+        <dt>
+
+          <code><a href="in_object_rcpp.html">in_object_rcpp()</a></code>
+
+        </dt>
+        <dd>Check Whether a Point Lies Within an Object</dd>
+
+        <dt>
+
+          <code><a href="intersects.html">intersects()</a></code>
+
+        </dt>
+        <dd>Check whether an Object intersects with Other Object</dd>
+
+        <dt>
+
+          <code><a href="line_intersection.html">line_intersection()</a></code>
+
+        </dt>
+        <dd>Check whether an Object intersects with Line Segments</dd>
+
+        <dt>
+
+          <code><a href="move.html">move()</a></code>
+
+        </dt>
+        <dd>Move object to new location</dd>
+
+        <dt>
+
+          <code><a href="nodes_on_circumference.html">nodes_on_circumference()</a></code>
+
+        </dt>
+        <dd>Add Nodes on the Circumference of an Object</dd>
+
+        <dt>
+
+          <code><a href="nodes_on_circumference_rcpp.html">nodes_on_circumference_rcpp()</a></code>
+
+        </dt>
+        <dd>Add Nodes on the Circumference of an Object</dd>
+
+        <dt>
+
+          <code><a href="out_object.html">out_object()</a></code>
+
+        </dt>
+        <dd>Check Whether a Point Lies Outside of an Object</dd>
+
+        <dt>
+
+          <code><a href="rng_point.html">rng_point()</a></code>
+
+        </dt>
+        <dd>Sample a Random Point on the Circumference</dd>
+
+        <dt>
+
+          <code><a href="rotate.html">rotate()</a></code>
+
+        </dt>
+        <dd>Rotate object around center</dd>
+      </dl></div><div class="section level2">
+      <h2 id="goal-manipulation">Goal Manipulation<a class="anchor" aria-label="anchor" href="#goal-manipulation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="add_goal.html">add_goal()</a></code>
+
+        </dt>
+        <dd>Add a goal to an object</dd>
+
+        <dt>
+
+          <code><a href="change.html">change()</a></code>
+
+        </dt>
+        <dd>Change a goal</dd>
+
+        <dt>
+
+          <code><a href="goal_stack.html">goal_stack()</a></code>
+
+        </dt>
+        <dd>Generate a goal stack</dd>
+
+        <dt>
+
+          <code><a href="interact.html">interact()</a></code>
+
+        </dt>
+        <dd>Interact with goal</dd>
+
+        <dt>
+
+          <code><a href="multiple_goal_stacks.html">multiple_goal_stacks()</a></code>
+
+        </dt>
+        <dd>Generate multiple goal stacks</dd>
+      </dl></div><div class="section level2">
+      <h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="add_agent.html">add_agent()</a></code>
+
+        </dt>
+        <dd>Add a single agent to the simulation</dd>
+
+        <dt>
+
+          <code><a href="add_group.html">add_group()</a></code>
+
+        </dt>
+        <dd>Add a group of agents to the simulation</dd>
+
+        <dt>
+
+          <code><a href="create_initial_condition.html">create_initial_condition()</a></code>
+
+        </dt>
+        <dd>Create initial condition</dd>
 
         <dt>
 
@@ -914,111 +432,6 @@
 
         </dt>
         <dd>Simulate a single state for the M4MA</dd>
-
-        <dt>
-
-          <code><a href="size.html">size()</a></code> <code><a href="size.html">`size&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>size</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="speed.html">speed()</a></code> <code><a href="speed.html">`speed&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>speed</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="state-class.html">state-class</a></code> <code><a href="state-class.html">state</a></code>
-
-        </dt>
-        <dd>An S4 Class to Represent the State</dd>
-
-        <dt>
-
-          <code><a href="status.html">status()</a></code> <code><a href="status.html">`status&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>status</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="time_series.html">time_series()</a></code>
-
-        </dt>
-        <dd>Transform trace to time-series</dd>
-
-        <dt>
-
-          <code><a href="time_series_rcpp.html">time_series_rcpp()</a></code>
-
-        </dt>
-        <dd>Transform trace to time-series</dd>
-
-        <dt>
-
-          <code><a href="to.html">to()</a></code> <code><a href="to.html">`to&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>to</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="to_bounded.html">to_bounded()</a></code>
-
-        </dt>
-        <dd>Transform to positive axis</dd>
-
-        <dt>
-
-          <code><a href="to_covariance.html">to_covariance()</a></code>
-
-        </dt>
-        <dd>Transform user-provided matrix to covariance matrix</dd>
-
-        <dt>
-
-          <code><a href="to_trace.html">to_trace()</a></code>
-
-        </dt>
-        <dd>Transform data to a trace</dd>
-
-        <dt>
-
-          <code><a href="to_unbounded.html">to_unbounded()</a></code>
-
-        </dt>
-        <dd>Transform to real axis</dd>
-
-        <dt>
-
-          <code><a href="transform_df.html">transform_df()</a></code>
-
-        </dt>
-        <dd>Transform to dataframe of segments</dd>
-
-        <dt>
-
-          <code><a href="transform_mu.html">transform_mu()</a></code>
-
-        </dt>
-        <dd>Transform nest association to precision (mu)</dd>
-
-        <dt>
-
-          <code><a href="unpack_trace.html">unpack_trace()</a></code>
-
-        </dt>
-        <dd>Transform trace to comprehensive data.frame</dd>
-
-        <dt>
-
-          <code><a href="unpack_trace_rcpp.html">unpack_trace_rcpp()</a></code>
-
-        </dt>
-        <dd>Transform trace to comprehensive data.frame</dd>
 
         <dt>
 
@@ -1047,6 +460,245 @@
 
         </dt>
         <dd>Update the Position of an Agent</dd>
+      </dl></div><div class="section level2">
+      <h2 id="estimation">Estimation<a class="anchor" aria-label="anchor" href="#estimation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="mll.html">mll()</a></code>
+
+        </dt>
+        <dd>Compute the min-log-likelihood</dd>
+
+        <dt>
+
+          <code><a href="mll_rcpp.html">mll_rcpp()</a></code>
+
+        </dt>
+        <dd>Compute the min-log-likelihood</dd>
+      </dl></div><div class="section level2">
+      <h2 id="movement">Movement<a class="anchor" aria-label="anchor" href="#movement"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="agents_between_goal.html">agents_between_goal()</a></code>
+
+        </dt>
+        <dd>Find number of agents blocking agent</dd>
+
+        <dt>
+
+          <code><a href="best_angle.html">best_angle()</a></code>
+
+        </dt>
+        <dd>Look for the best direction to head in</dd>
+
+        <dt>
+
+          <code><a href="compute_centers.html">compute_centers()</a></code>
+
+        </dt>
+        <dd>Compute cell centers</dd>
+
+        <dt>
+
+          <code><a href="compute_centers_rcpp.html">compute_centers_rcpp()</a></code>
+
+        </dt>
+        <dd>Compute cell centers</dd>
+
+        <dt>
+
+          <code><a href="moving_options.html">moving_options()</a></code>
+
+        </dt>
+        <dd>Check where an object can be moved to</dd>
+
+        <dt>
+
+          <code><a href="moving_options_rcpp.html">moving_options_rcpp()</a></code>
+
+        </dt>
+        <dd>Check where an object can be moved to</dd>
+
+        <dt>
+
+          <code><a href="overlap_with_objects.html">overlap_with_objects()</a></code>
+
+        </dt>
+        <dd>Check agent and object overlap</dd>
+
+        <dt>
+
+          <code><a href="overlap_with_objects_rcpp.html">overlap_with_objects_rcpp()</a></code>
+
+        </dt>
+        <dd>Check agent and object overlap</dd>
+
+        <dt>
+
+          <code><a href="predict_movement.html">predict_movement()</a></code>
+
+        </dt>
+        <dd>Predict agents' movement</dd>
+
+        <dt>
+
+          <code><a href="predict_movement_rcpp.html">predict_movement_rcpp()</a></code>
+
+        </dt>
+        <dd>Predict agents' movement</dd>
+      </dl></div><div class="section level2">
+      <h2 id="routing">Routing<a class="anchor" aria-label="anchor" href="#routing"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="adjust_edges.html">adjust_edges()</a></code>
+
+        </dt>
+        <dd>Adjust edges of graph to walk on</dd>
+
+        <dt>
+
+          <code><a href="compute_edges.html">compute_edges()</a></code>
+
+        </dt>
+        <dd>Compute the edges within a given setting</dd>
+
+        <dt>
+
+          <code><a href="compute_limited_access.html">compute_limited_access()</a></code>
+
+        </dt>
+        <dd>Transform <code>segment</code>s to <code>polygon</code>s</dd>
+
+        <dt>
+
+          <code><a href="create_edges.html">create_edges()</a></code>
+
+        </dt>
+        <dd>Create edges of graph to walk on</dd>
+
+        <dt>
+
+          <code><a href="create_nodes.html">create_nodes()</a></code>
+
+        </dt>
+        <dd>Create nodes that serve as path points</dd>
+
+        <dt>
+
+          <code><a href="evaluate_edges.html">evaluate_edges()</a></code>
+
+        </dt>
+        <dd>Evaluate whether edges pass through objects</dd>
+
+        <dt>
+
+          <code><a href="find_path.html">find_path()</a></code>
+
+        </dt>
+        <dd>Find path to a goal</dd>
+
+        <dt>
+
+          <code><a href="limit_access.html">limit_access()</a></code>
+
+        </dt>
+        <dd>Compute which segments can be crossed</dd>
+
+        <dt>
+
+          <code><a href="prune_edges.html">prune_edges()</a></code>
+
+        </dt>
+        <dd>Evaluate intersections with objects</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utility-framework">Utility Framework<a class="anchor" aria-label="anchor" href="#utility-framework"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="compute_utility_variables.html">compute_utility_variables(<i>&lt;agent&gt;</i>)</a></code> <code><a href="compute_utility_variables.html">compute_utility_variables(<i>&lt;data.frame&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Compute utility variables</dd>
+
+        <dt>
+
+          <code><a href="compute_utility_variables_rcpp.html">compute_utility_variables_rcpp()</a></code>
+
+        </dt>
+        <dd>Compute utility variables</dd>
+
+        <dt>
+
+          <code><a href="distance_group_centroid.html">distance_group_centroid()</a></code>
+
+        </dt>
+        <dd>Distances to group centroid</dd>
+
+        <dt>
+
+          <code><a href="distance_group_centroid_rcpp.html">distance_group_centroid_rcpp()</a></code>
+
+        </dt>
+        <dd>Distances to group centroid</dd>
+
+        <dt>
+
+          <code><a href="gc_utility.html">gc_utility()</a></code>
+
+        </dt>
+        <dd>Group centroid utility</dd>
+
+        <dt>
+
+          <code><a href="gc_utility_rcpp.html">gc_utility_rcpp()</a></code>
+
+        </dt>
+        <dd>Group centroid utility</dd>
+
+        <dt>
+
+          <code><a href="get_angles.html">get_angles()</a></code>
+
+        </dt>
+        <dd>Angle between agent and group members</dd>
+
+        <dt>
+
+          <code><a href="get_angles_rcpp.html">get_angles_rcpp()</a></code>
+
+        </dt>
+        <dd>Angle between agent and group members</dd>
 
         <dt>
 
@@ -1078,20 +730,6 @@
 
         <dt>
 
-          <code><a href="utility_variables.html">utility_variables()</a></code> <code><a href="utility_variables.html">`utility_variables&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>utility_variables</code>-slot</dd>
-
-        <dt>
-
-          <code><a href="variables.html">variables()</a></code> <code><a href="variables.html">`variables&lt;-`()</a></code>
-
-        </dt>
-        <dd>Getter/Setter for the <code>variables</code>-slot</dd>
-
-        <dt>
-
           <code><a href="vf_utility_continuous.html">vf_utility_continuous()</a></code>
 
         </dt>
@@ -1110,6 +748,476 @@
 
         </dt>
         <dd>Discrete visual field utility</dd>
+      </dl></div><div class="section level2">
+      <h2 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="generate_parameters.html">generate_parameters()</a></code>
+
+        </dt>
+        <dd>Generate parameters</dd>
+
+        <dt>
+
+          <code><a href="load_parameters.html">load_parameters()</a></code>
+
+        </dt>
+        <dd>Load parameters</dd>
+
+        <dt>
+
+          <code><a href="params_from_csv.html">params_from_csv</a></code>
+
+        </dt>
+        <dd>Default Parameter List</dd>
+
+        <dt>
+
+          <code><a href="plot_distribution.html">plot_distribution()</a></code>
+
+        </dt>
+        <dd>Plot prior parameter distributions</dd>
+
+        <dt>
+
+          <code><a href="to_bounded.html">to_bounded()</a></code>
+
+        </dt>
+        <dd>Transform to positive axis</dd>
+
+        <dt>
+
+          <code><a href="to_covariance.html">to_covariance()</a></code>
+
+        </dt>
+        <dd>Transform user-provided matrix to covariance matrix</dd>
+
+        <dt>
+
+          <code><a href="to_unbounded.html">to_unbounded()</a></code>
+
+        </dt>
+        <dd>Transform to real axis</dd>
+
+        <dt>
+
+          <code><a href="transform_mu.html">transform_mu()</a></code>
+
+        </dt>
+        <dd>Transform nest association to precision (mu)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="add_motion_variables.html">add_motion_variables()</a></code>
+
+        </dt>
+        <dd>Add motion variables to data</dd>
+
+        <dt>
+
+          <code><a href="time_series.html">time_series()</a></code>
+
+        </dt>
+        <dd>Transform trace to time-series</dd>
+
+        <dt>
+
+          <code><a href="time_series_rcpp.html">time_series_rcpp()</a></code>
+
+        </dt>
+        <dd>Transform trace to time-series</dd>
+
+        <dt>
+
+          <code><a href="to_trace.html">to_trace()</a></code>
+
+        </dt>
+        <dd>Transform data to a trace</dd>
+
+        <dt>
+
+          <code><a href="unpack_trace.html">unpack_trace()</a></code>
+
+        </dt>
+        <dd>Transform trace to comprehensive data.frame</dd>
+
+        <dt>
+
+          <code><a href="unpack_trace_rcpp.html">unpack_trace_rcpp()</a></code>
+
+        </dt>
+        <dd>Transform trace to comprehensive data.frame</dd>
+      </dl></div><div class="section level2">
+      <h2 id="helper-functions">Helper Functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="benchmark.html">benchmark()</a></code>
+
+        </dt>
+        <dd>Benchmark the package</dd>
+
+        <dt>
+
+          <code><a href="combine_nodes.html">combine_nodes()</a></code>
+
+        </dt>
+        <dd>Make combinations of different nodes</dd>
+
+        <dt>
+
+          <code><a href="create_agent_specifications.html">create_agent_specifications()</a></code>
+
+        </dt>
+        <dd>Create agent specifications</dd>
+
+        <dt>
+
+          <code><a href="create_agent_specifications_rcpp.html">create_agent_specifications_rcpp()</a></code>
+
+        </dt>
+        <dd>Create agent specifications</dd>
+
+        <dt>
+
+          <code><a href="determine_values.html">determine_values()</a></code>
+
+        </dt>
+        <dd>Determine iterated values from various arguments</dd>
+
+        <dt>
+
+          <code><a href="find_class.html">find_class()</a></code>
+
+        </dt>
+        <dd>Find all objects of a given class</dd>
+
+        <dt>
+
+          <code><a href="line_line_intersection.html">line_line_intersection()</a></code>
+
+        </dt>
+        <dd>Compute the line-line intersection between several segments. Is a vectorized function with minimal loss of time when the number of segments to test increases.</dd>
+
+        <dt>
+
+          <code><a href="line_line_intersection_rcpp.html">line_line_intersection_rcpp()</a></code>
+
+        </dt>
+        <dd>Rcpp version of line_line_intersection. Computes the between several segments. Is a vectorized function with minimal loss of time when the number of segments to test increases.</dd>
+
+        <dt>
+
+          <code><a href="perpendicular_orientation.html">perpendicular_orientation()</a></code>
+
+        </dt>
+        <dd>Find the perpendicular orientation</dd>
+
+        <dt>
+
+          <code><a href="plot_edges.html">plot_edges()</a></code>
+
+        </dt>
+        <dd>Plot the edges in a <code><a href="https://rdrr.io/pkg/predped/man/background-class.html" class="external-link">background-class</a></code></dd>
+
+        <dt>
+
+          <code><a href="raycasting.html">raycasting()</a></code>
+
+        </dt>
+        <dd>Raycasting algorithm</dd>
+
+        <dt>
+
+          <code><a href="transform_df.html">transform_df()</a></code>
+
+        </dt>
+        <dd>Transform to dataframe of segments</dd>
+      </dl></div><div class="section level2">
+      <h2 id="getters-and-setters">Getters and Setters<a class="anchor" aria-label="anchor" href="#getters-and-setters"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="agents.html">agents()</a></code> <code><a href="agents.html">`agents&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>agents</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="archetypes.html">archetypes()</a></code> <code><a href="archetypes.html">`archetypes&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>archetypes</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="busy.html">busy()</a></code> <code><a href="busy.html">`busy&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>busy</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="cell.html">cell()</a></code> <code><a href="cell.html">`cell&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>cell</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="cell_centers.html">cell_centers()</a></code> <code><a href="cell_centers.html">`cell_centers&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>cell_centers</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="center.html">center()</a></code> <code><a href="center.html">`center&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>center</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="color.html">color()</a></code> <code><a href="color.html">`color&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>color</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="counter.html">counter()</a></code> <code><a href="counter.html">`counter&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>counter</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="current_goal.html">current_goal()</a></code> <code><a href="current_goal.html">`current_goal&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>current_goal</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="done.html">done()</a></code> <code><a href="done.html">`done&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>done</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="entrance.html">entrance()</a></code> <code><a href="entrance.html">`entrance&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>entrance</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="exit.html">exit()</a></code> <code><a href="exit.html">`exit&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>exit</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="forbidden.html">forbidden()</a></code> <code><a href="forbidden.html">`forbidden&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>forbidden</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="from.html">from()</a></code> <code><a href="from.html">`from&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>from</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="goals.html">goals()</a></code> <code><a href="goals.html">`goals&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>goals</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="group.html">group()</a></code> <code><a href="group.html">`group&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>group</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="id.html">id()</a></code> <code><a href="id.html">`id&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>id</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="iteration.html">iteration()</a></code> <code><a href="iteration.html">`iteration&lt;-`()</a></code> <code><a href="iteration.html">`iteration_variables&lt;-`(<i>&lt;state&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>iteration</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="iteration_variables.html">iteration_variables()</a></code> <code><a href="iteration_variables.html">`iteration_variables&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>iteration_variables</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="limited_access.html">limited_access()</a></code> <code><a href="limited_access.html">`limited_access&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>limited_access</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="objects.html">`objects&lt;-`()</a></code> <code><a href="objects.html">objects(<i>&lt;background&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>objects</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="orientation.html">orientation()</a></code> <code><a href="orientation.html">`orientation&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>orientation</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="parameters.html">parameters()</a></code> <code><a href="parameters.html">`parameters&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>parameters</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="path.html">path()</a></code> <code><a href="path.html">`path&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>path</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="points.html">`points&lt;-`()</a></code> <code><a href="points.html">points(<i>&lt;polygon&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;rectangle&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;circle&gt;</i>)</a></code> <code><a href="points.html">points(<i>&lt;segment&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>points</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="position.html">position()</a></code> <code><a href="position.html">`position&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>position</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="potential_agents.html">potential_agents()</a></code> <code><a href="potential_agents.html">`potential_agents&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>potential_agents</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="radius.html">radius()</a></code> <code><a href="radius.html">`radius&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>radius</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="setting.html">setting()</a></code> <code><a href="setting.html">`setting&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>setting</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="shape.html">shape()</a></code> <code><a href="shape.html">`shape&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>shape</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="size.html">size()</a></code> <code><a href="size.html">`size&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>size</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="speed.html">speed()</a></code> <code><a href="speed.html">`speed&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>speed</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="status.html">status()</a></code> <code><a href="status.html">`status&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>status</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="to.html">to()</a></code> <code><a href="to.html">`to&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>to</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="utility_variables.html">utility_variables()</a></code> <code><a href="utility_variables.html">`utility_variables&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>utility_variables</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="variables.html">variables()</a></code> <code><a href="variables.html">`variables&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>variables</code>-slot</dd>
 
         <dt>
 
@@ -1125,7 +1233,8 @@
         </dt>
         <dd>Getter/Setter for the <code>weights</code>-slot</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

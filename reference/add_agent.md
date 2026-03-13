@@ -151,52 +151,52 @@ my_model <- predped(setting = my_background,
 my_agent <- add_agent(my_model, goal_number = 5)
 my_agent
 #> Agent Attributes 
-#> center: 0.6925 3.765789e-17 
+#> center: -0.6925 0 
 #> cell: 0 
-#> color: cornflowerblue 
-#> current_goal: (a) position: 0.5070711 0.05405127 (b) path: 0.5070711 0.05405127 
+#> color: goldenrod 
+#> current_goal: (a) position: -0.5070711 -0.2293804 (b) path: -0.5070711 -0.2293804 
 #> goals (number): 4 
 #> group: 1 
-#> id: aglvi 
-#> orientation: 180 
+#> id: aaglv 
+#> orientation: 0 
 #> parameters: 
-#>                           [,1]
-#> radius                    0.25
-#> slowing_time              1.00
-#> preferred_speed           1.25
-#> randomness                0.10
-#> stop_utility          10000.00
-#> reroute                  10.00
-#> b_turning                 0.20
-#> a_turning                 2.00
-#> b_current_direction       1.00
-#> a_current_direction       2.00
-#> blr_current_direction    10.00
-#> b_goal_direction         10.00
-#> a_goal_direction          2.00
-#> b_blocked                 4.00
-#> a_blocked                 2.00
-#> b_interpersonal           2.00
-#> a_interpersonal           2.00
-#> d_interpersonal           0.00
-#> b_preferred_speed         2.00
-#> a_preferred_speed         2.00
-#> b_leader                  0.00
-#> a_leader                  0.00
-#> d_leader                  0.00
-#> b_buddy                   0.00
-#> a_buddy                   0.00
-#> a_group_centroid          0.00
-#> b_group_centroid          0.00
-#> b_visual_field            0.00
-#> central                   0.00
-#> non_central               0.00
-#> acceleration              0.00
-#> constant_speed            0.00
-#> deceleration              0.00
+#>                          [,1]
+#> radius                   0.25
+#> slowing_time             1.00
+#> preferred_speed          1.00
+#> randomness               5.00
+#> stop_utility          1000.00
+#> reroute                 20.00
+#> b_turning                0.20
+#> a_turning                2.00
+#> b_current_direction      1.00
+#> a_current_direction      2.00
+#> blr_current_direction    0.10
+#> b_goal_direction        10.00
+#> a_goal_direction         2.00
+#> b_blocked                4.00
+#> a_blocked                2.00
+#> b_interpersonal          1.00
+#> a_interpersonal          2.00
+#> d_interpersonal          0.00
+#> b_preferred_speed        1.00
+#> a_preferred_speed        2.00
+#> b_leader                 1.00
+#> a_leader                 2.00
+#> d_leader                 0.00
+#> b_buddy                  0.00
+#> a_buddy                  0.00
+#> a_group_centroid         0.00
+#> b_group_centroid         0.00
+#> b_visual_field           0.00
+#> central                  0.00
+#> non_central              0.00
+#> acceleration             0.00
+#> constant_speed           0.00
+#> deceleration             0.00
 #> 
 #> radius: 0.25 
-#> speed: 0.125 
+#> speed: 0.1 
 #> status: move 
 #> 
 #> For more detailed information, please extract the wanted information from the agent directly.

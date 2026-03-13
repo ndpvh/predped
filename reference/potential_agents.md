@@ -56,7 +56,7 @@ potential_agents(my_state)
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
 #> group: 0 
-#> id: nivpp 
+#> id: uarcl 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]
@@ -112,7 +112,7 @@ potential_agents(my_state)
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
 #> group: 0 
-#> id: amcex 
+#> id: nwzdg 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]

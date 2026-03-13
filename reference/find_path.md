@@ -168,5 +168,5 @@ find_path(my_goal,
           my_agent,
           my_background)
 #>              x         y
-#> [1,] -0.205821 0.4666237
+#> [1,] 0.3169533 0.3995505
 ```

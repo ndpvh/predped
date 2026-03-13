@@ -57,7 +57,7 @@ objects(my_background)
 #> <0 x 0 matrix>
 #> 
 #> Slot "id":
-#> [1] "object hpivm"
+#> [1] "object ouong"
 #> 
 #> Slot "moveable":
 #> [1] FALSE
@@ -86,7 +86,7 @@ objects(my_background)
 #> <0 x 0 matrix>
 #> 
 #> Slot "id":
-#> [1] "object nyzbp"
+#> [1] "object dwccm"
 #> 
 #> Slot "moveable":
 #> [1] FALSE
