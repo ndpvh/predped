@@ -918,7 +918,7 @@ testthat::test_that(
 
                 tmp[[idx]] <- c(range(diff), dummy@center)
 
-                tst[idx] <- all(abs(diff) < 1e-2)
+                tst[idx] <- all(abs(diff) < 1e-4)
                 idx <- idx + 1
             }
         }

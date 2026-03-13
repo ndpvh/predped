@@ -286,7 +286,7 @@ setMethod("simulate", "predped", function(object,
     if((is.null(initial_agents) & is.null(initial_condition)) & !is.null(initial_number_agents)) {
         initial_agents <- create_initial_condition(initial_number_agents,
                                                    object,
-                                                   goal_number = goal_number[1:initial_number_agents],
+                                                   goal_number = goal_number[1],
                                                    goal_duration = goal_duration,
                                                    middle_edge = middle_edge,
                                                    standing_start = standing_start,
