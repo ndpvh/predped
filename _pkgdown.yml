@@ -24,9 +24,12 @@ repo:
 
 navbar:
   structure:
-    left: [reference, articles]
+    left: [reference, getting_started, articles]
     right: [search, github, lightswitch]
   components:
+    getting_started:
+      text: Getting Started
+      href: articles/getting_started.html
     articles:
       text: Usage
       menu:
