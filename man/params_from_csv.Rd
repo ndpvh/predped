@@ -147,4 +147,5 @@ decisions pedestrians make when walking around in an environment, namely:
 \code{\link[predped]{utility-agent}}
 \code{\link[predped]{utility-data.frame}}
 }
+\concept{parameters}
 \keyword{datasets}

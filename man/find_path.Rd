@@ -133,3 +133,4 @@ find_path(my_goal,
 \code{\link[predped]{compute_edges}}
 \code{\link[predped]{create_edges}}
 }
+\concept{routing}

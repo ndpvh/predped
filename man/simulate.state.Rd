@@ -220,3 +220,4 @@ plot(next_state)
 \code{\link[predped]{simulate}},
 \code{\link[predped]{update}}
 }
+\concept{simulation}

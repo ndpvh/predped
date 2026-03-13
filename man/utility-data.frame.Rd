@@ -37,3 +37,4 @@ options.
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{update_position}}
 }
+\concept{utility}

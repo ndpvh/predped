@@ -77,3 +77,4 @@ id(my_agent)
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 }
+\concept{getter}

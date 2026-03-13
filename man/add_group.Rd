@@ -65,3 +65,4 @@ sapply(agents, \(x) length(goals(x)))
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}}
 }
+\concept{simulation}

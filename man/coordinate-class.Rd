@@ -21,3 +21,4 @@ flexibility of the low-level functions.
 \code{\link[predped]{rotate}},
 \code{\link[predped]{initialize-coordinate}}
 }
+\concept{classes}

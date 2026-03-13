@@ -41,3 +41,4 @@ speed(my_agent)
 \seealso{
 \code{\link[predped]{agent-class}}
 }
+\concept{getter}

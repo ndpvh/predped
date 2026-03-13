@@ -55,3 +55,4 @@ prune_edges(objects, segments)
 \code{\link[predped]{evaluate_edges}},
 \code{\link[predped]{line_intersection}}
 }
+\concept{routing}

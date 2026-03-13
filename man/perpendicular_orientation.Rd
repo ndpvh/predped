@@ -22,3 +22,4 @@ point on an edge of the background's shape and going inwards. The point on the
 edge is chosen to be the entrance to the space. Is used to find in what 
 orientation the agents should be heading when entering the space.
 }
+\concept{helper}

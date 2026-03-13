@@ -46,3 +46,4 @@ exit(my_background)
 \seealso{
 \code{\link[predped]{background-class}}
 }
+\concept{getter}

@@ -44,6 +44,8 @@ setGeneric("utility", function(object, ...) standardGeneric("utility"))
 #' 
 #' @rdname utility-agent
 #' 
+#' @concept utility
+#' 
 #' @export
 setMethod("utility", "agent", function(object,
                                        state,
@@ -110,6 +112,8 @@ setMethod("utility", "agent", function(object,
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname utility-data.frame
+#' 
+#' @concept utility
 #' 
 #' @export 
 #
@@ -283,6 +287,8 @@ setGeneric("compute_utility_variables", function(object, ...) standardGeneric("c
 #' \code{\link[predped]{update}}
 #' 
 #' @rdname compute_utility_variables
+#' 
+#' @concept utility
 #' 
 #' @export 
 setMethod("compute_utility_variables", "agent", function(object,
@@ -468,6 +474,8 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' 
 #' @rdname compute_utility_variables
 #' 
+#' @concept utility
+#' 
 #' @export 
 setMethod("compute_utility_variables", "data.frame", function(object,
                                                               background) {
@@ -512,6 +520,8 @@ setMethod("compute_utility_variables", "data.frame", function(object,
 #' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname distance_group_centroid 
+#' 
+#' @concept utility
 #'
 #' @export 
 distance_group_centroid <- function(predictions, 
@@ -557,6 +567,8 @@ distance_group_centroid <- function(predictions,
 #' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility
+#' 
+#' @concept utility
 #' 
 #' @export
 gc_utility <- function(a_group_centroid, 
@@ -625,6 +637,8 @@ gc_utility <- function(a_group_centroid,
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname get_angles
+#' 
+#' @concept utility
 #' 
 #' @export 
 #'
@@ -726,6 +740,8 @@ get_angles <- function (agent_idx,
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname vf_utility_continuous
+#' 
+#' @concept utility
 #'
 #' @export
 vf_utility_continuous <- function(b_vf, 
@@ -766,6 +782,8 @@ vf_utility_continuous <- function(b_vf,
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_discrete
+#' 
+#' @concept utility
 #'
 #' @export
 #'

@@ -47,3 +47,4 @@ my_polygon@id
 \code{\link[predped]{polygon-class}}
 \code{\link[predped]{initialize-object}}
 }
+\concept{classes}

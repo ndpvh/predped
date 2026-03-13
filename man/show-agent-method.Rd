@@ -12,3 +12,4 @@
 \description{
 Show method for the \code{\link[predped]{agent-class}}
 }
+\concept{methods}

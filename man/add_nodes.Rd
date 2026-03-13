@@ -98,3 +98,4 @@ add_nodes(my_segment)
 \code{\link[predped]{nodes_on_circumference}},
 \code{\link[predped]{create_nodes}}
 }
+\concept{object}

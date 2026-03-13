@@ -57,3 +57,4 @@ nodes_on_circumference(my_circle, space_between = pi / 2, cpp = TRUE)
 \code{\link[predped]{in_object}}, 
 \code{\link[predped]{moving_options}}
 }
+\concept{object}

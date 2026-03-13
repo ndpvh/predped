@@ -44,6 +44,8 @@ using namespace Rcpp;
 //' # This is my example
 //'
 //' @rdname time_series_rcpp
+//'
+//' @concept data
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -197,6 +199,8 @@ DataFrame time_series_rcpp(List trace,
 //' # This is my example
 //'
 //' @rdname unpack_trace_rcpp
+//'
+//' @concept data
 //' 
 //' @export
 // [[Rcpp::export]]

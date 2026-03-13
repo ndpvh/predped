@@ -53,3 +53,4 @@ archetypes(my_model) <- c("DrunkAussie")
 \seealso{
 \code{\link[predped]{predped-class}}
 }
+\concept{getter}

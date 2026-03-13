@@ -54,3 +54,4 @@ forbidden(my_rectangle)
 \seealso{
 \code{\link[predped]{object-class}}
 }
+\concept{getter}

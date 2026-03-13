@@ -26,3 +26,4 @@ under the current specifications.
 \code{\link[predped]{to_covariance}},
 \code{\link[predped]{to_unbounded}}
 }
+\concept{parameters}

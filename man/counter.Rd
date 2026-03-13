@@ -38,3 +38,4 @@ counter(my_goal)
 
 
 }
+\concept{getter}

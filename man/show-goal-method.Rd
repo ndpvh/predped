@@ -12,3 +12,4 @@
 \description{
 Show method for the \code{\link[predped]{goal-class}}
 }
+\concept{methods}

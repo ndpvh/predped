@@ -68,3 +68,4 @@ my_model@weights
 \code{\link[predped]{load_parameters}},
 \code{\link[predped]{params_from_csv}}
 }
+\concept{classes}

@@ -51,3 +51,4 @@ my_circle@id
 \code{\link[predped]{object-class}},
 \code{\link[predped]{initialize-object}}
 }
+\concept{classes}

@@ -38,3 +38,4 @@ busy(my_goal)
 
 
 }
+\concept{getter}

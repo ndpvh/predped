@@ -109,3 +109,4 @@ determine where the agent will move next).
 \code{\link[predped]{update_goal}},
 \code{\link[predped]{update_position}}
 }
+\concept{simulation}

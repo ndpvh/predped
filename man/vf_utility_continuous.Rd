@@ -39,3 +39,4 @@ member or the group member behind the agent.
 \code{\link[predped]{utility-agent}},
 \code{\link[predped]{vf_utility_discrete}}
 }
+\concept{utility}

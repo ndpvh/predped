@@ -55,3 +55,4 @@ of the utility.
 \code{\link[predped]{compute_utility_variables}},
 \code{\link[predped]{update_position}}
 }
+\concept{utility}

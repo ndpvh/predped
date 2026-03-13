@@ -3,7 +3,6 @@
 *.Rdata
 .Rhistory
 
-/*/Figures/
 depr/
 */depr 
 */*/depr
@@ -58,3 +57,6 @@ testing_items/
 examples/*
 supermarket.R
 tst/
+inst/doc
+
+README_*

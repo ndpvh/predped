@@ -42,3 +42,4 @@ in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 \code{\link[predped]{update-agent}},
 \code{\link[predped]{update}}
 }
+\concept{helper}

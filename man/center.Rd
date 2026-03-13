@@ -74,3 +74,4 @@ points(my_rectangle)
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 }
+\concept{getter}

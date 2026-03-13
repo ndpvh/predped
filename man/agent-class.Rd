@@ -82,3 +82,4 @@ variables relevant to compute the utilities.}
 \code{\link[predped]{waiting_counter}},
 \code{\link[predped]{initialize-agent}}
 }
+\concept{classes}

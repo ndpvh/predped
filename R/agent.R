@@ -59,6 +59,8 @@
 #' \code{\link[predped]{initialize-agent}}
 #' 
 #' @rdname agent-class
+#' 
+#' @concept classes
 #'
 #' @export
 agent <- setClass("agent", 
@@ -156,6 +158,8 @@ agent <- setClass("agent",
 #' 
 #' @rdname initialize-agent
 #' 
+#' @concept classes
+#' 
 #' @export
 setMethod("initialize", "agent", function(.Object,
                                           center, 
@@ -221,6 +225,8 @@ setMethod("initialize", "agent", function(.Object,
 #' Show method for the \code{\link[predped]{agent-class}}
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}
+#' 
+#' @concept methods
 #' 
 #' @export
 setMethod("show", "agent", function(object) {

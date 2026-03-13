@@ -56,6 +56,8 @@
 #' 
 #' @rdname determine_values
 #' 
+#' @concept helper
+#' 
 #' @export
 determine_values <- function(x, 
                              iterations,
@@ -91,6 +93,8 @@ determine_values <- function(x,
 #' 
 #' @return A list containing all instances of the class.
 #' 
+#' @concept helper
+#' 
 #' @export find_class
 find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
@@ -109,6 +113,8 @@ find_class <- function(class_name, lst) {
 #' 
 #' @return Numeric denoting the perpendicular orientation to the entrance of the 
 #' space in degrees
+#' 
+#' @concept helper
 #' 
 #' @export
 perpendicular_orientation <- function(object, co) {
@@ -183,6 +189,8 @@ perpendicular_orientation <- function(object, co) {
 #' Rcpp version (\code{cpp = TRUE}) of this function. Defaults to \code{TRUE}
 #'
 #' @return Returns a logical denoting whether any of the segments in 
+#' 
+#' @concept helper
 #' 
 #' @export
 line_line_intersection <- function(segments_1, 
@@ -310,6 +318,8 @@ line_line_intersection <- function(segments_1,
 #' \code{\link[predped]{out_object}}
 #' 
 #' @rdname raycasting
+#' 
+#' @concept helper
 #' 
 #' @export
 raycasting <- function(coords, x) {

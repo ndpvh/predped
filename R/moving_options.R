@@ -77,6 +77,8 @@
 #'
 #'
 #' @rdname moving_options
+#' 
+#' @concept movement
 #'
 #' @export
 #
@@ -252,6 +254,8 @@ setMethod("moving_options", "agent", function(object,
 #' \code{\link[predped]{moving_options}}
 #'
 #' @rdname compute_centers
+#' 
+#' @concept movement
 #'
 #' @export
 compute_centers <- function(agent,
@@ -357,6 +361,8 @@ compute_centers <- function(agent,
 #' \code{\link[predped]{moving_options}}
 #'
 #' @rdname agents_between_goal
+#' 
+#' @concept movement
 #'
 #' @export
 #
@@ -529,6 +535,8 @@ agents_between_goal <- function(agent,
 #' \code{\link[predped]{nodes_on_circumference}}
 #'
 #' @rdname overlap_with_objects
+#' 
+#' @concept movement
 #'
 #' @export
 #

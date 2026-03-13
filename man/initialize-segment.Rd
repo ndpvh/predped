@@ -42,3 +42,4 @@ my_segment@id
 \code{\link[predped]{object-class}},
 \code{\link[predped]{initialize-object}}
 }
+\concept{classes}

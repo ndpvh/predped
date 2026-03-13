@@ -61,3 +61,4 @@ my_goal@position
 \code{\link[predped]{path}},
 \code{\link[predped]{position}}
 }
+\concept{classes}

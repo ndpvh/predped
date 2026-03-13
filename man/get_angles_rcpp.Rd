@@ -50,3 +50,4 @@ Uses the predicted positions of the group members for this.
 \code{\link[predped]{vf_utility_continuous}}
 \code{\link[predped]{vf_utility_discrete}}
 }
+\concept{utility}

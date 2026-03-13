@@ -30,3 +30,4 @@ Compute the line-line intersection between several segments. Is a vectorized
 function with minimal loss of time when the number of segments to test 
 increases.
 }
+\concept{helper}

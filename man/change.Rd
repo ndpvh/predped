@@ -69,3 +69,4 @@ change(my_goal, goal_list = goal_list)
 \code{\link[predped]{goal_stack}}
 \code{\link[predped]{multiple_goal_stacks}}
 }
+\concept{goal}

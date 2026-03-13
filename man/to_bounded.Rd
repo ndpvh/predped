@@ -26,3 +26,4 @@ them to a positive (probit, bounded) scale.
 \code{\link[predped]{to_unbounded}},
 \code{\link[predped]{to_covariance}}
 }
+\concept{parameters}

@@ -82,3 +82,4 @@ rotate(x, degrees = 90, center = c(0, 0))
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 }
+\concept{object}

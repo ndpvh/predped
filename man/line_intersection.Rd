@@ -66,3 +66,4 @@ line_intersection(my_circle, my_lines)
 \code{\link[predped]{segment-class}},
 \code{\link[predped]{intersects}}
 }
+\concept{object}

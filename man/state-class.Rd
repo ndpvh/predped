@@ -37,3 +37,4 @@ the simulation, see the \code{fx} argument of
 \code{\link[predped]{potential_agents}},
 \code{\link[predped]{setting}}
 }
+\concept{classes}

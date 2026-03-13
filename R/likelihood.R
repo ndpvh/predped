@@ -38,6 +38,8 @@
 #' (\code{summed = TRUE}) or named list with vectors of raw likelihoods
 #' (\code{summed = FALSE}) per person in the dataset.
 #' 
+#' @concept estimation
+#' 
 #' @export 
 mll <- function(data, 
                 parameters,

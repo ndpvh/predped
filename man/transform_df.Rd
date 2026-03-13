@@ -71,3 +71,4 @@ a \code{data.frame}. Is used when the \code{optimize} argument of
 smaller ones, which greatly reduces the computational load for making the 
 plots.
 }
+\concept{helper}

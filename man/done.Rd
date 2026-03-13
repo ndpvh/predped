@@ -38,3 +38,4 @@ done(my_goal)
 
 
 }
+\concept{getter}

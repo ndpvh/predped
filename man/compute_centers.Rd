@@ -87,3 +87,4 @@ graphics::points(fast_m4ma[, 1], fast_m4ma[, 2], col = "red")
 \code{\link[m4ma]{c_vd}}
 \code{\link[predped]{moving_options}}
 }
+\concept{movement}

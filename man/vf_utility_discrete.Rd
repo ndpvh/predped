@@ -29,3 +29,4 @@ falls inside the non-visual zone behind the agent.
 \code{\link[predped]{utility-agent}},
 \code{\link[predped]{vf_utility_continuous}}
 }
+\concept{utility}

@@ -116,3 +116,4 @@ my_agent
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}}
 }
+\concept{simulation}

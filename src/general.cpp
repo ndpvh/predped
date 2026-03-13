@@ -19,6 +19,8 @@ std::unordered_set<std::string> unique(CharacterVector x) {
 //' with. Should have the same structure as `segments_1`
 //'
 //' @return Returns a logical denoting whether any of the segments in 
+//'
+//' @concept helper
 //' 
 //' @export
 // [[Rcpp::export]]

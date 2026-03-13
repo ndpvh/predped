@@ -88,3 +88,4 @@ intersects(my_circle, my_rectangle)
 \code{\link[predped]{nodes_on_circumference}},
 \code{\link[predped]{overlap_with_objects}}
 }
+\concept{object}

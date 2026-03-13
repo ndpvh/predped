@@ -22,6 +22,8 @@
 #' 
 #' @rdname state-class
 #' 
+#' @concept classes
+#' 
 #' @export
 state <- setClass("state", list(iteration = "numeric", 
                                 setting = "background",
@@ -73,6 +75,8 @@ state <- setClass("state", list(iteration = "numeric",
 #' \code{\link[predped]{setting}}
 #' 
 #' @rdname initialize-state
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "state", function(.Object, 

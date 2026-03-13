@@ -46,6 +46,8 @@
 #' )
 #' }
 #' 
+#' @concept helper
+#' 
 #' @export 
 benchmark <- function(x = NULL, 
                       iterations = 100,

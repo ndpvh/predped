@@ -29,3 +29,4 @@ my_coordinate@.Data
 \code{\link[predped]{coordinate-class}},
 \code{\link[predped]{rotate}}
 }
+\concept{classes}

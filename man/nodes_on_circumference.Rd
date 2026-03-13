@@ -72,3 +72,4 @@ nodes_on_circumference(my_segment)
 \code{\link[predped]{in_object}}, 
 \code{\link[predped]{moving_options}}
 }
+\concept{object}

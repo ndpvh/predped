@@ -68,3 +68,4 @@ determine_values(generating_function, 5)
 \code{\link[predped]{goal_stack}}
 \code{\link[predped]{multiple_goal_stacks}}
 }
+\concept{helper}

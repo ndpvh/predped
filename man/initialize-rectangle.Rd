@@ -49,3 +49,4 @@ my_rectangle@id
 \code{\link[predped]{initialize-object}}
 \code{\link[predped]{initialize-polygon}}
 }
+\concept{classes}

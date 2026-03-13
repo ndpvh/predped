@@ -40,4 +40,5 @@ Other objects:
 \code{\link{object-class}},
 \code{\link{rectangle-class}}
 }
+\concept{classes}
 \concept{objects}

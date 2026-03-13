@@ -79,6 +79,8 @@ using namespace Rcpp;
 //'
 //' @rdname compute_centers_rcpp
 //'
+//' @concept movement
+//'
 //' @export
 // [[Rcpp::export]]
 Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
@@ -213,6 +215,8 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
 //' \code{\link[predped]{nodes_on_circumference}}
 //'
 //' @rdname overlap_with_objects_rcpp
+//'
+//' @concept movement
 //'
 //' @export
 // [[Rcpp::export]]
@@ -379,6 +383,8 @@ LogicalMatrix overlap_with_objects_rcpp(S4 agent,
 //' \code{\link[predped]{overlap_with_objects}}
 //'
 //' @rdname moving_options_rcpp
+//'
+//' @concept movement
 //'
 //' @export
 // [[Rcpp::export]]

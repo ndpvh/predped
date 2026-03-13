@@ -42,3 +42,4 @@ current_goal(my_agent)
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{goal-class}}
 }
+\concept{getter}

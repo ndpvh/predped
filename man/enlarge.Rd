@@ -61,3 +61,4 @@ smaller_circle@radius
 \code{\link[predped]{segment-class}},
 \code{\link[predped]{size<-}}
 }
+\concept{object}

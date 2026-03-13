@@ -58,3 +58,4 @@ head(edges)
 \code{\link[predped]{create_edges}},
 \code{\link[predped]{create_nodes}}
 }
+\concept{helper}

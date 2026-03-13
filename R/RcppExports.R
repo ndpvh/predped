@@ -13,6 +13,8 @@
 #' # This is my example
 #'
 #' @rdname time_series_rcpp
+#'
+#' @concept data
 #' 
 #' @export
 time_series_rcpp <- function(trace, time_step = 0.5) {
@@ -53,6 +55,8 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' # This is my example
 #'
 #' @rdname unpack_trace_rcpp
+#'
+#' @concept data
 #' 
 #' @export
 unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE, time_step = 0.5) {
@@ -73,6 +77,8 @@ unique <- function(x) {
 #' with. Should have the same structure as `segments_1`
 #'
 #' @return Returns a logical denoting whether any of the segments in 
+#'
+#' @concept helper
 #' 
 #' @export
 line_line_intersection_rcpp <- function(segments_1, segments_2) {
@@ -110,6 +116,8 @@ line_line_intersection_rcpp <- function(segments_1, segments_2) {
 #' @return Either named vector containing the summed min-log-likelihood 
 #' (\code{summed = TRUE}) or named list with vectors of raw likelihoods
 #' (\code{summed = FALSE}) per person in the dataset.
+#'
+#' @concept estimation
 #' 
 #' @export 
 mll_rcpp <- function(data, parameters, ids, idx, cells, sizes, summed) {
@@ -233,6 +241,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #'
 #' @rdname compute_centers_rcpp
 #'
+#' @concept movement
+#'
 #' @export
 compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5) {
     .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step)
@@ -327,6 +337,8 @@ compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_ste
 #'
 #' @rdname overlap_with_objects_rcpp
 #'
+#' @concept movement
+#'
 #' @export
 overlap_with_objects_rcpp <- function(agent, background, centers, check, space_between = 5e-2) {
     .Call('_predped_overlap_with_objects_rcpp', PACKAGE = 'predped', agent, background, centers, check, space_between)
@@ -413,6 +425,8 @@ overlap_with_objects_rcpp <- function(agent, background, centers, check, space_b
 #'
 #' @rdname moving_options_rcpp
 #'
+#' @concept movement
+#'
 #' @export
 moving_options_rcpp <- function(agent, state, background, centers) {
     .Call('_predped_moving_options_rcpp', PACKAGE = 'predped', agent, state, background, centers)
@@ -466,6 +480,8 @@ moving_options_rcpp <- function(agent, state, background, centers) {
 #' \code{\link[predped]{moving_options}}
 #' 
 #' @rdname nodes_on_circumference_rcpp
+#'
+#' @concept object
 #' 
 #' @export
 nodes_on_circumference_rcpp <- function(object, space_between) {
@@ -506,6 +522,8 @@ nodes_on_circumference_rcpp <- function(object, space_between) {
 #' \code{\link[predped]{moving_options}}
 #' 
 #' @rdname in_object_rcpp
+#'
+#' @concept object
 #' 
 #' @export
 in_object_rcpp <- function(object, x) {
@@ -539,6 +557,8 @@ in_object_rcpp <- function(object, x) {
 #' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement_rcpp
+#'
+#' @concept movement
 #' 
 #' @export
 predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
@@ -574,6 +594,8 @@ predict_movement_rcpp <- function(agent, stay_stopped = TRUE, time_step = 0.5) {
 #' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications_rcpp
+#'
+#' @concept helper
 #' 
 #' @export
 create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, time_step = 0.5) {
@@ -610,6 +632,8 @@ create_agent_specifications_rcpp <- function(agent_list, stay_stopped = TRUE, ti
 #' 
 #' @rdname distance_group_centroid_rcpp
 #'
+#' @concept utility
+#'
 #' @export 
 distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
     .Call('_predped_distance_group_centroid_rcpp', PACKAGE = 'predped', predictions, centers, number_agents)
@@ -645,6 +669,8 @@ distance_group_centroid_rcpp <- function(predictions, centers, number_agents) {
 #' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname get_angles_rcpp
+#'
+#' @concept utility
 #' 
 #' @export 
 get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predictions, centers, any_member = TRUE) {
@@ -680,6 +706,8 @@ get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predi
 #' \code{\link[predped]{update}}
 #' 
 #' @rdname compute_utility_variables_rcpp
+#'
+#' @concept utility
 #' 
 #' @export 
 compute_utility_variables_rcpp <- function(agent, state, background, agent_specifications, centers, check_original) {
@@ -709,6 +737,8 @@ compute_utility_variables_rcpp <- function(agent, state, background, agent_speci
 #' \code{\link[predped]{utility-agent}}
 #' 
 #' @rdname gc_utility_rcpp
+#'
+#' @concept utility
 #' 
 #' @export
 gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_distances, stop_utility, number_agents) {
@@ -739,6 +769,8 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' \code{\link[predped]{vf_utility_continuous}}
 #' 
 #' @rdname vf_utility_rcpp
+#'
+#' @concept utility
 #' 
 #' @export
 vf_utility_rcpp <- function(b_visual_field, relative_angles) {
@@ -773,6 +805,8 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname utility_rcpp
+#'
+#' @concept utility
 #' 
 utility_rcpp <- function(data, parameters) {
     .Call('_predped_utility_rcpp', PACKAGE = 'predped', data, parameters)
@@ -815,6 +849,8 @@ utility_rcpp <- function(data, parameters) {
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname utility_agent_rcpp
+#'
+#' @concept utility
 #' 
 #' @export
 utility_agent_rcpp <- function(agent, state, background, agent_specifications, centers, check) {
