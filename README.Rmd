@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 # predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
 
-This project serves as a tool to simulate pedestrian movement using the Minds for Mobile Agents (M4MA) model. It contains several helper functions for people who wish to use the model to investigate pedestrian flow in their own settings. Before delving into how to use the package, we will first provide the reader with some background on the model.
+This project serves as a tool to simulate pedestrian movement using the Minds for Mobile Agents (M4MA) model. It contains several helper functions for people who wish to use the model to investigate pedestrian flow in their own settings. Before diving into how to use the package, we will first provide the reader with some background on the model.
 
 ## Background
 
