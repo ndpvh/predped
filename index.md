@@ -3,7 +3,7 @@
 This project serves as a tool to simulate pedestrian movement using the
 Minds for Mobile Agents (M4MA) model. It contains several helper
 functions for people who wish to use the model to investigate pedestrian
-flow in their own settings. Before delving into how to use the package,
+flow in their own settings. Before diving into how to use the package,
 we will first provide the reader with some background on the model.
 
 ## Background
@@ -215,7 +215,7 @@ gifski::save_gif(
 ```
 
 ``` R
-#> [1] "man/figures/readme.gif"
+#> [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/man/figures/readme.gif"
 ```
 
 Looking at the created `.gif` then gives us an idea of how the agents
