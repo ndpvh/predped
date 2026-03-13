@@ -30,12 +30,12 @@ navbar:
     articles:
       text: Usage
       menu:
-      - text: M4MA
-        href: articles/m4ma.html
-      - text: Workflow
-        href: articles/workflow.html
-      - text: Advanced Simulation
+      - text: Theoretical Background
+        href: articles/theory.html
+      - text: Simulations
         href: articles/simulation.html
+      - text: Advanced Simulations
+        href: articles/advanced_simulation.html
       - text: Estimation
         href: articles/estimation.html
     github:
