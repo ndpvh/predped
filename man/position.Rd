@@ -108,3 +108,4 @@ position(my_segment)
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 }
+\concept{getter}

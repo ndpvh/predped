@@ -53,3 +53,4 @@ y-coordinate.}
 \code{\link[predped]{shape}},
 \code{\link[predped]{initialize-background}},
 }
+\concept{classes}

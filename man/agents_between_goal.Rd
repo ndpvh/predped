@@ -55,3 +55,4 @@ agents_between_goal(my_agent, my_state)
 \code{\link[predped]{state-class}},
 \code{\link[predped]{moving_options}}
 }
+\concept{movement}

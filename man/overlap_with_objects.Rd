@@ -102,3 +102,4 @@ overlap_with_objects(my_agent,
 \code{\link[predped]{moving_options}},
 \code{\link[predped]{nodes_on_circumference}}
 }
+\concept{movement}

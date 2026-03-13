@@ -56,3 +56,4 @@ setting(my_state)
 \seealso{
 \code{\link[predped]{state-class}}
 }
+\concept{getter}

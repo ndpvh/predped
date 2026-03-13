@@ -62,3 +62,4 @@ Use data to compute the min-log-likelihood of choosing a given observed cell
 given a set of parameters. Should allow the user to estimate the parameters 
 of the model.
 }
+\concept{estimation}

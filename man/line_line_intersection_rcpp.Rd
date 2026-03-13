@@ -23,3 +23,4 @@ Rcpp version of line_line_intersection. Computes the  between several segments. 
 function with minimal loss of time when the number of segments to test 
 increases.
 }
+\concept{helper}

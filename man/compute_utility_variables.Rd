@@ -70,3 +70,4 @@ functions.
 \code{\link[predped]{update_position}},
 \code{\link[predped]{update}}
 }
+\concept{utility}

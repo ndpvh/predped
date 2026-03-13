@@ -40,3 +40,4 @@ head(parameters)
 \seealso{
 \code{\link[predped]{params_from_csv}}
 }
+\concept{parameters}

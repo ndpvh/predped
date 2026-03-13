@@ -22,3 +22,4 @@ Use the inputted matrix to construct the covariance matrix for the parameters.
 \code{\link[predped]{to_bounded}},
 \code{\link[predped]{to_unbounded}}
 }
+\concept{parameters}

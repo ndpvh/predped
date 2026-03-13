@@ -205,3 +205,4 @@ instances of the \code{\link[predped]{background-class}} or of the
 \code{\link[predped]{state-class}}. Whenever either is provided in a list,
 a list containing the respective geoms or ggplots is returned.
 }
+\concept{methods}

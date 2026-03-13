@@ -42,3 +42,4 @@ in_object_rcpp(my_circle, coords)
 \code{\link[predped]{out_object}}, 
 \code{\link[predped]{moving_options}}
 }
+\concept{object}

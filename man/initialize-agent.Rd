@@ -115,3 +115,4 @@ my_agent@radius
 \code{\link[predped]{status}},
 \code{\link[predped]{waiting_counter}}
 }
+\concept{classes}

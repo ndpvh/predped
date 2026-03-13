@@ -38,3 +38,4 @@ path(my_goal)
 
 
 }
+\concept{getter}

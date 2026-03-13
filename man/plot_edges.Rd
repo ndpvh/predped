@@ -69,3 +69,4 @@ Note that \code{dark_mode} also works here!
 \code{\link[predped]{create_edges}},
 \code{\link[predped]{plot}}
 }
+\concept{helper}

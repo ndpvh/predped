@@ -72,3 +72,4 @@ my_background@objects
 \code{\link[predped]{objects}},
 \code{\link[predped]{shape}}
 }
+\concept{classes}

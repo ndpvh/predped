@@ -60,3 +60,4 @@ rng_point(my_circle)
 \code{\link[predped]{add_nodes}},
 \code{\link[predped]{nodes_on_circumference}}
 }
+\concept{object}

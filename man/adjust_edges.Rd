@@ -96,3 +96,4 @@ head(adjusted_edges$edges)
 \code{\link[predped]{create_nodes}},
 \code{\link[predped]{evaluate_edges}}
 }
+\concept{routing}

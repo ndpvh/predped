@@ -47,3 +47,4 @@ weights(my_model)
 \seealso{
 \code{\link[predped]{predped-class}}
 }
+\concept{getter}

@@ -44,3 +44,4 @@ raycasting(points, coords)
 \code{\link[predped]{in_object}},
 \code{\link[predped]{out_object}}
 }
+\concept{helper}

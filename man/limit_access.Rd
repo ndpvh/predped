@@ -68,3 +68,4 @@ limit_access(my_background, coords)
 \code{\link[predped]{agent-class}}
 \code{\link[predped]{background-class}}
 }
+\concept{routing}

@@ -68,3 +68,4 @@ moved_rectangle@points
 \code{\link[predped]{center<-}},
 \code{\link[predped]{position<-}}
 }
+\concept{object}

@@ -19,3 +19,4 @@ Rcpp alternative for \code{\link[predped]{time_series}}.
 # This is my example
 
 }
+\concept{data}

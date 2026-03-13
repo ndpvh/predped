@@ -35,3 +35,4 @@ area(my_circle)
 \code{\link[predped]{object-class}},
 \code{\link[predped]{rectangle-class}}
 }
+\concept{object}

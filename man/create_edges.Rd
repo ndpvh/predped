@@ -102,3 +102,4 @@ head(edges$edges_with_coords)
 \code{\link[predped]{create_nodes}},
 \code{\link[predped]{evaluate_edges}}
 }
+\concept{routing}

@@ -15,3 +15,4 @@ A named list containing the transformed parameters
 \description{
 Transform nest association to precision (mu)
 }
+\concept{parameters}

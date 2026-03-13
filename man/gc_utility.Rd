@@ -43,3 +43,4 @@ The parameters that are used by this function -- and which are defined in
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{utility-agent}}
 }
+\concept{utility}

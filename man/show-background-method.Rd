@@ -12,3 +12,4 @@
 \description{
 Show method for the \code{\link[predped]{background-class}}
 }
+\concept{methods}

@@ -38,3 +38,4 @@ interact with the goal before the goal has been completed.}
 \code{\link[predped]{position}},
 \code{\link[predped]{initialize-goal}}
 }
+\concept{classes}

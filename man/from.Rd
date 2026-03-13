@@ -47,3 +47,4 @@ size(my_segment)
 \code{\link[predped]{object-class}}
 \code{\link[predped]{segment-class}}
 }
+\concept{getter}

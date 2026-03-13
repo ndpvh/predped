@@ -65,3 +65,4 @@ head(surviving_edges$edges_with_coords)
 \code{\link[predped]{prune_edges}},
 \code{\link[predped]{line_intersection}}
 }
+\concept{routing}

@@ -81,3 +81,4 @@ Finally, group members are identified and given the same set of goals.
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate}}
 }
+\concept{simulation}

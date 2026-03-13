@@ -63,3 +63,4 @@ goal_stack[[2]]
 \code{\link[predped]{determine_values}}
 \code{\link[predped]{goal_stack}}
 }
+\concept{goal}

@@ -43,3 +43,4 @@ updated_goal@done
 \seealso{
 \code{\link[predped]{goal-class}}
 }
+\concept{goal}

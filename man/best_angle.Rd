@@ -60,3 +60,4 @@ the agent has to reorient itself.
 \code{\link[predped]{update}},
 \code{\link[predped]{utility-agent}}
 }
+\concept{movement}

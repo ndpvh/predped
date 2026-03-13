@@ -35,3 +35,4 @@ in it.
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}}
 }
+\concept{simulation}

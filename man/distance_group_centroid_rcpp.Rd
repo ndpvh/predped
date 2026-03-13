@@ -38,3 +38,4 @@ utility functions.
 \code{\link[predped]{gc_utility}},
 \code{\link[predped]{utility-agent}}
 }
+\concept{utility}

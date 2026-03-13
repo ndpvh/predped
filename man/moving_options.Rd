@@ -93,3 +93,4 @@ moving_options(my_agent,
 \code{\link[predped]{state-class}},
 \code{\link[predped]{overlap_with_objects}}
 }
+\concept{movement}

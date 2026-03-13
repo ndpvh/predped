@@ -66,3 +66,4 @@ my_state@agents
 \code{\link[predped]{potential_agents}},
 \code{\link[predped]{setting}}
 }
+\concept{classes}

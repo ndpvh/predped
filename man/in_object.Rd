@@ -59,3 +59,4 @@ in_object(my_circle, coords)
 \code{\link[predped]{out_object}},
 \code{\link[predped]{raycasting}}
 }
+\concept{object}

@@ -41,3 +41,4 @@ Rcpp alternative for the group centroid utility function.
 \code{\link[predped]{params_from_csv}},
 \code{\link[predped]{utility-agent}}
 }
+\concept{utility}

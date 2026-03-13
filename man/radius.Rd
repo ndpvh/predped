@@ -41,3 +41,4 @@ radius(my_circle)
 \code{\link[predped]{agent-class}},
 \code{\link[predped]{circle-class}}
 }
+\concept{getter}

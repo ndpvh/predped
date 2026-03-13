@@ -45,3 +45,4 @@ the data, nor does it do any of the other preprocessing. It is therefore
 better not used as an alternative to the R version, but rather as an 
 extension of it (as done automatically in predped).
 }
+\concept{estimation}

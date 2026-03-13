@@ -61,3 +61,4 @@ right of this segment.
 \code{\link[predped]{initialize-segment}},
 \code{\link[predped]{limit_access}}
 }
+\concept{classes}

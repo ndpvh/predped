@@ -75,3 +75,4 @@ Update the Position of an Agent
 \code{\link[predped]{update}},
 \code{\link[predped]{update_goal}}
 }
+\concept{simulation}

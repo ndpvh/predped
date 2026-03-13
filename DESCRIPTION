@@ -49,7 +49,7 @@ Imports:
     MASS,
     matrixStats
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Collate:
     'predped-package.R'
     'RcppExports.R'

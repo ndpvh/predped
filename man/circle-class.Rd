@@ -31,4 +31,5 @@ Other objects:
 \code{\link{polygon-class}},
 \code{\link{rectangle-class}}
 }
+\concept{classes}
 \concept{objects}

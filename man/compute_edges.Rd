@@ -66,3 +66,4 @@ head(edges$edges_with_coords)
 \code{\link[predped]{simulate}}
 \code{\link[predped]{simulate.state}}
 }
+\concept{routing}

@@ -38,3 +38,4 @@ Constructor for the \code{\link[predped]{object-class}}
 \code{\link[predped]{polygon-class}},
 \code{\link[predped]{rectangle-class}}
 }
+\concept{classes}

@@ -82,3 +82,4 @@ points(my_circle, length.out = 10)#'
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 }
+\concept{getter}

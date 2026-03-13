@@ -70,3 +70,4 @@ add_goal(my_background@objects[[1]],
 \code{\link[predped]{segment-class}}
 \code{\link[predped]{rng_point}}
 }
+\concept{goal}

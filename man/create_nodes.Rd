@@ -69,3 +69,4 @@ head(nodes)
 \code{\link[predped]{create_edges}},
 \code{\link[predped]{out_object}},
 }
+\concept{routing}

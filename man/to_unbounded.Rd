@@ -26,3 +26,4 @@ them to a real (normal, unbounded) scale.
 \code{\link[predped]{to_bounded}},
 \code{\link[predped]{to_covariance}}
 }
+\concept{parameters}
