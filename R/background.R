@@ -40,6 +40,8 @@
 #' 
 #' @rdname background-class
 #' 
+#' @concept classes
+#' 
 #' @export
 background <- setClass("background", list(shape = "object", 
                                           objects = "list",
@@ -97,6 +99,8 @@ background <- setClass("background", list(shape = "object",
 #' \code{\link[predped]{shape}}
 #' 
 #' @rdname initialize-background
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "background", function(.Object, 
@@ -166,6 +170,8 @@ setMethod("initialize", "background", function(.Object,
 #' Show method for the \code{\link[predped]{background-class}}
 #' 
 #' @param object Object of the \code{\link[predped]{background-class}}
+#' 
+#' @concept methods
 #' 
 #' @export
 setMethod("show", "background", function(object) {
@@ -239,6 +245,8 @@ setMethod("show", "background", function(object) {
 #' \code{\link[predped]{background-class}}
 #'  
 #' @rdname limit_access
+#' 
+#' @concept routing
 #' 
 #' @export 
 setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
@@ -317,6 +325,8 @@ setMethod("limit_access", "background", function(object, x) {
 #' \code{\link[predped]{segment-class}}
 #'
 #' @rdname compute_limited_access
+#' 
+#' @concept routing
 #'
 #' @export 
 compute_limited_access <- function(segment) {

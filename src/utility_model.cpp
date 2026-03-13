@@ -44,6 +44,8 @@ using namespace Rcpp;
 //' 
 //' @rdname distance_group_centroid_rcpp
 //'
+//' @concept utility
+//'
 //' @export 
 // [[Rcpp::export]]
 RObject distance_group_centroid_rcpp(NumericMatrix predictions, 
@@ -93,6 +95,8 @@ RObject distance_group_centroid_rcpp(NumericMatrix predictions,
 //' \code{\link[predped]{vf_utility_discrete}}
 //' 
 //' @rdname get_angles_rcpp
+//'
+//' @concept utility
 //' 
 //' @export 
 // [[Rcpp::export]]
@@ -187,6 +191,8 @@ RObject get_angles_rcpp(int agent_idx,
 //' \code{\link[predped]{update}}
 //' 
 //' @rdname compute_utility_variables_rcpp
+//'
+//' @concept utility
 //' 
 //' @export 
 // [[Rcpp::export]]
@@ -475,6 +481,8 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
 //' \code{\link[predped]{utility-agent}}
 //' 
 //' @rdname gc_utility_rcpp
+//'
+//' @concept utility
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -534,6 +542,8 @@ NumericVector gc_utility_rcpp(double a_group_centroid,
 //' \code{\link[predped]{vf_utility_continuous}}
 //' 
 //' @rdname vf_utility_rcpp
+//'
+//' @concept utility
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -587,6 +597,8 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 //' \code{\link[predped]{update_position}}
 //' 
 //' @rdname utility_rcpp
+//'
+//' @concept utility
 //' 
 // [[Rcpp::export]]
 NumericVector utility_rcpp(DataFrame data, 
@@ -802,6 +814,8 @@ NumericVector utility_rcpp(DataFrame data,
 //' \code{\link[predped]{update_position}}
 //' 
 //' @rdname utility_agent_rcpp
+//'
+//' @concept utility
 //' 
 //' @export
 // [[Rcpp::export]]

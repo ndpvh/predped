@@ -23,7 +23,6 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}.
 #' 
-
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
@@ -32,6 +31,8 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' \code{\link[predped]{update-agent}}
 #' 
 #' @rdname update
+#' 
+#' @concept simulation
 #' 
 #' @export 
 setMethod("update", "state", function(object,
@@ -195,9 +196,9 @@ setMethod("update", "state", function(object,
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
-
-#' 
 #' @rdname update-agent
+#' 
+#' @concept simulation
 #' 
 #' @export 
 setMethod("update", "agent", function(object,
@@ -298,6 +299,8 @@ setMethod("update", "agent", function(object,
 #' \code{\link[predped]{update_goal}}
 #' 
 #' @rdname update_position
+#' 
+#' @concept simulation
 #' 
 #' @export 
 #
@@ -523,6 +526,8 @@ update_position <- function(agent,
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname update_goal
+#' 
+#' @concept simulation
 #' 
 #' @export 
 #
@@ -905,6 +910,8 @@ update_goal <- function(agent,
 #' 
 #' @rdname predict_movement
 #' 
+#' @concept movement
+#' 
 #' @export
 predict_movement <- function(agent, 
                              stay_stopped = TRUE,
@@ -959,6 +966,8 @@ predict_movement <- function(agent,
 #' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications
+#' 
+#' @concept helper
 #' 
 #' @export
 create_agent_specifications <- function(agent_list,

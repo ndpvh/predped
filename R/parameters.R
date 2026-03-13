@@ -142,6 +142,8 @@
 #' 
 #' @rdname params_from_csv
 #' 
+#' @concept parameters
+#' 
 #' @export
 params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv")),
                         "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
@@ -179,6 +181,8 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 #' \code{\link[predped]{params_from_csv}}
 #' 
 #' @rdname load_parameters
+#' 
+#' @concept parameters
 #' 
 #' @export
 #
@@ -389,6 +393,8 @@ utility_parameters <- function(x) {
 #' 
 #' @rdname generate_parameters
 #' 
+#' @concept parameters
+#' 
 #' @export  
 generate_parameters <- function(n = 1,
                                 filename = NULL,
@@ -501,6 +507,8 @@ generate_parameters <- function(n = 1,
 #' \code{\link[predped]{to_covariance}}
 #' 
 #' @rdname to_unbounded
+#' 
+#' @concept parameters
 #'
 #' @export
 #
@@ -561,6 +569,8 @@ to_unbounded <- function(parameters,
 #' \code{\link[predped]{to_covariance}}
 #' 
 #' @rdname to_bounded
+#' 
+#' @concept parameters
 #'
 #' @export
 #
@@ -611,6 +621,8 @@ to_bounded <- function(parameters,
 #' 
 #' @rdname to_covariance
 #' 
+#' @concept parameters
+#' 
 #' @export 
 to_covariance <- function(X) {
     d <- nrow(X)
@@ -632,6 +644,8 @@ to_covariance <- function(X) {
 #' @param parameters A named list containing the parameters for a given agent
 #'
 #' @return A named list containing the transformed parameters
+#' 
+#' @concept parameters
 #'
 #' @export transform_mu
 #
@@ -670,6 +684,8 @@ transform_mu <- function(parameters) {
 #' \code{\link[predped]{to_unbounded}}
 #' 
 #' @rdname plot_distribution
+#' 
+#' @concept parameters
 #' 
 #' @export
 plot_distribution <- function(...) {

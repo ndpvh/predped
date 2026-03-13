@@ -24,6 +24,8 @@
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}},
 #' \code{\link[predped]{initialize-goal}}
+#' 
+#' @concept classes
 #'
 #' @export
 #
@@ -74,6 +76,8 @@ goal <- setClass("goal", list(id = "character",
 #' 
 #' @rdname initialize-goal
 #' 
+#' @concept classes
+#' 
 #' @export
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
@@ -110,6 +114,8 @@ setMethod("initialize", "goal", function(.Object,
 #' Show method for the \code{\link[predped]{goal-class}}
 #' 
 #' @param object Object of the \code{\link[predped]{goal-class}}
+#' 
+#' @concept methods
 #' 
 #' @export
 setMethod("show", "goal", function(object) {
@@ -180,6 +186,8 @@ setMethod("show", "goal", function(object) {
 #' \code{\link[predped]{rng_point}}
 #' 
 #' @rdname add_goal
+#' 
+#' @concept goal
 #' 
 #' @export
 # 
@@ -336,6 +344,8 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' \code{\link[predped]{create_edges}}
 #'
 #' @rdname find_path
+#' 
+#' @concept routing
 #' 
 #' @export
 setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
@@ -507,6 +517,8 @@ setMethod("find_path", "goal", function(object,
 #' \code{\link[predped]{goal-class}}
 #' 
 #' @rdname interact
+#' 
+#' @concept goal
 #'
 #' @export
 setGeneric("interact", function(object) standardGeneric("interact"))
@@ -570,6 +582,8 @@ setMethod("interact", "goal", function(object) {
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 
 #' @rdname change
+#' 
+#' @concept goal
 #' 
 #' @export 
 setGeneric("change", function(object, ...) standardGeneric("change"))
@@ -658,6 +672,8 @@ setMethod("change", "goal", function(object,
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 
 #' @rdname goal_stack
+#' 
+#' @concept goal
 #' 
 #' @export 
 #
@@ -837,6 +853,8 @@ goal_stack <- function(n,
 #' \code{\link[predped]{goal_stack}}
 #' 
 #' @rdname multiple_goal_stacks
+#' 
+#' @concept goal
 #' 
 #' @export 
 multiple_goal_stacks <- function(n, 

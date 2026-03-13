@@ -85,6 +85,8 @@
 #'
 #'
 #' @rdname plot
+#' 
+#' @concept methods
 #'
 #' @export
 #
@@ -670,6 +672,8 @@ setMethod("plot", "state", function(x,
 #' \code{\link[predped]{plot}}
 #'
 #' @rdname plot_edges
+#' 
+#' @concept helper
 #'
 #' @export
 plot_edges <- function(setting,
@@ -777,6 +781,8 @@ plot_edges <- function(setting,
 #' @param segment.size Numeric denoting the size of the arrow denoting 
 #' one-directional movement. Defaults to \code{0.6}.
 #' @param ... Arguments passed on to lower-level functions.
+#' 
+#' @concept helper
 #'
 #' @rdname transform_df
 setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))

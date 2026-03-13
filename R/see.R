@@ -35,6 +35,8 @@
 #' 
 #' @rdname best_angle
 #' 
+#' @concept movement
+#' 
 #' @export
 #
 # Object-oriented replacement of the function `bestAngle`.
@@ -78,7 +80,7 @@ best_angle <- function(agent,
 
 # DEPRECATED FUNCTION, BUT LEFT IN FOR LEGACY. 
 #
-# It's function is taken over by prune_edges
+# Its functionality is taken over by prune_edges
 #
 # #' Can agent see a point in space
 # #'

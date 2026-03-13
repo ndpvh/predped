@@ -54,6 +54,8 @@ using namespace Rcpp;
 //' \code{\link[predped]{moving_options}}
 //' 
 //' @rdname nodes_on_circumference_rcpp
+//'
+//' @concept object
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -184,6 +186,8 @@ NumericMatrix nodes_on_circumference_rcpp(S4 object,
 //' \code{\link[predped]{moving_options}}
 //' 
 //' @rdname in_object_rcpp
+//'
+//' @concept object
 //' 
 //' @export
 // [[Rcpp::export]]

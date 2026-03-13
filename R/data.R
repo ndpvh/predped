@@ -15,6 +15,8 @@
 #'
 #' @rdname time_series
 #' 
+#' @concept data
+#' 
 #' @export
 time_series <- function(trace, 
                         time_step = 0.5,
@@ -87,6 +89,8 @@ time_series <- function(trace,
 #' # This is my example
 #'
 #' @rdname unpack_trace
+#' 
+#' @concept data
 #' 
 #' @export
 unpack_trace <- function(trace, 
@@ -204,6 +208,8 @@ unpack_trace <- function(trace,
 #' # This is my example
 #'
 #' @rdname to_trace
+#' 
+#' @concept data
 #' 
 #' @export
 to_trace <- function(data, 
@@ -436,6 +442,8 @@ to_trace <- function(data,
 #' # This is my example
 #'
 #' @rdname add_motion_variables
+#' 
+#' @concept data
 #' 
 #' @export
 add_motion_variables <- function(data, 

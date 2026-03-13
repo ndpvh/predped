@@ -15,6 +15,8 @@
 #' \code{\link[predped]{initialize-coordinate}}
 #' 
 #' @rdname coordinate-class
+#' 
+#' @concept classes
 #'
 #' @export
 coordinate <- setClass("coordinate", contains = "numeric")
@@ -38,6 +40,8 @@ coordinate <- setClass("coordinate", contains = "numeric")
 #' \code{\link[predped]{rotate}}
 #' 
 #' @rdname initialize-coordinate
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "coordinate", function(.Object, ...) {
@@ -69,6 +73,8 @@ setMethod("initialize", "coordinate", function(.Object, ...) {
 #' 
 #' @rdname object-class
 #' @family objects 
+#' 
+#' @concept classes
 #'
 #' @export
 setClass("object", 
@@ -97,6 +103,8 @@ setClass("object",
 #' \code{\link[predped]{rectangle-class}}
 #' 
 #' @rdname initialize-object
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "object", function(.Object, 
@@ -148,6 +156,8 @@ setMethod("initialize", "object", function(.Object,
 #' @rdname polygon-class
 #' @family objects
 #' 
+#' @concept classes
+#' 
 #' @export
 polygon <- setClass("polygon", 
                     list(points = "matrix", 
@@ -190,6 +200,8 @@ polygon <- setClass("polygon",
 #' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-polygon
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "polygon", function(.Object, 
@@ -244,6 +256,8 @@ setMethod("initialize", "polygon", function(.Object,
 #' 
 #' @rdname rectangle-class
 #' @family objects
+#' 
+#' @concept classes
 #'
 #' @export
 #
@@ -292,6 +306,8 @@ rectangle <- setClass("rectangle",
 #' \code{\link[predped]{initialize-polygon}}
 #' 
 #' @rdname initialize-rectangle
+#' 
+#' @concept classes
 #' 
 #' @export
 # 
@@ -378,6 +394,8 @@ setMethod("initialize", "rectangle", function(.Object,
 #' @rdname circle-class
 #' @family objects
 #' 
+#' @concept classes
+#' 
 #' @export
 circle <- setClass("circle", 
                    list(center = "numeric", 
@@ -417,6 +435,8 @@ circle <- setClass("circle",
 #' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-circle
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "circle", function(.Object, 
@@ -512,6 +532,8 @@ setMethod("initialize", "circle", function(.Object,
 #' \code{\link[predped]{limit_access}}
 #' 
 #' @rdname segment-class
+#' 
+#' @concept classes
 #'
 #' @export
 segment <- setClass("segment", 
@@ -552,6 +574,8 @@ segment <- setClass("segment",
 #' \code{\link[predped]{initialize-object}}
 #' 
 #' @rdname initialize-segment
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "segment", function(.Object, 
@@ -634,6 +658,8 @@ setMethod("initialize", "segment", function(.Object,
 #' 
 #' 
 #' @rdname rotate
+#' 
+#' @concept object
 #' 
 #' @export
 # 
@@ -877,6 +903,8 @@ setMethod("rotate", signature(object = "segment"), function(object,
 #' 
 #' @rdname move
 #' 
+#' @concept object
+#' 
 #' @export
 setGeneric("move", function(object, ...) standardGeneric("move"))
 
@@ -989,6 +1017,8 @@ setMethod("move", signature(object = "segment"), function(object,
 #' 
 #' @rdname area
 #' 
+#' @concept object
+#' 
 #' @export
 setGeneric("area", function(object) standardGeneric("area"))
 
@@ -1038,6 +1068,8 @@ setMethod("area", signature(object = "circle"), function(object) pi * object@rad
 #' 
 #' 
 #' @rdname in_object
+#' 
+#' @concept object
 #' 
 #' @export
 setGeneric("in_object", function(object, x, ...) standardGeneric("in_object"))
@@ -1204,6 +1236,8 @@ setMethod("in_object", signature(object = "segment"), function(object,
 #' 
 #' @rdname out_object
 #' 
+#' @concept object
+#' 
 #' @export
 setGeneric("out_object", function(object, x, ...) standardGeneric("out_object"))
 
@@ -1255,6 +1289,8 @@ setMethod("out_object", signature(object = "object"), function(object, x, ...) !
 #' 
 #' 
 #' @rdname enlarge
+#' 
+#' @concept object
 #' 
 #' @export
 setGeneric("enlarge", function(object, extension, ...) standardGeneric("enlarge"))
@@ -1341,6 +1377,8 @@ setMethod("enlarge", signature(object = "circle"), function(object,
 #' 
 #' 
 #' @rdname rng_point
+#' 
+#' @concept object
 #' 
 #' @export
 # 
@@ -1500,6 +1538,8 @@ setMethod("rng_point", signature(object = "segment"), function(object,
 #' 
 #' 
 #' @rdname add_nodes
+#' 
+#' @concept object
 #' 
 #' @export
 setGeneric("add_nodes", function(object, ...) standardGeneric("add_nodes"))
@@ -1846,6 +1886,8 @@ setMethod("add_nodes", signature(object = "segment"), function(object,
 #' 
 #' @rdname nodes_on_circumference
 #' 
+#' @concept object
+#' 
 #' @export
 setGeneric("nodes_on_circumference", function(object, ...) standardGeneric("nodes_on_circumference"))
 
@@ -1953,6 +1995,8 @@ setMethod("nodes_on_circumference", signature(object = "segment"), function(obje
 #' 
 #' 
 #' @rdname intersects
+#' 
+#' @concept object
 #' 
 #' @export
 setGeneric("intersects", function(object, other_object, ...) standardGeneric("intersects"))
@@ -2122,6 +2166,8 @@ setMethod("intersects",
 #' 
 #' 
 #' @rdname line_intersection
+#' 
+#' @concept object
 #' 
 #' @export
 setGeneric("line_intersection", function(object, segments, ...) standardGeneric("line_intersection"))

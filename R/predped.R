@@ -22,6 +22,8 @@
 #' 
 #' @rdname predped-class
 #' 
+#' @concept classes
+#' 
 #' @export
 predped <- setClass("predped", list(id = "character",
                                     setting = "background",
@@ -74,6 +76,8 @@ predped <- setClass("predped", list(id = "character",
 #' \code{\link[predped]{params_from_csv}}
 #' 
 #' @rdname initialize-predped
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "predped", function(.Object,
@@ -161,6 +165,8 @@ setMethod("initialize", "predped", function(.Object,
 #' Show method for the \code{\link[predped]{predped-class}}
 #' 
 #' @param object Object of the \code{\link[predped]{predped-class}}
+#' 
+#' @concept methods
 #' 
 #' @export
 setMethod("show", "predped", function(object) {

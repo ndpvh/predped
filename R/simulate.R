@@ -208,6 +208,8 @@
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate
+#' 
+#' @concept simulation
 #'
 #' @export
 #
@@ -496,6 +498,8 @@ setMethod("simulate", "predped", function(object,
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate.state
+#' 
+#' @concept simulation
 #'
 #' @export
 #
@@ -692,6 +696,8 @@ setMethod("simulate", "state", function(object,
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_group
+#' 
+#' @concept simulation
 #'
 #' @export
 #
@@ -835,6 +841,8 @@ add_group <- function(model,
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_agent
+#' 
+#' @concept simulation
 #'
 #' @export
 #
@@ -1050,6 +1058,8 @@ add_agent <- function(model,
 #' \code{\link[predped]{simulate}}
 #'
 #' @rdname create_initial_condition
+#' 
+#' @concept simulation
 #'
 #' @export
 #

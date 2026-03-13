@@ -33,6 +33,8 @@
 #' 
 #' @rdname agents
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("agents", function(object) standardGeneric("agents"))
 
@@ -81,6 +83,8 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' 
 #' 
 #' @rdname archetypes
+#' 
+#' @concept getter
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
@@ -114,6 +118,8 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' 
 #' 
 #' @rdname busy
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("busy", function(object) standardGeneric("busy"))
@@ -152,6 +158,8 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' 
 #' @rdname cell
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("cell", function(object) standardGeneric("cell"))
 
@@ -188,6 +196,8 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' 
 #' 
 #' @rdname cell_centers
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("cell_centers", function(object) standardGeneric("cell_centers"))
@@ -241,6 +251,8 @@ setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_cente
 #' 
 #' @rdname center
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("center", function(object) standardGeneric("center"))
 
@@ -279,6 +291,8 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' 
 #' @rdname color
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("color", function(object) standardGeneric("color"))
 
@@ -311,6 +325,8 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' 
 #' 
 #' @rdname counter
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("counter", function(object) standardGeneric("counter"))
@@ -350,6 +366,8 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' 
 #' @rdname current_goal
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("current_goal", function(object) standardGeneric("current_goal"))
 
@@ -382,6 +400,8 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' 
 #' 
 #' @rdname done
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("done", function(object) standardGeneric("done"))
@@ -425,6 +445,8 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' 
 #' @rdname entrance
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("entrance", function(object) standardGeneric("entrance"))
 
@@ -467,6 +489,8 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' 
 #' @rdname exit
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("exit", function(object) standardGeneric("exit"))
 
@@ -504,6 +528,8 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' 
 #' 
 #' @rdname forbidden
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("forbidden", function(object) standardGeneric("forbidden"))
@@ -547,6 +573,8 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' 
 #' @rdname from
 #' 
+#' @concept getter
+#' 
 #' @export 
 setGeneric("from", function(object, ...) standardGeneric("from"))
 
@@ -585,6 +613,8 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' 
 #' @rdname goals
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("goals", function(object) standardGeneric("goals"))
 
@@ -621,6 +651,8 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' 
 #' 
 #' @rdname group
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("group", function(object) standardGeneric("group"))
@@ -676,6 +708,8 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' 
 #' @rdname id
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("id", function(object) standardGeneric("id"))
 
@@ -716,6 +750,8 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' 
 #' 
 #' @rdname iteration
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("iteration", function(object) standardGeneric("iteration"))
@@ -758,6 +794,8 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' 
 #' @rdname iteration_variables
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("iteration_variables", function(object) standardGeneric("iteration_variables"))
 
@@ -799,6 +837,8 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' 
 #' 
 #' @rdname limited_access
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("limited_access", function(object) standardGeneric("limited_access"))
@@ -845,6 +885,8 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' 
 #' @rdname objects
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 
@@ -886,6 +928,8 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' 
 #' @rdname orientation
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
@@ -924,6 +968,8 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' 
 #' @rdname parameters
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("parameters", function(object) standardGeneric("parameters"))
 
@@ -956,6 +1002,8 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' 
 #' 
 #' @rdname path
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("path", function(object) standardGeneric("path"))
@@ -1024,6 +1072,8 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' 
 #' @rdname points
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 
@@ -1091,6 +1141,8 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' 
 #' @rdname position
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
@@ -1133,6 +1185,8 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' 
 #' @rdname potential_agents
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
 
@@ -1169,6 +1223,8 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' 
 #' 
 #' @rdname radius
+#' 
+#' @concept getter
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
@@ -1216,6 +1272,8 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' 
 #' @rdname setting
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
@@ -1254,6 +1312,8 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' 
 #' 
 #' @rdname shape
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("shape", function(object) standardGeneric("shape"))
@@ -1314,6 +1374,8 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' 
 #' @rdname size
 #' 
+#' @concept getter
+#' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
@@ -1351,6 +1413,8 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' 
 #' @rdname speed
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("speed", function(object) standardGeneric("speed"))
 
@@ -1387,6 +1451,8 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' 
 #' 
 #' @rdname status
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("status", function(object) standardGeneric("status"))
@@ -1430,6 +1496,8 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' 
 #' @rdname to
 #' 
+#' @concept getter
+#' 
 #' @export 
 setGeneric("to", function(object, ...) standardGeneric("to"))
 
@@ -1467,6 +1535,8 @@ setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 #' 
 #' 
 #' @rdname utility_variables
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("utility_variables", function(object) standardGeneric("utility_variables"))
@@ -1509,6 +1579,8 @@ setGeneric("utility_variables<-", function(object, value) standardGeneric("utili
 #' 
 #' @rdname variables
 #' 
+#' @concept getter
+#' 
 #' @export
 setGeneric("variables", function(object) standardGeneric("variables"))
 
@@ -1546,6 +1618,8 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' 
 #' 
 #' @rdname waiting_counter
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
@@ -1588,6 +1662,8 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' 
 #' 
 #' @rdname weights
+#' 
+#' @concept getter
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))

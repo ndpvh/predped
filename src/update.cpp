@@ -32,6 +32,8 @@ using namespace Rcpp;
 //' \code{\link[predped]{update}}
 //' 
 //' @rdname predict_movement_rcpp
+//'
+//' @concept movement
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -92,6 +94,8 @@ NumericVector predict_movement_rcpp(S4 agent,
 //' \code{\link[predped]{update}}
 //' 
 //' @rdname create_agent_specifications_rcpp
+//'
+//' @concept helper
 //' 
 //' @export
 // [[Rcpp::export]]

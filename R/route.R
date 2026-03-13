@@ -82,6 +82,8 @@
 #' 
 #' @rdname create_edges
 #' 
+#' @concept routing
+#' 
 #' @export 
 create_edges <- function(from, 
                          to, 
@@ -187,6 +189,8 @@ create_edges <- function(from,
 #' \code{\link[predped]{evaluate_edges}}
 #' 
 #' @rdname adjust_edges
+#' 
+#' @concept routing
 #' 
 #' @export 
 adjust_edges <- function(from, 
@@ -372,6 +376,8 @@ adjust_edges <- function(from,
 #' 
 #' @rdname create_nodes
 #' 
+#' @concept routing
+#' 
 #' @export 
 #
 # TO DO 
@@ -536,6 +542,8 @@ create_nodes <- function(from,
 #' 
 #' @rdname evaluate_edges
 #' 
+#' @concept routing
+#' 
 #' @export
 evaluate_edges <- function(segments, 
                            background,
@@ -658,6 +666,8 @@ evaluate_edges <- function(segments,
 #' 
 #' @rdname prune_edges
 #' 
+#' @concept routing
+#' 
 #' @export
 #
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
@@ -738,6 +748,8 @@ prune_edges <- function(objects,
 #' \code{\link[predped]{create_nodes}}
 #' 
 #' @rdname combine_nodes
+#' 
+#' @concept helper
 #' 
 #' @export
 combine_nodes <- function(nodes_1, 
@@ -866,6 +878,8 @@ combine_nodes <- function(nodes_1,
 #' \code{\link[predped]{simulate.state}}
 #' 
 #' @rdname compute_edges 
+#' 
+#' @concept routing
 #' 
 #' @export 
 compute_edges <- function(background, 
