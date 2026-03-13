@@ -80,3 +80,4 @@ Suggests:
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3
+VignetteBuilder: knitr
