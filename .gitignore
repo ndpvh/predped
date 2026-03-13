@@ -3,7 +3,6 @@
 *.Rdata
 .Rhistory
 
-/*/Figures/
 depr/
 */depr 
 */*/depr
