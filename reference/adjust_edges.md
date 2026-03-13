@@ -129,9 +129,9 @@ adjusted_edges <- adjust_edges(c(-0.75, 0),
 head(adjusted_edges$edges)
 #>       from    to      cost
 #> 2   node 1 agent 0.4633883
-#> 2.1 node 1  goal 2.4937184
 #> 3   node 2 agent 0.4633883
-#> 3.1 node 2  goal 2.4937184
-#> 4   node 3 agent 2.4937184
 #> 4.1 node 3  goal 0.4633883
+#> 5.1 node 4  goal 0.4633883
+#> 6   node 5 agent 0.6830583
+#> 7   node 6 agent 0.6830583
 ```

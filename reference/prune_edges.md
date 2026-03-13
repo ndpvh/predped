@@ -72,5 +72,5 @@ segments
 
 # Do the test
 prune_edges(objects, segments)
-#> [1]  TRUE FALSE  TRUE
+#> [1]  TRUE FALSE FALSE
 ```
