@@ -25,7 +25,7 @@ repo:
 navbar:
   structure:
     left: [reference, articles]
-    right: [search, github]
+    right: [search, github, lightswitch]
   components:
     articles:
       text: Usage
