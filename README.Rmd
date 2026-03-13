@@ -88,7 +88,7 @@ setting <- background(
 
 It is good practice to visualize what the environment looks like. For this, we can use the [`plot`](https://ndpvh.github.io/reference/plot.html) function:
 
-```{r}
+```{r plot}
 #| fig.width = 5, 
 #| fig.height = 5.5,
 #| fig.align = "center",
@@ -135,10 +135,20 @@ plots <- plot(
 The [`plot`](https://ndpvh.github.io/reference/plot.html) outputs a list of plots. For research purposes, it is useful to transform this list to a gif, which can be achieved by using the `gifski` package:
 
 ```{r}
-#| eval = TRUE
+#| eval = FALSE
 gifski::save_gif(
   lapply(plots, print), 
   file.path("readme.gif"),
+  delay = 1/10
+)
+```
+
+```{r}
+#| eval = TRUE, 
+#| echo = FALSE 
+gifski::save_gif(
+  lapply(plots, print), 
+  file.path("man/figures/readme.gif"),
   delay = 1/10
 )
 ```
@@ -152,7 +162,7 @@ Looking at the created `.gif` then gives us an idea of how the agents walked aro
 #| fig.align = "center",
 #| fig.alt = "A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle."
 knitr::include_graphics(
-  file.path("./readme.gif")
+  file.path("man/figures/readme.gif")
 )
 ```
 

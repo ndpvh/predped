@@ -154,7 +154,7 @@ this, we can use the
 plot(setting)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;" />
+<img src="man/figures/README-plot-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;" />
 
 Once an environment has been defined, on should link this environment
 with the characteristics of the agents who are expected to walk around
@@ -221,13 +221,14 @@ gifski::save_gif(
   file.path("readme.gif"),
   delay = 1/10
 )
-#> [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/readme.gif"
 ```
+
+    #> [1] "man/figures/readme.gif"
 
 Looking at the created `.gif` then gives us an idea of how the agents
 walked around in the room:
 
-<img src="./readme.gif" alt="A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle." width="60%" style="display: block; margin: auto;" />
+<img src="man/figures/readme.gif" alt="A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle." width="60%" style="display: block; margin: auto;" />
 
 ## Getting help
 
