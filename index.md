@@ -145,7 +145,7 @@ plot(setting)
 ![One sees a plot visualizing a circular room with a square gray object
 in the middle. This represents the room in which the agents will walk
 around if the room is used for a
-simulation.](reference/figures/README-unnamed-chunk-5-1.png)
+simulation.](reference/figures/README-plot-1.png)
 
 Once an environment has been defined, on should link this environment
 with the characteristics of the agents who are expected to walk around
@@ -212,7 +212,10 @@ gifski::save_gif(
   file.path("readme.gif"),
   delay = 1/10
 )
-#> [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/readme.gif"
+```
+
+``` R
+#> [1] "man/figures/readme.gif"
 ```
 
 Looking at the created `.gif` then gives us an idea of how the agents
@@ -221,7 +224,7 @@ walked around in the room:
 ![A .gif displaying how an agent comes in through the entrance on the
 left side, interacts with a goal on the left side of the object,
 completes it, and then moves to a next goal on the bottom side of the
-rectangle.](./readme.gif)
+rectangle.](reference/figures/readme.gif)
 
 ## Getting help
 

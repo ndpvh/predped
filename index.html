@@ -48,6 +48,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
 <li class="nav-item"><a class="nav-link" href="https://github.com/ndpvh/predped/" aria-label="Github"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -120,7 +128,7 @@
 <p>It is good practice to visualize what the environment looks like. For this, we can use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">setting</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-plot-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;"></p>
 <p>Once an environment has been defined, on should link this environment with the characteristics of the agents who are expected to walk around in this environment. This is achieved through the definition of a <a href="https://ndpvh.github.io/reference/predped.html" class="external-link"><code>predped</code></a> model, another S4 class with slots <code>setting</code> (the environment we just created), <code>parameters</code> (dataframe of parameter values), <code>archetypes</code> (a character string of pedestrians to include), and <code>weights</code> (the probability of each archetype entering the room).</p>
 <p>Agent characteristics are defined through a <code>data.frame</code> that contains parameter values for a given “class” of people. One such dataframe is provided by us in <em>archetypes.csv</em> and can be called in the package through the variable <a href="https://ndpvh.github.io/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a> or through calling the function <a href="https://ndpvh.github.io/reference/load_parameters.html" class="external-link"><code>load_parameters()</code></a>. In this example, we wish to use the <code>"BaselineEuropean"</code>, specifying the model as:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -149,10 +157,10 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">plots</span>, <span class="va">print</span><span class="op">)</span>, </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"readme.gif"</span><span class="op">)</span>,</span>
 <span>  delay <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/readme.gif"</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#&gt; [1] "man/figures/readme.gif"</span></span></code></pre></div>
 <p>Looking at the created <code>.gif</code> then gives us an idea of how the agents walked around in the room:</p>
-<p><img src="./readme.gif" alt="A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle." width="60%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/readme.gif" alt="A .gif displaying how an agent comes in through the entrance on the left side, interacts with a goal on the left side of the object, completes it, and then moves to a next goal on the bottom side of the rectangle." width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
