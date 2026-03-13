@@ -58,3 +58,5 @@ testing_items/
 examples/*
 supermarket.R
 inst/doc
+
+README_*
