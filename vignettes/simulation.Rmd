@@ -228,7 +228,8 @@ We can then visualize these locations as through calling the `plot` method:
 ```{r}
 #| fig.align = "center",
 #| out.width = "100%",
-#| fig.alt = "One sees the visualization our office, having a rectangular desk on the middle-left, some rectangular bookcases at the bottom-left, bottom-right, and top, and some round plants on the left of the bottom-left and top bookcases. All objects are filled with a gray color, while the space on which agents can walk is white. The location of the entrance is visualized through a half-circle on the top-right of the space."
+#| fig.alt = "One sees the visualization our office, having a rectangular desk on the middle-left, some rectangular bookcases at the bottom-left, bottom-right, and top, and some round plants on the left of the bottom-left and top bookcases. All objects are filled with a gray color, while the space on which agents can walk is white. The location of the entrance is visualized through a half-circle on the top-right of the space.",
+#| dev = "pdf"
 # Plot the background with forbidden locations
 plot(
   my_background, 
