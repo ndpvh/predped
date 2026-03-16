@@ -2,7 +2,8 @@
 
 ### All vignettes
 
-- [advanced_simulation](https://github.com/ndpvh/predped/articles/advanced_simulation.md):
+- [Advanced
+  Simulations](https://github.com/ndpvh/predped/articles/advanced_simulation.md):
 - [estimation](https://github.com/ndpvh/predped/articles/estimation.md):
 - [Getting
   Started](https://github.com/ndpvh/predped/articles/getting_started.md):
