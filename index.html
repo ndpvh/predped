@@ -68,49 +68,44 @@
 <div class="section level1">
 <div class="page-header"><h1 id="predped-an-r-package-to-simulate-the-minds-for-mobile-agents-m4ma-pedestrian-model">predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model<a class="anchor" aria-label="anchor" href="#predped-an-r-package-to-simulate-the-minds-for-mobile-agents-m4ma-pedestrian-model"></a>
 </h1></div>
-<p>This project serves as a tool to simulate pedestrian movement using the Minds for Mobile Agents (M4MA) model. It contains several helper functions for people who wish to use the model to investigate pedestrian flow in their own settings. Before diving into how to use the package, we will first provide the reader with some background on the model.</p>
+<p>This project serves as a tool to simulate pedestrian movement using the Minds for Mobile Agents (M4MA) model. This package enables users to simulate from the model and estimate the parameters of the model on movement data, each tailored to their own setting of choice.</p>
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
-<p>Pedestrian models are popular tools to investigate how people navigate the complex world that we live in. While these models have certainly been useful to understand, for example, evacuation behavior, they most often assume that pedestrians are homogeneous – that is, that all pedestrians are one and the same. Because of this assumption, these pedestrian models are not suited to capture the variety of walking behaviors we observe in most low-density situations, such as those observed in the supermarket, in the train station, or even on the street.</p>
-<p>To alleviate these difficulties, Andrew Heathcote and Dora Matzke recently proposed M4MA to capture pedestrian movement. This model is based on the pedestrian model developed by Robin et al. (2009) and, similarly, proposes that pedestrian movement is determined on three levels:</p>
+<p>Pedestrian models are popular tools to investigate how people navigate the complex world that we live in. Yet, most current models assume that pedestrians are all one and the same, making them solely applicable to study movement behavior in high-density situations like festivals or sporting events, but less so in low-density situations like supermarkets and train stations.</p>
+<p>To capture movement behavior in both low- and high-density situations, Andrew Heathcote and Dora Matzke recently proposed the M4MA, proposing that pedestrian behavior is determined on three levels:</p>
 <ul>
 <li>
-<em>Strategic level</em>: Consists of planning where the pedestrian wants to go to and via which route. Typically, a pedestrian will have to fulfill a goal, which will serve as the destination of the route. To get to this goal, pedestrians will walk along so-called “path-points”: Waypoints along which the pedestrian can walk, serving as intermediate steps to get to their destination.</li>
+<em>Strategic level</em>: Consists of what the agent want to achieve and how they will navigate the space;</li>
 <li>
-<em>Tactical level</em>: Once their route is determined, pedestrians will still be able to adapt if their original plan does not seem feasible. For example, other pedestrians can block your route, which makes avoiding the crowd more attractive when trying to get to your goal. These adaptations are handled on this level.</li>
+<em>Tactical level</em>: Consists of reacting to the environment and making tactical decisions regarding navigation in case of blockages;</li>
 <li>
-<em>Operational level</em>: This final level handles the low-level, moment-to-moment decisions about where to walk to. In practice, this constitutes a choice between one of 34 movement options, created by 11 angular directions in which a pedestrian can move (going from -72.5 to 72.5 degrees) and 3 changes in velocity (deceleration, constant speed, or acceleration), with the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>34</mn><mrow><mi>s</mi><mi>t</mi></mrow></msup><annotation encoding="application/x-tex">34^{st}</annotation></semantics></math> option representing stopping. The probability with which a pedestrian will move to a given location is determined by a utility function that combines several moving components, namely (a) preferred speed, (b) current direction, (c) goal direction, (d) interpersonal distance, and (e) blocked angles, as well as several social components, namely (a) following a person heading in the same direction (follow-the-leader) and (b) walking besides someone heading in the same direction (walk-besides-buddy).</li>
+<em>Operational level</em>: Consists of the moment-to-moment step decisions the agent takes, encompassing changes in direction and/or speed at the lowest level.</li>
 </ul>
-<p>Critically, and different from other pedestrian models, M4MA assigns each pedestrian a “personality”, in that all pedestrians have their own unique values for the parameters that are defined on the operational level. These individual differences are implemented in two ways:</p>
+<p>Critically, M4MAs pedestrians have a particular “personality” reflected in unique parameters that guide the movement on the operational level. These individual differences are implemented in two ways:</p>
 <ul>
 <li>
-<em>Qualitative differences</em>: We define several “archetypes” of pedestrians, each of which have different discrete values for their parameters. These archetypes were created through trial-and-error by the researchers in this project and are contained in <em>archetypes.csv</em>. In no way should these archetypes be interpreted as ground truth or real differences between individuals.</li>
+<em>Qualitative differences</em>: Each pedestrian belongs to a particular class of people, defining a particular pedestrian profile that one may encounter within the setting of interest;<br>
+</li>
 <li>
-<em>Quantitative differences</em>: Each of the parameter values that are defined in the archetypes CSV-file serves as a mean around which each pedestrian’s actual parameter value fluctuates. Without going into detail, each archetype has their own matrix that contains standard deviations for each parameter on the diagonal and correlations between parameters on the off-diagonal. These matrices are stored in <em>archetypes_sigma.Rds</em>.</li>
+<em>Quantitative differences</em>: Within each class, parameter values are subject to random variation, assigning each pedestrian with a unique combination of parameters.</li>
 </ul>
-</div>
-<div class="section level2">
-<h2 id="how-to-use">How to use<a class="anchor" aria-label="anchor" href="#how-to-use"></a>
-</h2>
-<p>This package allows its users to simulate pedestrian behavior as expected by M4MA. Users can specify the environment, the characterstics the pedestrians, and the characteristics of the simulation itself (e.g., maximal number of agents, initial conditions,…), therefore allowing for a great variety of potential research questions that can be answered. For more information on the workflow of this package, see <em>Getting started</em>.</p>
-<p>This package depends heavily on the <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> package.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>One can install <code>predped</code> through the <code>remotes</code> package in the following way:</p>
+<p>One can install <code>predped</code> via the <code>remotes</code> package:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ndpvh/predped"</span><span class="op">)</span></span></code></pre></div>
-<p>To use the package, you should load it through <code>library</code>:</p>
+<p>To use the package, one should load it through <code>library</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>Within <code>predped</code>, we use a particular workflow.</p>
-<p>In the first step, you should define the environment in which you want pedestrians to walk around. For this, you will use the <a href="https://ndpvh.github.io/reference/background-class.html" class="external-link"><code>background</code></a> class. This S4 class contains slots for the <code>shape</code> (i.e., the shape of the room), the <code>objects</code> (i.e., which objects are contained within the room), and a potential <code>entrance</code> and/or <code>exit</code>. The <code>shape</code> and <code>objects</code> should all consist of instances of the <a href="https://ndpvh.github.io/reference/object-class.html" class="external-link"><code>object</code></a> class, that is they should be either a <a href="https://ndpvh.github.io/reference/rectangle-class.html" class="external-link"><code>rectangle</code></a>, <a href="https://ndpvh.github.io/reference/polygon-class.html" class="external-link"><code>polygon</code></a>, or <a href="https://ndpvh.github.io/reference/circle-class.html" class="external-link"><code>circle</code></a>. The <code>entrance</code>/<code>exit</code> should be either a numeric vector or a numeric matrix with two columns specifying their coordinates.</p>
+<p>To simulate data from the M4MA, <code>predped</code> requires the following workflow.</p>
+<p>First, one should define the environment in which the pedestrians will walk around, defined through the <a href="https://ndpvh.github.io/reference/background-class.html" class="external-link"><code>background</code></a> class. This S4 class defines the <code>shape</code> of the environment, , the <code>objects</code> that are contained in it, and a set of <code>entrance</code>s and/or <code>exit</code>s. The <code>shape</code> and <code>objects</code> are furthermore restricted to be instances of the <a href="https://ndpvh.github.io/reference/object-class.html" class="external-link"><code>object</code></a> class, that is they should be either a <a href="https://ndpvh.github.io/reference/rectangle-class.html" class="external-link"><code>rectangle</code></a>, <a href="https://ndpvh.github.io/reference/polygon-class.html" class="external-link"><code>polygon</code></a>, or <a href="https://ndpvh.github.io/reference/circle-class.html" class="external-link"><code>circle</code></a>.</p>
 <p>A simple example of an environment is the following circular room with a square object placed in the middle:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">setting</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/background-class.html">background</a></span><span class="op">(</span></span>
@@ -130,7 +125,7 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">setting</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;"></p>
-<p>Once an environment has been defined, on should link this environment with the characteristics of the agents who are expected to walk around in this environment. This is achieved through the definition of a <a href="https://ndpvh.github.io/reference/predped.html" class="external-link"><code>predped</code></a> model, another S4 class with slots <code>setting</code> (the environment we just created), <code>parameters</code> (dataframe of parameter values), <code>archetypes</code> (a character string of pedestrians to include), and <code>weights</code> (the probability of each archetype entering the room).</p>
+<p>Once an environment has been defined, on should link this environment with the characteristics of the agents who are expected to walk around in this environment. This is achieved through defining an instance of the <a href="https://ndpvh.github.io/reference/predped.html" class="external-link"><code>predped</code></a> class, this time defining the <code>setting</code> or environment, the <code>archetypes</code> of the agents expected to walk in it, and the <code>weights</code> or probability with which one expects each archetype to be found within the space.</p>
 <p>Agent characteristics are defined through a <code>data.frame</code> that contains parameter values for a given “class” of people. One such dataframe is provided by us in <em>archetypes.csv</em> and can be called in the package through the variable <a href="https://ndpvh.github.io/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a> or through calling the function <a href="https://ndpvh.github.io/reference/load_parameters.html" class="external-link"><code>load_parameters()</code></a>. In this example, we wish to use the <code>"BaselineEuropean"</code>, specifying the model as:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predped-class.html">predped</a></span><span class="op">(</span></span>
@@ -138,7 +133,7 @@
 <span>  setting <span class="op">=</span> <span class="va">setting</span>, </span>
 <span>  archetypes <span class="op">=</span> <span class="st">"BaselineEuropean"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Now that the model has been defined, we can now simulate pedestrian movement by calling the function <a href="https://ndpvh.github.io/reference/simulate.html" class="external-link"><code>simulate</code></a>:</p>
+<p>Once the setting and <code>predped</code> model have been defined, one can simulate pedestrian movement as expected by the M4MA through calling the function <a href="https://ndpvh.github.io/reference/simulate.html" class="external-link"><code>simulate</code></a>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
@@ -146,7 +141,7 @@
 <span>  max_agents <span class="op">=</span> <span class="fl">25</span>, </span>
 <span>  iterations <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The variable <code>trace</code> will be a list consisting of <a href="https://ndpvh.github.io/reference/state.html" class="external-link"><code>state</code></a>s of the environment, each state itself consisting of a copy of the environment (under slot <code>setting</code>) and of a list of pedestrians walking around in the environment (under slot <code>agents</code>). If you wish to visualize this trace, you can again use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
+<p>The variable <code>trace</code> consists of a list of <a href="https://ndpvh.github.io/reference/state.html" class="external-link"><code>state</code></a>s of the environment, each state itself consisting of a copy of the environment (under slot <code>setting</code>) and of a list of pedestrians walking around in the environment (under slot <code>agents</code>). To visualize this trace, one can again use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">trace</span>,</span>
@@ -166,7 +161,7 @@
 <div class="section level2">
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p>You can find the documentation for this package on its dedicated <a href="https://ndpvh.github.io/predped" class="external-link">documentation site</a>. This site includes additional information on the <a href="https://ndpvh.github.io/predped/articles/theory.html" class="external-link">theoretical background</a>, on <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link">running minimal</a> and <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link">advanced simulations</a>, and on <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link">estimating the model on data</a>.</p>
+<p>You can find the documentation for this package on its dedicated <a href="https://ndpvh.github.io/predped" class="external-link">documentation site</a>. For an overview of the logic within the package, we refer the interested reader to the <a href="https://ndpvh.github.io/predped/articles/getting_started.html" class="external-link">Getting Started</a> page on this site. On this site, we furthermore include information on the <a href="https://ndpvh.github.io/predped/articles/theory.html" class="external-link">theoretical background</a>, on <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link">running minimal</a> and <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link">advanced simulations</a>, and on <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link">estimating the model on data</a>.</p>
 <p>If you encounter a bug, you can report the bug with a minimal working example as an <a href="https://github.com/ndpvh/predped/issues">Issue</a>.</p>
 </div>
 <div class="section level2">
@@ -183,12 +178,12 @@
 <li><a href="https://github.com/maltelueken" class="external-link">Malte Lüken</a></li>
 <li><a href="https://github.com/CharlotteTanis" class="external-link">Charlotte Tanis</a></li>
 </ul>
-<p>For the creation of the <code>predped</code>, we thank several permanent project members (in alphabetical order):</p>
+<p>For the creation of the <code>predped</code>, we thank its permanent project members (in alphabetical order):</p>
 <ul>
 <li><a href="https://github.com/andrewheathcote" class="external-link">Andrew Heathcote</a></li>
 <li><a href="https://github.com/ndpvh" class="external-link">Niels Vanhasbroeck</a></li>
 </ul>
-<p>as well as many who worked with us temporarily (in alphabetical order):</p>
+<p>as well as those who worked with us temporarily (in alphabetical order):</p>
 <ul>
 <li><a href="https://github.com/Alexanderson31" class="external-link">Alexander Anderson</a></li>
 <li><a href="https://github.com/JorisGoosen" class="external-link">Joris Goossen</a></li>
@@ -200,11 +195,6 @@
 <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a>
 </h2>
 <p>For more information on the project, please see its dedicated section on the lab website: <a href="https://www.ampl-psych.com/projects/minds-for-mobile-agents/" class="external-link uri">https://www.ampl-psych.com/projects/minds-for-mobile-agents/</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
-<p>Robin, T., Antonini, G., Beirlaire, M., &amp; Cruz, J. (2009). Specification, estimation, and validation of a pedestrian walking behavior model. <em>Transportation Research Part B, 43</em>, 36-56. doi: <a href="doi.org/10.1016/j.trb.2008.06.010">10.1016/j.trb.2008.06.010</a></p>
 </div>
 </div>
 

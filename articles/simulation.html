@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>simulation • predped</title>
+<title>Simulations • predped</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="simulation">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Simulations">
 <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
@@ -68,7 +68,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>simulation</h1>
+      <h1>Simulations</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/ndpvh/predped/tree/main/vignettes/simulation.Rmd"><code>vignettes/simulation.Rmd</code></a></small>
@@ -77,17 +77,782 @@
 
     
     
+<p>One of the major functionalities of the <code>predped</code> package
+is allowing users to simulate data according to the Minds for Mobile
+Agents pedestrian model (M4MA). In this section, we will detail the
+workflow for carrying out basic simulations. Please see the vignette on
+<a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a> for ways in which you can personalize the
+simulations in <code>predped</code>.</p>
+<div class="section level2">
+<h2 id="defining-an-environment">Defining an Environment<a class="anchor" aria-label="anchor" href="#defining-an-environment"></a>
+</h2>
+<p>First, one should define the environment in which the agents are
+expected to walk around. Within <code>predped</code>, we currently allow
+for the creation of a space at a single floor, which may represent a
+single room (e.g., an office or a supermarket) or a collection of
+connected rooms (e.g., a tunnel under a train station containing several
+stores). To define such a space, one should create an instance of the <a href="https://ndpvh.github.io/reference/background.html" class="external-link"><code>background</code></a>
+class, defining the following attributes:</p>
+<ul>
+<li>
+<code>shape</code>: An instance of the <a href="https://ndpvh.github.io/reference/object.html" class="external-link"><code>object</code></a>
+class that defines the shape of the setting;</li>
+<li>
+<code>objects</code>: A list of <a href="https://ndpvh.github.io/reference/object.html" class="external-link"><code>object</code></a>s
+defining the obstacles in the setting;</li>
+<li>
+<code>entrance</code>, <code>exit</code>: Numeric matrices defining
+the entrances and/or exits of the space;</li>
+<li>
+<code>limited_access</code>: A list of <a href="https://ndpvh.github.io/reference/segment.html" class="external-link"><code>segment</code></a>s
+that restrict the movement of the agents within the space (see <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>).</li>
+</ul>
+<p>As an example, let’s define a rectangular environment that represents
+our office:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Recreate our office</span></span>
+<span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/background-class.html">background</a></span><span class="op">(</span></span>
+<span>  <span class="co"># Shape of the environment</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>    center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>    size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span></span>
+<span>  <span class="co"># Objects contained within the environment</span></span>
+<span>  objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Desks</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.4</span>, <span class="fl">1.6</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="co"># Cabinets</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">2.3</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">0.4</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.05</span>, <span class="op">-</span><span class="fl">1.9</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">1.2</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="co"># Big bookcase</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">2.275</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.45</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># Plants</span></span>
+<span>    <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.75</span>, <span class="fl">2.275</span><span class="op">)</span>, </span>
+<span>      radius <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2.3</span><span class="op">)</span>, </span>
+<span>      radius <span class="op">=</span> <span class="fl">0.15</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span></span>
+<span>  <span class="co"># Location of the entrance to our office</span></span>
+<span>  entrance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span><span class="op">)</span>                                               </span></code></pre></div>
+<p>To visualize what this setting looks like, we can use the <a href="https://ndpvh.github.io/predped/reference/plot.html" class="external-link"><code>plot</code></a>
+method:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">my_background</span><span class="op">)</span></span></code></pre></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="One sees the visualization our office, having a rectangular desk on the middle-left, some rectangular bookcases at the bottom-left, bottom-right, and top, and some round plants on the left of the bottom-left and top bookcases. All objects are filled with a gray color, while the space on which agents can walk is white. The location of the entrance is visualized through a half-circle on the top-right of the space." width="100%" style="display: block; margin: auto;"></p>
+<p>It is often useful to create your setting by going back and forth
+between adding an object and plotting the result, especially when the
+environment contains many different objects.</p>
+<div class="section level3">
+<h3 id="interactability">Interactability<a class="anchor" aria-label="anchor" href="#interactability"></a>
+</h3>
+<p>By default, <code>predped</code> assumes that all objects in the
+environment can be interacted with. However, as this assumption may not
+apply to all situations, we also allow users to limit the
+interactability of the objects in their environment. This is done in two
+ways.</p>
+<p>First, users can make a complete object non-interactable by setting
+the <code>interactable</code> argument of the constructors for
+<code>rectangle</code>s, <code>polygon</code>s, and <code>circle</code>s
+to <code>FALSE</code>, such as in the following examples:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Turn off interactability of the objects</span></span>
+<span><span class="va">my_rectangle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>  center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>  size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>  interactable <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_polygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/polygon-class.html">polygon</a></span><span class="op">(</span></span>
+<span>  points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  interactable <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>  center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>  radius <span class="op">=</span> <span class="fl">1</span>, </span>
+<span>  interactable <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Please note that if none of the objects in a given
+<code>background</code> are interactable, agents will enter the space
+and immediately leave again through one of the provided exits.</p>
+<p>Another way in which interactability can be limited is through
+specifying the <code>forbidden_edges</code> argument in the same
+constructors. Essentially, this argument tells <code>predped</code>
+which regions of the objects cannot be interacted with. For
+<code>polygon</code>s and <code>rectangle</code>s, this amounts to
+providing the indices of the edges that cannot be interacted with, for
+example:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_polygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/polygon-class.html">polygon</a></span><span class="op">(</span></span>
+<span>  points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span>  forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>and defining
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>1</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_1 = (1, 1)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>2</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_2 = (1, -1)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>3</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1</mn><mo>,</mo><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_3 = (-1, -1)</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mn>4</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_4 = (-1, 1)</annotation></semantics></math>,
+then the edges that cannot be interacted with are the lines
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mrow><msub><mi>P</mi><mn>1</mn></msub><msub><mi>P</mi><mn>2</mn></msub></mrow><mo accent="true">↔</mo></mover><annotation encoding="application/x-tex">\overset{\leftrightarrow}{P_1 P_2}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mrow><msub><mi>P</mi><mn>3</mn></msub><msub><mi>P</mi><mn>4</mn></msub></mrow><mo accent="true">↔</mo></mover><annotation encoding="application/x-tex">\overset{\leftrightarrow}{P_3 P_4}</annotation></semantics></math>.
+This can be seen by executing the following code:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create the edges by extracting the coordinates that make up the polygon and </span></span>
+<span><span class="co"># then combining them in fixed order</span></span>
+<span><span class="va">coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">my_polygon</span><span class="op">)</span></span>
+<span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">coords</span>, <span class="va">coords</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">coords</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Identify those edges that cannot contain a goal</span></span>
+<span><span class="va">idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/forbidden.html">forbidden</a></span><span class="op">(</span><span class="va">my_polygon</span><span class="op">)</span></span>
+<span><span class="va">edges</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span></span>
+<span><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
+<span><span class="co">#&gt; [1,]    1    1    1   -1</span></span>
+<span><span class="co">#&gt; [2,]   -1   -1   -1    1</span></span></code></pre></div>
+<p>The same ideas apply to the <code>rectangle</code>, using the output
+of the <a href="https://ndpvh.github.io/predped/reference/points.html" class="external-link"><code>points</code></a>
+method to create the relevant edges.</p>
+<p>For <code>circle</code>s, there are no discrete edges that can be
+indexed like for <code>polygon</code>s and <code>rectangle</code>s.
+Within <code>predped</code>, we therefore use angles to specify the
+locations on the <code>circle</code> that cannot be interacted with,
+taking the shape of a matrix containing the starting and the ending
+angles of the interval in which no goal can be contained. Consider the
+following example, where we create a circle that cannot contain a goal
+in the region
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mi>π</mi><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0, \pi]</annotation></semantics></math>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define a circle with forbidden angles ranging from </span></span>
+<span><span class="co"># 0 to pi</span></span>
+<span><span class="va">my_circle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>  center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>  radius <span class="op">=</span> <span class="fl">1</span>, </span>
+<span>  forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Note that the angles should be specified in radians, not in
+degrees.</p>
+<p>To simplify the specification of the <code>forbidden</code> argument,
+users can visualize the non-interactable locations when visualizing the
+environment. Redefining our office to include non-interactable
+locations:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Adjust the office to contain forbidden edges</span></span>
+<span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/background-class.html">background</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>    center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>    size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span></span>
+<span>  objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.4</span>, <span class="fl">1.6</span><span class="op">)</span>,</span>
+<span>      forbidden <span class="op">=</span> <span class="fl">1</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">2.3</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">0.4</span><span class="op">)</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.05</span>, <span class="op">-</span><span class="fl">1.9</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">1.2</span><span class="op">)</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">2.275</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.45</span><span class="op">)</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.75</span>, <span class="fl">2.275</span><span class="op">)</span>, </span>
+<span>      radius <span class="op">=</span> <span class="fl">0.2</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/circle-class.html">circle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2.3</span><span class="op">)</span>, </span>
+<span>      radius <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>      forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span></span>
+<span>  entrance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>We can then visualize these locations as through calling the
+<code>plot</code> method:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot the background with forbidden locations</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">my_background</span>, </span>
+<span>  plot_forbidden <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  forbidden.color <span class="op">=</span> <span class="st">"red"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="One sees the visualization our office, having a rectangular desk on the middle-left, some rectangular bookcases at the bottom-left, bottom-right, and top, and some round plants on the left of the bottom-left and top bookcases. All objects are filled with a gray color, while the space on which agents can walk is white. The location of the entrance is visualized through a half-circle on the top-right of the space." width="100%" style="display: block; margin: auto;"></p>
+<p>In this plot, non-interactable locations are visualized in red.</p>
+<p>Note that interactability of an object will automatically be limited
+by where the objects are placed in the environment. More concretely,
+agents cannot interact with locations that they cannot reach, such as
+sides of an object that stand against another object or a wall. You do
+not need to specify this explicitly, though it may help during the setup
+of your simulation study.</p>
+</div>
+<div class="section level3">
+<h3 id="debugging">Debugging<a class="anchor" aria-label="anchor" href="#debugging"></a>
+</h3>
+<p>There are some known issues or limitations regarding the <a href="https://ndpvh.github.io/predped/reference/background.html" class="external-link"><code>background</code></a>
+class that users should be aware off when creating their own
+environments. These are included here:</p>
+<ul>
+<li>Instances of the <a href="https://ndpvh.github.io/predped/reference/segment.html" class="external-link"><code>segment</code></a>
+class cannot be included as an object in the <code>objects</code>
+argument, as they solely exist to restrict the directionality of the
+pedestrian flow within an environment.</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="defining-agents">Defining Agents<a class="anchor" aria-label="anchor" href="#defining-agents"></a>
+</h2>
+<p>Once an environment has been defined, one should define the
+characteristics of the agents that are expected to walk around in this
+environment. The mapping of the setting with the agents is achieved
+through specifying an instance of the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>predped</code></a>
+class. It has the following attributes:</p>
+<ul>
+<li>
+<code>setting</code>: An instance of the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>background</code></a>
+class defining the environment in which agents should walk around;</li>
+<li>
+<code>archetypes</code>: A character vector containing the names of
+the types of agents you want to include;</li>
+<li>
+<code>weights</code>: A numerical vector denoting the probability
+with which each agent type can be found within the environment;</li>
+<li>
+<code>parameters</code>: A list containing all necessary parameter
+information for <code>predped</code> to be able to simulate distinct
+agents.</li>
+</ul>
+<p>One can create an instance of the <code>predped</code> class through
+its constructor, for example by calling:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create instance of predped class with our office and the default </span></span>
+<span><span class="co"># parameters</span></span>
+<span><span class="va">my_predped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predped-class.html">predped</a></span><span class="op">(</span>setting <span class="op">=</span> <span class="va">my_background</span><span class="op">)</span>    </span>
+<span><span class="va">my_predped</span></span>
+<span><span class="co">#&gt; Model object:</span></span>
+<span><span class="co">#&gt; ID: model eqmfa </span></span>
+<span><span class="co">#&gt; Parameters taken from the BaselineEuropean, BigRushingDutch, DrunkAussie, CautiousOldEuropean, Rushed, Distracted, BaselineEuropean1, BigRushingDutch1, DrunkAussie1, CautiousOldEuropean1, Rushed1, Distracted1, Lost, SociallyAnxious, SocialBaselineEuropean, SocialBigRushingDutch, SocialDrunkAussie, SocialCautiousOldEuropean archetypes.</span></span></code></pre></div>
+<p>This specification connects the previously defined environment to the
+type of agents that should walk around in it. By default, all archetypes
+defined in the project’s can join the simulation with an equal
+probability. If you wish to limit the number of types of agents that can
+walk around in the simulation and/or wish to change these probabilities,
+one can specify the <code>archetypes</code> and <code>weights</code>
+arguments of the constructor. For example, specifying:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create instance of predped class with our office and two of the </span></span>
+<span><span class="co"># default agent-types</span></span>
+<span><span class="va">my_predped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predped-class.html">predped</a></span><span class="op">(</span></span>
+<span>  setting <span class="op">=</span> <span class="va">my_background</span>, </span>
+<span>  archetypes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"BaselineEuropean"</span>, </span>
+<span>    <span class="st">"DrunkAussie"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">my_predped</span></span>
+<span><span class="co">#&gt; Model object:</span></span>
+<span><span class="co">#&gt; ID: model amrew </span></span>
+<span><span class="co">#&gt; Parameters taken from the BaselineEuropean, DrunkAussie archetypes.</span></span></code></pre></div>
+<p>states that you only want <code>"BaselineEuropean"</code>s and
+`“DrunkAussie”’s to walk around in the environment, where the former has
+a 75% probability of joining the environment while the latter only has a
+25% probability of doing so.</p>
+<div class="section level3">
+<h3 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a>
+</h3>
+<p>Given the importance of knowing which agent-types exist by default,
+and given the importance of personalization in specifying the agent
+characteristics (see <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>), it is useful to explain the parameter structure
+used by <code>predped</code>.</p>
+<p>To do so, we first load the default parameters of the package with
+the <a href="https://ndpvh.github.io/predped/reference/load_parameters.html" class="external-link"><code>load_parameters</code></a>
+function and inspect its type and structure:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/typeof.html" class="external-link">typeof</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "list"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "params_archetypes" "params_sigma"      "params_bounds"</span></span></code></pre></div>
+<p>As one can see, the variable <code>params</code> is a named list
+containing the slots <code>"params_archetypes"</code>,
+<code>"params_sigma"</code>, and <code>"params_bounds"</code>. Each slot
+serves a different purpose in the specification of agents, as we detail
+below.</p>
+<p>First, the <code>"params_archetypes"</code> slot contains a
+<code>data.frame</code> connecting the names of the agent types with the
+parameters that belong to this type. The <code>data.frame</code>
+contains the following columns:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">params_archetypes</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "name"                  "color"                 "radius"               </span></span>
+<span><span class="co">#&gt;  [4] "slowing_time"          "preferred_speed"       "randomness"           </span></span>
+<span><span class="co">#&gt;  [7] "stop_utility"          "reroute"               "b_turning"            </span></span>
+<span><span class="co">#&gt; [10] "a_turning"             "b_current_direction"   "a_current_direction"  </span></span>
+<span><span class="co">#&gt; [13] "blr_current_direction" "b_goal_direction"      "a_goal_direction"     </span></span>
+<span><span class="co">#&gt; [16] "b_blocked"             "a_blocked"             "b_interpersonal"      </span></span>
+<span><span class="co">#&gt; [19] "a_interpersonal"       "d_interpersonal"       "b_preferred_speed"    </span></span>
+<span><span class="co">#&gt; [22] "a_preferred_speed"     "b_leader"              "a_leader"             </span></span>
+<span><span class="co">#&gt; [25] "d_leader"              "b_buddy"               "a_buddy"              </span></span>
+<span><span class="co">#&gt; [28] "a_group_centroid"      "b_group_centroid"      "b_visual_field"       </span></span>
+<span><span class="co">#&gt; [31] "central"               "non_central"           "acceleration"         </span></span>
+<span><span class="co">#&gt; [34] "constant_speed"        "deceleration"</span></span></code></pre></div>
+<p>The column <code>name</code> contains the name of the agent type,
+<code>color</code> contains the color that is used to visualize the
+agent in simulation plots, and <code>radius</code> determines the size
+of the agent. After these initial three columns follow a bunch of
+parameters used by the utility functions on the operational level,
+namely:</p>
+<ul>
+<li>
+<code>randomness</code>: Controls the randomness of the decisions of
+the agent;</li>
+<li>
+<code>stop_utility</code>: Controls the utility of stopping instead
+of moving, forming a threshold that moving options need to surpass;</li>
+<li>
+<code>reroute</code>: Controls the agent’s tendency to reroute when
+their route is blocked by other agents;</li>
+<li>
+<code>a_turning</code>, <code>b_turning</code>: Controls the
+biomechanical limitations in the maintainence of your speed while
+turning;</li>
+<li>
+<code>preferred_speed</code>, <code>a_preferred_speed</code>,
+<code>b_preferred_speed</code>: Parameters that control the utility of
+continuing to move at your preferred speed;</li>
+<li>
+<code>slowing_time</code>: Controls the time needed for the agent to
+slow down when approaching a goal;</li>
+<li>
+<code>a_goal_direction</code>, <code>b_goal_direction</code>:
+Controls the extent to which agents will head directly in the direction
+of their goals;</li>
+<li>
+<code>a_current_direction</code>, <code>b_current_direction</code>:
+Controls the extent to which agents will continue to head in their
+current direction;</li>
+<li>
+<code>blr_current_direction</code>: Controls a left-right side bias
+when overtaking or crossing other agents;</li>
+<li>
+<code>a_interpersonal_distance</code>,
+<code>b_interpersonal_distance</code>,
+<code>d_interpersonal_distance</code>: Controls the extent to which
+agents leave room between them and other agents;</li>
+<li>
+<code>a_blocked_angle</code>, <code>b_blocked_angle</code>: Controls
+the extent to which agents will anticipate and avoid directions that are
+blocked by other agents or objects at a distance;</li>
+<li>
+<code>a_leader</code>, <code>b_leader</code>, <code>d_leader</code>:
+Controls the extent to which agents will follow a leader in crowded
+situations;</li>
+<li>
+<code>a_buddy</code>, <code>b_buddy</code>: Controls the extent to
+which agents will walk besides others of the ingroup:</li>
+<li>
+<code>a_group_centroid</code>, <code>b_group_centroid</code>:
+Controls the extent to which agents within a social group will tend to
+stick together;</li>
+<li>
+<code>b_visual_field</code>: Controls the extent to which agents
+within a social group will try to keep each other in a field of
+vision.</li>
+</ul>
+<p>The parameter names follow a particular convention, where for the
+typical utility function we use <code>a</code> is used for an exponent,
+<code>b</code> for a slope, and <code>d</code> for a difference between
+ingroup and outgroup members before the underscore <code>_</code>, and
+the name of the utility function after.</p>
+<p>The values contained within this <code>data.frame</code> represent
+average values for the parameter for each agent type. For example,
+changing an agent type’s <code>preferred_speed</code> to a higher value
+means that this type of agent will tend to walk faster. Yet, one
+typically expects agents within a particular type to show quantitative
+differences from their prototype. This variation is handled by the
+<code>"params_sigma"</code> slot in the <code>params</code>
+variable.</p>
+<p>The <code>"params_sigma"</code> slot contains a named list of
+matrices, each slot of which is named after the different agent types
+and the contents of which define the (co)variation of each of the
+parameters. For example, the variation matrix for the
+<code>"BaselineEuropean"</code> looks like follows::</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">params_sigma</span><span class="op">$</span><span class="va">BaselineEuropean</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 radius slowing_time preferred_speed randomness stop_utility</span></span>
+<span><span class="co">#&gt; radius            0.15          0.0            0.00        0.0         0.00</span></span>
+<span><span class="co">#&gt; slowing_time      0.00          0.1            0.00        0.0         0.00</span></span>
+<span><span class="co">#&gt; preferred_speed   0.00          0.0            0.05        0.0         0.00</span></span>
+<span><span class="co">#&gt; randomness        0.00          0.0            0.00        0.1         0.00</span></span>
+<span><span class="co">#&gt; stop_utility      0.00          0.0            0.00        0.0         0.01</span></span>
+<span><span class="co">#&gt; reroute           0.00          0.0            0.00        0.0         0.00</span></span>
+<span><span class="co">#&gt;                 reroute b_turning a_turning b_current_direction</span></span>
+<span><span class="co">#&gt; radius              0.0         0         0                   0</span></span>
+<span><span class="co">#&gt; slowing_time        0.0         0         0                   0</span></span>
+<span><span class="co">#&gt; preferred_speed     0.0         0         0                   0</span></span>
+<span><span class="co">#&gt; randomness          0.0         0         0                   0</span></span>
+<span><span class="co">#&gt; stop_utility        0.0         0         0                   0</span></span>
+<span><span class="co">#&gt; reroute             0.1         0         0                   0</span></span>
+<span><span class="co">#&gt;                 a_current_direction blr_current_direction b_goal_direction</span></span>
+<span><span class="co">#&gt; radius                            0                     0                0</span></span>
+<span><span class="co">#&gt; slowing_time                      0                     0                0</span></span>
+<span><span class="co">#&gt; preferred_speed                   0                     0                0</span></span>
+<span><span class="co">#&gt; randomness                        0                     0                0</span></span>
+<span><span class="co">#&gt; stop_utility                      0                     0                0</span></span>
+<span><span class="co">#&gt; reroute                           0                     0                0</span></span>
+<span><span class="co">#&gt;                 a_goal_direction b_blocked a_blocked b_interpersonal</span></span>
+<span><span class="co">#&gt; radius                         0         0         0               0</span></span>
+<span><span class="co">#&gt; slowing_time                   0         0         0               0</span></span>
+<span><span class="co">#&gt; preferred_speed                0         0         0               0</span></span>
+<span><span class="co">#&gt; randomness                     0         0         0               0</span></span>
+<span><span class="co">#&gt; stop_utility                   0         0         0               0</span></span>
+<span><span class="co">#&gt; reroute                        0         0         0               0</span></span>
+<span><span class="co">#&gt;                 a_interpersonal d_interpersonal b_preferred_speed</span></span>
+<span><span class="co">#&gt; radius                        0               0                 0</span></span>
+<span><span class="co">#&gt; slowing_time                  0               0                 0</span></span>
+<span><span class="co">#&gt; preferred_speed               0               0                 0</span></span>
+<span><span class="co">#&gt; randomness                    0               0                 0</span></span>
+<span><span class="co">#&gt; stop_utility                  0               0                 0</span></span>
+<span><span class="co">#&gt; reroute                       0               0                 0</span></span>
+<span><span class="co">#&gt;                 a_preferred_speed b_leader a_leader d_leader b_buddy a_buddy</span></span>
+<span><span class="co">#&gt; radius                          0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt; slowing_time                    0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt; preferred_speed                 0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt; randomness                      0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt; stop_utility                    0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt; reroute                         0        0        0        0       0       0</span></span>
+<span><span class="co">#&gt;                 a_group_centroid b_group_centroid b_visual_field central</span></span>
+<span><span class="co">#&gt; radius                         0                0              0       0</span></span>
+<span><span class="co">#&gt; slowing_time                   0                0              0       0</span></span>
+<span><span class="co">#&gt; preferred_speed                0                0              0       0</span></span>
+<span><span class="co">#&gt; randomness                     0                0              0       0</span></span>
+<span><span class="co">#&gt; stop_utility                   0                0              0       0</span></span>
+<span><span class="co">#&gt; reroute                        0                0              0       0</span></span>
+<span><span class="co">#&gt;                 non_central acceleration constant_speed deceleration</span></span>
+<span><span class="co">#&gt; radius                    0            0              0            0</span></span>
+<span><span class="co">#&gt; slowing_time              0            0              0            0</span></span>
+<span><span class="co">#&gt; preferred_speed           0            0              0            0</span></span>
+<span><span class="co">#&gt; randomness                0            0              0            0</span></span>
+<span><span class="co">#&gt; stop_utility              0            0              0            0</span></span>
+<span><span class="co">#&gt; reroute                   0            0              0            0</span></span></code></pre></div>
+<p>Note that this matrix is <u>not</u> a covariance matrix. Instead, it
+contains the standard deviations of each parameter on its diagonal and
+the correlations between each parameter on its off-diagonal, thus
+containing the following structure:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>σ</mi><mn>1</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ρ</mi><mn>12</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ρ</mi><mrow><mn>1</mn><mi>p</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ρ</mi><mn>21</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>σ</mi><mn>2</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>ρ</mi><mrow><mn>2</mn><mi>p</mi></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ρ</mi><mrow><mi>p</mi><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ρ</mi><mrow><mi>p</mi><mn>2</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>σ</mi><mi>p</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
+  \Gamma = \begin{bmatrix}
+    \sigma_1 &amp; \rho_{12} &amp; \cdots &amp; \rho_{1p} \\
+    \rho_{21} &amp; \sigma_{2} &amp; \cdots &amp; \rho{2p} \\
+    \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+    \rho_{p1} &amp; \rho_{p2} &amp; \hdots &amp; \sigma_p \\
+  \end{bmatrix}
+\end{equation}</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+is the number of parameters.</p>
+<p>Computing the covariance matrix can be achieved through the following
+equation, defining
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Λ</mi><annotation encoding="application/x-tex">\Lambda</annotation></semantics></math>
+as a diagonal matrix containing the standard deviations of the
+parameters and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
+as the matrix containing the correlations on its off-diagonal and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>’s
+on its diagonal, we can construct the covariance matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Σ</mi><annotation encoding="application/x-tex">\Sigma</annotation></semantics></math>
+as follows:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>Σ</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>Λ</mi><mi>R</mi><msup><mi>Λ</mi><mi>T</mi></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>Λ</mi><mi>R</mi><mi>Λ</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{split}
+    \Sigma &amp;= \Lambda R \Lambda^T \\
+    &amp;= \Lambda R \Lambda
+\end{split}
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+denotes the transpose.</p>
+<p>We additionally note that the covariance matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Σ</mi><annotation encoding="application/x-tex">\Sigma</annotation></semantics></math>
+does not act on the raw (bounded) values of the parameters defined by
+the <code>data.frame</code> in <code>"params_archetypes"</code>.
+Instead, it acts on a transformed unbounded version of these parameters,
+as explained below. The nature of this transformation falls outside of
+the scope of this vignette.</p>
+<p>The final slot of the parameter list is <code>"params_bounds"</code>,
+a matrix containing the bounds of each of the parameters. By default,
+these bounds are the following:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">params</span><span class="op">$</span><span class="va">params_bounds</span></span>
+<span><span class="co">#&gt;                        [,1]    [,2]</span></span>
+<span><span class="co">#&gt; radius                2e-01 3.0e-01</span></span>
+<span><span class="co">#&gt; slowing_time          5e-01 2.5e+00</span></span>
+<span><span class="co">#&gt; preferred_speed       1e-02 2.5e+00</span></span>
+<span><span class="co">#&gt; randomness            1e-04 5.0e+00</span></span>
+<span><span class="co">#&gt; stop_utility          1e+01 1.0e+06</span></span>
+<span><span class="co">#&gt; reroute               2e+00 3.0e+01</span></span>
+<span><span class="co">#&gt; b_turning             0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; a_turning             0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; b_current_direction   0e+00 2.0e+01</span></span>
+<span><span class="co">#&gt; a_current_direction   0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; blr_current_direction 5e-02 2.0e+01</span></span>
+<span><span class="co">#&gt; b_goal_direction      0e+00 2.0e+01</span></span>
+<span><span class="co">#&gt; a_goal_direction      0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; b_blocked             5e-02 2.0e+01</span></span>
+<span><span class="co">#&gt; a_blocked             0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; b_interpersonal       0e+00 2.0e+01</span></span>
+<span><span class="co">#&gt; a_interpersonal       0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; d_interpersonal       0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; b_preferred_speed     0e+00 2.0e+01</span></span>
+<span><span class="co">#&gt; a_preferred_speed     0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; b_leader              0e+00 3.2e+02</span></span>
+<span><span class="co">#&gt; a_leader              0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; d_leader              0e+00 2.2e+02</span></span>
+<span><span class="co">#&gt; b_buddy               0e+00 2.2e+02</span></span>
+<span><span class="co">#&gt; a_buddy               0e+00 3.0e+00</span></span>
+<span><span class="co">#&gt; a_group_centroid      0e+00 4.0e+00</span></span>
+<span><span class="co">#&gt; b_group_centroid      0e+00 2.0e+01</span></span>
+<span><span class="co">#&gt; b_visual_field        0e+00 1.1e+02</span></span>
+<span><span class="co">#&gt; central               0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; non_central           0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; acceleration          0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; constant_speed        0e+00 1.0e+00</span></span>
+<span><span class="co">#&gt; deceleration          0e+00 1.0e+00</span></span></code></pre></div>
+<p>Lower and upper bounds for each of the parameters are contained in
+the first and second column respectively. Importantly, these bounds
+imply a fixed minimal and maximal value for each of the parameters, a
+feature that is preserved when generating random parameters for each
+agent.</p>
+<p>Because the process of generating parameters may be a little obscure,
+we allow users to visualize the variation in the parameters across
+agents through the <a href="https://ndpvh.github.io/predped/reference/plot_distribution.html" class="external-link"><code>plot_distribution</code></a>
+function, which typically will be used in the following way:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Save all separate components in separate variables</span></span>
+<span><span class="va">means</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">params_archetypes</span></span>
+<span><span class="va">covariances</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">params_sigma</span></span>
+<span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">params_bounds</span></span>
+<span></span>
+<span><span class="co"># Select the parameters of the BaselineEuropean</span></span>
+<span><span class="va">means</span> <span class="op">&lt;-</span> <span class="va">means</span><span class="op">[</span><span class="va">means</span><span class="op">$</span><span class="va">name</span> <span class="op">==</span> <span class="st">"BaselineEuropean"</span>, <span class="op">]</span></span>
+<span><span class="va">covariances</span> <span class="op">&lt;-</span> <span class="va">covariances</span><span class="op">$</span><span class="va">BaselineEuropean</span></span>
+<span></span>
+<span><span class="co"># Create a plot </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="co"># Set for reproducability purposes</span></span>
+<span><span class="fu"><a href="../reference/plot_distribution.html">plot_distribution</a></span><span class="op">(</span></span>
+<span>  <span class="fl">1000</span>,</span>
+<span>  mean <span class="op">=</span> <span class="va">means</span>,</span>
+<span>  Sigma <span class="op">=</span> <span class="va">covariances</span>,</span>
+<span>  bounds <span class="op">=</span> <span class="va">bounds</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="One sees a series of histograms displaying the randomly drawn values of the parameters across 1000 iterations, using the mean, covariance, and bounds specified in the variables `means`, `covariances`, and `bounds`." width="1440" style="display: block; margin: auto;"></p>
+<p>For the default parameter settings, one can alternatively visualize
+the parameter distribution of a particular agent type as follows:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create a plot </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="co"># Set for reproducibility purposes</span></span>
+<span><span class="fu"><a href="../reference/plot_distribution.html">plot_distribution</a></span><span class="op">(</span></span>
+<span>  <span class="fl">1000</span>,</span>
+<span>  archetype <span class="op">=</span> <span class="st">"BaselineEuropean"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>which should output distributions similar to the previously plotted
+ones. Whichever way you use the function, it will output a set of
+histograms showing the variation in the values of each parameter with
+the current specifications of the three parameter slots. If you wish to
+play around with this, you can simply change the variables
+<code>means</code>, <code>covariance</code>, and <code>bounds</code>
+that were created earlier.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="performing-the-simulation">Performing the Simulation<a class="anchor" aria-label="anchor" href="#performing-the-simulation"></a>
+</h2>
+<p>With the hefty work done, we can finally go on to simulating
+pedestrian behavior as predicted by the M4MA. Having
+<code>my_predped</code> as the instance of the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>predped</code></a>
+class that combines our environment with several agent characteristics,
+we can perform a simulation through calling the <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>
+function:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Simulate behavior in our office for 100 iterations and maximally 3 agents</span></span>
+<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
+<span>  <span class="va">my_predped</span>, </span>
+<span>  max_agents <span class="op">=</span> <span class="fl">3</span>, </span>
+<span>  iterations <span class="op">=</span> <span class="fl">100</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'predped'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:graphics':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     polygon</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     unique</span></span></code></pre></div>
-  </main>
+<span><span class="co">#&gt; Precomputing edgesYour model: model amrew is being simulated</span></span></code></pre></div>
+<p>The variable <code>trace</code> is a list containing instances of the
+<a href="https://ndpvh.github.io/predped/reference/state" class="external-link"><code>state</code></a>
+class. Essentially, this class contains all information about the
+agents, environment, and other variables that are relevant for the
+simulation at each iteration. It has the following (relevant) slots:</p>
+<ul>
+<li>
+<code>iteration</code>: The iteration number;</li>
+<li>
+<code>setting</code>: The environment in which the agents are
+walking around;</li>
+<li>
+<code>agents</code>: A list containing the agents that are currently
+present in the environment, each with their own characteristics,
+positions, orientations,…;</li>
+<li>
+<code>potential_agents</code>: A list containing agents that are
+currently waiting at the entrance to enter the room;</li>
+<li>
+<code>variables</code>: A named list containing variables that can
+be adjusted or used during the simulation (see <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>);</li>
+<li>
+<code>iteration_variables</code>: A <code>data.frame</code>
+containing information for the simulation at each iteration. Is slowly
+being phased out.</li>
+</ul>
+<p>One can visualize both a single state of the simulation, or all
+states at once by calling the <a href="https://ndpvh.github.io/predped/articles/plot.html" class="external-link"><code>plot</code></a>
+function:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot a single state</span></span>
+<span><span class="va">plt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trace</span><span class="op">[[</span><span class="fl">10</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">plt</span></span></code></pre></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="The plot shows the environment " width="700" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot the complete trace</span></span>
+<span><span class="va">plt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span></span></code></pre></div>
+<p>One can now skim through all plots to see how the agents behave, but
+this may turn out to be a tedious task. We therefore also recommend the
+creation of GIFs based on these plots. We recommend using the
+<code>gifski</code> package for this purpose:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create a GIF that is 5 times faster than real time (10 frames per second </span></span>
+<span><span class="co"># instead of 2)</span></span>
+<span><span class="fu">gifski</span><span class="fu">::</span><span class="fu">save_gif</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">plt</span>, <span class="va">print</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"my_gif.gif"</span><span class="op">)</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>In our experience, this is the quickest way of producing a GIF in R,
+but we warn the user: When a <code>trace</code> is long, this may still
+take a while. If you are experimenting with simulation settings before
+running a full-length simulation study, we recommend setting the
+<code>plot_live</code> argument of <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>
+to <code>TRUE</code> instead. Note that <code>plot_live</code> is
+experimental and is known to not function equally well across different
+IDE’s.</p>
+</div>
+<div class="section level2">
+<h2 id="recap">Recap<a class="anchor" aria-label="anchor" href="#recap"></a>
+</h2>
+<p>In short, one can use the <code>predped</code> package to simulate
+data according to the M4MA by adhering to a particular workflow.
+Specifically, users need to specify (a) an environment, (b) the
+characteristics of the agents, and (c) the simulation characteristics. A
+minimal working example that combines all of these is shown the
+following bit of code:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load predped</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create an environment: Simplified version of our office</span></span>
+<span><span class="va">my_background</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/background-class.html">background</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>  objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Desks</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.85</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.4</span>, <span class="fl">1.6</span><span class="op">)</span>,</span>
+<span>      forbidden <span class="op">=</span> <span class="fl">1</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="co"># Cabinets</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">2.3</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">0.4</span><span class="op">)</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    <span class="co"># Big bookcase</span></span>
+<span>    <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
+<span>      center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">2.275</span><span class="op">)</span>, </span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.45</span><span class="op">)</span>, </span>
+<span>      forbidden <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>, </span>
+<span>  entrance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Link agent characteristics to the environment</span></span>
+<span><span class="va">my_predped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predped-class.html">predped</a></span><span class="op">(</span></span>
+<span>  setting <span class="op">=</span> <span class="va">my_background</span>, </span>
+<span>  archetypes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BaselineEuropean"</span>, <span class="st">"DrunkAussie"</span><span class="op">)</span>,</span>
+<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Simulate 120 iterations, or 1 minute</span></span>
+<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
+<span>  <span class="va">my_predped</span>,</span>
+<span>  max_agents <span class="op">=</span> <span class="fl">3</span>, </span>
+<span>  iterations <span class="op">=</span> <span class="fl">120</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot the trace and save as a GIF</span></span>
+<span><span class="va">plt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span></span>
+<span><span class="fu">gifski</span><span class="fu">::</span><span class="fu">save_gif</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">plt</span>, <span class="va">print</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"my_simulation.gif"</span><span class="op">)</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
