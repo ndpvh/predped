@@ -59,12 +59,6 @@ mll <- function(data,
         data <- data[!is.na(data$ps_speed), ]
     }
 
-    # If transform is TRUE, then we need to transform the parameters from the 
-    # real scale to the bounded scale.
-    if(transform) {
-        parameters <- to_bounded(parameters, bounds)
-    }
-
     # Retrieve each person's identifier. Note that we sort this to avoid problems
     # with indexing in the C++ code.
     ids <- unique(data$id) |>
@@ -87,6 +81,13 @@ mll <- function(data,
     } else if(is.data.frame(parameters) & nrow(parameters) < length(ids)) {
         idx <- rep_len(1:nrow(parameters), length(ids))
         parameters <- parameters[idx, ]
+    }
+
+    # If transform is TRUE, then we need to transform the parameters from the 
+    # real scale to the bounded scale.
+    if(transform) {
+        names(parameters) <- parameter_names
+        parameters <- to_bounded(parameters, bounds)
     }
 
     if(cpp) {
