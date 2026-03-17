@@ -142,6 +142,10 @@ mll <- function(data,
                                            exp_V <- exp(V)
                                            return(exp_V[selection$cell[j] + 1] / sum(exp_V))
                                        })
+
+                           # Transform likelihoods that fall below a particular 
+                           # threshold
+                           L[log(L) < -10] <- exp(-10)
                       
                            # Convert likelihoods to min-log-likelihood. 1 was added
                            # to each likelihood to ensure that 0 probability will 

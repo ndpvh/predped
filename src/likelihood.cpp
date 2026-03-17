@@ -67,6 +67,7 @@ List mll_rcpp(List data,
         // Loop over each row and do the actual computations
         NumericVector V(34);
         double MLL_i = 0.;
+        double L = 0.;
 
         for(int i = 0; i < data.length(); i++) {
             // Compute the utility of the data under the parameters of the person.
@@ -80,9 +81,15 @@ List mll_rcpp(List data,
             // Transform V to probabilities and afterwards to the min-log-likelihood.
             // Add the value of this likelihood to the MLL vector.
             V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
+            L = log(V[cells[i]] / Rcpp::sum(V));
+
+            // Check whether the value exceeds a particular threshold
+            if(L < -100.) {
+                L = -100.;
+            } 
 
             MLL_i = MLL[idx[i]]; 
-            MLL_i -= log(V[cells[i]] / Rcpp::sum(V));
+            MLL_i -= L;
             MLL[idx[i]] = MLL_i;
         }
 
@@ -95,6 +102,7 @@ List mll_rcpp(List data,
         }
 
         IntegerVector idx_participant(ids.length());
+        double L = 0.;
 
         // Loop over each iteration and assign the likelihood to the MLL list of the 
         // respective participant
@@ -111,9 +119,15 @@ List mll_rcpp(List data,
             // Transform V to probabilities and afterwards to the min-log-likelihood.
             // Add the value of this likelihood to the MLL vector.
             V = Rcpp::exp(V - *std::max_element(V.begin(), V.end()));
+            L = V[cells[i]] / Rcpp::sum(V);
+
+            // Check whether the value exceeds a particular threshold
+            if(log(L) < -10.) {
+                L = exp(-10.);
+            }
 
             NumericVector MLL_i = MLL[idx[i]];
-            MLL_i[idx_participant[idx[i]]] = V[cells[i]] / Rcpp::sum(V);
+            MLL_i[idx_participant[idx[i]]] = L;
             MLL[idx[i]] = MLL_i;
 
             // Update the participant index
