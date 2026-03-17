@@ -506,7 +506,7 @@ plt[[101]] <- plot(
 # Save to a gif
 gifski::save_gif(
     lapply(plt, print),
-    file.path("man", "figures", "supermarket.gif"),
+    file.path("supermarket.gif"),
     delay = 1/10
 )
 ```
