@@ -4,7 +4,7 @@
 
 - [Advanced
   Simulations](https://github.com/ndpvh/predped/articles/advanced_simulation.md):
-- [estimation](https://github.com/ndpvh/predped/articles/estimation.md):
+- [Estimation](https://github.com/ndpvh/predped/articles/estimation.md):
 - [Getting
   Started](https://github.com/ndpvh/predped/articles/getting_started.md):
 - [Simulations](https://github.com/ndpvh/predped/articles/simulation.md):

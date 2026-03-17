@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>estimation • predped</title>
+<title>Estimation • predped</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="estimation">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Estimation">
 <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
@@ -68,7 +68,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>estimation</h1>
+      <h1>Estimation</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/ndpvh/predped/tree/main/vignettes/estimation.Rmd"><code>vignettes/estimation.Rmd</code></a></small>
@@ -77,17 +77,682 @@
 
     
     
+<p>One of the major advances of the Minds for Mobile Agents model (M4MA)
+is the ability to estimate its parameters on data. In this vignette, we
+will illustrate this through two examples, one starting from the
+<code>trace</code> output from the <a href="https://ndpvh.github.io/predped/reference/simulate" class="external-link"><code>simulate</code></a>
+function and the other starting from a <code>data.frame</code>
+containing measured movement data.</p>
+<p>Note that for the estimation, <code>predped</code> only concerns
+itself with computing the utilities and associated probabilities of each
+expected movement decision. This means that we need to rely on external
+packages to perform the estimation procedure, using an optimization
+procedure to maximize the likelihood of the data under a set of
+parameters. Within this vignette, we use the <code>nloptr</code> package
+to perform this optimization procedure (Johnson, 2008). To install and
+use this package, one can execute the following two commands:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nloptr"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/astamm/nloptr" class="external-link">nloptr</a></span><span class="op">)</span></span></code></pre></div>
+<p>For more information on the package and the NLopt library, we refer
+the interested reader to the dedicated documentation sites
+(<code>nloptr</code>: <a href="https://astamm.github.io/nloptr" class="external-link uri">https://astamm.github.io/nloptr</a>; NLopt: <a href="https://nlopt.readthedocs.io/en/latest" class="external-link uri">https://nlopt.readthedocs.io/en/latest</a>).</p>
+<div class="section level2">
+<h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
+</h2>
+<p>At the moment of writing, we are performing recovery studies to
+ensure the quality of the estimation of the M4MAs parameters. While
+likelihood profiles look good, we are not sure yet how much movement
+data is needed to ensure unbiased estimates with small standard errors.
+For now, we therefore do not guarantee accurate results when performing
+estimations on your own movement data.</p>
+<p>Furthermore note that the computation of the likelihood has not been
+adequately optimzed yet. For large datasets, the estimation procedure
+may therefore be rather slow.</p>
+</div>
+<div class="section level2">
+<h2 id="starting-from-a-trace">Starting from a Trace<a class="anchor" aria-label="anchor" href="#starting-from-a-trace"></a>
+</h2>
+<p>Consider a trace that has been saved in the variable
+<code>trace</code>, containing a simulation in which people walk around
+in a minimal supermarket with some additional flow indicators to prevent
+blockages (see <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>):</p>
+<p><img src="../reference/figures/trace.gif" class="r-plt" alt="Visualization of the minimal supermarket and the agents that walk around in it. The first 200 iterations of movements of the agents within this supermarket are visualized in this GIF." style="display: block; margin: auto;"></p>
+<p>Then we need to perform the following steps to estimate the
+parameters of the M4MA to the data contained within this
+<code>trace</code>.</p>
+<p>First, one will have to transform the <code>trace</code> to a
+<code>data.frame</code>, which can be achieved with the <a href="https://ndpvh.github.io/predped/reference/unpack_trace.html" class="external-link"><code>unpack_trace</code></a>
+function:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack_trace.html">unpack_trace</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span></span></code></pre></div>
+<p>The variable <code>data</code> contains a bunch of information in a
+variety of columns, namely:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "iteration"   "time"        "id"          "x"           "y"          </span></span>
+<span><span class="co">#&gt;  [6] "speed"       "orientation" "cell"        "group"       "status"     </span></span>
+<span><span class="co">#&gt; [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  </span></span>
+<span><span class="co">#&gt; [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"</span></span>
+<span><span class="co">#&gt; [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" </span></span>
+<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"</span></span></code></pre></div>
+<p>Of these, some indicate some attributes of the agent at a particular
+time (e.g., position in <code>x</code> and <code>y</code>, speed and
+orientation in <code>speed</code> and <code>orientation</code>) but also
+the cell that they selected (<code>cell</code>) and variables that are
+relevant for computing the utility of that decision (e.g.,
+<code>check</code>, <code>ps_speed</code>, <code>gd_angle</code>,…). The
+contents of the latter set of columns depend heavily on the requirements
+of the utility functions defined in the <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> package and we
+refer the interested reader to its documentation for a full explanation
+(<a href="https://research-software-directory.org/software/m4ma" class="external-link uri">https://research-software-directory.org/software/m4ma</a>).</p>
+<p>Second, we need to delete datapoints that are not of interest for the
+estimation procedure. Given that the M4MAs parameters guide movement, we
+can only use those datapoints at which agents were moving around. Within
+a <code>trace</code>, the easiest way in which to spot whether this is
+the case is by filtering out any rows in which the utility variables are
+<code>NA</code>, indicating that they were not used during that
+iteration:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 804  30</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">check</span><span class="op">)</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 419  30</span></span></code></pre></div>
+<p>Note that this step is not necessary for the code to run, but that a
+warning would be thrown in case <code>NA</code> are left in the
+data.</p>
+<p>Finally, once the data has been filtered to contain only movement
+data, we can compute the likelihood of the data under a particular set
+of parameters. Calling this likelihood
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>,
+then one can compute the negative log-likelihood
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>L</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">-\log(L)</annotation></semantics></math>
+with the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+function as follows:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define a set of parameters to be evaluated. For illustration purposes, we use</span></span>
+<span><span class="co"># the parameters of the DrunkAussie for this purpose. Note that we delete the </span></span>
+<span><span class="co"># agent's type name and their color from the parameters. Furthermore note that </span></span>
+<span><span class="co"># we need to transform the parameters to a numeric vector.</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_archetypes</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">[</span><span class="va">params</span><span class="op">$</span><span class="va">name</span> <span class="op">==</span> <span class="st">"DrunkAussie"</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute the likelihood of the data under this parameter set</span></span>
+<span><span class="fu"><a href="../reference/mll.html">mll</a></span><span class="op">(</span></span>
+<span>  <span class="va">data</span>, </span>
+<span>  <span class="va">params</span>,</span>
+<span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  summed <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;    grazd    ihvmf    mlchb    nxpju    womdz </span></span>
+<span><span class="co">#&gt; 196.1544 186.6085 142.5374 178.6028 142.5474</span></span></code></pre></div>
+<p>The output of this call to <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+is a named vector displaying the summed negative log-likelihood of the
+data under the provided parameters.</p>
+<p>In this piece of code, we specified the argument
+<code>transform = FALSE</code> to communicate that the provided
+parameters are on the bounded scale rather than the unbounded scale (see
+<em>Parameters</em> in the vignette on <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link"><em>Simulations</em></a>).
+When using an optimizer, it may be interesting to let the optimizer work
+on the unbounded (real) scale instead, in which case you can specify
+<code>transform = TRUE</code>. Additionally, we specified
+<code>summed = TRUE</code> to get the summed value for the negative
+log-likelihood across all datapoints of a particular agent. If you wish
+to see the values of the negative log-likelihood for each datapoint
+individually, you can set <code>summed = FALSE</code>.</p>
+<p>The call to the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+function will serve as the basic building block of the estimation
+procedure, which we dive more into in the next section.</p>
+<div class="section level3">
+<h3 id="optimization">Optimization<a class="anchor" aria-label="anchor" href="#optimization"></a>
+</h3>
+<p>Typically, we want to estimate a set of unknown parameters to the
+data that is available to us. To achieve this via the
+<code>nloptr</code> package, we need to first define an <em>objective
+function</em>, that is a function that outputs a value to be minimized
+by the optimizer through changing a vector of parameters that serve as
+an input to this function. In our case, the objective function will be a
+wrapper around the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+function, summing all of the negative log-likelihoods together into one
+single <code>objective</code> value:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">objective_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="../reference/mll.html">mll</a></span><span class="op">(</span></span>
+<span>        <span class="va">data</span>, </span>
+<span>        <span class="va">parameters</span>,</span>
+<span>        transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>        summed <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Note that this function only takes in a single argument
+<code>parameters</code>: The content of the <code>data</code> that is
+included in the call to <code>mll</code> is assumed to be a global
+variable. Furthermore note that for our purposes, we assume that the
+provided parameters fall on the bounded scale and therefore don’t need
+to be transformed.</p>
+<p>Once the objective function is defined, we can call the
+<code>nloptr</code> function of the <code>nloptr</code> package to
+perform the estimation procedure. Using the dividing rectangles
+algorithm (Jones et al., 1993), for example, we get:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Extract the bounds of the parameters</span></span>
+<span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_bounds</span></span>
+<span></span>
+<span><span class="co"># Define the initial condition for the algorithm. Take the middle of the </span></span>
+<span><span class="co"># interval defined by the bounds</span></span>
+<span><span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">bounds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Perform the estimation procedure</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://astamm.github.io/nloptr/reference/nloptr.html" class="external-link">nloptr</a></span><span class="op">(</span></span>
+<span>  <span class="va">x0</span>,</span>
+<span>  <span class="va">objective_function</span>, </span>
+<span>  lb <span class="op">=</span> <span class="va">bounds</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
+<span>  ub <span class="op">=</span> <span class="va">bounds</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,</span>
+<span>  opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    algorithm <span class="op">=</span> <span class="st">"NLOPT_GN_DIRECT"</span>,</span>
+<span>    maxeval <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>    xtol_abs <span class="op">=</span> <span class="fl">1e-4</span>,</span>
+<span>    ftol_abs <span class="op">=</span> <span class="fl">1e-4</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print the resulting fit</span></span>
+<span><span class="va">fit</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'predped'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:graphics':</span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; nloptr(x0 = x0, eval_f = objective_function, lb = bounds[, 1], </span></span>
+<span><span class="co">#&gt;     ub = bounds[, 2], opts = list(algorithm = "NLOPT_GN_DIRECT", </span></span>
+<span><span class="co">#&gt;         maxeval = 1000, xtol_abs = 1e-04, ftol_abs = 1e-04))</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     polygon</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     unique</span></span></code></pre></div>
-  </main>
+<span><span class="co">#&gt; Minimization using NLopt version 2.10.0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; NLopt solver status: 5 ( NLOPT_MAXEVAL_REACHED: Optimization stopped because </span></span>
+<span><span class="co">#&gt; maxeval (above) was reached. )</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Iterations....: 1000 </span></span>
+<span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
+<span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
+<span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
+<span><span class="co">#&gt; Current value of objective function:  739.726257900465 </span></span>
+<span><span class="co">#&gt; Current value of controls: 0.25 1.5 2.085 4.166683 500005 16 0.5 1.5 10 1.5 3.375 10 1.5 10.025 1.5 10 1.5 </span></span>
+<span><span class="co">#&gt; 0.5 10 1.5 160 1.5 110 110 1.5 2 10 55 0.5 0.5 0.5 0.5 0.5</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="individual-parameters">Individual Parameters<a class="anchor" aria-label="anchor" href="#individual-parameters"></a>
+</h3>
+<p>Up to now, we have assumed that each of the participants has the same
+parameter set underlying their movement data. More realistically,
+though, individuals differ in their walking tendencies, requiring us to
+estimate different parameters for each individual within our data.</p>
+<p>To achieve this, we have to provide a matrix of parameter values to
+the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+function with rows indicating the individuals and the columns the
+parameters of interest. In practice, we therefore need to change the
+objective function so that:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the number of participants in the study</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">id</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define the objective function</span></span>
+<span><span class="va">objective_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Transform the parameters to the required format</span></span>
+<span>  <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
+<span>    <span class="va">parameters</span>,</span>
+<span>    nrow <span class="op">=</span> <span class="va">n</span>, </span>
+<span>    ncol <span class="op">=</span> <span class="fl">33</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Compute the objective</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="../reference/mll.html">mll</a></span><span class="op">(</span></span>
+<span>        <span class="va">data</span>, </span>
+<span>        <span class="va">parameters</span>,</span>
+<span>        transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>        summed <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Then, it’s just a matter of changing the initial conditions
+<code>x0</code> and the bounds <code>lb</code> and <code>ub</code> in
+the <code>nloptr</code> function so that it matches the objective
+function, in this case:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Extract the bounds of the parameters</span></span>
+<span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_bounds</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span>each <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">33</span> <span class="op">*</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define the initial condition for the algorithm. Take the middle of the </span></span>
+<span><span class="co"># interval defined by the bounds</span></span>
+<span><span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">bounds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Perform the estimation procedure</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://astamm.github.io/nloptr/reference/nloptr.html" class="external-link">nloptr</a></span><span class="op">(</span></span>
+<span>  <span class="va">x0</span>,</span>
+<span>  <span class="va">objective_function</span>, </span>
+<span>  lb <span class="op">=</span> <span class="va">bounds</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
+<span>  ub <span class="op">=</span> <span class="va">bounds</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,</span>
+<span>  opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    algorithm <span class="op">=</span> <span class="st">"NLOPT_GN_DIRECT"</span>,</span>
+<span>    maxeval <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>    xtol_abs <span class="op">=</span> <span class="fl">1e-4</span>,</span>
+<span>    ftol_abs <span class="op">=</span> <span class="fl">1e-4</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print the resulting fit</span></span>
+<span><span class="va">fit</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; nloptr(x0 = x0, eval_f = objective_function, lb = bounds[, 1], </span></span>
+<span><span class="co">#&gt;     ub = bounds[, 2], opts = list(algorithm = "NLOPT_GN_DIRECT", </span></span>
+<span><span class="co">#&gt;         maxeval = 1000, xtol_abs = 1e-04, ftol_abs = 1e-04))</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Minimization using NLopt version 2.10.0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; NLopt solver status: 5 ( NLOPT_MAXEVAL_REACHED: Optimization stopped because </span></span>
+<span><span class="co">#&gt; maxeval (above) was reached. )</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Iterations....: 1000 </span></span>
+<span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
+<span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
+<span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
+<span><span class="co">#&gt; Current value of objective function:  3598.79453227266 </span></span>
+<span><span class="co">#&gt; Current value of controls: 0.25 0.25 0.2833333 0.2833333 0.2833333 1.5 1.5 1.5 0.8333333 2.166667 1.255 </span></span>
+<span><span class="co">#&gt; 0.425 1.255 0.425 2.085 2.50005 2.50005 2.50005 0.8334167 2.50005 500005 500005 </span></span>
+<span><span class="co">#&gt; 500005 500005 500005 16 16 16 16 16 0.5 0.5 0.5 0.5 0.5 1.5 1.5 1.5 1.5 1.5 10 </span></span>
+<span><span class="co">#&gt; 10 10 10 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 10 10 10 10 </span></span>
+<span><span class="co">#&gt; 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 1.5 1.5 1.5 1.5 1.5 </span></span>
+<span><span class="co">#&gt; 10 10 10 10 10 1.5 1.5 1.5 1.5 1.5 0.5 0.5 0.5 0.5 0.5 10 10 10 10 10 1.5 1.5 </span></span>
+<span><span class="co">#&gt; 1.5 1.5 1.5 160 160 160 160 160 1.5 1.5 1.5 1.5 1.5 110 110 110 110 110 110 110 </span></span>
+<span><span class="co">#&gt; 110 110 110 1.5 1.5 1.5 1.5 1.5 2 2 2 2 2 10 10 10 10 10 55 55 55 55 55 0.5 0.5 </span></span>
+<span><span class="co">#&gt; 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 </span></span>
+<span><span class="co">#&gt; 0.5 0.5 0.5</span></span></code></pre></div>
+<p>In this case, it may be useful to transform the parameters back to
+the matrix introduced in the objective function and provide it with
+matching column names denoting the parameters and row names denoting the
+participants themselves:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the parameter names: By default the same order as the one in bounds</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_bounds</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get the id names: The same order as the ones output by mll</span></span>
+<span><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mll.html">mll</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">bounds</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, transform <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Transform the result to a matrix with the provided column and row names</span></span>
+<span><span class="va">fit</span><span class="op">$</span><span class="va">solution</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ids</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">`rownames&lt;-`</span> <span class="op">(</span><span class="va">ids</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">`colnames&lt;-`</span> <span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          radius slowing_time preferred_speed randomness stop_utility reroute</span></span>
+<span><span class="co">#&gt; grazd 0.2500000    1.5000000           1.255  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; ihvmf 0.2500000    1.5000000           0.425  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; mlchb 0.2833333    1.5000000           1.255  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; nxpju 0.2833333    0.8333333           0.425  0.8334167       500005      16</span></span>
+<span><span class="co">#&gt; womdz 0.2833333    2.1666667           2.085  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt;       b_turning a_turning b_current_direction a_current_direction</span></span>
+<span><span class="co">#&gt; grazd       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; ihvmf       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; mlchb       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; nxpju       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; womdz       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt;       blr_current_direction b_goal_direction a_goal_direction b_blocked</span></span>
+<span><span class="co">#&gt; grazd                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; ihvmf                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; mlchb                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; nxpju                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; womdz                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt;       a_blocked b_interpersonal a_interpersonal d_interpersonal</span></span>
+<span><span class="co">#&gt; grazd       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; ihvmf       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; mlchb       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; nxpju       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; womdz       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt;       b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span></span>
+<span><span class="co">#&gt; grazd                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; ihvmf                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; mlchb                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; nxpju                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; womdz                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt;       a_buddy a_group_centroid b_group_centroid b_visual_field central</span></span>
+<span><span class="co">#&gt; grazd     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; ihvmf     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; mlchb     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; nxpju     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; womdz     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt;       non_central acceleration constant_speed deceleration</span></span>
+<span><span class="co">#&gt; grazd         0.5          0.5            0.5          0.5</span></span>
+<span><span class="co">#&gt; ihvmf         0.5          0.5            0.5          0.5</span></span>
+<span><span class="co">#&gt; mlchb         0.5          0.5            0.5          0.5</span></span>
+<span><span class="co">#&gt; nxpju         0.5          0.5            0.5          0.5</span></span>
+<span><span class="co">#&gt; womdz         0.5          0.5            0.5          0.5</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="unbounded-estimation">Unbounded Estimation<a class="anchor" aria-label="anchor" href="#unbounded-estimation"></a>
+</h3>
+<p>The algorithm that we used before requires us to impose bounds on the
+parameters. In some cases, however, it may be more useful to use an
+optimizer that operates on the real scale, rather than on a bounded one.
+In this case, we change the argument <code>transform</code> to
+<code>TRUE</code> and change the call to <code>nloptr</code> as
+follows:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Change the objective function to operate on the real scale</span></span>
+<span><span class="va">objective_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="../reference/mll.html">mll</a></span><span class="op">(</span></span>
+<span>        <span class="va">data</span>, </span>
+<span>        <span class="va">parameters</span>,</span>
+<span>        transform <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        summed <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Change the initial condition</span></span>
+<span><span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">33</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Perform the estimation procedure with an algorithm that does not require </span></span>
+<span><span class="co"># bounds to be specified</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://astamm.github.io/nloptr/reference/nloptr.html" class="external-link">nloptr</a></span><span class="op">(</span></span>
+<span>  <span class="va">x0</span>,</span>
+<span>  <span class="va">objective_function</span>, </span>
+<span>  opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    algorithm <span class="op">=</span> <span class="st">"NLOPT_LN_SBPLX"</span>,</span>
+<span>    maxeval <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>    xtol_abs <span class="op">=</span> <span class="fl">1e-4</span>,</span>
+<span>    ftol_abs <span class="op">=</span> <span class="fl">1e-4</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print the resulting fit</span></span>
+<span><span class="va">fit</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; nloptr(x0 = x0, eval_f = objective_function, opts = list(algorithm = "NLOPT_LN_SBPLX", </span></span>
+<span><span class="co">#&gt;     maxeval = 1000, xtol_abs = 1e-04, ftol_abs = 1e-04))</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Minimization using NLopt version 2.10.0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; NLopt solver status: 5 ( NLOPT_MAXEVAL_REACHED: Optimization stopped because </span></span>
+<span><span class="co">#&gt; maxeval (above) was reached. )</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Iterations....: 1000 </span></span>
+<span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
+<span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
+<span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
+<span><span class="co">#&gt; Current value of objective function:  429.316084129412 </span></span>
+<span><span class="co">#&gt; Current value of controls: -2.594467 -0.5634537 0.5070385 -0.2047041 0.6581698 0.2549867 0.2549867 </span></span>
+<span><span class="co">#&gt; 0.06491596 -1.421626 -0.4919096 -0.0133553 10.21004 -0.3960335 -0.6823948 </span></span>
+<span><span class="co">#&gt; -0.004831927 -0.3530833 -0.01361795 -11.13464 0.2360346 0.7072078 -2.224339 </span></span>
+<span><span class="co">#&gt; 7.560695 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 </span></span>
+<span><span class="co">#&gt; 0.2549867 0.2549867 0.2549867 -0.1656554</span></span></code></pre></div>
+<p>Importantly, the parameters now have been estimated to be on the real
+scale, yet the parameters of the M4MA need to be defined on the bounded
+scale. To transform the parameters to their proper values, we use the <a href="https://ndpvh.github.io/predped/reference/to_bounded.html" class="external-link"><code>to_bounded</code></a>
+function:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the bounds of the parameters</span></span>
+<span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_bounds</span></span>
+<span></span>
+<span><span class="co"># Extract the parameters and transform to a data.frame. Expected by the </span></span>
+<span><span class="co"># to_bounded function</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">solution</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">`colnames&lt;-`</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">bounds</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use to_bounded to transform the parameters</span></span>
+<span><span class="va">transformed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/to_bounded.html">to_bounded</a></span><span class="op">(</span></span>
+<span>  <span class="va">params</span>, </span>
+<span>  <span class="va">bounds</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">transformed</span></span>
+<span><span class="co">#&gt;           radius slowing_time preferred_speed randomness stop_utility  reroute</span></span>
+<span><span class="co">#&gt; radius 0.2004737     1.073126        1.737901   2.094566     744788.1 18.81773</span></span>
+<span><span class="co">#&gt;        b_turning a_turning b_current_direction a_current_direction</span></span>
+<span><span class="co">#&gt; radius 0.6006333  1.577639            1.551349           0.9341749</span></span>
+<span><span class="co">#&gt;        blr_current_direction b_goal_direction a_goal_direction b_blocked</span></span>
+<span><span class="co">#&gt; radius               9.91871               20          1.03812  4.987519</span></span>
+<span><span class="co">#&gt;        a_blocked b_interpersonal a_interpersonal d_interpersonal</span></span>
+<span><span class="co">#&gt; radius  1.494217         7.24026        1.483702    4.254342e-29</span></span>
+<span><span class="co">#&gt;        b_preferred_speed a_preferred_speed b_leader a_leader d_leader  b_buddy</span></span>
+<span><span class="co">#&gt; radius          11.86594          2.280844   4.1801        3 132.1393 132.1393</span></span>
+<span><span class="co">#&gt;        a_buddy a_group_centroid b_group_centroid b_visual_field   central</span></span>
+<span><span class="co">#&gt; radius  1.8019         2.402533         12.01267       66.06967 0.6006333</span></span>
+<span><span class="co">#&gt;        non_central acceleration constant_speed deceleration</span></span>
+<span><span class="co">#&gt; radius   0.6006333    0.6006333      0.6006333    0.4342141</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="starting-from-data">Starting from Data<a class="anchor" aria-label="anchor" href="#starting-from-data"></a>
+</h2>
+<p>Within <code>predped</code>, we also allow users to estimate the M4MA
+on their data directly. Consider the following dataset taken from a
+simplified train station, for example (see <a href="https://ndpvh.github.io/predped/articles/advnaced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>):</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       time passenger        x             y</span></span>
+<span><span class="co">#&gt; 1 2.403958         1 4.692500  3.765789e-17</span></span>
+<span><span class="co">#&gt; 2 2.932846         1 4.606273 -4.020823e-02</span></span>
+<span><span class="co">#&gt; 3 3.413369         1 4.488606 -1.225997e-01</span></span>
+<span><span class="co">#&gt; 4 4.063040         1 4.281833 -1.780042e-01</span></span>
+<span><span class="co">#&gt; 5 4.453463         1 3.988913 -3.145950e-01</span></span>
+<span><span class="co">#&gt; 6 4.992690         1 3.591787 -5.926661e-01</span></span></code></pre></div>
+<p>In this dataset, we measured the positions (<code>x</code> and
+<code>y</code>) of different passengers (<code>passenger</code>) at
+several time points (<code>time</code>). To go from this dataset to one
+that we can use for the estimation procedure, we need to take the
+following steps.</p>
+<p>First, we need the dataset to conform to the standards of
+<code>predped</code>. This means that:</p>
+<ul>
+<li>The <code>time</code> variable needs to show discrete jumps
+conforming the <code>time_step</code> defined by the M4MA, it being
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>500</mn><annotation encoding="application/x-tex">500</annotation></semantics></math>msec;</li>
+<li>A variable <code>iteration</code> needs to be added showing the
+iteration at which the positions were measured;</li>
+<li>The <code>passenger</code> variable needs to be renamed to the
+<code>predped</code> internal <code>id</code>.</li>
+</ul>
+<p>Addressing the first change, this amounts to binning the data within
+a particular time window, aggregating the positions within that window
+through, for example, taking a mean, as we do in the next bit of
+code:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define the bins, assuming the time variable is specified in seconds</span></span>
+<span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span>, </span>
+<span>  by <span class="op">=</span> <span class="fl">0.5</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Loop over the bins and aggregate the data within those bins. Take the average</span></span>
+<span><span class="co"># of the bin as the time indication. Do this for each person separately.</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">passenger</span><span class="op">)</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
+<span>      <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="co"># Select the relevant data, it being the data where the time lies within</span></span>
+<span>        <span class="co"># a particular bin and the passenger is x</span></span>
+<span>        <span class="va">idx</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">time</span> <span class="op">&lt;=</span> <span class="va">bins</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">data</span><span class="op">$</span><span class="va">time</span> <span class="op">&gt;=</span> <span class="va">bins</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">data</span><span class="op">$</span><span class="va">passenger</span> <span class="op">==</span> <span class="va">x</span></span>
+<span>        <span class="va">selection</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span></span>
+<span></span>
+<span>        <span class="co"># Aggregate and return a single row of data</span></span>
+<span>        <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">selection</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>          <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>              time <span class="op">=</span> <span class="op">(</span><span class="va">bins</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">bins</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>,</span>
+<span>              passenger <span class="op">=</span> <span class="va">x</span>,</span>
+<span>              x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">selection</span><span class="op">$</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>              y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">selection</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
+<span>            <span class="op">)</span></span>
+<span>          <span class="op">)</span></span>
+<span>        <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>          <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
+<span>        <span class="op">}</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># Bind together and return</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"rbind"</span>, <span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Bind all rows within the list of binned data together</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"rbind"</span>, <span class="va">data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Order based on time</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         time passenger        x             y</span></span>
+<span><span class="co">#&gt; 218 2.653958         1 4.692500  3.765789e-17</span></span>
+<span><span class="co">#&gt; 219 3.153958         1 4.606273 -4.020823e-02</span></span>
+<span><span class="co">#&gt; 220 3.653958         1 4.488606 -1.225997e-01</span></span>
+<span><span class="co">#&gt; 221 4.153958         1 4.281833 -1.780042e-01</span></span>
+<span><span class="co">#&gt; 222 4.653958         1 3.988913 -3.145950e-01</span></span>
+<span><span class="co">#&gt; 223 5.153958         1 3.591787 -5.926661e-01</span></span></code></pre></div>
+<p>The <code>iteration</code> variable requires integer values denoting
+the bin in which the position was measured. To compute this variable, we
+can perform the following computation:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">iteration</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         time passenger        x             y iteration</span></span>
+<span><span class="co">#&gt; 218 2.653958         1 4.692500  3.765789e-17         1</span></span>
+<span><span class="co">#&gt; 219 3.153958         1 4.606273 -4.020823e-02         2</span></span>
+<span><span class="co">#&gt; 220 3.653958         1 4.488606 -1.225997e-01         3</span></span>
+<span><span class="co">#&gt; 221 4.153958         1 4.281833 -1.780042e-01         4</span></span>
+<span><span class="co">#&gt; 222 4.653958         1 3.988913 -3.145950e-01         5</span></span>
+<span><span class="co">#&gt; 223 5.153958         1 3.591787 -5.926661e-01         6</span></span></code></pre></div>
+<p>The column <code>passenger</code> can be renamed to <code>id</code>
+in the following way:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"id"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         time id        x             y iteration</span></span>
+<span><span class="co">#&gt; 218 2.653958  1 4.692500  3.765789e-17         1</span></span>
+<span><span class="co">#&gt; 219 3.153958  1 4.606273 -4.020823e-02         2</span></span>
+<span><span class="co">#&gt; 220 3.653958  1 4.488606 -1.225997e-01         3</span></span>
+<span><span class="co">#&gt; 221 4.153958  1 4.281833 -1.780042e-01         4</span></span>
+<span><span class="co">#&gt; 222 4.653958  1 3.988913 -3.145950e-01         5</span></span>
+<span><span class="co">#&gt; 223 5.153958  1 3.591787 -5.926661e-01         6</span></span></code></pre></div>
+<p>Now that the dataset conforms to <code>predped</code>s standards, we
+have to compute the values of the input variables for the input
+functions. For this, we first need to translate the environment in which
+the data were collected to an instance of the <a href="https://ndpvh.github.io/predped/reference/background.html" class="external-link"><code>background</code></a>
+to the best of our abilities. In this case, we collected the data in a
+simplified train station that looks as follows:</p>
+<p><img src="estimation_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="Visualization of the simplified train station in which the data were collected. Gates can be found on the left and right side of the space, and four exits and entrances can be found in the middle of each side of the rectangular space." width="700" style="display: block; margin: auto;"></p>
+<p>Note that when there are restrictions in flow, this is ideally
+included in the creation of this background (see <a href="https://ndpvh.github.io/predped/reference/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>).</p>
+<p>Additionally, we need to include information on the goals that the
+people were trying to achieve within this environment, information that
+is necessary due to the M4MAs assumption that movement within space is
+guided by people’s goals. Specifically, we need to define the position
+of the goal as well as attach an identifier to this goal, each
+respectively contained in the <code>goal_x</code>, <code>goal_y</code>,
+and <code>goal_id</code> columns in the data. In this case, we know that
+each person was walking towards a particular exit of the space. Based on
+this information, we add the required columns as follows:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Perform the mapping of a person with their goal position</span></span>
+<span><span class="va">mapping</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"exit 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">12</span>, <span class="fl">14</span>, <span class="fl">21</span>, <span class="fl">23</span>, <span class="fl">28</span>, <span class="fl">32</span>, <span class="fl">33</span><span class="op">)</span>, </span>
+<span>  <span class="st">"exit 2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">9</span>, <span class="fl">11</span>, <span class="fl">16</span>, <span class="fl">25</span><span class="op">)</span>,</span>
+<span>  <span class="st">"exit 3"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span>, <span class="fl">18</span>, <span class="fl">22</span>, <span class="fl">24</span>, <span class="fl">26</span>, <span class="fl">30</span><span class="op">)</span>,</span>
+<span>  <span class="st">"exit 4"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">15</span>, <span class="fl">17</span>, <span class="fl">19</span>, <span class="fl">20</span>, <span class="fl">27</span>, <span class="fl">29</span>, <span class="fl">21</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">coordinates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"exit 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="op">-</span><span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  <span class="st">"exit 2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  <span class="st">"exit 3"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  <span class="st">"exit 4"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Add placeholders in the dataset for the columns to be filled later</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">goal_x</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">goal_y</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">goal_id</span> <span class="op">&lt;-</span> <span class="st">" "</span></span>
+<span></span>
+<span><span class="co"># Loop over the different mappings and fill the columns of interest</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">mapping</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Define the rows to be filled based on the passengers moving to a particular</span></span>
+<span>  <span class="co"># location</span></span>
+<span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">mapping</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span>  <span class="co"># Fill the columns based on the exit's information</span></span>
+<span>  <span class="va">exit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mapping</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
+<span></span>
+<span>  <span class="va">data</span><span class="op">$</span><span class="va">goal_x</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">coordinates</span><span class="op">[[</span><span class="va">exit</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">data</span><span class="op">$</span><span class="va">goal_y</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">coordinates</span><span class="op">[[</span><span class="va">exit</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">data</span><span class="op">$</span><span class="va">goal_id</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"moving to"</span>, <span class="va">exit</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         time id        x             y iteration goal_x goal_y          goal_id</span></span>
+<span><span class="co">#&gt; 218 2.653958  1 4.692500  3.765789e-17         1      0   -2.5 moving to exit 1</span></span>
+<span><span class="co">#&gt; 219 3.153958  1 4.606273 -4.020823e-02         2      0   -2.5 moving to exit 1</span></span>
+<span><span class="co">#&gt; 220 3.653958  1 4.488606 -1.225997e-01         3      0   -2.5 moving to exit 1</span></span>
+<span><span class="co">#&gt; 221 4.153958  1 4.281833 -1.780042e-01         4      0   -2.5 moving to exit 1</span></span>
+<span><span class="co">#&gt; 222 4.653958  1 3.988913 -3.145950e-01         5      0   -2.5 moving to exit 1</span></span>
+<span><span class="co">#&gt; 223 5.153958  1 3.591787 -5.926661e-01         6      0   -2.5 moving to exit 1</span></span></code></pre></div>
+<p>Once the setting and the people’s goals have been defined, we can
+compute the input variables for the utility functions through the <a href="https://ndpvh.github.io/predped/reference/compute_utility_variables.html" class="external-link"><code>compute_utility_variables</code></a>
+function as follows:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">utility_data</span> <span class="op">&lt;-</span> <span class="fu">compute_utility_variables</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">train_station</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">utility_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "iteration"   "time"        "id"          "x"           "y"          </span></span>
+<span><span class="co">#&gt;  [6] "speed"       "orientation" "cell"        "group"       "status"     </span></span>
+<span><span class="co">#&gt; [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  </span></span>
+<span><span class="co">#&gt; [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"</span></span>
+<span><span class="co">#&gt; [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" </span></span>
+<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"</span></span></code></pre></div>
+<p>As shown, the result contains all of the same columns as the ones
+found in the transformed <code>trace</code> in the previous section.
+From here on, the steps to take in the estimation routine are thus the
+same and won’t be repeated.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Johnson, S. G. (2008). <em>The NLopt nonlinear-optimization
+package.</em> <a href="https://github.com/stevengj/nlopt" class="external-link uri">https://github.com/stevengj/nlopt</a></p>
+<p>Jones, D. R., Perttunen, C. D., &amp; Stuckmann, B. E. (1993).
+Lipschitzian optimization without the lipschitz constant. <em>Journal of
+Optimization Theory and Applications, 79</em>, 157.</p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
