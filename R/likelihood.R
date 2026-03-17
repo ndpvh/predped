@@ -59,6 +59,19 @@ mll <- function(data,
         data <- data[!is.na(data$ps_speed), ]
     }
 
+    # Check whether there are any instances in which the person is not moving 
+    # around. If so, throw a warning and delete these rows
+    if(any(is.na(data$ps_speed))) {
+        warning(
+            paste(
+                "NAs found in the utility variables within the data.",
+                "Deleting the affected rows."
+            )
+        )
+
+        data <- data[!is.na(data$ps_speed), ]
+    }
+
     # Retrieve each person's identifier. Note that we sort this to avoid problems
     # with indexing in the C++ code.
     ids <- unique(data$id) |>
