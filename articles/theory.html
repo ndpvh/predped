@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>theory • predped</title>
+<title>Theoretical Framework • predped</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="theory">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Theoretical Framework">
 <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>theory</h1>
+      <h1>Theoretical Framework</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/ndpvh/predped/tree/main/vignettes/theory.Rmd"><code>vignettes/theory.Rmd</code></a></small>
@@ -77,17 +77,1026 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ndpvh/predped">predped</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'predped'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:graphics':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     polygon</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     unique</span></span></code></pre></div>
-  </main>
+<p>On this page, we provide the reader with a general introduction to
+the Minds for Mobile Agents (M4MA) pedestrian model. The model was
+developed as an alternative to physics-inspired pedestrian models that
+often assume pedestrian are all the same (e.g., Helbing &amp; Molnár,
+1995; Schadschneider et al., 2002). This is a reasonable assumption in
+crowds that are sufficiently dense to limit the expression of individual
+differences, but it limits the applicability of these models to only
+these high-density situations. The M4MA model aims to be more broadly
+applicable, allowing users to understand pedestrian behavior in both
+high- and low-density situations while accounting for the inherent
+heterogeneity that exists in pedestrians.</p>
+<div class="section level2">
+<h2 id="building-blocks">Building Blocks<a class="anchor" aria-label="anchor" href="#building-blocks"></a>
+</h2>
+<p>The M4MA is based on the discrete-choice models of walking behaviour
+proposed by Antonini et al. (2006), Campanella et al. (2004), and Robin
+et al. (2009). These models fit within a broader utility-based framework
+proposed by Hoogendoorn &amp; Bovy (2004) who proposed that pedestrians
+made decisions at three levels: (a) the <em>strategic level</em> that is
+concerned with the activities the pedestrians want to do within a
+particular environment, (b) the <em>tactical level</em> that is
+concerned with choosing a route to that location and adapting to changes
+in the environment, and (c) the <em>operational level</em> that is
+concderned with step-by-step decisions.</p>
+<p>The M4MA makes a same distinction between the three interconnected
+levels of choice to understand pedestrian behavior. In the remainder of
+this text, we dive into the details of each level and how they are
+implemented in <code>predped</code>. If not done yet, it may be useful
+to take a look at the <a href="https://ndpvh.github.io/predped/articles/getting_started.html" class="external-link">Getting
+Started</a> page before engaging with this material.</p>
+</div>
+<div class="section level2">
+<h2 id="strategic-level">Strategic Level<a class="anchor" aria-label="anchor" href="#strategic-level"></a>
+</h2>
+<p>On the strategic level, the M4MA assumes that pedestrians plan a
+particular set of goals that they want to achieve within the
+environment. Before a pedestrian enters a room, they therefore already
+have a preplanned <em>goal stack</em> or collection of goals that they
+need to finish before they can leave the environment. For example, an
+agent can only leave a grocery store after finding all of the items they
+want to buy. Similarly, an agent who needs to catch a train can only do
+so after buying a ticket and finding the track at which the train
+leaves. The goal stack therefore plays an crucial role in guiding a
+pedestrian’s behavior: Without goals, there would be no movement.</p>
+<p>According to the M4MA, goals contain two primary characteristics,
+namely a location (i.e., where to find the goal) and a timer (i.e., how
+long it takes to complete the goal). This allows agents to plan ahead on
+the order in which to achieve goals and defines how long they will
+interact with a particular goal, therefore controlling the length of
+periods of standstill as well as of movement. Note that this implies,
+though, that all agents have intimate knowledge about the space that
+they will walk into: Only then do they know exactly where to find their
+goals and how long they will take. For most purposes, however, this is a
+realistic assumption to take.</p>
+<p>Within <code>predped</code>, the goal stack is contained within the
+<a href="https://ndpvh.github.io/predped/reference/agent.html" class="external-link"><code>agent</code></a>
+itself, specifically under the slots <code>current_goal</code> and
+<code>goal_stack</code>. The former contains the goals that the agent
+currently wants to achieve while the latter contains goals that the
+agent needs to achieve later on. Each goal is furthermore coded as an
+instance of the <a href="https://ndpvh.github.io/predped/reference/goal.html" class="external-link"><code>goal</code></a>
+class, containing the defining features <code>id</code>,
+<code>position</code>, and <code>counter</code>, representing an
+identifier, the location of the goal, and the number of iterations it
+takes to complete the goal.</p>
+<p>Note that the strategic level’s role is retricted to what happens
+<em>before</em> the agent enters the room. When the agent has entered
+the room, the tactical and operational level take over. This is also
+reflected within the package: All functions related to the strategic
+level are called during the creation of an agent and are not used once
+the agent has been created. For more information on these functions, we
+refer the interested reader to the documentation of <a href="https://ndpvh.github.io/predped/reference/add_agent.html" class="external-link"><code>add_agent</code></a>,
+<a href="https://ndpvh.github.io/predped/reference/add_group.html" class="external-link"><code>add_group</code></a>,
+and <a href="https://ndpvh.github.io/predped/reference/goal_stack.html" class="external-link"><code>goal_stack</code></a>.</p>
+</div>
+<div class="section level2">
+<h2 id="tactical-level">Tactical Level<a class="anchor" aria-label="anchor" href="#tactical-level"></a>
+</h2>
+<p>On the tactical level the M4MA places routing decisions, the
+manipulation of the goals within the goal stack, and other tactical
+decisions that influence the operational level. Regarding routing, the
+M4MA assumes that goals can be subdivided in two parts, namely
+<em>activitiy goals</em> which represent the end goal (e.g., getting the
+grocery item) and <em>path points</em> that represent locations that can
+be used to navigate the space between two points. Navigating the space
+from one’s current location to the end goal’s location therefore entails
+stringing together a series of path points within the space so as to end
+at the end goal’s location (see the Figure below). Importantly, this
+requires that an agent is able to see the next location that they move
+to (it being a path point or end goal). If this is not the case, the
+agent will choose one of several ways to resolve this issue, as we will
+detail below.</p>
+<p><img src="../reference/figures/routing.png" class="r-plt" alt="Visualization of routing within the M4MA. One sees an agent at the bottom-left side of a minimal environment with three horizontally placed rectangles in the middle, displaying path points at each of its corners. Across a series of steps, these path points are then connected to the agent's current location, marking a route that the agent can take to their end goal." style="display: block; margin: auto;"></p>
+<p>Within <code>predped</code>, path points are created and connected
+through the <a href="https://ndpvh.github.io/predped/reference/compute_edges.html" class="external-link"><code>compute_edges</code></a>
+function. To find the path from an agent’s location to their goal’s
+location, <code>predped</code> makes use of the <a href="https://ndpvh.github.io/predped/reference/find_path.html" class="external-link"><code>find_path</code></a>
+function, relying on a greedy algorithm implemented in the
+<code>cppRouting</code> package (Larmet, 2022), saving this path in the
+<code>path</code> slot in the relevant instance of the <a href="https://ndpvh.github.io/predped/reference/goal.html" class="external-link"><code>goal</code></a>
+class.</p>
+<p>Regarding goal manipulation, there are two ways in which agents can
+handle goals. First, they can reach a goal’s location and start
+interacting with the goal, waiting at the specified location for a
+determinate amount of time. In <code>predped</code>, this amounts to
+reducing the value of the <code>counter</code> slot by 1 at each
+iteration. Once the <code>counter</code> reaches 0, the goal is marked
+as completed and the first goal in the <code>goal_stack</code> is
+selected as the next goal to be achieved, first searching for the path
+towards that goal through the <a href="https://ndpvh.github.io/predped/reference/find_path.html" class="external-link"><code>find_path</code></a>
+function. Second, agents can decide that a particular goal is currently
+unreachable (e.g., when another agent is standing in the way), allowing
+them to switch to another goal. In this case, the
+<code>current_goal</code> is switched out for the first goal in the
+<code>goal_stack</code>, allowing them to return to the unachieved goal
+at a later time.</p>
+<p>When an agent has reached the end of their goal stack
+(programmatically, when <code>length(agent@goal_stack) == 0</code> and
+the current goal has been completed), then agents still need to leave
+the space. In <code>predped</code>, we assign a special type of goal for
+this purpose, namely one with the goal id <code>"goal exit"</code> and a
+position right before one of the exits of the space. This will prompt
+the agent to move towards an exit and, when close enough, set its status
+to <code>"exit"</code> to indicate that they are ready to leave the
+space (see the next paragraph).</p>
+<p>Outside of routing and goal manipulation, the tactical level also
+encompasses several additional tactical decisions that influence the
+operational level. For one, agents have several ways of aleviating
+difficulties when they lose sight of their next path point or goal
+location, specifically by reorienting – turning in different directions
+and choosing one that provides a clear path – or rerouting – finding a
+new path to the goal location. Addditionally, agents can choose to wait
+for a specific amount of time, triggered only when either another agent
+is interacting with a goal close to theirs or when rerouting did not
+yield an alternative route. These types of decisions are capture through
+the <code>status</code> slot of the agent, in this case taking on the
+values <code>"reorient"</code>, <code>"reroute"</code>, and
+<code>"wait"</code> respectively. Other <code>status</code>es of the
+agents are <code>"move"</code> (when an agent moves around),
+<code>"completing goal"</code> (when an agent is interacting with their
+goal), <code>"plan"</code> (when finding a path to their next goal), and
+<code>"exit"</code> (when the agent is ready to exit the space).</p>
+<p>Another tactical decision is the agent’s tendency to slow down when
+they approach a goal location, preventing them from overshooting the
+goal (Robin et al., 2009). Within the M4MA, this adjustment is made at
+the tactical level, directly affecting the agent’s current speed so that
+they would arrive at the goal in particular time (by default 1sec or 2
+iterations). Within <code>predped</code>, this is captured through the
+parameters <code>slowing_time</code>, which can be accessed through
+calling the <a href="https://ndpvh.github.io/predped/reference/load_parameters.html" class="external-link"><code>load_parameters</code></a>
+function.</p>
+<p>Finally, tactics are also affected by group membership, which affects
+both the routing decisions of the group members as well as the value of
+some of the utility functions more directly. For example, agents in the
+same group typically don’t mind having a closer interpersonal distance
+to ingroup members rather than outgroup members or stick together more
+often. These tactical decision are captured within the utility functions
+at the operational level itself and will be elaborated on in that
+section.</p>
+<p>Importantly, the tactical level can be used to accommodate situations
+where agents do not know goal locations and have to explore the area
+first to find their goals. For exmaple, in an earlier version of M4MA,
+agents could walk along the aisles in a supermarket before being able to
+see the items on their shopping list, adding their location to the goal
+stack as the next activity. More generally, the tactical level could be
+used to reconfigure other aspects of the model so that goals may
+influence the operational level (e.g., increasing agent’s preferred
+speed when their train is about to leave). Although not part of the
+default behavior in <code>predped</code>, we do provide ways for people
+to include their own set of tactical decisions of this level within
+simulations (see <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
+Simulations</em></a>).</p>
+</div>
+<div class="section level2">
+<h2 id="operational-level">Operational Level<a class="anchor" aria-label="anchor" href="#operational-level"></a>
+</h2>
+<p>On the operational level, the M4MA describes how agents make
+step-by-step decisions while navigating the space. Step-by-step
+decisions are assumed to be taken once in a particular cycle, by default
+every 500msec. To guide this type of movement on the operational level,
+we first define all discrete step choices an agent has every cycle and
+then define the probability with which the agent chooses each discrete
+choice.</p>
+<div class="section level3">
+<h3 id="discrete-step-choices">Discrete Step Choices<a class="anchor" aria-label="anchor" href="#discrete-step-choices"></a>
+</h3>
+<p>The M4MA states that on every cycle (by default 0.5sec) an agent
+chooses one of 34 discrete velocity options, 33 of which are composed by
+crossing 11 direction options or “cones” that describe turns relative to
+the current direction
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mo>−</mo><msup><mn>72.5</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>0</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>72.5</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">a \in \{-72.5^\circ, -50^\circ, -32.5^\circ, -20^\circ, -10^\circ, 0^\circ, 10^\circ, 20^\circ, 32.5^\circ, 50^\circ, 72.5^\circ\}</annotation></semantics></math>)
+and 3 speed options or “rings” that describe how speed changes relative
+the current speed ( multiplier
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1.5</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">s \in \{0.5, 1, 1.5\}</annotation></semantics></math>;
+see the Figure below). The expansion of cones away from the center
+corresponds to direction control being more precise closer to the
+current direction.</p>
+<p><img src="../reference/figures/step_choices.png" class="r-plt" alt="Visualization of the 33 positions that agents can choose to move to based on the angle of turning and the change of speed." width="60%" style="display: block; margin: auto;"></p>
+<p>Several things are of note here. First, as one may have noticed when
+examining the picture above, the M4MA includes a biomechanical slowing
+so that agents have difficulty maintaining or accelerating their speeds
+while turning. Within <code>predped</code>, this slowing factor is taken
+into account when computing these discrete choices in
+<code>predped</code>s <a href="https://ndpvh.github.io/predped/reference/compute_centers.html" class="external-link"><code>compute_centers</code></a>
+and can be summarized mathematically as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ρ</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>β</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub><mtext mathvariant="normal">sin</mtext><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>a</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>α</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msubsup><mi>s</mi><mi>i</mi><mo>*</mo></msubsup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>ρ</mi><mi>i</mi></msub><msub><mi>s</mi><mi>i</mi></msub></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\begin{split}
+  \rho_i &amp;= 1 - \beta_{turn} \text{sin}(\frac{|a_i|}{2})^{\alpha_{turn}} \\
+  s_i^* &amp;= \rho_i s_i
+\end{split}
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>⋯</mi><mo>,</mo><mn>33</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i \in \{1, 2, \cdots, 33\}</annotation></semantics></math>
+represents the discrete choice of interest,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_i</annotation></semantics></math>
+is the turning angle for this choice,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>i</mi></msub><annotation encoding="application/x-tex">s_i</annotation></semantics></math>
+is the speed for this choice if the agent were not turning,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>s</mi><mi>i</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">s_i^*</annotation></semantics></math>
+represents the biomechanically corrected speed, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">\beta_{turn}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{turn}</annotation></semantics></math>
+are the parameters that guide this biomechanical slowing. Within
+<code>predped</code>, we allow each agent to have a different rate of
+slowing as capture through their parameters <code>b_turning</code> and
+<code>a_turning</code> (see <a href="https://ndpvh.github.io/predped/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a>).</p>
+<p>Additionally, under the hood we are required to index the rings and
+cones in a particular reproducible way. In <code>predped</code>, rings
+are numbered
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">r \in \{1, 2, 3\}</annotation></semantics></math>,
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r = 1</annotation></semantics></math>
+corresponding to acceleration,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">r = 2</annotation></semantics></math>
+to maintaining speed, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">r = 3</annotation></semantics></math>
+to decelerating. Cones are numbered
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>11</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">k \in \{1, \hdots, 11\}</annotation></semantics></math>
+from left to right from the agent’s perspective. The set of locations
+corresponding to each option is described as a “cell” and the set of
+cells defines the agent’s spatial “field of operations” for the current
+cycle. Hence, each of these
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>33</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i = \{1, \hdots, 33\}</annotation></semantics></math>
+choices corresponds to moving to a new location and, typically, a change
+in direction and/or speed. The index for each of the cells is found by
+multplying the ring identifier with the cone identifier, so that cells
+are numbered
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">1, \hdots, 11</annotation></semantics></math>
+from left to right in the acceleration ring,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>12</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>22</mn></mrow><annotation encoding="application/x-tex">12, \hdots, 22</annotation></semantics></math>
+in the constant speed cone, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>23</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>33</mn></mrow><annotation encoding="application/x-tex">23, \hdots, 33</annotation></semantics></math>
+in the deceleration cone.</p>
+<div class="section level4">
+<h4 id="the-34th-option">The 34th Option<a class="anchor" aria-label="anchor" href="#the-34th-option"></a>
+</h4>
+<p>In scenarios modeled by Antonini et al. (2006) and Robin et
+al. (2009), pedestrians were assumed to be always in motion. In
+contrast, the M4MA allows agents to stop for one of three reasons: (a)
+no cell is available (e.g., all cells are blocked by objects or other
+pedestrians in a crowded scenario), (b) one or more cells are available
+but none have an acceptably high utility (see later on), and (c) agents
+are performing an activity (e.g., buying a ticket). Hence, we added a
+34<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">^{th}</annotation></semantics></math>
+option that allows agents to stop, corresponding to the current location
+and direction being maintained while reducing their speed to zero. When
+movement subsequently recommences speed is set to a low value controlled
+through the <code>standing_start</code> argument of <a href="https:ndpvh.github.io/predped/reference/simulate.html"><code>simulate</code></a>.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="probability-of-moving-to-a-cell">Probability of Moving to a Cell<a class="anchor" aria-label="anchor" href="#probability-of-moving-to-a-cell"></a>
+</h3>
+<p>Once an agent has identified the positions that they can move to on
+the current cycle, they still need to make a decision between these
+different options. According to the M4MA, the probability that an agent
+will choose a specific cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mn>33</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i \in \{1, ... 33\}</annotation></semantics></math>
+is determined by that cell’s utility
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">(</mo><mo>−</mo><mi>∞</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">u_i \in (-\infty, 0]</annotation></semantics></math>,
+denoting how <em>useful</em> it is for the agent to move to cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+The larger the value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mi>i</mi></msub><annotation encoding="application/x-tex">u_i</annotation></semantics></math>,
+the greater the usefulness.</p>
+<p>Using the utility
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mi>i</mi></msub><annotation encoding="application/x-tex">u_i</annotation></semantics></math>
+of a particular cell, one can derive the probability of moving to that
+cell as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msup><mi>τ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>u</mi><mi>i</mi></msub></mrow></msup><mi>Z</mi></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+  p_i = \frac{e^{\tau^{-1} u_i}}{Z},
+\end{equation}</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Z</mi><annotation encoding="application/x-tex">Z</annotation></semantics></math>
+is a normalizing constant that ensures all probabilities add to 1 and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
+is a randomness parameter which controls to which extent the agent
+always chooses the cell with the highest utility, where small values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
+make the agent’s decision process essentially deterministic (see the
+<code>randomness</code> parameter in <a href="https://ndpvh.github.io/predped/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a>).
+Using these probabilities, agent’s randomly select one of the options
+according to a multinomial distribution and, once selected, change their
+position to the chosen cell.</p>
+<p>A two-stage procedure is used to determine each of the 33 cells’
+utility. In the first stage, we set the utility of a particular cell to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+when it is not accessible. This is the case when a cell is currently
+occupied or movement to the cell is obstructed by other objects and when
+moving to that location would require the agent’s body intersecting with
+other objects in the space. By setting the utility to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+in these cases, we prevent the agent from being able to choose this cell
+so that its probability
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">p_i = 0</annotation></semantics></math>
+at the current cycle. In <code>predped</code>, this check is taken care
+of by the <a href="https://ndpvh.github.io/predped/reference/moving_options.html" class="external-link"><code>moving_options</code></a>
+function.</p>
+<p>In the second stage, the utility of all available cells is computed
+as the weighted sum of M4MAs component utilities defined, each of which
+quantifies a preference regarding different aspects of the pedestrian’s
+behavior. For sake of simplicity, we set the maximum value for a
+particular component utility to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+so that utilities that become more negative indicate a decrease in their
+preference.</p>
+<p>With these two steps in mind, we can define the utility of cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>33</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i = \{1, \hdots, 33\}</annotation></semantics></math>
+for agent
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><munder><mo>∑</mo><mrow><mi>f</mi><mo>∈</mo><mi>F</mi></mrow></munder><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>S</mi><mi>j</mi></msub><mo>,</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝛉</mi><mi>f</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is available</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>∞</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is unavailable</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
+  u_{ij} = \begin{cases}
+      \displaystyle\sum_{f \in F} f(S_j, \bm{x}_i | \bm{\theta}_f), &amp; \quad{\text{if cell $i$ is available}} \\
+      -\infty, &amp; \quad{\text{if cell $i$ is unavailable}} 
+  \end{cases},
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+indicates the set of component utility functions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>,
+each of which takes in a matrix of agent states
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mi>j</mi></msub><annotation encoding="application/x-tex">S_j</annotation></semantics></math>,
+the position
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\bm{x}_i</annotation></semantics></math>
+of the cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+and a set of parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝛉</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\bm{\theta}_f</annotation></semantics></math>
+specific to the utility function. Most utility function make use of a
+similar structure with an exponent parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\alpha_f</annotation></semantics></math>
+and a weight parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\beta_f</annotation></semantics></math>.
+For some utlity functions, there is an additional weight parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\delta_f</annotation></semantics></math>
+that is added to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\beta_f</annotation></semantics></math>,
+altering the utility of a particular cell based on an agent’s group
+membership.</p>
+<p>Within <code>predped</code>, the parameter designations are reflected
+in the use of a notational convention, using
+<code>a_&lt;component&gt;</code> for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\alpha_f</annotation></semantics></math>,
+<code>b_&lt;component&gt;</code> for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\beta_f</annotation></semantics></math>,
+and <code>d_&lt;component&gt;</code> for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\delta_f</annotation></semantics></math>
+(see <a href="https://ndpvh.github.io/predped/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a>).
+The agent states
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mi>j</mi></msub><annotation encoding="application/x-tex">S_j</annotation></semantics></math>
+are furthermore included in the package as a combination of the current
+state (an instance of the <a href="https://ndpvh.github.io/predped/reference/state.html" class="external-link"><code>state</code></a>
+class) and several highlighted specifications of the agents within that
+space such as identifiers and predictions (the output of <a href="https://ndpvh.github.io/predped/reference/create_agent_specifications.html" class="external-link"><code>create_agent_specifications</code></a>,
+allowing mapping to the utility functions contained in the
+<code>m4ma</code> package).</p>
+<p>Up to now, we have only defined the utility of moving to one of the
+33 new locations, but not about the utility of standing still. For this,
+the M4MA sets the utility of the agent’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>34</mn><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">34^{th}</annotation></semantics></math>
+cell to a fixed value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>υ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\upsilon_j</annotation></semantics></math>,
+ensuring agent’s will only stop when no other good options are available
+(i.e., when all utilities
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>&lt;</mo><msub><mi>υ</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">u_{ij} &lt; \upsilon_j</annotation></semantics></math>
+in the deterministic case). The value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>υ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\upsilon_j</annotation></semantics></math>
+is contained in the parameter list of the agent as
+<code>stop_utility</code> (see again <a href="https://ndpvh.github.io/predped/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a>).</p>
+<p>In the remainder of this section, we will highlight the different
+component utility functions that the M4MA uses to guide agent’s
+decisions on the operational level.</p>
+</div>
+<div class="section level3">
+<h3 id="component-utility-functions">Component Utility Functions<a class="anchor" aria-label="anchor" href="#component-utility-functions"></a>
+</h3>
+<p>The M4MA’s existing component utility functions can be divided along
+several different dimensions, namely (a) individual vs. social, (b)
+attractive vs. repulsive, and (c) predictive vs. concurrent. The
+individual-social dimension captures whether a utility function accounts
+for the agent’s own characteristics (<em>individual</em>) or those of
+the other agent’s in the space as well (<em>social</em>). The
+attractive-repulsive dimension furthermore specifies whether the utility
+function acts through attraction (<em>attractive</em>) or repulsion
+(<em>repulsive</em>) from a central point or region. The
+predictive-concurrent dimension finally specifies whether they make use
+of concurrent information (<em>concurrent</em>) or of predictions that
+the agent made (<em>predictive</em>). Predictions are always based on
+the other agents’ current speed and direction, allowing the agent to
+anticipate their locations on the next time step by assuming that they
+continue moving in the same direction and at the same speed.</p>
+<p>The categorization of each utility functions with regard to these
+dimensions are displayed in the following Table.</p>
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th>Utility function</th>
+<th>Abbreviation</th>
+<th>Individual-Social</th>
+<th>Attractive-Repulsive</th>
+<th>Predictive-Concurrent</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>current direction</td>
+<td>CD</td>
+<td>individual</td>
+<td>attractive</td>
+<td>concurrent</td>
+</tr>
+<tr class="even">
+<td>goal direction</td>
+<td>GD</td>
+<td>individual</td>
+<td>attractive</td>
+<td>concurrent</td>
+</tr>
+<tr class="odd">
+<td>preferred speed</td>
+<td>PS</td>
+<td>individual</td>
+<td>attractive</td>
+<td>concurrent</td>
+</tr>
+<tr class="even">
+<td>interpersonal distance</td>
+<td>ID</td>
+<td>social</td>
+<td>repulsive</td>
+<td>predictive</td>
+</tr>
+<tr class="odd">
+<td>blocked angle</td>
+<td>BA</td>
+<td>social</td>
+<td>repulsive</td>
+<td>predictive</td>
+</tr>
+<tr class="even">
+<td>follow-the-leader</td>
+<td>FL</td>
+<td>social</td>
+<td>attractive</td>
+<td>predictive</td>
+</tr>
+<tr class="odd">
+<td>walk-beside</td>
+<td>WB</td>
+<td>social</td>
+<td>attractive</td>
+<td>predictive</td>
+</tr>
+<tr class="even">
+<td>group centroid</td>
+<td>GC</td>
+<td>social</td>
+<td>attractive</td>
+<td>predictive</td>
+</tr>
+<tr class="odd">
+<td>visual field</td>
+<td>VF</td>
+<td>social</td>
+<td>attractive</td>
+<td>predictive</td>
+</tr>
+</tbody>
+</table>
+<p>In what follows, we give a detailed overview of the utility functions
+themselves. Note that all parameters that we discuss are assumed to be
+positively valued. Furthermore note that, for simplicities sake, we
+won’t index the different utility functions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+and parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,…
+with their respective abbreviation for the utility function (e.g.,
+<em>CD</em> for <em>current direction</em>), ensuring clean equations
+for each utility function.</p>
+<div class="section level4">
+<h4 id="current-direction">Current Direction<a class="anchor" aria-label="anchor" href="#current-direction"></a>
+</h4>
+<p>The current direction utility function creates a tendency for
+pedestrians to continue heading in their current direction. For each
+cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+in the same cone
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
+this utility function returns the same value, being
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+for the central cone
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>=</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">k_i = 6</annotation></semantics></math>)
+and increasingly negative for cones on either side. Defining
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><annotation encoding="application/x-tex">a_{k_i}</annotation></semantics></math>
+as the angle in degrees of the cone
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+in which cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is contained, then the utility function is computed as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>γ</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+    f_i = - \gamma \left|\frac{a_{k_i}}{90}\right|^{\alpha} .
+\end{equation}</annotation></semantics></math> Note that in this
+equation, the cone angles are normalized by the constant
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>90</mn><annotation encoding="application/x-tex">90</annotation></semantics></math>
+and the absolute value is taken, so that the resulting quantity is on
+the unit interval. The parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+and the function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+define the exponent and weight that determine the value of this utility
+function in the way displayed in the following figure:</p>
+<p><img src="theory_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="Visualization of the current direction utility function. The result is a set of functions that become increasingly negative the further the angles deviate from the current direction at 0 degrees." width="1920" style="display: block; margin: auto;"></p>
+<p>The parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+in the utility function is defined in terms of the cone in which the
+cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is contained, the weight parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+and a side-bias parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>.
+If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda = 1</annotation></semantics></math>
+there is no side bias, if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda &lt; 1</annotation></semantics></math>
+there is a bias to the left, and if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda &gt; 1</annotation></semantics></math>
+there is a bias to the right:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>=</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mi>λ</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&gt;</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><msup><mi>λ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&lt;</mo><mn>6</mn></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation*}
+  \gamma = \begin{cases}
+      \beta, &amp; \quad{k_i = 6} \\
+      \beta \lambda, &amp; \quad{k_i &gt; 6} \\
+      \beta \lambda^{-1}, &amp; \quad{k_i &lt; 6}
+  \end{cases}
+\end{equation*}</annotation></semantics></math></p>
+<p>The effect of the parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+on the utility is shown in the following figure.</p>
+<p>Within <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+are known as <code>a_current_direction</code>,
+<code>b_current_direction</code>, and
+<code>blr_current_direction</code>.</p>
+<p><img src="theory_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="Visualization of the left-right side bias in the current direction utility function. The result is a set of functions that are steeper or less steep towards the left or right side relative to the current direction at 0 degrees, otherwise resembling the set of functions described before." width="2256" style="display: block; margin: auto;"></p>
+<p>For identifiability purposes, we set
+<code>b_current_direction = 1</code> for all archetypes uses in
+<code>predped</code>, weighing the influence of the other utility
+functions relative to this one.</p>
+</div>
+<div class="section level4">
+<h4 id="preferred-speed">Preferred Speed<a class="anchor" aria-label="anchor" href="#preferred-speed"></a>
+</h4>
+<p>The preferred speed utility function creates a tendency for
+pedestrians to keep to a particular speed. Consequently, it’s output is
+the same for all cells
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+contained in a same ring
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>r</mi><mi>i</mi></msub><annotation encoding="application/x-tex">r_i</annotation></semantics></math>.
+Denoting the preferred speed as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+the current speed as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><msub><mi>r</mi><mi>i</mi></msub></msub><annotation encoding="application/x-tex">s_{r_i}</annotation></semantics></math>
+as the adjusted speed once the multiplier of the ring has been taken in
+to account (0.5 for deceleration, 1 for maintenance, and 1.5 for
+acceleration), then the preferred speed utility function is defined
+as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>s</mi><msub><mi>r</mi><mi>i</mi></msub></msub><mo>−</mo><msup><mo>𝜍</mo><mo>*</mo></msup><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+  f_i = -\beta \left| s_{r_i} - \varsigma^* \right|^{\alpha},
+\end{equation}</annotation></semantics></math> taking on the same shape
+as for the unbiased current direction utility function above. The
+preferred speed utility function thus attains an optimal utility of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+whenever the speed of a particular ring corresponds to the agent’s
+preferred speed. Note, however, that this equation does not make use of
+the raw preferred speed
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+but rather of a value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mo>𝜍</mo><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
+derived thereof. The value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mo>𝜍</mo><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
+depends on the distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
+between an agent and their goal, so that</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mo>𝜍</mo><mo>*</mo></msup><mo>=</mo><mtext mathvariant="normal">min</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mo>𝜍</mo><mo>,</mo><mi>τ</mi><mfrac><mo>𝜍</mo><mi>d</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+  \varsigma^* = \text{min}( \varsigma, \tau \frac{\varsigma}{d} ) ,
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
+is a time-based slowing parameter, ensuring that an agent approaches a
+goal more slowly in order to not overshoot its location.</p>
+<p>In <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+are called <code>preferred_speed</code>, <code>slowing_time</code>,
+<code>b_preferred_speed</code>, and <code>a_preferred_speed</code>
+respectively.</p>
+</div>
+<div class="section level4">
+<h4 id="goal-direction">Goal Direction<a class="anchor" aria-label="anchor" href="#goal-direction"></a>
+</h4>
+<p>The goal direction utility function creates a tendency for
+pedestrians to head towards their goals. Like for the current direction
+utility function, its value is the same for all cells contained within a
+same cone. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>g</mi><annotation encoding="application/x-tex">g</annotation></semantics></math>
+be the angle between the current direction and the goal, and denote
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><annotation encoding="application/x-tex">a_{k_i}</annotation></semantics></math>
+as the angle of the cone in which cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is contained (in degrees). Then we normalize the absolute deviation by
+90 degrees and define the utility function as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><mrow><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mo>−</mo><mi>g</mi></mrow><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+    f_i = - \beta \left| \frac{a_{k_i} - g}{90} \right|^{\alpha} .
+\end{equation}</annotation></semantics></math></p>
+<p>This utility functiona gain resembles the others already discussed,
+this time attaining a maximal value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+when the goal direction aligns perfectly with the cone.</p>
+</div>
+<div class="section level4">
+<h4 id="interpersonal-distance">Interpersonal Distance<a class="anchor" aria-label="anchor" href="#interpersonal-distance"></a>
+</h4>
+<p>The interpersonal distance utility function creates a tendency to
+avoid other pedestrians, with its effects differing depending on whether
+the other pedestrians belong to the in- or outgroup. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
+be the shortest distance between the agent when standing in cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and another visible agent
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+standing at its predicted position, then this utility function takes the
+average of a power function of all distances
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
+across the set of visible agents
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mi>i</mi></msub><annotation encoding="application/x-tex">A_i</annotation></semantics></math>
+at that cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><msub><mi>N</mi><mi>i</mi></msub></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><msub><mi>A</mi><mi>i</mi></msub></mrow></munder><mi>γ</mi><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mo>−</mo><mi>α</mi></mrow></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
+    f_i = -\frac{1}{N_i} \sum_{j \in A_i} \gamma d_{ij}^{-\alpha} ,
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_i</annotation></semantics></math>
+represent the number of visible agents in the list of agents
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mi>i</mi></msub><annotation encoding="application/x-tex">A_i</annotation></semantics></math>
+visible from cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+This equation defines a hyperbolic function for the distance to each
+individual agent, as visualized in the next Figure. Note that this
+utility function becomes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+whenever the interpersonal distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
+is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>,
+ensuring that the agent does not choose a cell that would result in a
+collision.</p>
+<p><img src="theory_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="Visualization of the interpersonal utility function, showing a hyperbolic function starting at minus infinity when the distance d approaches 0 and slowly growing until it approaches the maximal value of 0." width="1920" style="display: block; margin: auto;"></p>
+<p>The interpersonal distance utility function critically depends on the
+parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>,
+which itself is a function of the weight parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+and the group membership of the other agent, so that:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if agent </mtext><mspace width="0.333em"></mspace></mrow><mi>j</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is a member of the ingroup</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>+</mo><mi>δ</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if agent </mtext><mspace width="0.333em"></mspace></mrow><mi>j</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is not a member of the ingroup</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
+    \gamma = \begin{cases}
+        \beta, &amp; \quad{\text{if agent $j$ is a member of the ingroup}} \\
+        \beta + \delta, &amp; \quad{\text{if agent $j$ is not a member of the ingroup}}
+    \end{cases} .
+\end{equation}</annotation></semantics></math> As demonstrated by
+Figure~, adding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+decreases the utility of a cell, thus creating a tendency to avoid
+getting too close to out-group members.</p>
+<p>In <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+for the interpersonal distance utility function are known as
+<code>a_interpersonal</code>, <code>b_interpersonal</code>, and
+<code>d_interpersonal</code> respectively.</p>
+</div>
+<div class="section level4">
+<h4 id="blocked-angle">Blocked Angle<a class="anchor" aria-label="anchor" href="#blocked-angle"></a>
+</h4>
+<p>The blocked angle utility function introduces the tendency to move in
+directions that afford a clear path, which can become particularly
+important in crowded situation. Its intent is to approximate an ability
+to avoid directions that are blocked by other agents before being forced
+to take a tactical decision (e.g., rerouting). Note that the blockage
+may lie both inside or outside the field of operations, increasing an
+agents’ ability to avoid collisions even if they are not likely to occur
+for several steps.</p>
+<p>Blocking is assessed by computing the <em>profile</em> for the
+closest visible agent falling within each cone at any distance (see the
+Figure below). A profile is created by first connecting a line between
+agents then drawing a profile line perpendicular to the connecting line
+at the center of the other agent. The profile then is the line segment
+spanning the other agent’s diameter. A cone is considered “blocked” if
+an agent profile spans the edges of the cone (i.e., if there is no room
+within the cone to move past the blocking agent).</p>
+<p><img src="../reference/figures/profile.png" class="r-plt" alt="Visualization of how a profile is computed according to the M4MA." style="display: block; margin: auto;"></p>
+<p>Any cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+in a cone
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>k</mi><mi>i</mi></msub><annotation encoding="application/x-tex">k_i</annotation></semantics></math>
+that is not blocked is given the maximal utility of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>.
+For each cell in the other cones, a distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>i</mi></msub><annotation encoding="application/x-tex">d_i</annotation></semantics></math>
+from the cell to the blocking agent is derived and the following utility
+function is computed:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> not in a blocked cone</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>∞</mi></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if blocking agent </mtext><mspace width="0.333em"></mspace></mrow><mi>j</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> stands between the agent and cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><msubsup><mi>d</mi><mi>i</mi><mrow><mo>−</mo><mi>α</mi></mrow></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in a blocked cone</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+    f_i = \begin{cases}
+        0, &amp; \quad{\text{if cell $i$ not in a blocked cone}} \\
+        -\infty &amp; \quad{\text{if blocking agent $j$ stands between the agent and cell $i$}} \\
+        -\beta d_{i}^{-\alpha}, &amp; \quad{\text{if cell $i$ lies in a blocked cone}}
+    \end{cases} .
+\end{equation}</annotation></semantics></math></p>
+<p>This function takes on the same shape as for the interpersonal
+distance utility function.</p>
+<p>In <code>predped</code>, the parameters <code>alpha</code> and
+<code>\beta</code> are stored as <code>a_blocked</code> and
+<code>b_blocked</code>.</p>
+</div>
+<div class="section level4">
+<h4 id="follow-the-leader">Follow the Leader<a class="anchor" aria-label="anchor" href="#follow-the-leader"></a>
+</h4>
+<p>The follow-the-leader utility function attracts a pedestrian towards
+currently occupied cells containing a potential “leader”, a close and
+visible agent who is heading in the general direction of the agent’s
+current goal. Importantly, this utility function assumes that the leader
+will move to a new position at the next time step, leaving their current
+cell available for occupation by the agent.</p>
+<p>Computing this utility function requires several steps. First, we
+identify potential leaders for each cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+(if any), selecting those agents who currently occupy cells within the
+agent’s field of operations. If multiple agents are selected for each
+cell, preference is given to those who belong to the agent’s ingroup and
+whose current direction is closest to the agent’s own goal direction.
+Selected agents are then designated as cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>’s
+leader.</p>
+<p>For cells with a leader, we define the distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">d_{i, t + 1}</annotation></semantics></math>
+from the leader’s predicted position on the next step
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t + 1</annotation></semantics></math>
+to the cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and the angular difference
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_{i}</annotation></semantics></math>
+between the direction of the agent’s goal and cell’s leader (in
+degrees), allowing us to compute the follow-the-leader utility as
+follows:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not have a leader</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>γ</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>α</mi></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> has a leader</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+  f_i = \begin{cases}
+    0, &amp; \quad{\text{if cell $i$ does not have a leader}} \\
+    -\gamma \left| \frac{a_i}{90} \right| d_{i, t + 1}^{\alpha}, &amp; \quad{\text{if cell $i$ has a leader}}
+  \end{cases} .
+\end{equation}</annotation></semantics></math></p>
+<p>As previously, we normalize the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_i</annotation></semantics></math>
+to fall on the unit interval. The shape of the utility function is shown
+in the next Figure. Note that in the case where the angular disparity is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>,
+the utility is at its maximum value, meaning that leader’s who are
+heading in the same direction as the agent’s current goal are strongly
+preferred.</p>
+<p><img src="theory_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="Visualization of the follow the leader utility function for different angular disparities. One sees right-sided parabola-like functions that grow increasingly steeper with greater angular disparity, greater distance to the leader, and greater values of gamma." width="2256" style="display: block; margin: auto;"></p>
+<p>In the above equation, the parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+changes based on the group membership of the leader, so that:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mtext mathvariant="normal">’s leader is a member of the ingroup</mtext></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>+</mo><mi>δ</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mtext mathvariant="normal">’s leader is not a member of the ingroup</mtext></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
+  \gamma = \begin{cases}
+    \beta, &amp; \quad{\text{if cell $i$'s leader is a member of the ingroup}} \\
+    \beta + \delta, &amp; \quad{\text{if cell $i$'s  leader is not a member of the ingroup}}
+  \end{cases} .
+\end{equation}</annotation></semantics></math> Adding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+will decrease the utility of using this agent as a leader, letting
+agents tend to use ingroup members as leaders.</p>
+<p>In <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+controlling the follow the leader utility function are called
+<code>a_leader</code>, <code>b_leader</code>, and <code>d_leader</code>
+respectively.</p>
+</div>
+<div class="section level4">
+<h4 id="walk-beside">Walk Beside<a class="anchor" aria-label="anchor" href="#walk-beside"></a>
+</h4>
+<p>The walk beside utility function attracts agents towards cells that
+are located beside a “buddy”, a member of the ingroup. The aim of this
+utility is to approximate the tendency to walk beside group members in
+order to converse with them (cf. the other group utility function). Like
+for the follow the leader utility function, this utility function
+requires a few steps in its computation.</p>
+<p>In a first step, potential buddies are identified through finding
+agents that belong to the ingroup and are reachable for the agent.
+Importantly, potential buddies do not need to be in the agent’s field of
+view, as it is assumed that pedestrians are usually aware of the
+locations of ingroup members even if they are cannot presently see them.
+This implies that the utility can slow down the agent when a potential
+buddy is reachable and behind them.</p>
+<p>For each buddy
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
+we define their corresponding <em>buddy cell</em> as being the cell that
+lies (a) in the cone most parallel to the buddy’s current direction and
+(b) closest to the predicted position of the buddy on the next time
+step. We define the distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
+each cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to the buddy cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+and the angular difference
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>j</mi></msub><annotation encoding="application/x-tex">a_j</annotation></semantics></math>
+between the current direction of the agent and the buddy and use these
+to compute the utility function as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>B</mi></mrow></munder><mi>β</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>j</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mi>α</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+  f_i = -\sum_{j \in B} \beta \left| \frac{a_j}{90} \right| d_{ij}^{\alpha},
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+is the set of all buddies. Note that this utility function has the same
+shape as the follow the leader utility function, meaning one can refer
+to the previous figure for a visualization.</p>
+<p>In <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+for the walk beside utility function are called <code>a_buddy</code> and
+<code>b_buddy</code> respectively.</p>
+</div>
+<div class="section level4">
+<h4 id="group-centroid">Group Centroid<a class="anchor" aria-label="anchor" href="#group-centroid"></a>
+</h4>
+<p>The group centroid utility function attracts agents towards the
+predicted position of their social group as a whole. The central
+assumption here is that different group members want to walk together as
+a group, rather than as separate individuals. This therefore represents
+a more extreme case than the walk beside utility function in which
+agents only temporarily join forces with ingroup members.</p>
+<p>Define the group centroid as the mean predicted location
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝐱</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{\bm{x}}</annotation></semantics></math>
+across all group members and define the distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>i</mi></msub><annotation encoding="application/x-tex">d_i</annotation></semantics></math>
+between a cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and the group centroid, then the group centroid utility function can be
+computed as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&lt;</mo><mo>=</mo><mi>Δ</mi></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>d</mi><mi>i</mi></msub><mo>−</mo><mi>Δ</mi><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&gt;</mo><mi>Δ</mi></mrow></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation} 
+  f_i = \begin{cases}
+    0, &amp; \quad{\text{if $d_i &lt;= \Delta$}} \\
+    -\beta | d_i - \Delta |^{\alpha}, &amp; \quad{\text{if $d_i &gt; \Delta$}}
+  \end{cases}
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+is a comfortable distance around the group centroid that agents can
+maintain and for which the utility is optimal. Defining
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+makes sure that agents will remain close to the group while maintaining
+a safe distance from the other members of the group, in effect not
+blocking the path of the other members. The value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+is adapted to group size, so that:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mo>=</mo><mn>1.5</mn><mo>×</mo><mi>n</mi><mo>×</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation*}
+  \Delta = 1.5 \times n \times \bar{r},
+\end{equation*}</annotation></semantics></math> where,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+is the number of agents in the group and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>r</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{r}</annotation></semantics></math>
+is their average radius (not to be confused with the ring identifier
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>).
+The shape of this utility function resembles the one of the current
+direction utility function.</p>
+<p>In <code>predped</code>, the relevant parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+are known as <code>a_group_centroid</code> and
+<code>b_group_centroid</code>.</p>
+</div>
+<div class="section level4">
+<h4 id="visual-field">Visual Field<a class="anchor" aria-label="anchor" href="#visual-field"></a>
+</h4>
+<p>The visual field utility function attracts agents to positions in
+which they are able to see other group members. The idea behind this
+utility function is again similar to the walk beside utility function in
+that agents who walk together with group members like to converse with
+them, therefore wanting to walk besides them. The approach to generating
+this behavior is, however, different in the sense that for the walk
+beside utility function, conversing with a group member is situational
+while for the visual field utility function, this behavior endures
+throughout the complete walking trajectory.</p>
+<p>To compute this utility function, we define the angles
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">a_{ij}</annotation></semantics></math>
+from cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to the predicted position of group member
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+and, based on these angles, define
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_i</annotation></semantics></math>
+as the angle for which
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>o</mi><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">cos\left(a_{ij}\right)</annotation></semantics></math>
+is maximal, effectively selecting the group member who falls closest to
+the angle of the cone in which cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is located. Using these angles, we then define the utility function
+as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in the extended visual field</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not lie in the extended visual field</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+    f_i = \begin{cases}
+        0, &amp; \quad{\text{if $a_i$ lies in the extended visual field}} \\
+        -\beta, &amp; \quad{\text{if $a_i$ does not lie in the extended visual field}}
+    \end{cases} .
+\end{equation}</annotation></semantics></math></p>
+<p>Importantly, the agent’s visual field that usually spans
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><msup><mn>85</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>85</mn><mo>∘</mo></msup><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-85^\circ, 85^\circ]</annotation></semantics></math>
+is extended by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>45</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">45^\circ</annotation></semantics></math>
+in both directions, therefore creating an extended visual field of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><msup><mn>130</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>130</mn><mo>∘</mo></msup><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-130^\circ, 130^\circ]</annotation></semantics></math>.
+The idea behind the extension is that people can turn their heads for
+about
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>45</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">45^\circ</annotation></semantics></math>
+in both directions while talking to a group member. The effect of this
+utility function is displayed in the following figure:</p>
+<p><img src="theory_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="Visualization of visual field utility function. The function is stepwise, so that it becomes 0 within when an agent is able to see their ingroup members and adds a discrete negative utility otherwise." width="50%" style="display: block; margin: auto;"></p>
+<p>In <code>predped</code>, this utility functions parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+is called <code>b_visual_field</code>.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="discussion">Discussion<a class="anchor" aria-label="anchor" href="#discussion"></a>
+</h2>
+<p>The M4MA’s utility framework is designed to be extensible, allowing
+the addition of whichever tactical choices and/or component utility
+functions that are required to allow the M4MA to create realistic
+walking behavior. The model is still under development, and so some
+features may change in the future. The development stage of the model
+may be especially visible in the component utility functions, where the
+boundaries between some of these seem to be blurred (e.g., visual field
+utility function and walk beside utility function). If you would like to
+help out with this development, please reach out to either Andrew
+Heathcote or Niels Vanhasbroeck.</p>
+<p>It is furthermore useful to note that the M4MA is an estimable model,
+meaning that most (if not all) of the parameters discussed in this
+section can be derived based on walking data. To see how you can use
+<code>predped</code> for these types of estimations, we refer the
+interested reader to the vignette on <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link"><em>Estimation</em></a>.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Antonini, G., Martinez, S. V., Bierlaire, M., &amp; Thiran, J. P.
+(2006). Behavioral priors for detection and tracking of pedestrians in
+video sequences. <em>International Journal of Computer Vision,
+69</em>(2), 159-180. doi: <a href="https://doi.org/10.1007/s11263-005-4797-0" class="external-link">10.1007/s11263-005-4797-0</a></p>
+<p>Campanella, M., Hoogendoorn, S. P., &amp; Daamen, W. (2014). The
+Nomad model: Theory, developments and applications. <em>Transportation
+Research Procedia, 2</em>, 462-467. doi: <a href="https://doi.org/10.1016/j.trpro.2014.09.061" class="external-link">10.1016/j.trpro.2014.09.061</a></p>
+<p>Helbing, D. &amp; Molnár, P. (1995). Social force models for
+pedestrian dynamics. <em>Physical Review E, 51</em>(5), 4282-4286.</p>
+<p>Hoogendoorn, S. P. &amp; Bovy, P. H. L. (2004). Pedestrian
+route-choice and activity scheduling theory and models.
+<em>Transportation Research Part B, 38</em>, 169–190. doi: <a href="https://doi.org/10.1016/S0191-2615(03)00007-9" class="external-link">10.1016/S0191-2615(03)00007-9</a></p>
+<p>Larmet, V. (2022). <em>cppRouting: Algorithms for routing and solving
+the traffic assignment problem.</em> <a href="https://CRAN.R-project.org/package=cppRouting" class="external-link uri">https://CRAN.R-project.org/package=cppRouting</a></p>
+<p>Robin, T., Antonini, G., Bierlaire, M., &amp; Cruz, J. (2009).
+Specification, estimation, and validation of a pedestrian walking
+behavior model. <em>Transportation Research Part B, 43</em>, 36-56. doi:
+<a href="https://doi.org/10.1016/j.trb.2008.06.010" class="external-link">10.1016/j.trb.2008.06.010</a></p>
+<p>Schadschneider, A., Kirchner, A., &amp; Nishinari, K. (2002). CA
+approach to collective phenomena in pedestrian dynamics. Bandini, S and
+Chopard, B., &amp; Tomassini, M. (Eds.), <em>ACRI International
+Conference on Cellullar Automata for Research and Industry 2002</em>.
+Springer-Verlag.</p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

@@ -8,4 +8,5 @@
 - [Getting
   Started](https://github.com/ndpvh/predped/articles/getting_started.md):
 - [Simulations](https://github.com/ndpvh/predped/articles/simulation.md):
-- [theory](https://github.com/ndpvh/predped/articles/theory.md):
+- [Theoretical
+  Framework](https://github.com/ndpvh/predped/articles/theory.md):
