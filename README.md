@@ -10,99 +10,54 @@
 v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
-# predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
+# predped: An R package around the Minds for Mobile Agents (M4MA) pedestrian model
 
 This project serves as a tool to simulate pedestrian movement using the
-Minds for Mobile Agents (M4MA) model. It contains several helper
-functions for people who wish to use the model to investigate pedestrian
-flow in their own settings. Before delving into how to use the package,
-we will first provide the reader with some background on the model.
+Minds for Mobile Agents (M4MA) model. This package enables users to
+simulate from the model and estimate the parameters of the model on
+movement data, each tailored to their own setting of choice.
 
 ## Background
 
 Pedestrian models are popular tools to investigate how people navigate
-the complex world that we live in. While these models have certainly
-been useful to understand, for example, evacuation behavior, they most
-often assume that pedestrians are homogeneous – that is, that all
-pedestrians are one and the same. Because of this assumption, these
-pedestrian models are not suited to capture the variety of walking
-behaviors we observe in most low-density situations, such as those
-observed in the supermarket, in the train station, or even on the
-street.
+the complex world that we live in. Yet, most current models assume that
+pedestrians are all one and the same, making them solely applicable to
+study movement behavior in high-density situations like festivals or
+sporting events, but less so in low-density situations like supermarkets
+and train stations.
 
-To alleviate these difficulties, Andrew Heathcote and Dora Matzke
-recently proposed M4MA to capture pedestrian movement. This model is
-based on the pedestrian model developed by Robin et al. (2009) and,
-similarly, proposes that pedestrian movement is determined on three
-levels:
+To capture movement behavior in both low- and high-density situations,
+Andrew Heathcote and Dora Matzke recently proposed the M4MA, proposing
+that pedestrian behavior is determined on three levels:
 
-- *Strategic level*: Consists of planning where the pedestrian wants to
-  go to and via which route. Typically, a pedestrian will have to
-  fulfill a goal, which will serve as the destination of the route. To
-  get to this goal, pedestrians will walk along so-called “path-points”:
-  Waypoints along which the pedestrian can walk, serving as intermediate
-  steps to get to their destination.
-- *Tactical level*: Once their route is determined, pedestrians will
-  still be able to adapt if their original plan does not seem feasible.
-  For example, other pedestrians can block your route, which makes
-  avoiding the crowd more attractive when trying to get to your goal.
-  These adaptations are handled on this level.
-- *Operational level*: This final level handles the low-level,
-  moment-to-moment decisions about where to walk to. In practice, this
-  constitutes a choice between one of 34 movement options, created by 11
-  angular directions in which a pedestrian can move (going from -72.5 to
-  72.5 degrees) and 3 changes in velocity (deceleration, constant speed,
-  or acceleration), with the $34^{st}$ option representing stopping. The
-  probability with which a pedestrian will move to a given location is
-  determined by a utility function that combines several moving
-  components, namely (a) preferred speed, (b) current direction, (c)
-  goal direction, (d) interpersonal distance, and (e) blocked angles, as
-  well as several social components, namely (a) following a person
-  heading in the same direction (follow-the-leader) and (b) walking
-  besides someone heading in the same direction (walk-besides-buddy).
+- *Strategic level*: Consists of what the agent want to achieve and how
+  they will navigate the space;
+- *Tactical level*: Consists of reacting to the environment and making
+  tactical decisions regarding navigation in case of blockages;
+- *Operational level*: Consists of the moment-to-moment step decisions
+  the agent takes, encompassing changes in direction and/or speed at the
+  lowest level.
 
-Critically, and different from other pedestrian models, M4MA assigns
-each pedestrian a “personality”, in that all pedestrians have their own
-unique values for the parameters that are defined on the operational
-level. These individual differences are implemented in two ways:
+Critically, M4MAs pedestrians have a particular “personality” reflected
+in unique parameters that guide the movement on the operational level.
+These individual differences are implemented in two ways:
 
-- *Qualitative differences*: We define several “archetypes” of
-  pedestrians, each of which have different discrete values for their
-  parameters. These archetypes were created through trial-and-error by
-  the researchers in this project and are contained in *archetypes.csv*.
-  In no way should these archetypes be interpreted as ground truth or
-  real differences between individuals.
-- *Quantitative differences*: Each of the parameter values that are
-  defined in the archetypes CSV-file serves as a mean around which each
-  pedestrian’s actual parameter value fluctuates. Without going into
-  detail, each archetype has their own matrix that contains standard
-  deviations for each parameter on the diagonal and correlations between
-  parameters on the off-diagonal. These matrices are stored in
-  *archetypes_sigma.Rds*.
-
-## How to use
-
-This package allows its users to simulate pedestrian behavior as
-expected by M4MA. Users can specify the environment, the characterstics
-the pedestrians, and the characteristics of the simulation itself (e.g.,
-maximal number of agents, initial conditions,…), therefore allowing for
-a great variety of potential research questions that can be answered.
-For more information on the workflow of this package, see *Getting
-started*.
-
-This package depends heavily on the
-[`m4ma`](https://github.com/m4ma/m4ma) package.
+- *Qualitative differences*: Each pedestrian belongs to a particular
+  class of people, defining a particular pedestrian profile that one may
+  encounter within the setting of interest;  
+- *Quantitative differences*: Within each class, parameter values are
+  subject to random variation, assigning each pedestrian with a unique
+  combination of parameters.
 
 ## Installation
 
-One can install `predped` through the `remotes` package in the following
-way:
+One can install `predped` via the `remotes` package:
 
 ``` r
 remotes::install_github("ndpvh/predped")
 ```
 
-To use the package, you should load it through `library`:
+To use the package, one should load it through `library`:
 
 ``` r
 library(predped)
@@ -110,22 +65,21 @@ library(predped)
 
 ## Getting started
 
-Within `predped`, we use a particular workflow.
+To simulate data from the M4MA, `predped` requires the following
+workflow.
 
-In the first step, you should define the environment in which you want
-pedestrians to walk around. For this, you will use the
+First, one should define the environment in which the pedestrians will
+walk around, defined through the
 [`background`](https://ndpvh.github.io/reference/background-class.html)
-class. This S4 class contains slots for the `shape` (i.e., the shape of
-the room), the `objects` (i.e., which objects are contained within the
-room), and a potential `entrance` and/or `exit`. The `shape` and
-`objects` should all consist of instances of the
+class. This S4 class defines the `shape` of the environment, , the
+`objects` that are contained in it, and a set of `entrance`s and/or
+`exit`s. The `shape` and `objects` are furthermore restricted to be
+instances of the
 [`object`](https://ndpvh.github.io/reference/object-class.html) class,
 that is they should be either a
 [`rectangle`](https://ndpvh.github.io/reference/rectangle-class.html),
 [`polygon`](https://ndpvh.github.io/reference/polygon-class.html), or
-[`circle`](https://ndpvh.github.io/reference/circle-class.html). The
-`entrance`/`exit` should be either a numeric vector or a numeric matrix
-with two columns specifying their coordinates.
+[`circle`](https://ndpvh.github.io/reference/circle-class.html).
 
 A simple example of an environment is the following circular room with a
 square object placed in the middle:
@@ -158,12 +112,11 @@ plot(setting)
 
 Once an environment has been defined, on should link this environment
 with the characteristics of the agents who are expected to walk around
-in this environment. This is achieved through the definition of a
-[`predped`](https://ndpvh.github.io/reference/predped.html) model,
-another S4 class with slots `setting` (the environment we just created),
-`parameters` (dataframe of parameter values), `archetypes` (a character
-string of pedestrians to include), and `weights` (the probability of
-each archetype entering the room).
+in this environment. This is achieved through defining an instance of
+the [`predped`](https://ndpvh.github.io/reference/predped.html) class,
+this time defining the `setting` or environment, the `archetypes` of the
+agents expected to walk in it, and the `weights` or probability with
+which one expects each archetype to be found within the space.
 
 Agent characteristics are defined through a `data.frame` that contains
 parameter values for a given “class” of people. One such dataframe is
@@ -183,8 +136,8 @@ model <- predped(
 )
 ```
 
-Now that the model has been defined, we can now simulate pedestrian
-movement by calling the function
+Once the setting and `predped` model have been defined, one can simulate
+pedestrian movement as expected by the M4MA through calling the function
 [`simulate`](https://ndpvh.github.io/reference/simulate.html):
 
 ``` r
@@ -196,13 +149,13 @@ trace <- simulate(
 )
 ```
 
-The variable `trace` will be a list consisting of
+The variable `trace` consists of a list of
 [`state`](https://ndpvh.github.io/reference/state.html)s of the
 environment, each state itself consisting of a copy of the environment
 (under slot `setting`) and of a list of pedestrians walking around in
-the environment (under slot `agents`). If you wish to visualize this
-trace, you can again use the
-[`plot`](https://ndpvh.github.io/reference/plot.html) function:
+the environment (under slot `agents`). To visualize this trace, one can
+again use the [`plot`](https://ndpvh.github.io/reference/plot.html)
+function:
 
 ``` r
 plots <- plot(
@@ -223,7 +176,7 @@ gifski::save_gif(
 )
 ```
 
-    #> [1] "man/figures/readme.gif"
+    #> [1] "/Users/nielsvanhasbroeck/Documents/UvA/Projects/Software, Pedestrian Modeling/man/figures/readme.gif"
 
 Looking at the created `.gif` then gives us an idea of how the agents
 walked around in the room:
@@ -233,8 +186,12 @@ walked around in the room:
 ## Getting help
 
 You can find the documentation for this package on its dedicated
-[documentation site](https://ndpvh.github.io/predped). This site
-includes additional information on the [theoretical
+[documentation site](https://ndpvh.github.io/predped). For an overview
+of the logic within the package, we refer the interested reader to the
+[Getting
+Started](https://ndpvh.github.io/predped/articles/getting_started.html)
+page on this site. On this site, we furthermore include information on
+the [theoretical
 background](https://ndpvh.github.io/predped/articles/theory.html), on
 [running
 minimal](https://ndpvh.github.io/predped/articles/simulation.html) and
@@ -262,13 +219,13 @@ package, we thank (in alphabetical order):
 - [Malte Lüken](https://github.com/maltelueken)
 - [Charlotte Tanis](https://github.com/CharlotteTanis)
 
-For the creation of the `predped`, we thank several permanent project
+For the creation of the `predped`, we thank its permanent project
 members (in alphabetical order):
 
 - [Andrew Heathcote](https://github.com/andrewheathcote)
 - [Niels Vanhasbroeck](https://github.com/ndpvh)
 
-as well as many who worked with us temporarily (in alphabetical order):
+as well as those who worked with us temporarily (in alphabetical order):
 
 - [Alexander Anderson](https://github.com/Alexanderson31)
 - [Joris Goossen](https://github.com/JorisGoosen)
@@ -280,10 +237,3 @@ as well as many who worked with us temporarily (in alphabetical order):
 For more information on the project, please see its dedicated section on
 the lab website:
 <https://www.ampl-psych.com/projects/minds-for-mobile-agents/>.
-
-## References
-
-Robin, T., Antonini, G., Beirlaire, M., & Cruz, J. (2009).
-Specification, estimation, and validation of a pedestrian walking
-behavior model. *Transportation Research Part B, 43*, 36-56. doi:
-[10.1016/j.trb.2008.06.010](doi.org/10.1016/j.trb.2008.06.010)

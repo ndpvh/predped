@@ -1,7 +1,7 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 0.1.2
+Version: 0.2.0
 Date: 2026-02-05
 Description: 
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
@@ -38,11 +38,6 @@ Imports:
     methods,
     cppRouting,
     m4ma,
-    ggplot2,
-    ggpubr,
-    knitr,
-    rmarkdown,
-    kableExtra,
     stats,
     utils,
     dplyr,
@@ -76,7 +71,13 @@ Suggests:
     fs,
     testthat (>= 3.0.0),
     RSQLite,
-    DBI
+    DBI,
+    ggplot2,
+    ggpubr,
+    knitr,
+    kableExtra,
+    rmarkdown,
+    nloptr
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3

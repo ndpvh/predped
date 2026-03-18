@@ -172,8 +172,12 @@ setMethod("initialize", "predped", function(.Object,
 setMethod("show", "predped", function(object) {
     cat("Model object:\n")
     cat("ID:", object@id, "\n")
-    cat("Parameters: \n")
-    cat(write.table(object@parameters[["params_archetypes"]]), "\n")
+    cat(
+        "Parameters taken from the",
+        paste0(object@archetypes, collapse = ", "),
+        "archetypes.",
+        "\n"
+    )
 })
 
 

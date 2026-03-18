@@ -243,6 +243,15 @@ knitr_table <- function(x,
                         caption = "",
                         digits = 2) {
 
+    if(!requireNamespace("knitr") | !requireNamespace("kableExtra")) {
+        stop(
+            paste(
+                "The `knitr` and `kableExtra` packages are required to benchmark `predped`.",
+                "Please install."
+            )
+        )
+    }
+
     rnd <- function(y) {
         return(format(y, scientific = TRUE, digits = digits))
     }

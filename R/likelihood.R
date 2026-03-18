@@ -59,10 +59,17 @@ mll <- function(data,
         data <- data[!is.na(data$ps_speed), ]
     }
 
-    # If transform is TRUE, then we need to transform the parameters from the 
-    # real scale to the bounded scale.
-    if(transform) {
-        parameters <- to_bounded(parameters, bounds)
+    # Check whether there are any instances in which the person is not moving 
+    # around. If so, throw a warning and delete these rows
+    if(any(is.na(data$ps_speed))) {
+        warning(
+            paste(
+                "NAs found in the utility variables within the data.",
+                "Deleting the affected rows."
+            )
+        )
+
+        data <- data[!is.na(data$ps_speed), ]
     }
 
     # Retrieve each person's identifier. Note that we sort this to avoid problems
@@ -87,6 +94,13 @@ mll <- function(data,
     } else if(is.data.frame(parameters) & nrow(parameters) < length(ids)) {
         idx <- rep_len(1:nrow(parameters), length(ids))
         parameters <- parameters[idx, ]
+    }
+
+    # If transform is TRUE, then we need to transform the parameters from the 
+    # real scale to the bounded scale.
+    if(transform) {
+        names(parameters) <- parameter_names
+        parameters <- to_bounded(parameters, bounds)
     }
 
     if(cpp) {
@@ -128,6 +142,10 @@ mll <- function(data,
                                            exp_V <- exp(V)
                                            return(exp_V[selection$cell[j] + 1] / sum(exp_V))
                                        })
+
+                           # Transform likelihoods that fall below a particular 
+                           # threshold
+                           L[log(L) < -10] <- exp(-10)
                       
                            # Convert likelihoods to min-log-likelihood. 1 was added
                            # to each likelihood to ensure that 0 probability will 
