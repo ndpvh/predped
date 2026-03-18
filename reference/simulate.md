@@ -376,6 +376,7 @@ sapply(trace, \(x) length(x@agents))
 
 # If you wish to plot the trace, you can simply use the plot function.
 plt <- plot(trace)
+#> Loading required namespace: ggplot2
 #> 
 #> Making plot for state 0Making plot for state 1Making plot for state 2Making plot for state 3Making plot for state 4Making plot for state 5Making plot for state 6Making plot for state 7Making plot for state 8Making plot for state 9Making plot for state 10
 plt[[1]]

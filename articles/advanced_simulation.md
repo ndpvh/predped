@@ -284,6 +284,7 @@ which when plotted gives:
 
 ``` r
 plot(train_station)
+#> Loading required namespace: ggplot2
 ```
 
 ![A visualization of a simplified train station with gates on the left

@@ -7,7 +7,7 @@ of the low-level functions.
 
 ## Slots
 
-- `x`:
+- `.Data`:
 
   Numerical vector denoting the coordinate.
 

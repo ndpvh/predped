@@ -86,6 +86,7 @@ To visualize what this setting looks like, we can use the
 
 ``` r
 plot(my_background)
+#> Loading required namespace: ggplot2
 ```
 
 ![One sees the visualization our office, having a rectangular desk on
