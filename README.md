@@ -10,7 +10,7 @@
 v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
-# predped: An R package to simulate the Minds for Mobile Agents (M4MA) pedestrian model
+# predped: An R package around the Minds for Mobile Agents (M4MA) pedestrian model
 
 This project serves as a tool to simulate pedestrian movement using the
 Minds for Mobile Agents (M4MA) model. This package enables users to
