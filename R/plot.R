@@ -99,6 +99,15 @@ setMethod("plot", "agent", function(x,
                                     goal.size = 1,
                                     ...) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     agent <- x
 
     # Determine the orientation of the agent to be plotted
@@ -156,6 +165,15 @@ setMethod("plot", "background", function(x,
                                          dark_mode = FALSE,
                                          optimize = TRUE,
                                          ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # If you want to toggle the default dark mode, then change the default colors
     if(dark_mode) {
@@ -305,6 +323,15 @@ setMethod("plot", "list", function(x,
                                    print_progress = TRUE, 
                                    ...) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # First a check of whether anything is contained within this list. Otherwise
     # return an error
     if(length(x) == 0) {
@@ -347,6 +374,15 @@ setMethod("plot", "object", function(x,
                                      plot_forbidden = FALSE,
                                      forbidden.color = "red",
                                      ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # Extract the points of the object
     pts <- points(x)
@@ -422,6 +458,15 @@ setMethod("plot", "segment", function(x,
                                       arrow.size = 0.3,
                                       segment.hjust = 0.5) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # Get the orientation of the segment and subtract 90 degrees
     angle <- orientation(x) - pi / 2
 
@@ -473,6 +518,15 @@ setMethod("plot", "state", function(x,
                                     dark_mode = FALSE,
                                     optimize = TRUE,
                                     ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # Change colors of shape and agent if needed
     if(dark_mode) {
@@ -687,6 +741,15 @@ plot_edges <- function(setting,
                        nodes.size = 1,
                        dark_mode = FALSE,
                        ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # If you want to toggle the default dark mode, then change the default colors
     if(dark_mode) {
