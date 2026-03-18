@@ -14,7 +14,7 @@ flexibility of the low-level functions.
 \section{Slots}{
 
 \describe{
-\item{\code{x}}{Numerical vector denoting the coordinate.}
+\item{\code{.Data}}{Numerical vector denoting the coordinate.}
 }}
 
 \seealso{

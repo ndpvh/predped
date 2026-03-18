@@ -8,7 +8,7 @@
 #' \code{coordinate}s out of \code{predped}, as they greatly hamper the 
 #' flexibility of the low-level functions.
 #'
-#' @slot x Numerical vector denoting the coordinate.
+#' @slot .Data Numerical vector denoting the coordinate.
 #' 
 #' @seealso 
 #' \code{\link[predped]{rotate}},
