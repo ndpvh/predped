@@ -20,15 +20,15 @@ knitr::opts_chunk$set(
 library(predped)
 ```
 
-In the vignette [_Simulations_](https://ndpvh.github.io/predped/articles/simulation.html), we explained the basic workflow behind performing a simulation. In this vignette, we will dive deeper into tweaks one can do to further personalize these simulations.
+In the vignette [_Simulations_](https://ndpvh.github.io/predped/articles/simulation.html), we explained the basic workflow behind performing a simulation. In this vignette, we will dive deeper into tweaks one can do to further refine simulations.
 
 
 
 # Initial Conditions 
 
-Up to now, simulations have always started from scratch, having no agents inside of the environment at the start and slowly building towards a greater number of agents within the space. However, there may be occasions where the user may want to start a simulation from a particular _initial condition_ or initial state, for example starting with $X$ number of people in the room or continuing a previous simulation from a particular iteration thereof. In this section, we will describe several ways in which users can provide initial conditions to the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function.
+Up to now, simulations have always started from scratch, having no agents inside of the environment at the start and slowly building towards a greater number of agents within the space. However, there may be occasions where the user may want to start a simulation from a particular _initial condition_ or initial state, for example starting with $X$ number of agents in the space or continuing a previous simulation from a particular iteration thereof. In this section, we will describe several ways in which users can provide initial conditions to the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function.
 
-While we will only focus on the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function, some of the functionality underlying the creation of initial conditions is handled by a dedicated function, namely [`create_initial_condition`](https://ndpvh.github.io/predped/reference/create_initial_condition.html). Please consult its documentation for an overview of all functionalities underlying this function.
+While we will only focus on the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function, some of the functionality underlying the creation of initial conditions is handled by a dedicated function, namely [`create_initial_condition`](https://ndpvh.github.io/predped/reference/create_initial_condition.html). Please consult its documentation for an overview of its full functionality.
 
 ## Initial `state`
 
@@ -65,7 +65,7 @@ continued_trace <- simulate(
 )
 ```
 
-Note that providing a `state` to the `initial_condition` argument only works if both the `state` and the model -- here, varaibles `initial_state` and `my_predped` -- both contain the same environment under their slot `setting`. Furthermore note that the only property of the `state` that is retained for the new simulation is the list of [`agent`](https://ndpvh.github.io/predped/reference/agent.html)s that it contains. It may therefore be more interesting to consider the next approach for controlling initial conditions.
+Note that providing a `state` to the `initial_condition` argument only works if both the `state` and the model -- here, variables `initial_state` and `my_predped` -- both contain the same environment under their slot `setting`. Furthermore note that the only property of the `state` that is retained for the new simulation is the list of [`agent`](https://ndpvh.github.io/predped/reference/agent.html)s that it contains. It may therefore be more interesting to consider the next approach for controlling initial conditions.
 
 ## Initial List of Agents
 
@@ -170,13 +170,13 @@ Note that there is no guarantee that the required number of agents is generated,
 
 ## Precedence
 
-It is useful to know which arguments take precedence when specifying multiple of them at once (though this is not recommended). The argument `initial_agents` takes precedence, followed by `initial_number_agents` and, finally, `initial_condition`. 
+It is useful to know which arguments take precedence when specifying many at once (though this is not recommended). The argument `initial_agents` takes precedence, followed by `initial_number_agents` and, finally, `initial_condition`. 
 
 
 
 # One-directional Flow
 
-Up to now, we have assumed pedestrian flow to be bidirectional, that is that pedestrians are able to walk in two directions across the whole environment. However, there are cases in which pedestrian flow is limited to only a single direction, which is for example the case at art exhibitions, gates at the metro station, or the one-directional aisles in the supermarkets during the COVID-19 pandemic. Given the ubiquity of unidirectional flow, we included functionalities to restrict pedestrian movement to a single direction through the definition of [`segment`](https://npdvh.github.io/predped/reference/segment.html)s and providing them to the `limited_access` slot of the [`background`](https://npdvh.github.io/predped/reference/background.html) class. In `predped`, [`segment`](https://npdvh.github.io/predped/reference/segment.html)s are defined by their first (`from`) and second coordinate (`to`) and can be created as follows:
+Up to now, we have assumed pedestrian flow to be be unrestricted in terms of direction. However, there are cases in which pedestrian flow is limited to only a single direction, which is for example the case at art exhibitions, gates at the metro station, or the one-directional aisles in the supermarkets during the COVID-19 pandemic. Given the ubiquity of unidirectional flow, we included functionality to restrict pedestrian movement to a single direction through the definition of [`segment`](https://npdvh.github.io/predped/reference/segment.html)s and providing them to the `limited_access` slot of the [`background`](https://npdvh.github.io/predped/reference/background.html) class. In `predped`, [`segment`](https://npdvh.github.io/predped/reference/segment.html)s are defined by their first (`from`) and second coordinate (`to`) and can be created as follows:
 
 ```{r}
 # Create a segment that starts at the origin and goes to coordinate P(1, 1)
@@ -310,7 +310,7 @@ plot(
 )
 ```
 
-This figure again shows the train station, but includes arrows that point in the direction that agents can move into at the specified locations. Note that the segments were added at the end of the gates rather than in the middle of them: Experience teaches us that agents have the tendency to move into closed gates before realizing they are not accessible, a problem that is still under investigation. 
+This figure again shows the train station, but includes arrows that point in the direction that agents can move into at the specified locations. Note that the segments were added at the end of the gates rather than in the middle of them to prevent agents moving to closed gates before realizing they are not accessible. 
 
 To see unidirectionality in action, we create another instance of the `predped` class and simulate movement data within this restricted train station: 
 
@@ -358,7 +358,7 @@ knitr::include_graphics(
 
 # Situational Changes
 
-A lot of the functionality that we displayed up to now has assumed that you can prespecify the behavior of the agents, meaning you do not control the behavior of the agents once the simulation is running. Yet, the user may wish to more directly influence the course of a simulation, for example to urge pedestrians to perform an evacuation, to let agents walk around as they would in a dynamic experiment, or to adjust an agent's parameters so that they rush to catch their train. This kind of conditional manipulations are possible in `predped`, specifically through the specification of the `fx` argument of the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function.
+A lot of the functionality that we displayed up to now has assumed that you can pre-specify the behavior of the agents, meaning you do not control the behavior of the agents once the simulation is running. Yet, the user may wish to more directly influence the course of a simulation, for example to urge pedestrians to perform an evacuation, to let agents walk around as they would in a dynamic experiment, or to adjust an agent's parameters so that they rush to catch their train. This kind of conditional manipulations are possible in `predped`, specifically through the specification of the `fx` argument of the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function.
 
 Let's take the evacuation as an example. First, we create a simplified supermarket environment:
 
@@ -424,7 +424,7 @@ plot(
 )
 ```
 
-Within our simulation, we want agents to enter the room, walk around to get the items they want to buy, but then be forced to evacuate at a particular time during the evacuation. To achieve this, we have to specify the `fx` argument, providing it with a function that takes in the state at each iteration of the simulation and allows the user to make a set of desired changes to this state. For our evacuation procedure, we create the function `start_evacuation`, starting an evacuation after `100` iterations:
+Within our simulation, we want agents to enter the room, walk around to get the items they want to buy, but then be forced to evacuate at a particular time. To achieve this, we have to specify the `fx` argument, providing it with a function that takes in the state at each iteration of the simulation and allows the user to make a set of desired changes to this state. For our evacuation procedure, we create the function `start_evacuation`, starting an evacuation after `100` iterations:
 
 ```{r}
 start_evacuation <- function(state) {
@@ -520,7 +520,7 @@ knitr::include_graphics(
 )
 ```
 
-Of course, you are not limited to changing the agents, but can also change the environment itself. For example, if we want to allow agents to ignore the unidirectionality imposed at the beginning of the simulation, we can empty the `limited_access` slot once the evacuation has started:
+Of course, you are not limited to changing the agents, but can also change the environment itself. For example, if we want to allow agents to ignore the uni-directionality imposed at the beginning of the simulation, we can empty the `limited_access` slot once the evacuation has started:
 
 ```{r}
 start_evacuation <- function(state) {
@@ -551,7 +551,7 @@ In other words, the `fx` argument allows users to create a whole range of situat
 
 ## Bookkeeping through the `variables` Slot
 
-If one wants to create even more complicated situations, one can leverage the `variables` slot of the [`state`](https://ndpvh.github.io/predped/reference/state) class to make bookkeeping across the simulation easier. This slot keeps hold of a named list containing all variables relevant to your simulation. Keeping within our evacuation example, we may want to keep track of how long it takes each agent to leave the room after the evacuation has been signalled. We can achieve this by creating a variables of times in the variable `slot` and updating it accordingly, for example redefining `start_evacuation` as:
+If one wants to create even more complicated situations, one can leverage the `variables` slot of the [`state`](https://ndpvh.github.io/predped/reference/state) class to make bookkeeping across the simulation easier. This slot contains a named list of all variables relevant to your simulation. Following our evacuation example, we may want to keep track of how long it takes each agent to leave the room after the evacuation has been signaled. We can achieve this by creating a variables of times in the variable `slot` and updating it accordingly, for example redefining `start_evacuation` as:
 
 ```{r}
 start_evacuation <- function(state) {
@@ -631,7 +631,7 @@ variables(trace[[251]])$times
 
 # Using your Own Parameters 
 
-While we provide a lot of prespecified agent types to choose from, one may wish to play around with the parameters themselves to personalize their own simulations. In this case, one may wish to save the parameters for future use. In this case, you can let the [`predped`](https://ndpvh.github.io/predped/reference/predped.html) constructor know what parameters you would want to use by specifying the `filename` argument:
+While we provide a lot of pre-specified agent types to choose from, one may wish to play around with the parameters themselves to personalize their own simulations. In this case, you can save the parameters for future use by letting the [`predped`](https://ndpvh.github.io/predped/reference/predped.html) constructor know what parameters you would want to use by specifying the `filename` argument:
 
 ```{r}
 #| eval = FALSE
