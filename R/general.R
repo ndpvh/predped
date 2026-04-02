@@ -12,14 +12,14 @@
 #' This function is used to enhance the generalizability of how certain values 
 #' are determined, and is used for determining:
 #' \itemize{
-#'    \item{}{the number of goals to simulate in each goal stack in the 
-#'            \code{\link[predped]{multiple_goal_stacks}} function}
-#'    \item{}{the counter for each goal in a goal stack in the 
-#'            \code{\link[predped]{goal_stack}} function}
-#'    \item{}{the number of agents that can maximally be in the simulation at 
-#'            each time point in the \code{\link[predped]{simulate-predped-method}}}
-#'    \item{}{the iteration number at which an agent can be added to the
-#'            simulation in the \code{\link[predped]{simulate-predped-method}}}
+#'    \item the number of goals to simulate in each goal stack in the 
+#'          \code{\link[predped]{multiple_goal_stacks}} function
+#'    \item the counter for each goal in a goal stack in the 
+#'          \code{\link[predped]{goal_stack}} function
+#'    \item the number of agents that can maximally be in the simulation at 
+#'          each time point in the \code{\link[predped]{simulate}}
+#'    \item the iteration number at which an agent can be added to the
+#'          simulation in the \code{\link[predped]{simulate}}
 #' }
 #' 
 #' Note that for this function to work, one should correctly define their 
@@ -50,11 +50,13 @@
 #' determine_values(generating_function, 5)
 #' 
 #' @seealso
-#' \code{\link[predped]{simulate-predped}}
+#' \code{\link[predped]{simulate}}
 #' \code{\link[predped]{goal_stack}}
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 
 #' @rdname determine_values
+#' 
+#' @concept helper
 #' 
 #' @export
 determine_values <- function(x, 
@@ -91,6 +93,8 @@ determine_values <- function(x,
 #' 
 #' @return A list containing all instances of the class.
 #' 
+#' @concept helper
+#' 
 #' @export find_class
 find_class <- function(class_name, lst) {
     return(Filter(function(x) class_name %in% class(x), lst))
@@ -109,6 +113,8 @@ find_class <- function(class_name, lst) {
 #' 
 #' @return Numeric denoting the perpendicular orientation to the entrance of the 
 #' space in degrees
+#' 
+#' @concept helper
 #' 
 #' @export
 perpendicular_orientation <- function(object, co) {
@@ -179,13 +185,34 @@ perpendicular_orientation <- function(object, co) {
 #' @param return_all Logical denoting whether it should return the intersection 
 #' of all segments to each other. If true, will include indicators of which segments
 #' were compared. Defaults to `FALSE`.
+#' @param cpp Logical denoting whether to use the R (\code{cpp = FALSE}) or 
+#' Rcpp version (\code{cpp = TRUE}) of this function. Defaults to \code{TRUE}
 #'
 #' @return Returns a logical denoting whether any of the segments in 
+#' 
+#' @concept helper
 #' 
 #' @export
 line_line_intersection <- function(segments_1, 
                                    segments_2,
-                                   return_all = FALSE) {
+                                   return_all = FALSE,
+                                   cpp = TRUE) {
+
+    if(cpp) {
+        # Check whether the input arguments are of the correct type
+        segments_1 <- as.matrix(segments_1)
+        segments_2 <- as.matrix(segments_2)
+
+        # Pass down to Rcpp version
+        result <- line_line_intersection_rcpp(segments_1, segments_2)
+
+        # Check what to provide as output
+        if(return_all) {
+            return(result)
+        } else {
+            return(any(result))
+        }
+    }
 
     # Check which of the two sequences is shortest. Whichever is shortest will 
     # go into the loop, the other will serve as the vectorized set of segments
@@ -291,6 +318,8 @@ line_line_intersection <- function(segments_1,
 #' \code{\link[predped]{out_object}}
 #' 
 #' @rdname raycasting
+#' 
+#' @concept helper
 #' 
 #' @export
 raycasting <- function(coords, x) {

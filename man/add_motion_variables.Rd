@@ -7,29 +7,37 @@
 add_motion_variables(
   data,
   velocities = c(1.5, 1, 0.5),
-  orientations = c(-72.5, -50, -32.5, -20, -10, 0, 10, 20, 32.5, 50, 72.5),
+  orientations = c(72.5, 50, 32.5, 20, 10, 0, -72.5, -50, -32.5, -20, -10),
   time_step = 0.5,
-  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4)/time_step
+  threshold = qlnorm(0.25, -2.95, 0.64)/time_step,
+  initial_conditions = FALSE
 )
 }
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
 
 \item{velocities}{Numeric vector denoting the changes in speeds as assumed by 
-the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
+the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
+(deceleration).}
 
 \item{orientations}{Numeric vector denoting the changes in orientation as 
 assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
-\code{20}, \code{10}, code{0}, \code{350}, \code{340}, \code{327.5}, 
+\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
 \code{310}, \code{287.5} (note that the larger angles are actually the 
 negative symmetric versions of the smaller angles).}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).}
+to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{treshold}{Numeric denoting under which observed value for speed the 
+\item{threshold}{Numeric denoting under which observed value for speed the 
 cell to which an agent has moved should be put to `0`. Defaults to a value 
 based on the observed measurement error in our system.}
+
+\item{initial_conditions}{Logical denoting whether the added columns should 
+include the initial conditions (that is, speed, orientation, and position at
+the previous time point) alongside their current alternatives. Useful when 
+one wants to compute the values of the utility-related variables from the 
+data. Defaults to \code{FALSE}.}
 }
 \description{
 This function adds several motion variables to an already existing dataset. 
@@ -54,3 +62,4 @@ The provided dataset should at least have the following columns:
 # This is my example
 
 }
+\concept{data}

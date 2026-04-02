@@ -23,15 +23,16 @@ setGeneric("update", function(object, ...) standardGeneric("update"))
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}.
 #' 
-#' @docType method
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}}
 #' 
-#' @rdname update-state
+#' @rdname update
+#' 
+#' @concept simulation
 #' 
 #' @export 
 setMethod("update", "state", function(object,
@@ -52,6 +53,38 @@ setMethod("update", "state", function(object,
                                                time_step = time_step,
                                                cpp = cpp)
 
+    # Extract objects and shape of the environment
+    obj <- objects(background)
+    shp <- shape(background)
+
+    # Check whether each agent can see the current goal. This is used in "plan", 
+    # "reroute", and "move". Based on (a) whether any objects can be in the way 
+    # and (b) the shape of the room. With regard to the latter, we note that an 
+    # agent is guaranteed to see their goal if the room is regular (rectangle or 
+    # circle) and no objects are in the way. 
+    #
+    # This is a necessary part of the code that prevents agents from getting 
+    # stuck
+    # if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
+    if((length(obj) == 0) | (length(agent_list) == 0)) {
+        seen <- rep(TRUE, length(agent_list))
+    } else {
+        edges <- sapply(agent_list, 
+                        function(x) {
+                            if(nrow(current_goal(x)@path) < 1) {
+                                return(c(position(x), rep(0, 2)))
+                            } else {
+                                return(c(position(x), current_goal(x)@path[1, ]))
+                            }
+                        })
+        edges <- t(edges)
+
+        seen_1 <- sapply(agent_list, \(x) nrow(current_goal(x)@path) >= 1)
+        seen_2 <- prune_edges(obj, edges)
+
+        seen <- seen_1 & seen_2
+    }
+
     # Loop over each agent in the simulation and update their position with the 
     # `update_agent` function
     state_copy <- object
@@ -62,11 +95,31 @@ setMethod("update", "state", function(object,
         agent <- agent_list[[i]]
         agents(state_copy) <- agent_list[-i]
 
+        # Update the utility variables slot for the agents, as we don't want 
+        # carry-over effects in this variable
+        agent@utility_variables <- data.frame(agent_idx = i,
+                                              check = NA,
+                                              ps_speed = NA, 
+                                              ps_distance = NA, 
+                                              gd_angle = NA, 
+                                              id_distance = NA,
+                                              id_check = NA,
+                                              id_ingroup = NA,
+                                              ba_angle = NA,
+                                              ba_cones = NA,
+                                              fl_leaders = NA,
+                                              wb_buddies = NA,
+                                              gc_distance = NA,
+                                              gc_radius = NA, 
+                                              gc_nped = NA,
+                                              vf_angles = NA)
+
         # Update the agent himself
         agent_list[[i]] <- update(agent, 
                                   state_copy,
                                   background,
                                   agent_specs,
+                                  seen[i],
                                   cpp = cpp,
                                   ...)
     }
@@ -91,20 +144,19 @@ setMethod("update", "state", function(object,
 #' information of all agents within the current \code{state} and allows for the
 #' communication between the \code{predped} simulation functions and the 
 #' \code{m4ma} utility functions.
+#' @param seen Logical indicating whether the agent can see the path point 
+#' to which they are currently moving.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -122,6 +174,9 @@ setMethod("update", "state", function(object,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is 
@@ -135,21 +190,22 @@ setMethod("update", "state", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}},
 #' \code{\link[predped]{update_position}}
 #' 
-#' @docType method
-#' 
 #' @rdname update-agent
+#' 
+#' @concept simulation
 #' 
 #' @export 
 setMethod("update", "agent", function(object,
                                       state,
                                       background,
                                       agent_specifications,
+                                      seen,
                                       velocities = c(1.5, 1, 0.5) |>
                                           rep(each = 11) |>
                                           matrix(ncol = 3),
@@ -161,6 +217,7 @@ setMethod("update", "agent", function(object,
                                       space_between = 1.25,
                                       precomputed_edges = NULL,
                                       many_nodes = !is.null(precomputed_edges),
+                                      adaptive_goal_sorting = TRUE,
                                       standing_start = 0.1,
                                       time_step = 0.5,
                                       report = FALSE,
@@ -171,11 +228,13 @@ setMethod("update", "agent", function(object,
     object <- update_goal(object, 
                           state, 
                           background,
+                          seen,
                           standing_start = standing_start,     
                           close_enough = close_enough,
                           space_between = space_between,                     
                           precomputed_edges = precomputed_edges,
                           many_nodes = many_nodes,
+                          adaptive_goal_sorting = adaptive_goal_sorting,
                           report = report,
                           print_iteration = print_iteration,
                           cpp = cpp) 
@@ -198,7 +257,7 @@ setMethod("update", "agent", function(object,
 
 #' Update the Position of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
 #' @param agent_specifications List created by the 
@@ -207,19 +266,16 @@ setMethod("update", "agent", function(object,
 #' communication between the \code{predped} simulation functions and the 
 #' \code{m4ma} utility functions.
 #' @param velocities Numeric matrix containing the change in speed for an agent
-#' whenever they move to the respective cell of this matrix. Is used to create 
-#' the cell positions that the agent might move to, as performed through 
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-#' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-#' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-#' @param orientations Numeric matrix containing the change in direction for an 
-#' agent whenever they move to the respective cell of this matrix. Is used to 
-#' create the cell positions that the agent might move to, as performed through
-#' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-#' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-#' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-#' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-#' angles are actually the negative symmetric versions of the smaller angles).
+#' whenever they move to the respective cell of this matrix. Is used to create
+#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
+#' @param orientations Numeric matrix containing the change in direction for an
+#' agent whenever they move to the respective cell of this matrix. Is used to
+#' create the cell positions that the agent might move to. Defaults to a matrix 
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -236,13 +292,15 @@ setMethod("update", "agent", function(object,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_goal}}
 #' 
 #' @rdname update_position
+#' 
+#' @concept simulation
 #' 
 #' @export 
 #
@@ -297,6 +355,7 @@ update_position <- function(agent,
                                          agent_specifications, 
                                          velocities, 
                                          orientations,
+                                         time_step = time_step,
                                          cpp = cpp)
 
         # Report the degress that the agent is reorienting to
@@ -315,16 +374,15 @@ update_position <- function(agent,
     # utility of moving to a given location
     } else {
         # Define the centers of the options to move to
-        centers <- m4ma::c_vd_rcpp(cells = 1:33,
-                                   p1 = position(agent),
-                                   v1 = speed(agent),
-                                   a1 = orientation(agent),
-                                   vels = velocities,
-                                   angles = orientations,
-                                   tStep = time_step)
+        centers <- compute_centers(agent, 
+                                   velocities = velocities,
+                                   orientations = orientations,
+                                   time_step = time_step,
+                                   cpp = cpp)
+        agent@cell_centers <- centers
 
         # Check for occlusions or blocked cells the agent cannot move to
-        check <- moving_options(agent, state, background, centers)
+        check <- moving_options(agent, state, background, centers, cpp = cpp)
         
         # If there are no good options available, trigger a reroutening of the 
         # agent: This will create new path points and let the agent reorient. 
@@ -342,14 +400,19 @@ update_position <- function(agent,
             return(agent)
         }
 
-        # Compute the utility of of each option and transform the utilities to
+        # Compute the utility variables
+        agent@utility_variables <- compute_utility_variables(agent, 
+                                                             state,
+                                                             background,
+                                                             agent_specifications,
+                                                             centers,
+                                                             check,
+                                                             cpp = cpp)
+
+        # Compute the utility of each option and transform the utilities to
         # probabilities
-        V <- utility(agent, 
-                     state, 
-                     background, 
-                     agent_specifications, 
-                     centers, 
-                     check,
+        V <- utility(agent@utility_variables,
+                     agent@parameters,
                      cpp = cpp)
 
         # Check whether you have only infinite moving options. Delete the baseline
@@ -371,11 +434,7 @@ update_position <- function(agent,
         # Using the probabilities, sample the cell to which the agent will move.
         # Importantly, 1 is subtracted from the integer as 0 is also an option
         # (standing still), but `seq_along` starts at 1
-        cell <- sample.int(length(Pr),
-                           1,
-                           TRUE,
-                           prob = Pr) - 1
-
+        cell <- sample(seq_along(Pr), 1, prob = Pr) - 1
         cell(agent) <- cell
 
         # Check what to do: Either the chosen cell is 0 (stop) or something else
@@ -386,7 +445,7 @@ update_position <- function(agent,
             # status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
             
         } else {
-            position(agent) <- centers[cell,]
+            position(agent) <- centers[cell, ]
 
             # Update speed to be either higher than or equal to `standing_start`
             acceleration <- velocities[cell]
@@ -424,9 +483,11 @@ update_position <- function(agent,
 
 #' Update the Goal of an Agent
 #' 
-#' @param object Object of the \code{\link[predped]{agent-class}}.
+#' @param agent Object of the \code{\link[predped]{agent-class}}.
 #' @param state Object of the \code{\link[predped]{state-class}}.
 #' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param seen Logical indicating whether the agent can see the path point 
+#' to which they are currently moving.
 #' @param standing_start Numeric denoting the factor of their preferred speed 
 #' that agents move when they just came from standing still. Defaults to 
 #' \code{0.1}.
@@ -444,6 +505,9 @@ update_position <- function(agent,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
+#' to change the order of their goals adaptively throughout the simulation. 
+#' Defaults to \code{TRUE}.
 #' @param report Logical denoting whether to report whenever an agent is 
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
@@ -455,13 +519,15 @@ update_position <- function(agent,
 #' @return Object of the \code{\link[predped]{agent-class}}.
 #' 
 #' @seealso 
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}},
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}},
 #' \code{\link[predped]{update_position}}
 #' 
 #' @rdname update_goal
+#' 
+#' @concept simulation
 #' 
 #' @export 
 #
@@ -478,23 +544,25 @@ update_position <- function(agent,
 update_goal <- function(agent,
                         state,
                         background,
+                        seen,
                         standing_start = 0.1,
                         close_enough = 2,
                         space_between = 1.25,
                         precomputed_edges = NULL,
                         many_nodes = !is.null(precomputed_edges),
+                        adaptive_goal_sorting = TRUE,
                         report = FALSE,
                         print_iteration = FALSE,
                         cpp = TRUE) {  
 
+    # Adjust the relative measures to account for the radius of the agent
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
+    # Extract objects and shape of the environment
     obj <- objects(background)
-
-    # Make some placeholders for reroutening and rerouting
-    reroute <- FALSE
+    shp <- shape(background)
 
     # Check whether an agent is close to their goal. If so, they can stop what 
     # they're doing and instead start completing the goal. 
@@ -563,15 +631,6 @@ update_goal <- function(agent,
     # directly towards it, or they cannot see their goal and they have to 
     # actually plan their route.
     if(status(agent) == "plan") {
-        # Check whether the agent can see the current goal.
-        if(length(obj) == 0) {
-            seen <- TRUE 
-        } else {
-            seen <- all(prune_edges(obj, 
-                                    matrix(c(position(agent), current_goal(agent)@position),
-                                           nrow = 1)))
-        }
-
         # If the agent sees their goal, the path is just going to go directly 
         # towards the goal
         if(seen) {
@@ -608,20 +667,6 @@ update_goal <- function(agent,
     # agents can still plan their path if they can see their goal, but other 
     # agents are in the way. This is determined by the reroute parameter
     if(status(agent) == "reroute") {
-        # Check whether the agent can see the current goal based on (a) whether
-        # any objects can be in the way and (b) the shape of the room. With 
-        # regard to the latter, we note that an agent is guaranteed to see their
-        # goal if the room is regular (rectangle or circle) and no objects are 
-        # in the way. Otherwise, we have to do a check
-        shp <- shape(background)
-        if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
-            seen <- TRUE
-        } else {
-            seen <- all(prune_edges(append(obj, shape(background)), 
-                                    matrix(c(position(agent), current_goal(agent)@position),
-                                           nrow = 1)))
-        }
-
         # If the agent doesn't see their current goal, they have to reroute with
         # a probability of 100%
         if(!seen) {
@@ -738,7 +783,7 @@ update_goal <- function(agent,
         # to the goal. To make sure agents don't get stuck easily, let them 
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
-        if(waiting_counter(agent) < 0 & status(agent) != "move") {
+        if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
             if(length(goals(agent)) != 0) {
                 goals(agent) <- append(current_goal(agent), 
                                        goals(agent))
@@ -754,20 +799,29 @@ update_goal <- function(agent,
     # Finally, it might also be that the agent is close to the goal and can 
     # start interacting with it. This is what's handled in this code block.
     if(status(agent) == "move") {  
+        # Check whether agents can still see their goal. If not, then let them
+        # reroute.
+        if(!seen) {
+            status(agent) <- "reroute"
+            return(agent)
+        }
+
+        # Check whether agents can see the next path point. If so, then they 
+        # can move to that one instead of the first one
         if(nrow(current_goal(agent)@path) > 1) {
             # If there are still path points left, check whether the agent can see 
             # the next path point.
             if(length(obj) == 0) {
-                seen <- TRUE
+                seen_next <- TRUE
             } else {
-                seen <- all(prune_edges(obj, 
-                                        matrix(c(position(agent), current_goal(agent)@path[2,]), 
-                                               nrow = 1)))
+                seen_next <- prune_edges(obj,
+                                         matrix(c(position(agent), current_goal(agent)@path[2,]), 
+                                                nrow = 1))
             }
 
             # If a next path point is visible, the agent will switch to that 
             # path point instead
-            if(seen) {
+            if(seen_next) {
                 current_goal(agent)@path <- current_goal(agent)@path[-1, , drop = FALSE] 
                 status(agent) <- "reorient" # Keep this in! Otherwise agents get stuck
 
@@ -849,12 +903,14 @@ update_goal <- function(agent,
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname predict_movement
+#' 
+#' @concept movement
 #' 
 #' @export
 predict_movement <- function(agent, 
@@ -872,7 +928,7 @@ predict_movement <- function(agent,
     # same speed in the same direction. Different when an agent is currently 
     # stopped vs when they are actively moving. Also different depending on 
     # whether this is considered in the first place.
-    if(stay_stopped & agent@status == "stop") {
+    if(stay_stopped & agent@status != "move") {
         co <- position(agent)
     } else {
         crossed_distance <- m4ma::scaleVel(agent@speed, tStep = time_step) * m4ma::aTOd(agent@orientation)
@@ -890,24 +946,28 @@ predict_movement <- function(agent,
 #' objects. Allows for a translation from the object-oriented way of doing things
 #' in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 #'
-#' @param agent Object of the \code{\link[predped]{agent-class}}.
+#' @param agent_list List of objects of the \code{\link[predped]{agent-class}}.
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing all information of all agents within the current 
 #' state.
 #' 
 #' @seealso 
 #' \code{\link[predped]{create_agent_specifications}},
-#' \code{\link[predped]{simulate,predped-method}},
-#' \code{\link[predped]{simulate,state-method}},
-#' \code{\link[predped]{update,agent-method}},
-#' \code{\link[predped]{update,state-method}}
+#' \code{\link[predped]{simulate}},
+#' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{update-agent}},
+#' \code{\link[predped]{update}}
 #' 
 #' @rdname create_agent_specifications
+#' 
+#' @concept helper
 #' 
 #' @export
 create_agent_specifications <- function(agent_list,

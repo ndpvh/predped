@@ -5,6 +5,10 @@
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{agents} slot.
+#' 
 #' @examples 
 #' # Initialize state
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
@@ -26,14 +30,15 @@
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname agents-method
+#' @rdname agents
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("agents", function(object) standardGeneric("agents"))
 
-#' @rdname agents-method
+#' @rdname agents
 #' 
 #' @export
 setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
@@ -43,6 +48,11 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' Getter/Setter for the \code{archetypes}-slot
 #' 
 #' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{archetypes} slot. Note that you will get an error if the newly provided
+#' value is not contained within the \code{parameters} slot of the \code{object}.
 #' 
 #' @examples 
 #' # Initialize a predped model
@@ -71,14 +81,15 @@ setGeneric("agents<-", function(object, value) standardGeneric("agents<-"))
 #' @seealso 
 #' \code{\link[predped]{predped-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname archetypes-method
+#' @rdname archetypes
+#' 
+#' @concept getter
 #'
 #' @export
 setGeneric("archetypes", function(object) standardGeneric("archetypes"))
 
-#' @rdname archetypes-method
+#' @rdname archetypes
 #'
 #' @export
 setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-"))
@@ -88,6 +99,10 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' Getter/Setter for the \code{busy}-slot
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{busy} slot.
 #' 
 #' @examples 
 #' # Initialize a goal with a given business status
@@ -101,14 +116,15 @@ setGeneric("archetypes<-", function(object, value) standardGeneric("archetypes<-
 #' busy(my_goal) <- FALSE
 #' busy(my_goal)
 #' 
-#' @docType method
 #' 
-#' @rdname busy-method
+#' @rdname busy
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("busy", function(object) standardGeneric("busy"))
 
-#' @rdname busy-method
+#' @rdname busy
 #' 
 #' @export
 setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
@@ -118,6 +134,10 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' Getter/Setter for the \code{cell}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{cell} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -135,36 +155,81 @@ setGeneric("busy<-", function(object, value) standardGeneric("busy<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname cell-method
+#' @rdname cell
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("cell", function(object) standardGeneric("cell"))
 
-#' @rdname cell-method
+#' @rdname cell
 #' 
 #' @export
 setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 
 
 
+#' Getter/Setter for the \code{cell_centers}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{cell_centers} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   cell_centers = matrix(1, nrow = 33, ncol = 2))
+#' 
+#' # Access the cell centers for the agent
+#' cell_centers(my_agent)
+#' 
+#' # Change the cell centers for the agent
+#' cell_centers(my_agent) <- compute_centers(my_agent)
+#' cell_centers(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}}
+#' 
+#' 
+#' @rdname cell_centers
+#' 
+#' @concept getter
+#' 
+#' @export
+setGeneric("cell_centers", function(object) standardGeneric("cell_centers"))
+
+#' @rdname cell_centers
+#' 
+#' @export
+setGeneric("cell_centers<-", function(object, value) standardGeneric("cell_centers<-"))
+
+
+
 #' Getter/Setter for the \code{center}-slot
 #' 
-#' Is a more specific version of \code{\link[predped]{position-method}} that 
+#' Is a more specific version of \code{\link[predped]{position}} that 
 #' works for all extensions of the \code{\link[predped]{object-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}} or the 
+#' \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{center} slot.
 #' 
 #' @examples
 #' # Initialize a circle
 #' my_circle <- circle(center = c(0, 0), 
 #'                     radius = 1)
 #' 
-#' # Access the center slot for the agent
-#' center(my_agent)
+#' # Access the center slot for the circle
+#' center(my_circle)
 #' 
-#' # Change the center slot for the agent
-#' center(my_agent) <- c(1, 1)
-#' center(my_agent)
+#' # Change the center slot for the circle
+#' center(my_circle) <- c(1, 1)
+#' center(my_circle)
 #' 
 #' # Note that for some object, changing the center also changes other slots
 #' my_rectangle <- rectangle(center = c(0, 0), 
@@ -183,14 +248,15 @@ setGeneric("cell<-", function(object, value) standardGeneric("cell<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
-#' @rdname center-method
+#' @rdname center
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("center", function(object) standardGeneric("center"))
 
-#' @rdname center-method
+#' @rdname center
 #' 
 #' @export 
 setGeneric("center<-", function(object, value) standardGeneric("center<-"))
@@ -200,6 +266,10 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' Getter/Setter for the \code{color}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{color} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -218,14 +288,15 @@ setGeneric("center<-", function(object, value) standardGeneric("center<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname color-method
+#' @rdname color
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("color", function(object) standardGeneric("color"))
 
-#' @rdname color-method
+#' @rdname color
 #' 
 #' @export
 setGeneric("color<-", function(object, value) standardGeneric("color<-"))
@@ -235,6 +306,10 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' Getter/Setter for the \code{counter}-slot
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{counter} slot.
 #' 
 #' @examples 
 #' # Initialize a goal with a given counter
@@ -248,14 +323,15 @@ setGeneric("color<-", function(object, value) standardGeneric("color<-"))
 #' counter(my_goal) <- 10
 #' counter(my_goal)
 #' 
-#' @docType method
 #' 
-#' @rdname counter-method
+#' @rdname counter
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("counter", function(object) standardGeneric("counter"))
 
-#' @rdname counter-method
+#' @rdname counter
 #' 
 #' @export
 setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
@@ -265,6 +341,10 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' Getter/Setter for the \code{current_goal}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{current_goal} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -283,14 +363,15 @@ setGeneric("counter<-", function(object, value) standardGeneric("counter<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname current_goal-method
+#' @rdname current_goal
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("current_goal", function(object) standardGeneric("current_goal"))
 
-#' @rdname current_goal-method
+#' @rdname current_goal
 #' 
 #' @export
 setGeneric("current_goal<-", function(object, value) standardGeneric("current_goal<-"))
@@ -300,6 +381,10 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' Getter/Setter for the \code{done}-slot
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{done} slot.
 #' 
 #' @examples 
 #' # Initialize a goal with a given done argument
@@ -313,14 +398,15 @@ setGeneric("current_goal<-", function(object, value) standardGeneric("current_go
 #' done(my_goal) <- TRUE
 #' done(my_goal)
 #' 
-#' @docType method
 #' 
-#' @rdname done-method
+#' @rdname done
+#' 
+#' @concept getter
 #' 
 #' @export
-setGeneric("done", function(object, return_matrix = FALSE) standardGeneric("done"))
+setGeneric("done", function(object) standardGeneric("done"))
 
-#' @rdname done-method
+#' @rdname done
 #' 
 #' @export
 setGeneric("done<-", function(object, value) standardGeneric("done<-"))
@@ -330,6 +416,10 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' Getter/Setter for the \code{entrance}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{entrance} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -352,14 +442,15 @@ setGeneric("done<-", function(object, value) standardGeneric("done<-"))
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname entrance-method
+#' @rdname entrance
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("entrance", function(object) standardGeneric("entrance"))
 
-#' @rdname entrance-method
+#' @rdname entrance
 #' 
 #' @export
 setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
@@ -369,6 +460,10 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' Getter/Setter for the \code{exit}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{exit} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -391,14 +486,15 @@ setGeneric("entrance<-", function(object, value) standardGeneric("entrance<-"))
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname exit-method
+#' @rdname exit
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("exit", function(object) standardGeneric("exit"))
 
-#' @rdname exit-method
+#' @rdname exit
 #' 
 #' @export
 setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
@@ -409,6 +505,10 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' 
 #' Works for the all instances of the \code{\link[predped]{object-class}}, 
 #' except for the \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{forbidden} slot.
 #' 
 #' @examples 
 #' # Initialize an object
@@ -426,14 +526,15 @@ setGeneric("exit<-", function(object, value) standardGeneric("exit<-"))
 #' @seealso 
 #' \code{\link[predped]{object-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname forbidden-method
+#' @rdname forbidden
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("forbidden", function(object) standardGeneric("forbidden"))
 
-#' @rdname forbidden-method
+#' @rdname forbidden
 #' 
 #' @export
 setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-"))
@@ -443,6 +544,11 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' Getter/Setter for the \code{from}-slot
 #' 
 #' Works for the \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{segment-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{from} slot.
+#' @param ... Arguments passed on to the methods of this generic.
 #' 
 #' @examples 
 #' # Create a segment
@@ -464,14 +570,15 @@ setGeneric("forbidden<-", function(object, value) standardGeneric("forbidden<-")
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname from-method
+#' @rdname from
+#' 
+#' @concept getter
 #' 
 #' @export 
 setGeneric("from", function(object, ...) standardGeneric("from"))
 
-#' @rdname from-method
+#' @rdname from
 #' 
 #' @export 
 setGeneric("from<-", function(object, value) standardGeneric("from<-"))
@@ -481,6 +588,10 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' Getter/Setter for the \code{goals}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{goals} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -499,14 +610,15 @@ setGeneric("from<-", function(object, value) standardGeneric("from<-"))
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname goals-method
+#' @rdname goals
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("goals", function(object) standardGeneric("goals"))
 
-#' @rdname goals-method
+#' @rdname goals
 #' 
 #' @export
 setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
@@ -516,6 +628,10 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' Getter/Setter for the \code{group}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{group} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -533,14 +649,15 @@ setGeneric("goals<-", function(object, value) standardGeneric("goals<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method 
 #' 
-#' @rdname group-method
+#' @rdname group
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("group", function(object) standardGeneric("group"))
 
-#' @rdname group-method
+#' @rdname group
 #' 
 #' @export
 setGeneric("group<-", function(object, value) standardGeneric("group<-"))
@@ -552,6 +669,11 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' Works for all objects that have an \code{id}-slot, such as all extensions of 
 #' \code{\link[predped]{object-class}}, the \code{\link[predped]{agent-class}}, 
 #' and the \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}}, 
+#' \code{\link[predped]{agent-class}}, or \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{id} slot.
 #' 
 #' @details
 #' Note that while the \code{\link[predped]{agent-class}}, 
@@ -583,14 +705,15 @@ setGeneric("group<-", function(object, value) standardGeneric("group<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
-#' @rdname id-method
+#' @rdname id
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("id", function(object) standardGeneric("id"))
 
-#' @rdname id-method
+#' @rdname id
 #' 
 #' @export
 setGeneric("id<-", function(object, value) standardGeneric("id<-"))
@@ -600,6 +723,10 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' Getter/Setter for the \code{iteration}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{iteration} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -621,14 +748,15 @@ setGeneric("id<-", function(object, value) standardGeneric("id<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname iteration-method
+#' @rdname iteration
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("iteration", function(object) standardGeneric("iteration"))
 
-#' @rdname iteration-method
+#' @rdname iteration
 #' 
 #' @export
 setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-"))
@@ -638,6 +766,10 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' Getter/Setter for the \code{iteration_variables}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{iteration_variables} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -659,14 +791,15 @@ setGeneric("iteration<-", function(object, value) standardGeneric("iteration<-")
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname iteration_variables-method
+#' @rdname iteration_variables
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("iteration_variables", function(object) standardGeneric("iteration_variables"))
 
-#' @rdname iteration_variables-method
+#' @rdname iteration_variables
 #' 
 #' @export
 setGeneric("iteration_variables<-", function(object, value) standardGeneric("iteration_variables<-"))
@@ -676,6 +809,10 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' Getter/Setter for the \code{limited_access}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{limited_access} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -698,14 +835,15 @@ setGeneric("iteration_variables<-", function(object, value) standardGeneric("ite
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname limited_access-method
+#' @rdname limited_access
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("limited_access", function(object) standardGeneric("limited_access"))
 
-#' @rdname limited_access-method
+#' @rdname limited_access
 #' 
 #' @export
 setGeneric("limited_access<-", function(object, value) standardGeneric("limited_access<-"))
@@ -715,6 +853,13 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' Getter/Setter for the \code{objects}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param name,object An instance of the \code{\link[predped]{background-class}}.
+#' Note that \code{name} and \code{object} are synonymous for this function: The
+#' former is only used to ensure compatibility with the \code{objects} function 
+#' in base R.
+#' @param value Value with which to replace the original value of the 
+#' \code{objects} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -737,14 +882,10 @@ setGeneric("limited_access<-", function(object, value) standardGeneric("limited_
 #' objects(my_background) <- list(circle(center = c(1, 0), radius = 0.5))
 #' objects(my_background)
 #' 
-#' @docType method
 #' 
-#' @rdname objects-method
+#' @rdname objects
 #' 
-#' @export
-setGeneric("objects", function(object) standardGeneric("objects"))
-
-#' @rdname objects-method
+#' @concept getter
 #' 
 #' @export
 setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
@@ -757,6 +898,11 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' \code{\link[predped]{object-class}}, except for the 
 #' \code{\link[predped]{circle-class}} and the 
 #' \code{\link[predped]{polygon-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{rectangle-class}}, 
+#' \code{\link[predped]{segment-class}}, or \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{orientation} slot.
 #' 
 #' @examples
 #' # Initialize a rectangle
@@ -779,14 +925,15 @@ setGeneric("objects<-", function(object, value) standardGeneric("objects<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method 
 #' 
-#' @rdname orientation-method
+#' @rdname orientation
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("orientation", function(object) standardGeneric("orientation"))
 
-#' @rdname orientation-method
+#' @rdname orientation
 #' 
 #' @export 
 setGeneric("orientation<-", function(object, value) standardGeneric("orientation<-"))
@@ -797,30 +944,36 @@ setGeneric("orientation<-", function(object, value) standardGeneric("orientation
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
 #' 
+#' @param object An instance of the \code{\link[predped]{agent-class}} or 
+#' \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{parameters} slot.
+#' 
 #' @examples
 #' # Initialize agent
 #' my_agent <- agent(center = c(0, 0), 
 #'                   radius = 0.25, 
-#'                   parameters = draw_parameters(1))
+#'                   parameters = generate_parameters(1))
 #' 
 #' # Access the parameters slot for the agent
 #' parameters(my_agent)
 #' 
 #' # Change the parameters slot for the agent
-#' parameters(my_agent) <- draw_parameters(1)
+#' parameters(my_agent) <- generate_parameters(1)
 #' parameters(my_agent)
 #' 
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname parameters-method
+#' @rdname parameters
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("parameters", function(object) standardGeneric("parameters"))
 
-#' @rdname parameters-method
+#' @rdname parameters
 #' 
 #' @export
 setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-"))
@@ -830,6 +983,10 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' Getter/Setter for the \code{path}-slot
 #' 
 #' Works for \code{\link[predped]{goal-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{path} slot.
 #' 
 #' @examples 
 #' # Initialize a goal with a given path
@@ -843,14 +1000,15 @@ setGeneric("parameters<-", function(object, value) standardGeneric("parameters<-
 #' path(my_goal) <- matrix(5:8, nrow = 2, ncol = 2)
 #' path(my_goal)
 #' 
-#' @docType method
 #' 
-#' @rdname path-method
+#' @rdname path
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("path", function(object) standardGeneric("path"))
 
-#' @rdname path-method
+#' @rdname path
 #' 
 #' @export
 setGeneric("path<-", function(object, value) standardGeneric("path<-"))
@@ -863,6 +1021,17 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' that you can only change the \code{points} slot for the 
 #' \code{\link[predped]{polygon-class}} and the 
 #' \code{\link[predped]{segment-class}}.
+#' 
+#' @param x,object An instance of the \code{\link[predped]{object-class}}. Note
+#' that for this function \code{x} and \code{object} are synonymous: The \code{x}
+#' argument is included to ensure compatibility with the \code{points} function 
+#' from base R.
+#' @param value Value with which to replace the original value of the 
+#' \code{points} slot.
+#' @param length.out Numeric denoting the number of points to create when the 
+#' provided object is of an instance \code{\link[predped]{circle-class}}. 
+#' Defaults to \code{100}
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @details 
 #' Note that for the \code{\link[predped]{circle-class}}, you can only access
@@ -900,16 +1069,12 @@ setGeneric("path<-", function(object, value) standardGeneric("path<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname points-method
+#' @rdname points
+#' 
+#' @concept getter
 #' 
 #' @export
-setGeneric("points", function(object, ...) standardGeneric("points"))
-
-#' @rdname points-method
-#' 
-#' @export 
 setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 
 
@@ -920,6 +1085,13 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' \code{\link[predped]{goal-class}}, \code{\link[predped]{object-class}}, 
 #' \code{\link[predped]{polygon-class}}, \code{\link[predped]{rectangle-class}},
 #' and \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}, 
+#' \code{\link[predped]{object-class}}, or \code{\link[predped]{goal-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{position} or \code{center} slot.
+#' @param return_matrix Logical denoting whether to return the position in a 
+#' matrix of size 1 x 2. Defaults to \code{FALSE}.
 #' 
 #' @examples
 #' # Initialize all objects for which this getter works
@@ -966,14 +1138,15 @@ setGeneric("points<-", function(object, value) standardGeneric("points<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname position-method
+#' @rdname position
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("position", function(object, return_matrix = FALSE) standardGeneric("position"))
 
-#' @rdname position-method
+#' @rdname position
 #' 
 #' @export
 setGeneric("position<-", function(object, value) standardGeneric("position<-"))
@@ -983,6 +1156,10 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' Getter/Setter for the \code{potential_agents}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{potential_agents} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -1005,14 +1182,15 @@ setGeneric("position<-", function(object, value) standardGeneric("position<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("potential_agents", function(object) standardGeneric("potential_agents"))
 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
 #' 
 #' @export
 setGeneric("potential_agents<-", function(object, value) standardGeneric("potential_agents<-"))
@@ -1022,6 +1200,10 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' Getter/Setter for the \code{radius}-slot
 #' 
 #' Works for the \code{\link[predped]{circle-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{circle-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{radius} slot.
 #' 
 #' @examples 
 #' # Initialize a circle
@@ -1039,14 +1221,15 @@ setGeneric("potential_agents<-", function(object, value) standardGeneric("potent
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{circle-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname radius-method
+#' @rdname radius
+#' 
+#' @concept getter
 #' 
 #' @export 
 setGeneric("radius", function(object) standardGeneric("radius"))
 
-#' @rdname radius-method
+#' @rdname radius
 #' 
 #' @export
 setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
@@ -1056,6 +1239,10 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' Getter/Setter for the \code{setting}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{setting} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -1082,14 +1269,15 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname setting-method
+#' @rdname setting
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("setting", function(object) standardGeneric("setting"))
 
-#' @rdname setting-method
+#' @rdname setting
 #' 
 #' @export
 setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
@@ -1099,6 +1287,10 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' Getter/Setter for the \code{shape}-slot
 #' 
 #' Works for \code{\link[predped]{background-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{background-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{shape} slot.
 #' 
 #' @examples
 #' # Initialize background
@@ -1118,14 +1310,15 @@ setGeneric("setting<-", function(object, value) standardGeneric("setting<-"))
 #' shape(my_background) <- circle(center = c(1, 0), radius = 1)
 #' shape(my_background)
 #' 
-#' @docType method
 #' 
-#' @rdname shape-method
+#' @rdname shape
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("shape", function(object) standardGeneric("shape"))
 
-#' @rdname shape-method
+#' @rdname shape
 #' 
 #' @export
 setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
@@ -1134,14 +1327,19 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 
 #' Getter/Setter for the \code{size}-slot
 #' 
-#' Works for the \code{\link[predped]{agent-method}},
-#' \code{\link[predped]{circle-method}},
-#' \code{\link[predped]{object-method}},
-#' \code{\link[predped]{rectangle-method}}, and
-#' \code{\link[predped]{segment-method}}.
+#' Works for the \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{circle-class}},
+#' \code{\link[predped]{object-class}},
+#' \code{\link[predped]{rectangle-class}}, and
+#' \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{object-class}} or 
+#' \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{size} slot.
 #' 
 #' @details 
-#' Note that for \code{\link[predped]{circle-method}}, this getter outputs the 
+#' Note that for \code{\link[predped]{circle-class}}, this getter outputs the 
 #' radius (and similarly, the setter changes the radius).
 #' 
 #' @examples 
@@ -1173,14 +1371,15 @@ setGeneric("shape<-", function(object, value) standardGeneric("shape<-"))
 #' \code{\link[predped]{rectangle-class}},
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname size-method
+#' @rdname size
+#' 
+#' @concept getter
 #' 
 #' @export 
 setGeneric("size", function(object) standardGeneric("size"))
 
-#' @rdname size-method
+#' @rdname size
 #' 
 #' @export 
 setGeneric("size<-", function(object, value) standardGeneric("size<-"))
@@ -1190,6 +1389,10 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' Getter/Setter for the \code{speed}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{speed} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -1207,14 +1410,15 @@ setGeneric("size<-", function(object, value) standardGeneric("size<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname speed-method
+#' @rdname speed
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("speed", function(object) standardGeneric("speed"))
 
-#' @rdname speed-method
+#' @rdname speed
 #' 
 #' @export
 setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
@@ -1224,6 +1428,10 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' Getter/Setter for the \code{status}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{status} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -1241,14 +1449,15 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' @seealso 
 #' \code{\link[predped]{agent-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname status-method
+#' @rdname status
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("status", function(object) standardGeneric("status"))
 
-#' @rdname status-method
+#' @rdname status
 #' 
 #' @export
 setGeneric("status<-", function(object, value) standardGeneric("status<-"))
@@ -1258,6 +1467,11 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' Getter/Setter for the \code{to}-slot
 #' 
 #' Works for the \code{\link[predped]{segment-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{segment-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{to} slot.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @examples 
 #' # Create a segment
@@ -1279,23 +1493,68 @@ setGeneric("status<-", function(object, value) standardGeneric("status<-"))
 #' \code{\link[predped]{object-class}}
 #' \code{\link[predped]{segment-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname to-method
+#' @rdname to
+#' 
+#' @concept getter
 #' 
 #' @export 
 setGeneric("to", function(object, ...) standardGeneric("to"))
 
-#' @rdname to-method
+#' @rdname to
 #' 
 #' @export 
 setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 
 
 
+#' Getter/Setter for the \code{utility_variables}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{utility_variables} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   utility_variables = data.frame())
+#' 
+#' # Access the utility_variables slot for the agent
+#' utility_variables(my_agent)
+#' 
+#' # Change the utility_variables slot for the agent
+#' utility_variables(my_agent) <- data.frame(value = 1)
+#' utility_variables(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{goal-class}}
+#' 
+#' 
+#' @rdname utility_variables
+#' 
+#' @concept getter
+#' 
+#' @export
+setGeneric("utility_variables", function(object) standardGeneric("utility_variables"))
+
+#' @rdname utility_variables
+#' 
+#' @export
+setGeneric("utility_variables<-", function(object, value) standardGeneric("utility_variables<-"))
+
+
+
 #' Getter/Setter for the \code{variables}-slot
 #' 
 #' Works for the \code{\link[predped]{state-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{variables} slot.
 #' 
 #' @examples 
 #' # Initialize state
@@ -1317,14 +1576,15 @@ setGeneric("to<-", function(object, value) standardGeneric("to<-"))
 #' @seealso 
 #' \code{\link[predped]{state-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname variables-method
+#' @rdname variables
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("variables", function(object) standardGeneric("variables"))
 
-#' @rdname variables-method
+#' @rdname variables
 #' 
 #' @export
 setGeneric("variables<-", function(object, value) standardGeneric("variables<-"))
@@ -1334,6 +1594,10 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' Getter/Setter for the \code{waiting_counter}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{waiting_counter} slot.
 #' 
 #' @examples
 #' # Initialize agent
@@ -1352,14 +1616,15 @@ setGeneric("variables<-", function(object, value) standardGeneric("variables<-")
 #' \code{\link[predped]{agent-class}},
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname waiting_counter-method
+#' @rdname waiting_counter
+#' 
+#' @concept getter
 #' 
 #' @export
 setGeneric("waiting_counter", function(object) standardGeneric("waiting_counter"))
 
-#' @rdname waiting_counter-method
+#' @rdname waiting_counter
 #' 
 #' @export
 setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting_counter<-"))
@@ -1369,6 +1634,11 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' Getter/Setter for the \code{weights}-slot
 #' 
 #' Works for \code{\link[predped]{predped-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{predped-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{weights} slot.
+#' @param ... Arguments passed to the methods of this generic
 #' 
 #' @examples
 #' # Initialize a predped model
@@ -1390,14 +1660,15 @@ setGeneric("waiting_counter<-", function(object, value) standardGeneric("waiting
 #' @seealso 
 #' \code{\link[predped]{predped-class}}
 #' 
-#' @docType method
 #' 
-#' @rdname weights-method
+#' @rdname weights
+#' 
+#' @concept getter
 #'
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 
-#' @rdname weights-method
+#' @rdname weights
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))

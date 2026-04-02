@@ -58,6 +58,7 @@ right of this segment.
 
 \seealso{
 \code{\link[predped]{object-class}},
-\code{\link[predped]{initialize,segment-method}},
+\code{\link[predped]{initialize-segment}},
 \code{\link[predped]{limit_access}}
 }
+\concept{classes}

@@ -7,7 +7,7 @@
 #' \code{\link[predped]{state-class}}. Whenever either is provided in a list,
 #' a list containing the respective geoms or ggplots is returned.
 #'
-#' @param object Object of the \code{\link[predped]{background-class}},
+#' @param x Object of the \code{\link[predped]{background-class}},
 #' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}},
 #' or a list containing multiple of these objects.
 #' @param agent.fill Character denoting the color with which the agent should
@@ -76,62 +76,77 @@
 #' @param print_progress Logical that denotes whether to print the iteration of 
 #' the state that is currently being plotted. Only applies when plotting a trace.
 #' Defaults to \code{TRUE}.
+#' @param fill,color Character denoting the lower-level definition of the fill 
+#' and color of an instance of \code{\link[predped]{object-class}}
 #' @param ... Additional ggplot arguments passed on to the geoms for the objects.
 #'
 #' @return Either a geom or a ggplot, depending on the object provided (see
 #' Details).
 #'
-#' @docType method
 #'
-#' @rdname plot-method
+#' @rdname plot
+#' 
+#' @concept methods
 #'
 #' @export
-setGeneric("plot", function(object, ...) standardGeneric("plot"))
-
-#'@rdname plot-method
-setMethod("plot", "agent", function(object,
+#
+# Note that R requires the first argument of these functions to be x! Otherwise 
+# it will throw an error
+setMethod("plot", "agent", function(x,
                                     plot_goal = TRUE,
                                     agent.linewidth = 1,
                                     agent.fill = "white",
                                     goal.size = 1,
                                     ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
+    agent <- x
+
     # Determine the orientation of the agent to be plotted
-    angle <- object@orientation * 2 * pi / 360
+    angle <- x@orientation * 2 * pi / 360
 
     # Extract the points of the agent and plot those here. The reason why we
     # use points here is to ensure that the agent can take on all shapes that
     # they want
-    pts <- points(object)
-    half <- ifelse(inherits(object, "circle"), size(object), 0.5 * size(object)[1])
+    pts <- points(x)
+    half <- ifelse(inherits(x, "circle"), size(x), 0.5 * size(x)[1])
 
     plt <- list(ggplot2::annotate("polygon",
                                   x = pts[,1],
                                   y = pts[,2],
-                                  color = object@color,
+                                  color = x@color,
                                   fill = agent.fill,
                                   linewidth = agent.linewidth),
                 ggplot2::annotate("segment",
-                                  x = object@center[[1]],
-                                  y = object@center[[2]],
-                                  xend = object@center[[1]] + half * cos(angle),
-                                  yend = object@center[[2]] + half * sin(angle),
-                                  color = object@color,
+                                  x = x@center[[1]],
+                                  y = x@center[[2]],
+                                  xend = x@center[[1]] + half * cos(angle),
+                                  yend = x@center[[2]] + half * sin(angle),
+                                  color = x@color,
                                   linewidth = agent.linewidth))
 
     # If the agent's goal should be plotted as well, then do so
     if(plot_goal) {
         plt <- append(plt,
-                      ggplot2::geom_point(ggplot2::aes(x = current_goal(object)@position[1],
-                                                       y = current_goal(object)@position[2]),
-                                          color = object@color,
+                      ggplot2::geom_point(ggplot2::aes(x = current_goal(agent)@position[1],
+                                                       y = current_goal(agent)@position[2]),
+                                          color = x@color,
                                           size = goal.size))
     }
 
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "background", function(object,
+#'@rdname plot
+setMethod("plot", "background", function(x,
                                          entry.width = 0.3,
                                          plot_segment = TRUE,
                                          shape.fill = "white",
@@ -151,6 +166,15 @@ setMethod("plot", "background", function(object,
                                          optimize = TRUE,
                                          ...) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # If you want to toggle the default dark mode, then change the default colors
     if(dark_mode) {
         shape.fill <- "black"
@@ -162,7 +186,7 @@ setMethod("plot", "background", function(object,
 
     # Create some limits to prevent the limits of the plot changing across
     # iterations.
-    pts <- points(object@shape)
+    pts <- points(x@shape)
     limits <- rbind(range(pts[,1]), range(pts[,2]))
 
     # Check whether you want to optimize the plot. If you do, then the objects
@@ -171,7 +195,7 @@ setMethod("plot", "background", function(object,
     # and agents will all be plotted with their own `plot` functions, leading
     # to a lot of `geom`s being added together.
     if(optimize) {
-        pts <- transform_df(object, 
+        pts <- transform_df(x, 
                             entry.width = entry.width)        
         plt <- ggplot2::ggplot(data = pts, 
                                ggplot2::aes(x = x, 
@@ -192,7 +216,7 @@ setMethod("plot", "background", function(object,
 
         # Also check whether there is something forbidden going on.
         if(plot_forbidden) {
-            segments <- transform_df(object@objects, 
+            segments <- transform_df(x@objects, 
                                      plot_forbidden = TRUE)
 
             # Plot these edges
@@ -228,7 +252,7 @@ setMethod("plot", "background", function(object,
 
         # Step 1: Bind together the entrances and exits: all they need to be handled
         # in the same way
-        entries <- rbind(entrance(object), exit(object))
+        entries <- rbind(entrance(x), exit(x))
 
         # Step 2: Loop over these entries, convert them to points, and only retain
         # those that fall into the shape of the background. Then transform them to
@@ -236,7 +260,7 @@ setMethod("plot", "background", function(object,
         segments <- list()
         for(i in seq_len(nrow(entries))) {
             pts <- points(predped::circle(center = entries[i,], radius = entry.width))
-            pts <- pts[predped::in_object(shape(object), pts),]
+            pts <- pts[predped::in_object(shape(x), pts),]
 
             segments[[i]] <- cbind(pts[2:nrow(pts) - 1,], pts[2:nrow(pts),])
         }
@@ -247,10 +271,10 @@ setMethod("plot", "background", function(object,
         # With all elements in place, we can now create the plot itself
         plt <- ggplot2::ggplot() +
             # Plot the shape and objects of the environment
-            predped::plot(shape(object),
+            predped::plot(shape(x),
                           fill = shape.fill,
                           color = shape.color) +
-            predped::plot(objects(object),
+            predped::plot(objects(x),
                           fill = object.fill,
                           color = object.color,
                           linewidth = object.linewidth,
@@ -283,7 +307,7 @@ setMethod("plot", "background", function(object,
     # If you want to plot the segments as well, add these to the plot
     if(plot_segment) {
         plt <- plt +
-            predped::plot(limited_access(object),
+            predped::plot(limited_access(x),
                           segment.color = segment.color,
                           segment.size = segment.size,
                           segment.linewidth = segment.linewidth,
@@ -294,12 +318,23 @@ setMethod("plot", "background", function(object,
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
+#'@rdname plot
+setMethod("plot", "list", function(x, 
+                                   print_progress = TRUE, 
+                                   ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # First a check of whether anything is contained within this list. Otherwise
     # return an error
-    if(length(object) == 0) {
+    if(length(x) == 0) {
         return(list())
     }
 
@@ -310,19 +345,19 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
     #
     # However, if it is a trace, we would like some information on the iteration
     # of the state, which we need to do some bookkeeping for
-    trace <- inherits(object[[1]], "state")
+    trace <- inherits(x[[1]], "state")
 
     if(trace & print_progress) {
         cat("\n")
     }
 
-    plt <- lapply(seq_along(object),
+    plt <- lapply(seq_along(x),
                   function(i) {
                       if(trace & print_progress) {
-                          cat(paste0("\rMaking plot for state ", object[[i]]@iteration))
+                          cat(paste0("\rMaking plot for state ", x[[i]]@iteration))
                       }
 
-                      return(predped::plot(object[[i]], ...))
+                      return(predped::plot(x[[i]], ...))
                   })
 
     if(trace & print_progress) {
@@ -332,16 +367,25 @@ setMethod("plot", "list", function(object, print_progress = TRUE, ...) {
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "object", function(object,
+#'@rdname plot
+setMethod("plot", "object", function(x,
                                      color = "black",
                                      fill = "gray",
                                      plot_forbidden = FALSE,
                                      forbidden.color = "red",
                                      ...) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # Extract the points of the object
-    pts <- points(object)
+    pts <- points(x)
 
     # Create the basic geom
     plt <- ggplot2::annotate("polygon",
@@ -356,7 +400,7 @@ setMethod("plot", "object", function(object,
     if(plot_forbidden) {
         # Check whether the object can be interacted with. If not, then we can 
         # just annotate the same polygon but then with the forbidden.color
-        if(!object@interactable) {
+        if(!x@interactable) {
             return(ggplot2::annotate("polygon", 
                                      x = pts[,1], 
                                      y = pts[,2], 
@@ -371,15 +415,15 @@ setMethod("plot", "object", function(object,
 
         # If it is a circle, we need to find the indices of those edges that are
         # forbidden and those who are not.
-        if(inherits(object, "circle")) {
+        if(inherits(x, "circle")) {
             # Get relative angle from center to points and correct so that they
             # are positive
-            angles <- atan2(pts[,2] - center(object)[2],
-                            pts[,1] - center(object)[1])
+            angles <- atan2(pts[,2] - center(x)[2],
+                            pts[,1] - center(x)[1])
             angles <- ifelse(angles < 0, angles + 2 * pi, angles)
 
             # Extract the forbidden angles from the circle
-            forbidden <- forbidden(object)
+            forbidden <- forbidden(x)
 
             if(nrow(forbidden) == 0) {
                 idx <- logical(0)
@@ -389,7 +433,7 @@ setMethod("plot", "object", function(object,
                 idx <- Reduce("|", idx)
             }
         } else {
-            idx <- forbidden(object)
+            idx <- forbidden(x)
         }
 
         # Add another annotate with a different color
@@ -406,20 +450,29 @@ setMethod("plot", "object", function(object,
     return(plt)
 })
 
-#'@rdname plot-method
-setMethod("plot", "segment", function(object,
+#'@rdname plot
+setMethod("plot", "segment", function(x,
                                       segment.size = 0.6,
                                       segment.color = "black",
                                       segment.linewidth = 1,
                                       arrow.size = 0.3,
                                       segment.hjust = 0.5) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # Get the orientation of the segment and subtract 90 degrees
-    angle <- orientation(object) - pi / 2
+    angle <- orientation(x) - pi / 2
 
     # Define a line of length `segment.size` centered around a given `center`.
     # To compute this center, you use the `hjust` argument.
-    center <- center(object)
+    center <- center(x)
 
     # Adjust the center if you want the arrow to start at the center of the
     # segment
@@ -438,8 +491,8 @@ setMethod("plot", "segment", function(object,
                              linewidth = segment.linewidth))
 })
 
-#' @rdname plot-method
-setMethod("plot", "state", function(object,
+#' @rdname plot
+setMethod("plot", "state", function(x,
                                     agent.linewidth = 1,
                                     plot.title.size = 10,
                                     plot.title.hjust = 0.5,
@@ -466,6 +519,15 @@ setMethod("plot", "state", function(object,
                                     optimize = TRUE,
                                     ...) {
 
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
     # Change colors of shape and agent if needed
     if(dark_mode) {
         agent.fill <- "black"
@@ -477,7 +539,7 @@ setMethod("plot", "state", function(object,
 
         # If any of the agents have a "black" color, we need to change that to 
         # white. Makes sure agents without specified color can still be seen.
-        agents(object) <- lapply(agents(object),
+        agents(x) <- lapply(agents(x),
                                  function(x) {
                                      if(color(x) == "black") {
                                          color(x) <- "white"
@@ -496,13 +558,13 @@ setMethod("plot", "state", function(object,
 
     if(optimize) {
         # Create all polygons that are needed
-        pts <- transform_df(object,
+        pts <- transform_df(x,
                             plot_goal = plot_goal,
                             goal.size = goal.size,
                             ...)
 
         # Get the limits of the shape
-        tmp <- points(setting(object)@shape)
+        tmp <- points(setting(x)@shape)
         lims <- rbind(range(tmp[,1]), range(tmp[,2]))
 
         # Create the different lists
@@ -536,7 +598,7 @@ setMethod("plot", "state", function(object,
             ggplot2::scale_color_manual(values = colors) +
             ggplot2::scale_linewidth_manual(values = linewidths) +
             # Titles and axes
-            ggplot2::labs(title = paste("iteration", object@iteration), 
+            ggplot2::labs(title = paste("iteration", x@iteration), 
                           x = "x", 
                           y = "y") +
             ggplot2::scale_x_continuous(limits = lims[1,]) +
@@ -555,7 +617,7 @@ setMethod("plot", "state", function(object,
         # Check whether to add the segments to the plot, and if so, add them
         # to the plot
         if(plot_segment) {
-            segments <- transform_df(setting(object)@limited_access,
+            segments <- transform_df(setting(x)@limited_access,
                                      segment.size = segment.size, 
                                      segment.hjust = segment.hjust)
 
@@ -573,7 +635,7 @@ setMethod("plot", "state", function(object,
 
         # Also check whether there is something forbidden going on.
         if(plot_forbidden) {
-            segments <- transform_df(setting(object)@objects, 
+            segments <- transform_df(setting(x)@objects, 
                                      plot_forbidden = TRUE)
 
             # Plot these edges
@@ -592,7 +654,7 @@ setMethod("plot", "state", function(object,
     } else {
 
         # Create the plot for the setting, which will serve as the basis of
-        base_plot <- predped::plot(setting(object),
+        base_plot <- predped::plot(setting(x),
                                    shape.fill = shape.fill,
                                    dark_mode = dark_mode,
                                    optimize = optimize,
@@ -600,7 +662,7 @@ setMethod("plot", "state", function(object,
                                    plot_forbidden = plot_forbidden, 
                                    forbidden.color = forbidden.color,
                                    ...) +
-            ggplot2::labs(title = paste("iteration", object@iteration)) +
+            ggplot2::labs(title = paste("iteration", x@iteration)) +
             ggplot2::theme(legend.position = "none",
                            plot.title = ggplot2::element_text(size = plot.title.size,
                                                               hjust = plot.title.hjust),
@@ -608,13 +670,13 @@ setMethod("plot", "state", function(object,
                            axis.text = ggplot2::element_text(size = axis.text.size))
 
         # If there are currently no agents, then we just return the base_plot
-        if(length(object@agents) == 0) {
+        if(length(x@agents) == 0) {
             return(base_plot)
         }
 
         # Add agents through their innate plot-function
         return(base_plot +
-            predped::plot(agents(object),
+            predped::plot(agents(x),
                           plot_goal = plot_goal,
                           agent.fill = agent.fill,
                           agent.linewidth = agent.linewidth,
@@ -664,6 +726,8 @@ setMethod("plot", "state", function(object,
 #' \code{\link[predped]{plot}}
 #'
 #' @rdname plot_edges
+#' 
+#' @concept helper
 #'
 #' @export
 plot_edges <- function(setting,
@@ -677,6 +741,15 @@ plot_edges <- function(setting,
                        nodes.size = 1,
                        dark_mode = FALSE,
                        ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
 
     # If you want to toggle the default dark mode, then change the default colors
     if(dark_mode) {
@@ -740,14 +813,47 @@ plot_edges <- function(setting,
 
 
 #' Transform to dataframe of segments
+#' 
+#' Lower-level functions that transform the provided information into rows within
+#' a \code{data.frame}. Is used when the \code{optimize} argument of 
+#' \code{\link[predped]{plot}} is set to \code{TRUE}, as it ensures that 
+#' \code{ggplot2} only has to look at one big \code{data.frame} instead of many
+#' smaller ones, which greatly reduces the computational load for making the 
+#' plots.
+#' 
+#' @param object Instance of the \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{background-class}}, \code{list},
+#' \code{\link[predped]{object-class}}, \code{\link[predped]{segment-class}}, or
+#' \code{\link[predped]{state-class}} to be transformed for plotting purposes
+#' @param plot_goal Logical denoting whether to plot the goal together with the 
+#' agent. Defaults to \code{TRUE}.
+#' @param goal.size Radius of the circle that should be plotted at the location
+#' of the agent's goal. Ignored if \code{plot_goal} is \code{FALSE}. Defaults to
+#' \code{2/100}.
+#' @param entry.width Radius of the circle that should be plotted at the 
+#' location of the entries and exits of the background. Defaults to \code{0.3}.
+#' @param kind Character denoting what the category of the objects are. Defaults
+#' to \code{"object"} for instances of \code{\link[predped]{object-class}} or
+#' \code{"segment"} for instances of \code{\link[predped]{segment-class}}. 
+#' Is otherwise handled under the hood.
+#' @param plot_forbidden Logical denoting wether to plot the forbidden edges or
+#' regions of objects. Defaults to \code{FALSE}.
+#' @param segment.hjust Numeric between 0 and 1 denoting the horizontal 
+#' justification of the arrow denoting one-directional movement. Defaults to 
+#' \code{0.5}
+#' @param segment.size Numeric denoting the size of the arrow denoting 
+#' one-directional movement. Defaults to \code{0.6}.
+#' @param ... Arguments passed on to lower-level functions.
+#' 
+#' @concept helper
 #'
-#' @rdname transform_df-method
+#' @rdname transform_df
 setGeneric("transform_df", function(object,...) standardGeneric("transform_df"))
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "agent", function(object,
                                             plot_goal = TRUE,
-                                            goal.size = 1) {
+                                            goal.size = 2/100) {
 
     # Determine the orientation of the agent to be plotted
     angle <- object@orientation * 2 * pi / 360
@@ -787,7 +893,7 @@ setMethod("transform_df", "agent", function(object,
                       kind = rep(object@color, each = nrow(pts))))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "background", function(object, 
                                                  entry.width = 0.3,
                                                  ...) {
@@ -822,10 +928,7 @@ setMethod("transform_df", "background", function(object,
     # Step 3: Retain those entrances that fall within the specified bounds
     # of the shape
     entries <- do.call("rbind", entries)
-    entries <- entries[entries$x < limits[1, 2] &
-                       entries$x > limits[1, 1] &
-                       entries$y < limits[2, 2] &
-                       entries$y > limits[2, 1], ]
+    entries <- entries[in_object(object@shape, entries[, c("x", "y")]), ]
 
     # Return all points created here
     return(rbind(pts, 
@@ -833,7 +936,7 @@ setMethod("transform_df", "background", function(object,
                  transform_df(object@objects)))
 })
 
-#'@rdname transform_df-method
+#'@rdname transform_df
 setMethod("transform_df", "list", function(object,
                                            ...) {
 
@@ -844,7 +947,7 @@ setMethod("transform_df", "list", function(object,
     return(do.call("rbind", pts))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "object", function(object,
                                              kind = "object",
                                              plot_forbidden = FALSE,
@@ -914,7 +1017,7 @@ setMethod("transform_df", "object", function(object,
     return(data)
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "segment", function(object,
                                               kind = "segment",
                                               segment.hjust = 0.5,
@@ -943,7 +1046,7 @@ setMethod("transform_df", "segment", function(object,
                       kind = kind))
 })
 
-#' @rdname transform_df-method
+#' @rdname transform_df
 setMethod("transform_df", "state", function(object, 
                                             entry.width = 0.3, 
                                             plot_goal = TRUE,

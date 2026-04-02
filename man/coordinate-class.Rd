@@ -14,10 +14,11 @@ flexibility of the low-level functions.
 \section{Slots}{
 
 \describe{
-\item{\code{x}}{Numerical vector denoting the coordinate.}
+\item{\code{.Data}}{Numerical vector denoting the coordinate.}
 }}
 
 \seealso{
 \code{\link[predped]{rotate}},
-\code{\link[predped]{initialize,coordinate-method}}
+\code{\link[predped]{initialize-coordinate}}
 }
+\concept{classes}

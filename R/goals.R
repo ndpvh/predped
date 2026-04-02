@@ -23,7 +23,9 @@
 #' \code{\link[predped]{id}},
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}},
-#' \code{\link[predped]{initialize,goal-method}}
+#' \code{\link[predped]{initialize-goal}}
+#' 
+#' @concept classes
 #'
 #' @export
 #
@@ -37,6 +39,7 @@ goal <- setClass("goal", list(id = "character",
 
 #' Constructor for the \code{\link[predped]{goal-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param id Character that serves as an identifier for the goal. Defaults to 
 #' an empty character, triggering the random generation of an id.
 #' @param position Numerical vector denoting the position of the goal. Defaults 
@@ -71,13 +74,15 @@ goal <- setClass("goal", list(id = "character",
 #' \code{\link[predped]{path}},
 #' \code{\link[predped]{position}}
 #' 
-#' @rdname initialize-goal-method
+#' @rdname initialize-goal
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "goal", function(.Object,
                                          id = character(0),
                                          position = numeric(2),
-                                         path = matrix(nrow = 0, ncol = 2),
+                                         path = NULL,
                                          busy = FALSE,
                                          done = FALSE,
                                          counter = 5) {
@@ -87,16 +92,34 @@ setMethod("initialize", "goal", function(.Object,
     .Object@busy <- busy
     .Object@done <- done
     .Object@counter <- counter
-    .Object@path <- path
+
+    if(is.null(path)) {
+        .Object@path <- matrix(0, nrow = 0, ncol = 2)
+
+    } else if(!is.numeric(path)) {
+        warning("Path that was provided to the goal is not a numeric. Replacing with a null path.")
+        .Object@path <- matrix(0, nrow = 0, ncol = 2)
+
+    } else if(!is.matrix(path)) {
+        warning("Path that was provided to the goal is not a matrix. Transforming to a matrix.")
+        .Object@path <- matrix(path, ncol = 2)
+
+    } else {
+        .Object@path <- path
+    }
 
     return(.Object)
 })
 
 #' Show method for the \code{\link[predped]{goal-class}}
 #' 
+#' @param object Object of the \code{\link[predped]{goal-class}}
+#' 
+#' @concept methods
+#' 
 #' @export
 setMethod("show", "goal", function(object) {
-    cat(crayon::bold("Goal Attributes"), "\n")
+    cat("Goal Attributes", "\n")
     cat("busy:", object@busy, "\n")
     cat("counter:", object@counter, "\n")
     cat("done:", object@done, "\n")
@@ -129,7 +152,7 @@ setMethod("show", "goal", function(object) {
 #' an empty character, triggering the random generation of an id.
 #' @param counter Numeric denoting the number of time steps the agent should 
 #' interact with the goal before the goal has been completed. Defaults to \code{5}.
-#' @param ... Arguments passed on to \code{\link[predped]{rng_point-method}}
+#' @param ... Arguments passed on to \code{\link[predped]{rng_point}}
 #'
 #' @return Object of \code{\link[predped]{goal-class}}.
 #' 
@@ -141,14 +164,17 @@ setMethod("show", "goal", function(object) {
 #' # Adjust the objects in the background for each of the different objects to 
 #' # showcase how add_goals works for each
 #' objects(my_background) <- list(circle(center = c(0, 0), radius = 0.5))
-#' add_goal(my_background)
+#' add_goal(my_background@objects[[1]], 
+#'          my_background)
 #' 
 #' objects(my_background) <- list(rectangle(center = c(0, 0), size = c(1, 1)))
-#' add_goal(my_background)
+#' add_goal(my_background@objects[[1]], 
+#'          my_background)
 #' 
 #' objects(my_background) <- list(polygon(points = cbind(c(0.5, 0.5, -0.5, -0.5), 
 #'                                                       c(0.5, -0.5, -0.5, 0.5))))
-#' add_goal(my_background)
+#' add_goal(my_background@objects[[1]], 
+#'          my_background)
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
@@ -159,7 +185,9 @@ setMethod("show", "goal", function(object) {
 #' \code{\link[predped]{segment-class}}
 #' \code{\link[predped]{rng_point}}
 #' 
-#' @rdname add_goal-method
+#' @rdname add_goal
+#' 
+#' @concept goal
 #' 
 #' @export
 # 
@@ -167,6 +195,7 @@ setMethod("show", "goal", function(object) {
 # even though it is not a method of the `goal` class.
 setGeneric("add_goal", function(object, ...) standardGeneric("add_goal"))
 
+#' @rdname add_goal
 setMethod("add_goal", signature(object = "object"), function(object, 
                                                              background,
                                                              id = character(0),
@@ -260,7 +289,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' which the goal and agent are contained.
 #' @param space_between Numeric denoting the amount of space to leave between 
 #' an object and a path point. Within this function, the default is the radius 
-#' of the agent that is provided. However, in the \code{\link[predped]{simulate-method}}
+#' of the agent that is provided. However, in the \code{\link[predped]{simulate}}
 #' function, this default is overwritten to be equal to \code{2.5} times this 
 #' radius.
 #' @param many_nodes Logical denoting whether to create many nodes or leave 
@@ -282,6 +311,7 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' provided in \code{precomputed_edges}. Is useful whenever \code{new_objects}
 #' is not \code{NULL}, allowing us to check whether some nodes and edges are now
 #' occluded by the new objects. Defaults to \code{FALSE}.
+#' @param ... Arguments passed on to the methods of this generic
 #' 
 #' @return Numerical matrix of coordinates representing the path points the 
 #' agent will have to move to to reach the goal.
@@ -313,11 +343,14 @@ setMethod("add_goal", signature(object = "object"), function(object,
 #' \code{\link[predped]{compute_edges}}
 #' \code{\link[predped]{create_edges}}
 #'
-#' @rdname find_path-method
+#' @rdname find_path
+#' 
+#' @concept routing
 #' 
 #' @export
 setGeneric("find_path", function(object, ...) standardGeneric("find_path"))
 
+#' @rdname find_path
 setMethod("find_path", "goal", function(object, 
                                         agent,
                                         background,
@@ -483,11 +516,14 @@ setMethod("find_path", "goal", function(object,
 #' @seealso 
 #' \code{\link[predped]{goal-class}}
 #' 
-#' @rdname interact-method
+#' @rdname interact
+#' 
+#' @concept goal
 #'
 #' @export
 setGeneric("interact", function(object) standardGeneric("interact"))
 
+#' @rdname interact
 setMethod("interact", "goal", function(object) {
     # Decrease the counter and adjust the done slot
     object@counter <- object@counter - 1
@@ -496,7 +532,7 @@ setMethod("interact", "goal", function(object) {
     return(object)
 })
 
-#' Replace a goal
+#' Change a goal
 #' 
 #' Replaces an existing object of \code{\link[predped]{goal-class}} with an 
 #' alternative object of the same class. The new goal is randomly generated or 
@@ -512,10 +548,11 @@ setMethod("interact", "goal", function(object) {
 #' @param goal_list List containing instances of \code{\link[predped]{goal-class}}
 #' from which the new goal should be chosen. Defaults to \code{NULL}, triggering 
 #' the generation of a random goal.
-#' @param counter_generator Function that takes in no arguments and generates 
+#' @param counter Function that takes in no arguments and generates 
 #' a single numerical value that will be used as the counter of the goal. 
-#' See \code{\link[predped]{generate_goal_stack}} for details on this argument.
+#' See \code{\link[predped]{goal_stack}} for details on this argument.
 #' Defaults to \code{\() rnorm(1, 10, 2)}.
+#' @param ... Arguments provided to the method implementations of the generic.
 #' 
 #' @return Object of \code{\link[predped]{goal-class}}.
 #' 
@@ -530,28 +567,32 @@ setMethod("interact", "goal", function(object) {
 #'                                               size = c(2, 2)), 
 #'                             objects = list(rectangle(center = c(0, 0), 
 #'                                                      size = c(1, 1))))
-#' replace(my_goal, setting = my_background)
+#' change(my_goal, setting = my_background)
 #' 
 #' # Replace with a random goal drawn from a list of different goals. For this
 #' # to work, we first define this list.
 #' goal_list <- list(goal(position = c(-0.5, 0)), 
 #'                   goal(position = c(0.5, 0)))
-#' replace(my_goal, goal_list = goal_list)
+#' change(my_goal, goal_list = goal_list)
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
 #' \code{\link[predped]{goal-class}}
-#' \code{\link[predped]{generate_goal_stack}}
+#' \code{\link[predped]{goal_stack}}
+#' \code{\link[predped]{multiple_goal_stacks}}
 #' 
-#' @rdname replace-method
+#' @rdname change
+#' 
+#' @concept goal
 #' 
 #' @export 
-setGeneric("replace", function(object,...) standardGeneric("replace"))
+setGeneric("change", function(object, ...) standardGeneric("change"))
 
-setMethod("replace", "goal", function(object, 
-                                      setting = NULL,
-                                      goal_list = NULL,
-                                      counter = \(n) rnorm(n, 10, 2)) {
+#' @rdname change
+setMethod("change", "goal", function(object, 
+                                     setting = NULL,
+                                     goal_list = NULL,
+                                     counter = \(n) rnorm(n, 10, 2)) {
 
     # If neither the background, nor a goal list is provided, we should throw 
     # an error
@@ -595,14 +636,14 @@ setMethod("replace", "goal", function(object,
 #' @param starting_position Numeric vector denoting the position at which the 
 #' agent starts in the room. Defaults to the first entrance of the \code{setting}.
 #' @param precompute_goal_paths Logical denoting whether to run the
-#' \code{\link[predped]{find_path-method}} for each of the generated goals 
+#' \code{\link[predped]{find_path}} for each of the generated goals 
 #' beforehand. Assumes that the agent does all of the goals in the order of the 
 #' goal stack. Defaults to \code{FALSE}. 
 #' @param middle_edge Logical denoting whether to sample the goals from the 
 #' middle of the edge of the objects in the \code{link[predped]{background-class}}
 #' (\code{TRUE}) or to allow the goal locations to fall on all points on these 
 #' edges (\code{FALSE}). Defaults to \code{FALSE}.
-#' @param ... Arguments provided to \code{\link[predped]{find_path-method}} to 
+#' @param ... Arguments provided to \code{\link[predped]{find_path}} to 
 #' precompute the paths that the agents should take to reach their goals. Only
 #' used when \code{precompute_goal_paths = TRUE}.
 #' 
@@ -612,15 +653,15 @@ setMethod("replace", "goal", function(object,
 #' # Create a setting
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(cirlce(center = c(0, 0), 
+#'                             objects = list(circle(center = c(0, 0), 
 #'                                                   radius = 0.5)))
 #' 
 #' # Create a goal stack containing two goals
-#' goal_stack <- goal_stack(2, my_background)
+#' stack <- goal_stack(2, my_background)
 #' 
 #' # Two goals
-#' length(goal_stack)
-#' goal_stack
+#' length(stack)
+#' stack
 #' 
 #' @seealso 
 #' \code{\link[predped]{background-class}}
@@ -631,6 +672,8 @@ setMethod("replace", "goal", function(object,
 #' \code{\link[predped]{multiple_goal_stacks}}
 #' 
 #' @rdname goal_stack
+#' 
+#' @concept goal
 #' 
 #' @export 
 #
@@ -788,7 +831,7 @@ goal_stack <- function(n,
 #' # Create a setting
 #' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(cirlce(center = c(0, 0), 
+#'                             objects = list(circle(center = c(0, 0), 
 #'                                                   radius = 0.5)))
 #' 
 #' # Create two goal stacks containing two goals each
@@ -809,7 +852,9 @@ goal_stack <- function(n,
 #' \code{\link[predped]{determine_values}}
 #' \code{\link[predped]{goal_stack}}
 #' 
-#' @rdname multiple_goal_stack
+#' @rdname multiple_goal_stacks
+#' 
+#' @concept goal
 #' 
 #' @export 
 multiple_goal_stacks <- function(n, 
@@ -834,12 +879,12 @@ multiple_goal_stacks <- function(n,
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname busy-method
+#' @rdname busy
 setMethod("busy", "goal", function(object) {
     return(object@busy)
 })
 
-#' @rdname busy-method
+#' @rdname busy
 setMethod("busy<-", "goal", function(object, value) {
     object@busy <- value
     return(object)
@@ -847,12 +892,12 @@ setMethod("busy<-", "goal", function(object, value) {
 
 
 
-#' @rdname counter-method
+#' @rdname counter
 setMethod("counter", "goal", function(object) {
     return(object@counter)
 })
 
-#' @rdname counter-method
+#' @rdname counter
 setMethod("counter<-", "goal", function(object, value) {
     object@counter <- value
     return(object)
@@ -860,12 +905,12 @@ setMethod("counter<-", "goal", function(object, value) {
 
 
 
-#' @rdname done-method
+#' @rdname done
 setMethod("done", "goal", function(object) {
     return(object@done)
 })
 
-#' @rdname done-method
+#' @rdname done
 setMethod("done<-", "goal", function(object, value) {
     object@done <- value
     return(object)
@@ -873,12 +918,12 @@ setMethod("done<-", "goal", function(object, value) {
 
 
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id", "goal", function(object) {
     return(object@id)
 })
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id<-", "goal", function(object, value) {
     object@id <- value
     return(object)
@@ -886,12 +931,12 @@ setMethod("id<-", "goal", function(object, value) {
 
 
 
-#' @rdname path-method
+#' @rdname path
 setMethod("path", "goal", function(object) {
     return(object@path)
 })
 
-#' @rdname path-method
+#' @rdname path
 setMethod("path<-", "goal", function(object, value) {
     object@path <- value
     return(object)
@@ -899,12 +944,12 @@ setMethod("path<-", "goal", function(object, value) {
 
 
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", "goal", function(object) {
     return(object@position)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", "goal", function(object, value) {
     object@position <- as(value, "coordinate")
     return(object)

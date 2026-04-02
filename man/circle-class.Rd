@@ -24,11 +24,12 @@ generate goals (in radians).}
 
 \seealso{
 \code{\link[predped]{object-class}}, 
-\code{\link[predped]{initialize,circle-method}}
+\code{\link[predped]{initialize-circle}}
 
 Other objects: 
 \code{\link{object-class}},
 \code{\link{polygon-class}},
 \code{\link{rectangle-class}}
 }
+\concept{classes}
 \concept{objects}

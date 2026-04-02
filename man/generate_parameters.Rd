@@ -103,9 +103,10 @@ head(parameters)
 }
 \seealso{
 \code{\link[predped]{load_parameters}},
-\code{\link[predped]{params_to_csv}},
+\code{\link[predped]{params_from_csv}},
 \code{\link[predped]{plot_distribution}},
 \code{\link[predped]{to_bounded}},
 \code{\link[predped]{to_covariance}},
 \code{\link[predped]{to_unbounded}}
 }
+\concept{parameters}

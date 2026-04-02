@@ -35,6 +35,10 @@
 #' agent. Should contain all parameters relevant for the utility functions 
 #' (use \code{predped::draw_parameters(1)} for an example).
 #' @slot color Character denoting the color in which the agent should be plotted.
+#' @slot cell_centers Numeric matrix denoting the positions that the agent may 
+#' move to at a particular iteration.
+#' @slot utility_variables Data.frame precomputed containing values for all the 
+#' variables relevant to compute the utilities.
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
@@ -52,9 +56,11 @@
 #' \code{\link[predped]{speed}},
 #' \code{\link[predped]{status}},
 #' \code{\link[predped]{waiting_counter}},
-#' \code{\link[predped]{initialize,agent-method}}
+#' \code{\link[predped]{initialize-agent}}
 #' 
 #' @rdname agent-class
+#' 
+#' @concept classes
 #'
 #' @export
 agent <- setClass("agent", 
@@ -68,11 +74,14 @@ agent <- setClass("agent",
                        current_goal = "goal",
                        goals = "list", 
                        parameters = "data.frame",
-                       color = "character"), 
+                       color = "character",
+                       cell_centers = "matrix",
+                       utility_variables = "data.frame"), 
                   contains = c("circle"))
 
 #' Constructor for the \code{\link[predped]{agent-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param center Numerical vector of two elements denoting the current position
 #' of the agent (x and y coordinate).
 #' @param radius Numeric denoting the size of agent. As agents are circular, this 
@@ -115,6 +124,12 @@ agent <- setClass("agent",
 #' (use \code{predped::draw_parameters(1)} for an example). Defaults to a random 
 #' set of parameters from the default parameter list in \code{predped}.
 #' @param color Character denoting the color in which the agent should be plotted.
+#' @param cell_centers Numeric matrix denoting the positions that the agent may 
+#' move to at a particular iteration. Should usually not be provided or altered
+#' by the user.
+#' @param utility_variables Data.frame precomputed containing values for all the 
+#' variables relevant to compute the utilities. Should usually not be provided 
+#' or altered by the user.
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}
 #' 
@@ -141,7 +156,9 @@ agent <- setClass("agent",
 #' \code{\link[predped]{status}},
 #' \code{\link[predped]{waiting_counter}}
 #' 
-#' @rdname initialize-agent-method
+#' @rdname initialize-agent
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "agent", function(.Object,
@@ -157,7 +174,9 @@ setMethod("initialize", "agent", function(.Object,
                                           waiting_counter = 0,
                                           cell = 0,
                                           parameters = data.frame(),                                   
-                                          color = "black") {
+                                          color = "black",
+                                          cell_centers = matrix(0, nrow = 33, ncol = 2),
+                                          utility_variables = data.frame()) {
 
     # Use the circular object as the basis of the agent     
     .Object <- callNextMethod(.Object, 
@@ -175,13 +194,22 @@ setMethod("initialize", "agent", function(.Object,
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
-    .Object@color <- color    
+    .Object@color <- color
+    .Object@cell_centers <- cell_centers
+    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 16) |>
+        as.data.frame() |>
+        setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 
+                   "id_distance", "id_check", "id_ingroup", "ba_angle", 
+                   "ba_cones", "fl_leaders", "wb_buddies", "gc_distance", 
+                   "gc_radius", "gc_nped", "vf_angles"))
 
     # If the parameters are empty, add the BaselineEuropean as default. Otherwise
     # use the defined parameters
     if(nrow(parameters) == 0) {
         params <- params_from_csv[["params_archetypes"]]
-        .Object@parameters <- params[params$name == "BaselineEuropean", ]
+        params <- params[params$name == "BaselineEuropean", ]
+        params$radius <- radius
+        .Object@parameters <- params[, -(1:2)]
     } else {
         .Object@parameters <- parameters
     }
@@ -196,6 +224,10 @@ setMethod("initialize", "agent", function(.Object,
 
 #' Show method for the \code{\link[predped]{agent-class}}
 #' 
+#' @param object Object of the \code{\link[predped]{agent-class}}
+#' 
+#' @concept methods
+#' 
 #' @export
 setMethod("show", "agent", function(object) {
     params <- parameters(object)
@@ -204,7 +236,7 @@ setMethod("show", "agent", function(object) {
     names(params) <- cols
     params <- as.matrix(params)
 
-    cat(crayon::bold("Agent Attributes"), "\n")
+    cat("Agent Attributes", "\n")
     cat("center:", object@center, "\n")
     cat("cell:", object@cell, "\n")
     cat("color:", object@color, "\n")
@@ -232,12 +264,12 @@ setMethod("show", "agent", function(object) {
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname cell-method
+#' @rdname cell
 setMethod("cell", "agent", function(object) {
     return(setNames(object@cell, object@id))
 })
 
-#' @rdname cell-method
+#' @rdname cell
 setMethod("cell<-", "agent", function(object, value) {
     object@cell <- value
     return(object)
@@ -245,12 +277,25 @@ setMethod("cell<-", "agent", function(object, value) {
 
 
 
-#' @rdname color-method
+#' @rdname cell_centers
+setMethod("cell_centers", "agent", function(object) {
+    return(object@cell_centers)
+})
+
+#' @rdname cell_centers
+setMethod("cell_centers<-", "agent", function(object, value) {
+    object@cell_centers <- value
+    return(object)
+})
+
+
+
+#' @rdname color
 setMethod("color", "agent", function(object) {
     return(setNames(object@color, object@id))
 })
 
-#' @rdname color-method
+#' @rdname color
 setMethod("color<-", "agent", function(object, value) {
     object@color <- value
     return(object)
@@ -258,12 +303,12 @@ setMethod("color<-", "agent", function(object, value) {
 
 
 
-#' @rdname current_goal-method
+#' @rdname current_goal
 setMethod("current_goal", "agent", function(object) {
     return(object@current_goal)
 })
 
-#' @rdname current_goal-method
+#' @rdname current_goal
 setMethod("current_goal<-", "agent", function(object, value) {
     object@current_goal <- value
     return(object)
@@ -271,12 +316,12 @@ setMethod("current_goal<-", "agent", function(object, value) {
 
 
 
-#' @rdname goals-method
+#' @rdname goals
 setMethod("goals", "agent", function(object) {
     return(object@goals)
 })
 
-#' @rdname goals-method
+#' @rdname goals
 setMethod("goals<-", "agent", function(object, value) {
     object@goals <- value
     return(object)
@@ -284,12 +329,12 @@ setMethod("goals<-", "agent", function(object, value) {
 
 
 
-#' @rdname group-method
+#' @rdname group
 setMethod("group", "agent", function(object) {
     return(setNames(object@group, object@id))
 })
 
-#' @rdname group-method
+#' @rdname group
 setMethod("group<-", "agent", function(object, value) {
     object@group <- value
     return(object)
@@ -297,12 +342,12 @@ setMethod("group<-", "agent", function(object, value) {
 
 
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id", "agent", function(object) {
     return(setNames(object@id, object@id))
 })
 
-#' @rdname id-method
+#' @rdname id
 setMethod("id<-", "agent", function(object, value) {
     object@id <- value
     return(object)
@@ -310,12 +355,12 @@ setMethod("id<-", "agent", function(object, value) {
 
 
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation", "agent", function(object) {
     return(setNames(object@orientation, object@id))
 })
 
-#' @rdname orientation-method
+#' @rdname orientation
 setMethod("orientation<-", "agent", function(object, value) {
     object@orientation <- value
     return(object)
@@ -323,12 +368,12 @@ setMethod("orientation<-", "agent", function(object, value) {
 
 
 
-#' @rdname parameters-method
+#' @rdname parameters
 setMethod("parameters", "agent", function(object) {
     return(object@parameters)
 })
 
-#' @rdname parameters-method
+#' @rdname parameters
 setMethod("parameters<-", "agent", function(object, value) {
     object@parameters <- value
     return(object)
@@ -336,7 +381,7 @@ setMethod("parameters<-", "agent", function(object, value) {
 
 
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position", "agent", function(object, return_matrix = FALSE) {
     if (return_matrix) {
         return(matrix(object@center, nrow = 1, ncol = 2, dimnames = list(object@id, names(object@center))))
@@ -344,7 +389,7 @@ setMethod("position", "agent", function(object, return_matrix = FALSE) {
     return(object@center)
 })
 
-#' @rdname position-method
+#' @rdname position
 setMethod("position<-", "agent", function(object, value) {
     object@center <- as(value, "coordinate")
     return(object)
@@ -352,12 +397,12 @@ setMethod("position<-", "agent", function(object, value) {
 
 
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size", "agent", function(object) {
     return(setNames(object@radius, object@id))
 })
 
-#' @rdname size-method
+#' @rdname size
 setMethod("size<-", "agent", function(object, value) {
     object@radius <- value
     return(object)
@@ -365,12 +410,12 @@ setMethod("size<-", "agent", function(object, value) {
 
 
 
-#' @rdname speed-method
+#' @rdname speed
 setMethod("speed", "agent", function(object) {
     return(setNames(object@speed, object@id))
 })
 
-#' @rdname speed-method
+#' @rdname speed
 setMethod("speed<-", "agent", function(object, value) {
     object@speed <- value
     return(object)
@@ -378,12 +423,12 @@ setMethod("speed<-", "agent", function(object, value) {
 
 
 
-#' @rdname status-method
+#' @rdname status
 setMethod("status", "agent", function(object) {
     return(setNames(object@status, object@id))
 })
 
-#' @rdname status-method
+#' @rdname status
 setMethod("status<-", "agent", function(object, value) {
     stopifnot(value %in% c("move", "plan", "reroute", "reorient", "completing goal", "exit", "wait"))
     object@status <- value
@@ -392,12 +437,25 @@ setMethod("status<-", "agent", function(object, value) {
 
 
 
-#' @rdname waiting_counter-method
+#' @rdname utility_variables
+setMethod("utility_variables", "agent", function(object) {
+    return(object@utility_variables)
+})
+
+#' @rdname utility_variables
+setMethod("utility_variables<-", "agent", function(object, value) {
+    object@utility_variables <- value
+    return(object)
+})
+
+
+
+#' @rdname waiting_counter
 setMethod("waiting_counter", "agent", function(object) {
     return(setNames(object@waiting_counter, object@id))
 })
 
-#' @rdname waiting_counter-method
+#' @rdname waiting_counter
 setMethod("waiting_counter<-", "agent", function(object, value) {
     object@waiting_counter <- value
     return(object)

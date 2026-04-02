@@ -38,12 +38,14 @@ using namespace Rcpp;
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
 //'
 //' @rdname time_series_rcpp
+//'
+//' @concept data
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -176,29 +178,29 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
 //' @param velocities Numeric matrix containing the change in speed for an agent
-//' whenever they move to the respective cell of this matrix. Is used to create 
-//' the cell positions that the agent might move to, as performed through 
-//' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction) 
-//' and 3 columns (speed). Defaults to a matrix in which the columns contain 
-//' \code{1.5} (acceleration), \code{1}, and \code{0.5}.
-//' @param orientations Numeric matrix containing the change in direction for an 
-//' agent whenever they move to the respective cell of this matrix. Is used to 
-//' create the cell positions that the agent might move to, as performed through
-//' \code{\link[m4ma]{c_vd_rcpp}}. Currently limited to having 11 rows (direction)
-//' and 3 columns (speed). Defaults to a matrix in which the rows contain 
-//' \code{72.5}, \code{50}, \code{32.5}, \code{20}, \code{10}, code{0}, \code{350}, 
-//' \code{340}, \code{327.5}, \code{310}, \code{287.5} (note that the larger 
-//' angles are actually the negative symmetric versions of the smaller angles).
+//' whenever they move to the respective cell of this matrix. Is used to create
+//' the cell positions that the agent might move to. Defaults to a matrix in 
+//' which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+//' of speed), and \code{0.5} (deceleration).
+//' @param orientations Numeric matrix containing the change in direction for an
+//' agent whenever they move to the respective cell of this matrix. Is used to
+//' create the cell positions that the agent might move to. Defaults to a matrix 
+//' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
+//' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
+//' \code{287.5} (note that the larger angles are actually the negative symmetric 
+//' versions of the smaller angles).
 //' @param stay_stopped Logical denoting whether agents will predict others that 
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.
 //' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate,predped-method}}).
+//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
 //'
 //' @rdname unpack_trace_rcpp
+//'
+//' @concept data
 //' 
 //' @export
 // [[Rcpp::export]]
@@ -256,9 +258,6 @@ DataFrame unpack_trace_rcpp(List trace,
     // agent.
     LogicalVector NA_logical(1);
     NA_logical[0] = NA_LOGICAL;
-
-    // Create a check_j variable beforehand
-    LogicalMatrix check_j(11, 3);
 
     // Loop over the different instances in the trace.
     List copy_trace = clone(trace);
@@ -326,51 +325,25 @@ DataFrame unpack_trace_rcpp(List trace,
             goal_x[idx] = goal_x_j;
             goal_y[idx] = goal_y_j;
 
-            // If the agent is moving, we compute the utility variables that 
-            // govern the agents's behavior. 
-            if(status_j == "move") {
-                // Get the centers for this participant, given their current
-                // position, speed, and orientation
-                NumericMatrix centers = c_vd(
-                    seq(1, 33),
-                    position_j,
-                    speed_j,
-                    orientation_j,
-                    velocities,
-                    orientations,
-                    time_step
-                );
+            // Access the utility variables slot in the agent class. 
+            DataFrame uv_j = as<DataFrame>(agent.slot("utility_variables"));
 
-                // Delete the agent from the agent list in the state (otherwise 
-                // moving options will give wrong results)
-                List agents_minus_agent = clone(agents);
-                agents_minus_agent.erase(j);
-                state.slot("agents") = agents_minus_agent;
-    
-                // Do an initial check of which of these centers can be 
-                // reached and which ones can't
-                LogicalMatrix check_j = moving_options_rcpp(
-                    agent, 
-                    state,
-                    setting,
-                    centers
-                );
-                            
-                // Compute the utility variables for this agent under the
-                // current state      
-                state.slot("agents") = agents;
-                DataFrame uv_j = compute_utility_variables_rcpp(
-                    agent, 
-                    state,
-                    setting,
-                    specifications,
-                    centers,
-                    check_j
-                );
+            // Do a small check of whether the current utility variables are 
+            // filled with information. If not, then we cannot preallocate.
+            // For this, I use one of the variables that should always be 
+            // defined.
+            NumericVector tmp = uv_j["ps_speed"];
+            LogicalVector tmp_check = Rcpp::is_na(tmp);
 
+            // Assign different values to the resulting DataFrame depending on 
+            // the status of the agent. This approach taken to allow for 
+            // the correct preallocation in different variables
+            if(!any(tmp_check).is_true()) {
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
+                List check_list = uv_j["check"];
+                LogicalMatrix check_j = check_list[0];
                 double ps_speed_j = uv_j["ps_speed"];
                 List ps_distance_j = uv_j["ps_distance"];
                 List gd_angle_j = uv_j["gd_angle"];

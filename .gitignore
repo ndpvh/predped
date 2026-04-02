@@ -3,7 +3,6 @@
 *.Rdata
 .Rhistory
 
-/*/Figures/
 depr/
 */depr 
 */*/depr
@@ -17,16 +16,21 @@ minimal_working_example.R
 Train/
 inst/*
 parameters.R
+turning.R
+tests/testthat/data/*.R
 
 *.drawio*
 
 tmp/
-*.txt
+/*.txt
 *.rtf
 *.zip
 *.pdf
 *.out
+*.dll
 docs/*
+benchmark/*
+benchmark.html
 
 R/*_depr.R
 
@@ -46,7 +50,15 @@ tmp*
 
 *.o 
 *.so
-tests/testthat/data/trace_mll.Rds
+tests/testthat/data/trace_mll_full.Rds
 
 
 testing_items/
+examples/*
+supermarket.R
+tst/
+inst/doc
+
+README_*
+*_cache
+man/figures/trace_train.gif

@@ -46,7 +46,7 @@
 #' 
 #' Each of the parameters in \code{params_archetypes} controls an aspect of the 
 #' decisions pedestrians make when walking around in an environment, namely:
-#' \itemize{
+#' \describe{
 #'     \item{\code{radius}:}{the radius of the agent}
 #'     \item{\code{slowing_time}:}{the number of seconds the agent needs to slow
 #'                                down when approaching a goal}
@@ -59,7 +59,13 @@
 #'                              by the utility functions).}
 #'     \item{\code{stop_utility}:}{utility value of stopping instead of moving}
 #'     \item{\code{reroute}:}{number of pedestrians that should be in the way for
-#'                           an agent to consider rerouting 50\% of the time}
+#'                            an agent to consider rerouting 50\% of the time}
+#'     \item{\code{b_turning}:}{slope that scales the effect of turning on the 
+#'                              speed an agent can maintain, where 
+#'                              \code{1 - b_turning} denotes the maximal decrease
+#'                              in velocity in percent}
+#'     \item{\code{a_turning}:}{exponent that determines the shape of the effect
+#'                              of turning on the speed an agent can maintain}
 #'     \item{\code{b_current_direction}:}{slope that scales the utility of 
 #'                                       continuing waking in the current 
 #'                                       direction}
@@ -131,9 +137,12 @@
 #' \code{\link[predped]{predped-class}},
 #' \code{\link[predped]{generate_parameters}},
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{utility}}
+#' \code{\link[predped]{utility-agent}}
+#' \code{\link[predped]{utility-data.frame}}
 #' 
 #' @rdname params_from_csv
+#' 
+#' @concept parameters
 #' 
 #' @export
 params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv")),
@@ -172,6 +181,8 @@ params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv
 #' \code{\link[predped]{params_from_csv}}
 #' 
 #' @rdname load_parameters
+#' 
+#' @concept parameters
 #' 
 #' @export
 #
@@ -219,7 +230,10 @@ load_parameters <- function(x = NULL,
     # Case: Other delimited files        
     } else {
         # Use read.table for this purpose
-        params <- utils::read.table(x, header = TRUE, sep = sep)
+        params <- utils::read.table(x, 
+                                    header = TRUE, 
+                                    sep = sep,
+                                    comment.char = "@")
     }
 
     # When parameters have been read in, we should check what their type is. 
@@ -371,13 +385,15 @@ utility_parameters <- function(x) {
 #' 
 #' @seealso 
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{params_to_csv}},
+#' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{plot_distribution}},
 #' \code{\link[predped]{to_bounded}},
 #' \code{\link[predped]{to_covariance}},
 #' \code{\link[predped]{to_unbounded}}
 #' 
 #' @rdname generate_parameters
+#' 
+#' @concept parameters
 #' 
 #' @export  
 generate_parameters <- function(n = 1,
@@ -491,6 +507,8 @@ generate_parameters <- function(n = 1,
 #' \code{\link[predped]{to_covariance}}
 #' 
 #' @rdname to_unbounded
+#' 
+#' @concept parameters
 #'
 #' @export
 #
@@ -518,11 +536,11 @@ to_unbounded <- function(parameters,
         # by an arbitrarily small number to make sure there are no infinities in 
         # our generated parameters
         if(parameters[[i]] == 0) {
-            parameters[[i]] <- parameters[[i]] + 1e-5
+            parameters[[i]] <- parameters[[i]]
         }
 
         if(parameters[[i]] == 1) {
-            parameters[[i]] <- parameters[[i]] - 1e-5
+            parameters[[i]] <- parameters[[i]]
         }
 
         # Transform to a value of a normal distribution
@@ -551,6 +569,8 @@ to_unbounded <- function(parameters,
 #' \code{\link[predped]{to_covariance}}
 #' 
 #' @rdname to_bounded
+#' 
+#' @concept parameters
 #'
 #' @export
 #
@@ -601,6 +621,8 @@ to_bounded <- function(parameters,
 #' 
 #' @rdname to_covariance
 #' 
+#' @concept parameters
+#' 
 #' @export 
 to_covariance <- function(X) {
     d <- nrow(X)
@@ -622,6 +644,8 @@ to_covariance <- function(X) {
 #' @param parameters A named list containing the parameters for a given agent
 #'
 #' @return A named list containing the transformed parameters
+#' 
+#' @concept parameters
 #'
 #' @export transform_mu
 #
@@ -654,12 +678,14 @@ transform_mu <- function(parameters) {
 #' @seealso 
 #' \code{\link[predped]{generate_parameters}},
 #' \code{\link[predped]{load_parameters}},
-#' \code{\link[predped]{params_to_csv}},
+#' \code{\link[predped]{params_from_csv}},
 #' \code{\link[predped]{to_bounded}},
 #' \code{\link[predped]{to_covariance}},
 #' \code{\link[predped]{to_unbounded}}
 #' 
 #' @rdname plot_distribution
+#' 
+#' @concept parameters
 #' 
 #' @export
 plot_distribution <- function(...) {

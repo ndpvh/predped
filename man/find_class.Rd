@@ -18,3 +18,4 @@ A list containing all instances of the class.
 This function is a simple utility function to extract all objects from a given 
 class from a list containing several of those.
 }
+\concept{helper}

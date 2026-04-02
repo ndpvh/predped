@@ -9,15 +9,20 @@
 #' enter the \code{setting}.
 #' @slot iteration_variables Dataframe containing values for variables that 
 #' control the simulation under the hood, such as \code{max_agents}.
+#' @slot variables List of user-specified variables that can be used to control 
+#' the simulation, see the \code{fx} argument of 
+#' \code{\link[predped]{simulate}}
 #' 
 #' @seealso 
 #' \code{\link[predped]{agents}},
-#' \code{\link[predped]{initialize,state-method}},
+#' \code{\link[predped]{initialize-state}},
 #' \code{\link[predped]{iteration}},
 #' \code{\link[predped]{potential_agents}},
 #' \code{\link[predped]{setting}}
 #' 
 #' @rdname state-class
+#' 
+#' @concept classes
 #' 
 #' @export
 state <- setClass("state", list(iteration = "numeric", 
@@ -29,6 +34,7 @@ state <- setClass("state", list(iteration = "numeric",
 
 #' Constructor for the \code{\link[predped]{state-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param iteration Numeric denoting the iteration number that this state 
 #' represents. Makes it possible to order states into one coherent trace, showing
 #' how agents walked around over time.
@@ -44,7 +50,7 @@ state <- setClass("state", list(iteration = "numeric",
 #' to an empty data.frame.
 #' @param variables Named list containing variables that you want to use to 
 #' control the simulation in the \code{fx} argument of the 
-#' \code{\link[predped]{simulate,predped-method}}. Defaults to an empty list.
+#' \code{\link[predped]{simulate}}. Defaults to an empty list.
 #' 
 #' @return Object of the \code{\link[predped]{state-class}}
 #' 
@@ -68,7 +74,9 @@ state <- setClass("state", list(iteration = "numeric",
 #' \code{\link[predped]{potential_agents}},
 #' \code{\link[predped]{setting}}
 #' 
-#' @rdname initialize-state-method
+#' @rdname initialize-state
+#' 
+#' @concept classes
 #' 
 #' @export
 setMethod("initialize", "state", function(.Object, 
@@ -105,12 +113,12 @@ setMethod("initialize", "state", function(.Object,
 ################################################################################
 # GETTERS AND SETTERS
 
-#' @rdname agents-method
+#' @rdname agents
 setMethod("agents", "state", function(object) {
     return(object@agents)
 })
 
-#' @rdname agents-method
+#' @rdname agents
 setMethod("agents<-", "state", function(object, value) {
     # Check
     if(length(value) != 0 & !all(sapply(value, is, class2 = "agent"))) {
@@ -123,12 +131,12 @@ setMethod("agents<-", "state", function(object, value) {
 
 
 
-#' @rdname iteration-method
+#' @rdname iteration
 setMethod("iteration", "state", function(object) {
     return(object@iteration)
 })
 
-#' @rdname iteration-method
+#' @rdname iteration
 setMethod("iteration<-", "state", function(object, value) {
     object@iteration <- floor(value)
     return(object)
@@ -136,12 +144,12 @@ setMethod("iteration<-", "state", function(object, value) {
 
 
 
-#' @rdname iteration_variables-method
+#' @rdname iteration_variables
 setMethod("iteration_variables", "state", function(object) {
     return(object@iteration_variables)
 })
 
-#' @rdname iteration-method
+#' @rdname iteration
 setMethod("iteration_variables<-", "state", function(object, value) {
     object@iteration_variables <- floor(value)
     return(object)
@@ -149,12 +157,12 @@ setMethod("iteration_variables<-", "state", function(object, value) {
 
 
 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
 setMethod("potential_agents", "state", function(object) {
     return(object@potential_agents)
 })
 
-#' @rdname potential_agents-method
+#' @rdname potential_agents
 setMethod("potential_agents<-", "state", function(object, value) {
     # Check
     if(length(value) != 0 & !all(sapply(value, is, class2 = "agent"))) {
@@ -167,12 +175,12 @@ setMethod("potential_agents<-", "state", function(object, value) {
 
 
 
-#' @rdname setting-method
+#' @rdname setting
 setMethod("setting", "state", function(object) {
     return(object@setting)
 })
 
-#' @rdname setting-method
+#' @rdname setting
 setMethod("setting<-", "state", function(object, value) {
     # Check
     if(!inherits(value, "background")) {
@@ -185,12 +193,12 @@ setMethod("setting<-", "state", function(object, value) {
 
 
 
-#' @rdname variables-method
+#' @rdname variables
 setMethod("variables", "state", function(object) {
     return(object@variables)
 })
 
-#' @rdname variables-method
+#' @rdname variables
 setMethod("variables<-", "state", function(object, value) {
     object@variables <- value
     return(object)

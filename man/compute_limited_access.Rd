@@ -25,3 +25,4 @@ slot.
 \code{\link[predped]{polygon-class}}
 \code{\link[predped]{segment-class}}
 }
+\concept{routing}

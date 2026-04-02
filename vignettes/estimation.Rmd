@@ -1,0 +1,732 @@
+---
+title: "Estimation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Estimation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#| echo = FALSE,
+#| message = FALSE
+library(predped)
+library(nloptr)
+```
+
+One of the major advances of the Minds for Mobile Agents model (M4MA) is the ability to estimate its parameters on data. In this vignette, we will illustrate this through two examples, one starting from the `trace` output from the [`simulate`](https://ndpvh.github.io/predped/reference/simulate) function and the other starting from a `data.frame` containing measured movement data. 
+
+Note that for the estimation, `predped` only concerns itself with computing the utilities and associated probabilities of each expected movement decision. This means that we need to rely on external packages to perform the estimation procedure, using an optimization procedure to maximize the likelihood of the data under a set of parameters. Within this vignette, we use the `nloptr` package to perform this optimization procedure (Johnson, 2008). To install and use this package, one can execute the following two commands:
+
+```{r}
+#| eval = FALSE
+install.packages("nloptr")
+library(nloptr)
+```
+
+For more information on the package and the NLopt library, we refer the interested reader to the dedicated documentation sites (`nloptr`: https://astamm.github.io/nloptr; NLopt: https://nlopt.readthedocs.io/en/latest).
+
+
+
+# Disclaimer
+
+At the moment of writing, we are performing recovery studies to ensure the quality of the estimation of the M4MAs parameters. While likelihood profiles look good, we are not sure yet how much movement data is needed to ensure unbiased estimates with small standard errors. For now, we therefore do not guarantee accurate results when performing estimations on your own movement data.
+
+Furthermore note that the computation of the likelihood has not been adequately optimzed yet. For large datasets, the estimation procedure may therefore be rather slow.
+
+
+
+# Starting from a Trace 
+
+Consider a trace that has been saved in the variable `trace`, containing a simulation in which people walk around in a minimal supermarket with some additional flow indicators to prevent blockages (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html)):
+
+```{r}
+#| echo = FALSE,
+#| eval = FALSE
+# Create a simplified version of a supermarket
+supermarket <- background(
+  # Shaking things up: Create a polygon environment
+  shape = polygon(
+    points = cbind(
+      c(0, 0, 5, 5, 10, 10), 
+      c(0, 5, 5, 10, 10, 0)
+    )
+  ), 
+
+  # Objects in the environment, consisting of 
+  # some shelves and a gated entrance. Gates are
+  # again not interactable.
+  objects = list(
+    # Top shelves
+    rectangle(center = c(7.5, 7), size = c(0.7, 4)),
+    rectangle(center = c(6, 7), size = c(0.7, 4)),
+    rectangle(center = c(9, 7), size = c(0.7, 4)),
+
+    # Bottom shelves
+    rectangle(center = c(3, 2.5), size = c(4, 0.7)),
+    rectangle(center = c(3, 1), size = c(4, 0.7)),
+
+    # Central box
+    rectangle(center = c(7.5, 2.5), size = c(2, 2)),
+
+    # Cash register and gate
+    polygon(
+      points = cbind(
+        c(1, 2.25, 2.25, 2.5, 2.5, 1), 
+        c(3.75, 3.75, 4.25, 4.25, 3.5, 3.5)
+      ), 
+      interactable = FALSE
+    ),
+    rectangle(
+      center = c(3.5, 4.25), 
+      size = c(0.25, 1.5), 
+      interactable = FALSE
+    )
+  ),
+
+  # Entrance and exit are at the cash register
+  entrance = c(1, 5),
+
+  # Limited access so that agents have to pass the cash 
+  # register beforehand
+  limited_access = list(
+    # Entrances
+    segment(from = c(1, 3.5), to = c(0, 3.5)),
+    segment(from = c(2.5, 4.25), to = c(3.375, 4.25)),
+
+    # Bottom shelves
+    segment(from = c(5, 2.5), to = c(5, 1)),
+    segment(from = c(1, 2.5), to = c(1, 3.5)),
+    segment(from = c(1, 0), to = c(1, 0.65)),
+    segment(from = c(1, 2.5), to = c(1, 1)),
+    segment(from = c(5, 2.5), to = c(5, 3.5)),
+    segment(from = c(5, 0), to = c(5, 0.65)),
+
+    # Top shelves
+    segment(from = c(5, 9), to = c(5.65, 9)),
+    segment(from = c(9.3, 9), to = c(10, 9)),
+    segment(from = c(7.10, 5), to = c(6.35, 5)),
+    segment(from = c(8.7, 5), to = c(7.75, 5)),
+    segment(from = c(5, 5), to = c(5.65, 5)),
+    segment(from = c(9.3, 5), to = c(10, 5)),
+    segment(from = c(7.10, 9), to = c(6.35, 9)),
+    segment(from = c(8.7, 9), to = c(7.75, 9))
+  )
+)
+
+# Plot the supermarket
+plot(
+  supermarket, 
+  segment.hjust = 1
+)
+
+# Set seed
+set.seed(1)
+
+# Connect environment to agent characteristics
+my_predped <- predped(
+  setting = supermarket, 
+  archetypes = c("BaselineEuropean", "BigRushingDutch")
+)
+
+# Run the simulation and provide our function 
+# to the `fx` argument
+trace <- simulate(
+  my_predped, 
+  max_agents = 5, 
+  add_agent = 20, 
+  iterations = 200,
+  print_iteration = TRUE,
+  individual_differences = TRUE
+)
+
+# Create plots and GIF
+plt <- plot(
+  trace, 
+  plot_segment = FALSE
+)
+
+# Save to a gif
+gifski::save_gif(
+  lapply(plt[1:200], print),
+  file.path("man", "figures", "trace.gif"),
+  delay = 1/10
+)
+
+# Save the trace itself
+saveRDS(
+  trace, 
+  file.path("man", "data", "trace.Rds")
+)
+```
+
+```{r}
+#| echo = FALSE,
+#| fig.align = "center",
+#| fig.alt = "Visualization of the minimal supermarket and the agents that walk around in it. The first 200 iterations of movements of the agents within this supermarket are visualized in this GIF."
+knitr::include_graphics(
+  file.path("..", "man", "figures", "trace.gif")
+)
+
+trace <- readRDS(
+  file.path("..", "man", "data", "trace.Rds")
+)
+
+```
+
+Then we need to perform the following steps to estimate the parameters of the M4MA to the data contained within this `trace`.
+
+First, one will have to transform the `trace` to a `data.frame`, which can be achieved with the [`unpack_trace`](https://ndpvh.github.io/predped/reference/unpack_trace.html) function:
+
+```{r}
+data <- unpack_trace(trace)
+```
+
+The variable `data` contains a bunch of information in a variety of columns, namely:
+
+```{r}
+colnames(data)
+```
+
+Of these, some indicate some attributes of the agent at a particular time (e.g., position in `x` and `y`, speed and orientation in `speed` and `orientation`) but also the cell that they selected (`cell`) and variables that are relevant for computing the utility of that decision (e.g., `check`, `ps_speed`, `gd_angle`,...). The contents of the latter set of columns depend heavily on the requirements of the utility functions defined in the [`m4ma`](https://github.com/m4ma/m4ma) package and we refer the interested reader to its documentation for a full explanation (https://research-software-directory.org/software/m4ma).
+
+Second, we need to delete datapoints that are not of interest for the estimation procedure. Given that the M4MAs parameters guide movement, we can only use those datapoints at which agents were moving around. Within a `trace`, the easiest way in which to spot whether this is the case is by filtering out any rows in which the utility variables are `NA`, indicating that they were not used during that iteration:
+
+```{r}
+dim(data)
+
+data <- data[!is.na(data$check), ]
+
+dim(data)
+```
+
+Note that this step is not necessary for the code to run, but that a warning would be thrown in case `NA` are left in the data. 
+
+Finally, once the data has been filtered to contain only movement data, we can compute the likelihood of the data under a particular set of parameters. Calling this likelihood $L$, then one can compute the negative log-likelihood $-\log(L)$ with the [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function as follows:
+
+```{r}
+# Define a set of parameters to be evaluated. For illustration purposes, we use
+# the parameters of the DrunkAussie for this purpose. Note that we delete the 
+# agent's type name and their color from the parameters. Furthermore note that 
+# we need to transform the parameters to a numeric vector.
+params <- load_parameters()$params_archetypes
+params <- params[params$name == "DrunkAussie", -c(1, 2)] |>
+  unlist() |>
+  as.numeric()
+
+# Compute the likelihood of the data under this parameter set
+mll(
+  data, 
+  params,
+  transform = FALSE,
+  summed = TRUE
+)
+```
+
+The output of this call to [`mll`](https://ndpvh.github.io/predped/reference/mll.html) is a named vector displaying the summed negative log-likelihood of the data under the provided parameters. 
+
+In this piece of code, we specified the argument `transform = FALSE` to communicate that the provided parameters are on the bounded scale rather than the unbounded scale (see _Parameters_ in the vignette on [_Simulations_](https://ndpvh.github.io/predped/articles/simulation.html)). When using an optimizer, it may be interesting to let the optimizer work on the unbounded (real) scale instead, in which case you can specify `transform = TRUE`. Additionally, we specified `summed = TRUE` to get the summed value for the negative log-likelihood across all datapoints of a particular agent. If you wish to see the values of the negative log-likelihood for each datapoint individually, you can set `summed = FALSE`.
+
+The call to the [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function will serve as the basic building block of the estimation procedure, which we dive more into in the next section.
+
+
+
+## Optimization 
+
+Typically, we want to estimate a set of unknown parameters to the data that is available to us. To achieve this via the `nloptr` package, we need to first define an _objective function_, that is a function that outputs a value to be minimized by the optimizer through changing a vector of parameters that serve as an input to this function. In our case, the objective function will be a wrapper around the [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function, summing all of the negative log-likelihoods together into one single `objective` value:
+
+```{r}
+objective_function <- function(parameters) {
+  return(
+    sum(
+      mll(
+        data, 
+        parameters,
+        transform = FALSE,
+        summed = TRUE
+      )
+    )
+  )
+}
+```
+
+Note that this function only takes in a single argument `parameters`: The content of the `data` that is included in the call to `mll` is assumed to be a global variable. Furthermore note that for our purposes, we assume that the provided parameters fall on the bounded scale and therefore don't need to be transformed.
+
+Once the objective function is defined, we can call the `nloptr` function of the `nloptr` package to perform the estimation procedure. Using the dividing rectangles algorithm (Jones et al., 1993), for example, we get: 
+
+```{r}
+#| cache = TRUE
+# Extract the bounds of the parameters
+bounds <- load_parameters()$params_bounds
+
+# Define the initial condition for the algorithm. Take the middle of the 
+# interval defined by the bounds
+x0 <- rowMeans(bounds)
+
+# Perform the estimation procedure
+fit <- nloptr(
+  x0,
+  objective_function, 
+  lb = bounds[, 1],
+  ub = bounds[, 2],
+  opts = list(
+    algorithm = "NLOPT_GN_DIRECT",
+    maxeval = 1000,
+    xtol_abs = 1e-4,
+    ftol_abs = 1e-4
+  )
+)
+
+# Print the resulting fit
+fit
+```
+
+
+
+## Individual Parameters 
+
+Up to now, we have assumed that each of the participants has the same parameter set underlying their movement data. More realistically, though, individuals differ in their walking tendencies, requiring us to estimate different parameters for each individual within our data. 
+
+To achieve this, we have to provide a matrix of parameter values to the [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function with rows indicating the individuals and the columns the parameters of interest. In practice, we therefore need to change the objective function so that:
+
+```{r}
+# Get the number of participants in the study
+n <- length(unique(data$id))
+
+# Define the objective function
+objective_function <- function(parameters) {
+  # Transform the parameters to the required format
+  parameters <- matrix(
+    parameters,
+    nrow = n, 
+    ncol = 33
+  )
+
+  # Compute the objective
+  return(
+    sum(
+      mll(
+        data, 
+        parameters,
+        transform = FALSE,
+        summed = TRUE
+      )
+    )
+  )
+}
+```
+
+Then, it's just a matter of changing the initial conditions `x0` and the bounds `lb` and `ub` in the `nloptr` function so that it matches the objective function, in this case:
+
+```{r}
+#| cache = TRUE
+# Extract the bounds of the parameters
+bounds <- load_parameters()$params_bounds |>
+  rep(each = n) |>
+  matrix(nrow = 33 * n, ncol = 2)
+
+# Define the initial condition for the algorithm. Take the middle of the 
+# interval defined by the bounds
+x0 <- rowMeans(bounds)
+
+# Perform the estimation procedure
+fit <- nloptr(
+  x0,
+  objective_function, 
+  lb = bounds[, 1],
+  ub = bounds[, 2],
+  opts = list(
+    algorithm = "NLOPT_GN_DIRECT",
+    maxeval = 1000,
+    xtol_abs = 1e-4,
+    ftol_abs = 1e-4
+  )
+)
+
+# Print the resulting fit
+fit
+```
+
+In this case, it may be useful to transform the parameters back to the matrix introduced in the objective function and provide it with matching column names denoting the parameters and row names denoting the participants themselves:
+
+```{r}
+# Get the parameter names: By default the same order as the one in bounds
+params <- load_parameters()$params_bounds |>
+  rownames()
+
+# Get the id names: The same order as the ones output by mll
+ids <- mll(data, bounds[, 1], transform = FALSE) |>
+  names()
+
+# Transform the result to a matrix with the provided column and row names
+fit$solution |>
+  matrix(nrow = length(ids), ncol = length(params)) |>
+  `rownames<-` (ids) |>
+  `colnames<-` (params)
+```
+
+
+
+## Unbounded Estimation
+
+The algorithm that we used before requires us to impose bounds on the parameters. In some cases, however, it may be more useful to use an optimizer that operates on the real scale, rather than on a bounded one. In this case, we change the argument `transform` to `TRUE` and change the call to `nloptr` as follows:
+
+```{r}
+#| cache = TRUE
+# Change the objective function to operate on the real scale
+objective_function <- function(parameters) {
+  return(
+    sum(
+      mll(
+        data, 
+        parameters,
+        transform = TRUE,
+        summed = TRUE
+      )
+    )
+  )
+}
+
+# Change the initial condition
+x0 <- numeric(33)
+
+# Perform the estimation procedure with an algorithm that does not require 
+# bounds to be specified
+fit <- nloptr(
+  x0,
+  objective_function, 
+  opts = list(
+    algorithm = "NLOPT_LN_SBPLX",
+    maxeval = 1000,
+    xtol_abs = 1e-4,
+    ftol_abs = 1e-4
+  )
+)
+
+# Print the resulting fit
+fit
+```
+
+Importantly, the parameters now have been estimated to be on the real scale, yet the parameters of the M4MA need to be defined on the bounded scale. To transform the parameters to their proper values, we use the [`to_bounded`](https://ndpvh.github.io/predped/reference/to_bounded.html) function:
+
+```{r}
+# Get the bounds of the parameters
+bounds <- load_parameters()$params_bounds
+
+# Extract the parameters and transform to a data.frame. Expected by the 
+# to_bounded function
+params <- fit$solution |>
+  matrix(nrow = 1) |>
+  as.data.frame() |>
+  `colnames<-` (rownames(bounds))
+
+# Use to_bounded to transform the parameters
+transformed <- to_bounded(
+  params, 
+  bounds
+)
+transformed
+```
+
+
+
+# Starting from Data
+
+Within `predped`, we also allow users to estimate the M4MA on their data directly. Consider the following dataset taken from a simplified train station, for example (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advnaced_simulation.html)):
+
+```{r}
+#| echo = FALSE,
+#| include = FALSE
+train_station <- background(
+  # Define a space of size (10, 5) meters
+  shape = rectangle(
+    center = c(0, 0), 
+    size = c(10, 5)
+  ), 
+  
+  # Define some gates at the entrances. These gates are 
+  # not interactable.
+  objects = list(
+    # Gates on the left
+    rectangle(
+      center = c(-3, 0), 
+      size = c(0.6, 1.3),
+      interactable = FALSE
+    ), 
+    rectangle(
+      center = c(-3, 1.9), 
+      size = c(0.6, 1.2),
+      interactable = FALSE
+    ),
+    rectangle(
+      center = c(-3, -1.9), 
+      size = c(0.6, 1.2),
+      interactable = FALSE
+    ),
+
+    # Gates on the right
+    rectangle(
+      center = c(3, 0), 
+      size = c(0.6, 1.3),
+      interactable = FALSE
+    ), 
+    rectangle(
+      center = c(3, 1.9), 
+      size = c(0.6, 1.2),
+      interactable = FALSE
+    ),
+    rectangle(
+      center = c(3, -1.9), 
+      size = c(0.6, 1.2),
+      interactable = FALSE
+    )
+  ),
+
+  # Define the entrances themselves. The two entrances
+  # at the top and bottom of the space represent the 
+  # stairs agents can use to exit the train tracks. 
+  # The two entrances at the left and right represent
+  # the entrances of the train station.
+  entrance = rbind(
+      # Top and bottom
+      c(0, 2.5), 
+      c(0, -2.5),
+
+      # Left and right
+      c(-5, 0),
+      c(5, 0)
+  )
+)
+
+# Plot the train station
+plot(
+  train_station, 
+  segment.hjust = 1
+)
+```
+
+```{r}
+#| echo = FALSE,
+#| eval = FALSE
+# Set seed
+set.seed(1)
+
+# Connect environment to agent characteristics
+my_predped <- predped(
+  setting = train_station, 
+  archetypes = "BaselineEuropean"
+)
+
+# Run the simulation and provide our function 
+# to the `fx` argument
+trace <- simulate(
+  my_predped, 
+  max_agents = 10, 
+  add_agent = 5, 
+  iterations = 200,
+  print_iteration = TRUE,
+  individual_differences = TRUE
+)
+
+# Create plots and GIF
+plt <- plot(
+  trace, 
+  plot_segment = FALSE
+)
+
+# Save to a gif
+gifski::save_gif(
+  lapply(plt[1:200], print),
+  file.path("man", "figures", "trace_train.gif"),
+  delay = 1/10
+)
+
+# Save the trace itself
+saveRDS(
+  trace, 
+  file.path("man", "data", "trace_train.Rds")
+)
+
+# Create a dataset out of this
+data <- time_series(trace)[, c("time", "id", "x", "y")]
+
+data$id <- factor(data$id) |>
+  as.numeric()
+data$time <- jitter(data$time)
+colnames(data) <- c("time", "passenger", "x", "y")
+
+write.table(
+  data, 
+  file.path("man", "data", "data.txt"),
+  sep = ","
+)
+```
+
+```{r}
+#| echo = FALSE
+data <- read.table(
+  file.path("..", "man", "data", "data.txt"),
+  sep = ","
+)
+```
+
+```{r}
+head(data)
+```
+
+In this dataset, we measured the positions (`x` and `y`) of different passengers (`passenger`) at several time points (`time`). To go from this dataset to one that we can use for the estimation procedure, we need to take the following steps.
+
+First, we need the dataset to conform to the standards of `predped`. This means that:
+
+- The `time` variable needs to show discrete jumps conforming the `time_step` defined by the M4MA, it being $500$msec;
+- A variable `iteration` needs to be added showing the iteration at which the positions were measured;
+- The `passenger` variable needs to be renamed to the `predped` internal `id`.
+
+Addressing the first change, this amounts to binning the data within a particular time window, aggregating the positions within that window through, for example, taking a mean, as we do in the next bit of code:
+
+```{r}
+# Define the bins, assuming the time variable is specified in seconds
+bins <- seq(
+  min(data$time), 
+  max(data$time) + 0.5, 
+  by = 0.5
+)
+
+# Loop over the bins and aggregate the data within those bins. Take the average
+# of the bin as the time indication. Do this for each person separately.
+data <- lapply(
+  unique(data$passenger),
+  function(x) {
+    data <- lapply(
+      1:(length(bins) - 1),
+      function(i) {
+        # Select the relevant data, it being the data where the time lies within
+        # a particular bin and the passenger is x
+        idx <- data$time <= bins[i + 1] & data$time >= bins[i] & data$passenger == x
+        selection <- data[idx, ]
+
+        # Aggregate and return a single row of data
+        if(nrow(selection) > 0) {
+          return(
+            data.frame(
+              time = (bins[i] + bins[i + 1]) / 2,
+              passenger = x,
+              x = mean(selection$x),
+              y = mean(selection$y)
+            )
+          )
+        } else {
+          return(NULL)
+        }
+      }
+    )
+
+    # Bind together and return
+    return(do.call("rbind", data))
+  }
+)
+
+# Bind all rows within the list of binned data together
+data <- do.call("rbind", data)
+
+# Order based on time
+data <- data[order(data$time), ]
+
+head(data)
+```
+
+The `iteration` variable requires integer values denoting the bin in which the position was measured. To compute this variable, we can perform the following computation:
+
+```{r}
+data$iteration <- (data$time - min(data$time)) / 0.5 + 1
+head(data)
+```
+
+The column `passenger` can be renamed to `id` in the following way:
+
+```{r}
+colnames(data)[2] <- "id"
+head(data)
+```
+
+Now that the dataset conforms to `predped`s standards, we have to compute the values of the input variables for the input functions. For this, we first need to translate the environment in which the data were collected to an instance of the [`background`](https://ndpvh.github.io/predped/reference/background.html) to the best of our abilities. In this case, we collected the data in a simplified train station that looks as follows:
+
+```{r}
+#| echo = FALSE,
+#| fig.align = "center",
+#| fig.alt = "Visualization of the simplified train station in which the data were collected. Gates can be found on the left and right side of the space, and four exits and entrances can be found in the middle of each side of the rectangular space."
+plot(
+  train_station,
+  segment.hjust = 1
+)
+```
+
+Note that when there are restrictions in flow, this is ideally included in the creation of this background (see [_Advanced Simulations_](https://ndpvh.github.io/predped/reference/advanced_simulation.html)). 
+
+Additionally, we need to include information on the goals that the people were trying to achieve within this environment, information that is necessary due to the M4MAs assumption that movement within space is guided by people's goals. Specifically, we need to define the position of the goal as well as attach an identifier to this goal, each respectively contained in the `goal_x`, `goal_y`, and `goal_id` columns in the data. In this case, we know that each person was walking towards a particular exit of the space. Based on this information, we add the required columns as follows:
+
+```{r}
+# Perform the mapping of a person with their goal position
+mapping <- list(
+  "exit 1" = c(1, 3, 12, 14, 21, 23, 28, 32, 33), 
+  "exit 2" = c(2, 4, 5, 6, 9, 11, 16, 25),
+  "exit 3" = c(7, 13, 18, 22, 24, 26, 30),
+  "exit 4" = c(8, 10, 15, 17, 19, 20, 27, 29, 21)
+)
+coordinates <- list(
+  "exit 1" = c(0, -2.5),
+  "exit 2" = c(-5, 0),
+  "exit 3" = c(0, 2.5),
+  "exit 4" = c(5, 0)
+)
+
+# Add placeholders in the dataset for the columns to be filled later
+data$goal_x <- 0
+data$goal_y <- 0
+data$goal_id <- " "
+
+# Loop over the different mappings and fill the columns of interest
+for(i in seq_along(mapping)) {
+  # Define the rows to be filled based on the passengers moving to a particular
+  # location
+  idx <- data$id %in% mapping[[i]]
+
+  # Fill the columns based on the exit's information
+  exit <- names(mapping)[i]
+
+  data$goal_x[idx] <- coordinates[[exit]][1]
+  data$goal_y[idx] <- coordinates[[exit]][2]
+  data$goal_id[idx] <- paste("moving to", exit)
+}
+
+head(data)
+```
+
+Once the setting and the people's goals have been defined, we can compute the input variables for the utility functions through the [`compute_utility_variables`](https://ndpvh.github.io/predped/reference/compute_utility_variables.html) function as follows:
+
+```{r}
+#| cache = TRUE
+utility_data <- compute_utility_variables(
+  data,
+  train_station
+)
+colnames(utility_data)
+```
+
+As shown, the result contains all of the same columns as the ones found in the transformed `trace` in the previous section. From here on, the steps to take in the estimation routine are thus the same and won't be repeated.
+
+
+
+
+# References 
+
+Johnson, S. G. (2008). _The NLopt nonlinear-optimization package._ https://github.com/stevengj/nlopt
+
+Jones, D. R., Perttunen, C. D., & Stuckmann, B. E. (1993). Lipschitzian optimization without the lipschitz constant. _Journal of Optimization Theory and Applications, 79_, 157.

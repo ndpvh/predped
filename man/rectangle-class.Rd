@@ -34,4 +34,5 @@ Other objects:
 \code{\link{object-class}},
 \code{\link{polygon-class}}
 }
+\concept{classes}
 \concept{objects}

@@ -33,11 +33,12 @@ cannot be used to generate goals on.}
 \code{\link[predped]{circle-class}},
 \code{\link[predped]{object-class}}, 
 \code{\link[predped]{rectangle-class}},
-\code{\link[predped]{initialize,polygon-method}}
+\code{\link[predped]{initialize-polygon}}
 
 Other objects: 
 \code{\link{circle-class}},
 \code{\link{object-class}},
 \code{\link{rectangle-class}}
 }
+\concept{classes}
 \concept{objects}

@@ -6,6 +6,10 @@
 \usage{
 \S4method{show}{goal}(object)
 }
+\arguments{
+\item{object}{Object of the \code{\link[predped]{goal-class}}}
+}
 \description{
 Show method for the \code{\link[predped]{goal-class}}
 }
+\concept{methods}

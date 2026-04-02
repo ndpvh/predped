@@ -22,11 +22,23 @@
 #' in its first and second column respectively. Additionally, rownames should 
 #' denote for which parameter a certain pair represents the bounds. Only used 
 #' when \code{transform = TRUE}. Defaults to the default bounds of \code{predped}.
+#' @param cpp Logical denoting whether to use the \code{\link[predped]{mll_rcpp}}
+#' function to compute the min-log-likelihood. Defaults to \code{TRUE}.
+#' @param summed Logical denoting whether to sum the min-log-likelihood to one
+#' value per person. If \code{TRUE}, you get the resulting summed 
+#' min-log-likelihood for each individual with a correction to avoid \code{-Inf}s.
+#' If \code{FALSE}, the function will instead return a list of vectors containing
+#' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
+#' their own corrections (if needed). Defaults to \code{FALSE}.
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 #' In a typical estimation situation, these motion variables should already be 
 #' in \code{data}.
 #' 
-#' @return Min-log-likelihood per person in the dataset.
+#'  @return Either named vector containing the summed min-log-likelihood 
+#' (\code{summed = TRUE}) or named list with vectors of raw likelihoods
+#' (\code{summed = FALSE}) per person in the dataset.
+#' 
+#' @concept estimation
 #' 
 #' @export 
 mll <- function(data, 
@@ -35,6 +47,7 @@ mll <- function(data,
                 transform = TRUE,
                 bounds = params_from_csv[["params_bounds"]],
                 cpp = TRUE,
+                summed = FALSE,
                 ...) {
 
     # Check whether the utility variables are in there. Just checked for one and 
@@ -46,14 +59,23 @@ mll <- function(data,
         data <- data[!is.na(data$ps_speed), ]
     }
 
-    # If transform is TRUE, then we need to transform the parameters from the 
-    # real scale to the bounded scale.
-    if(transform) {
-        parameters <- to_bounded(parameters, bounds)
+    # Check whether there are any instances in which the person is not moving 
+    # around. If so, throw a warning and delete these rows
+    if(any(is.na(data$ps_speed))) {
+        warning(
+            paste(
+                "NAs found in the utility variables within the data.",
+                "Deleting the affected rows."
+            )
+        )
+
+        data <- data[!is.na(data$ps_speed), ]
     }
 
-    # Retrieve each person's identifier
-    ids <- unique(data$id)
+    # Retrieve each person's identifier. Note that we sort this to avoid problems
+    # with indexing in the C++ code.
+    ids <- unique(data$id) |>
+        sort()
 
     # Check whether the provided parameters conform to data.frame format. If not, 
     # transform.
@@ -74,6 +96,13 @@ mll <- function(data,
         parameters <- parameters[idx, ]
     }
 
+    # If transform is TRUE, then we need to transform the parameters from the 
+    # real scale to the bounded scale.
+    if(transform) {
+        names(parameters) <- parameter_names
+        parameters <- to_bounded(parameters, bounds)
+    }
+
     if(cpp) {
         # Transform the data and parameters to a list of dataframes. Makes data
         # handling easier in cpp
@@ -81,43 +110,57 @@ mll <- function(data,
         params <- split(parameters, 1:nrow(parameters))
 
         # Denote which participant should be updated at each iteration in the
-        # data_list. Transform so that it coheres to C++ indexing
+        # data_list. Transform so that it coheres to C++ indexing.
         idx <- factor(data$id,
                       levels = levels(factor(ids))) |>
             as.numeric()
         idx <- idx - 1
 
         # Actually execute
-        return(mll_rcpp(data_list, 
+        MLL <- mll_rcpp(data_list, 
                         params, 
                         ids,
-                        idx,
-                        data$cell))
-    }
-
-    # For each agent, loop over the unique participant id's 
-    MLL <- sapply(seq_along(ids), 
-                  function(i) {
-                      # Select the data for which the utilities should be computed
-                      selection <- data[data$id == ids[i], ]
+                        as.integer(idx),
+                        as.integer(data$cell),
+                        as.integer(table(data$id)),
+                        summed)
+                        
+    } else {
+        # For each agent, loop over the unique participant id's 
+         MLL <- lapply(seq_along(ids), 
+                       function(i) {
+                           # Select the data for which the utilities should be computed
+                           selection <- data[data$id == ids[i], ]
   
-                      # Get the utilities for each cell based on the provided 
-                      # results
-                      L <- sapply(1:nrow(selection), 
-                                  function(j) {
-                                      V <- utility(selection[j, ], parameters[i, ], cpp = FALSE)
+                           # Get the utilities for each cell based on the provided 
+                           # results
+                           L <- sapply(1:nrow(selection), 
+                                       function(j) {
+                                           V <- utility(selection[j, ], parameters[i, ], cpp = FALSE)
+     
+                                           V <- V - max(V)
+                                           exp_V <- exp(V)
+                                           return(exp_V[selection$cell[j] + 1] / sum(exp_V))
+                                       })
 
-                                      V <- V - max(V)
-                                      exp_V <- exp(V)
-                                      return(exp_V[selection$cell[j] + 1] / sum(exp_V))
-                                  })
+                           # Transform likelihoods that fall below a particular 
+                           # threshold
+                           L[log(L) < -10] <- exp(-10)
                       
-                      # Convert likelihoods to min-log-likelihood. 1 was added
-                      # to each likelihood to ensure that 0 probability will 
-                      # not lead to -Inf min-log-likelihood.
-                      return(-sum(log(1 + L)))
-                  })
+                           # Convert likelihoods to min-log-likelihood. 1 was added
+                           # to each likelihood to ensure that 0 probability will 
+                           # not lead to -Inf min-log-likelihood.
+                           if(summed) {
+                             return(-sum(log(L)))
+                           } else {
+                             return(L)
+                           }
+                       })
+    }    
 
+    if(summed) {
+        MLL <- as.numeric(MLL)
+    }
     names(MLL) <- ids 
     return(MLL)
 }

@@ -46,6 +46,8 @@
 #' If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 #' x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 #' making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving nodes under 
 #' \code{"nodes"}, a dataframe with the surviving connections between nodes 
@@ -80,19 +82,23 @@
 #' 
 #' @rdname create_edges
 #' 
+#' @concept routing
+#' 
 #' @export 
 create_edges <- function(from, 
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_nodes = FALSE) {
+                         many_nodes = FALSE,
+                         cpp = TRUE) {
 
     # Create the nodes that will serve as potential path points
     nodes <- create_nodes(from, 
                           to, 
                           background, 
                           space_between = space_between,
-                          many_nodes = many_nodes)
+                          many_nodes = many_nodes,
+                          cpp = cpp)
 
     # If there are no nodes, then we will have to return NULL
     if(is.null(nodes)) {
@@ -106,7 +112,7 @@ create_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background 
     # and return the required list of edges and nodes
-    return(append(evaluate_edges(segments, background), 
+    return(append(evaluate_edges(segments, background, space_between - 1e-4, cpp = cpp), 
                   list(nodes = nodes)))
 }
 
@@ -142,6 +148,8 @@ create_edges <- function(from,
 #' of the edges that are contained in the \code{precomputed_edges}. Defaults to 
 #' \code{TRUE} when \code{new_objects} is not empty, and to \code{FALSE} 
 #' whenever it is.
+#' @param cpp Logical denoting whether to use the R or Rcpp version of the 
+#' function. Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving nodes under 
 #' \code{"nodes"}, a dataframe with the surviving connections between nodes 
@@ -182,6 +190,8 @@ create_edges <- function(from,
 #' 
 #' @rdname adjust_edges
 #' 
+#' @concept routing
+#' 
 #' @export 
 adjust_edges <- function(from, 
                          to, 
@@ -189,7 +199,8 @@ adjust_edges <- function(from,
                          precomputed_edges,                  
                          space_between = 0.5,
                          new_objects = NULL, 
-                         reevaluate = !is.null(new_objects)) {
+                         reevaluate = !is.null(new_objects),
+                         cpp = TRUE) {
 
     nodes <- precomputed_edges$nodes
     edges_with_coords <- precomputed_edges$edges_with_coords
@@ -216,7 +227,8 @@ adjust_edges <- function(from,
         obj_nodes <- lapply(new_objects, 
                             \(x) add_nodes(x, 
                                            space_between = space_between, 
-                                           only_corners = TRUE))
+                                           only_corners = TRUE,
+                                           cpp = cpp))
         obj_nodes <- do.call("rbind", obj_nodes)
 
         # Delete these nodes if they are already the same as those in `nodes`
@@ -296,7 +308,7 @@ adjust_edges <- function(from,
 
     # Check whether these edges don't pass through the objects in the background
     objects(background) <- obj
-    edges <- evaluate_edges(segments, background)
+    edges <- evaluate_edges(segments, background, space_between - 1e-4, cpp = cpp)
 
     # If there hadn't been a reevaluation before, we need to bind these edges
     # to the already computed ones
@@ -333,6 +345,8 @@ adjust_edges <- function(from,
 #' If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 #' x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 #' making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Dataframe with the surviving nodes, containing the node id under 
 #' \code{"node_ID"} and its coordinates under \code{"X"} and \code{"Y"}.
@@ -362,6 +376,8 @@ adjust_edges <- function(from,
 #' 
 #' @rdname create_nodes
 #' 
+#' @concept routing
+#' 
 #' @export 
 #
 # TO DO 
@@ -372,7 +388,8 @@ create_nodes <- function(from,
                          to, 
                          background, 
                          space_between = 0.5,
-                         many_nodes = FALSE) {
+                         many_nodes = FALSE,
+                         cpp = TRUE) {
                             
     # Create a matrix of coordinates that fill up the complete space. This will 
     # allow agents to take whatever route to their destination 
@@ -401,11 +418,13 @@ create_nodes <- function(from,
     obj_nodes <- lapply(obj, 
                         \(x) add_nodes(x, 
                                        space_between = space_between,
-                                       only_corners = TRUE))
+                                       only_corners = TRUE,
+                                       cpp = cpp))
     shp_nodes <- add_nodes(shp, 
                            space_between = space_between, 
                            only_corners = TRUE,
-                           outside = FALSE)
+                           outside = FALSE,
+                           cpp = cpp)
 
     if(many_nodes) {
         nodes <- rbind(nodes,
@@ -424,11 +443,11 @@ create_nodes <- function(from,
     extension <- space_between - 1e-4
 
     if(length(obj) == 0) {
-        to_delete <- out_object(shp, nodes)
+        to_delete <- out_object(shp, nodes, cpp = cpp)
     } else {
         to_delete <- lapply(obj, 
-                        \(x) in_object(enlarge(x, extension), nodes))
-        to_delete <- Reduce("|", to_delete) | out_object(shp, nodes)
+                        \(x) in_object(enlarge(x, extension, cpp = cpp), nodes, cpp = cpp))
+        to_delete <- Reduce("|", to_delete) | out_object(shp, nodes, cpp = cpp)
     }   
 
     nodes <- nodes[!to_delete,] |> 
@@ -482,8 +501,11 @@ create_nodes <- function(from,
 #' @param segments Named matrix or dataframe containing the ids of the nodes 
 #' under column names \code{"from"} and \code{"to"}, and their coordinates under 
 #' \code{"from_x"}, \code{"from_y"}, \code{"to_x"}, and \code{"to_y"}.
-#' @param objects List of objects that extend the 
-#' \code{\link[predped]{object-class}}.
+#' @param background Object of the \code{\link[predped]{background-class}}.
+#' @param space_between Numeric denoting the space that should be left between 
+#' an object and the created path points for the agents.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving connections between 
 #' the nodes under \code{"edges"} and a similar dataframe also containing the 
@@ -491,12 +513,12 @@ create_nodes <- function(from,
 #' 
 #' @examples 
 #' # Let's create a background
-#' my_background <- background(shape = rectangle(shape = c(0, 0), 
+#' my_background <- background(shape = rectangle(center = c(0, 0), 
 #'                                               size = c(2, 2)), 
-#'                             objects = list(rectangle(shape = c(0, 0), 
+#'                             objects = list(rectangle(center = c(0, 0), 
 #'                                                      size = c(1, 1))))
 #' 
-#' # Create some segments that do and do not go though the objects in the 
+#' # Create some segments that do and do not go through the objects in the 
 #' # background
 #' potential_edges <- data.frame(from = c("node 1", "node 2", "node 3"), 
 #'                               from_x = c(-0.75, -0.75, -0.75), 
@@ -507,7 +529,9 @@ create_nodes <- function(from,
 #' head(potential_edges)
 #' 
 #' # Only retain the edges that don't intersect the object
-#' surviving_edges <- evaluate_edges(potential_edges, my_background)
+#' surviving_edges <- evaluate_edges(potential_edges, 
+#'                                   my_background,
+#'                                   space_between = 0)
 #' head(surviving_edges$edges_with_coords)
 #' 
 #' @seealso 
@@ -518,11 +542,16 @@ create_nodes <- function(from,
 #' 
 #' @rdname evaluate_edges
 #' 
+#' @concept routing
+#' 
 #' @export
 evaluate_edges <- function(segments, 
-                           background) {
+                           background,
+                           space_between,
+                           cpp = TRUE) {
 
-    obj <- objects(background)
+    obj <- lapply(objects(background),
+                  \(x) enlarge(x, space_between))
     lim <- limited_access(background)
 
     # Step 1: Note, we use squared distances as the cost for efficiency purposes
@@ -534,7 +563,11 @@ evaluate_edges <- function(segments,
     if(length(obj) == 0) {
         idx <- rep(TRUE, nrow(segments))
     } else {
-        idx <- prune_edges(obj, segments[, c("from_x", "from_y", "to_x", "to_y")])
+        idx <- prune_edges(
+            objects(background), 
+            segments[, c("from_x", "from_y", "to_x", "to_y")],
+            cpp = cpp
+        )
     }
 
     # Step 3: If there is limited access, we need to account for this. Unfortunately, 
@@ -553,7 +586,10 @@ evaluate_edges <- function(segments,
         # Loop over the limited access and look at the interactions between 
         # these and the edges 
         intersections <- sapply(background@precomputed_limited_access, 
-                                \(x) line_intersection(x, segments[, c("from_x", "from_y", "to_x", "to_y")], return_all = TRUE))
+                                \(x) line_intersection(x, 
+                                                       segments[, c("from_x", "from_y", "to_x", "to_y")], 
+                                                       return_all = TRUE,
+                                                       cpp = cpp))
 
         # First check whether the intersections matter, which amounts to having 
         # a TRUE in both idy and in intersections. Then, we can check whether 
@@ -601,13 +637,15 @@ evaluate_edges <- function(segments,
 #' \code{\link[predped]{object-class}}.
 #' @param segments Numerical matrix of size N x 4 containing the coordinates of 
 #' the line segments in order x_1, y_1, x_2, y_2.
+#' @param cpp Logical denoting whether to use the Rcpp alternative (\code{TRUE})
+#' or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.
 #' 
 #' @return Logical vector denoting whether a given edge can be retained 
 #' (\code{TRUE}) or should be discarded (\code{FALSE})
 #' 
 #' @examples 
 #' # Let's create a list of objects
-#' objects <- list(rectangle(shape = c(0, 0), size = c(1, 1)))
+#' objects <- list(rectangle(center = c(0, 0), size = c(1, 1)))
 #' 
 #' # Create some segments that do and do not go though the objects in the 
 #' # background
@@ -628,25 +666,36 @@ evaluate_edges <- function(segments,
 #' 
 #' @rdname prune_edges
 #' 
+#' @concept routing
+#' 
 #' @export
 #
 # NOTE: Tried a completely vectorized alternative, but this was not helpful. 
 # This form seems to be the fastest this function can work.
-prune_edges <- function(objects, segments) {
+prune_edges <- function(objects, 
+                        segments, 
+                        cpp = TRUE) {
+
     # If there are no objects, then there can be no intersections
     if(length(objects) == 0) {
         return(rep(TRUE, nrow(segments)))
     }
 
-    # Loop over the objects in the environment and check their intersections 
-    # with the lines in `segments`
-    all_intersections <- lapply(objects, 
-                                \(x) line_intersection(x, segments, return_all = TRUE))
+    # If there are no segments, there can be no intersections
+    if(length(segments) == 0) {
+        return(logical(0))
+    }
+
+    # Loop over the objects in the environment and check their intersections
+    # with the segments in `segments`. 
+    test <- lapply(objects, 
+                   \(x) line_intersection(x, segments, return_all = TRUE, cpp = cpp))
+    test <- Reduce("|", test)
 
     # I want to only retain those that do not intersect, meaning that the complete
     # row should be FALSE. We therefore check whether any of the sides is TRUE and 
     # then reverse the operation, so that none of them can be
-    return(!Reduce("|", all_intersections))
+    return(!test)
 }
 
 #' Make combinations of different nodes
@@ -699,6 +748,8 @@ prune_edges <- function(objects, segments) {
 #' \code{\link[predped]{create_nodes}}
 #' 
 #' @rdname combine_nodes
+#' 
+#' @concept helper
 #' 
 #' @export
 combine_nodes <- function(nodes_1, 
@@ -789,12 +840,14 @@ combine_nodes <- function(nodes_1,
 #' circumference of the object and the nodes created under the hood (see
 #' \code{\link[predped]{add_nodes}}). Defaults to 2.5 times the maximal 
 #' possible radius from the default \code{\link[predped]{params_from_csv}}.
-#' @param many_nodes ogical denoting whether to create many nodes or leave 
+#' @param many_nodes Logical denoting whether to create many nodes or leave 
 #' it at the minimum. If \code{FALSE}, nodes are only added at the outlines of 
 #' the objects contained within the \code{objects} slot of \code{background}. 
 #' If \code{TRUE}, 400 additional nodes are added at an equal distance in the 
 #' x-direction (20 nodes) and an equal distance in the y-direction (20 nodes), 
 #' making the 20 x 20 = 400 additional nodes. Defaults to \code{FALSE}.
+#' @param cpp Logical denoting whether to use the R or Rcpp version of the 
+#' function. Defaults to \code{TRUE}.
 #' 
 #' @return List containing a dataframe with the surviving nodes under 
 #' \code{"nodes"}, a dataframe with the surviving connections between nodes 
@@ -821,22 +874,26 @@ combine_nodes <- function(nodes_1,
 #' \code{\link[predped]{create_edges}}
 #' \code{\link[predped]{create_nodes}}
 #' \code{\link[predped]{find_path}}
-#' \code{\link[predped]{simulate-predped}}
-#' \code{\link[predped]{simulate-state}}
+#' \code{\link[predped]{simulate}}
+#' \code{\link[predped]{simulate.state}}
 #' 
 #' @rdname compute_edges 
+#' 
+#' @concept routing
 #' 
 #' @export 
 compute_edges <- function(background, 
                           space_between = 2.5 * max(params_from_csv[["params_bounds"]]["radius",]),
-                          many_nodes = TRUE) {
+                          many_nodes = TRUE,
+                          cpp = TRUE) {
                             
     # Create the edges themselves with mock-positions of agent and goal
     edges <- create_edges(c(0, 0), 
                           c(0, 0), 
                           background,
                           space_between = space_between,
-                          many_nodes = many_nodes)
+                          many_nodes = many_nodes,
+                          cpp = cpp)
 
     # Delete agent and goal positions from these edges, as these should be 
     # dynamic. 
