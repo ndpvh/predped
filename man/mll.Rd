@@ -12,6 +12,7 @@ mll(
   bounds = params_from_csv[["params_bounds"]],
   cpp = TRUE,
   summed = FALSE,
+  time_step = 0.5,
   ...
 )
 }
@@ -49,8 +50,12 @@ If \code{FALSE}, the function will instead return a list of vectors containing
 the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 their own corrections (if needed). Defaults to \code{FALSE}.}
 
+\item{time_step}{Numeric denoting the number of seconds each discrete step in
+time should mimic. Passed to \code{\link[predped]{add_motion_variables}} when
+motion variables are not yet present in \code{data}. Defaults to \code{0.5}.}
+
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-In a typical estimation situation, these motion variables should already be 
+In a typical estimation situation, these motion variables should already be
 in \code{data}.
 
  @return Either named vector containing the summed min-log-likelihood 
