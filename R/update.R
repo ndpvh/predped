@@ -115,12 +115,13 @@ setMethod("update", "state", function(object,
                                               vf_angles = NA)
 
         # Update the agent himself
-        agent_list[[i]] <- update(agent, 
+        agent_list[[i]] <- update(agent,
                                   state_copy,
                                   background,
                                   agent_specs,
                                   seen[i],
                                   cpp = cpp,
+                                  time_step = time_step,
                                   ...)
     }
 

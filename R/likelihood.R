@@ -30,8 +30,11 @@
 #' If \code{FALSE}, the function will instead return a list of vectors containing
 #' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 #' their own corrections (if needed). Defaults to \code{FALSE}.
+#' @param time_step Numeric denoting the number of seconds each discrete step in
+#' time should mimic. Passed to \code{\link[predped]{add_motion_variables}} when
+#' motion variables are not yet present in \code{data}. Defaults to \code{0.5}.
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-#' In a typical estimation situation, these motion variables should already be 
+#' In a typical estimation situation, these motion variables should already be
 #' in \code{data}.
 #' 
 #'  @return Either named vector containing the summed min-log-likelihood 
@@ -41,19 +44,20 @@
 #' @concept estimation
 #' 
 #' @export 
-mll <- function(data, 
+mll <- function(data,
                 parameters,
                 parameter_names = colnames(params_from_csv[["params_archetypes"]])[-c(1, 2)],
                 transform = TRUE,
                 bounds = params_from_csv[["params_bounds"]],
                 cpp = TRUE,
                 summed = FALSE,
+                time_step = 0.5,
                 ...) {
 
-    # Check whether the utility variables are in there. Just checked for one and 
+    # Check whether the utility variables are in there. Just checked for one and
     # assumed that the others are there as well
     if(!("ps_speed" %in% colnames(data))) {
-        data <- add_motion_variables(data, ...)
+        data <- add_motion_variables(data, time_step = time_step, ...)
 
         # Delete those instances in which a person is not moving around
         data <- data[!is.na(data$ps_speed), ]
