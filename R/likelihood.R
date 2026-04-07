@@ -51,8 +51,10 @@ mll <- function(data,
                 bounds = params_from_csv[["params_bounds"]],
                 cpp = TRUE,
                 summed = FALSE,
-                time_step = 0.5,
+                time_step = NULL,
                 ...) {
+
+    time_step <- .get_time_step(data, explicit = time_step)
 
     # Check whether the utility variables are in there. Just checked for one and
     # assumed that the others are there as well

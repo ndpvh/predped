@@ -12,7 +12,7 @@ mll(
   bounds = params_from_csv[["params_bounds"]],
   cpp = TRUE,
   summed = FALSE,
-  time_step = 0.5,
+  time_step = NULL,
   ...
 )
 }

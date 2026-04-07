@@ -11,8 +11,8 @@ to_trace(
   a_turning = NULL,
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -10, -20, -32.5, -50, -72.5),
-  time_step = 0.5,
-  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4)/time_step,
+  time_step = NULL,
+  threshold = NULL,
   stay_stopped = TRUE,
   cpp = TRUE,
   ...

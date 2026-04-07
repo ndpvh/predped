@@ -478,10 +478,11 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' 
 #' @export 
 setMethod("compute_utility_variables", "data.frame", function(object,
-                                                              background) {
-    # Transform the data to a trace and then back to a dataframe
-    trace <- to_trace(object, background)
-    return(unpack_trace(trace))
+                                                              background,
+                                                              time_step = NULL) {
+    time_step <- .get_time_step(object, explicit = time_step)
+    trace <- to_trace(object, background, time_step = time_step)
+    return(unpack_trace(trace, time_step = time_step))
 })
 
 

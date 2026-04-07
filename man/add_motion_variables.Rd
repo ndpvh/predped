@@ -8,8 +8,8 @@ add_motion_variables(
   data,
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -72.5, -50, -32.5, -20, -10),
-  time_step = 0.5,
-  threshold = qlnorm(0.25, -2.95, 0.64)/time_step,
+  time_step = NULL,
+  threshold = NULL,
   initial_conditions = FALSE
 )
 }

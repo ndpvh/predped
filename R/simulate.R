@@ -368,6 +368,7 @@ setMethod("simulate", "predped", function(object,
 
     cat("\n")
 
+    attr(trace, "time_step") <- time_step
     return(trace)
 })
 

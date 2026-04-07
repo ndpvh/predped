@@ -18,12 +18,16 @@
 #' @concept data
 #' 
 #' @export
-time_series <- function(trace, 
-                        time_step = 0.5,
+time_series <- function(trace,
+                        time_step = NULL,
                         cpp = TRUE) {
 
+    time_step <- .get_time_step(trace, explicit = time_step)
+
     if(cpp) {
-        return(time_series_rcpp(trace, time_step))
+        result <- time_series_rcpp(trace, time_step)
+        attr(result, "time_step") <- time_step
+        return(result)
     }
 
     # Create a function that will extract all details of the agents from a 
@@ -47,11 +51,12 @@ time_series <- function(trace,
         return(do.call("rbind", y))
     }
 
-    # Iterate over each object in the list and extract the state. 
+    # Iterate over each object in the list and extract the state.
     x <- lapply(trace, extract_state)
     x <- do.call("rbind", x)
     rownames(x) <- NULL
 
+    attr(x, "time_step") <- time_step
     return(x)
 }
 
@@ -93,25 +98,29 @@ time_series <- function(trace,
 #' @concept data
 #' 
 #' @export
-unpack_trace <- function(trace, 
+unpack_trace <- function(trace,
                          velocities = c(1.5, 1, 0.5) |>
                             rep(each = 11) |>
                             matrix(ncol = 3),
-                         orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                         orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                           350, 340, 327.5, 310, 287.5) |>
                              rep(times = 3) |>
                              matrix(ncol = 3),
                          stay_stopped = TRUE,
-                         time_step = 0.5,
+                         time_step = NULL,
                          cpp = TRUE) {
+
+    time_step <- .get_time_step(trace, explicit = time_step)
 
     # If Rcpp alternative requested, then let them use it
     if(cpp) {
-        return(unpack_trace_rcpp(trace, 
-                                 velocities,
-                                 orientations,
-                                 stay_stopped,
-                                 time_step))
+        result <- unpack_trace_rcpp(trace,
+                                    velocities,
+                                    orientations,
+                                    stay_stopped,
+                                    time_step)
+        attr(result, "time_step") <- time_step
+        return(result)
     }
 
     # Create a function that will extract all details of the agents from a 
@@ -154,6 +163,7 @@ unpack_trace <- function(trace,
     rownames(x) <- NULL
 
     # Create a continuous time-variable in seconds
+    attr(x, "time_step") <- time_step
     return(x)
 }
 
@@ -212,18 +222,22 @@ unpack_trace <- function(trace,
 #' @concept data
 #' 
 #' @export
-to_trace <- function(data, 
+to_trace <- function(data,
                      background,
-                     b_turning = NULL, 
+                     b_turning = NULL,
                      a_turning = NULL,
                      velocities = c(1.5, 1, 0.5),
-                     orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                     orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                       -10, -20, -32.5, -50, -72.5),
-                     time_step = 0.5,
-                     threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
+                     time_step = NULL,
+                     threshold = NULL,
                      stay_stopped = TRUE,
                      cpp = TRUE,
                      ...) {
+
+    time_step <- .get_time_step(data, explicit = time_step)
+    if (is.null(threshold))
+        threshold <- qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step
 
     # Add the information needed to transform the data to a collection of states.
     data <- add_motion_variables(
@@ -396,6 +410,7 @@ to_trace <- function(data,
                                                             cpp = cpp)
     }
 
+    attr(trace, "time_step") <- time_step
     return(trace)
 }
 
@@ -446,14 +461,17 @@ to_trace <- function(data,
 #' @concept data
 #' 
 #' @export
-add_motion_variables <- function(data, 
+add_motion_variables <- function(data,
                                  velocities = c(1.5, 1, 0.5),
-                                 orientations = c(72.5, 50, 32.5, 20, 10, 0, 
+                                 orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                                   -72.5, -50, -32.5, -20, -10),
-                                 time_step = 0.5,
-                                #  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step,
-                                 threshold = qlnorm(0.25, -2.95, 0.64) / time_step,
+                                 time_step = NULL,
+                                 threshold = NULL,
                                  initial_conditions = FALSE) {
+
+    time_step <- .get_time_step(data, explicit = time_step)
+    if (is.null(threshold))
+        threshold <- qlnorm(0.25, -2.95, 0.64) / time_step
 
     # Define the times at which the simulation ran and define the bins and 
     # iterations that come with it
@@ -593,5 +611,6 @@ add_motion_variables <- function(data,
         new_data <- new_data[, !(colnames(new_data) %in% c("x0", "y0", "speed0", "orientation0"))]
     }
 
+    attr(new_data, "time_step") <- time_step
     return(new_data)
 }

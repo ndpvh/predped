@@ -367,3 +367,18 @@ raycasting <- function(coords, x) {
 
 # Vectorized version of seq, used in `overlap_with_objects`
 multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "length.out"))
+
+
+# Internal helper: resolve time_step from stored attribute, explicit argument,
+# or hard default. Pass explicit=NULL to mean "use stored or default".
+.get_time_step <- function(x = NULL, explicit = NULL, default = 0.5) {
+    stored <- attr(x, "time_step")
+    if (!is.null(explicit)) {
+        if (!is.null(stored) && !isTRUE(all.equal(explicit, stored)))
+            warning("Supplied time_step (", explicit, ") differs from value stored ",
+                    "in data/trace (", stored, "). Using supplied value.")
+        return(explicit)
+    }
+    if (!is.null(stored)) return(stored)
+    return(default)
+}
