@@ -72,6 +72,16 @@ noiser <- function(data = NULL,
     y_col <- if (!is.null(cols) && "y"    %in% names(cols)) unname(cols["y"])    else "y"
     t_col <- if (!is.null(cols) && "time" %in% names(cols)) unname(cols["time"]) else "time"
 
+    # Record original row order so we can restore it after noising.
+    # We must also sort by (group, time) to align x_orig/y_orig with the
+    # row order that lapply produces internally.
+    data$.orig_order <- seq_len(nrow(data))
+    if (!is.null(.by)) {
+        data <- data[order(match(data[[.by]], unique(data[[.by]])), data[[t_col]]), ]
+    } else {
+        data <- data[order(data[[t_col]]), ]
+    }
+
     # Save original (noiseless) x and y before noising
     x_orig <- data[[x_col]]
     y_orig <- data[[y_col]]
@@ -141,6 +151,10 @@ noiser <- function(data = NULL,
         }
     }
 
+    # Restore original row order
+    data <- data[order(data$.orig_order), ]
+    data$.orig_order <- NULL
+
     return(data)
 }
 
@@ -176,21 +190,39 @@ noiser <- function(data = NULL,
         cols["id"] <- "id"
     }
 
-    data <- data[, cols] |> `colnames<-`(names(cols))
+    # Identify extra columns not covered by cols
+    extra_col_names <- setdiff(names(data), unname(cols))
 
-    list("data" = data, "cols" = cols, "group" = group)
+    # Select and rename core columns, then cbind any extra columns
+    data_core <- data[, unname(cols), drop = FALSE]
+    colnames(data_core) <- names(cols)
+    if (length(extra_col_names) > 0) {
+        data_core <- cbind(data_core, data[, extra_col_names, drop = FALSE])
+    }
+
+    list("data" = data_core, "cols" = cols, "group" = group)
 }
 
 
 .noiser_finalize <- function(data, cols = NULL, .by = NULL) {
 
-    data <- data[, names(cols)] |> `colnames<-`(cols)
+    # Extra columns are those not in the core set
+    extra_col_names <- setdiff(names(data), names(cols))
+
+    # Rename core columns back to their original names
+    data_out <- data[, names(cols), drop = FALSE]
+    colnames(data_out) <- unname(cols)
 
     if (is.null(.by)) {
-        data[, cols["id"]] <- NULL
+        data_out[[cols["id"]]] <- NULL
     }
 
-    return(data)
+    # Attach extra columns unchanged
+    if (length(extra_col_names) > 0) {
+        data_out <- cbind(data_out, data[, extra_col_names, drop = FALSE])
+    }
+
+    return(data_out)
 }
 
 
