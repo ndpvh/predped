@@ -249,6 +249,7 @@ noiser <- function(data = NULL,
     }
 
     residuals <- MASS::mvrnorm(nrow(data), mu = mean, Sigma = covariance)
+    if (!is.matrix(residuals)) residuals <- matrix(residuals, nrow = 1)
     data[, c("x", "y")] <- data[, c("x", "y")] + residuals
     return(data)
 }
@@ -295,6 +296,7 @@ noiser <- function(data = NULL,
     transition <- transition %^% (6.13 / sampling_rate)
 
     residuals <- MASS::mvrnorm(nrow(data), mu = c(0, 0), Sigma = covariance)
+    if (!is.matrix(residuals)) residuals <- matrix(residuals, nrow = 1)
     epsilon   <- matrix(0, nrow = nrow(data), ncol = 2)
 
     for (i in seq_len(nrow(data))) {
