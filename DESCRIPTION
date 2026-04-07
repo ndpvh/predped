@@ -11,7 +11,7 @@ Authors@R: c(
     person("Niels", 
            "Vanhasbroeck", 
            email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090),
+           comment = c(ORCID = "0000-0002-7423-0090"),
            role = c("aut", "cre")), 
     person("Malte", 
            "Lüken",
@@ -42,7 +42,8 @@ Imports:
     utils,
     dplyr,
     MASS,
-    matrixStats
+    matrixStats,
+    expm
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.3
 Collate:
@@ -67,6 +68,7 @@ Collate:
     'likelihood.R'
     'simulate.R'
     'benchmark.R'
+    'noiser.R'
 Suggests: 
     fs,
     testthat (>= 3.0.0),
