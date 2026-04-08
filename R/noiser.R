@@ -51,6 +51,7 @@ noiser <- function(data = NULL,
                    model = "temporal",
                    background = NULL,
                    ntry = 100,
+                   span = NULL,
                    ...) {
 
     # Validate that exactly one of data or trace is provided
@@ -92,46 +93,48 @@ noiser <- function(data = NULL,
     group         <- preparation$group
     data_prep     <- preparation$data
 
-    # Load the measurement error model
-    if (is.character(model)) {
-        error_fn <- function(x) .noise_models[[model]](x, ...)
-    } else {
-        error_fn <- function(x) model(x, ...)
-    }
-
-    # Apply the measurement model to each group
-    data_prep <- lapply(
-        seq_along(group),
-        function(i) {
-            data_i <- data_prep[data_prep$id == group[i], ]
-            data_i <- data_i[order(data_i$time), ]
-            return(error_fn(data_i))
+    if (!is.null(model)) {
+        # Load the measurement error model
+        if (is.character(model)) {
+            error_fn <- function(x) .noise_models[[model]](x, ...)
+        } else {
+            error_fn <- function(x) model(x, ...)
         }
-    )
-    data_prep <- do.call("rbind", data_prep)
+
+        # Apply the measurement model to each group
+        data_prep <- lapply(
+            seq_along(group),
+            function(i) {
+                data_i <- data_prep[data_prep$id == group[i], ]
+                data_i <- data_i[order(data_i$time), ]
+                return(error_fn(data_i))
+            }
+        )
+        data_prep <- do.call("rbind", data_prep)
+    }
 
     # Restore original column names
     data <- .noiser_finalize(data_prep, cols = cols_prepared, .by = .by)
 
-    # If no background provided, return noised data as-is
-    if (is.null(background)) return(data)
-
-    # Extract room shape and obstacle objects for reachability checking
-    obj <- objects(background)
-    shp <- shape(background)
-
-    # Helper: check whether a single (x, y) coordinate is reachable
-    is_valid <- function(x, y) {
-        coord <- matrix(c(x, y), nrow = 1, ncol = 2)
-        colnames(coord) <- c("x", "y")
-        in_shp     <- in_object(shp, coord)
-        not_in_obj <- if (length(obj) == 0) TRUE else
-            !any(sapply(obj, \(o) in_object(o, coord)))
-        in_shp & not_in_obj
+    # Build reachability checker (returns TRUE everywhere when no background)
+    if (!is.null(background)) {
+        obj <- objects(background)
+        shp <- shape(background)
+        is_valid <- function(x, y) {
+            coord <- matrix(c(x, y), nrow = 1, ncol = 2)
+            colnames(coord) <- c("x", "y")
+            in_shp     <- in_object(shp, coord)
+            not_in_obj <- if (length(obj) == 0) TRUE else
+                !any(sapply(obj, \(o) in_object(o, coord)))
+            in_shp & not_in_obj
+        }
+    } else {
+        is_valid <- function(x, y) TRUE
     }
 
-    # For each row, check reachability and resample if needed
-    for (i in seq_len(nrow(data))) {
+    # For each row, check reachability of noised position and resample if needed
+    # (only when a noise model was applied)
+    for (i in if (!is.null(model)) seq_len(nrow(data)) else integer(0)) {
         if (!is_valid(data[[x_col]][i], data[[y_col]][i])) {
             tmp <- data.frame(x = x_orig[i], y = y_orig[i],
                               time = data[[t_col]][i])
@@ -149,6 +152,33 @@ noiser <- function(data = NULL,
                 warning("Cannot find a reachable location, consider a larger value of ntry")
             }
         }
+    }
+
+    # Boxcar averaging: data is currently sorted by (group, time), which is
+    # the correct order for windowing. Averaged position is checked for
+    # reachability; if unreachable, the first row of the window is kept as-is.
+    if (!is.null(span)) {
+        groups_bc <- if (!is.null(.by)) unique(data[[.by]]) else list(NULL)
+        data <- do.call("rbind", lapply(groups_bc, function(g) {
+            d <- if (!is.null(.by)) data[data[[.by]] == g, ] else data
+            dt <- min(diff(d[[t_col]]))
+            w  <- max(1L, round(span / dt))
+            rows <- lapply(seq_len(nrow(d)), function(i) {
+                win_idx <- which(d[[t_col]] >= d[[t_col]][i] &
+                                 d[[t_col]] <  d[[t_col]][i] + span)
+                if (length(win_idx) < w) return(NULL)
+                out <- d[win_idx[1], , drop = FALSE]
+                avg_x <- mean(d[[x_col]][win_idx])
+                avg_y <- mean(d[[y_col]][win_idx])
+                if (is_valid(avg_x, avg_y)) {
+                    out[[x_col]] <- avg_x
+                    out[[y_col]] <- avg_y
+                    out[[t_col]] <- mean(d[[t_col]][win_idx])
+                }
+                out
+            })
+            do.call("rbind", rows)
+        }))
     }
 
     # Restore original row order
