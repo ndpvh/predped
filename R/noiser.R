@@ -51,7 +51,9 @@ noiser <- function(data = NULL,
                    model = "temporal",
                    background = NULL,
                    ntry = 100,
+                   kalman = FALSE,
                    span = NULL,
+                   thin = NULL,
                    ...) {
 
     # Validate that exactly one of data or trace is provided
@@ -154,6 +156,25 @@ noiser <- function(data = NULL,
         }
     }
 
+    # Kalman smoothing: applied per group on the time-sorted data.
+    # After smoothing, any position that is not reachable reverts to the
+    # pre-Kalman value for that row.
+    if (kalman) {
+        groups_kf <- if (!is.null(.by)) unique(data[[.by]]) else list(NULL)
+        for (g in groups_kf) {
+            idx <- if (!is.null(.by)) which(data[[.by]] == g) else seq_len(nrow(data))
+            x_pre <- data[[x_col]][idx]
+            y_pre <- data[[y_col]][idx]
+            smoothed <- .kalman_smooth(x_pre, y_pre, data[[t_col]][idx], ...)
+            for (j in seq_along(idx)) {
+                if (is_valid(smoothed[j, 1], smoothed[j, 2])) {
+                    data[[x_col]][idx[j]] <- smoothed[j, 1]
+                    data[[y_col]][idx[j]] <- smoothed[j, 2]
+                } # else keep pre-Kalman value already in place
+            }
+        }
+    }
+
     # Boxcar averaging: data is currently sorted by (group, time), which is
     # the correct order for windowing. Averaged position is checked for
     # reachability; if unreachable, the first row of the window is kept as-is.
@@ -178,6 +199,16 @@ noiser <- function(data = NULL,
                 out
             })
             do.call("rbind", rows)
+        }))
+    }
+
+    # Thinning: keep every thin-th row per group, preserving all columns.
+    # Done last so thinning applies to fully processed data.
+    if (!is.null(thin)) {
+        groups_th <- if (!is.null(.by)) unique(data[[.by]]) else list(NULL)
+        data <- do.call("rbind", lapply(groups_th, function(g) {
+            d <- if (!is.null(.by)) data[data[[.by]] == g, ] else data
+            d[seq(1, nrow(d), by = thin), ]
         }))
     }
 
@@ -349,3 +380,80 @@ noiser <- function(data = NULL,
     "independent" = .noise_independent,
     "temporal"    = .noise_temporal
 )
+
+
+# Kalman smoother (constant-velocity model) for a single agent's trajectory.
+# x, y, t are numeric vectors of equal length, already sorted by time.
+# Additional arguments (e.g. error) are passed through ...
+# Returns an n x 2 matrix of smoothed [x, y] values.
+.kalman_smooth <- function(x, y, t, error = 0.031^2, ...) {
+
+    n <- length(x)
+    if (n < 2) return(cbind(x, y))
+
+    if (length(error) == 1) error <- rep(error, 2)
+
+    # Precompute time differences and per-step speeds
+    dt     <- c(0, diff(t))
+    dxdt   <- c(0, diff(x) / diff(t))
+    dydt   <- c(0, diff(y) / diff(t))
+
+    # Estimate process noise variances (error-corrected)
+    mean_dt2 <- mean(dt[-1])^2
+    var_vx <- max(var(dxdt, na.rm = TRUE) - 2 * error[1] / mean_dt2, 1e-10)
+    var_vy <- max(var(dydt, na.rm = TRUE) - 2 * error[2] / mean_dt2, 1e-10)
+
+    # Transition matrix F(dt) and process noise W(dt) for constant-velocity model
+    make_F <- function(d) {
+        matrix(c(1, 0, d, 0,
+                 0, 1, 0, d,
+                 0, 0, 1, 0,
+                 0, 0, 0, 1), nrow = 4, byrow = TRUE)
+    }
+    make_W <- function(d) {
+        matrix(c(d^2*var_vx, 0,         d*var_vx, 0,
+                 0,          d^2*var_vy, 0,        d*var_vy,
+                 d*var_vx,   0,          var_vx,   0,
+                 0,          d*var_vy,   0,         var_vy), nrow = 4, byrow = TRUE)
+    }
+
+    # Measurement matrix and noise covariance (Cholesky)
+    H <- matrix(c(1,0,0,0, 0,1,0,0), nrow = 2, byrow = TRUE)
+    R <- chol(diag(error))
+
+    # Initial state and covariance
+    x0 <- matrix(c(mean(x), mean(y), mean(dxdt, na.rm=TRUE), mean(dydt, na.rm=TRUE)), ncol = 1)
+    P0 <- diag(c(var(x), var(y),
+                 var(dxdt, na.rm=TRUE), var(dydt, na.rm=TRUE)))
+
+    sx <- x
+    sy <- y
+
+    for (i in seq_len(n)) {
+        # Predict
+        if (i == 1) {
+            xp <- x0;  Pp <- P0
+        } else {
+            F  <- make_F(dt[i])
+            W  <- make_W(dt[i])
+            xp <- F %*% x0
+            Pp <- F %*% P0 %*% t(F) + W
+        }
+
+        # Innovate
+        z   <- matrix(c(x[i], y[i]), ncol = 1)
+        Rc  <- t(R) %*% R
+        inn <- z - H %*% xp
+        S   <- H %*% Pp %*% t(H) + Rc
+        K   <- Pp %*% t(H) %*% solve(S)
+
+        # Update
+        x0 <- xp + K %*% inn
+        P0 <- (diag(4) - K %*% H) %*% Pp
+
+        sx[i] <- x0[1]
+        sy[i] <- x0[2]
+    }
+
+    cbind(sx, sy)
+}
