@@ -35,6 +35,42 @@
 #' when \code{trace} is supplied.
 #' @param ntry Integer denoting the maximum number of resampling attempts per
 #' invalid position before issuing a warning. Defaults to \code{100}.
+#' @param kalman Logical. When \code{TRUE}, applies a constant-velocity Kalman
+#' smoother (Cartesian state [x, y, vx, vy]) to each group's trajectory after
+#' noise is added. Smoothed positions failing the reachability check revert to
+#' their pre-smoothed values. Defaults to \code{FALSE}.
+#' @param span Numeric. When non-\code{NULL}, applies a boxcar (sliding-window)
+#' average to each group's trajectory. For each row with time \eqn{t_0}, the
+#' window covers rows where \eqn{t_0 \le t < t_0 + \text{span}}. Averaged
+#' positions failing the reachability check are left unchanged. Defaults to
+#' \code{NULL}.
+#' @param thin Integer. When non-\code{NULL}, retains every \code{thin}-th row
+#' per group after all other processing. Defaults to \code{NULL}.
+#' @param ekalman Logical. When \code{TRUE}, applies an Extended Kalman Filter
+#' with a Rauch-Tung-Striebel backward smoother to each group's trajectory
+#' after noise (and any \code{kalman} smoothing) has been applied. The state
+#' vector is \eqn{[x, y, v, \theta]^\top} (position, speed, heading), and the
+#' constant-velocity process model is nonlinear in \eqn{\theta}, hence the
+#' extended formulation. The smoother updates the \code{x}, \code{y},
+#' \code{speed}, and \code{orientation} columns. Smoothed positions failing the
+#' reachability check revert to their pre-smoothed values. Defaults to
+#' \code{FALSE}.
+#' @param optimal Logical. Only used when \code{ekalman = TRUE}. When
+#' \code{TRUE}, the \code{speed} and \code{orientation} columns already present
+#' in \code{data} are treated as near-perfect measurements of the velocity
+#' state at every time step (measurement noise \code{ekalman_state_noise}).
+#' This is the \emph{oracle} mode: in a simulation context these columns
+#' contain the true pre-noise speed and heading, so \code{optimal = TRUE}
+#' represents an upper bound on filter performance. When \code{FALSE} (default),
+#' speed and heading are inferred entirely from the noisy position differences.
+#' @param ekalman_R Numeric \eqn{2 \times 2} matrix giving the position
+#' measurement noise covariance used by the EKF. Should match the covariance
+#' passed to the noise model. Defaults to
+#' \code{diag(c(0.031^2, 0.031^2))} when \code{NULL}.
+#' @param ekalman_state_noise Numeric scalar. Near-zero measurement noise
+#' variance applied to the speed and orientation state components when
+#' \code{optimal = TRUE}. Smaller values pin those components more tightly to
+#' the observed true values. Defaults to \code{1e-6}.
 #' @param ... Additional arguments passed to the measurement error model (e.g.
 #' \code{covariance}, \code{transition}, \code{sampling_rate}).
 #'
@@ -54,6 +90,10 @@ noiser <- function(data = NULL,
                    kalman = FALSE,
                    span = NULL,
                    thin = NULL,
+                   ekalman = FALSE,
+                   optimal = FALSE,
+                   ekalman_R = NULL,
+                   ekalman_state_noise = 1e-6,
                    ...) {
 
     # Validate that exactly one of data or trace is provided
@@ -171,6 +211,56 @@ noiser <- function(data = NULL,
                     data[[x_col]][idx[j]] <- smoothed[j, 1]
                     data[[y_col]][idx[j]] <- smoothed[j, 2]
                 } # else keep pre-Kalman value already in place
+            }
+        }
+    }
+
+    # Extended Kalman Filter + RTS smoother: applied per group on time-sorted data.
+    # Smooths x, y, speed, and orientation jointly under a constant-velocity model
+    # (constant speed and heading). Two modes:
+    #   optimal = TRUE  — treats the 'speed' and 'orientation' columns as near-perfect
+    #                     measurements of the velocity state at every step.
+    #   optimal = FALSE — infers speed and heading from noisy position differences.
+    # Positions failing the reachability check revert to their pre-smoothing values.
+    if (ekalman) {
+        if (is.null(ekalman_R)) ekalman_R <- diag(c(0.031^2, 0.031^2))
+        has_speed <- "speed"       %in% names(data)
+        has_ori   <- "orientation" %in% names(data)
+        if (optimal && (!has_speed || !has_ori)) {
+            warning(
+                "optimal = TRUE requires 'speed' and 'orientation' columns in data. ",
+                "Falling back to optimal = FALSE."
+            )
+            optimal <- FALSE
+        }
+        groups_ek <- if (!is.null(.by)) unique(data[[.by]]) else list(NULL)
+        for (g in groups_ek) {
+            idx   <- if (!is.null(.by)) which(data[[.by]] == g) else seq_len(nrow(data))
+            x_pre <- data[[x_col]][idx]
+            y_pre <- data[[y_col]][idx]
+            t_pre <- data[[t_col]][idx]
+            spd   <- if (optimal && has_speed) data[["speed"]][idx]       else NULL
+            ori   <- if (optimal && has_ori)   data[["orientation"]][idx] else NULL
+
+            res <- .ekalman_smooth(
+                x               = x_pre,
+                y               = y_pre,
+                t               = t_pre,
+                speed           = spd,
+                orientation     = ori,
+                R               = ekalman_R,
+                optimal         = optimal,
+                state_noise     = ekalman_state_noise
+            )
+            for (j in seq_along(idx)) {
+                if (is_valid(res$x[j], res$y[j])) {
+                    data[[x_col]][idx[j]] <- res$x[j]
+                    data[[y_col]][idx[j]] <- res$y[j]
+                    if (has_speed && !is.na(res$speed[j]))
+                        data[["speed"]][idx[j]]       <- res$speed[j]
+                    if (has_ori   && !is.na(res$orientation[j]))
+                        data[["orientation"]][idx[j]] <- res$orientation[j]
+                }
             }
         }
     }
@@ -456,4 +546,193 @@ noiser <- function(data = NULL,
     }
 
     cbind(sx, sy)
+}
+
+
+# Extended Kalman Filter + Rauch-Tung-Striebel smoother for a single agent's
+# trajectory. State vector: [x, y, v, theta]^T where v is speed (m/s) and
+# theta is heading (radians internally; degrees for 'orientation' column I/O).
+#
+# Process model (nonlinear):
+#   x_{k+1} = x_k + v_k * cos(theta_k) * dt
+#   y_{k+1} = y_k + v_k * sin(theta_k) * dt
+#   v_{k+1} = v_k
+#   theta_{k+1} = theta_k
+#
+# Measurement model (linear):
+#   optimal = FALSE: z = [x_noisy, y_noisy]
+#   optimal = TRUE:  z = [x_noisy, y_noisy, v_true, theta_true]  (near-perfect)
+#
+# Returns a list with smoothed x, y, speed, orientation (degrees).
+.ekalman_smooth <- function(x, y, t,
+                             speed       = NULL,
+                             orientation = NULL,
+                             R           = diag(c(0.031^2, 0.031^2)),
+                             optimal     = FALSE,
+                             state_noise = 1e-6) {
+
+    n <- length(x)
+
+    # Not enough points to smooth: return originals unchanged
+    if (n < 3) {
+        return(list(
+            x           = x,
+            y           = y,
+            speed       = if (!is.null(speed))       speed       else rep(NA_real_, n),
+            orientation = if (!is.null(orientation)) orientation else rep(NA_real_, n)
+        ))
+    }
+
+    dts     <- diff(t)
+    mean_dt <- mean(dts)
+
+    # Orientation column is in degrees; work in radians internally
+    theta_rad <- if (!is.null(orientation)) orientation * pi / 180 else NULL
+
+    # ── INITIALISATION ──────────────────────────────────────────────────────────
+    if (optimal) {
+        # Use true speed / orientation for initial state and Q estimation
+        v0   <- speed[1]
+        th0  <- theta_rad[1]
+        P0   <- diag(c(R[1, 1], R[2, 2], state_noise, state_noise))
+        q_v  <- max(var(diff(speed)),     1e-10)
+        q_th <- max(var(diff(theta_rad)), 1e-10)
+
+    } else {
+        # Estimate speed and heading from noisy position differences
+        dx     <- diff(x); dy <- diff(y)
+        vx_est <- dx / dts; vy_est <- dy / dts
+        v_est  <- pmax(sqrt(vx_est^2 + vy_est^2), 1e-6)
+        th_est <- atan2(vy_est, vx_est)
+
+        v0  <- v_est[1]
+        th0 <- th_est[1]
+
+        # Bias-corrected process noise: observation noise inflates empirical variance
+        # var(diff(v_est)) ≈ var(diff(v_true)) + 4*sigma_pos/dt^2
+        sigma_pos <- mean(diag(R))
+        bias      <- 4 * sigma_pos / mean_dt^2
+        q_v  <- max(var(diff(v_est))  - bias, 1e-10)
+        q_th <- max(var(diff(th_est)) - bias, 1e-10)
+
+        P0 <- diag(c(sigma_pos, sigma_pos,
+                     max(var(v_est),  1e-10),
+                     max(var(th_est), 1e-10)))
+    }
+
+    # Position process noise: estimated so that RTS smoother gain G ≈ 0.4–0.8
+    if (optimal) {
+        # Estimate from constant-velocity prediction residuals
+        resid_x  <- x[-1] - (x[-n] + speed[-n] * cos(theta_rad[-n]) * dts)
+        resid_y  <- y[-1] - (y[-n] + speed[-n] * sin(theta_rad[-n]) * dts)
+        q_pos_x  <- max(var(resid_x) - R[1, 1], R[1, 1] * 0.25)
+        q_pos_y  <- max(var(resid_y) - R[2, 2], R[2, 2] * 0.25)
+    } else {
+        q_pos_x <- R[1, 1]
+        q_pos_y <- R[2, 2]
+    }
+
+    # ── MEASUREMENT SETUP ────────────────────────────────────────────────────────
+    if (optimal) {
+        # 4D measurement: [x, y, v, theta]; v and theta observed near-perfectly
+        H     <- diag(4)
+        R_use <- diag(c(diag(R), state_noise, state_noise))
+    } else {
+        # 2D measurement: [x, y] only
+        H     <- cbind(diag(2), matrix(0, 2, 2))
+        R_use <- R
+    }
+
+    # ── STORAGE FOR FORWARD PASS ─────────────────────────────────────────────────
+    xf <- matrix(0, n, 4)          # filtered means  x_{k|k}
+    Pf <- array(0, c(4, 4, n))    # filtered covars P_{k|k}
+    xp <- matrix(0, n, 4)          # predicted means  x_{k|k-1}
+    Pp <- array(0, c(4, 4, n))    # predicted covars P_{k|k-1}
+    Fa <- array(0, c(4, 4, n - 1)) # Jacobians F_k (predict step k → k+1)
+
+    # Prior at step 1 (before first observation)
+    xp[1, ] <- c(x[1], y[1], v0, th0)
+    Pp[,,1]  <- P0
+
+    # ── FORWARD EKF PASS ─────────────────────────────────────────────────────────
+    for (i in seq_len(n)) {
+        x_curr <- matrix(xp[i, ], ncol = 1)
+        P_curr <- Pp[,,i]
+
+        # ── Update (fuse observation at step i) ──
+        if (optimal) {
+            z <- matrix(c(x[i], y[i], speed[i], theta_rad[i]), ncol = 1)
+        } else {
+            z <- matrix(c(x[i], y[i]), ncol = 1)
+        }
+        inn <- z - H %*% x_curr
+        if (optimal) inn[4] <- atan2(sin(inn[4]), cos(inn[4]))  # wrap angle innovation
+
+        S     <- H %*% P_curr %*% t(H) + R_use
+        K     <- P_curr %*% t(H) %*% solve(S + diag(1e-12, nrow(S)))
+        x_upd <- x_curr + K %*% inn
+        x_upd[4] <- atan2(sin(x_upd[4]), cos(x_upd[4]))        # normalise heading
+        P_upd <- (diag(4) - K %*% H) %*% P_curr
+        P_upd <- 0.5 * (P_upd + t(P_upd))                      # enforce symmetry
+
+        xf[i, ] <- x_upd
+        Pf[,,i]  <- P_upd
+
+        # ── Predict to step i+1 ──
+        if (i < n) {
+            dti <- t[i + 1] - t[i]
+            vi  <- x_upd[3]
+            thi <- x_upd[4]
+            cth <- cos(thi); sth <- sin(thi)
+
+            F_i <- matrix(c(
+                1, 0, cth * dti, -vi * sth * dti,
+                0, 1, sth * dti,  vi * cth * dti,
+                0, 0, 1,          0,
+                0, 0, 0,          1
+            ), nrow = 4, byrow = TRUE)
+
+            x_nxt    <- matrix(c(
+                x_upd[1] + vi * cth * dti,
+                x_upd[2] + vi * sth * dti,
+                vi,
+                thi
+            ), ncol = 1)
+            x_nxt[4] <- atan2(sin(x_nxt[4]), cos(x_nxt[4]))
+
+            # Scale process noise proportionally to step size
+            Q_i   <- diag(c(q_pos_x * dti / mean_dt,
+                            q_pos_y * dti / mean_dt,
+                            q_v     * dti / mean_dt,
+                            q_th    * dti / mean_dt))
+            P_nxt <- F_i %*% P_upd %*% t(F_i) + Q_i
+            P_nxt <- 0.5 * (P_nxt + t(P_nxt))
+
+            xp[i + 1, ] <- x_nxt
+            Pp[,,i + 1]  <- P_nxt
+            Fa[,,i]      <- F_i
+        }
+    }
+
+    # ── BACKWARD RTS SMOOTHER ────────────────────────────────────────────────────
+    xs <- xf          # initialise with filtered estimates
+    Ps <- Pf
+
+    for (i in (n - 1):1) {
+        G_i <- tryCatch(
+            Pf[,,i] %*% t(Fa[,,i]) %*% solve(Pp[,,i + 1] + diag(1e-12, 4)),
+            error = function(e) matrix(0, 4, 4)
+        )
+        xs[i, ] <- xf[i, ] + G_i %*% (xs[i + 1, ] - xp[i + 1, ])
+        Ps[,,i]  <- Pf[,,i] + G_i %*% (Ps[,,i + 1] - Pp[,,i + 1]) %*% t(G_i)
+        Ps[,,i]  <- 0.5 * (Ps[,,i] + t(Ps[,,i]))
+        xs[i, 4] <- atan2(sin(xs[i, 4]), cos(xs[i, 4]))          # normalise heading
+    }
+
+    list(
+        x           = xs[, 1],
+        y           = xs[, 2],
+        speed       = pmax(xs[, 3], 0),       # speed is non-negative
+        orientation = xs[, 4] * 180 / pi      # radians → degrees
+    )
 }

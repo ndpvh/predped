@@ -13,6 +13,13 @@ noiser(
   model = "temporal",
   background = NULL,
   ntry = 100,
+  kalman = FALSE,
+  span = NULL,
+  thin = NULL,
+  ekalman = FALSE,
+  optimal = FALSE,
+  ekalman_R = NULL,
+  ekalman_state_noise = 1e-06,
   ...
 )
 }
@@ -48,6 +55,49 @@ when \code{trace} is supplied.}
 
 \item{ntry}{Integer denoting the maximum number of resampling attempts per
 invalid position before issuing a warning. Defaults to \code{100}.}
+
+\item{kalman}{Logical. When \code{TRUE}, applies a constant-velocity Kalman
+smoother (Cartesian state [x, y, vx, vy]) to each group's trajectory after
+noise is added. Smoothed positions failing the reachability check revert to
+their pre-smoothed values. Defaults to \code{FALSE}.}
+
+\item{span}{Numeric. When non-\code{NULL}, applies a boxcar (sliding-window)
+average to each group's trajectory. For each row with time \eqn{t_0}, the
+window covers rows where \eqn{t_0 \le t < t_0 + \text{span}}. Averaged
+positions failing the reachability check are left unchanged. Defaults to
+\code{NULL}.}
+
+\item{thin}{Integer. When non-\code{NULL}, retains every \code{thin}-th row
+per group after all other processing. Defaults to \code{NULL}.}
+
+\item{ekalman}{Logical. When \code{TRUE}, applies an Extended Kalman Filter
+with a Rauch-Tung-Striebel backward smoother to each group's trajectory
+after noise (and any \code{kalman} smoothing) has been applied. The state
+vector is \eqn{[x, y, v, \theta]^\top} (position, speed, heading), and the
+constant-velocity process model is nonlinear in \eqn{\theta}, hence the
+extended formulation. The smoother updates the \code{x}, \code{y},
+\code{speed}, and \code{orientation} columns. Smoothed positions failing the
+reachability check revert to their pre-smoothed values. Defaults to
+\code{FALSE}.}
+
+\item{optimal}{Logical. Only used when \code{ekalman = TRUE}. When
+\code{TRUE}, the \code{speed} and \code{orientation} columns already present
+in \code{data} are treated as near-perfect measurements of the velocity
+state at every time step (measurement noise \code{ekalman_state_noise}).
+This is the \emph{oracle} mode: in a simulation context these columns
+contain the true pre-noise speed and heading, so \code{optimal = TRUE}
+represents an upper bound on filter performance. When \code{FALSE} (default),
+speed and heading are inferred entirely from the noisy position differences.}
+
+\item{ekalman_R}{Numeric \eqn{2 \times 2} matrix giving the position
+measurement noise covariance used by the EKF. Should match the covariance
+passed to the noise model. Defaults to
+\code{diag(c(0.031^2, 0.031^2))} when \code{NULL}.}
+
+\item{ekalman_state_noise}{Numeric scalar. Near-zero measurement noise
+variance applied to the speed and orientation state components when
+\code{optimal = TRUE}. Smaller values pin those components more tightly to
+the observed true values. Defaults to \code{1e-6}.}
 
 \item{...}{Additional arguments passed to the measurement error model (e.g.
 \code{covariance}, \code{transition}, \code{sampling_rate}).}
