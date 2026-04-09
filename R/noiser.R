@@ -64,9 +64,11 @@
 #' represents an upper bound on filter performance. When \code{FALSE} (default),
 #' speed and heading are inferred entirely from the noisy position differences.
 #' @param ekalman_R Numeric \eqn{2 \times 2} matrix giving the position
-#' measurement noise covariance used by the EKF. Should match the covariance
-#' passed to the noise model. Defaults to
-#' \code{diag(c(0.031^2, 0.031^2))} when \code{NULL}.
+#' measurement noise covariance used by the EKF. When \code{NULL} (default),
+#' the variance is estimated from the data via second differences:
+#' \eqn{\hat{\sigma}^2 = \mathrm{var}(\Delta^2 x) / 6}, which is unbiased under
+#' the constant-velocity assumption. Supply an explicit matrix (e.g.\
+#' \code{diag(c(0.031^2, 0.031^2))}) when the noise level is known.
 #' @param ekalman_state_noise Numeric scalar. Near-zero measurement noise
 #' variance applied to the speed and orientation state components when
 #' \code{optimal = TRUE}. Smaller values pin those components more tightly to
@@ -223,7 +225,6 @@ noiser <- function(data = NULL,
     #   optimal = FALSE — infers speed and heading from noisy position differences.
     # Positions failing the reachability check revert to their pre-smoothing values.
     if (ekalman) {
-        if (is.null(ekalman_R)) ekalman_R <- diag(c(0.031^2, 0.031^2))
         has_speed <- "speed"       %in% names(data)
         has_ori   <- "orientation" %in% names(data)
         if (optimal && (!has_speed || !has_ori)) {
@@ -567,7 +568,7 @@ noiser <- function(data = NULL,
 .ekalman_smooth <- function(x, y, t,
                              speed       = NULL,
                              orientation = NULL,
-                             R           = diag(c(0.031^2, 0.031^2)),
+                             R           = NULL,
                              optimal     = FALSE,
                              state_noise = 1e-6) {
 
@@ -585,6 +586,14 @@ noiser <- function(data = NULL,
 
     dts     <- diff(t)
     mean_dt <- mean(dts)
+
+    # Estimate measurement noise from second differences when R not supplied.
+    # Under a constant-velocity model, var(x[i+1] - 2x[i] + x[i-1]) = 6*sigma^2.
+    if (is.null(R)) {
+        sigma2_x <- max(var(diff(diff(x))) / 6, 1e-10)
+        sigma2_y <- max(var(diff(diff(y))) / 6, 1e-10)
+        R <- diag(c(sigma2_x, sigma2_y))
+    }
 
     # Orientation column is in degrees; work in radians internally
     theta_rad <- if (!is.null(orientation)) orientation * pi / 180 else NULL
