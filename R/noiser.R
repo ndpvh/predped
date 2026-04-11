@@ -138,11 +138,17 @@ noiser <- function(data = NULL,
     data_prep     <- preparation$data
 
     if (!is.null(model)) {
-        # Load the measurement error model
+        # Load the measurement error model.
+        # For the temporal model, sampling_rate should reflect time_step unless
+        # the user has explicitly supplied it via ...
+        dots <- list(...)
+        if (is.character(model) && model == "temporal" && !"sampling_rate" %in% names(dots)) {
+            dots$sampling_rate <- 1 / time_step
+        }
         if (is.character(model)) {
-            error_fn <- function(x) .noise_models[[model]](x, ...)
+            error_fn <- function(x) do.call(.noise_models[[model]], c(list(x), dots))
         } else {
-            error_fn <- function(x) model(x, ...)
+            error_fn <- function(x) do.call(model, c(list(x), dots))
         }
 
         # Apply the measurement model to each group

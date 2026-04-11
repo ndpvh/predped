@@ -239,19 +239,35 @@ to_trace <- function(data,
     if (is.null(threshold))
         threshold <- qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step
 
+    # Save group mapping before add_motion_variables: it rebuilds positions from
+    # scratch (via sapply), dropping every column not explicitly included — group
+    # among them.  If we don't save it here, to_trace always falls through to the
+    # factor(id) fallback below, producing a different numbering.
+    if ("group" %in% colnames(data)) {
+        first_occ <- !duplicated(data$id)
+        group_map <- list(id    = data$id   [first_occ],
+                          group = data$group[first_occ])
+    } else {
+        group_map <- NULL
+    }
+
     # Add the information needed to transform the data to a collection of states.
     data <- add_motion_variables(
-        data, 
+        data,
         velocities = velocities,
-        orientations = orientations, 
-        time_step = time_step, 
+        orientations = orientations,
+        time_step = time_step,
         threshold = threshold,
         initial_conditions = TRUE
     )
 
-    # Assign each person to a group: If provided in the data, use that value. 
-    # If not, make a new one
-    if(!("group" %in% colnames(data))) {
+    # Assign each person to a group: If provided in the data, use that value.
+    # If not, make a new one.  Use named-vector lookup to avoid merge() which
+    # reorders rows and breaks the iteration loop below.
+    if (!is.null(group_map)) {
+        idx <- match(as.character(data$id), as.character(group_map$id))
+        data$group <- as.numeric(group_map$group[idx])
+    } else if (!("group" %in% colnames(data))) {
         data$group <- data$id |>
             factor() |>
             as.numeric()
@@ -572,18 +588,18 @@ add_motion_variables <- function(data,
         )
         cone <- rowSums(
             cbind(
-                rep(TRUE, each = length(d_orientation)), 
-                d_orientation > mean(orientations[1:2]),       
-                d_orientation > mean(orientations[2:3]),      
-                d_orientation > mean(orientations[3:4]),      
-                d_orientation > mean(orientations[4:5]),      
-                d_orientation > mean(orientations[5:6]),      
-                d_orientation > mean(orientations[6:7]),      
-                d_orientation > mean(orientations[7:8]),      
-                d_orientation > mean(orientations[8:9]),      
-                d_orientation > mean(orientations[9:10]),     
-                d_orientation > mean(orientations[10:11])
-            )   
+                rep(TRUE, each = length(d_orientation)),
+                d_orientation < mean(orientations[1:2]),
+                d_orientation < mean(orientations[2:3]),
+                d_orientation < mean(orientations[3:4]),
+                d_orientation < mean(orientations[4:5]),
+                d_orientation < mean(orientations[5:6]),
+                d_orientation < mean(orientations[6:7]),
+                d_orientation < mean(orientations[7:8]),
+                d_orientation < mean(orientations[8:9]),
+                d_orientation < mean(orientations[9:10]),
+                d_orientation < mean(orientations[10:11])
+            )
         )
 
         cells <- matrix(1:33, nrow = length(orientations), ncol = length(velocities))
