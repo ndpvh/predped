@@ -304,9 +304,10 @@ to_trace <- function(data,
         # Select the data for that iteration
         iter_data <- data[data$iteration == i, ]
 
-        # If no data is available, then we cannot add any agents to the current 
+        # If no data is available, then we cannot add any agents to the current
         # iteration. Otherwise, we can continue
         if(nrow(iter_data) == 0) {
+            trace[[i]]@agents <- list()   # ensure empty states carry no agents
             next
         }
 
