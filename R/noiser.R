@@ -649,105 +649,33 @@ noiser <- function(data = NULL,
 
     # ── MEASUREMENT SETUP ────────────────────────────────────────────────────────
     if (optimal) {
-        # 4D measurement: [x, y, v, theta]; v and theta observed near-perfectly
-        H     <- diag(4)
         R_use <- diag(c(diag(R), state_noise, state_noise))
     } else {
-        # 2D measurement: [x, y] only
-        H     <- cbind(diag(2), matrix(0, 2, 2))
         R_use <- R
     }
 
-    # ── STORAGE FOR FORWARD PASS ─────────────────────────────────────────────────
-    xf <- matrix(0, n, 4)          # filtered means  x_{k|k}
-    Pf <- array(0, c(4, 4, n))    # filtered covars P_{k|k}
-    xp <- matrix(0, n, 4)          # predicted means  x_{k|k-1}
-    Pp <- array(0, c(4, 4, n))    # predicted covars P_{k|k-1}
-    Fa <- array(0, c(4, 4, n - 1)) # Jacobians F_k (predict step k → k+1)
-
-    # Prior at step 1 (before first observation)
-    xp[1, ] <- c(x[1], y[1], v0, th0)
-    Pp[,,1]  <- P0
-
-    # ── FORWARD EKF PASS ─────────────────────────────────────────────────────────
-    for (i in seq_len(n)) {
-        x_curr <- matrix(xp[i, ], ncol = 1)
-        P_curr <- Pp[,,i]
-
-        # ── Update (fuse observation at step i) ──
-        if (optimal) {
-            z <- matrix(c(x[i], y[i], speed[i], theta_rad[i]), ncol = 1)
-        } else {
-            z <- matrix(c(x[i], y[i]), ncol = 1)
-        }
-        inn <- z - H %*% x_curr
-        if (optimal) inn[4] <- atan2(sin(inn[4]), cos(inn[4]))  # wrap angle innovation
-
-        S     <- H %*% P_curr %*% t(H) + R_use
-        K     <- P_curr %*% t(H) %*% solve(S + diag(1e-12, nrow(S)))
-        x_upd <- x_curr + K %*% inn
-        x_upd[4] <- atan2(sin(x_upd[4]), cos(x_upd[4]))        # normalise heading
-        P_upd <- (diag(4) - K %*% H) %*% P_curr
-        P_upd <- 0.5 * (P_upd + t(P_upd))                      # enforce symmetry
-
-        xf[i, ] <- x_upd
-        Pf[,,i]  <- P_upd
-
-        # ── Predict to step i+1 ──
-        if (i < n) {
-            dti <- t[i + 1] - t[i]
-            vi  <- x_upd[3]
-            thi <- x_upd[4]
-            cth <- cos(thi); sth <- sin(thi)
-
-            F_i <- matrix(c(
-                1, 0, cth * dti, -vi * sth * dti,
-                0, 1, sth * dti,  vi * cth * dti,
-                0, 0, 1,          0,
-                0, 0, 0,          1
-            ), nrow = 4, byrow = TRUE)
-
-            x_nxt    <- matrix(c(
-                x_upd[1] + vi * cth * dti,
-                x_upd[2] + vi * sth * dti,
-                vi,
-                thi
-            ), ncol = 1)
-            x_nxt[4] <- atan2(sin(x_nxt[4]), cos(x_nxt[4]))
-
-            # Scale process noise proportionally to step size
-            Q_i   <- diag(c(q_pos_x * dti / mean_dt,
-                            q_pos_y * dti / mean_dt,
-                            q_v     * dti / mean_dt,
-                            q_th    * dti / mean_dt))
-            P_nxt <- F_i %*% P_upd %*% t(F_i) + Q_i
-            P_nxt <- 0.5 * (P_nxt + t(P_nxt))
-
-            xp[i + 1, ] <- x_nxt
-            Pp[,,i + 1]  <- P_nxt
-            Fa[,,i]      <- F_i
-        }
-    }
-
-    # ── BACKWARD RTS SMOOTHER ────────────────────────────────────────────────────
-    xs <- xf          # initialise with filtered estimates
-    Ps <- Pf
-
-    for (i in (n - 1):1) {
-        G_i <- tryCatch(
-            Pf[,,i] %*% t(Fa[,,i]) %*% solve(Pp[,,i + 1] + diag(1e-12, 4)),
-            error = function(e) matrix(0, 4, 4)
-        )
-        xs[i, ] <- xf[i, ] + G_i %*% (xs[i + 1, ] - xp[i + 1, ])
-        Ps[,,i]  <- Pf[,,i] + G_i %*% (Ps[,,i + 1] - Pp[,,i + 1]) %*% t(G_i)
-        Ps[,,i]  <- 0.5 * (Ps[,,i] + t(Ps[,,i]))
-        xs[i, 4] <- atan2(sin(xs[i, 4]), cos(xs[i, 4]))          # normalise heading
-    }
+    # ── FORWARD EKF + BACKWARD RTS (Rcpp) ───────────────────────────────────────
+    res <- ekalman_smooth_rcpp(
+        x_obs     = x,
+        y_obs     = y,
+        t_obs     = t,
+        speed_obs = if (optimal) speed     else numeric(0),
+        theta_obs = if (optimal) theta_rad else numeric(0),
+        R_mat     = R_use,
+        P0_mat    = P0,
+        x0        = c(x[1], y[1], v0, th0),
+        q_pos_x   = q_pos_x,
+        q_pos_y   = q_pos_y,
+        q_v       = q_v,
+        q_th      = q_th,
+        mean_dt   = mean_dt,
+        optimal   = optimal
+    )
 
     list(
-        x           = xs[, 1],
-        y           = xs[, 2],
-        speed       = pmax(xs[, 3], 0),       # speed is non-negative
-        orientation = xs[, 4] * 180 / pi      # radians → degrees
+        x           = res$x,
+        y           = res$y,
+        speed       = res$speed,
+        orientation = res$orientation * 180 / pi   # radians → degrees
     )
 }

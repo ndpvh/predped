@@ -63,6 +63,36 @@ unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TR
     .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step)
 }
 
+#' Extended Kalman Filter + Rauch-Tung-Striebel smoother (Rcpp/Armadillo)
+#'
+#' Fits a constant-velocity model [x, y, v, theta] to a noisy trajectory.
+#' Called from the R wrapper \code{.ekalman_smooth()} when \code{use_rcpp=TRUE}.
+#'
+#' @param x_obs   Numeric vector of observed x positions (length n).
+#' @param y_obs   Numeric vector of observed y positions (length n).
+#' @param t_obs   Numeric vector of observation times (length n).
+#' @param speed_obs   Numeric vector of speed observations (length n); used only
+#'   when \code{optimal=TRUE}.
+#' @param theta_obs   Numeric vector of heading observations in radians (length n);
+#'   used only when \code{optimal=TRUE}.
+#' @param R_mat   2x2 (optimal=FALSE) or 4x4 (optimal=TRUE) measurement noise matrix.
+#' @param P0_mat  4x4 initial state covariance.
+#' @param x0      Length-4 initial state vector [x, y, v, theta].
+#' @param q_pos_x Process noise for x position (scalar).
+#' @param q_pos_y Process noise for y position (scalar).
+#' @param q_v     Process noise for speed (scalar).
+#' @param q_th    Process noise for heading (scalar).
+#' @param mean_dt Mean time step (used to scale process noise).
+#' @param optimal Logical; when TRUE uses 4D measurement model.
+#'
+#' @return List with smoothed vectors: x, y, speed, orientation (radians).
+#'
+#' @concept noiser
+#'
+ekalman_smooth_rcpp <- function(x_obs, y_obs, t_obs, speed_obs, theta_obs, R_mat, P0_mat, x0, q_pos_x, q_pos_y, q_v, q_th, mean_dt, optimal) {
+    .Call('_predped_ekalman_smooth_rcpp', PACKAGE = 'predped', x_obs, y_obs, t_obs, speed_obs, theta_obs, R_mat, P0_mat, x0, q_pos_x, q_pos_y, q_v, q_th, mean_dt, optimal)
+}
+
 unique <- function(x) {
     .Call('_predped_unique', PACKAGE = 'predped', x)
 }
