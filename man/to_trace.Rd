@@ -12,7 +12,7 @@ to_trace(
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -10, -20, -32.5, -50, -72.5),
   time_step = NULL,
-  threshold = 0.05,
+  standing_start = 0.1,
   stay_stopped = TRUE,
   cpp = TRUE,
   ...
@@ -43,9 +43,9 @@ negative symmetric versions of the smaller angles).}
 \item{time_step}{Numeric denoting the time between each iteration. Defaults
 to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{threshold}{Numeric denoting under which observed value for speed the
-cell to which an agent has moved should be put to `0`. Defaults to a value
-based on the observed measurement error in our system.}
+\item{standing_start}{Numeric denoting the speed below which the cell is
+set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+\code{\link[predped]{update_position}}. Defaults to \code{0.1}.}
 
 \item{stay_stopped}{Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Is needed

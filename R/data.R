@@ -204,9 +204,9 @@ unpack_trace <- function(trace,
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
-#' @param threshold Numeric denoting under which observed value for speed the
-#' cell to which an agent has moved should be put to `0`. Defaults to a value
-#' based on the observed measurement error in our system.
+#' @param standing_start Numeric denoting the speed below which the cell is
+#' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+#' \code{\link[predped]{update_position}}. Defaults to \code{0.1}.
 #' @param stay_stopped Logical denoting whether agents will predict others that
 #' are currently not moving to remain immobile in the next iteration. Is needed
 #' to compute the utility variables accurately. Defaults to \code{TRUE}.
@@ -230,14 +230,12 @@ to_trace <- function(data,
                      orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                       -10, -20, -32.5, -50, -72.5),
                      time_step = NULL,
-                     threshold = .05,
+                     standing_start = 0.1,
                      stay_stopped = TRUE,
                      cpp = TRUE,
                      ...) {
 
     time_step <- .get_time_step(data, explicit = time_step)
-    if (is.null(threshold))
-        threshold <- qnorm(0.975, 2 * 0.035, 4 * 0.035^4) / time_step
 
     # Resolve a_turning / b_turning: explicit args take priority, then per-agent
     # values from attr(data,"pars"), then archetype defaults.
@@ -273,7 +271,7 @@ to_trace <- function(data,
         velocities = velocities,
         orientations = orientations,
         time_step = time_step,
-        threshold = threshold,
+        standing_start = standing_start,
         initial_conditions = TRUE,
         a_turning = a_turning,
         b_turning = b_turning
@@ -479,9 +477,9 @@ to_trace <- function(data,
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
-#' @param threshold Numeric denoting under which observed value for speed the
-#' cell to which an agent has moved should be put to `0`. Defaults to a value
-#' based on the observed measurement error in our system.
+#' @param standing_start Numeric denoting the speed below which the cell is
+#' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+#' \code{\link[predped]{update_position}}. Defaults to \code{0.1}.
 #' @param initial_conditions Logical denoting whether the added columns should
 #' include the initial conditions (that is, speed, orientation, and position at
 #' the previous time point) alongside their current alternatives. Useful when
@@ -501,14 +499,12 @@ add_motion_variables <- function(data,
                                  orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                                   -72.5, -50, -32.5, -20, -10),
                                  time_step = NULL,
-                                 threshold = .05,
+                                 standing_start = 0.1,
                                  initial_conditions = FALSE,
                                  a_turning = 2,
                                  b_turning = 0.2) {
 
     time_step <- .get_time_step(data, explicit = time_step)
-    if (is.null(threshold))
-        threshold <- qlnorm(0.25, -2.95, 0.64) / time_step
 
     # Define the times at which the simulation ran and define the bins and
     # iterations that come with it
@@ -637,7 +633,7 @@ add_motion_variables <- function(data,
         positions$cell <- sapply(
             seq_along(ring),
             \(j) ifelse(
-                positions$speed[j] <= threshold,
+                positions$speed[j] < standing_start,
                 0,
                 cells[cone[j], ring[j]]
             )

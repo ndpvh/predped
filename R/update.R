@@ -332,8 +332,6 @@ update_position <- function(agent,
                             print_iteration = TRUE,
                             cpp = TRUE) {
 
-    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
-
     idx <- limit_access(background, agent)
     objects(background) <- append(objects(background),
                                   background@precomputed_limited_access[idx])
@@ -344,7 +342,7 @@ update_position <- function(agent,
     # they are waiting for another agent.
     if(status(agent) %in% c("completing goal", "exit", "reroute", "plan", "wait")) {
         cell(agent) <- 0
-        speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+        speed(agent) <- standing_start
 
     # If the agent has stopped their interaction, check whether they already know
     # where to go to (i.e., whether they are oriented towards their new path
@@ -374,6 +372,15 @@ update_position <- function(agent,
     # If an agent is moving, then get the necessary centers and compute the
     # utility of moving to a given location
     } else {
+        # If the agent's current speed is below standing_start, force a stop and
+        # reset speed.  This handles edge cases (e.g. initialisation) and ensures
+        # no agent can persist in a sub-threshold slow state.
+        if (speed(agent) < standing_start) {
+            cell(agent) <- 0
+            speed(agent) <- standing_start
+            return(agent)
+        }
+
         # Define the centers of the options to move to
         centers <- compute_centers(agent,
                                    velocities = velocities,
@@ -385,12 +392,19 @@ update_position <- function(agent,
         # Check for occlusions or blocked cells the agent cannot move to
         check <- moving_options(agent, state, background, centers, cpp = cpp)
 
+        # Mask cells whose resulting speed would fall below standing_start.
+        # This unifies standing_start as the single threshold: rather than a
+        # separate post-hoc clamp, cells that would produce too-low speeds are
+        # simply unavailable.  The !any(check) guard below then handles the case
+        # where no viable moving cell remains.
+        check <- check & (speed(agent) * as.numeric(velocities) >= standing_start)
+
         # If there are no good options available, trigger a reroutening of the
         # agent: This will create new path points and let the agent reorient.
         if(!any(check)) {
             # Change the agent's speed to the starting speed after waiting and
             # indicate that the agent is choosing the stop cell
-            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+            speed(agent) <- standing_start
             cell(agent) <- 0 # Not sure if needed: is more like a soft reorientation
 
             # Let the agent reorient to find a better way to move out of the
@@ -419,7 +433,7 @@ update_position <- function(agent,
         # Check whether you have only infinite moving options. Delete the baseline
         # (cell 0) utility from this list and invoke that they should reorient.
         if(!any(is.finite(V[-1]))) {
-            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+            speed(agent) <- standing_start
             status(agent) <- "reorient"
             cell(agent) <- 0
             return(agent)
@@ -453,7 +467,7 @@ update_position <- function(agent,
             speed(agent) <- speed(agent) * acceleration
             # speed(agent) <- pmax(speed(agent) * acceleration,
             #                      standing_start * parameters(agent)[["preferred_speed"]])
-
+            # speed(agent) <- pmax(speed(agent) * acceleration,standing_start)
             # Update orientation to be in degrees and relative to the current
             # orientation of the agent
             rel_orientation <- ifelse(orientations >= 180,
@@ -560,8 +574,6 @@ update_goal <- function(agent,
     # Adjust the relative measures to account for the radius of the agent
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
-    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
-
     # Extract objects and shape of the environment
     obj <- objects(background)
     shp <- shape(background)
@@ -727,7 +739,7 @@ update_goal <- function(agent,
             }
 
             # Turn to the new path point and slow down
-            speed(agent) <- standing_start * parameters(agent)[["preferred_speed"]]
+            speed(agent) <- standing_start
 
             goal_position <- current_goal(agent)@path
             agent_position <- position(agent)
