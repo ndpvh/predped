@@ -90,9 +90,11 @@ represents an upper bound on filter performance. When \code{FALSE} (default),
 speed and heading are inferred entirely from the noisy position differences.}
 
 \item{ekalman_R}{Numeric \eqn{2 \times 2} matrix giving the position
-measurement noise covariance used by the EKF. Should match the covariance
-passed to the noise model. Defaults to
-\code{diag(c(0.031^2, 0.031^2))} when \code{NULL}.}
+measurement noise covariance used by the EKF. When \code{NULL} (default),
+the variance is estimated from the data via second differences:
+\eqn{\hat{\sigma}^2 = \mathrm{var}(\Delta^2 x) / 6}, which is unbiased under
+the constant-velocity assumption. Supply an explicit matrix (e.g.\
+\code{diag(c(0.031^2, 0.031^2))}) when the noise level is known.}
 
 \item{ekalman_state_noise}{Numeric scalar. Near-zero measurement noise
 variance applied to the speed and orientation state components when

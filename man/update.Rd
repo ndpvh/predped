@@ -12,8 +12,8 @@
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
+\item{stay_stopped}{Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
 \item{cpp}{Logical denoting whether to use the Rcpp alternatives for several
@@ -26,7 +26,7 @@ instead (\code{FALSE}). Defaults to \code{TRUE}.}
 Object of the \code{\link[predped]{state-class}}.
 }
 \description{
-Update the current state by updating all of the agents that are contained 
+Update the current state by updating all of the agents that are contained
 in it.
 }
 \seealso{

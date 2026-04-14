@@ -32,58 +32,58 @@
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{agent_specifications}{List created by the 
-\code{\link[predped]{create_agent_specifications}} function. Contains all 
+\item{agent_specifications}{List created by the
+\code{\link[predped]{create_agent_specifications}} function. Contains all
 information of all agents within the current \code{state} and allows for the
-communication between the \code{predped} simulation functions and the 
+communication between the \code{predped} simulation functions and the
 \code{m4ma} utility functions.}
 
-\item{seen}{Logical indicating whether the agent can see the path point 
+\item{seen}{Logical indicating whether the agent can see the path point
 to which they are currently moving.}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to. Defaults to a matrix in 
+the cell positions that the agent might move to. Defaults to a matrix in
 which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to. Defaults to a matrix 
-in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
-\code{287.5} (note that the larger angles are actually the negative symmetric 
+create the cell positions that the agent might move to. Defaults to a matrix
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20},
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310},
+\code{287.5} (note that the larger angles are actually the negative symmetric
 versions of the smaller angles).}
 
-\item{close_enough}{Numeric denoting how close (in radii) the agent needs to 
-be to an object in order to interact with it. Defaults to \code{2}, meaning the 
+\item{close_enough}{Numeric denoting how close (in radii) the agent needs to
+be to an object in order to interact with it. Defaults to \code{2}, meaning the
 agent can interact with objects at \code{2 * radius(agent)} distance away.}
 
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+\item{space_between}{Numeric denoting the space that should be left between
+an object and the created path points for the agents (in radii). Defaults to
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
 object and the path points agents use in their strategy.}
 
-\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
-containing the nodes and edges the agent can use to plan its path. Defauls 
-to \code{NULL}, triggering the creation of these edges whenever they are 
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
 \item{many_nodes}{Logical denoting whether to use the minimal number of nodes
-or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
+or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
 
-\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
-to change the order of their goals adaptively throughout the simulation. 
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability
+to change the order of their goals adaptively throughout the simulation.
 Defaults to \code{TRUE}.}
 
-\item{standing_start}{Numeric denoting the factor of their preferred speed 
-that agents move when they just came from standing still. Defaults to 
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
 \code{0.1}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
-\item{report}{Logical denoting whether to report whenever an agent is 
+\item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
 \item{print_iteration}{Logical denoting whether to report each simulated
@@ -97,9 +97,9 @@ instead (\code{FALSE}). Defaults to \code{TRUE}.}
 Object of the \code{\link[predped]{agent-class}}.
 }
 \description{
-Update the current agent by first updating its goal status (i.e., checking 
-how and whether an agent can start interacting with a goal, has to reorient, 
-etc) and then updating its position (i.e., using the utility functions to 
+Update the current agent by first updating its goal status (i.e., checking
+how and whether an agent can start interacting with a goal, has to reorient,
+etc) and then updating its position (i.e., using the utility functions to
 determine where the agent will move next).
 }
 \seealso{

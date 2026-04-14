@@ -9,53 +9,55 @@ add_motion_variables(
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -72.5, -50, -32.5, -20, -10),
   time_step = NULL,
-  threshold = NULL,
-  initial_conditions = FALSE
+  threshold = 0.05,
+  initial_conditions = FALSE,
+  a_turning = 2,
+  b_turning = 0.2
 )
 }
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
 
-\item{velocities}{Numeric vector denoting the changes in speeds as assumed by 
+\item{velocities}{Numeric vector denoting the changes in speeds as assumed by
 the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
 (deceleration).}
 
-\item{orientations}{Numeric vector denoting the changes in orientation as 
-assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
-\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
-\code{310}, \code{287.5} (note that the larger angles are actually the 
+\item{orientations}{Numeric vector denoting the changes in orientation as
+assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
+\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5},
+\code{310}, \code{287.5} (note that the larger angles are actually the
 negative symmetric versions of the smaller angles).}
 
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
 to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{threshold}{Numeric denoting under which observed value for speed the 
-cell to which an agent has moved should be put to `0`. Defaults to a value 
+\item{threshold}{Numeric denoting under which observed value for speed the
+cell to which an agent has moved should be put to `0`. Defaults to a value
 based on the observed measurement error in our system.}
 
-\item{initial_conditions}{Logical denoting whether the added columns should 
+\item{initial_conditions}{Logical denoting whether the added columns should
 include the initial conditions (that is, speed, orientation, and position at
-the previous time point) alongside their current alternatives. Useful when 
-one wants to compute the values of the utility-related variables from the 
+the previous time point) alongside their current alternatives. Useful when
+one wants to compute the values of the utility-related variables from the
 data. Defaults to \code{FALSE}.}
 }
 \description{
-This function adds several motion variables to an already existing dataset. 
-These motion variables are then used by \code{predped} to compute utilities, 
-allowing for estimations in the long run. The variables that are added are 
+This function adds several motion variables to an already existing dataset.
+These motion variables are then used by \code{predped} to compute utilities,
+allowing for estimations in the long run. The variables that are added are
 speed, orientation, and the cell to which a person moved (as defined by the
 M4MA).
 }
 \details{
 The provided dataset should at least have the following columns:
- - \code{x}, \code{y}: Coordinates at which a person was standing at a given 
+ - \code{x}, \code{y}: Coordinates at which a person was standing at a given
    time
- - \code{time}: A continuous variable that denotes the time at which the 
+ - \code{time}: A continuous variable that denotes the time at which the
    measurement took place.
  - \code{id}: The identifier given to the person whose position was measured.
- - \code{goal_id}: The identifier given to the goal the person had to move 
+ - \code{goal_id}: The identifier given to the goal the person had to move
    towards while their position was being measured.
- - \code{goal_x}, \code{goal_y}: The position of the goal the person had to 
+ - \code{goal_x}, \code{goal_y}: The position of the goal the person had to
    move to while their position was being measured.
 }
 \examples{

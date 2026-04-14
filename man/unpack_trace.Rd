@@ -19,34 +19,34 @@ unpack_trace(
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to. Defaults to a matrix in 
-which the columns contain \code{1.5} (acceleration), \code{1} (maintenance 
+the cell positions that the agent might move to. Defaults to a matrix in
+which the columns contain \code{1.5} (acceleration), \code{1} (maintenance
 of speed), and \code{0.5} (deceleration).}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to. Defaults to a matrix 
-in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
-\code{287.5} (note that the larger angles are actually the negative symmetric 
+create the cell positions that the agent might move to. Defaults to a matrix
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20},
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310},
+\code{287.5} (note that the larger angles are actually the negative symmetric
 versions of the smaller angles).}
 
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
+\item{stay_stopped}{Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
 to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}
 }
 \description{
-This function will take a trace and return a data.frame containing all 
-information contained within a typical time-series (cfr. 
-\code{\link[predped]{time_series}}) and with all the input that should be 
-provided to the utility functions. This is therefore the primary function to 
-use if you want to go from a trace to a data.frame that can be used in 
+This function will take a trace and return a data.frame containing all
+information contained within a typical time-series (cfr.
+\code{\link[predped]{time_series}}) and with all the input that should be
+provided to the utility functions. This is therefore the primary function to
+use if you want to go from a trace to a data.frame that can be used in
 M4MA-based estimations.
 }
 \examples{

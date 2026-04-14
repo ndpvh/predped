@@ -14,8 +14,8 @@ create_agent_specifications(
 \arguments{
 \item{agent_list}{List of objects of the \code{\link[predped]{agent-class}}.}
 
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
+\item{stay_stopped}{Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
@@ -25,13 +25,13 @@ time should mimic. Defaults to \code{0.5}, or half a second.}
 or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
-List containing all information of all agents within the current 
+List containing all information of all agents within the current
 state.
 }
 \description{
 This list translates the information available in the \code{agents} slot of
-the current status of the \code{\link[predped]{state-class}} to a list 
-with all this information in numeric vectors or matrices instead of inside 
+the current status of the \code{\link[predped]{state-class}} to a list
+with all this information in numeric vectors or matrices instead of inside
 objects. Allows for a translation from the object-oriented way of doing things
 in \code{predped} to the vectorized way of doing things in \code{m4ma}.
 }

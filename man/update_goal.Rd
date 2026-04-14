@@ -27,36 +27,36 @@ update_goal(
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{seen}{Logical indicating whether the agent can see the path point 
+\item{seen}{Logical indicating whether the agent can see the path point
 to which they are currently moving.}
 
-\item{standing_start}{Numeric denoting the factor of their preferred speed 
-that agents move when they just came from standing still. Defaults to 
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
 \code{0.1}.}
 
-\item{close_enough}{Numeric denoting how close (in radii) the agent needs to 
-be to an object in order to interact with it. Defaults to \code{2}, meaning the 
+\item{close_enough}{Numeric denoting how close (in radii) the agent needs to
+be to an object in order to interact with it. Defaults to \code{2}, meaning the
 agent can interact with objects at \code{2 * radius(agent)} distance away.}
 
-\item{space_between}{Numeric denoting the space that should be left between 
-an object and the created path points for the agents (in radii). Defaults to 
-\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an 
+\item{space_between}{Numeric denoting the space that should be left between
+an object and the created path points for the agents (in radii). Defaults to
+\code{2.5}, meaning a space of \code{2.5 * radius(agent)} is left between an
 object and the path points agents use in their strategy.}
 
-\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}} 
-containing the nodes and edges the agent can use to plan its path. Defauls 
-to \code{NULL}, triggering the creation of these edges whenever they are 
+\item{precomputed_edges}{Output of \code{\link[predped]{compute_edges}}
+containing the nodes and edges the agent can use to plan its path. Defauls
+to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
 \item{many_nodes}{Logical denoting whether to use the minimal number of nodes
-or to use many more (see \code{\link[predped]{create_edges}}). Ignored if 
+or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
 
-\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
-to change the order of their goals adaptively throughout the simulation. 
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability
+to change the order of their goals adaptively throughout the simulation.
 Defaults to \code{TRUE}.}
 
-\item{report}{Logical denoting whether to report whenever an agent is 
+\item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
 \item{print_iteration}{Logical denoting whether to report each simulated

@@ -9,10 +9,10 @@ time_series(trace, time_step = NULL, cpp = TRUE)
 \arguments{
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}
 
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
 to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
-\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}
 }
 \description{
