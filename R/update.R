@@ -397,7 +397,7 @@ update_position <- function(agent,
         # separate post-hoc clamp, cells that would produce too-low speeds are
         # simply unavailable.  The !any(check) guard below then handles the case
         # where no viable moving cell remains.
-        # check <- check & (speed(agent) * as.numeric(velocities) >= standing_start)
+        check <- check & (speed(agent) * as.numeric(velocities) >= standing_start)
 
         # If there are no good options available, trigger a reroutening of the
         # agent: This will create new path points and let the agent reorient.
