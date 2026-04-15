@@ -242,13 +242,13 @@ to_trace <- function(data,
     pars_attr <- attr(data, "pars")
     if (is.null(a_turning)) {
         if (!is.null(pars_attr) && "a_turning" %in% colnames(pars_attr))
-            a_turning <- setNames(as.numeric(pars_attr[, "a_turning"]), rownames(pars_attr))
+            a_turning <- setNames(unlist(pars_attr[, "a_turning"]), rownames(pars_attr))
         else
             a_turning <- 2
     }
     if (is.null(b_turning)) {
         if (!is.null(pars_attr) && "b_turning" %in% colnames(pars_attr))
-            b_turning <- setNames(as.numeric(pars_attr[, "b_turning"]), rownames(pars_attr))
+            b_turning <- setNames(unlist(pars_attr[, "b_turning"]), rownames(pars_attr))
         else
             b_turning <- 0.2
     }
@@ -372,10 +372,12 @@ to_trace <- function(data,
                 copy@orientation <- as.numeric(iter_data$orientation0[j])
 
                 if(!is.null(b_turning)) {
-                    copy@parameters$b_turning <- b_turning
+                    copy@parameters$b_turning <- if (length(b_turning) > 1)
+                        b_turning[[as.character(iter_data$id[j])]] else b_turning
                 }
                 if(!is.null(a_turning)) {
-                    copy@parameters$a_turning <- a_turning
+                    copy@parameters$a_turning <- if (length(a_turning) > 1)
+                        a_turning[[as.character(iter_data$id[j])]] else a_turning
                 }
 
                 dummy_agent@cell_centers <- compute_centers(copy,
