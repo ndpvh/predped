@@ -61,7 +61,7 @@ containing the nodes and edges the agent can use to plan its path. Defauls
 to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
-\item{many_nodes}{Logical denoting whether to use many nodes when computing 
+\item{many_nodes}{Logical denoting whether to use many nodes when computing
 the edges. Defaults to \code{FALSE} if \code{precomputed_edges = FALSE}.}
 
 \item{space_between}{Numeric denoting the space that should be left between
@@ -83,8 +83,8 @@ that agents move when they just came from standing still. Defaults to
 deviations in the parameter list to create some variation in the parameters.
 Defaults to \code{FALSE}.}
 
-\item{return_characteristics}{Logical denoting whether to return the 
-characteristics of the generated agents in a list (\code{TRUE}) or as part 
+\item{return_characteristics}{Logical denoting whether to return the
+characteristics of the generated agents in a list (\code{TRUE}) or as part
 of an agent (\code{FALSE}). Defaults to \code{FALSE}.}
 }
 \value{

@@ -20,7 +20,8 @@
   parameters = data.frame(),
   color = "black",
   cell_centers = matrix(0, nrow = 33, ncol = 2),
-  utility_variables = data.frame()
+  utility_variables = data.frame(),
+  extra_objects = list()
 )
 }
 \arguments{

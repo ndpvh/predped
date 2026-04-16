@@ -12,7 +12,8 @@ update_position(
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
-  standing_start = 0.1,
+  standing_start = 0.25,
+  stop_factor = 0.4,
   time_step = 0.5,
   report = TRUE,
   print_iteration = TRUE,
@@ -47,7 +48,11 @@ versions of the smaller angles).}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
+
+\item{stop_factor}{Numeric multiplied by \code{standing_start} to form the
+threshold below which a moving agent is forced to stop. Defaults to
+\code{0.4}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}

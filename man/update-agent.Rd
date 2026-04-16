@@ -18,7 +18,8 @@
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   adaptive_goal_sorting = TRUE,
-  standing_start = 0.1,
+  standing_start = 0.25,
+  stop_factor = 0.4,
   time_step = 0.5,
   report = FALSE,
   print_iteration = FALSE,
@@ -78,7 +79,11 @@ Defaults to \code{TRUE}.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
+
+\item{stop_factor}{Numeric multiplied by \code{standing_start} to form the
+threshold below which a moving agent is forced to stop. Defaults to
+\code{0.4}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}

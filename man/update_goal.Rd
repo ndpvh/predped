@@ -9,7 +9,7 @@ update_goal(
   state,
   background,
   seen,
-  standing_start = 0.1,
+  standing_start = 0.25,
   close_enough = 2,
   space_between = 1.25,
   precomputed_edges = NULL,
@@ -32,7 +32,7 @@ to which they are currently moving.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{close_enough}{Numeric denoting how close (in radii) the agent needs to
 be to an object in order to interact with it. Defaults to \code{2}, meaning the

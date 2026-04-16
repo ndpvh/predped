@@ -9,7 +9,7 @@ add_motion_variables(
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -72.5, -50, -32.5, -20, -10),
   time_step = NULL,
-  standing_start = 0.1,
+  standing_start = 0.25,
   initial_conditions = FALSE,
   a_turning = 2,
   b_turning = 0.2
@@ -33,7 +33,7 @@ to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
 \item{standing_start}{Numeric denoting the speed below which the cell is
 set to \code{0} (stopped). Matches the \code{standing_start} parameter in
-\code{\link[predped]{update_position}}. Defaults to \code{0.1}.}
+\code{\link[predped]{update_position}}. Defaults to \code{0.25}.}
 
 \item{initial_conditions}{Logical denoting whether the added columns should
 include the initial conditions (that is, speed, orientation, and position at

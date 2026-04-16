@@ -55,15 +55,15 @@ social groups).}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to. Defaults to a matrix in 
+the cell positions that the agent might move to. Defaults to a matrix in
 which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to. Defaults to a matrix 
-in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
-\code{287.5} (note that the larger angles are actually the negative symmetric 
+create the cell positions that the agent might move to. Defaults to a matrix
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20},
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310},
+\code{287.5} (note that the larger angles are actually the negative symmetric
 versions of the smaller angles).}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
@@ -108,8 +108,8 @@ reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 \item{print_iteration}{Logical denoting whether to report each simulated
 iteration. Defaults to \code{FALSE}, but can be switched off if desired.}
 
-\item{step_report}{Numeric denoting at which iteration to report the 
-current iteration in the simulation & the number of agents present 
+\item{step_report}{Numeric denoting at which iteration to report the
+current iteration in the simulation & the number of agents present
 at the current iteration in the simulation. Defaults to 1, which
 represents each iteration to be reported.}
 
@@ -132,8 +132,8 @@ the argument \code{starting_position}. Then, we define each of the next goals
 as being the one that is closest to the position of the previous goal.
 Defaults to \code{TRUE}.}
 
-\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability 
-to change the order of their goals adaptively throughout the simulation. 
+\item{adaptive_goal_sorting}{Logical denoting whether agents have the ability
+to change the order of their goals adaptively throughout the simulation.
 Defaults to \code{TRUE}.}
 
 \item{precomputed_goals}{List of goal stacks from which the agent can be
@@ -146,8 +146,8 @@ middle of the edge of the objects in the \code{link[predped]{background-class}}
 edges (\code{FALSE}). Defaults to \code{FALSE}.}
 
 \item{position}{Numeric denoting the position you would like to assign to an
-agent if they are added to the simulation. Defaults to \code{NULL}, making 
-the agent start at the entrance. Note that this is an experimental feature 
+agent if they are added to the simulation. Defaults to \code{NULL}, making
+the agent start at the entrance. Note that this is an experimental feature
 that has not been tested yet, and therefore might not work for the moment.}
 
 \item{individual_differences}{Logical denoting whether to use the standard
@@ -158,7 +158,7 @@ Defaults to \code{FALSE}.}
 of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 instead (\code{FALSE}). Defaults to \code{TRUE}.}
 
-\item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if 
+\item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if
 \code{plot_live = TRUE}).}
 }
 \value{
