@@ -160,7 +160,10 @@ setMethod("update", "state", function(object,
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
+#' @param stop_factor Numeric multiplied by \code{standing_start} to form the
+#' threshold below which a moving agent is forced to stop. Defaults to
+#' \code{0.4}.
 #' @param close_enough Numeric denoting how close (in radii) the agent needs to
 #' be to an object in order to interact with it. Defaults to \code{2}, meaning the
 #' agent can interact with objects at \code{2 * radius(agent)} distance away.
@@ -219,7 +222,8 @@ setMethod("update", "agent", function(object,
                                       precomputed_edges = NULL,
                                       many_nodes = !is.null(precomputed_edges),
                                       adaptive_goal_sorting = TRUE,
-                                      standing_start = 0.1,
+                                      standing_start = 0.25,
+                                      stop_factor = 0.4,
                                       time_step = 0.5,
                                       report = FALSE,
                                       print_iteration = FALSE,
@@ -248,6 +252,7 @@ setMethod("update", "agent", function(object,
                               velocities = velocities,
                               orientations = orientations,
                               standing_start = standing_start,
+                              stop_factor = stop_factor,
                               time_step = time_step,
                               report = report,
                               print_iteration = print_iteration,
@@ -279,7 +284,10 @@ setMethod("update", "agent", function(object,
 #' versions of the smaller angles).
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
+#' @param stop_factor Numeric multiplied by \code{standing_start} to form the
+#' threshold below which a moving agent is forced to stop. Defaults to
+#' \code{0.4}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is
@@ -326,7 +334,8 @@ update_position <- function(agent,
                                              350, 340, 327.5, 310, 287.5) |>
                                 rep(times = 3) |>
                                 matrix(ncol = 3),
-                            standing_start = 0.1,
+                            standing_start = 0.25,
+                            stop_factor = 0.4,
                             time_step = 0.5,
                             report = TRUE,
                             print_iteration = TRUE,
@@ -372,10 +381,11 @@ update_position <- function(agent,
     # If an agent is moving, then get the necessary centers and compute the
     # utility of moving to a given location
     } else {
-        # If the agent's current speed is below standing_start, force a stop and
-        # reset speed.  This handles edge cases (e.g. initialisation) and ensures
-        # no agent can persist in a sub-threshold slow state.
-        if (speed(agent) < standing_start) {
+        # If the agent's current speed is below standing_start * stop_factor,
+        # force a stop and reset speed.  This handles edge cases (e.g.
+        # initialisation) and ensures no agent can persist in a sub-threshold
+        # slow state.
+        if (speed(agent) < standing_start * stop_factor) {
             cell(agent) <- 0
             speed(agent) <- standing_start
             return(agent)
@@ -398,6 +408,19 @@ update_position <- function(agent,
         # simply unavailable.  The !any(check) guard below then handles the case
         # where no viable moving cell remains.
         check <- check & (speed(agent) * as.numeric(velocities) >= standing_start)
+
+        # Mask cells whose centre falls inside a per-agent forbidden y-strip.
+        # extra_objects[["forbidden_y"]] = c(y_lower, y_upper) when active.
+        # Only apply when at least one valid cell remains after masking; if the
+        # agent is already so deep in the strip that no cell escapes it in one
+        # step, leave check unchanged so the agent is not completely trapped.
+        if (!is.null(agent@extra_objects[["forbidden_y"]])) {
+            fy        <- agent@extra_objects[["forbidden_y"]]
+            in_strip  <- centers[, 2] >= fy[1] & centers[, 2] <= fy[2]
+            new_check <- check & !matrix(in_strip, nrow = nrow(check), ncol = ncol(check))
+            if (any(new_check))
+                check <- new_check
+        }
 
         # If there are no good options available, trigger a reroutening of the
         # agent: This will create new path points and let the agent reorient.
@@ -506,7 +529,7 @@ update_position <- function(agent,
 #' to which they are currently moving.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param close_enough Numeric denoting how close (in radii) the agent needs to
 #' be to an object in order to interact with it. Defaults to \code{2}, meaning the
 #' agent can interact with objects at \code{2 * radius(agent)} distance away.
@@ -561,7 +584,7 @@ update_goal <- function(agent,
                         state,
                         background,
                         seen,
-                        standing_start = 0.1,
+                        standing_start = 0.25,
                         close_enough = 2,
                         space_between = 1.25,
                         precomputed_edges = NULL,
