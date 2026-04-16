@@ -47,7 +47,6 @@ Uses the predicted positions of the group members for this.
 }
 \seealso{
 \code{\link[predped]{utility-agent}}
-\code{\link[predped]{vf_utility_continuous}}
-\code{\link[predped]{vf_utility_discrete}}
+\code{\link[predped]{gvf_nearest_utility}}
 }
 \concept{utility}
