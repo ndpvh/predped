@@ -206,7 +206,7 @@ unpack_trace <- function(trace,
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
-#' \code{\link[predped]{update_position}}. Defaults to \code{0.1}.
+#' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
 #' @param stay_stopped Logical denoting whether agents will predict others that
 #' are currently not moving to remain immobile in the next iteration. Is needed
 #' to compute the utility variables accurately. Defaults to \code{TRUE}.
@@ -230,7 +230,7 @@ to_trace <- function(data,
                      orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                       -10, -20, -32.5, -50, -72.5),
                      time_step = NULL,
-                     standing_start = 0.1,
+                     standing_start = 0.25,
                      stay_stopped = TRUE,
                      cpp = TRUE,
                      ...) {
@@ -481,7 +481,7 @@ to_trace <- function(data,
 #' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
-#' \code{\link[predped]{update_position}}. Defaults to \code{0.1}.
+#' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
 #' @param initial_conditions Logical denoting whether the added columns should
 #' include the initial conditions (that is, speed, orientation, and position at
 #' the previous time point) alongside their current alternatives. Useful when
@@ -501,7 +501,7 @@ add_motion_variables <- function(data,
                                  orientations = c(72.5, 50, 32.5, 20, 10, 0,
                                                   -72.5, -50, -32.5, -20, -10),
                                  time_step = NULL,
-                                 standing_start = 0.1,
+                                 standing_start = 0.25,
                                  initial_conditions = FALSE,
                                  a_turning = 2,
                                  b_turning = 0.2) {
