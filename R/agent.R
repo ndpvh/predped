@@ -63,7 +63,7 @@
 #' @concept classes
 #'
 #' @export
-agent <- setClass("agent", 
+agent <- setClass("agent",
                   list(id = "character",
                        speed = "numeric",
                        orientation = "numeric",
@@ -72,11 +72,12 @@ agent <- setClass("agent",
                        waiting_counter = "numeric",
                        cell = "numeric",
                        current_goal = "goal",
-                       goals = "list", 
+                       goals = "list",
                        parameters = "data.frame",
                        color = "character",
                        cell_centers = "matrix",
-                       utility_variables = "data.frame"), 
+                       utility_variables = "data.frame",
+                       extra_objects = "list"),
                   contains = c("circle"))
 
 #' Constructor for the \code{\link[predped]{agent-class}}
@@ -162,7 +163,7 @@ agent <- setClass("agent",
 #' 
 #' @export
 setMethod("initialize", "agent", function(.Object,
-                                          center, 
+                                          center,
                                           radius,
                                           id = character(0),
                                           speed = 0.1,
@@ -173,10 +174,11 @@ setMethod("initialize", "agent", function(.Object,
                                           status = "move",
                                           waiting_counter = 0,
                                           cell = 0,
-                                          parameters = data.frame(),                                   
+                                          parameters = data.frame(),
                                           color = "black",
                                           cell_centers = matrix(0, nrow = 33, ncol = 2),
-                                          utility_variables = data.frame()) {
+                                          utility_variables = data.frame(),
+                                          extra_objects = list()) {
 
     # Use the circular object as the basis of the agent     
     .Object <- callNextMethod(.Object, 
@@ -196,6 +198,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@cell <- cell    
     .Object@color <- color
     .Object@cell_centers <- cell_centers
+    .Object@extra_objects <- extra_objects
     .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 16) |>
         as.data.frame() |>
         setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 
