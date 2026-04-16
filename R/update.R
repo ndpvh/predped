@@ -112,7 +112,9 @@ setMethod("update", "state", function(object,
                                               gc_distance = NA,
                                               gc_radius = NA, 
                                               gc_nped = NA,
-                                              vf_angles = NA)
+                                              vf_angles = NA,
+                                              gvf_distance = NA,
+                                              gvf_angles = NA)
 
         # Update the agent himself
         agent_list[[i]] <- update(agent, 
