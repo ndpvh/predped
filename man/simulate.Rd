@@ -25,6 +25,8 @@
   many_nodes = precompute_edges,
   individual_differences = FALSE,
   group_size = matrix(1, nrow = 1, ncol = 2),
+  plot_live = FALSE,
+  delay = 0.4,
   fx = function(x) x,
   cpp = TRUE,
   ...

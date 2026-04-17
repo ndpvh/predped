@@ -15,6 +15,7 @@ update_goal(
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   adaptive_goal_sorting = TRUE,
+  stuck_threshold = 3L,
   report = FALSE,
   print_iteration = FALSE,
   cpp = TRUE
@@ -55,6 +56,11 @@ or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 \item{adaptive_goal_sorting}{Logical denoting whether agents have the ability
 to change the order of their goals adaptively throughout the simulation.
 Defaults to \code{TRUE}.}
+
+\item{stuck_threshold}{Integer. Number of consecutive blocked-goal entries
+before mechanism 1 (head-on deadlock rerouting) fires. On the first blocked
+entry mechanism 2 (goal-zone congestion deferral) is attempted instead.
+Defaults to \code{3L}.}
 
 \item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}

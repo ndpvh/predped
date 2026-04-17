@@ -181,6 +181,10 @@ setMethod("update", "state", function(object,
 #' @param adaptive_goal_sorting Logical denoting whether agents have the ability
 #' to change the order of their goals adaptively throughout the simulation.
 #' Defaults to \code{TRUE}.
+#' @param stuck_threshold Integer. Number of consecutive blocked-goal entries
+#' before mechanism 1 (head-on deadlock rerouting) fires. On the first blocked
+#' entry mechanism 2 (goal-zone congestion deferral) is attempted instead.
+#' Defaults to \code{3L}.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
 #' @param report Logical denoting whether to report whenever an agent is
@@ -549,6 +553,10 @@ update_position <- function(agent,
 #' @param adaptive_goal_sorting Logical denoting whether agents have the ability
 #' to change the order of their goals adaptively throughout the simulation.
 #' Defaults to \code{TRUE}.
+#' @param stuck_threshold Integer. Number of consecutive blocked-goal entries
+#' before mechanism 1 (head-on deadlock rerouting) fires. On the first blocked
+#' entry mechanism 2 (goal-zone congestion deferral) is attempted instead.
+#' Defaults to \code{3L}.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated

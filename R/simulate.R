@@ -438,7 +438,10 @@ setMethod("simulate", "predped", function(object,
 #' the agent start at the entrance. Note that this is an experimental feature
 #' that has not been tested yet, and therefore might not work for the moment.
 #' @param plot_live Logical denoting whether to plot each iteration while the
-#' simulation is going on. Defaults to `FALSE`.
+#' simulation is going on. Defaults to \code{FALSE}.
+#' @param delay Numeric denoting the time (in seconds) to pause between each
+#' plotted iteration when \code{plot_live = TRUE}. A small pause is needed to
+#' allow the graphics device to refresh. Defaults to \code{0.4}.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
 #' between iterations, i.e., the time between updating the plot. Defaults to
 #' `0.2`.

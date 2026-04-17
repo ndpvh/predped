@@ -96,7 +96,7 @@ or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 \code{precomputed_edges} is provided. Defaults to \code{FALSE}.}
 
 \item{plot_live}{Logical denoting whether to plot each iteration while the
-simulation is going on. Defaults to `FALSE`.}
+simulation is going on. Defaults to \code{FALSE}.}
 
 \item{plot_time}{Numeric denoting the amount of time (in seconds) to wait
 between iterations, i.e., the time between updating the plot. Defaults to
@@ -160,6 +160,10 @@ instead (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if
 \code{plot_live = TRUE}).}
+
+\item{delay}{Numeric denoting the time (in seconds) to pause between each
+plotted iteration when \code{plot_live = TRUE}. A small pause is needed to
+allow the graphics device to refresh. Defaults to \code{0.4}.}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}.
