@@ -222,6 +222,7 @@ setMethod("update", "agent", function(object,
                                       precomputed_edges = NULL,
                                       many_nodes = !is.null(precomputed_edges),
                                       adaptive_goal_sorting = TRUE,
+                                      stuck_threshold = 3L,
                                       standing_start = 0.25,
                                       stop_factor = 0.4,
                                       time_step = 0.5,
@@ -240,6 +241,7 @@ setMethod("update", "agent", function(object,
                           precomputed_edges = precomputed_edges,
                           many_nodes = many_nodes,
                           adaptive_goal_sorting = adaptive_goal_sorting,
+                          stuck_threshold = stuck_threshold,
                           report = report,
                           print_iteration = print_iteration,
                           cpp = cpp)
@@ -590,6 +592,7 @@ update_goal <- function(agent,
                         precomputed_edges = NULL,
                         many_nodes = !is.null(precomputed_edges),
                         adaptive_goal_sorting = TRUE,
+                        stuck_threshold = 3L,
                         report = FALSE,
                         print_iteration = FALSE,
                         cpp = TRUE) {
@@ -629,6 +632,9 @@ update_goal <- function(agent,
 
         # Replace goal if necessary
         if(current_goal(agent)@done) {
+            # Goal reached: reset the stuck counter so the next goal starts fresh
+            agent@extra_objects[["stuck_count"]] <- 0L
+
             # Check if there are goals left to give. If not, then give the agent
             # the task of going to the exit
             if(length(goals(agent)) > 0) {
@@ -813,6 +819,7 @@ update_goal <- function(agent,
         # If no agents are blocking access to the goal, allow the agent to move
         # again
         if(!any(blocking_agents)) {
+            agent@extra_objects[["stuck_count"]] <- 0L
             status(agent) <- "reorient"
         }
 
@@ -893,6 +900,59 @@ update_goal <- function(agent,
             # the goal (i.e., when the position of the current goal is also the
             # last path point) and if the agent is almost within reach of the goal
             if(any(blocking_agents) & (nrow(current_goal(agent)@path) == 1)) {
+                stuck_count <- if (!is.null(agent@extra_objects[["stuck_count"]]))
+                                   agent@extra_objects[["stuck_count"]] else 0L
+
+                # Mechanism 2 (goal-zone congestion): on the very first entry into
+                # this wait trigger, check whether the direct line of sight to the
+                # goal is also blocked by an agent. If it is and there are queued
+                # goals available, immediately defer the current goal to the back of
+                # the queue and plan towards the next goal instead — rather than
+                # sitting in a wait/reorient/wait cycle at a busy goal zone.
+                if (stuck_count == 0L && length(goals(agent)) > 0) {
+                    los_blockers <- agents_between_goal(agent, state)
+                    if (length(los_blockers) > 0) {
+                        goals(agent) <- append(goals(agent), list(current_goal(agent)))
+                        current_goal(agent) <- goals(agent)[[1]]
+                        goals(agent) <- goals(agent)[-1]
+                        status(agent) <- "plan"
+                        return(agent)
+                    }
+                }
+
+                # Mechanism 1 (head-on deadlock): after stuck_threshold repeated
+                # wait entries on the same goal, force a reroute that treats
+                # line-of-sight blocking agents as path obstacles. Reset the counter
+                # and reorient to the new route regardless of whether a better path
+                # was found (to break the cycle).
+                if (stuck_count >= stuck_threshold) {
+                    los_blockers <- agents_between_goal(agent, state)
+                    if (length(los_blockers) > 0) {
+                        new_path <- find_path(current_goal(agent),
+                                              agent,
+                                              background,
+                                              space_between = space_between,
+                                              new_objects = los_blockers,
+                                              precomputed_edges = precomputed_edges,
+                                              many_nodes = many_nodes,
+                                              reevaluate = TRUE)
+                        if (!is.null(new_path) && nrow(new_path) > 0) {
+                            current_goal(agent)@path <- new_path
+                            speed(agent) <- standing_start
+                            goal_pos2 <- current_goal(agent)@path
+                            agent_pos2 <- position(agent)
+                            orientation(agent) <- atan2(goal_pos2[1, 2] - agent_pos2[2],
+                                                        goal_pos2[1, 1] - agent_pos2[1]) * 180 / pi
+                        }
+                    }
+                    agent@extra_objects[["stuck_count"]] <- 0L
+                    status(agent) <- "reorient"
+                    return(agent)
+                }
+
+                # Normal wait entry: increment stuck counter then wait.
+                agent@extra_objects[["stuck_count"]] <- stuck_count + 1L
+
                 # Find out whether that agent is actually completing a goal or not.
                 # If not, then the agent will just continue business as usual.
                 idx <- Position(\(x) x == TRUE, blocking_agents)
