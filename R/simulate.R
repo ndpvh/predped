@@ -243,6 +243,8 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
+                                          plot_live = FALSE,
+                                          delay = 0.4,
                                           fx = \(x) x,
                                           cpp = TRUE,
                                           ...) {
@@ -362,6 +364,8 @@ setMethod("simulate", "predped", function(object,
                                    precompute_goal_paths = precompute_goal_paths,
                                    middle_edge = middle_edge,
                                    individual_differences = individual_differences,
+                                   plot_live = plot_live,
+                                   plot_time = delay,
                                    cpp = cpp,
                                    ...)
     }
@@ -638,7 +642,7 @@ setMethod("simulate", "state", function(object,
 
     # If you want to plot the result immediately, do so
     if(plot_live) {
-        print(plot(object, ...))
+        print(plot(object))
         Sys.sleep(plot_time)
     }
 
