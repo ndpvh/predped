@@ -328,17 +328,21 @@ DataFrame unpack_trace_rcpp(List trace,
             // Access the utility variables slot in the agent class. 
             DataFrame uv_j = as<DataFrame>(agent.slot("utility_variables"));
 
-            // Do a small check of whether the current utility variables are 
+            // Do a small check of whether the current utility variables are
             // filled with information. If not, then we cannot preallocate.
-            // For this, I use one of the variables that should always be 
+            // For this, I use one of the variables that should always be
             // defined.
             NumericVector tmp = uv_j["ps_speed"];
             LogicalVector tmp_check = Rcpp::is_na(tmp);
 
-            // Assign different values to the resulting DataFrame depending on 
-            // the status of the agent. This approach taken to allow for 
-            // the correct preallocation in different variables
-            if(!any(tmp_check).is_true()) {
+            // Assign different values to the resulting DataFrame depending on
+            // the status of the agent. This approach taken to allow for
+            // the correct preallocation in different variables.
+            // Guard with status check: agents forced to reorient mid-move (e.g.
+            // all utility values infinite) can have non-NA utility_variables
+            // even though they did not complete a genuine movement step. Only
+            // copy utility variables for agents that are actually moving.
+            if(!any(tmp_check).is_true() && (status_j == "move" || status_j == "completing goal")) {
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
