@@ -209,19 +209,34 @@ setMethod("utility", "data.frame", function(object,
                                       object$wb_buddies[[1]][["dists"]])
     }
 
-    # Group-attracted visual field utility: combine nearest in-group distance
-    # attraction and visual-field disutility in one social utility term.
-    if(!is.null(object$gvf_distance[[1]])) {
-        V <- V + gvf_nearest_utility(parameters[["a_group_centroid"]],
-                                     parameters[["b_group_centroid"]],
-                                     parameters[["b_visual_field"]],
-                                     object$gc_radius,
-                                     object$gvf_distance[[1]],
-                                     object$gvf_angles[[1]])
+    # Group centroid utility: Check whether people are walking in a group in 
+    # the first place and, if so, compute the utility
+    if(!is.null(object$gc_distance[[1]])) {
+        V <- V + gc_utility(parameters[["a_group_centroid"]],
+                            parameters[["b_group_centroid"]],
+                            object$gc_radius,
+                            object$gc_distance[[1]],
+                            -parameters[["stop_utility"]],
+                            object$gc_nped)
     }
 
+    # Visual field utility: Check whether people are walking in a group and, if 
+    # so, compute the utility
+    if(!is.null(object$vf_angles[[1]])) {
+        V <- V + vf_utility_discrete(parameters[["b_visual_field"]],
+                                     object$vf_angles[[1]])
+    }
 
+    # Local group dynamics utility: Check whether people are any group
+    # members and, if so, compute the utility
 
+    if(!is.null(object$llgvf_data[[1]])) {
+        V <- V + local_gvf_utility(parameters[["a_llgvf"]],
+                                    parameters[["b_llgvf"]],
+                                    parameters[["e_llgvf"]],
+                                    object$llgvf_data[[1]][["distances"]],
+                                    object$llgvf_data[[1]][["rel_angles"]])
+    }
 
 
     ############################################################################
@@ -409,32 +424,48 @@ setMethod("compute_utility_variables", "agent", function(object,
                                               objects(background),
                                               pickBest = FALSE))
 
-    # Group-attracted visual field utility: Required variables are the nearest
-    # in-group distance and corresponding relative angles from each potential
-    # cell.
+    # Group centroid utility: Required variables are the distance to the predicted
+    # group centroid, the number of pedestrians in the group, and the radius of 
+    # the agent in question
     ingroup <- agent_specifications$group[-uv$agent_idx] == agent_specifications$group[uv$agent_idx]
     p_pred <- predictions_minus_agent[ingroup, , drop = FALSE]
     nped <- dim(p_pred)[1]    
+        
+    uv$gc_distance <- list(distance_group_centroid(p_pred,
+                                                   centers,
+                                                   nped))
     uv$gc_radius <- radius(object)
+    uv$gc_nped <- nped
+
+    # Visual field utility: Required variable is the angle of one or more 
+    # other pedestrians.
+    uv$vf_angles <- list(get_angles(uv$agent_idx,
+                                    agent_specifications$group,
+                                    position(object),
+                                    orientation(object),
+                                    agent_specifications$predictions,
+                                    centers,
+                                    any_member = TRUE))
     
-    if (nped == 0) {
-        uv$gvf_distance <- list(NULL)
-        uv$gvf_angles <- list(NULL)
-    } else {
-        nearest_member_idx <- which.min(m4ma::dist1_rcpp(position(object), p_pred))
-        nearest_member <- p_pred[nearest_member_idx, , drop = FALSE]
+    # Local group dynamics utility
+    vf_angles_local <- get_angles(uv$agent_idx,
+                                    agent_specifications$group,
+                                    position(object),
+                                    orientation(object),
+                                    agent_specifications$predictions,
+                                    centers,
+                                    any_member = FALSE)
+    
+    uv$llgvf_data <- list(get_nearest_member_data(uv$agent_idx,
+                                                agent_specifications$group,
+                                                position(object),
+                                                orientation(object),
+                                                agent_specifications$predictions,
+                                                vf_angles_local))
+    
 
-        uv$gvf_distance <- list(m4ma::dist1_rcpp(as.numeric(nearest_member), centers))
-        uv$gvf_angles <- list(get_angles(uv$agent_idx,
-                                         agent_specifications$group,
-                                         position(object),
-                                         orientation(object),
-                                         agent_specifications$predictions,
-                                         centers,
-                                         any_member = FALSE))
-    }
 
-    return(uv)
+    return(uv)       
 })
 
 #' Compute utility variables
@@ -479,56 +510,124 @@ setMethod("compute_utility_variables", "data.frame", function(object,
     return(unpack_trace(trace))
 })
 
-################################################################################
-# GROUP-ATTRACHED VISUAL FIELD
 
-#' Group-attracted visual field utility
+
+
+
+################################################################################
+# GROUP CENTROID
+
+#' Distances to group centroid
 #'
-#' Combined social utility based on the nearest in-group member: a distance
-#' attraction term plus a visual-field penalty term.
+#' Compute the distance of a given agent to the group centroid. This group 
+#' centroid is computed as a summary statistic of the predicted x- and y-
+#' coordinates of all pedestrians belonging to the same group as the agent. The 
+#' summary statistic of choice should be one of mean-tendency, but can be 
+#' specified by the user through the argument \code{fx}.
+#' 
+#' @details 
+#' Note that this function has been defined to be in line with the \code{m4ma}
+#' utility functions.
 #'
-#' @param a_group_centroid Numeric denoting the power for the attraction term.
-#' @param b_group_centroid Numeric denoting the slope of the attraction term.
-#' @param b_visual_field Numeric denoting the visual-field penalty.
-#' @param radius Numeric denoting the radius of the agent.
-#' @param cell_distances Numeric vector with distance from each cell to the
-#' nearest in-group member.
-#' @param relative_angles Numeric vector with relative angle from each cell to
-#' the nearest in-group member.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted 
+#' positions of all pedestrians that belong to the social group of the agent.
+#' @param centers Numerical matrix containing the coordinates at each position
+#' the object can be moved to. Should have one row for each cell.
+#' @param number_agents Integer indicating number of people in the pedestrian's 
+#' social group. 
+#' @param fx Function used to find the group centroid. Defaults to \code{mean}
 #'
-#' @return Numeric vector with utility contribution per cell.
-#'
-#' @rdname gvf_nearest_utility
-#'
+#' @return Numeric vector containing the distance from each cell in the `center`
+#' to the group centroid. If not other agents belong to the same group as the 
+#' agent, returns \code{NULL}.
+#' 
+#' @seealso 
+#' \code{\link[predped]{gc_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @rdname distance_group_centroid 
+#' 
 #' @concept utility
 #'
-#' @export
-gvf_nearest_utility <- function(a_group_centroid,
-                                b_group_centroid,
-                                b_visual_field,
-                                radius,
-                                cell_distances,
-                                relative_angles) {
+#' @export 
+distance_group_centroid <- function(predictions, 
+                                    centers, 
+                                    number_agents,
+                                    fx = mean) {
+   
+    # First need to identify whether a pedestrian belongs to a social group    
+    if (number_agents == 0) {
+        return(NULL)    
+    }
 
-    if (is.null(cell_distances) || is.null(relative_angles)) {
+    # All of the positions of all in-group pedestrians need to be averaged
+    # Which represents the group centroid
+    centroid <- c(fx(predictions[,1]), fx(predictions[,2]))
+
+    # Euclidean distance for pedestrian_i is calculated for each cell
+    return(m4ma::dist1_rcpp(centroid, centers))
+}
+
+#' Group centroid utility
+#' 
+#' The parameters that are used by this function -- and which are defined in 
+#' \code{\link[predped]{params_from_csv}} -- are \code{a_group_centroid} and 
+#' \code{b_group_centroid}.
+#'
+#' @param a_group_centroid Numeric denoting the power to which to take the 
+#' utility.
+#' @param b_group_centroid Numeric denoting the slope of the utility function.
+#' @param radius Numeric denoting the radius of the agent.
+#' @param cell_distances Numeric vector denoting the distance of each cell in  
+#' the \code{centers} to the predicted group centroid.
+#' @param stop_utility Numeric denoting the utility of stopping. Is used to 
+#' ensure the agents do not freeze when they are too far away from each other. 
+#' @param number_agents Numeric denoting the number of ingroup members. 
+#' 
+#' @return Numeric vector containing the group-centroid-related utility for each 
+#' cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{distance_group_centroid}},
+#' \code{\link[predped]{params_from_csv}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @rdname gc_utility
+#' 
+#' @concept utility
+#' 
+#' @export
+gc_utility <- function(a_group_centroid, 
+                       b_group_centroid, 
+                       radius, 
+                       cell_distances, 
+                       stop_utility, 
+                       number_agents) {
+    
+    # No utilities to be added whenever there are is no group centroid to 
+    # account for (see `distance_group_centroid`).
+    if (is.null(cell_distances)) {
         return(numeric(33))
     }
 
-    optimal_distance <- 1.5 * radius
-    attraction <- -sapply(cell_distances,
-                        \(x) ifelse(x < optimal_distance,
-                                    0,
-                                    b_group_centroid * abs(x - optimal_distance)^a_group_centroid))
+    optimal_distance <- 1.5 * number_agents * radius
+    
+    # Calculate centroid 
+    centroid_util <- -sapply(cell_distances, 
+                             \(x) ifelse(x < optimal_distance, 
+                                         0, 
+                                         b_group_centroid * abs(x - optimal_distance)^a_group_centroid))
 
-    lower_angle <- 130 * pi / 180
-    upper_angle <- 2 * pi - lower_angle
-    visual <- -sapply(relative_angles,
-                    \(x) ifelse(x > lower_angle & x < upper_angle,
-                                b_visual_field,
-                                0))
-
-    return(attraction + visual)
+    if (all(centroid_util < stop_utility)) {
+        return(numeric(33))
+    }
+    
+    # return the utility
+    return(centroid_util)
 }
+
+
+
 
 
 ################################################################################
@@ -560,7 +659,8 @@ gvf_nearest_utility <- function(a_group_centroid,
 #' 
 #' @seealso 
 #' \code{\link[predped]{utility-agent}}
-#' \code{\link[predped]{gvf_nearest_utility}}
+#' \code{\link[predped]{vf_utility_continuous}}
+#' \code{\link[predped]{vf_utility_discrete}}
 #' 
 #' @rdname get_angles
 #' 
@@ -619,7 +719,7 @@ get_angles <- function (agent_idx,
         # to other pedestrians in the group at the next time step.
         nearest_ped <- m4ma::dist1_rcpp(position, predictions)
         nearest_ped <- predictions[which.min(nearest_ped),]
-        orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+        orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
 
         # Get angle from cell centers of pedestrian `n`
         # to predicted position of the nearest group member.
@@ -635,10 +735,305 @@ get_angles <- function (agent_idx,
     return(rel_angles)
 }
 
+#' Continuous visual field utility
+#' 
+#' The idea of this utility function is to let the angle at which you see your 
+#' group members play a role in the utility. Here, we distinguish between using 
+#' a cosine for the maximization -- leading to maximum utility whenever an agent 
+#' is directly looking at a group member and to minimum utility whenever the 
+#' group member is directly behind the agent -- and the sine -- leading to 
+#' maximum utility whenever the group members are directly besides the agent and 
+#' to minimum utility whenever the agent is either directly behind the group 
+#' member or the group member behind the agent.
+#'
+#' @param b_vf Numeric denoting the slope of the utility function. 
+#' @param rel_angles Numeric vector containing the relative angle from each cell 
+#' center to the predicted positions of the group members. Typically output of 
+#' \code{\link[predped]{get_angles}}. 
+#' @param fx Trigonometric function applied to the relative angles defining what
+#' their effect is (scaled by \code{b_vf}). Defaults to \code{cos}, saying that 
+#' the maximal utility stems from directly looking at a person (orientation 0).
+#' Alternative could be \code{sin}, which maximizes the utility of looking at 
+#' a person from right next to them (orientation 90).
+#'
+#' @return Numeric vector containing the utility attributed to keeping the 
+#' group members within your visual field. Returns 0's if the agent does not 
+#' have any additional group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_angles}},
+#' \code{\link[predped]{utility-agent}},
+#' \code{\link[predped]{vf_utility_discrete}}
+#' 
+#' @rdname vf_utility_continuous
+#' 
+#' @concept utility
+#'
+#' @export
+vf_utility_continuous <- function(b_vf, 
+                                  rel_angles, 
+                                  fx = cos) {
+     
+     if (is.null(rel_angles)) {
+        return(numeric(33))
+    }
+
+    # Calculate visual field utility
+    visual_field_utility <- -sapply(rel_angles, 
+                                    \(x) b_vf * fx(x))
+
+    # Return the visual field utility
+    return(visual_field_utility)
+}
+
+#' Discrete visual field utility
+#' 
+#' The idea of this utility function is that it doesn't matter at which angle 
+#' you see a group member within the visual field, as long as you see them. 
+#' This translates to a discrete added disutility whenever the group member 
+#' falls inside the non-visual zone behind the agent.
+#'
+#' @param b_vf Numeric denoting the slope of the utility function. 
+#' @param rel_angles Numeric vector containing the relative angle from each cell 
+#' center to the predicted positions of the group members. Typically output of 
+#' \code{\link[predped]{get_angles}}. 
+#'
+#' @return Numeric vector containing the utility attributed to keeping the 
+#' group members within your visual field. Returns 0's if the agent does not 
+#' have any additional group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_angles}},
+#' \code{\link[predped]{utility-agent}},
+#' \code{\link[predped]{vf_utility_continuous}}
+#' 
+#' @rdname vf_utility_discrete
+#' 
+#' @concept utility
+#'
+#' @export
+#'
+vf_utility_discrete <- function(b_vf, 
+                                rel_angles) {
+     
+     if (is.null(rel_angles)) {
+        return(numeric(33))
+    }
+
+    # Calculate visual field utility
+    # If in visual field: disutility = 0
+    # If not in visual field: disutility = b*-1
+    visual_field_angle <- 130 * pi / 180
+    visual_field_utility <- -sapply(rel_angles, 
+                                    \(x) ifelse(x > visual_field_angle & x < 2 * pi - visual_field_angle, b_vf * 1, 0))
+
+    # Return the visual field utility
+    return(visual_field_utility)
+}
+
+##################################################################################
+# LOCAL DYNAMICS FUNCTIONS
+
+#' Get Distance and Angle to Nearest Group Member
+#' 
+#' Finds the predicted position of the nearest group member and calculates the
+#' distance and relative angle from all candidate cells to that single member.
+#' This replaces the old Walk Beside, Group Centroid, and Visual Field methods.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the predictions.
+#' @param agent_group Numeric vector with the group membership of all pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions
+#' @param centers Numerical matrix containing the coordinates at each candidate cell.
+#'
+#' @return A list containing the distances and relative angles to the nearest group member.
+#' 
+#' @seealso 
+#' \code{\link[predped]{local_gvf_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+get_nearest_member_data <- function(agent_idx, 
+                                    agent_group, 
+                                    position, 
+                                    orientation, 
+                                    predictions, 
+                                    rel_angles) {
+    
+    # Identify in-group pedestrians
+    predictions <- predictions[-agent_idx, , drop = FALSE]
+    ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    predictions <- predictions[ingroup, , drop = FALSE]
+    nped <- dim(predictions)[1]
+    
+    if (nped == 0) {
+        return(NULL)    
+    }
+    
+    # # Find the single nearest group member based on the agent's *current* position
+    # # dist1_rcpp returns a vector of distances when comparing a point to a matrix
+    # distances_to_group <- m4ma::dist1_rcpp(as.numeric(position), predictions)
+    # nearest_idx <- which.min(distances_to_group)
+    # nearest_ped <- predictions[nearest_idx, ]
+    
+    # # Calculate distances from all candidate cells to the nearest member
+    # distances <- m4ma::dist1_rcpp(as.numeric(nearest_ped), centers)
+    
+    # # Calculate relative angles from all candidate cells to the nearest member
+    # orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+    # angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
+    # rel_angles <- angles - orientations
+    
+    # # Normalize angles to [-pi, pi]
+    # rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
+    # rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
+    
+    return(list(distances = distances, rel_angles = rel_angles))
+}
+
+
+#' Local Logarithmic Group-Attracted Visual Field Utility (LLGVF)
+#' 
+#' Unifies distance attraction and visual field alignment into a single local dynamic.
+#' Applies a logarithmic penalty based on distance to the nearest group member, and 
+#' adds an additional penalty if that member is outside the extended visual field.
+#'
+#' @param a_llgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_llgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_llgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+#' @param distances Numeric vector of distances from candidate cells to the member.
+#' @param rel_angles Numeric vector of relative angles from candidate cells to the member.
+#' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+#'
+#' @return Numeric vector containing the LLGVF utility for each cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_nearest_member_data}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+local_gvf_utility <- function(a_llgvf, 
+                              b_llgvf, 
+                              e_llgvf, 
+                              distances, 
+                              rel_angles, 
+                              vf_limit = 135 * pi / 180) {
+    
+    if (is.null(distances) || is.null(rel_angles)) {
+        return(numeric(33))
+    }
+    
+    # Calculate base attraction utility to the comfortable distance (epsilon)
+    base_util <- -b_llgvf * abs(log(distances) - log(e_llgvf))^a_llgvf
+    
+    # Calculate penalty for not having the member in the visual field
+    in_vf <- abs(rel_angles) <= vf_limit
+    penalty <- ifelse(in_vf, 0, -b_llgvf / (distances^a_llgvf))
+    
+    return(base_util + penalty)
+}
+
 
 
 # #' Transform utility to probability
+# #'
+# #' Takes in the utility for each of the cells that an agent can decide on and
+# #' transforms these utilities to probabilities. This quantifies the probability
+# #' that an agent will move to a given cell in space.
+# #'
+# #' @param V Summed utility per candidate cell the agent might move to. Output of
+# #' `utility`.
+# #' @param muM Transformed nest assocation parameters that denote precision.
+# #' Result of the `transform_mu` function. Defaults to `1` for each nest.
+# #' @param nests Not clear yet
+# #' @param alpha Not clear yet
+# #'
+# #' @export
+# #
+# # TO DO:
+# #  - Nested functions in this function: Should we consider them separate?
+# #  - The order of the arguments don't make sense to me: Would change them so
+# #    that the defaults remain at the back
+# #  - If I understand correctly, `between_nest` uses the individual probabilities
+# #    of the `within_nest` function to compute the probabilities of the nests.
+# #    If so, I would try to make this computation more general so that
+# #    `within_nest` and `between_nest` are computed at once instead of twice
+# #    in two separate functions
+# pCNLs <- function(V,
+#                   muM = rep(1, length(nests)),
+#                   nests,
+#                   alpha,
+#                   mu = 1) {
 
+#     # Create function to compute the probability of different alternatives
+#     # within a nest
+#     within_nest <- function(V, nests, alpha, muM) {
+#         # Loop over the different nests to assess the probabilities of all
+#         # alternatives within a single nest
+#         for(i in seq_along(nests)) {
+#             # Compute the probabilities
+#             prob <- alpha[[i]] * exp(muM[i] * V[[i]])
+
+#             # Check whether any of them are bad, and if so replace `prob` with
+#             # either 1 or 0 depending on which ones are bad
+#             if(any(prob == Inf)) {
+#                 prob <- ifelse(prob == Inf, 1, 0)
+#             }
+
+#             # Scale the probabilities based on the total sum
+#             if(all(prob == 0)) {
+#                 nests[[i]] <- prob
+#             } else {
+#                 nests[[i]] <- prob / sum(prob)
+#             }
+#         }
+
+#         return(nests)
+#     }
+
+#     # Create a function to compute the probability of the nests themselves
+#     between_nest <- function(V, nests, alpha, mu, muM) {
+#         # Transform the precision parameter
+#         mu <- mu / muM
+
+#         # Create probabilities for the different nests by summing the
+#         # probabilities of all their alternatives
+#         prob <- sapply(seq_along(nests),
+#                        \(x) sum(alpha[[x]] * exp(muM[x] * V[[x]]))^mu_muM[x])
+
+#         # Again check for any bad ones
+#         if(any(prob) == Inf) {
+#             prob <- ifelse(prob == Inf, 1, 0)
+#         }
+
+#         # Again normalize the probabilities
+#         if(all(prob == 0)) {
+#             prob <- prob
+#         } else {
+#             prob <- prob / sum(prob)
+#         }
+
+#         return(prob)
+#     }
+
+#     # Nest probabilities
+#     if(any(unlist(nests) == 0)) {
+#         nests <- lapply(nests, \(x) x + 1)
+#     }
+
+#     # Save all utilities of the different nests in a list
+#     Vlist <- lapply(nests, \(x) V[x])
+
+#     # Set largest V to zero to avoid numerical issues and apply this reduction
+#     # to all other V's
+#     upper_bound <- lapply(Vlist, max) |>
+#         unlist() |>
+#         max()
+
+#     Vlist <- lapply(Vlist, \(x) x - upper_bound)
 
 #     # Compute both kinds of probabilities and multiply to get a total
 #     # probability for each of the alternatives
