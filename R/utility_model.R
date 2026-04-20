@@ -479,9 +479,11 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' @export 
 setMethod("compute_utility_variables", "data.frame", function(object,
                                                               background,
-                                                              time_step = NULL) {
+                                                              time_step = NULL,
+                                                              standing_start = 0.25) {
     time_step <- .get_time_step(object, explicit = time_step)
-    trace <- to_trace(object, background, time_step = time_step)
+    trace <- to_trace(object, background, time_step = time_step,
+                      standing_start = standing_start)
     return(unpack_trace(trace, time_step = time_step))
 })
 
