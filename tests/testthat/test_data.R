@@ -5,11 +5,11 @@ testthat::test_that("Transforming to time series works", {
         sep = ",",
         header = TRUE
     )
-
+    attr(ref, "time_step") <- 0.5
     tst <- predped::time_series(trace)
-
     testthat::expect_equal(ref, tst)
 })
+
 
 testthat::test_that("Transforming to time series from R and Rcpp is same", {
     trace <- readRDS(file.path(".", "data", "trace_example.Rds"))
@@ -33,7 +33,7 @@ testthat::test_that("Transforming to trace works", {
     # Do some checks on the trace itself
     testthat::expect_equal(length(tst), 10)
     testthat::expect_equal(
-        sapply(tst, \(x) length(x@agents)), 
+        sapply(tst, \(x) length(x@agents)),
         c(0, 0, 1, 1, 1, 1, 2, 2, 2, 2)             # Values here represent: 1 being empty as initial state, 2 being empty due to NA speed and orientation after introduction of agent
     )
 })
@@ -86,14 +86,14 @@ testthat::test_that("General characteristics for `to_trace` works", {
         data_ref <- data_ref[order(data_ref$iteration), ]
         data_tst <- data_tst[order(data_tst$iteration), ]
 
-        # Select only relevant iterations: Some are ultimately lost in 
+        # Select only relevant iterations: Some are ultimately lost in
         # translation
         data_tst <- data_tst[data_tst$status == "move" & data_tst$cell != 0, ]
         data_ref <- data_ref[data_ref$iteration %in% data_tst$iteration, ]
 
         # FIX LATER: HAS TO DO WITH THRESHOLDS OF SPEED, NOT SURE HOW TO FIX NOW
         #
-        # Remove instances where the agent is not moving around; These cannot 
+        # Remove instances where the agent is not moving around; These cannot
         # be adequately distinguished from actual data
         # data_ref <- data_ref[data_ref$status == "move" & data_ref$cell != 0, ]
         # data_tst <- data_tst[data_tst$status == "move", ]
@@ -105,7 +105,7 @@ testthat::test_that("General characteristics for `to_trace` works", {
 
             if(is.numeric(x)) {
                 result[i, j] <- all(abs(x - y) < 1e-1)
-                
+
             } else {
                 result[i, j] <- all(x == y)
             }
@@ -150,7 +150,7 @@ testthat::test_that("Computing cell centers for data works", {
         stati <- sapply(agents_tst, predped::status)
         agents_tst <- agents_tst[stati == "move"]
 
-        # Select only the agents that are also present in the tst list. There 
+        # Select only the agents that are also present in the tst list. There
         # is bound to be loss of information (and potentially agents) when speeds
         # and orientations are computed in the `to_trace` function
         id_ref <- sapply(agents_ref, predped::id)
@@ -185,17 +185,17 @@ testthat::test_that("Computing cell centers for data works", {
 #
 # For some reason, the social utility functions do not always get the
 # same results when based on data. It is not entirely clear why this may be,
-# but it seems to be that agents will only be flagged if they move (i.e., 
-# when the predictions seem to point in a given direction), which may be 
+# but it seems to be that agents will only be flagged if they move (i.e.,
+# when the predictions seem to point in a given direction), which may be
 # different in traces inferred from data compared to actual traces.
 #
-# Whenever interpersonal distance, for example, is computed in both, it 
+# Whenever interpersonal distance, for example, is computed in both, it
 # seems to correspond quite well.
 #
-# In addition to this difficulty, it seems that the divergence between what we 
+# In addition to this difficulty, it seems that the divergence between what we
 # can infer from data and the information in the traces furthermore provides some
 # other small deviations that are difficult to solve. For example, agent indices
-# are not correctly transformed, and checks are only approximate (based on the 
+# are not correctly transformed, and checks are only approximate (based on the
 # information in the data, not on actual information in the space).
 #
 #
