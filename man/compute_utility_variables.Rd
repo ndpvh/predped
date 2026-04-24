@@ -15,7 +15,12 @@
   cpp = TRUE
 )
 
-\S4method{compute_utility_variables}{data.frame}(object, background, time_step = NULL)
+\S4method{compute_utility_variables}{data.frame}(
+  object,
+  background,
+  time_step = NULL,
+  standing_start = 0.25
+)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
