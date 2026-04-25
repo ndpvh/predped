@@ -158,9 +158,9 @@ gifski::save_gif(
 )
 
 # Save the trace itself
-saveRDS(
+qs2::qs_save(
   trace, 
-  file.path("man", "data", "trace.Rds")
+  file.path("man", "data", "trace.qs2")
 )
 ```
 
@@ -172,8 +172,8 @@ knitr::include_graphics(
   file.path("..", "man", "figures", "trace.gif")
 )
 
-trace <- readRDS(
-  file.path("..", "man", "data", "trace.Rds")
+trace <- qs2::qs_read(
+  file.path("..", "man", "data", "trace.qs2")
 )
 
 ```
@@ -546,9 +546,9 @@ gifski::save_gif(
 )
 
 # Save the trace itself
-saveRDS(
+qs2::qs_save(
   trace, 
-  file.path("man", "data", "trace_train.Rds")
+  file.path("man", "data", "trace_train.qs2")
 )
 
 # Create a dataset out of this
