@@ -35,6 +35,7 @@ Depends:
     R (>= 4.3.0)
 Imports: 
     Rcpp (>= 1.0.14),
+    qs2 (>= 0.1.0),
     methods,
     cppRouting,
     m4ma,
