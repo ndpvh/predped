@@ -461,14 +461,14 @@ benchmark_args <- list(
 
     # data.R
     "time_series" = list(
-        readRDS(file.path("tests", "testthat", "data", "trace_mll_bench.Rds"))[1:10]
+        qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
     ),
     "to_trace" = list(
         data_bench[data_bench$iteration <= 14, ],
         supermarket
     ),
     "unpack_trace" = list(
-        readRDS(file.path("tests", "testthat", "data", "trace_mll_bench.Rds"))[1:10]
+        qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
     ),
 
     # general.R
