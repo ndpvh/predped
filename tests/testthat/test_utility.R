@@ -29,7 +29,7 @@ testthat::test_that("Utility data R and Rcpp converge", {
 })
 
 testthat::test_that("Utility agent R and Rcpp converge", {
-    trace <- readRDS(file.path("data", "trace_utility.Rds"))
+    trace <- qs2::qs_read(file.path("data", "trace_utility.qs2"))
 
     # Loop over 10 of the traces
     result <- logical(10)
@@ -90,7 +90,7 @@ testthat::test_that("Utility agent R and Rcpp converge", {
 })
 
 testthat::test_that("Compute utility variables agent R and Rcpp converge", {
-    trace <- readRDS(file.path("data", "trace_utility.Rds"))
+    trace <- qs2::qs_read(file.path("data", "trace_utility.qs2"))
 
     # Loop over 10 of the traces
     result <- logical(10)
