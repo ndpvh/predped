@@ -2,6 +2,7 @@
 % Please edit documentation in R/utility_model.R
 \name{compute_utility_variables,agent-method}
 \alias{compute_utility_variables,agent-method}
+\alias{compute_utility_variables,data.frame-method}
 \title{Compute utility variables}
 \usage{
 \S4method{compute_utility_variables}{agent}(
@@ -13,6 +14,8 @@
   check,
   cpp = TRUE
 )
+
+\S4method{compute_utility_variables}{data.frame}(object, background)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
@@ -39,13 +42,27 @@ or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 \value{
 Data.frame containing all of the needed variables to be able to 
 compute the values of the utility functions.
+
+Data.frame containing all of the needed variables to be able to 
+compute the values of the utility functions.
 }
 \description{
 This function uses the current state of the environment to determine the 
 values of a whole range of variables that are used within the utility 
 functions.
+
+This function uses the current state of the environment to determine the 
+values of a whole range of variables that are used within the utility 
+functions.
 }
 \seealso{
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{update_position}},
+\code{\link[predped]{update}}
+
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},

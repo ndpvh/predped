@@ -461,7 +461,7 @@ setMethod("compute_utility_variables", "agent", function(object,
                                                 position(object),
                                                 orientation(object),
                                                 agent_specifications$predictions,
-                                                vf_angles_local))
+                                                centers))
     
 
 
@@ -719,7 +719,7 @@ get_angles <- function (agent_idx,
         # to other pedestrians in the group at the next time step.
         nearest_ped <- m4ma::dist1_rcpp(position, predictions)
         nearest_ped <- predictions[which.min(nearest_ped),]
-        orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
+        orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
 
         # Get angle from cell centers of pedestrian `n`
         # to predicted position of the nearest group member.
@@ -860,7 +860,7 @@ get_nearest_member_data <- function(agent_idx,
                                     position, 
                                     orientation, 
                                     predictions, 
-                                    rel_angles) {
+                                    centers) {
     
     # Identify in-group pedestrians
     predictions <- predictions[-agent_idx, , drop = FALSE]
@@ -872,23 +872,23 @@ get_nearest_member_data <- function(agent_idx,
         return(NULL)    
     }
     
-    # # Find the single nearest group member based on the agent's *current* position
-    # # dist1_rcpp returns a vector of distances when comparing a point to a matrix
-    # distances_to_group <- m4ma::dist1_rcpp(as.numeric(position), predictions)
-    # nearest_idx <- which.min(distances_to_group)
-    # nearest_ped <- predictions[nearest_idx, ]
+    # Find the single nearest group member based on the agent's *current* position
+    # dist1_rcpp returns a vector of distances when comparing a point to a matrix
+    distances_to_group <- m4ma::dist1_rcpp(as.numeric(position), predictions)
+    nearest_idx <- which.min(distances_to_group)
+    nearest_ped <- predictions[nearest_idx, ]
     
-    # # Calculate distances from all candidate cells to the nearest member
-    # distances <- m4ma::dist1_rcpp(as.numeric(nearest_ped), centers)
+    # Calculate distances from all candidate cells to the nearest member
+    distances <- m4ma::dist1_rcpp(as.numeric(nearest_ped), centers)
     
-    # # Calculate relative angles from all candidate cells to the nearest member
-    # orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
-    # angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
-    # rel_angles <- angles - orientations
+    # Calculate relative angles from all candidate cells to the nearest member
+    orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+    angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
+    rel_angles <- angles - orientations
     
-    # # Normalize angles to [-pi, pi]
-    # rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
-    # rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
+    # Normalize angles to [-pi, pi]
+    rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
+    rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
     
     return(list(distances = distances, rel_angles = rel_angles))
 }
