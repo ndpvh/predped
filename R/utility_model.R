@@ -447,14 +447,6 @@ setMethod("compute_utility_variables", "agent", function(object,
                                     centers,
                                     any_member = TRUE))
     
-    # Local group dynamics utility
-    vf_angles_local <- get_angles(uv$agent_idx,
-                                    agent_specifications$group,
-                                    position(object),
-                                    orientation(object),
-                                    agent_specifications$predictions,
-                                    centers,
-                                    any_member = FALSE)
     
     uv$llgvf_data <- list(get_nearest_member_data(uv$agent_idx,
                                                 agent_specifications$group,
