@@ -1136,13 +1136,24 @@ create_initial_condition <- function(agent_number,
                                           length.out = n_agents_fit[i])))
     alternatives <- do.call("rbind", alternatives)
 
-
     # Create a dummy agent. This will allow for faster generation of the initial
     # condition, as changing an agent's characteristics is faster than the 
     # generation of one
     dummy <- agent(center = c(0, 0), radius = 0.25)
     dummy_big <- dummy
     radius(dummy_big) <- 2 * max_size
+
+    # Remove all alternatives that would end with an overlap with the objects
+    # in the space.
+    idx <- lapply(
+        objects(model@setting),
+        function(x) x |>
+            enlarge(extension = space_between * max_size) |>
+            in_object(alternatives)
+    )
+    idx <- do.call("cbind", idx) |>
+        rowSums()
+    alternatives <- alternatives[idx == 0, ]
 
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents,
@@ -1151,6 +1162,15 @@ create_initial_condition <- function(agent_number,
     group_number <- 0
     agents <- list()
     for(i in seq_len(agent_number)) {
+        # Check whether we can still add some agents to the list based on the 
+        # positions that are left.
+        if(nrow(alternatives) == 0) {
+            message(paste0("Couldn't add any new agents after ",
+                           length(agents),
+                           " due to crowdiness."))
+            break
+        }
+
         # Sample a random position on which the agent will stand and adjust the
         # dummy
         idx <- sample(1:nrow(alternatives), 1)
@@ -1200,15 +1220,6 @@ create_initial_condition <- function(agent_number,
 
         idx <- out_object(dummy_big, alternatives)
         alternatives <- alternatives[idx, ]
-
-        # Check whether we can still add some agents to the list based on the 
-        # positions that are left.
-        if(nrow(alternatives) == 0) {
-            message(paste0("Couldn't add any new agents after ",
-                           length(agents),
-                           " due to crowdiness."))
-            break
-        }
     }
 
     return(agents)

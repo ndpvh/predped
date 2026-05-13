@@ -1,7 +1,7 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 0.2.0
+Version: 0.2.2
 Date: 2026-02-05
 Description: 
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
@@ -11,7 +11,7 @@ Authors@R: c(
     person("Niels", 
            "Vanhasbroeck", 
            email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090),
+           comment = c(ORCID = "0000-0002-7423-0090"),
            role = c("aut", "cre")), 
     person("Malte", 
            "Lüken",
