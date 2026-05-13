@@ -18,6 +18,7 @@ procedure (Johnson, 2008). To install and use this package, one can
 execute the following two commands:
 
 ``` r
+
 install.packages("nloptr")
 library(nloptr)
 ```
@@ -61,6 +62,7 @@ can be achieved with the
 function:
 
 ``` r
+
 data <- unpack_trace(trace)
 ```
 
@@ -68,6 +70,7 @@ The variable `data` contains a bunch of information in a variety of
 columns, namely:
 
 ``` r
+
 colnames(data)
 #>  [1] "iteration"   "time"        "id"          "x"           "y"          
 #>  [6] "speed"       "orientation" "cell"        "group"       "status"     
@@ -95,6 +98,7 @@ by filtering out any rows in which the utility variables are `NA`,
 indicating that they were not used during that iteration:
 
 ``` r
+
 dim(data)
 #> [1] 804  30
 
@@ -109,12 +113,13 @@ warning would be thrown in case `NA` are left in the data.
 
 Finally, once the data has been filtered to contain only movement data,
 we can compute the likelihood of the data under a particular set of
-parameters. Calling this likelihood $L$, then one can compute the
-negative log-likelihood $- \log(L)$ with the
+parameters. Calling this likelihood $`L`$, then one can compute the
+negative log-likelihood $`-\log(L)`$ with the
 [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function as
 follows:
 
 ``` r
+
 # Define a set of parameters to be evaluated. For illustration purposes, we use
 # the parameters of the DrunkAussie for this purpose. Note that we delete the 
 # agent's type name and their color from the parameters. Furthermore note that 
@@ -170,6 +175,7 @@ summing all of the negative log-likelihoods together into one single
 `objective` value:
 
 ``` r
+
 objective_function <- function(parameters) {
   return(
     sum(
@@ -196,6 +202,7 @@ Using the dividing rectangles algorithm (Jones et al., 1993), for
 example, we get:
 
 ``` r
+
 # Extract the bounds of the parameters
 bounds <- load_parameters()$params_bounds
 
@@ -254,6 +261,7 @@ interest. In practice, we therefore need to change the objective
 function so that:
 
 ``` r
+
 # Get the number of participants in the study
 n <- length(unique(data$id))
 
@@ -285,6 +293,7 @@ bounds `lb` and `ub` in the `nloptr` function so that it matches the
 objective function, in this case:
 
 ``` r
+
 # Extract the bounds of the parameters
 bounds <- load_parameters()$params_bounds |>
   rep(each = n) |>
@@ -345,6 +354,7 @@ column names denoting the parameters and row names denoting the
 participants themselves:
 
 ``` r
+
 # Get the parameter names: By default the same order as the one in bounds
 params <- load_parameters()$params_bounds |>
   rownames()
@@ -411,6 +421,7 @@ In this case, we change the argument `transform` to `TRUE` and change
 the call to `nloptr` as follows:
 
 ``` r
+
 # Change the objective function to operate on the real scale
 objective_function <- function(parameters) {
   return(
@@ -474,6 +485,7 @@ scale. To transform the parameters to their proper values, we use the
 function:
 
 ``` r
+
 # Get the bounds of the parameters
 bounds <- load_parameters()$params_bounds
 
@@ -514,6 +526,7 @@ station, for example (see [*Advanced
 Simulations*](https://ndpvh.github.io/predped/articles/advnaced_simulation.html)):
 
 ``` r
+
 head(data)
 #>       time passenger        x             y
 #> 1 2.403958         1 4.692500  3.765789e-17
@@ -533,7 +546,7 @@ First, we need the dataset to conform to the standards of `predped`.
 This means that:
 
 - The `time` variable needs to show discrete jumps conforming the
-  `time_step` defined by the M4MA, it being $500$msec;
+  `time_step` defined by the M4MA, it being $`500`$msec;
 - A variable `iteration` needs to be added showing the iteration at
   which the positions were measured;
 - The `passenger` variable needs to be renamed to the `predped` internal
@@ -544,6 +557,7 @@ particular time window, aggregating the positions within that window
 through, for example, taking a mean, as we do in the next bit of code:
 
 ``` r
+
 # Define the bins, assuming the time variable is specified in seconds
 bins <- seq(
   min(data$time), 
@@ -606,6 +620,7 @@ which the position was measured. To compute this variable, we can
 perform the following computation:
 
 ``` r
+
 data$iteration <- (data$time - min(data$time)) / 0.5 + 1
 head(data)
 #>         time passenger        x             y iteration
@@ -620,6 +635,7 @@ head(data)
 The column `passenger` can be renamed to `id` in the following way:
 
 ``` r
+
 colnames(data)[2] <- "id"
 head(data)
 #>         time id        x             y iteration
@@ -660,6 +676,7 @@ a particular exit of the space. Based on this information, we add the
 required columns as follows:
 
 ``` r
+
 # Perform the mapping of a person with their goal position
 mapping <- list(
   "exit 1" = c(1, 3, 12, 14, 21, 23, 28, 32, 33), 
@@ -709,6 +726,7 @@ compute the input variables for the utility functions through the
 function as follows:
 
 ``` r
+
 utility_data <- compute_utility_variables(
   data,
   train_station

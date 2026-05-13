@@ -20,6 +20,7 @@ To install `predped`, you should use the `install_github()` function
 from the package `remotes`:
 
 ``` r
+
 remotes::install_github("ndpvh/predped")
 ```
 
@@ -28,6 +29,7 @@ One can load the package through
 package’s functionalities:
 
 ``` r
+
 library(predped)
 ```
 
@@ -58,6 +60,7 @@ which can be created by calling their constructor and defining their
 characteristics:
 
 ``` r
+
 # Main characteristics of rectangle are `center` and `size`
 rectangle(
   center = c(0, 0),
@@ -162,18 +165,29 @@ their underlying computations differ depending on the object’s class.
 Take, for example, the computation of the area of different shapes. For
 rectangles, the area can be computed as:
 
-$$A = wh$$ where $A$ represents the area and $w$, $h$ are the width and
-the height of the rectangle respectively. For circles, the area is
-defined differently, where:
+``` math
+\begin{equation}
+  A = w h
+\end{equation}
+```
+where $`A`$ represents the area and $`w`$, $`h`$ are the width and the
+height of the rectangle respectively. For circles, the area is defined
+differently, where:
 
-$$A = \pi r^{2}$$ where $r$ is the radius of the circle. Traditionally,
-to differentiate between both use-cases, one would have to implement two
-different functions, for example `area_rectangle` and `area_circle`.
-When making use of object-oriented programming, however, we can create a
-separate method for both use-cases, preserving the same name `area` in
-both cases:
+``` math
+\begin{equation}
+  A = \pi r^2
+\end{equation}
+```
+where $`r`$ is the radius of the circle. Traditionally, to differentiate
+between both use-cases, one would have to implement two different
+functions, for example `area_rectangle` and `area_circle`. When making
+use of object-oriented programming, however, we can create a separate
+method for both use-cases, preserving the same name `area` in both
+cases:
 
 ``` r
+
 # Create the objects for which to compute the area
 my_rectangle <- rectangle(
   center = c(0, 0),
@@ -208,6 +222,7 @@ used to either retrieve or overwrite the size of the object provided to
 it. Exemplified with the rectangle we made earlier:
 
 ``` r
+
 size(my_rectangle)
 #> [1] 2 4
 
@@ -226,6 +241,7 @@ two thus changes these coordinates. To ensure that this happens, we need
 to use the setters rather than overwriting the attribute manually:
 
 ``` r
+
 # Create a rectangle with a given size
 my_rectangle <- rectangle(
   center = c(0, 0), 

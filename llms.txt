@@ -42,12 +42,14 @@ These individual differences are implemented in two ways:
 One can install `predped` via the `remotes` package:
 
 ``` r
+
 remotes::install_github("ndpvh/predped")
 ```
 
 To use the package, one should load it through `library`:
 
 ``` r
+
 library(predped)
 ```
 
@@ -73,6 +75,7 @@ A simple example of an environment is the following circular room with a
 square object placed in the middle:
 
 ``` r
+
 setting <- background(
   shape = circle(
     center = c(0, 0), 
@@ -93,6 +96,7 @@ this, we can use the
 [`plot`](https://ndpvh.github.io/reference/plot.html) function:
 
 ``` r
+
 plot(setting)
 ```
 
@@ -120,6 +124,7 @@ In this example, we wish to use the `"BaselineEuropean"`, specifying the
 model as:
 
 ``` r
+
 model <- predped(
   id = "my model", 
   setting = setting, 
@@ -132,6 +137,7 @@ pedestrian movement as expected by the M4MA through calling the function
 [`simulate`](https://ndpvh.github.io/reference/simulate.html):
 
 ``` r
+
 set.seed(1)
 trace <- simulate(
   model,
@@ -149,6 +155,7 @@ again use the [`plot`](https://ndpvh.github.io/reference/plot.html)
 function:
 
 ``` r
+
 plots <- plot(
   trace,
   print_progress = FALSE
@@ -160,6 +167,7 @@ of plots. For research purposes, it is useful to transform this list to
 a gif, which can be achieved by using the `gifski` package:
 
 ``` r
+
 gifski::save_gif(
   lapply(plots, print), 
   file.path("readme.gif"),

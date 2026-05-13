@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -267,7 +267,7 @@ choice.</p>
 chooses one of 34 discrete velocity options, 33 of which are composed by
 crossing 11 direction options or “cones” that describe turns relative to
 the current direction
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mo>−</mo><msup><mn>72.5</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><mo>−</mo><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>0</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>72.5</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">a \in \{-72.5^\circ, -50^\circ, -32.5^\circ, -20^\circ, -10^\circ, 0^\circ, 10^\circ, 20^\circ, 32.5^\circ, 50^\circ, 72.5^\circ\}</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mi>−</mi><msup><mn>72.5</mn><mo>∘</mo></msup><mo>,</mo><mi>−</mi><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><mi>−</mi><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><mi>−</mi><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><mi>−</mi><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>0</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>10</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>20</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>32.5</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>50</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>72.5</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">a \in \{-72.5^\circ, -50^\circ, -32.5^\circ, -20^\circ, -10^\circ, 0^\circ, 10^\circ, 20^\circ, 32.5^\circ, 50^\circ, 72.5^\circ\}</annotation></semantics></math>)
 and 3 speed options or “rings” that describe how speed changes relative
 the current speed ( multiplier
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1.5</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">s \in \{0.5, 1, 1.5\}</annotation></semantics></math>;
@@ -282,7 +282,7 @@ while turning. Within <code>predped</code>, this slowing factor is taken
 into account when computing these discrete choices in
 <code>predped</code>s <a href="https://ndpvh.github.io/predped/reference/compute_centers.html" class="external-link"><code>compute_centers</code></a>
 and can be summarized mathematically as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ρ</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>β</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub><mtext mathvariant="normal">sin</mtext><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>a</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>α</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msubsup><mi>s</mi><mi>i</mi><mo>*</mo></msubsup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>ρ</mi><mi>i</mi></msub><msub><mi>s</mi><mi>i</mi></msub></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>ρ</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>β</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub><mtext mathvariant="normal">sin</mtext><mo stretchy="false" form="prefix">(</mo><mfrac><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>a</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo></mrow><mn>2</mn></mfrac><msup><mo stretchy="false" form="postfix">)</mo><msub><mi>α</mi><mrow><mi>t</mi><mi>u</mi><mi>r</mi><mi>n</mi></mrow></msub></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msubsup><mi>s</mi><mi>i</mi><mo>*</mo></msubsup></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>ρ</mi><mi>i</mi></msub><msub><mi>s</mi><mi>i</mi></msub></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
 \begin{split}
   \rho_i &amp;= 1 - \beta_{turn} \text{sin}(\frac{|a_i|}{2})^{\alpha_{turn}} \\
   s_i^* &amp;= \rho_i s_i
@@ -356,7 +356,7 @@ different options. According to the M4MA, the probability that an agent
 will choose a specific cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mn>33</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i \in \{1, ... 33\}</annotation></semantics></math>
 is determined by that cell’s utility
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">(</mo><mo>−</mo><mi>∞</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">u_i \in (-\infty, 0]</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mi>∞</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">u_i \in (-\infty, 0]</annotation></semantics></math>,
 denoting how <em>useful</em> it is for the agent to move to cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
 The larger the value of
@@ -366,7 +366,7 @@ the greater the usefulness.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mi>i</mi></msub><annotation encoding="application/x-tex">u_i</annotation></semantics></math>
 of a particular cell, one can derive the probability of moving to that
 cell as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msup><mi>τ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>u</mi><mi>i</mi></msub></mrow></msup><mi>Z</mi></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msup><mi>τ</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><msub><mi>u</mi><mi>i</mi></msub></mrow></msup><mi>Z</mi></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
   p_i = \frac{e^{\tau^{-1} u_i}}{Z},
 \end{equation}</annotation></semantics></math></p>
 <p>where
@@ -383,12 +383,12 @@ according to a multinomial distribution and, once selected, change their
 position to the chosen cell.</p>
 <p>A two-stage procedure is used to determine each of the 33 cells’
 utility. In the first stage, we set the utility of a particular cell to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
 when it is not accessible. This is the case when a cell is currently
 occupied or movement to the cell is obstructed by other objects and when
 moving to that location would require the agent’s body intersecting with
 other objects in the space. By setting the utility to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
 in these cases, we prevent the agent from being able to choose this cell
 so that its probability
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">p_i = 0</annotation></semantics></math>
@@ -408,7 +408,7 @@ preference.</p>
 for agent
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
 as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><munder><mo>∑</mo><mrow><mi>f</mi><mo>∈</mo><mi>F</mi></mrow></munder><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>S</mi><mi>j</mi></msub><mo>,</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝛉</mi><mi>f</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is available</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>∞</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is unavailable</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><munder><mo>∑</mo><mrow><mi>f</mi><mo>∈</mo><mi>F</mi></mrow></munder><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>S</mi><mi>j</mi></msub><mo>,</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>𝛉</mi><mi>f</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is available</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>∞</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is unavailable</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
   u_{ij} = \begin{cases}
       \displaystyle\sum_{f \in F} f(S_j, \bm{x}_i | \bm{\theta}_f), &amp; \quad{\text{if cell $i$ is available}} \\
       -\infty, &amp; \quad{\text{if cell $i$ is unavailable}} 
@@ -602,7 +602,7 @@ as the angle in degrees of the cone
 in which cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 is contained, then the utility function is computed as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>γ</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mi>−</mi><mi>γ</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
     f_i = - \gamma \left|\frac{a_{k_i}}{90}\right|^{\alpha} .
 \end{equation}</annotation></semantics></math> Note that in this
 equation, the cone angles are normalized by the constant
@@ -631,7 +631,7 @@ there is no side bias, if
 there is a bias to the left, and if
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda &gt; 1</annotation></semantics></math>
 there is a bias to the right:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>=</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mi>λ</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&gt;</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><msup><mi>λ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&lt;</mo><mn>6</mn></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation*}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>=</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><mi>λ</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&gt;</mo><mn>6</mn></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>β</mi><msup><mi>λ</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><msub><mi>k</mi><mi>i</mi></msub><mo>&lt;</mo><mn>6</mn></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation*}
   \gamma = \begin{cases}
       \beta, &amp; \quad{k_i = 6} \\
       \beta \lambda, &amp; \quad{k_i &gt; 6} \\
@@ -665,7 +665,7 @@ the same for all cells
 contained in a same ring
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>r</mi><mi>i</mi></msub><annotation encoding="application/x-tex">r_i</annotation></semantics></math>.
 Denoting the preferred speed as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝜍</mi><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
 the current speed as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>,
 and
@@ -674,7 +674,7 @@ as the adjusted speed once the multiplier of the ring has been taken in
 to account (0.5 for deceleration, 1 for maintenance, and 1.5 for
 acceleration), then the preferred speed utility function is defined
 as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>s</mi><msub><mi>r</mi><mi>i</mi></msub></msub><mo>−</mo><msup><mo>𝜍</mo><mo>*</mo></msup><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mi>−</mi><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>s</mi><msub><mi>r</mi><mi>i</mi></msub></msub><mo>−</mo><msup><mi>𝜍</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
   f_i = -\beta \left| s_{r_i} - \varsigma^* \right|^{\alpha},
 \end{equation}</annotation></semantics></math> taking on the same shape
 as for the unbiased current direction utility function above. The
@@ -683,22 +683,22 @@ preferred speed utility function thus attains an optimal utility of
 whenever the speed of a particular ring corresponds to the agent’s
 preferred speed. Note, however, that this equation does not make use of
 the raw preferred speed
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝜍</mi><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
 but rather of a value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mo>𝜍</mo><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝜍</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
 derived thereof. The value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mo>𝜍</mo><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝜍</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\varsigma^*</annotation></semantics></math>
 depends on the distance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
 between an agent and their goal, so that</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mo>𝜍</mo><mo>*</mo></msup><mo>=</mo><mtext mathvariant="normal">min</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mo>𝜍</mo><mo>,</mo><mi>τ</mi><mfrac><mo>𝜍</mo><mi>d</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝜍</mi><mo>*</mo></msup><mo>=</mo><mtext mathvariant="normal">min</mtext><mo stretchy="false" form="prefix">(</mo><mi>𝜍</mi><mo>,</mo><mi>τ</mi><mfrac><mi>𝜍</mi><mi>d</mi></mfrac><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
   \varsigma^* = \text{min}( \varsigma, \tau \frac{\varsigma}{d} ) ,
 \end{equation}</annotation></semantics></math> where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
 is a time-based slowing parameter, ensuring that an agent approaches a
 goal more slowly in order to not overshoot its location.</p>
 <p>In <code>predped</code>, the parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>𝜍</mo><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝜍</mi><annotation encoding="application/x-tex">\varsigma</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
 and
@@ -721,7 +721,7 @@ as the angle of the cone in which cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 is contained (in degrees). Then we normalize the absolute deviation by
 90 degrees and define the utility function as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><mrow><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mo>−</mo><mi>g</mi></mrow><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mi>−</mi><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><mrow><msub><mi>a</mi><msub><mi>k</mi><mi>i</mi></msub></msub><mo>−</mo><mi>g</mi></mrow><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
     f_i = - \beta \left| \frac{a_{k_i} - g}{90} \right|^{\alpha} .
 \end{equation}</annotation></semantics></math></p>
 <p>This utility functiona gain resembles the others already discussed,
@@ -747,7 +747,7 @@ across the set of visible agents
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mi>i</mi></msub><annotation encoding="application/x-tex">A_i</annotation></semantics></math>
 at that cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><msub><mi>N</mi><mi>i</mi></msub></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><msub><mi>A</mi><mi>i</mi></msub></mrow></munder><mi>γ</mi><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mo>−</mo><mi>α</mi></mrow></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mi>−</mi><mfrac><mn>1</mn><msub><mi>N</mi><mi>i</mi></msub></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><msub><mi>A</mi><mi>i</mi></msub></mrow></munder><mi>γ</mi><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mi>−</mi><mi>α</mi></mrow></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
     f_i = -\frac{1}{N_i} \sum_{j \in A_i} \gamma d_{ij}^{-\alpha} ,
 \end{equation}</annotation></semantics></math> where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_i</annotation></semantics></math>
@@ -758,7 +758,7 @@ visible from cell
 This equation defines a hyperbolic function for the distance to each
 individual agent, as visualized in the next Figure. Note that this
 utility function becomes
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
 whenever the interpersonal distance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
 is
@@ -823,7 +823,7 @@ For each cell in the other cones, a distance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>i</mi></msub><annotation encoding="application/x-tex">d_i</annotation></semantics></math>
 from the cell to the blocking agent is derived and the following utility
 function is computed:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> not in a blocked cone</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>∞</mi></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if blocking agent </mtext><mspace width="0.333em"></mspace></mrow><mi>j</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> stands between the agent and cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><msubsup><mi>d</mi><mi>i</mi><mrow><mo>−</mo><mi>α</mi></mrow></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in a blocked cone</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> not in a blocked cone</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>∞</mi></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if blocking agent </mtext><mspace width="0.333em"></mspace></mrow><mi>j</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> stands between the agent and cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>β</mi><msubsup><mi>d</mi><mi>i</mi><mrow><mi>−</mi><mi>α</mi></mrow></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in a blocked cone</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
     f_i = \begin{cases}
         0, &amp; \quad{\text{if cell $i$ not in a blocked cone}} \\
         -\infty &amp; \quad{\text{if blocking agent $j$ stands between the agent and cell $i$}} \\
@@ -866,7 +866,7 @@ and the angular difference
 between the direction of the agent’s goal and cell’s leader (in
 degrees), allowing us to compute the follow-the-leader utility as
 follows:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not have a leader</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>γ</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>α</mi></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> has a leader</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not have a leader</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>γ</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>i</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mi>α</mi></msubsup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if cell </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> has a leader</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
   f_i = \begin{cases}
     0, &amp; \quad{\text{if cell $i$ does not have a leader}} \\
     -\gamma \left| \frac{a_i}{90} \right| d_{i, t + 1}^{\alpha}, &amp; \quad{\text{if cell $i$ has a leader}}
@@ -935,7 +935,7 @@ and the angular difference
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>j</mi></msub><annotation encoding="application/x-tex">a_j</annotation></semantics></math>
 between the current direction of the agent and the buddy and use these
 to compute the utility function as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>B</mi></mrow></munder><mi>β</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>j</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mi>α</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mi>−</mi><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>B</mi></mrow></munder><mi>β</mi><mrow><mo stretchy="true" form="prefix">|</mo><mfrac><msub><mi>a</mi><mi>j</mi></msub><mn>90</mn></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><mi>α</mi></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
   f_i = -\sum_{j \in B} \beta \left| \frac{a_j}{90} \right| d_{ij}^{\alpha},
 \end{equation}</annotation></semantics></math> where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
@@ -966,22 +966,22 @@ between a cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 and the group centroid, then the group centroid utility function can be
 computed as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&lt;</mo><mo>=</mo><mi>Δ</mi></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>d</mi><mi>i</mi></msub><mo>−</mo><mi>Δ</mi><mo stretchy="true" form="postfix">|</mo></mrow><mi>α</mi></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&gt;</mo><mi>Δ</mi></mrow></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&lt;</mo><mo>=</mo><mi mathvariant="normal">Δ</mi></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>β</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>d</mi><mi>i</mi></msub><mo>−</mo><mi mathvariant="normal">Δ</mi><msup><mo stretchy="false" form="prefix">|</mo><mi>α</mi></msup><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mrow><msub><mi>d</mi><mi>i</mi></msub><mo>&gt;</mo><mi mathvariant="normal">Δ</mi></mrow></mrow></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\begin{equation} 
   f_i = \begin{cases}
     0, &amp; \quad{\text{if $d_i &lt;= \Delta$}} \\
     -\beta | d_i - \Delta |^{\alpha}, &amp; \quad{\text{if $d_i &gt; \Delta$}}
   \end{cases}
 \end{equation}</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
 is a comfortable distance around the group centroid that agents can
 maintain and for which the utility is optimal. Defining
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
 makes sure that agents will remain close to the group while maintaining
 a safe distance from the other members of the group, in effect not
 blocking the path of the other members. The value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
 is adapted to group size, so that:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mo>=</mo><mn>1.5</mn><mo>×</mo><mi>n</mi><mo>×</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation*}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mo>=</mo><mn>1.5</mn><mo>×</mo><mi>n</mi><mo>×</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation*}
   \Delta = 1.5 \times n \times \bar{r},
 \end{equation*}</annotation></semantics></math> where,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
@@ -1025,18 +1025,18 @@ the angle of the cone in which cell
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 is located. Using these angles, we then define the utility function
 as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in the extended visual field</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mo>−</mo><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not lie in the extended visual field</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> lies in the extended visual field</mtext></mrow></mrow></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>−</mi><mi>β</mi><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mrow><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>a</mi><mi>i</mi></msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> does not lie in the extended visual field</mtext></mrow></mrow></mtd></mtr></mtable></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation} 
     f_i = \begin{cases}
         0, &amp; \quad{\text{if $a_i$ lies in the extended visual field}} \\
         -\beta, &amp; \quad{\text{if $a_i$ does not lie in the extended visual field}}
     \end{cases} .
 \end{equation}</annotation></semantics></math></p>
 <p>Importantly, the agent’s visual field that usually spans
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><msup><mn>85</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>85</mn><mo>∘</mo></msup><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-85^\circ, 85^\circ]</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>85</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>85</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-85^\circ, 85^\circ]</annotation></semantics></math>
 is extended by
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>45</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">45^\circ</annotation></semantics></math>
 in both directions, therefore creating an extended visual field of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><msup><mn>130</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>130</mn><mo>∘</mo></msup><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-130^\circ, 130^\circ]</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>130</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>130</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-130^\circ, 130^\circ]</annotation></semantics></math>.
 The idea behind the extension is that people can turn their heads for
 about
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>45</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">45^\circ</annotation></semantics></math>

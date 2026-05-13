@@ -2,9 +2,8 @@
 
 ## Authors
 
-- **[Niels Vanhasbroeck](https://ndpvh.github.io)**. Author,
-  maintainer.  
-  -7515
+- **[Niels Vanhasbroeck](https://ndpvh.github.io)**. Author, maintainer.
+  [](https://orcid.org/0000-0002-7423-0090)
 
 - **Malte Lüken**. Contributor.
 
@@ -22,13 +21,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ndpvh/predped/tree/main/DESCRIPTION)
 
 Vanhasbroeck N, Heathcote A (2026). *predped: Interface to Minds for
-Mobile Agents*. R package version 0.2.0,
+Mobile Agents*. R package version 0.2.2,
 <https://github.com/ndpvh/predped>.
 
     @Manual{,
       title = {predped: Interface to Minds for Mobile Agents},
       author = {Niels Vanhasbroeck and Andrew Heathcote},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.2.2},
       url = {https://github.com/ndpvh/predped},
     }

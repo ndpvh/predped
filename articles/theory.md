@@ -204,9 +204,9 @@ The M4MA states that on every cycle (by default 0.5sec) an agent chooses
 one of 34 discrete velocity options, 33 of which are composed by
 crossing 11 direction options or “cones” that describe turns relative to
 the current direction
-($a \in \{ - 72.5^{\circ}, - 50^{\circ}, - 32.5^{\circ}, - 20^{\circ}, - 10^{\circ},0^{\circ},10^{\circ},20^{\circ},32.5^{\circ},50^{\circ},72.5^{\circ}\}$)
+($`a \in \{-72.5^\circ, -50^\circ, -32.5^\circ, -20^\circ, -10^\circ, 0^\circ, 10^\circ, 20^\circ, 32.5^\circ, 50^\circ, 72.5^\circ\}`$)
 and 3 speed options or “rings” that describe how speed changes relative
-the current speed ( multiplier $s \in \{ 0.5,1,1.5\}$; see the Figure
+the current speed ( multiplier $`s \in \{0.5, 1, 1.5\}`$; see the Figure
 below). The expansion of cones away from the center corresponds to
 direction control being more precise closer to the current direction.
 
@@ -222,33 +222,38 @@ account when computing these discrete choices in `predped`s
 [`compute_centers`](https://ndpvh.github.io/predped/reference/compute_centers.html)
 and can be summarized mathematically as:
 
-$$\begin{aligned}
-\rho_{i} & {= 1 - \beta_{turn}\text{sin}\left( \frac{\left| a_{i} \right|}{2} \right)^{\alpha_{turn}}} \\
-s_{i}^{*} & {= \rho_{i}s_{i}}
-\end{aligned}$$ where $i \in \{ 1,2,\cdots,33\}$ represents the discrete
-choice of interest, $a_{i}$ is the turning angle for this choice,
-$s_{i}$ is the speed for this choice if the agent were not turning,
-$s_{i}^{*}$ represents the biomechanically corrected speed, and
-$\beta_{turn}$ and $\alpha_{turn}$ are the parameters that guide this
-biomechanical slowing. Within `predped`, we allow each agent to have a
-different rate of slowing as capture through their parameters
-`b_turning` and `a_turning` (see
+``` math
+\begin{equation}
+\begin{split}
+  \rho_i &= 1 - \beta_{turn} \text{sin}(\frac{|a_i|}{2})^{\alpha_{turn}} \\
+  s_i^* &= \rho_i s_i
+\end{split}
+\end{equation}
+```
+where $`i \in \{1, 2, \cdots, 33\}`$ represents the discrete choice of
+interest, $`a_i`$ is the turning angle for this choice, $`s_i`$ is the
+speed for this choice if the agent were not turning, $`s_i^*`$
+represents the biomechanically corrected speed, and $`\beta_{turn}`$ and
+$`\alpha_{turn}`$ are the parameters that guide this biomechanical
+slowing. Within `predped`, we allow each agent to have a different rate
+of slowing as capture through their parameters `b_turning` and
+`a_turning` (see
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
 
 Additionally, under the hood we are required to index the rings and
 cones in a particular reproducible way. In `predped`, rings are numbered
-$r \in \{ 1,2,3\}$, with $r = 1$ corresponding to acceleration, $r = 2$
-to maintaining speed, and $r = 3$ to decelerating. Cones are numbered
-$k \in \{ 1,\ldots,11\}$ from left to right from the agent’s
+$`r \in \{1, 2, 3\}`$, with $`r = 1`$ corresponding to acceleration,
+$`r = 2`$ to maintaining speed, and $`r = 3`$ to decelerating. Cones are
+numbered $`k \in \{1, \hdots, 11\}`$ from left to right from the agent’s
 perspective. The set of locations corresponding to each option is
 described as a “cell” and the set of cells defines the agent’s spatial
 “field of operations” for the current cycle. Hence, each of these
-$i = \{ 1,\ldots,33\}$ choices corresponds to moving to a new location
-and, typically, a change in direction and/or speed. The index for each
-of the cells is found by multplying the ring identifier with the cone
-identifier, so that cells are numbered $1,\ldots,11$ from left to right
-in the acceleration ring, $12,\ldots,22$ in the constant speed cone, and
-$23,\ldots,33$ in the deceleration cone.
+$`i = \{1, \hdots, 33\}`$ choices corresponds to moving to a new
+location and, typically, a change in direction and/or speed. The index
+for each of the cells is found by multplying the ring identifier with
+the cone identifier, so that cells are numbered $`1, \hdots, 11`$ from
+left to right in the acceleration ring, $`12, \hdots, 22`$ in the
+constant speed cone, and $`23, \hdots, 33`$ in the deceleration cone.
 
 #### The 34th Option
 
@@ -258,7 +263,7 @@ allows agents to stop for one of three reasons: (a) no cell is available
 (e.g., all cells are blocked by objects or other pedestrians in a
 crowded scenario), (b) one or more cells are available but none have an
 acceptably high utility (see later on), and (c) agents are performing an
-activity (e.g., buying a ticket). Hence, we added a 34$^{th}$ option
+activity (e.g., buying a ticket). Hence, we added a 34$`^{th}`$ option
 that allows agents to stop, corresponding to the current location and
 direction being maintained while reducing their speed to zero. When
 movement subsequently recommences speed is set to a low value controlled
@@ -270,20 +275,24 @@ through the `standing_start` argument of
 Once an agent has identified the positions that they can move to on the
 current cycle, they still need to make a decision between these
 different options. According to the M4MA, the probability that an agent
-will choose a specific cell $i \in \{ 1,...33\}$ is determined by that
-cell’s utility $u_{i} \in ( - \infty,0\rbrack$, denoting how *useful* it
-is for the agent to move to cell $i$. The larger the value of $u_{i}$,
+will choose a specific cell $`i \in \{1, ... 33\}`$ is determined by
+that cell’s utility $`u_i \in (-\infty, 0]`$, denoting how *useful* it
+is for the agent to move to cell $`i`$. The larger the value of $`u_i`$,
 the greater the usefulness.
 
-Using the utility $u_{i}$ of a particular cell, one can derive the
+Using the utility $`u_i`$ of a particular cell, one can derive the
 probability of moving to that cell as:
 
-$$p_{i} = \frac{e^{\tau^{- 1}u_{i}}}{Z},$$
+``` math
+\begin{equation}
+  p_i = \frac{e^{\tau^{-1} u_i}}{Z},
+\end{equation}
+```
 
-where $Z$ is a normalizing constant that ensures all probabilities add
-to 1 and $\tau$ is a randomness parameter which controls to which extent
-the agent always chooses the cell with the highest utility, where small
-values of $\tau$ make the agent’s decision process essentially
+where $`Z`$ is a normalizing constant that ensures all probabilities add
+to 1 and $`\tau`$ is a randomness parameter which controls to which
+extent the agent always chooses the cell with the highest utility, where
+small values of $`\tau`$ make the agent’s decision process essentially
 deterministic (see the `randomness` parameter in
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
 Using these probabilities, agent’s randomly select one of the options
@@ -292,12 +301,12 @@ position to the chosen cell.
 
 A two-stage procedure is used to determine each of the 33 cells’
 utility. In the first stage, we set the utility of a particular cell to
-$- \infty$ when it is not accessible. This is the case when a cell is
+$`-\infty`$ when it is not accessible. This is the case when a cell is
 currently occupied or movement to the cell is obstructed by other
 objects and when moving to that location would require the agent’s body
 intersecting with other objects in the space. By setting the utility to
-$- \infty$ in these cases, we prevent the agent from being able to
-choose this cell so that its probability $p_{i} = 0$ at the current
+$`-\infty`$ in these cases, we prevent the agent from being able to
+choose this cell so that its probability $`p_i = 0`$ at the current
 cycle. In `predped`, this check is taken care of by the
 [`moving_options`](https://ndpvh.github.io/predped/reference/moving_options.html)
 function.
@@ -306,31 +315,36 @@ In the second stage, the utility of all available cells is computed as
 the weighted sum of M4MAs component utilities defined, each of which
 quantifies a preference regarding different aspects of the pedestrian’s
 behavior. For sake of simplicity, we set the maximum value for a
-particular component utility to $0$ so that utilities that become more
+particular component utility to $`0`$ so that utilities that become more
 negative indicate a decrease in their preference.
 
 With these two steps in mind, we can define the utility of cell
-$i = \{ 1,\ldots,33\}$ for agent $j$ as:
+$`i = \{1, \hdots, 33\}`$ for agent $`j`$ as:
 
-$$u_{ij} = \begin{cases}
-{\sum\limits_{f \in F}f\left( S_{j},\mathbf{x}_{i}|{\mathbf{θ}}_{f} \right),} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{is available}}}} \\
-{- \infty,} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{is unavailable}}}}
-\end{cases},$$ where $F$ indicates the set of component utility
-functions $f$, each of which takes in a matrix of agent states $S_{j}$,
-the position $\mathbf{x}_{i}$ of the cell $i$, and a set of parameters
-${\mathbf{θ}}_{f}$ specific to the utility function. Most utility
+``` math
+\begin{equation} 
+  u_{ij} = \begin{cases}
+      \displaystyle\sum_{f \in F} f(S_j, \bm{x}_i | \bm{\theta}_f), & \quad{\text{if cell $i$ is available}} \\
+      -\infty, & \quad{\text{if cell $i$ is unavailable}} 
+  \end{cases},
+\end{equation}
+```
+where $`F`$ indicates the set of component utility functions $`f`$, each
+of which takes in a matrix of agent states $`S_j`$, the position
+$`\bm{x}_i`$ of the cell $`i`$, and a set of parameters
+$`\bm{\theta}_f`$ specific to the utility function. Most utility
 function make use of a similar structure with an exponent parameter
-$\alpha_{f}$ and a weight parameter $\beta_{f}$. For some utlity
-functions, there is an additional weight parameter $\delta_{f}$ that is
-added to $\beta_{f}$, altering the utility of a particular cell based on
+$`\alpha_f`$ and a weight parameter $`\beta_f`$. For some utlity
+functions, there is an additional weight parameter $`\delta_f`$ that is
+added to $`\beta_f`$, altering the utility of a particular cell based on
 an agent’s group membership.
 
 Within `predped`, the parameter designations are reflected in the use of
-a notational convention, using `a_<component>` for $\alpha_{f}$,
-`b_<component>` for $\beta_{f}$, and `d_<component>` for $\delta_{f}$
+a notational convention, using `a_<component>` for $`\alpha_f`$,
+`b_<component>` for $`\beta_f`$, and `d_<component>` for $`\delta_f`$
 (see
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
-The agent states $S_{j}$ are furthermore included in the package as a
+The agent states $`S_j`$ are furthermore included in the package as a
 combination of the current state (an instance of the
 [`state`](https://ndpvh.github.io/predped/reference/state.html) class)
 and several highlighted specifications of the agents within that space
@@ -341,10 +355,10 @@ package).
 
 Up to now, we have only defined the utility of moving to one of the 33
 new locations, but not about the utility of standing still. For this,
-the M4MA sets the utility of the agent’s $34^{th}$ cell to a fixed value
-$\upsilon_{j}$, ensuring agent’s will only stop when no other good
-options are available (i.e., when all utilities $u_{ij} < \upsilon_{j}$
-in the deterministic case). The value of $\upsilon_{j}$ is contained in
+the M4MA sets the utility of the agent’s $`34^{th}`$ cell to a fixed
+value $`\upsilon_j`$, ensuring agent’s will only stop when no other good
+options are available (i.e., when all utilities $`u_{ij} < \upsilon_j`$
+in the deterministic case). The value of $`\upsilon_j`$ is contained in
 the parameter list of the agent as `stop_utility` (see again
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
 
@@ -373,65 +387,74 @@ speed.
 The categorization of each utility functions with regard to these
 dimensions are displayed in the following Table.
 
-| Utility function       | Abbreviation | Individual-Social | Attractive-Repulsive | Predictive-Concurrent |
-|------------------------|--------------|-------------------|----------------------|-----------------------|
-| current direction      | CD           | individual        | attractive           | concurrent            |
-| goal direction         | GD           | individual        | attractive           | concurrent            |
-| preferred speed        | PS           | individual        | attractive           | concurrent            |
-| interpersonal distance | ID           | social            | repulsive            | predictive            |
-| blocked angle          | BA           | social            | repulsive            | predictive            |
-| follow-the-leader      | FL           | social            | attractive           | predictive            |
-| walk-beside            | WB           | social            | attractive           | predictive            |
-| group centroid         | GC           | social            | attractive           | predictive            |
-| visual field           | VF           | social            | attractive           | predictive            |
+| Utility function | Abbreviation | Individual-Social | Attractive-Repulsive | Predictive-Concurrent |
+|----|----|----|----|----|
+| current direction | CD | individual | attractive | concurrent |
+| goal direction | GD | individual | attractive | concurrent |
+| preferred speed | PS | individual | attractive | concurrent |
+| interpersonal distance | ID | social | repulsive | predictive |
+| blocked angle | BA | social | repulsive | predictive |
+| follow-the-leader | FL | social | attractive | predictive |
+| walk-beside | WB | social | attractive | predictive |
+| group centroid | GC | social | attractive | predictive |
+| visual field | VF | social | attractive | predictive |
 
 In what follows, we give a detailed overview of the utility functions
 themselves. Note that all parameters that we discuss are assumed to be
 positively valued. Furthermore note that, for simplicities sake, we
-won’t index the different utility functions $f$ and parameters $\alpha$,
-$\beta$,… with their respective abbreviation for the utility function
-(e.g., *CD* for *current direction*), ensuring clean equations for each
-utility function.
+won’t index the different utility functions $`f`$ and parameters
+$`\alpha`$, $`\beta`$,… with their respective abbreviation for the
+utility function (e.g., *CD* for *current direction*), ensuring clean
+equations for each utility function.
 
 #### Current Direction
 
 The current direction utility function creates a tendency for
 pedestrians to continue heading in their current direction. For each
-cell $i$ in the same cone $k$, this utility function returns the same
-value, being $0$ for the central cone ($k_{i} = 6$) and increasingly
-negative for cones on either side. Defining $a_{k_{i}}$ as the angle in
-degrees of the cone $k$ in which cell $i$ is contained, then the utility
-function is computed as:
+cell $`i`$ in the same cone $`k`$, this utility function returns the
+same value, being $`0`$ for the central cone ($`k_i = 6`$) and
+increasingly negative for cones on either side. Defining $`a_{k_i}`$ as
+the angle in degrees of the cone $`k`$ in which cell $`i`$ is contained,
+then the utility function is computed as:
 
-$$f_{i} = - \gamma\left| \frac{a_{k_{i}}}{90} \right|^{\alpha}.$$ Note
-that in this equation, the cone angles are normalized by the constant
-$90$ and the absolute value is taken, so that the resulting quantity is
-on the unit interval. The parameters $\alpha$ and the function $\gamma$
-define the exponent and weight that determine the value of this utility
-function in the way displayed in the following figure:
+``` math
+\begin{equation} 
+    f_i = - \gamma \left|\frac{a_{k_i}}{90}\right|^{\alpha} .
+\end{equation}
+```
+Note that in this equation, the cone angles are normalized by the
+constant $`90`$ and the absolute value is taken, so that the resulting
+quantity is on the unit interval. The parameters $`\alpha`$ and the
+function $`\gamma`$ define the exponent and weight that determine the
+value of this utility function in the way displayed in the following
+figure:
 
 ![Visualization of the current direction utility function. The result is
 a set of functions that become increasingly negative the further the
 angles deviate from the current direction at 0
 degrees.](theory_files/figure-html/unnamed-chunk-4-1.png)
 
-The parameter $\gamma$ in the utility function is defined in terms of
-the cone in which the cell $i$ is contained, the weight parameter
-$\beta$, and a side-bias parameter $\lambda$. If $\lambda = 1$ there is
-no side bias, if $\lambda < 1$ there is a bias to the left, and if
-$\lambda > 1$ there is a bias to the right:
+The parameter $`\gamma`$ in the utility function is defined in terms of
+the cone in which the cell $`i`$ is contained, the weight parameter
+$`\beta`$, and a side-bias parameter $`\lambda`$. If $`\lambda = 1`$
+there is no side bias, if $`\lambda < 1`$ there is a bias to the left,
+and if $`\lambda > 1`$ there is a bias to the right:
 
-$$\gamma = \begin{cases}
-{\beta,} & {\quad{k_{i} = 6}} \\
-{\beta\lambda,} & {\quad{k_{i} > 6}} \\
-{\beta\lambda^{- 1},} & {\quad{k_{i} < 6}}
-\end{cases}$$
+``` math
+\begin{equation*}
+  \gamma = \begin{cases}
+      \beta, & \quad{k_i = 6} \\
+      \beta \lambda, & \quad{k_i > 6} \\
+      \beta \lambda^{-1}, & \quad{k_i < 6}
+  \end{cases}
+\end{equation*}
+```
 
-The effect of the parameter $\lambda$ on the utility is shown in the
+The effect of the parameter $`\lambda`$ on the utility is shown in the
 following figure.
 
-Within `predped`, the parameters $\alpha$, $\beta$, and $\lambda$ are
-known as `a_current_direction`, `b_current_direction`, and
+Within `predped`, the parameters $`\alpha`$, $`\beta`$, and $`\lambda`$
+are known as `a_current_direction`, `b_current_direction`, and
 `blr_current_direction`.
 
 ![Visualization of the left-right side bias in the current direction
@@ -448,63 +471,81 @@ utility functions relative to this one.
 
 The preferred speed utility function creates a tendency for pedestrians
 to keep to a particular speed. Consequently, it’s output is the same for
-all cells $i$ contained in a same ring $r_{i}$. Denoting the preferred
-speed as $\varsigma$, the current speed as $s$, and $s_{r_{i}}$ as the
-adjusted speed once the multiplier of the ring has been taken in to
+all cells $`i`$ contained in a same ring $`r_i`$. Denoting the preferred
+speed as $`\varsigma`$, the current speed as $`s`$, and $`s_{r_i}`$ as
+the adjusted speed once the multiplier of the ring has been taken in to
 account (0.5 for deceleration, 1 for maintenance, and 1.5 for
 acceleration), then the preferred speed utility function is defined as:
 
-$$f_{i} = - \beta\left| s_{r_{i}} - \varsigma^{*} \right|^{\alpha},$$
+``` math
+\begin{equation}
+  f_i = -\beta \left| s_{r_i} - \varsigma^* \right|^{\alpha},
+\end{equation}
+```
 taking on the same shape as for the unbiased current direction utility
 function above. The preferred speed utility function thus attains an
-optimal utility of $0$ whenever the speed of a particular ring
+optimal utility of $`0`$ whenever the speed of a particular ring
 corresponds to the agent’s preferred speed. Note, however, that this
-equation does not make use of the raw preferred speed $\varsigma$, but
-rather of a value $\varsigma^{*}$ derived thereof. The value of
-$\varsigma^{*}$ depends on the distance $d$ between an agent and their
+equation does not make use of the raw preferred speed $`\varsigma`$, but
+rather of a value $`\varsigma^*`$ derived thereof. The value of
+$`\varsigma^*`$ depends on the distance $`d`$ between an agent and their
 goal, so that
 
-$$\varsigma^{*} = \text{min}\left( \varsigma,\tau\frac{\varsigma}{d} \right),$$
-where $\tau$ is a time-based slowing parameter, ensuring that an agent
+``` math
+\begin{equation}
+  \varsigma^* = \text{min}( \varsigma, \tau \frac{\varsigma}{d} ) ,
+\end{equation}
+```
+where $`\tau`$ is a time-based slowing parameter, ensuring that an agent
 approaches a goal more slowly in order to not overshoot its location.
 
-In `predped`, the parameters $\varsigma$, $\tau$, $\beta$, and $\alpha$
-are called `preferred_speed`, `slowing_time`, `b_preferred_speed`, and
-`a_preferred_speed` respectively.
+In `predped`, the parameters $`\varsigma`$, $`\tau`$, $`\beta`$, and
+$`\alpha`$ are called `preferred_speed`, `slowing_time`,
+`b_preferred_speed`, and `a_preferred_speed` respectively.
 
 #### Goal Direction
 
 The goal direction utility function creates a tendency for pedestrians
 to head towards their goals. Like for the current direction utility
 function, its value is the same for all cells contained within a same
-cone. Let $g$ be the angle between the current direction and the goal,
-and denote $a_{k_{i}}$ as the angle of the cone in which cell $i$ is
+cone. Let $`g`$ be the angle between the current direction and the goal,
+and denote $`a_{k_i}`$ as the angle of the cone in which cell $`i`$ is
 contained (in degrees). Then we normalize the absolute deviation by 90
 degrees and define the utility function as:
 
-$$f_{i} = - \beta\left| \frac{a_{k_{i}} - g}{90} \right|^{\alpha}.$$
+``` math
+\begin{equation} 
+    f_i = - \beta \left| \frac{a_{k_i} - g}{90} \right|^{\alpha} .
+\end{equation}
+```
 
 This utility functiona gain resembles the others already discussed, this
-time attaining a maximal value of $0$ when the goal direction aligns
+time attaining a maximal value of $`0`$ when the goal direction aligns
 perfectly with the cone.
 
 #### Interpersonal Distance
 
 The interpersonal distance utility function creates a tendency to avoid
 other pedestrians, with its effects differing depending on whether the
-other pedestrians belong to the in- or outgroup. Let $d_{ij}$ be the
-shortest distance between the agent when standing in cell $i$ and
-another visible agent $j$ standing at its predicted position, then this
-utility function takes the average of a power function of all distances
-$d_{ij}$ across the set of visible agents $A_{i}$ at that cell $i$:
+other pedestrians belong to the in- or outgroup. Let $`d_{ij}`$ be the
+shortest distance between the agent when standing in cell $`i`$ and
+another visible agent $`j`$ standing at its predicted position, then
+this utility function takes the average of a power function of all
+distances $`d_{ij}`$ across the set of visible agents $`A_i`$ at that
+cell $`i`$:
 
-$$f_{i} = - \frac{1}{N_{i}}\sum\limits_{j \in A_{i}}\gamma d_{ij}^{- \alpha},$$
-where $N_{i}$ represent the number of visible agents in the list of
-agents $A_{i}$ visible from cell $i$. This equation defines a hyperbolic
-function for the distance to each individual agent, as visualized in the
-next Figure. Note that this utility function becomes $- \infty$ whenever
-the interpersonal distance $d_{ij}$ is $0$, ensuring that the agent does
-not choose a cell that would result in a collision.
+``` math
+\begin{equation} 
+    f_i = -\frac{1}{N_i} \sum_{j \in A_i} \gamma d_{ij}^{-\alpha} ,
+\end{equation}
+```
+where $`N_i`$ represent the number of visible agents in the list of
+agents $`A_i`$ visible from cell $`i`$. This equation defines a
+hyperbolic function for the distance to each individual agent, as
+visualized in the next Figure. Note that this utility function becomes
+$`-\infty`$ whenever the interpersonal distance $`d_{ij}`$ is $`0`$,
+ensuring that the agent does not choose a cell that would result in a
+collision.
 
 ![Visualization of the interpersonal utility function, showing a
 hyperbolic function starting at minus infinity when the distance d
@@ -512,19 +553,25 @@ approaches 0 and slowly growing until it approaches the maximal value of
 0.](theory_files/figure-html/unnamed-chunk-6-1.png)
 
 The interpersonal distance utility function critically depends on the
-parameter $\gamma$, which itself is a function of the weight parameter
-$\beta$ and the group membership of the other agent, so that:
+parameter $`\gamma`$, which itself is a function of the weight parameter
+$`\beta`$ and the group membership of the other agent, so that:
 
-$$\gamma = \begin{cases}
-{\beta,} & {\quad{{\text{if agent}\mspace{6mu}}j{\mspace{6mu}\text{is a member of the ingroup}}}} \\
-{\beta + \delta,} & {\quad{{\text{if agent}\mspace{6mu}}j{\mspace{6mu}\text{is not a member of the ingroup}}}}
-\end{cases}.$$ As demonstrated by Figure~, adding $\delta$ to $\beta$
-decreases the utility of a cell, thus creating a tendency to avoid
-getting too close to out-group members.
+``` math
+\begin{equation}
+    \gamma = \begin{cases}
+        \beta, & \quad{\text{if agent $j$ is a member of the ingroup}} \\
+        \beta + \delta, & \quad{\text{if agent $j$ is not a member of the ingroup}}
+    \end{cases} .
+\end{equation}
+```
+As demonstrated by Figure~, adding $`\delta`$ to $`\beta`$ decreases the
+utility of a cell, thus creating a tendency to avoid getting too close
+to out-group members.
 
-In `predped`, the parameters $\alpha$, $\beta$, and $\delta$ for the
-interpersonal distance utility function are known as `a_interpersonal`,
-`b_interpersonal`, and `d_interpersonal` respectively.
+In `predped`, the parameters $`\alpha`$, $`\beta`$, and $`\delta`$ for
+the interpersonal distance utility function are known as
+`a_interpersonal`, `b_interpersonal`, and `d_interpersonal`
+respectively.
 
 #### Blocked Angle
 
@@ -549,16 +596,20 @@ the cone to move past the blocking agent).
 ![Visualization of how a profile is computed according to the
 M4MA.](../reference/figures/profile.png)
 
-Any cell $i$ in a cone $k_{i}$ that is not blocked is given the maximal
-utility of $0$. For each cell in the other cones, a distance $d_{i}$
-from the cell to the blocking agent is derived and the following utility
-function is computed:
+Any cell $`i`$ in a cone $`k_i`$ that is not blocked is given the
+maximal utility of $`0`$. For each cell in the other cones, a distance
+$`d_i`$ from the cell to the blocking agent is derived and the following
+utility function is computed:
 
-$$f_{i} = \begin{cases}
-{0,} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{not in a blocked cone}}}} \\
-{- \infty} & {\quad{{\text{if blocking agent}\mspace{6mu}}j{\mspace{6mu}\text{stands between the agent and cell}\mspace{6mu}}i}} \\
-{- \beta d_{i}^{- \alpha},} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{lies in a blocked cone}}}}
-\end{cases}.$$
+``` math
+\begin{equation} 
+    f_i = \begin{cases}
+        0, & \quad{\text{if cell $i$ not in a blocked cone}} \\
+        -\infty & \quad{\text{if blocking agent $j$ stands between the agent and cell $i$}} \\
+        -\beta d_{i}^{-\alpha}, & \quad{\text{if cell $i$ lies in a blocked cone}}
+    \end{cases} .
+\end{equation}
+```
 
 This function takes on the same shape as for the interpersonal distance
 utility function.
@@ -576,27 +627,31 @@ will move to a new position at the next time step, leaving their current
 cell available for occupation by the agent.
 
 Computing this utility function requires several steps. First, we
-identify potential leaders for each cell $i$ (if any), selecting those
+identify potential leaders for each cell $`i`$ (if any), selecting those
 agents who currently occupy cells within the agent’s field of
 operations. If multiple agents are selected for each cell, preference is
 given to those who belong to the agent’s ingroup and whose current
 direction is closest to the agent’s own goal direction. Selected agents
-are then designated as cell $i$’s leader.
+are then designated as cell $`i`$’s leader.
 
-For cells with a leader, we define the distance $d_{i,t + 1}$ from the
-leader’s predicted position on the next step $t + 1$ to the cell $i$ and
-the angular difference $a_{i}$ between the direction of the agent’s goal
-and cell’s leader (in degrees), allowing us to compute the
+For cells with a leader, we define the distance $`d_{i, t + 1}`$ from
+the leader’s predicted position on the next step $`t + 1`$ to the cell
+$`i`$ and the angular difference $`a_{i}`$ between the direction of the
+agent’s goal and cell’s leader (in degrees), allowing us to compute the
 follow-the-leader utility as follows:
 
-$$f_{i} = \begin{cases}
-{0,} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{does not have a leader}}}} \\
-{- \gamma\left| \frac{a_{i}}{90} \right|d_{i,t + 1}^{\alpha},} & {\quad{{\text{if cell}\mspace{6mu}}i{\mspace{6mu}\text{has a leader}}}}
-\end{cases}.$$
+``` math
+\begin{equation} 
+  f_i = \begin{cases}
+    0, & \quad{\text{if cell $i$ does not have a leader}} \\
+    -\gamma \left| \frac{a_i}{90} \right| d_{i, t + 1}^{\alpha}, & \quad{\text{if cell $i$ has a leader}}
+  \end{cases} .
+\end{equation}
+```
 
-As previously, we normalize the $a_{i}$ to fall on the unit interval.
+As previously, we normalize the $`a_i`$ to fall on the unit interval.
 The shape of the utility function is shown in the next Figure. Note that
-in the case where the angular disparity is $0$, the utility is at its
+in the case where the angular disparity is $`0`$, the utility is at its
 maximum value, meaning that leader’s who are heading in the same
 direction as the agent’s current goal are strongly preferred.
 
@@ -606,19 +661,24 @@ grow increasingly steeper with greater angular disparity, greater
 distance to the leader, and greater values of
 gamma.](theory_files/figure-html/unnamed-chunk-8-1.png)
 
-In the above equation, the parameter $\gamma$ changes based on the group
-membership of the leader, so that:
+In the above equation, the parameter $`\gamma`$ changes based on the
+group membership of the leader, so that:
 
-$$\gamma = \begin{cases}
-{\beta,} & {\quad{{\text{if cell}\mspace{6mu}}i\text{’s leader is a member of the ingroup}}} \\
-{\beta + \delta,} & {\quad{{\text{if cell}\mspace{6mu}}i\text{’s leader is not a member of the ingroup}}}
-\end{cases}.$$ Adding $\delta$ to $\beta$ will decrease the utility of
-using this agent as a leader, letting agents tend to use ingroup members
-as leaders.
+``` math
+\begin{equation}
+  \gamma = \begin{cases}
+    \beta, & \quad{\text{if cell $i$'s leader is a member of the ingroup}} \\
+    \beta + \delta, & \quad{\text{if cell $i$'s  leader is not a member of the ingroup}}
+  \end{cases} .
+\end{equation}
+```
+Adding $`\delta`$ to $`\beta`$ will decrease the utility of using this
+agent as a leader, letting agents tend to use ingroup members as
+leaders.
 
-In `predped`, the parameters $\alpha$, $\beta$, and $\delta$ controlling
-the follow the leader utility function are called `a_leader`,
-`b_leader`, and `d_leader` respectively.
+In `predped`, the parameters $`\alpha`$, $`\beta`$, and $`\delta`$
+controlling the follow the leader utility function are called
+`a_leader`, `b_leader`, and `d_leader` respectively.
 
 #### Walk Beside
 
@@ -637,21 +697,25 @@ ingroup members even if they are cannot presently see them. This implies
 that the utility can slow down the agent when a potential buddy is
 reachable and behind them.
 
-For each buddy $j$, we define their corresponding *buddy cell* as being
-the cell that lies (a) in the cone most parallel to the buddy’s current
-direction and (b) closest to the predicted position of the buddy on the
-next time step. We define the distance $d_{ij}$ each cell $i$ to the
-buddy cell $j$ and the angular difference $a_{j}$ between the current
-direction of the agent and the buddy and use these to compute the
-utility function as:
+For each buddy $`j`$, we define their corresponding *buddy cell* as
+being the cell that lies (a) in the cone most parallel to the buddy’s
+current direction and (b) closest to the predicted position of the buddy
+on the next time step. We define the distance $`d_{ij}`$ each cell $`i`$
+to the buddy cell $`j`$ and the angular difference $`a_j`$ between the
+current direction of the agent and the buddy and use these to compute
+the utility function as:
 
-$$f_{i} = - \sum\limits_{j \in B}\beta\left| \frac{a_{j}}{90} \right|d_{ij}^{\alpha},$$
-where $B$ is the set of all buddies. Note that this utility function has
-the same shape as the follow the leader utility function, meaning one
-can refer to the previous figure for a visualization.
+``` math
+\begin{equation}
+  f_i = -\sum_{j \in B} \beta \left| \frac{a_j}{90} \right| d_{ij}^{\alpha},
+\end{equation}
+```
+where $`B`$ is the set of all buddies. Note that this utility function
+has the same shape as the follow the leader utility function, meaning
+one can refer to the previous figure for a visualization.
 
-In `predped`, the parameters $\alpha$ and $\beta$ for the walk beside
-utility function are called `a_buddy` and `b_buddy` respectively.
+In `predped`, the parameters $`\alpha`$ and $`\beta`$ for the walk
+beside utility function are called `a_buddy` and `b_buddy` respectively.
 
 #### Group Centroid
 
@@ -663,27 +727,37 @@ a more extreme case than the walk beside utility function in which
 agents only temporarily join forces with ingroup members.
 
 Define the group centroid as the mean predicted location
-$\bar{\mathbf{x}}$ across all group members and define the distance
-$d_{i}$ between a cell $i$ and the group centroid, then the group
+$`\bar{\bm{x}}`$ across all group members and define the distance
+$`d_i`$ between a cell $`i`$ and the group centroid, then the group
 centroid utility function can be computed as:
 
-$$f_{i} = \begin{cases}
-{0,} & {\quad{{\text{if}\mspace{6mu}}{d_{i} < = \Delta}}} \\
-{- \beta\left| d_{i} - \Delta \right|^{\alpha},} & {\quad{{\text{if}\mspace{6mu}}{d_{i} > \Delta}}}
-\end{cases}$$ where $\Delta$ is a comfortable distance around the group
-centroid that agents can maintain and for which the utility is optimal.
-Defining $\Delta$ makes sure that agents will remain close to the group
-while maintaining a safe distance from the other members of the group,
-in effect not blocking the path of the other members. The value of
-$\Delta$ is adapted to group size, so that:
+``` math
+\begin{equation} 
+  f_i = \begin{cases}
+    0, & \quad{\text{if $d_i <= \Delta$}} \\
+    -\beta | d_i - \Delta |^{\alpha}, & \quad{\text{if $d_i > \Delta$}}
+  \end{cases}
+\end{equation}
+```
+where $`\Delta`$ is a comfortable distance around the group centroid
+that agents can maintain and for which the utility is optimal. Defining
+$`\Delta`$ makes sure that agents will remain close to the group while
+maintaining a safe distance from the other members of the group, in
+effect not blocking the path of the other members. The value of
+$`\Delta`$ is adapted to group size, so that:
 
-$$\Delta = 1.5 \times n \times \bar{r},$$ where, $n$ is the number of
-agents in the group and $\bar{r}$ is their average radius (not to be
-confused with the ring identifier $r$). The shape of this utility
-function resembles the one of the current direction utility function.
+``` math
+\begin{equation*}
+  \Delta = 1.5 \times n \times \bar{r},
+\end{equation*}
+```
+where, $`n`$ is the number of agents in the group and $`\bar{r}`$ is
+their average radius (not to be confused with the ring identifier
+$`r`$). The shape of this utility function resembles the one of the
+current direction utility function.
 
-In `predped`, the relevant parameters $\alpha$ and $\beta$ are known as
-`a_group_centroid` and `b_group_centroid`.
+In `predped`, the relevant parameters $`\alpha`$ and $`\beta`$ are known
+as `a_group_centroid` and `b_group_centroid`.
 
 #### Visual Field
 
@@ -697,32 +771,36 @@ utility function, conversing with a group member is situational while
 for the visual field utility function, this behavior endures throughout
 the complete walking trajectory.
 
-To compute this utility function, we define the angles $a_{ij}$ from
-cell $i$ to the predicted position of group member $j$ and, based on
-these angles, define $a_{i}$ as the angle for which
-$cos\left( a_{ij} \right)$ is maximal, effectively selecting the group
-member who falls closest to the angle of the cone in which cell $i$ is
+To compute this utility function, we define the angles $`a_{ij}`$ from
+cell $`i`$ to the predicted position of group member $`j`$ and, based on
+these angles, define $`a_i`$ as the angle for which
+$`cos\left(a_{ij}\right)`$ is maximal, effectively selecting the group
+member who falls closest to the angle of the cone in which cell $`i`$ is
 located. Using these angles, we then define the utility function as:
 
-$$f_{i} = \begin{cases}
-{0,} & {\quad{{\text{if}\mspace{6mu}}a_{i}{\mspace{6mu}\text{lies in the extended visual field}}}} \\
-{- \beta,} & {\quad{{\text{if}\mspace{6mu}}a_{i}{\mspace{6mu}\text{does not lie in the extended visual field}}}}
-\end{cases}.$$
+``` math
+\begin{equation} 
+    f_i = \begin{cases}
+        0, & \quad{\text{if $a_i$ lies in the extended visual field}} \\
+        -\beta, & \quad{\text{if $a_i$ does not lie in the extended visual field}}
+    \end{cases} .
+\end{equation}
+```
 
 Importantly, the agent’s visual field that usually spans
-$\left\lbrack - 85^{\circ},85^{\circ} \right\rbrack$ is extended by
-$45^{\circ}$ in both directions, therefore creating an extended visual
-field of $\left\lbrack - 130^{\circ},130^{\circ} \right\rbrack$. The
-idea behind the extension is that people can turn their heads for about
-$45^{\circ}$ in both directions while talking to a group member. The
-effect of this utility function is displayed in the following figure:
+$`[-85^\circ, 85^\circ]`$ is extended by $`45^\circ`$ in both
+directions, therefore creating an extended visual field of
+$`[-130^\circ, 130^\circ]`$. The idea behind the extension is that
+people can turn their heads for about $`45^\circ`$ in both directions
+while talking to a group member. The effect of this utility function is
+displayed in the following figure:
 
 ![Visualization of visual field utility function. The function is
 stepwise, so that it becomes 0 within when an agent is able to see their
 ingroup members and adds a discrete negative utility
 otherwise.](theory_files/figure-html/unnamed-chunk-9-1.png)
 
-In `predped`, this utility functions parameter $\beta$ is called
+In `predped`, this utility functions parameter $`\beta`$ is called
 `b_visual_field`.
 
 ## Discussion

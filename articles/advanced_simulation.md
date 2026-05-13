@@ -13,7 +13,7 @@ agents inside of the environment at the start and slowly building
 towards a greater number of agents within the space. However, there may
 be occasions where the user may want to start a simulation from a
 particular *initial condition* or initial state, for example starting
-with $X$ number of people in the room or continuing a previous
+with $`X`$ number of people in the room or continuing a previous
 simulation from a particular iteration thereof. In this section, we will
 describe several ways in which users can provide initial conditions to
 the
@@ -44,6 +44,7 @@ class that will serve as our initial condition, we can start the
 simulation from this point by calling:
 
 ``` r
+
 trace <- simulate(
   my_predped,
   initial_condition = initial_state,
@@ -56,6 +57,7 @@ most often come from a previous simulation, such as in the following
 example:
 
 ``` r
+
 # Simulate an initial trace
 trace <- simulate(
   my_predped,
@@ -92,6 +94,7 @@ serve as the first people in the room. This list can be provided to the
 [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html):
 
 ``` r
+
 # Retrieve the agents-list from an initial state
 my_agents <- agents(my_state)
 
@@ -123,6 +126,7 @@ number of agents that the simulation starts up with, letting `predped`
 take care of heterogeneity, locations, and goals:
 
 ``` r
+
 # Start simulation with 3 agents in the room
 trace <- simulate(
   my_predped,
@@ -136,6 +140,7 @@ generating these agents will stop and provide the agents it was able to
 generate as an initial condition instead.
 
 ``` r
+
 # Try to fit too many people in the room
 trace <- simulate(
     my_predped,
@@ -178,6 +183,7 @@ defined by their first (`from`) and second coordinate (`to`) and can be
 created as follows:
 
 ``` r
+
 # Create a segment that starts at the origin and goes to coordinate P(1, 1)
 my_segment <- segment(
   from = c(0, 0), 
@@ -197,20 +203,24 @@ first coordinate at the bottom and the second coordinate at the top),
 they cannot cross the
 segment.](../reference/figures/one_directional.png)
 
-A segment going from the coordinate $F$ to another coordinate $T$
+A segment going from the coordinate $`F`$ to another coordinate $`T`$
 (`from` and `to` respectively) ensures an agent that stand on the left
 of this segment cannot cross the segment. From a mathematical viewpoint,
-this comes down to the following formalism: Defining $\mathbf{x}$ as a
+this comes down to the following formalism: Defining $`\bm{x}`$ as a
 coordinate, defining the orientation of the segment as the angle
-$a_{\text{segment}} = \text{arctan}\left( \mathbf{x}_{\text{to}} - \mathbf{x}_{\text{from}} \right)$,
+$`a_{\text{segment}} = \text{arctan}(\bm{x}_\text{to} - \bm{x}_\text{from})`$,
 and the orientation of the agent relative to the start of the segment as
-$a_{\text{agent}} = \text{arctan}\left( \mathbf{x}_{\text{agent}} - \mathbf{x}_{\text{from}} \right)$,
+$`a_{\text{agent}} = \text{arctan}(\bm{x}_\text{agent} - \bm{x}_\text{from})`$,
 then a segment restricts the agent’s movement when:
 
-$$a_{\text{agent}} - a_{\text{segment}} \in \begin{cases}
-{\lbrack 0,\pi\rbrack,} & {\quad\text{agent cannot cross}} \\
-{(\pi,2\pi),} & {\quad\text{agent can cross}}
-\end{cases}$$
+``` math
+\begin{equation}
+  a_{\text{agent}} - a_{\text{segment}} \in \begin{cases}
+    [0, \pi], & \quad{\text{agent cannot cross}} \\
+    (\pi, 2 \pi), & \quad{\text{agent can cross}}
+  \end{cases}
+\end{equation}
+```
 
 Let’s put this to practice. First, we define a simplified version of a
 train station where people can enter the space either through one of the
@@ -218,6 +228,7 @@ entrances or through the train tracks. Such a simplified train station
 may look as follows:
 
 ``` r
+
 train_station <- background(
   # Define a space of size (10, 5) meters
   shape = rectangle(
@@ -283,6 +294,7 @@ train_station <- background(
 which when plotted gives:
 
 ``` r
+
 plot(train_station)
 #> Loading required namespace: ggplot2
 ```
@@ -298,6 +310,7 @@ train station. To achieve this, we add segments to each of the gates as
 follows:
 
 ``` r
+
 # Add segments that deal with directionality to the 
 # previously defined train station
 limited_access(train_station) <- list(
@@ -316,6 +329,7 @@ We can visualize the unidirectionality by using the
 once again:
 
 ``` r
+
 # Plot the train station. The argument `segment.hjust` 
 # makes sure arrows are plotted entirely to the left 
 # of the segment, that is that the arrow's point lies 
@@ -342,6 +356,7 @@ To see unidirectionality in action, we create another instance of the
 station:
 
 ``` r
+
 set.seed(1)
 
 # Link the train station to the agent characteristics
@@ -373,6 +388,7 @@ gifski::save_gif(
 ```
 
 ``` r
+
 knitr::include_graphics(
   file.path("../man/figures/unidirectional_example.gif")
 )
@@ -401,6 +417,7 @@ Let’s take the evacuation as an example. First, we create a simplified
 supermarket environment:
 
 ``` r
+
 # Create a simplified version of a supermarket
 supermarket <- background(
   # Shaking things up: Create a polygon environment
@@ -476,6 +493,7 @@ procedure, we create the function `start_evacuation`, starting an
 evacuation after `100` iterations:
 
 ``` r
+
 start_evacuation <- function(state) {
   # Check whether the current iteration is greater than 
   # 100. If not, then we do not want to change the state.
@@ -513,12 +531,12 @@ Several things in this function deserve note:
 
 - A conditional statement in this function checks for the iteration
   number in the simulation, ensuring that the evacuation procedure only
-  starts when $100$ iterations have passed;
+  starts when $`100`$ iterations have passed;
 - Within the if-statement, we adjust the `state` so that the evacuation
   can start. Specifically, we make the following changes:
   - We ensure no agents are standing in line, waiting to enter the space
     (delete the contents of the `potential_agents` slot);
-  - We ensure the space should be empty by setting `max_agents` to $0$
+  - We ensure the space should be empty by setting `max_agents` to $`0`$
     in the `iteration_variables`;
   - We adjust the agents so that they have no more goals to achieve,
     triggering them to leave the environment.
@@ -526,6 +544,7 @@ Several things in this function deserve note:
 With this function defined, we can now run the simulation:
 
 ``` r
+
 set.seed(1)
 
 # Connect environment to agent characteristics
@@ -578,6 +597,7 @@ simulation, we can empty the `limited_access` slot once the evacuation
 has started:
 
 ``` r
+
 start_evacuation <- function(state) {
   if(iteration(state) == 100) {
     potential_agents(state) <- list()
@@ -622,6 +642,7 @@ variable `slot` and updating it accordingly, for example redefining
 `start_evacuation` as:
 
 ``` r
+
 start_evacuation <- function(state) {
   # Ensures the start of the evacuation and creates the variable of interest
   if(iteration(state) == 100) {
@@ -674,6 +695,7 @@ iteration:
     #> Precomputing edgesYour model: model ydgab is being simulated
 
 ``` r
+
 variables(trace[[251]])$times
 #> donzm eyqaz llyry mvzfl owfjm rbnvd kheaq oggxf dobyg senmi wvijj iypko 
 #>    67    23    98   113    47    80   102    19    93    41     6     3
@@ -690,6 +712,7 @@ constructor know what parameters you would want to use by specifying the
 `filename` argument:
 
 ``` r
+
 my_predped <- predped(
   setting = my_background, 
   filename = file.path("path", "to", "file")
@@ -709,6 +732,7 @@ following:
 In code, this workflow looks like this:
 
 ``` r
+
 # Read in default parameters
 params <- load_parameters()
 
@@ -747,6 +771,7 @@ and save `"params_archetypes"` and read it in through the `predped`
 constructor:
 
 ``` r
+
 # Read in default parameters
 params <- load_parameters()
 
@@ -784,6 +809,7 @@ deal with changes in a few components in a list, as long as they are
 saved in a list with the correct slot names:
 
 ``` r
+
 # Read in default parameters
 params <- load_parameters()
 

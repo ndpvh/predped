@@ -36,6 +36,7 @@ As an example, let’s define a rectangular environment that represents
 our office:
 
 ``` r
+
 # Recreate our office
 my_background <- background(
   # Shape of the environment
@@ -85,6 +86,7 @@ To visualize what this setting looks like, we can use the
 [`plot`](https://ndpvh.github.io/predped/reference/plot.html) method:
 
 ``` r
+
 plot(my_background)
 #> Loading required namespace: ggplot2
 ```
@@ -113,6 +115,7 @@ First, users can make a complete object non-interactable by setting the
 `polygon`s, and `circle`s to `FALSE`, such as in the following examples:
 
 ``` r
+
 # Turn off interactability of the objects
 my_rectangle <- rectangle(
   center = c(0, 0), 
@@ -149,6 +152,7 @@ to providing the indices of the edges that cannot be interacted with,
 for example:
 
 ``` r
+
 my_polygon <- polygon(
   points = rbind(
     c(1, 1), 
@@ -160,13 +164,14 @@ my_polygon <- polygon(
 )
 ```
 
-and defining $P_{1} = (1,1)$, $P_{2} = (1, - 1)$, $P_{3} = ( - 1, - 1)$,
-and $P_{4} = ( - 1,1)$, then the edges that cannot be interacted with
-are the lines $\overset{\leftrightarrow}{P_{1}P_{2}}$ and
-$\overset{\leftrightarrow}{P_{3}P_{4}}$. This can be seen by executing
+and defining $`P_1 = (1, 1)`$, $`P_2 = (1, -1)`$, $`P_3 = (-1, -1)`$,
+and $`P_4 = (-1, 1)`$, then the edges that cannot be interacted with are
+the lines $`\overset{\leftrightarrow}{P_1 P_2}`$ and
+$`\overset{\leftrightarrow}{P_3 P_4}`$. This can be seen by executing
 the following code:
 
 ``` r
+
 # Create the edges by extracting the coordinates that make up the polygon and 
 # then combining them in fixed order
 coords <- points(my_polygon)
@@ -190,9 +195,10 @@ to specify the locations on the `circle` that cannot be interacted with,
 taking the shape of a matrix containing the starting and the ending
 angles of the interval in which no goal can be contained. Consider the
 following example, where we create a circle that cannot contain a goal
-in the region $\lbrack 0,\pi\rbrack$.
+in the region $`[0, \pi]`$.
 
 ``` r
+
 # Define a circle with forbidden angles ranging from 
 # 0 to pi
 my_circle <- circle(
@@ -210,6 +216,7 @@ environment. Redefining our office to include non-interactable
 locations:
 
 ``` r
+
 # Adjust the office to contain forbidden edges
 my_background <- background(
   shape = rectangle(
@@ -264,6 +271,7 @@ We can then visualize these locations as through calling the `plot`
 method:
 
 ``` r
+
 # Plot the background with forbidden locations
 plot(
   my_background, 
@@ -325,6 +333,7 @@ One can create an instance of the `predped` class through its
 constructor, for example by calling:
 
 ``` r
+
 # Create instance of predped class with our office and the default 
 # parameters
 my_predped <- predped(setting = my_background)    
@@ -343,6 +352,7 @@ one can specify the `archetypes` and `weights` arguments of the
 constructor. For example, specifying:
 
 ``` r
+
 # Create instance of predped class with our office and two of the 
 # default agent-types
 my_predped <- predped(
@@ -377,6 +387,7 @@ To do so, we first load the default parameters of the package with the
 function and inspect its type and structure:
 
 ``` r
+
 params <- load_parameters()
 
 typeof(params)
@@ -395,6 +406,7 @@ the names of the agent types with the parameters that belong to this
 type. The `data.frame` contains the following columns:
 
 ``` r
+
 colnames(params$params_archetypes)
 #>  [1] "name"                  "color"                 "radius"               
 #>  [4] "slowing_time"          "preferred_speed"       "randomness"           
@@ -468,6 +480,7 @@ which define the (co)variation of each of the parameters. For example,
 the variation matrix for the `"BaselineEuropean"` looks like follows::
 
 ``` r
+
 head(params$params_sigma$BaselineEuropean)
 #>                 radius slowing_time preferred_speed randomness stop_utility
 #> radius            0.15          0.0            0.00        0.0         0.00
@@ -532,38 +545,47 @@ the standard deviations of each parameter on its diagonal and the
 correlations between each parameter on its off-diagonal, thus containing
 the following structure:
 
-$$\Gamma = \begin{bmatrix}
-\sigma_{1} & \rho_{12} & \cdots & \rho_{1p} \\
-\rho_{21} & \sigma_{2} & \cdots & {\rho{2p}} \\
-\vdots & \vdots & \ddots & \vdots \\
-\rho_{p1} & \rho_{p2} & \ldots & \sigma_{p} \\
- & & & 
-\end{bmatrix}$$
+``` math
+\begin{equation}
+  \Gamma = \begin{bmatrix}
+    \sigma_1 & \rho_{12} & \cdots & \rho_{1p} \\
+    \rho_{21} & \sigma_{2} & \cdots & \rho{2p} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \rho_{p1} & \rho_{p2} & \hdots & \sigma_p \\
+  \end{bmatrix}
+\end{equation}
+```
 
-where $p$ is the number of parameters.
+where $`p`$ is the number of parameters.
 
 Computing the covariance matrix can be achieved through the following
-equation, defining $\Lambda$ as a diagonal matrix containing the
-standard deviations of the parameters and $R$ as the matrix containing
-the correlations on its off-diagonal and $1$’s on its diagonal, we can
-construct the covariance matrix $\Sigma$ as follows:
+equation, defining $`\Lambda`$ as a diagonal matrix containing the
+standard deviations of the parameters and $`R`$ as the matrix containing
+the correlations on its off-diagonal and $`1`$’s on its diagonal, we can
+construct the covariance matrix $`\Sigma`$ as follows:
 
-$$\begin{aligned}
-\Sigma & {= \Lambda R\Lambda^{T}} \\
- & {= \Lambda R\Lambda}
-\end{aligned}$$ where $T$ denotes the transpose.
+``` math
+\begin{equation}
+\begin{split}
+    \Sigma &= \Lambda R \Lambda^T \\
+    &= \Lambda R \Lambda
+\end{split}
+\end{equation}
+```
+where $`T`$ denotes the transpose.
 
-We additionally note that the covariance matrix $\Sigma$ does not act on
-the raw (bounded) values of the parameters defined by the `data.frame`
-in `"params_archetypes"`. Instead, it acts on a transformed unbounded
-version of these parameters, as explained below. The nature of this
-transformation falls outside of the scope of this vignette.
+We additionally note that the covariance matrix $`\Sigma`$ does not act
+on the raw (bounded) values of the parameters defined by the
+`data.frame` in `"params_archetypes"`. Instead, it acts on a transformed
+unbounded version of these parameters, as explained below. The nature of
+this transformation falls outside of the scope of this vignette.
 
 The final slot of the parameter list is `"params_bounds"`, a matrix
 containing the bounds of each of the parameters. By default, these
 bounds are the following:
 
 ``` r
+
 params$params_bounds
 #>                        [,1]    [,2]
 #> radius                2e-01 3.0e-01
@@ -613,6 +635,7 @@ through the
 function, which typically will be used in the following way:
 
 ``` r
+
 # Save all separate components in separate variables
 means <- params$params_archetypes
 covariances <- params$params_sigma
@@ -641,6 +664,7 @@ For the default parameter settings, one can alternatively visualize the
 parameter distribution of a particular agent type as follows:
 
 ``` r
+
 # Create a plot 
 set.seed(1) # Set for reproducibility purposes
 plot_distribution(
@@ -668,6 +692,7 @@ we can perform a simulation through calling the
 function:
 
 ``` r
+
 # Simulate behavior in our office for 100 iterations and maximally 3 agents
 trace <- simulate(
   my_predped, 
@@ -702,6 +727,7 @@ at once by calling the
 [`plot`](https://ndpvh.github.io/predped/articles/plot.html) function:
 
 ``` r
+
 # Plot a single state
 plt <- plot(trace[[10]])
 plt
@@ -711,6 +737,7 @@ plt
 ](simulation_files/figure-html/unnamed-chunk-19-1.png)
 
 ``` r
+
 # Plot the complete trace
 plt <- plot(trace)
 ```
@@ -721,6 +748,7 @@ creation of GIFs based on these plots. We recommend using the `gifski`
 package for this purpose:
 
 ``` r
+
 # Create a GIF that is 5 times faster than real time (10 frames per second 
 # instead of 2)
 gifski::save_gif(
@@ -748,6 +776,7 @@ agents, and (c) the simulation characteristics. A minimal working
 example that combines all of these is shown the following bit of code:
 
 ``` r
+
 # Load predped
 library(predped)
 
