@@ -693,7 +693,7 @@ get_angles <- function (agent_idx,
         # to other pedestrians in the group at the next time step.
         nearest_ped <- m4ma::dist1_rcpp(position, predictions)
         nearest_ped <- predictions[which.min(nearest_ped),]
-        orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
+        orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
 
         # Get angle from cell centers of pedestrian `n`
         # to predicted position of the nearest group member.
