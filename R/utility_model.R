@@ -234,8 +234,7 @@ setMethod("utility", "data.frame", function(object,
         V <- V + local_gvf_utility(parameters[["a_llgvf"]],
                                     parameters[["b_llgvf"]],
                                     parameters[["e_llgvf"]],
-                                    object$llgvf_data[[1]][["distances"]],
-                                    object$llgvf_data[[1]][["rel_angles"]])
+                                    object$llgvf_data[[1]])
     }
 
 
@@ -448,7 +447,7 @@ setMethod("compute_utility_variables", "agent", function(object,
                                     any_member = TRUE))
     
     
-    uv$llgvf_data <- list(get_nearest_member_data(uv$agent_idx,
+    uv$llgvf_data <- list(get_group_member_data(uv$agent_idx,
                                                 agent_specifications$group,
                                                 position(object),
                                                 orientation(object),
@@ -825,6 +824,7 @@ vf_utility_discrete <- function(b_vf,
 
 ##################################################################################
 # LOCAL DYNAMICS FUNCTIONS
+# TODO: Change the information of the member data function
 
 #' Get Distance and Angle to Nearest Group Member
 #' 
@@ -847,7 +847,7 @@ vf_utility_discrete <- function(b_vf,
 #' 
 #' @concept utility
 #' @export
-get_nearest_member_data <- function(agent_idx, 
+get_group_member_data <- function(agent_idx, 
                                     agent_group, 
                                     position, 
                                     orientation, 
@@ -863,26 +863,28 @@ get_nearest_member_data <- function(agent_idx,
     if (nped == 0) {
         return(NULL)    
     }
-    
-    # Find the single nearest group member based on the agent's *current* position
-    # dist1_rcpp returns a vector of distances when comparing a point to a matrix
-    distances_to_group <- m4ma::dist1_rcpp(as.numeric(position), predictions)
-    nearest_idx <- which.min(distances_to_group)
-    nearest_ped <- predictions[nearest_idx, ]
-    
-    # Calculate distances from all candidate cells to the nearest member
-    distances <- m4ma::dist1_rcpp(as.numeric(nearest_ped), centers)
-    
-    # Calculate relative angles from all candidate cells to the nearest member
+
+    # Return lists of distances and angles for all members of in-group
+    all_distances <- list()
+    all_rel_angles <- list()
     orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
-    angles <- atan2(nearest_ped[2] - centers[,2], nearest_ped[1] - centers[,1])
-    rel_angles <- angles - orientations
-    
-    # Normalize angles to [-pi, pi]
-    rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
-    rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
-    
-    return(list(distances = distances, rel_angles = rel_angles))
+
+    # Loop over all in-group members to calculate distances and relative angles
+    for (i in 1:nped) {
+
+        # Distances
+        target_ped <- predictions[i, ]
+        all_distances[[i]] <- m4ma::dist1_rcpp(target_ped, centers)
+
+        # Angles
+        angles <- atan2(target_ped[2] - centers[,2], target_ped[1] - centers[,1])
+        rel_angles <- angles - orientations
+        rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
+        rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
+        all_rel_angles[[i]] <- rel_angles
+    }
+
+    return(list(distances = all_distances, rel_angles = all_rel_angles, nped = nped))
 }
 
 
@@ -902,30 +904,42 @@ get_nearest_member_data <- function(agent_idx,
 #' @return Numeric vector containing the LLGVF utility for each cell. 
 #' 
 #' @seealso 
-#' \code{\link[predped]{get_nearest_member_data}},
+#' \code{\link[predped]{get_group_member_data}},
 #' \code{\link[predped]{utility-agent}}
 #' 
 #' @concept utility
 #' @export
 local_gvf_utility <- function(a_llgvf, 
                               b_llgvf, 
-                              e_llgvf, 
-                              distances, 
-                              rel_angles, 
+                              e_llgvf,
+                              group_member_data,
                               vf_limit = 135 * pi / 180) {
     
-    if (is.null(distances) || is.null(rel_angles)) {
+    if (is.null(group_member_data)) {
         return(numeric(33))
     }
+
+    total_util <- numeric(33)
+    nped <- group_member_data$nped
+
+    # Loop over all in-group members to calculate and sum their utilities
+    for (i in 1:nped) {
+        # Target members data
+        distances <- group_member_data$distances[[i]]
+        rel_angles <- group_member_data$rel_angles[[i]]
+
+        # Base utility
+        base_util <- -b_llgvf * abs(log(distances) - log(e_llgvf))^a_llgvf
+
+        # Penalty
+        in_vf <- abs(rel_angles) <= vf_limit
+        penalty <- ifelse(in_vf, 0, -b_llgvf / (distances^a_llgvf))
+
+        # Total utility for this member
+        total_util <- total_util + base_util + penalty
+    }
     
-    # Calculate base attraction utility to the comfortable distance (epsilon)
-    base_util <- -b_llgvf * abs(log(distances) - log(e_llgvf))^a_llgvf
-    
-    # Calculate penalty for not having the member in the visual field
-    in_vf <- abs(rel_angles) <= vf_limit
-    penalty <- ifelse(in_vf, 0, -b_llgvf / (distances^a_llgvf))
-    
-    return(base_util + penalty)
+    return(total_util/nped)
 }
 
 

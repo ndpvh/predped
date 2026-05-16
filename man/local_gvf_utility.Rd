@@ -8,8 +8,7 @@ local_gvf_utility(
   a_llgvf,
   b_llgvf,
   e_llgvf,
-  distances,
-  rel_angles,
+  group_member_data,
   vf_limit = 135 * pi/180
 )
 }
@@ -20,11 +19,11 @@ local_gvf_utility(
 
 \item{e_llgvf}{Numeric denoting the optimal comfortable distance (epsilon) to maintain.}
 
+\item{vf_limit}{Numeric denoting the visual field limit (default 135 degrees in radians).}
+
 \item{distances}{Numeric vector of distances from candidate cells to the member.}
 
 \item{rel_angles}{Numeric vector of relative angles from candidate cells to the member.}
-
-\item{vf_limit}{Numeric denoting the visual field limit (default 135 degrees in radians).}
 }
 \value{
 Numeric vector containing the LLGVF utility for each cell.
@@ -35,7 +34,7 @@ Applies a logarithmic penalty based on distance to the nearest group member, and
 adds an additional penalty if that member is outside the extended visual field.
 }
 \seealso{
-\code{\link[predped]{get_nearest_member_data}},
+\code{\link[predped]{get_group_member_data}},
 \code{\link[predped]{utility-agent}}
 }
 \concept{utility}
