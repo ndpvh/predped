@@ -1672,3 +1672,15 @@ setGeneric("weights", function(object) standardGeneric("weights"))
 #'
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
+
+# Getter/setter for current_group_goal
+setGeneric("current_group_goal", function(object) standardGeneric("current_group_goal"))
+setGeneric("current_group_goal<-", function(object, value) standardGeneric("current_group_goal<-"))
+
+# Getter/setter for group_goals
+setGeneric("group_goals", function(object) standardGeneric("group_goals"))
+setGeneric("group_goals<-", function(object, value) standardGeneric("group_goals<-"))
+
+# Getter/setter for group representative
+setGeneric("group_representative", function(object) standardGeneric("group_representative"))
+setGeneric("group_representative<-", function(object, value) standardGeneric("group_representative<-"))

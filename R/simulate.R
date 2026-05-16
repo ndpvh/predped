@@ -721,6 +721,11 @@ add_group <- function(model,
                              individual_differences = individual_differences,
                              ...)
 
+    # Designating this agent as the group representative
+    current_group_goal(agents[[1]]) <- current_goal(agents[[1]])
+    group_goals(agents[[1]]) <- goals(agents[[1]])
+    group_representative(agents[[1]]) <- TRUE
+
     # If only one agent needed, we will return it immediately
     if(agent_number == 1) {
         return(agents)
@@ -756,6 +761,9 @@ add_group <- function(model,
         radius(tmp_agent) <- params$radius
         color(tmp_agent) <- mean_params$color
         speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
+
+        # Ensures they are followers (should be default anyways)
+        group_representative(tmp_agent) <- FALSE
 
         # Add the agent to the list
         agents[[i]] <- tmp_agent
@@ -1184,9 +1192,17 @@ create_initial_condition <- function(agent_number,
 
             goals(dummy) <- new_agent$goals
             current_goal(dummy) <- new_agent$current_goal
+
+            group_representative(dummy) <- TRUE
+            current_group_goal(dummy) <- new_agent$current_goal
+            group_goals(dummy) <- new_agent$goals
         } else {
             goals(dummy) <- goals(agents[[i - 1]])
             current_goal(dummy) <- current_goal(agents[[i - 1]])
+
+            group_representative(dummy) <- FALSE
+            current_group_goal(dummy) <- current_group_goal(agents[[i - 1]])
+            group_goals(dummy) <- group_goals(agents[[i - 1]])
         }
         group(dummy) <- group_number
 

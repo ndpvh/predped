@@ -72,7 +72,10 @@ agent <- setClass("agent",
                        waiting_counter = "numeric",
                        cell = "numeric",
                        current_goal = "goal",
-                       goals = "list", 
+                       goals = "list",
+                       current_group_goal = "goal", 
+                       group_goals = "list",
+                       group_representative = "logical",
                        parameters = "data.frame",
                        color = "character",
                        cell_centers = "matrix",
@@ -170,6 +173,9 @@ setMethod("initialize", "agent", function(.Object,
                                           current_goal = NULL,
                                           goals = list(),
                                           group = 0,
+                                          current_group_goal = NULL,
+                                          group_goals = list(),
+                                          group_representative = FALSE,
                                           status = "move",
                                           waiting_counter = 0,
                                           cell = 0,
@@ -191,6 +197,8 @@ setMethod("initialize", "agent", function(.Object,
     .Object@orientation <- orientation
     .Object@goals <- goals
     .Object@group <- group
+    .Object@group_goals <- group_goals
+    .Object@group_representative <- group_representative
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
@@ -219,6 +227,11 @@ setMethod("initialize", "agent", function(.Object,
         .Object@current_goal <- current_goal
     }
 
+    # Only add the provided current group goal if it is defined.
+    if(!is.null(current_group_goal)) {
+        .Object@current_group_goal <- current_group_goal
+    }
+
     return(.Object)
 })
 
@@ -229,6 +242,8 @@ setMethod("initialize", "agent", function(.Object,
 #' @concept methods
 #' 
 #' @export
+# TO DO:
+# - Change the method to include new group goal slots and info.
 setMethod("show", "agent", function(object) {
     params <- parameters(object)
     cols <- colnames(params)
@@ -460,3 +475,37 @@ setMethod("waiting_counter<-", "agent", function(object, value) {
     object@waiting_counter <- value
     return(object)
 })
+
+#' @rdname current_group_goal
+setMethod("current_group_goal", "agent", function(object) {
+    return(object@current_group_goal)
+})
+
+#' @rdname current_group_goal
+setMethod("current_group_goal<-", "agent", function(object, value) {
+    object@current_group_goal <- value
+    return(object)
+})
+
+#' @rdname group_goals
+setMethod("group_goals", "agent", function(object) {
+    return(object@group_goals)
+})  
+
+#' @rdname group_goals
+setMethod("group_goals<-", "agent", function(object, value) {
+    object@group_goals <- value
+    return(object)
+})  
+
+#' @rdname group_representative
+setMethod("group_representative", "agent", function(object) {
+    return(setNames(object@group_representative, object@id))
+})    
+
+#' @rdname group_representative
+setMethod("group_representative<-", "agent", function(object, value) {
+    object@group_representative <- value
+    return(object)
+}) 
+

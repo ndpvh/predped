@@ -824,7 +824,7 @@ vf_utility_discrete <- function(b_vf,
 
 ##################################################################################
 # LOCAL DYNAMICS FUNCTIONS
-# TODO: Change the information of the member data function
+# TO DO: Change the information of the member data function
 
 #' Get Distance and Angle to Nearest Group Member
 #' 

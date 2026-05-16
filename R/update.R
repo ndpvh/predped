@@ -561,6 +561,32 @@ update_goal <- function(agent,
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
+    # --- NEW: Synchronisation with group representative ---
+    if (!group_representative(agent)) {
+        # Find the group representative in the state
+        rep_agents <- Filter(function(x) group_representative(x) && group(x) == group(agent), agents(state))
+        
+        if (length(rep_agents) > 0) {
+            rep_agent <- rep_agents[[1]]
+
+            # Check if the representative has moved on to a new group goal
+            if (id(current_group_goal(agent)) != id(current_group_goal(rep_agent))) {
+                
+                # Sync group goals
+                current_group_goal(agent) <- current_group_goal(rep_agent)
+                group_goals(agent) <- group_goals(rep_agent)
+
+                # Sync the individual goals to match
+                current_goal(agent) <- current_goal(rep_agent)
+                goals(agent) <- goals(rep_agent)
+
+                # Force recalculation of path
+                status(agent) <- "plan"
+            }
+        }
+    }
+    # ----------------------------------------------------
+
     # Extract objects and shape of the environment
     obj <- objects(background)
     shp <- shape(background)
@@ -577,11 +603,16 @@ update_goal <- function(agent,
         # interaction phase.
         if(current_goal(agent)@id == "goal exit") {
             status(agent) <- "exit"
-        } else {
+        } else if (group_representative(agent)) {
+            # --- NEW: Only the representative interacts ---
             status(agent) <- "completing goal"                    
             co_1 <- position(agent)
             co_2 <- current_goal(agent)@position 
             orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+        } else {
+            # --- NEW: Followers wait patiently nearby ---
+            status(agent) <- "wait"
+            waiting_counter(agent) <- 5
         }
     }
 
@@ -598,6 +629,13 @@ update_goal <- function(agent,
             if(length(goals(agent)) > 0) {
                 current_goal(agent) <- goals(agent)[[1]]
                 goals(agent) <- goals(agent)[-1]
+                
+                # --- NEW: Update Group Tracker ---
+                if (group_representative(agent)) {
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- goals(agent)
+                }
+                
             } else {
                 # When there are multiple exits, use an algorithm to make the 
                 # agent decide which one to go to 
@@ -610,6 +648,12 @@ update_goal <- function(agent,
                 
                 current_goal(agent) <- goal(id = "goal exit",
                                             position = as.numeric(exits))
+                                            
+                # --- NEW: Update Group Tracker ---
+                if (group_representative(agent)) {
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- list()
+                }
             }
 
             # Replan if the goal paths were not precomputed yet
@@ -785,14 +829,24 @@ update_goal <- function(agent,
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
         if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
-            if(length(goals(agent)) != 0) {
-                goals(agent) <- append(current_goal(agent), 
-                                       goals(agent))
-                current_goal(agent) <- goals(agent)[[2]]
-                goals(agent) <- goals(agent)[-2]
-                status(agent) <- "plan"
+            # --- NEW: Prevent Followers from abandoning the group ---
+            if (!group_representative(agent)) {
+                waiting_counter(agent) <- 5 # Keep waiting patiently
             } else {
-                status(agent) <- "reorient"
+                if(length(goals(agent)) != 0) {
+                    goals(agent) <- append(current_goal(agent), 
+                                           goals(agent))
+                    current_goal(agent) <- goals(agent)[[2]]
+                    goals(agent) <- goals(agent)[-2]
+                    
+                    # --- NEW: Sync group goal if Rep dynamically sorted ---
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- goals(agent)
+                    
+                    status(agent) <- "plan"
+                } else {
+                    status(agent) <- "reorient"
+                }
             }
         }
     }
@@ -877,8 +931,6 @@ update_goal <- function(agent,
 
     return(agent)
 }
-
-
 
 
 
