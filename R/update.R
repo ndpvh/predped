@@ -45,6 +45,68 @@ setMethod("update", "state", function(object,
     agent_list <- agents(object)
     background <- setting(object)
 
+    # --- NEW: Dynamic Group Representative Election ---
+    if (length(agent_list) > 0) {
+        agent_groups <- sapply(agent_list, group)
+        unique_groups <- unique(agent_groups)
+        
+        for (g in unique_groups) {
+            g_indices <- which(agent_groups == g)
+            
+            if (length(g_indices) > 1) {
+                # 1. Identify the CURRENT representative to get the true active goal
+                current_rep_logical <- sapply(agent_list[g_indices], group_representative)
+                if (any(current_rep_logical)) {
+                    current_rep_idx <- g_indices[which(current_rep_logical)[1]]
+                } else {
+                    current_rep_idx <- g_indices[1] # Safety fallback
+                }
+                
+                # 2. Get the position of the active group goal
+                ref_goal_pos <- matrix(current_group_goal(agent_list[[current_rep_idx]])@position, ncol = 2)
+                
+                # 3. Calculate everyone's distance to that goal
+                distances <- sapply(g_indices, function(idx) {
+                    m4ma::dist1(position(agent_list[[idx]]), ref_goal_pos)
+                })
+                
+                # 4. Elect the new representative (the closest one)
+                current_rep_dist <- distances[which(g_indices == current_rep_idx)]
+                min_dist <- min(distances)
+                potential_new_rep_idx <- g_indices[which.min(distances)]
+
+                # safeguard against infinite election loop error
+                if((current_rep_dist - min_dist) > 0.25) {
+                    new_rep_idx <- current_rep_idx
+                } else {
+                    new_rep_idx <- potential_new_rep_idx
+                }
+
+                # Memory sync
+                if (new_rep_idx != current_rep_idx) {
+                    new_rep_agent <- agent_list[[new_rep_idx]]
+                    current_rep_agent <- agent_list[[current_rep_idx]]
+
+                    current_group_goal(new_rep_agent) <- current_group_goal(current_rep_agent)
+                    group_goals(new_rep_agent) <- group_goals(current_rep_agent)
+                    current_goal(new_rep_agent) <- current_goal(current_rep_agent)
+                    goals(new_rep_agent) <- goals(current_rep_agent)
+
+                    agent_list[[new_rep_idx]] <- new_rep_agent
+                   
+                }
+                
+                # 5. Apply the roles
+                for (idx in g_indices) {
+                    group_representative(agent_list[[idx]]) <- (idx == new_rep_idx)
+                }
+            } else if (length(g_indices) == 1) {
+                # Solo agents are always their own representative
+                group_representative(agent_list[[g_indices[1]]]) <- TRUE
+            }
+        }
+    }
+
     # Create agent-specifications. Are used in the utility-function and used to
     # be created there. Moved it here to reduce computational cost (which increases
     # exponentially with more agents)
