@@ -30,6 +30,12 @@
 #' If \code{FALSE}, the function will instead return a list of vectors containing
 #' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 #' their own corrections (if needed). Defaults to \code{FALSE}.
+#' @param byrow Logical denoting whether to put the provided vector in a matrix 
+#' of parameters by row (\code{TRUE}) or by column (\code{FALSE}). This matrix 
+#' is of the order N x P, where N denotes the number of participants and P the 
+#' number of parameters of the model. Ignored or redundant when optimization is 
+#' performed for a single participant or when the \code{parameters} are already 
+#' in the required format. Defaults to \code{TRUE}.
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 #' In a typical estimation situation, these motion variables should already be 
 #' in \code{data}.
@@ -48,6 +54,7 @@ mll <- function(data,
                 bounds = params_from_csv[["params_bounds"]],
                 cpp = TRUE,
                 summed = FALSE,
+                byrow = TRUE,
                 ...) {
 
     # Check whether the utility variables are in there. Just checked for one and 
@@ -86,8 +93,8 @@ mll <- function(data,
     if(is.null(dim(parameters)) | is.matrix(parameters)) {
         parameters <- matrix(parameters, 
                              nrow = length(ids),
-                             ncol = length(parameters),
-                             byrow = TRUE) |>
+                             ncol = nrow(bounds),
+                             byrow = byrow) |>
             as.data.frame() |>
             setNames(parameter_names)
 
