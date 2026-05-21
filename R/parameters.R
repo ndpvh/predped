@@ -526,22 +526,22 @@ to_unbounded <- function(parameters,
 
         # Check whether the parameter indeed falls within this range. If not, 
         # throw an error
-        if(parameters[[i]] < 0 | parameters[[i]] > 1) {
+        if(any(parameters[[i]] < 0) | any(parameters[[i]] > 1)) {
             stop(paste0("Parameter ", 
                         i,
                         " does not fall within its bounds."))
         }
 
-        # If the parameters fall exactly on the bounds, we need to change them 
-        # by an arbitrarily small number to make sure there are no infinities in 
-        # our generated parameters
-        if(parameters[[i]] == 0) {
-            parameters[[i]] <- parameters[[i]]
-        }
+        # # If the parameters fall exactly on the bounds, we need to change them 
+        # # by an arbitrarily small number to make sure there are no infinities in 
+        # # our generated parameters
+        # if(parameters[[i]] == 0) {
+        #     parameters[[i]] <- parameters[[i]]
+        # }
 
-        if(parameters[[i]] == 1) {
-            parameters[[i]] <- parameters[[i]]
-        }
+        # if(parameters[[i]] == 1) {
+        #     parameters[[i]] <- parameters[[i]]
+        # }
 
         # Transform to a value of a normal distribution
         parameters[[i]] <- qnorm(parameters[[i]])
