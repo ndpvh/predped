@@ -77,9 +77,9 @@ setMethod("update", "state", function(object,
 
                 # safeguard against infinite election loop error
                 if((current_rep_dist - min_dist) > 0.25) {
-                    new_rep_idx <- current_rep_idx
-                } else {
                     new_rep_idx <- potential_new_rep_idx
+                } else {
+                    new_rep_idx <- current_rep_idx
                 }
 
                 # Memory sync
