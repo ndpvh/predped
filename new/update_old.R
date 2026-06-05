@@ -47,12 +47,8 @@ setMethod("update", "state", function(object,
 
     # --- NEW: Dynamic Group Representative Election ---
     if (length(agent_list) > 0) {
-        active_mode <- sapply(agent_list, active_mode)
         agent_groups <- sapply(agent_list, group)
-
-        agent_groups[active_mode == "solo"] <- NA
-
-        unique_groups <- unique(agent_groups[!is.na(agent_groups)])
+        unique_groups <- unique(agent_groups)
         
         for (g in unique_groups) {
             g_indices <- which(agent_groups == g)
@@ -81,9 +77,9 @@ setMethod("update", "state", function(object,
 
                 # safeguard against infinite election loop error
                 if((current_rep_dist - min_dist) > 0.25) {
-                    new_rep_idx <- potential_new_rep_idx
-                } else {
                     new_rep_idx <- current_rep_idx
+                } else {
+                    new_rep_idx <- potential_new_rep_idx
                 }
 
                 # Memory sync
@@ -635,49 +631,42 @@ update_goal <- function(agent,
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
-    # --- NEW: Check if the representative has moved on to a new goal ---
-        # If so, break out of wait state and sync to follow them
-        # (Only applies if still in a group and in group mode)
-    if (!group_representative(agent) && !is.na(group(agent)) && active_mode(agent) == "group") {
+    # --- NEW: Synchronisation with group representative ---
+    # Only sync if this agent is still part of a group
+    if (!group_representative(agent) && !is.na(group(agent))) {
+        # Find the group representative in the state
         rep_agents <- Filter(function(x) group_representative(x) && group(x) == group(agent), agents(state))
         
         if (length(rep_agents) > 0) {
             rep_agent <- rep_agents[[1]]
-            
-            # --- NEW: Check if the group has permanently disbanded ---
-            if (length(group_goals(rep_agent)) == 0 && active_mode(rep_agent) == "solo") {
-                # The Rep has finished the final group goal. Group is disbanded.
-                active_mode(agent) <- "solo"
-                
-                # Follower pursues their own individual goals or exits
-                if (length(individual_goals(agent)) > 0) {
-                    current_goal(agent) <- individual_goals(agent)[[1]]
-                    individual_goals(agent) <- individual_goals(agent)[-1]
-                } else {
-                    exits <- exit(background)
-                    if(nrow(exits) > 1) {
-                        distances <- (position(agent)[1] - exits[,1])^2 + (position(agent)[2] - exits[,2])^2
-                        exits <- exits[which.min(distances),]
-                    } 
-                    current_goal(agent) <- goal(id = "goal exit", position = as.numeric(exits))
-                }
-                
-                current_group_goal(agent) <- goal()
-                goals(agent) <- list()
-                current_goal(agent)@path <- matrix(nrow = 0, ncol = 2)
-                status(agent) <- "plan"
-                return(agent)
-            }
-            
-            # If rep's goal has changed from what we think it is, sync and move on
+
+            # Check if the representative has moved on to a new group goal
             if (id(current_group_goal(agent)) != id(current_group_goal(rep_agent))) {
-                current_group_goal(agent) <- current_group_goal(rep_agent)
-                group_goals(agent) <- group_goals(rep_agent)
-                current_goal(agent) <- current_group_goal(rep_agent)
-                goals(agent) <- group_goals(rep_agent)
-                current_goal(agent)@path <- matrix(nrow = 0, ncol = 2)
-                status(agent) <- "plan"
-                return(agent)
+                
+                # --- NEW: Check if the follower was on a private side-quest ---
+                if (id(current_goal(agent)) != id(current_group_goal(agent))) {
+                    # Follower is on an individual goal detour - don't force them back!
+                    # Just update their group tracker so they know where the rep is
+                    current_group_goal(agent) <- current_group_goal(rep_agent)
+                    group_goals(agent) <- group_goals(rep_agent)
+                } else {
+                    # Not on an individual goal, do full sync
+                    # Sync group goals
+                    current_group_goal(agent) <- current_group_goal(rep_agent)
+                    group_goals(agent) <- group_goals(rep_agent)
+
+                    # Sync the individual goals to match
+                    current_goal(agent) <- current_goal(rep_agent)
+                    goals(agent) <- goals(rep_agent)
+                    
+                    # --- CRITICAL: Clear the path inherited from rep ---
+                    # The rep's path was computed from THEIR position, not ours
+                    # We need to replan from our own position
+                    current_goal(agent)@path <- matrix(nrow = 0, ncol = 2)
+
+                    # Force recalculation of path
+                    status(agent) <- "plan"
+                }
             }
         }
     }
@@ -756,9 +745,6 @@ update_goal <- function(agent,
                             next_is_individual <- TRUE
                             selected_idx <- closest_indiv_idx
                         }
-                    } else {
-                        next_is_individual <- TRUE
-                        selected_idx <- closest_indiv_idx
                     }
                 }
                 
@@ -768,20 +754,18 @@ update_goal <- function(agent,
                     current_goal(agent) <- individual_goals(agent)[[selected_idx]]
                     individual_goals(agent) <- individual_goals(agent)[-selected_idx]
                     
-                    # Switch to solo mode to ignore group cohesion
-                    active_mode(agent) <- "solo"
-                    
+                    # --- NEW: If this agent now has NO group goals left, break from the group ---
                     if (length(goals(agent)) == 0) {
+                        # Agent is now pursuing individual goals only - remove from group
+                        group(agent) <- 999000 + sample(1:1000, 1)
+                        group_representative(agent) <- FALSE
                         current_group_goal(agent) <- goal()  # Empty goal
                     }
                     
                 } else if (has_group_goals) {
-                    # Proceed with the next group goal
+                    # Proceed with the next group goal (only if group goals exist)
                     current_goal(agent) <- goals(agent)[[1]]
                     goals(agent) <- goals(agent)[-1]
-                    
-                    # Switch back to group mode to restore group cohesion
-                    active_mode(agent) <- "group"
                     
                     # Sync the tracker if this is the Representative
                     if (group_representative(agent)) {
@@ -803,9 +787,7 @@ update_goal <- function(agent,
                 current_goal(agent) <- goal(id = "goal exit",
                                             position = as.numeric(exits))
                                             
-                # Switch to solo mode to walk to exit naturally
-                active_mode(agent) <- "solo"
-                                            
+                # --- NEW: Update Group Tracker + Break from group ---
                 if (group_representative(agent)) {
                     current_group_goal(agent) <- current_goal(agent)
                     group_goals(agent) <- list()
@@ -984,9 +966,6 @@ update_goal <- function(agent,
                 closest_indiv_idx <- which.min(dist_indiv)
                 current_goal(agent) <- individual_goals(agent)[[closest_indiv_idx]]
                 individual_goals(agent) <- individual_goals(agent)[-closest_indiv_idx]
-                
-                active_mode(agent) <- "solo" # <-- SWITCH TO SOLO
-                
                 status(agent) <- "plan"
                 return(agent)  # Return early to restart planning
             }
@@ -995,8 +974,8 @@ update_goal <- function(agent,
         
         # --- NEW: Check if the representative has moved on to a new goal ---
         # If so, break out of wait state and sync to follow them
-        # (Only applies if still in a group and in group mode)
-        if (!group_representative(agent) && !is.na(group(agent)) && active_mode(agent) == "group") {
+        # (Only applies if still in a group)
+        if (!group_representative(agent) && !is.na(group(agent))) {
             rep_agents <- Filter(function(x) group_representative(x) && group(x) == group(agent), agents(state))
             
             if (length(rep_agents) > 0) {
@@ -1044,8 +1023,8 @@ update_goal <- function(agent,
                 # Followers stuck waiting: check if they have individual goals
                 if (length(individual_goals(agent)) > 0) {
                     # They have individual goals! Break from group and pursue them
-                    active_mode(agent) <- "solo" # <-- SWITCH TO SOLO
-                    
+                    group(agent) <- 999000 + sample(1:1000, 1)
+                    group_representative(agent) <- FALSE
                     current_goal(agent) <- individual_goals(agent)[[1]]
                     individual_goals(agent) <- individual_goals(agent)[-1]
                     goals(agent) <- list()  # Clear group goals
@@ -1269,16 +1248,6 @@ create_agent_specifications <- function(agent_list,
                                                       cpp = cpp)) |>
         t()
 
-    # --- NEW: Mask group IDs for solo agents ---
-    groups_exported <- numeric(length(agent_list))
-    for (i in seq_along(agent_list)) {
-        if (active_mode(agent_list[[i]]) == "solo") {
-            groups_exported[i] <- 999000 + i  # Unique ID for math bypassing
-        } else {
-            groups_exported[i] <- group(agent_list[[i]])
-        }
-    }
-
     # Make the object-based arguments of predped compatible with the information
     # needed by m4ma. 
     agent_specs <- list(id = as.character(sapply(agent_list, id)),
@@ -1286,7 +1255,7 @@ create_agent_specifications <- function(agent_list,
                         position = t(sapply(agent_list, position)),
                         orientation = as.numeric(sapply(agent_list, orientation)), 
                         speed = as.numeric(sapply(agent_list, speed)), 
-                        group = groups_exported,
+                        group = as.numeric(sapply(agent_list, group)),
                         predictions = agent_predictions)
 
     # Required for utility helper functions: Add names of the agents to their

@@ -77,7 +77,6 @@ agent <- setClass("agent",
                        group_goals = "list",
                        group_representative = "logical",
                        individual_goals = "list",
-                       active_mode = "character",
                        parameters = "data.frame",
                        color = "character",
                        cell_centers = "matrix",
@@ -179,7 +178,6 @@ setMethod("initialize", "agent", function(.Object,
                                           group_goals = list(),
                                           group_representative = FALSE,
                                           individual_goals = list(),
-                                          active_mode = "group",
                                           status = "move",
                                           waiting_counter = 0,
                                           cell = 0,
@@ -204,7 +202,6 @@ setMethod("initialize", "agent", function(.Object,
     .Object@group_goals <- group_goals
     .Object@group_representative <- group_representative
     .Object@individual_goals <- individual_goals
-    .Object@active_mode <- active_mode
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
@@ -264,7 +261,6 @@ setMethod("show", "agent", function(object) {
     cat("current_goal: (a) position:", object@current_goal@position, "(b) path:", object@current_goal@path, "\n")
     cat("goals (number):", length(object@goals), "\n")
     cat("group:", object@group, "\n")
-    cat("active_mode:", object@active_mode, "\n")
     cat("id:", object@id, "\n")
     cat("orientation:", object@orientation, "\n")
     cat("parameters:", "\n")
@@ -527,13 +523,3 @@ setMethod("individual_goals<-", "agent", function(object, value) {
     return(object)
 })  
 
-#' @rdname active_mode
-setMethod("active_mode", "agent", function(object) {
-    return(setNames(object@active_mode, object@id))
-})
-
-#' @rdname active_mode
-setMethod("active_mode<-", "agent", function(object, value) {
-    object@active_mode <- value
-    return(object)
-})

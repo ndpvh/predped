@@ -1684,3 +1684,11 @@ setGeneric("group_goals<-", function(object, value) standardGeneric("group_goals
 # Getter/setter for group representative
 setGeneric("group_representative", function(object) standardGeneric("group_representative"))
 setGeneric("group_representative<-", function(object, value) standardGeneric("group_representative<-"))
+
+# Getter/setter for individual goals
+setGeneric("individual_goals", function(object) standardGeneric("individual_goals"))
+setGeneric("individual_goals<-", function(object, value) standardGeneric("individual_goals<-"))
+
+# Getter/setter for active mode
+setGeneric("active_mode", function(object) standardGeneric("active_mode"))
+setGeneric("active_mode<-", function(object, value) standardGeneric("active_mode<-"))

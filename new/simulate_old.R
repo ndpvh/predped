@@ -1028,8 +1028,7 @@ add_agent <- function(model,
                     individual_goals = private_goals,
                     color = color,
                     status = "plan",
-                    group = group_number,
-                    active_mode = "group"))
+                    group = group_number))
     }
 
     # Create the agent itself
@@ -1042,8 +1041,7 @@ add_agent <- function(model,
                        current_goal = shared_goals[[1]],
                        individual_goals = private_goals,
                        color = color,
-                       group = group_number,
-                       active_mode = "group")
+                       group = group_number)
 
     # Create the path to walk on for the current goal and return the agent. Given
     # that nothing new is put in the environment, we can put `reevaluate` to
@@ -1240,7 +1238,6 @@ create_initial_condition <- function(agent_number,
         parameters(dummy) <- new_agent$parameters
         color(dummy) <- new_agent$color
         status(dummy) <- new_agent$status
-        active_mode(dummy) <- new_agent$active_mode
 
         # Update the group number for the future if `i` is in the indices that
         # indicate a change in group membership. If the agent belongs to a 
