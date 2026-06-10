@@ -76,6 +76,7 @@ agent <- setClass("agent",
                        current_group_goal = "goal", 
                        group_goals = "list",
                        group_representative = "logical",
+                       individual_goals = "list",
                        parameters = "data.frame",
                        color = "character",
                        cell_centers = "matrix",
@@ -176,6 +177,7 @@ setMethod("initialize", "agent", function(.Object,
                                           current_group_goal = NULL,
                                           group_goals = list(),
                                           group_representative = FALSE,
+                                          individual_goals = list(),
                                           status = "move",
                                           waiting_counter = 0,
                                           cell = 0,
@@ -199,6 +201,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@group <- group
     .Object@group_goals <- group_goals
     .Object@group_representative <- group_representative
+    .Object@individual_goals <- individual_goals
     .Object@status <- status
     .Object@waiting_counter <- waiting_counter
     .Object@cell <- cell    
@@ -509,3 +512,13 @@ setMethod("group_representative<-", "agent", function(object, value) {
     return(object)
 }) 
 
+#' @rdname individual_goals
+setMethod("individual_goals", "agent", function(object) {
+    return(object@individual_goals)
+})  
+
+#' @rdname individual_goals
+setMethod("individual_goals<-", "agent", function(object, value) {
+    object@individual_goals <- value
+    return(object)
+})

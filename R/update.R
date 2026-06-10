@@ -52,6 +52,38 @@ setMethod("update", "state", function(object,
         
         for (g in unique_groups) {
             g_indices <- which(agent_groups == g)
+
+            # Check if this group currently has a representative
+            current_rep_logical <- sapply(agent_list[g_indices], group_representative)
+
+            if(!any(current_rep_logical)) {
+                # If not, elect the closest agent to the current group goal as the new representative
+                for (idx in g_indices) {
+                    agent <- agent_list[[idx]]
+
+                    if(length(individual_goals(agent)) > 0) {
+                        group(agent) <- 10000 + sample(1:9999, 1)
+                        group_representative(agent) <- TRUE
+                        current_goal(agent) <- individual_goals(agent)[[1]]
+                        individual_goals(agent) <- individual_goals(agent)[-1]
+                        current_goal(agent)@path <- matrix(numeric(0), ncol = 2)
+                        status(agent) <- "plan"
+                    } else {
+                        exits <- exit(background)
+                        if(nrow(exits) > 1) {
+                            distances <- (position(agent)[1] - exits[,1])^2 + (position(agent)[2] - exits[,2])^2
+                            exits <- exits[which.min(distances),]
+                        }
+                        current_goal(agent) <- goal(id = "goal exit", position = as.numeric(exits))
+                        current_goal(agent)@path <- matrix(numeric(0), ncol = 2)
+                        status(agent) <- "plan"
+                        group(agent) <- 10000 + sample(1:9999, 1)
+                        group_representative(agent) <- TRUE
+                    }
+                    agent_list[[idx]] <- agent
+                }
+                next
+            }
             
             if (length(g_indices) > 1) {
                 # 1. Identify the CURRENT representative to get the true active goal
@@ -697,6 +729,14 @@ update_goal <- function(agent,
                     current_group_goal(agent) <- current_goal(agent)
                     group_goals(agent) <- goals(agent)
                 }
+                
+            } else if (length(individual_goals(agent)) > 0) {
+
+                group(agent) <- 10000 + sample(1:9999, 1) # Separates agent from group
+                group_representative(agent) <- TRUE # Becomes own representative
+
+                current_goal(agent) <- individual_goals(agent)[[1]]
+                individual_goals(agent) <- individual_goals(agent)[-1]
                 
             } else {
                 # When there are multiple exits, use an algorithm to make the 

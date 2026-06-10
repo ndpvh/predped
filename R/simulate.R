@@ -233,6 +233,7 @@ setMethod("simulate", "predped", function(object,
                                           initial_number_agents = NULL,
                                           goal_number = \(x) rnorm(x, 10, 2),
                                           goal_duration = \(x) rnorm(x, 10, 2),
+                                          individual_goal_number = NULL,
                                           precompute_goal_paths = FALSE,
                                           sort_goals = TRUE,
                                           precomputed_goals = NULL,
@@ -353,6 +354,7 @@ setMethod("simulate", "predped", function(object,
                                                (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
                                    group_size = group_size,
                                    goal_number = iteration_variables(altered_state)$goal_number[i],
+                                   individual_goal_number = individual_goal_number,
                                    time_step = time_step,
                                    space_between = space_between,
                                    standing_start = standing_start,
@@ -530,6 +532,7 @@ setMethod("simulate", "state", function(object,
                                         step_report = 1,
                                         goal_number = 5,
                                         goal_duration = \(x) rnorm(x, 10, 2),
+                                        individual_goal_number = NULL,
                                         precompute_goal_paths = TRUE,
                                         sort_goals = TRUE,
                                         adaptive_goal_sorting = TRUE,
@@ -573,6 +576,7 @@ setMethod("simulate", "state", function(object,
                                               standing_start = standing_start,
                                               goal_number = goal_number,
                                               goal_duration = goal_duration,
+                                              individual_goal_number = individual_goal_number,
                                               precompute_goal_paths = precompute_goal_paths,
                                               sort_goals = sort_goals,
                                               precomputed_goals = precomputed_goals,
@@ -734,33 +738,33 @@ add_group <- function(model,
     # Otherwise, we should loop over all other agents and change their
     # parameter values (and color) so that each agent is unique.
     #
-    # First, draw the parameters for each of the new agents
-    model_parameters <- parameters(model)
-    idx <- sample(model@archetypes,
-                  agent_number - 1,
-                  prob = model@weights,
-                  replace = TRUE)
+    #Capture the extra arguments passed via the ellipsis (...)
+    args <- list(...)
+    
+    # Force followers to spawn at the exact same location as the leader
+    args$position <- position(agents[[1]])
 
     # Loop over these agents
     for(i in 2:agent_number) {
-        # Create a temporary agent as a copy of the first simulated agent
-        tmp_agent <- agents[[1]]
+        # 1. Spawn a fresh agent from scratch! 
+        # This guarantees they generate UNIQUE individual goals and unique parameters.
+        follower_args <- c(list(model = model, 
+                                standing_start = standing_start, 
+                                individual_differences = individual_differences), 
+                           args)
+        
+        tmp_agent <- do.call(add_agent, follower_args)
 
-        # Change this temporary agent's characterstics based on simulated
-        # parameters
-        tmp <- model_parameters[["params_archetypes"]]
-        mean_params <- tmp[tmp$name == idx[i - 1], ]
-        params <- generate_parameters(1,
-                                      mean = mean_params,
-                                      Sigma = model_parameters[["params_sigma"]][[idx[i - 1]]],
-                                      bounds = model_parameters[["params_bounds"]],
-                                      archetype = idx[i - 1],
-                                      individual_differences = individual_differences)
 
-        id(tmp_agent) <- paste(sample(letters, 5, replace = TRUE), collapse = "")
-        radius(tmp_agent) <- params$radius
-        color(tmp_agent) <- mean_params$color
-        speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
+        # 2. Sync their group goals to match the leader perfectly
+        group(tmp_agent) <- group(agents[[1]])
+        current_goal(tmp_agent) <- current_goal(agents[[1]])
+        goals(tmp_agent) <- goals(agents[[1]])
+        current_group_goal(tmp_agent) <- current_group_goal(agents[[1]])
+        group_goals(tmp_agent) <- group_goals(agents[[1]])
+        
+        # 3. Match the leader's starting orientation so they walk into the room smoothly
+        orientation(tmp_agent) <- orientation(agents[[1]])
 
         # Ensures they are followers (should be default anyways)
         group_representative(tmp_agent) <- FALSE
@@ -862,6 +866,7 @@ add_agent <- function(model,
                       group_number = 1,
                       goal_number = 5,
                       goal_duration = \(x) rnorm(x, 10, 2),
+                      individual_goal_number = NULL,
                       precompute_goal_paths = TRUE,
                       sort_goals = TRUE,
                       precomputed_goals = NULL,
@@ -952,6 +957,22 @@ add_agent <- function(model,
         goal_stack <- precomputed_goals[[i]]
     }
 
+    # Create the extra individual goal stack if needed
+    if(!is.null(individual_goal_number)) {
+        individual_goal_stack <- goal_stack(individual_goal_number,
+                                           background,
+                                           counter = goal_duration,
+                                           precomputed_edges = precomputed_edges,
+                                           many_nodes = many_nodes,
+                                           starting_position = position,
+                                           precompute_goal_paths = precompute_goal_paths,
+                                           space_between = space_between * radius,
+                                           sort = sort_goals,
+                                           middle_edge = middle_edge)
+    } else {
+        individual_goal_stack <- list()
+    }                                  
+
     # Determine the agent's orientation. This is only triggered if angles wasn't
     # prevously defined as being perpendicular to the entry.
     if(is.null(angle)) {
@@ -973,6 +994,7 @@ add_agent <- function(model,
                     parameters = params, 
                     goals = goal_stack[-1],
                     current_goal = goal_stack[[1]],
+                    individual_goals = individual_goal_stack,
                     color = color,
                     status = "plan",
                     group = group_number))
@@ -986,6 +1008,7 @@ add_agent <- function(model,
                        parameters = params,
                        goals = goal_stack[-1],
                        current_goal = goal_stack[[1]],
+                       individual_goals = individual_goal_stack,
                        color = color,
                        group = group_number)
 
