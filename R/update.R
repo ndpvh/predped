@@ -680,8 +680,8 @@ update_goal <- function(agent,
             }
         }
     }
-    # ----------------------------------------------------
-
+    
+    
     # Extract objects and shape of the environment
     obj <- objects(background)
     shp <- shape(background)
@@ -699,13 +699,13 @@ update_goal <- function(agent,
         if(current_goal(agent)@id == "goal exit") {
             status(agent) <- "exit"
         } else if (group_representative(agent)) {
-            # --- NEW: Only the representative interacts ---
+            # Only the representative interacts
             status(agent) <- "completing goal"                    
             co_1 <- position(agent)
             co_2 <- current_goal(agent)@position 
             orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
         } else {
-            # --- NEW: Followers wait patiently nearby ---
+            # Followers wait patiently nearby
             status(agent) <- "wait"
             waiting_counter(agent) <- 5
         }
