@@ -66,3 +66,5 @@ man/figures/trace_train.gif
 scripts/
 gifs/
 .positai
+results/
+files/

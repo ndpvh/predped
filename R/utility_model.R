@@ -227,14 +227,14 @@ setMethod("utility", "data.frame", function(object,
                                      object$vf_angles[[1]])
     }
 
-    # Local group dynamics utility: Check whether people are any group
+    # Logarithmic Group-Attracted Visual Field utility: Check whether people are any group
     # members and, if so, compute the utility
 
-    if(!is.null(object$llgvf_data[[1]])) {
-        V <- V + local_gvf_utility(parameters[["a_llgvf"]],
-                                    parameters[["b_llgvf"]],
-                                    parameters[["e_llgvf"]],
-                                    object$llgvf_data[[1]])
+    if(!is.null(object$lgvf_data[[1]])) {
+        V <- V + lgvf_utility(parameters[["a_lgvf"]],
+                              parameters[["b_lgvf"]],
+                              parameters[["e_lgvf"]],
+                              object$lgvf_data[[1]])
     }
 
 
@@ -447,7 +447,9 @@ setMethod("compute_utility_variables", "agent", function(object,
                                     any_member = TRUE))
     
     
-    uv$llgvf_data <- list(get_group_member_data(uv$agent_idx,
+    # Logarithmic Group-Attracted Visual Field utility: Required variable is the distance 
+    # and angles of one or more other pedestrians.
+    uv$lgvf_data <- list(get_group_member_data(uv$agent_idx,
                                                 agent_specifications$group,
                                                 position(object),
                                                 orientation(object),
@@ -823,26 +825,27 @@ vf_utility_discrete <- function(b_vf,
 }
 
 ##################################################################################
-# LOCAL DYNAMICS FUNCTIONS
-# TO DO: Change the information of the member data function
+# NEW UTILITY FUNCTION
 
-#' Get Distance and Angle to Nearest Group Member
+#' Get Distances and Angles to Group Members
 #' 
-#' Finds the predicted position of the nearest group member and calculates the
-#' distance and relative angle from all candidate cells to that single member.
-#' This replaces the old Walk Beside, Group Centroid, and Visual Field methods.
+#' Finds the predicted positions of the group members and calculates the
+#' distances and relative angles from all candidate cells to each member.
+#' This functions as the alternative to distance_group_centroid and
+#' get_angles for the lgvf_utility.
 #'
 #' @param agent_idx Numeric denoting the position of the agent in the predictions.
 #' @param agent_group Numeric vector with the group membership of all pedestrians.
 #' @param position Numeric vector denoting the current position of the agent.
 #' @param orientation Numeric denoting the current orientation of the agent.
-#' @param predictions Numeric matrix with shape N x 2 containing predicted positions
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
 #' @param centers Numerical matrix containing the coordinates at each candidate cell.
 #'
-#' @return A list containing the distances and relative angles to the nearest group member.
+#' @return A list containing the distances, relative angles and number of 
+#' group members.
 #' 
 #' @seealso 
-#' \code{\link[predped]{local_gvf_utility}},
+#' \code{\link[predped]{lgvf_utility}},
 #' \code{\link[predped]{utility-agent}}
 #' 
 #' @concept utility
@@ -888,20 +891,20 @@ get_group_member_data <- function(agent_idx,
 }
 
 
-#' Local Logarithmic Group-Attracted Visual Field Utility (LLGVF)
+#' Logarithmic Group-Attracted Visual Field Utility (LGVF)
 #' 
-#' Unifies distance attraction and visual field alignment into a single local dynamic.
-#' Applies a logarithmic penalty based on distance to the nearest group member, and 
-#' adds an additional penalty if that member is outside the extended visual field.
+#' Unifies the previous social utility functions WB, GC and VF into one utility function.
+#' Applies a logarithmic penalty based on distances to group members, and adds 
+#' an additional penalty if that member is outside the extended visual field.
 #'
-#' @param a_llgvf Numeric denoting the exponent (shape) of the utility function.
-#' @param b_llgvf Numeric denoting the slope (weight) of the utility function.
-#' @param e_llgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+#' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
 #' @param distances Numeric vector of distances from candidate cells to the member.
 #' @param rel_angles Numeric vector of relative angles from candidate cells to the member.
 #' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
 #'
-#' @return Numeric vector containing the LLGVF utility for each cell. 
+#' @return Numeric vector containing the LGVF utility for each cell. 
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_group_member_data}},
@@ -909,9 +912,9 @@ get_group_member_data <- function(agent_idx,
 #' 
 #' @concept utility
 #' @export
-local_gvf_utility <- function(a_llgvf, 
-                              b_llgvf, 
-                              e_llgvf,
+lgvf_utility <- function(a_lgvf, 
+                              b_lgvf, 
+                              e_lgvf,
                               group_member_data,
                               vf_limit = 135 * pi / 180) {
     
@@ -929,17 +932,18 @@ local_gvf_utility <- function(a_llgvf,
         rel_angles <- group_member_data$rel_angles[[i]]
 
         # Base utility
-        base_util <- -b_llgvf * abs(log(distances) - log(e_llgvf))^a_llgvf
+        base_util <- -b_lgvf * abs(log(distances) - log(e_lgvf))^a_lgvf
 
         # Penalty
         in_vf <- abs(rel_angles) <= vf_limit
-        penalty <- ifelse(in_vf, 0, -b_llgvf / (distances^a_llgvf))
+        penalty <- ifelse(in_vf, 0, -b_lgvf / (distances^a_lgvf))
 
         # Total utility for this member
         total_util <- total_util + base_util + penalty
     }
     
-    return(total_util/nped)
+    # Averaged to avoid scaling issues with large groups
+    return(total_util/nped) 
 }
 
 

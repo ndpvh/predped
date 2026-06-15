@@ -677,6 +677,30 @@ get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predi
     .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers, any_member)
 }
 
+#' Get Distances and Angles to Group Members
+#' 
+#' Rcpp version of \code{\link[predped]{get_group_member_data}}.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the predictions.
+#' @param agent_group Numeric vector with the group membership of all pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
+#' @param centers Numerical matrix containing the coordinates at each candidate cell.
+#'
+#' @return A list containing the distances, relative angles and number of 
+#' group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{lgvf_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+get_group_member_data_rcpp <- function(agent_idx, agent_group, position, orientation, predictions, centers) {
+    .Call('_predped_get_group_member_data_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers)
+}
+
 #' Compute utility variables
 #' 
 #' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
@@ -775,6 +799,28 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' @export
 vf_utility_rcpp <- function(b_visual_field, relative_angles) {
     .Call('_predped_vf_utility_rcpp', PACKAGE = 'predped', b_visual_field, relative_angles)
+}
+
+#' Logarithmic Group-Attracted Visual Field Utility (LGVF)
+#' 
+#' Rcpp alternative to the \code{lgvf_utility} function.
+#'
+#' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+#' @param group_member_data List containing distances and relative angles to members.
+#' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+#'
+#' @return Numeric vector containing the LGVF utility for each cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_group_member_data_rcpp}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135 * M_PI / 180) {
+    .Call('_predped_lgvf_utility_rcpp', PACKAGE = 'predped', a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit)
 }
 
 #' Utility

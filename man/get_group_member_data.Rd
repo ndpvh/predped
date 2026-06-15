@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility_model.R
 \name{get_group_member_data}
 \alias{get_group_member_data}
-\title{Get Distance and Angle to Nearest Group Member}
+\title{Get Distances and Angles to Group Members}
 \usage{
 get_group_member_data(
   agent_idx,
@@ -22,20 +22,22 @@ get_group_member_data(
 
 \item{orientation}{Numeric denoting the current orientation of the agent.}
 
-\item{predictions}{Numeric matrix with shape N x 2 containing predicted positions}
+\item{predictions}{Numeric matrix with shape N x 2 containing predicted positions.}
 
 \item{centers}{Numerical matrix containing the coordinates at each candidate cell.}
 }
 \value{
-A list containing the distances and relative angles to the nearest group member.
+A list containing the distances, relative angles and number of 
+group members.
 }
 \description{
-Finds the predicted position of the nearest group member and calculates the
-distance and relative angle from all candidate cells to that single member.
-This replaces the old Walk Beside, Group Centroid, and Visual Field methods.
+Finds the predicted positions of the group members and calculates the
+distances and relative angles from all candidate cells to each member.
+This functions as the alternative to distance_group_centroid and
+get_angles for the lgvf_utility.
 }
 \seealso{
-\code{\link[predped]{local_gvf_utility}},
+\code{\link[predped]{lgvf_utility}},
 \code{\link[predped]{utility-agent}}
 }
 \concept{utility}

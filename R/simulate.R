@@ -112,6 +112,10 @@
 #' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param individual_goal_number Numeric denoting the number of goals that should be 
+#' assigned to each agent individually after completing their group goals. Generates a 
+#' separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+#' \code{NULL}.
 #' @param precompute_goal_paths Logical denoting whether to run the
 #' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
@@ -735,9 +739,6 @@ add_group <- function(model,
         return(agents)
     }
 
-    # Otherwise, we should loop over all other agents and change their
-    # parameter values (and color) so that each agent is unique.
-    #
     #Capture the extra arguments passed via the ellipsis (...)
     args <- list(...)
     
@@ -746,8 +747,8 @@ add_group <- function(model,
 
     # Loop over these agents
     for(i in 2:agent_number) {
-        # 1. Spawn a fresh agent from scratch! 
-        # This guarantees they generate UNIQUE individual goals and unique parameters.
+        # Spawn a fresh agent from scratch
+        # This guarantees they generate unique individual goal stacks and parameters
         follower_args <- c(list(model = model, 
                                 standing_start = standing_start, 
                                 individual_differences = individual_differences), 
@@ -756,14 +757,14 @@ add_group <- function(model,
         tmp_agent <- do.call(add_agent, follower_args)
 
 
-        # 2. Sync their group goals to match the leader perfectly
+        # Sync their group goals to match the leader perfectly
         group(tmp_agent) <- group(agents[[1]])
         current_goal(tmp_agent) <- current_goal(agents[[1]])
         goals(tmp_agent) <- goals(agents[[1]])
         current_group_goal(tmp_agent) <- current_group_goal(agents[[1]])
         group_goals(tmp_agent) <- group_goals(agents[[1]])
         
-        # 3. Match the leader's starting orientation so they walk into the room smoothly
+        # Match the leader's starting orientation so they walk into the room smoothly
         orientation(tmp_agent) <- orientation(agents[[1]])
 
         # Ensures they are followers (should be default anyways)
@@ -786,6 +787,10 @@ add_group <- function(model,
 #' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param individual_goal_number Numeric denoting the number of goals that should be 
+#' assigned to each agent individually after completing their group goals. Generates a 
+#' separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+#' \code{NULL}.
 #' @param precompute_goal_paths Logical denoting whether to run the
 #' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
@@ -960,15 +965,15 @@ add_agent <- function(model,
     # Create the extra individual goal stack if needed
     if(!is.null(individual_goal_number)) {
         individual_goal_stack <- goal_stack(individual_goal_number,
-                                           background,
-                                           counter = goal_duration,
-                                           precomputed_edges = precomputed_edges,
-                                           many_nodes = many_nodes,
-                                           starting_position = position,
-                                           precompute_goal_paths = precompute_goal_paths,
-                                           space_between = space_between * radius,
-                                           sort = sort_goals,
-                                           middle_edge = middle_edge)
+                                            background,
+                                            counter = goal_duration,
+                                            precomputed_edges = precomputed_edges,
+                                            many_nodes = many_nodes,
+                                            starting_position = position,
+                                            precompute_goal_paths = precompute_goal_paths,
+                                            space_between = space_between * radius,
+                                            sort = sort_goals,
+                                            middle_edge = middle_edge)
     } else {
         individual_goal_stack <- list()
     }                                  

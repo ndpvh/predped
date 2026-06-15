@@ -11,7 +11,7 @@ Authors@R: c(
     person("Niels", 
            "Vanhasbroeck", 
            email = "niels.vanhasbroeck@gmail.com",
-           comment = c(ORCID = 0000-0002-7423-0090),
+           comment = c(ORCID = "0000-0002-7423-0090"),
            role = c("aut", "cre")), 
     person("Malte", 
            "Lüken",
@@ -21,7 +21,10 @@ Authors@R: c(
            role = "ctb"), 
     person("Ece",
            "Yatıkçı",
-           role = "ctb"), 
+           role = "ctb"),
+    person("Jakub",
+           "Jurak",
+           role = "ctb"),
     person("Andrew",
            "Heathcote", 
            email = "ajheathcote@gmail.com",
@@ -44,7 +47,6 @@ Imports:
     MASS,
     matrixStats
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.3.3
 Collate:
     'predped-package.R'
     'RcppExports.R'
@@ -82,3 +84,4 @@ Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

@@ -1673,18 +1673,168 @@ setGeneric("weights", function(object) standardGeneric("weights"))
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
 
-# Getter/setter for current_group_goal
+
+
+#' Getter/Setter for the \code{current_group_goal}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{current_group_goal} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   current_group_goal = goal(position = c(1, 0)))
+#' 
+#' # Access the current_group_goal slot for the agent
+#' current_group_goal(my_agent)
+#' 
+#' # Change the current_group_goal slot for the agent
+#' current_group_goal(my_agent) <- goal(position = c(-1, 0))
+#' current_group_goal(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{goal-class}}
+#' 
+#' 
+#' @rdname current_group_goal
+#' 
+#' @concept getter
+#' 
+#' @export
+
 setGeneric("current_group_goal", function(object) standardGeneric("current_group_goal"))
+
+#' @rdname current_group_goal
+#'
+#' @export
 setGeneric("current_group_goal<-", function(object, value) standardGeneric("current_group_goal<-"))
 
-# Getter/setter for group_goals
+
+
+#' Getter/Setter for the \code{group_goals}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{group_goals} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   group_goals = list(goal(position = c(1, 0))))
+#' 
+#' # Access the group_goals slot for the agent
+#' group_goals(my_agent)
+#' 
+#' # Change the group_goals slot for the agent
+#' group_goals(my_agent) <- list(goal(position = c(-1, 0)))
+#' group_goals(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{goal-class}}
+#' 
+#' 
+#' @rdname group_goals
+#' 
+#' @concept getter
+#' 
+#' @export
+
 setGeneric("group_goals", function(object) standardGeneric("group_goals"))
+
+#' @rdname group_goals
+#'
+#' @export
+
 setGeneric("group_goals<-", function(object, value) standardGeneric("group_goals<-"))
 
-# Getter/setter for group representative
+
+
+#' Getter/Setter for the \code{group_representative}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{group_representative} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   group_representative = TRUE)
+#' 
+#' # Access the group_representative slot for the agent
+#' group_representative(my_agent)
+#' 
+#' # Change the group_representative slot for the agent
+#' group_representative(my_agent) <- FALSE
+#' group_representative(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' 
+#' 
+#' @rdname group_representative
+#' 
+#' @concept getter
+#' 
+#' @export
+
 setGeneric("group_representative", function(object) standardGeneric("group_representative"))
+
+#' @rdname group_representative
+#' 
+#' @export
+
 setGeneric("group_representative<-", function(object, value) standardGeneric("group_representative<-"))
 
-# Getter/setter for individual goals
+
+
+#' Getter/Setter for the \code{individual_goals}-slot
+#' 
+#' Works for \code{\link[predped]{agent-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{agent-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{individual_goals} slot.
+#' 
+#' @examples
+#' # Initialize agent
+#' my_agent <- agent(center = c(0, 0), 
+#'                   radius = 0.25, 
+#'                   individual_goals = list(goal(position = c(1, 0))))
+#' 
+#' # Access the individual_goals slot for the agent
+#' individual_goals(my_agent)
+#' 
+#' # Change the individual_goals slot for the agent
+#' individual_goals(my_agent) <- list(goal(position = c(-1, 0)))
+#' individual_goals(my_agent)
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{goal-class}}
+#' 
+#' 
+#' @rdname individual_goals
+#' 
+#' @concept getter
+#' 
+#' @export
+
 setGeneric("individual_goals", function(object) standardGeneric("individual_goals"))
+
+#' @rdname individual_goals
+#' 
+#' @export
+
 setGeneric("individual_goals<-", function(object, value) standardGeneric("individual_goals<-"))

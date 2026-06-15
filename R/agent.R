@@ -31,6 +31,15 @@
 #' represents the current goal of the agent.
 #' @slot goals List of goals the agent has to achieve. The current goal is not 
 #' included in this list.
+#' @slot current_group_goal Object of class \code{\link[predped]{goal-class}} which
+#' represents the current goal of the agent's group.
+#' @slot group_goals List of goals the agent's group has to achieve. The current 
+#' goal is not included in this list.
+#' @slot group_representative Logical denoting whether the agent is the representative of their group. 
+#' The representative is the only one in the group that completes the group goals, hence also leading
+#' the group towards the group goals.
+#' @slot individual_goals List of goals the agent has to achieve that are not shared with their group.
+#' These will be completes after the agent's group goals are completed. 
 #' @slot parameters Dataframe containing the values of the parameters for the 
 #' agent. Should contain all parameters relevant for the utility functions 
 #' (use \code{predped::draw_parameters(1)} for an example).
@@ -47,6 +56,10 @@
 #' \code{\link[predped]{cell}},
 #' \code{\link[predped]{current_goal}},
 #' \code{\link[predped]{goals}},
+#' \code{\link[predped]{current_group_goal}},
+#' \code{\link[predped]{group_goals}},
+#' \code{\link[predped]{group_representative}},
+#' \code{\link[predped]{individual_goals}},
 #' \code{\link[predped]{group}},
 #' \code{\link[predped]{id}},
 #' \code{\link[predped]{orientation}},
@@ -123,6 +136,16 @@ agent <- setClass("agent",
 #' class \code{\link[predped]{goal-class}}.
 #' @param goals List of goals the agent has to achieve. The current goal is not 
 #' included in this list. Defaults to an empty list.
+#' @param current_group_goal Object of class \code{\link[predped]{goal-class}} which
+#' represents the current goal of the agent's group. Defaults to a placeholder of class 
+#' class \code{\link[predped]{goal-class}}.
+#' @param group_goals List of goals the agent's group has to achieve. The current 
+#' goal is not included in this list. Defaults to an empty list.
+#' @param group_representative Logical denoting whether the agent is the representative of 
+#' their group. The representative is the only one in the group that completes the group 
+#' goals, hence also leading the group towards the group goals. Defaults to \code{FALSE}.
+#' @param individual_goals List of goals the agent has to achieve that are not shared with their group.
+#' These will be completes after the agent's group goals are completed. Defaults to an empty list.
 #' @param parameters Dataframe containing the values of the parameters for the 
 #' agent. Should contain all parameters relevant for the utility functions 
 #' (use \code{predped::draw_parameters(1)} for an example). Defaults to a random 
@@ -151,6 +174,10 @@ agent <- setClass("agent",
 #' \code{\link[predped]{current_goal}},
 #' \code{\link[predped]{goals}},
 #' \code{\link[predped]{group}},
+#' \code{\link[predped]{current_group_goal}},
+#' \code{\link[predped]{group_goals}},
+#' \code{\link[predped]{group_representative}},
+#' \code{\link[predped]{individual_goals}},
 #' \code{\link[predped]{id}},
 #' \code{\link[predped]{orientation}},
 #' \code{\link[predped]{parameters}}
@@ -207,12 +234,12 @@ setMethod("initialize", "agent", function(.Object,
     .Object@cell <- cell    
     .Object@color <- color
     .Object@cell_centers <- cell_centers
-    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 16) |>
+    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 17) |>
         as.data.frame() |>
         setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 
                    "id_distance", "id_check", "id_ingroup", "ba_angle", 
                    "ba_cones", "fl_leaders", "wb_buddies", "gc_distance", 
-                   "gc_radius", "gc_nped", "vf_angles"))
+                   "gc_radius", "gc_nped", "vf_angles", "lgvf_data"))
 
     # If the parameters are empty, add the BaselineEuropean as default. Otherwise
     # use the defined parameters
@@ -260,6 +287,9 @@ setMethod("show", "agent", function(object) {
     cat("color:", object@color, "\n")
     cat("current_goal: (a) position:", object@current_goal@position, "(b) path:", object@current_goal@path, "\n")
     cat("goals (number):", length(object@goals), "\n")
+    cat("group_goals (number):", length(object@group_goals), "\n")
+    cat("group_representative:", object@group_representative, "\n")
+    cat("individual_goals (number):", length(object@individual_goals), "\n")
     cat("group:", object@group, "\n")
     cat("id:", object@id, "\n")
     cat("orientation:", object@orientation, "\n")

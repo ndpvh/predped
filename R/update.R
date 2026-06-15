@@ -45,22 +45,23 @@ setMethod("update", "state", function(object,
     agent_list <- agents(object)
     background <- setting(object)
 
-    # --- NEW: Dynamic Group Representative Election ---
+    # Dynamic Group Representative Election 
     if (length(agent_list) > 0) {
         agent_groups <- sapply(agent_list, group)
         unique_groups <- unique(agent_groups)
-        
+         
         for (g in unique_groups) {
             g_indices <- which(agent_groups == g)
 
             # Check if this group currently has a representative
             current_rep_logical <- sapply(agent_list[g_indices], group_representative)
 
+            # Logic for when group representative leaves the group because they have no more group goals left
             if(!any(current_rep_logical)) {
-                # If not, elect the closest agent to the current group goal as the new representative
                 for (idx in g_indices) {
                     agent <- agent_list[[idx]]
 
+                    # Check if agent has any individual goals left
                     if(length(individual_goals(agent)) > 0) {
                         group(agent) <- 10000 + sample(1:9999, 1)
                         group_representative(agent) <- TRUE
@@ -85,29 +86,29 @@ setMethod("update", "state", function(object,
                 next
             }
             
+            # Logic for electing a new representative who is closest to the active group goal
             if (length(g_indices) > 1) {
-                # 1. Identify the CURRENT representative to get the true active goal
-                current_rep_logical <- sapply(agent_list[g_indices], group_representative)
+                # Identify the current representative to get the true active goal
                 if (any(current_rep_logical)) {
                     current_rep_idx <- g_indices[which(current_rep_logical)[1]]
                 } else {
                     current_rep_idx <- g_indices[1] # Safety fallback
                 }
                 
-                # 2. Get the position of the active group goal
+                # Get the position of the active group goal
                 ref_goal_pos <- matrix(current_group_goal(agent_list[[current_rep_idx]])@position, ncol = 2)
                 
-                # 3. Calculate everyone's distance to that goal
+                # Calculate everyone's distance to that goal
                 distances <- sapply(g_indices, function(idx) {
                     m4ma::dist1(position(agent_list[[idx]]), ref_goal_pos)
                 })
                 
-                # 4. Elect the new representative (the closest one)
+                # Elect the new representative (the closest one)
                 current_rep_dist <- distances[which(g_indices == current_rep_idx)]
                 min_dist <- min(distances)
                 potential_new_rep_idx <- g_indices[which.min(distances)]
 
-                # safeguard against infinite election loop error
+                # Safeguard against infinite election loop error
                 if((current_rep_dist - min_dist) > 0.25) {
                     new_rep_idx <- potential_new_rep_idx
                 } else {
@@ -128,7 +129,7 @@ setMethod("update", "state", function(object,
                    
                 }
                 
-                # 5. Apply the roles
+                # Apply the roles
                 for (idx in g_indices) {
                     group_representative(agent_list[[idx]]) <- (idx == new_rep_idx)
                 }
@@ -207,7 +208,7 @@ setMethod("update", "state", function(object,
                                               gc_radius = NA, 
                                               gc_nped = NA,
                                               vf_angles = NA,
-                                              llgvf_data = NA)
+                                              lgvf_data = NA)
 
         # Update the agent himself
         agent_list[[i]] <- update(agent, 
@@ -655,7 +656,7 @@ update_goal <- function(agent,
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
-    # --- NEW: Synchronisation with group representative ---
+    # Synchronisation with group representative
     if (!group_representative(agent)) {
         # Find the group representative in the state
         rep_agents <- Filter(function(x) group_representative(x) && group(x) == group(agent), agents(state))
@@ -724,7 +725,7 @@ update_goal <- function(agent,
                 current_goal(agent) <- goals(agent)[[1]]
                 goals(agent) <- goals(agent)[-1]
                 
-                # --- NEW: Update Group Tracker ---
+                # Update group tracker
                 if (group_representative(agent)) {
                     current_group_goal(agent) <- current_goal(agent)
                     group_goals(agent) <- goals(agent)
@@ -732,8 +733,9 @@ update_goal <- function(agent,
                 
             } else if (length(individual_goals(agent)) > 0) {
 
-                group(agent) <- 10000 + sample(1:9999, 1) # Separates agent from group
-                group_representative(agent) <- TRUE # Becomes own representative
+                # Separates the agent from group/group utility functions
+                group(agent) <- 10000 + sample(1:9999, 1) # Rudimentary way to create an individual group ID
+                group_representative(agent) <- TRUE 
 
                 current_goal(agent) <- individual_goals(agent)[[1]]
                 individual_goals(agent) <- individual_goals(agent)[-1]
@@ -751,7 +753,7 @@ update_goal <- function(agent,
                 current_goal(agent) <- goal(id = "goal exit",
                                             position = as.numeric(exits))
                                             
-                # --- NEW: Update Group Tracker ---
+                # Update Group Tracker
                 if (group_representative(agent)) {
                     current_group_goal(agent) <- current_goal(agent)
                     group_goals(agent) <- list()
