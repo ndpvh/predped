@@ -63,7 +63,7 @@ setMethod("update", "state", function(object,
 
                     # Check if agent has any individual goals left
                     if(length(individual_goals(agent)) > 0) {
-                        group(agent) <- 10000 + sample(1:9999, 1)
+                        group(agent) <- char2int(id(agent))
                         group_representative(agent) <- TRUE
                         current_goal(agent) <- individual_goals(agent)[[1]]
                         individual_goals(agent) <- individual_goals(agent)[-1]
@@ -78,7 +78,7 @@ setMethod("update", "state", function(object,
                         current_goal(agent) <- goal(id = "goal exit", position = as.numeric(exits))
                         current_goal(agent)@path <- matrix(numeric(0), ncol = 2)
                         status(agent) <- "plan"
-                        group(agent) <- 10000 + sample(1:9999, 1)
+                        group(agent) <- char2int(id(agent))
                         group_representative(agent) <- TRUE
                     }
                     agent_list[[idx]] <- agent
@@ -124,6 +124,8 @@ setMethod("update", "state", function(object,
                     group_goals(new_rep_agent) <- group_goals(current_rep_agent)
                     current_goal(new_rep_agent) <- current_goal(current_rep_agent)
                     goals(new_rep_agent) <- goals(current_rep_agent)
+
+                    status(new_rep_agent) <- "plan"
 
                     agent_list[[new_rep_idx]] <- new_rep_agent
                    
@@ -734,7 +736,7 @@ update_goal <- function(agent,
             } else if (length(individual_goals(agent)) > 0) {
 
                 # Separates the agent from group/group utility functions
-                group(agent) <- 10000 + sample(1:9999, 1) # Rudimentary way to create an individual group ID
+                group(agent) <- char2int(id(agent))
                 group_representative(agent) <- TRUE 
 
                 current_goal(agent) <- individual_goals(agent)[[1]]
@@ -848,7 +850,11 @@ update_goal <- function(agent,
             # other agents that this agent should account for when planning),
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
+
+            
             blocking_agents <- agents_between_goal(agent, state)
+
+
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   background,
@@ -925,7 +931,11 @@ update_goal <- function(agent,
         # If no agents are blocking access to the goal, allow the agent to move
         # again
         if(!any(blocking_agents)) {
-            status(agent) <- "reorient"
+            if (nrow(current_goal(agent)@path) > 0) {
+                status(agent) <- "reorient"
+            } else {
+                status(agent) <- "plan"
+            }
         }
 
         # If counter is low enough, the agent will have to reroute his approach
@@ -949,7 +959,11 @@ update_goal <- function(agent,
                     
                     status(agent) <- "plan"
                 } else {
-                    status(agent) <- "reorient"
+                    if (nrow(current_goal(agent)@path) > 0) {
+                        status(agent) <- "reorient"
+                    }else {
+                        status(agent) <- "plan"
+                    }
                 }
             }
         }
