@@ -55,6 +55,9 @@ benchmark <- function(x = NULL,
                       digits = 2,
                       progress = TRUE) {
 
+    # Load all tests used in the benchmark
+    benchmark_test <- load_benchmark()
+
     # Define the functions to include in the benchmark. If x is NULL, then we 
     # include all functions in the benchmark
     if(is.null(x)) {
@@ -406,1868 +409,1916 @@ knitr_table <- function(x,
 ################################################################################
 # SPECIFICATIONS OF THE BENCHMARK
 
-# Load in the supermarket environment and its precomputed edges that serve as 
-# input to some of these benchmarks
-supermarket <- readRDS(file.path("tests", "testthat", "data", "supermarket.Rds"))
-few_edges <- readRDS(file.path("tests", "testthat", "data", "few_edges_bench.Rds"))
-many_edges <- readRDS(file.path("tests", "testthat", "data", "many_edges_bench.Rds"))
-
-# Introduce unevaluated edges as well: More representative of what's going on 
-# down below
-few_uneval_edges <- readRDS(file.path("tests", "testthat", "data", "few_uneval_edges_bench.Rds"))
-many_uneval_edges <- readRDS(file.path("tests", "testthat", "data", "many_uneval_edges_bench.Rds"))
-
-# Do the same for a dataset and parameters that will serve as input to some 
-# benchmarks
-params_bounded <- params_from_csv[["params_archetypes"]][1, -c(1:2)]
-params_real <- to_unbounded(params_bounded, params_from_csv[["params_bounds"]])
-
-data_1 <- readRDS(file.path("tests", "testthat", "data", "data_mll_benchmark.Rds"))
-data_1 <- data_1[data_1$id == "eqdyv", ][1:100, ]
-data_bench <- lapply(
-    1:10, 
-    function(i) {
-        data_1$id <- paste0("person_", i)
-        return(data_1)
+#' Load the arguments for the benchmark
+#' 
+#' This function serves as a wrapper around a named list defining the arguments
+#' provided to the functions that should be benchmarked. This allows the use of 
+#' more optimized methods for loading the arguments of these functions (e.g., 
+#' through the use of the \code{qs2} extension instead of the native \code{.Rds}) 
+#' and for the package to not require loading this variable unless absolutely 
+#' necessary (i.e., when the function is called).
+#' 
+#' @return Returns a named list containing the arguments for the benchmarks.
+#' 
+#' @noExport
+load_benchmark_arguments <- function() {
+    # Check whether the qs2 package is installed.
+    if(!requireNamespace("qs2")) {
+        stop(
+            paste(
+                "The `qs2` package is required to run the benchmarks of this package.",
+                "Please install."
+            )
+        )
     }
-)
-data_bench <- do.call("rbind", data_bench)
 
-# Finally, load the initial condition for the simulate benchmark
-inx <- readRDS(file.path("tests", "testthat", "data", "benchmark_inx.Rds"))
-data_inx <- unpack_trace(list(inx), cpp = FALSE)
+    # Load in the supermarket environment and its precomputed edges that serve as 
+    # input to some of these benchmarks
+    supermarket <- qs2::qs_read(file.path("tests", "testthat", "data", "supermarket.qs2"))
+    few_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "few_edges_bench.qs2"))
+    many_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "many_edges_bench.qs2"))
 
-# Create a variable that provides arguments to the tests. These are precomputed,
-# meaning that they should not influence the speed of the tests themselves
-benchmark_args <- list(
-    # background.R
-    "compute_limited_access" = list(
-        segment(from = c(0, 0), to = c(1, 1))
-    ),
-    "background" = list(
-        rectangle(center = c(0, 0), size = c(2, 2)),
-        lapply(1:10, \(x) rectangle(center = c(0, 0), size = c(1, 1))),
-        lapply(1:10, \(x) segment(from = c(-1, -1), to = c(1, 1)))
-    ),
-    "limit_access" = list(
-        background(
-            shape = rectangle(center = c(0, 0), size = c(2, 2)),
-            objects = lapply(1:10, \(x) rectangle(center = c(0, 0), size = c(1, 1))),
-            limited_access = lapply(1:10, \(x) segment(from = c(-1, -1), to = c(1, 1)))
-        ),
-        c(0, -0.5),
-        agent(center = c(0, -0.5), radius = 0.25)
-    ),
+    # Introduce unevaluated edges as well: More representative of what's going on 
+    # down below
+    few_uneval_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "few_uneval_edges_bench.qs2"))
+    many_uneval_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "many_uneval_edges_bench.qs2"))
 
-    # data.R
-    "time_series" = list(
-        qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
-    ),
-    "to_trace" = list(
-        data_bench[data_bench$iteration <= 14, ],
-        supermarket
-    ),
-    "unpack_trace" = list(
-        qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
-    ),
+    # Do the same for a dataset and parameters that will serve as input to some 
+    # benchmarks
+    params_bounded <- params_from_csv[["params_archetypes"]][1, -c(1:2)]
+    params_real <- to_unbounded(params_bounded, params_from_csv[["params_bounds"]])
 
-    # general.R
-    "line_line_intersection" = list(
-        cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100)),
-        cbind(rep(20, 100), rep(1, 100), rep(1, 100), rep(20, 100))
-    ),
-    "perpendicular_orientation" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1), 
-        c(0.1, 0.2)
-    ),
-
-    # goals.R
-    "add_goal" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(0, 0), size = c(1, 1)), 
-        circle(center = c(0, 0), radius = 1)
-    ),
-    "change" = list(
-        goal(id = "goal exit", position = c(0, 13), counter = 10)
-    ),
-    "find_path" = list(
-        goal(id = "goal exit", position = c(0, 13)),
-        agent(center = c(0.3, 0.5), radius = 0.25)
-    ),
-    "goal_stack" = list(
-        10,
-        10
-    ),
-    "goal" = list(
-        c(1, 2)
-    ),
-    "interact" = list(
-        goal(id = "goal exit", position = c(0, 13), counter = 10)
-    ),
-
-    # likelihood.R
-    "mll" = list(
-        data_bench,
-        params_bounded,
-        params_real
-    ),
-
-    # moving_options.R
-    "agents_between_goal" = list(
-        agent(
-            center = c(1, 1), 
-            radius = 0.25, 
-            current_goal = goal(
-                position = c(0, 13), 
-                path = matrix(c(0, 13), nrow = 1)
-            )
-        ),
-        state(
-            iteration = 0,
-            setting = supermarket,
-            agents = append(
-                agent(
-                    center = c(1, 1), 
-                    radius = 0.25, 
-                    current_goal = goal(
-                        position = c(0, 13), 
-                        path = matrix(c(0, 13), nrow = 1)
-                    )
-                ),
-                lapply(1:10, \(x) agent(center = runif(2, 1, 20), radius = 0.25))
-            )
-        )
-    ),
-    "compute_centers" = list(
-        agent(
-            center = c(1, 1), 
-            radius = 0.25, 
-            current_goal = goal(
-                position = c(0, 13), 
-                path = matrix(c(0, 13), nrow = 1)
-            )
-        )
-    ),
-    "moving_options" = list(
-        agent(
-            center = c(1, 1), 
-            radius = 0.25, 
-            current_goal = goal(
-                position = c(0, 13), 
-                path = matrix(c(0, 13), nrow = 1)
-            )
-        ),
-        state(
-            iteration = 0,
-            setting = supermarket,
-            agents = append(
-                agent(
-                    center = c(1, 1), 
-                    radius = 0.25, 
-                    current_goal = goal(
-                        position = c(0, 13), 
-                        path = matrix(c(0, 13), nrow = 1)
-                    )
-                ),
-                lapply(1:10, \(x) agent(center = runif(2, 1, 20), radius = 0.25))
-            )
-        ),
-        compute_centers(
-            agent(
-                center = c(1, 1), 
-                radius = 0.25, 
-                current_goal = goal(
-                    position = c(0, 13), 
-                    path = matrix(c(0, 13), nrow = 1)
-                )
-            ),
-            cpp = FALSE
-        )
-    ),
-    "overlap_with_objects" = list(
-        agent(
-            center = c(1, 1), 
-            radius = 0.25, 
-            current_goal = goal(
-                position = c(0, 13), 
-                path = matrix(c(0, 13), nrow = 1)
-            )
-        ),
-        compute_centers(
-            agent(
-                center = c(1, 1), 
-                radius = 0.25, 
-                current_goal = goal(
-                    position = c(0, 13), 
-                    path = matrix(c(0, 13), nrow = 1)
-                )
-            ),
-            cpp = FALSE
-        ),
-        matrix(TRUE, nrow = 11, ncol = 3)
-    ),
-
-    # objects.R
-    "add_nodes" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1)
-    ),
-    "enlarge" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1)
-    ),
-    "in_object" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1),
-        cbind(rep(1, 100), rep(2, 100))
-    ),
-    "polygon" = list(
-        rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))
-    ),
-    "rectangle" = list(
-        c(1, 2),
-        c(1, 1)
-    ),
-    "circle" = list(
-        c(1, 2),
-        1
-    ),
-    "intersects" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1)        
-    ),
-    "line_intersection" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1),
-        cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100))
-    ),
-    "nodes_on_circumference" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1)
-    ),
-    "out_object" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(1, 2), size = c(1, 1)),
-        circle(center = c(1, 2), radius = 1),
-        cbind(rep(1, 100), rep(2, 100))
-    ),
-    "rng_point" = list(
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(0, 0), size = c(1, 1)), 
-        circle(center = c(0, 0), radius = 1)
-    ),
-
-    # plot.R
-    "plot" = list(
-        agent(
-            center = c(0, 0), 
-            radius = 0.25, 
-            current_goal = goal(position = c(10, 0))
-        ),
-        polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
-        rectangle(center = c(0, 0), size = c(1, 1)), 
-        circle(center = c(0, 0), radius = 1),
-        inx
-    ),
-
-    # routing.R
-    "adjust_edges" = list(
-        c(0.3, 0.5), 
-        c(0, 13),
-        lapply(1:10, \(x) agent(center = c(2, 1), radius = 0.25))
-    ),
-    "combine_nodes" = list(
-        data.frame(
-            node_ID = paste0("node_", 1:100), 
-            X = 1:100, 
-            Y = 1:100
-        )
-    ),
-    "compute_edges" = list(
-        background(
-            shape = shape(supermarket),
-            objects = objects(supermarket),
-            limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
-        )
-    ),
-    "create_edges" = list(
-        c(0.3, 0.5), 
-        c(0, 13),
-        background(
-            shape = shape(supermarket),
-            objects = objects(supermarket),
-            limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
-        )
-    ),
-    "create_nodes" = list(
-        c(0.3, 0.5), 
-        c(0, 13)
-    ),
-    "evaluate_edges" = list(
-        few_uneval_edges, 
-        many_uneval_edges,
-        background(
-            shape = shape(supermarket),
-            objects = objects(supermarket),
-            limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
-        )
-    ),
-    "prune_edges" = list(
-        objects(supermarket),
-        cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100))
-    ),
-
-    # simulate.R
-    "add_agent" = list(
-        predped(
-            id = "benchmark",
-            setting = supermarket,
-            archetypes = "BaselineEuropean"
-        )
-    ),
-    "create_initial_condition" = list(
-        10, 
-        predped(
-            id = "benchmark",
-            setting = supermarket,
-            archetypes = "BaselineEuropean"
-        ),
-        10
-    ),
-    "simulate" = list(
-        predped(
-            id = "benchmark",
-            setting = supermarket, 
-            archetypes = "BaselineEuropean"
-        ),
-        1,
-        inx@agents
-    ),
-
-    # update-R
-    "create_agent_specifications" = list(
-        lapply(1:100, \(x) agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0))
-    ),
-    "predict_movement" = list(
-        agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0)
-    ),
-
-    # utility.R
-    "compute_utility_variables" = list(
-        inx,
-        create_agent_specifications(inx@agents, cpp = FALSE),
-        matrix(1, nrow = 33, ncol = 2),
-        matrix(TRUE, nrow = 11, ncol = 3)
-    ),
-    "utility" = list(
-        data_inx[data_inx$status == "move", ],
-        params_bounded,
-        inx,
-        create_agent_specifications(inx@agents, cpp = FALSE),
-        matrix(1, nrow = 33, ncol = 2),
-        matrix(TRUE, nrow = 11, ncol = 3)
+    data_1 <- qs2::qs_read(file.path("tests", "testthat", "data", "data_mll_benchmark.qs2"))
+    data_1 <- data_1[data_1$id == "eqdyv", ][1:100, ]
+    data_bench <- lapply(
+        1:10, 
+        function(i) {
+            data_1$id <- paste0("person_", i)
+            return(data_1)
+        }
     )
-)
+    data_bench <- do.call("rbind", data_bench)
 
-# Create a variable with the benchmark tests in it
-benchmark_test <- list(
-    # background.R
-    "compute_limited_access" = list(
-        " | " = function() {
-            return(
-                compute_limited_access(
-                    benchmark_args[["compute_limited_access"]][[1]]
-                )
-            )
-        }
-    ),
-    "background" = list(
-        "no limited_access" = function() {
-            return(
-                background(
-                    shape = benchmark_args[["background"]][[1]],
-                    objects = benchmark_args[["background"]][[2]]
-                )
-            )
-        },
-        "limited_access" = function() {
-            return(
-                background(
-                    shape = benchmark_args[["background"]][[1]],
-                    objects = benchmark_args[["background"]][[2]],
-                    limited_access = benchmark_args[["background"]][[3]]
-                )
-            )
-        }
-    ),
-    "limit_access" = list(
-        "coordinate" = function() {
-            return(
-                limit_access(
-                    benchmark_args[["limit_access"]][[1]], 
-                    benchmark_args[["limit_access"]][[2]]
-                )
-            )
-        },
-        "agent" = function() {
-            return(
-                limit_access(
-                    benchmark_args[["limit_access"]][[1]], 
-                    benchmark_args[["limit_access"]][[3]]
-                )
-            )
-        }
-    ),
-
-    # data.R
-    "time_series" = list(
-        "cpp = FALSE" = function() {
-            return(
-                time_series(
-                    benchmark_args[["time_series"]][[1]], 
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                time_series(
-                    benchmark_args[["time_series"]][[1]], 
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "to_trace" = list(
-        "cpp = FALSE" = function() {
-            return(
-                to_trace(
-                    benchmark_args[["to_trace"]][[1]],
-                    benchmark_args[["to_trace"]][[2]], 
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                to_trace(
-                    benchmark_args[["to_trace"]][[1]],
-                    benchmark_args[["to_trace"]][[2]], 
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "unpack_trace" = list(
-        "cpp = FALSE" = function() {
-            return(
-                unpack_trace(
-                    benchmark_args[["unpack_trace"]][[1]], 
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                unpack_trace(
-                    benchmark_args[["unpack_trace"]][[1]], 
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-
-    # general.R
-    "line_line_intersection" = list(
-        "cpp = FALSE" = function() {
-            return(
-                line_line_intersection(
-                    benchmark_args[["line_line_intersection"]][[1]],
-                    benchmark_args[["line_line_intersection"]][[2]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                line_line_intersection(
-                    benchmark_args[["line_line_intersection"]][[1]],
-                    benchmark_args[["line_line_intersection"]][[2]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "perpendicular_orientation" = list(
-        "polygon" = function() {
-            return(
-                perpendicular_orientation(
-                    benchmark_args[["perpendicular_orientation"]][[1]],
-                    benchmark_args[["perpendicular_orientation"]][[4]]
-                )
-            )
-        },
-        "rectangle" = function() {
-            return(
-                perpendicular_orientation(
-                    benchmark_args[["perpendicular_orientation"]][[2]],
-                    benchmark_args[["perpendicular_orientation"]][[4]]
-                )
-            )
-        },
-        "circle" = function() {
-            return(
-                perpendicular_orientation(
-                    benchmark_args[["perpendicular_orientation"]][[3]],
-                    benchmark_args[["perpendicular_orientation"]][[4]]
-                )
-            )
-        }
-    ),
-
-    # goals.R
-    "add_goal" = list(
-        "polygon | middle_edge = FALSE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[1]],
-                    supermarket,
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "rectangle | middle_edge = FALSE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[2]],
-                    supermarket,
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "circle | middle_edge = FALSE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[3]],
-                    supermarket
-                )
-            )
-        },
-        "polygon | middle_edge = TRUE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[1]],
-                    supermarket,
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "rectangle | middle_edge = TRUE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[2]],
-                    supermarket,
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "circle | middle_edge = TRUE" = function() {
-            return(
-                add_goal(
-                    benchmark_args[["add_goal"]][[3]],
-                    supermarket
-                )
-            )
-        }
-    ),
-    "change" = list(
-        " | " = function() {
-            return(
-                change(
-                    benchmark_args[["change"]][[1]], 
-                    supermarket, 
-                    counter = 5
-                )
-            )
-        }
-    ),
-    "find_path" = list(
-        "precomputed | many_nodes = FALSE | reevaluate = FALSE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = few_edges,
-                    reevaluate = FALSE
-                )
-            )
-        },
-        "precomputed | many_nodes = TRUE | reevaluate = FALSE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = many_edges,
-                    reevaluate = FALSE
-                )
-            )
-        },
-        "precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = few_edges,
-                    reevaluate = TRUE
-                )
-            )
-        },
-        "precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = many_edges,
-                    reevaluate = TRUE
-                )
-            )
-        },
-        "not precomputed | many_nodes = FALSE | reevaluate = FALSE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = NULL,
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "not precomputed | many_nodes = TRUE | reevaluate = FALSE" = function() {
-            return(
-                find_path(
-                    benchmark_args[["find_path"]][[1]],
-                    benchmark_args[["find_path"]][[2]],
-                    supermarket,
-                    precomputed_edges = NULL,
-                    many_nodes = TRUE
-                )
-            )
-        },
-        "not precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
-            return(NA)
-        },
-        "not precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
-            return(NA)
-        }
-    ),
-    "goal_stack" = list(
-        " | " = function() {
-            return(
-                goal_stack(
-                    benchmark_args[["goal_stack"]][[1]],
-                    supermarket,
-                    counter = benchmark_args[["goal_stack"]][[2]]
-                )
-            )
-        }
-    ),
-    "goal" = list(
-        " | " = function() {
-            return(
-                goal(
-                    position = benchmark_args[["goal"]][[1]]
-                )
-            )
-        }
-    ),
-    "interact" = list(
-        " | " = function() {
-            return(
-                interact(
-                    benchmark_args[["interact"]][[1]]
-                )
-            )
-        }
-    ),
-
-    # likelihood.R
-    "mll" = list(
-        "transform = FALSE | cpp = FALSE | summed = FALSE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[2]],
-                    transform = FALSE,
-                    cpp = FALSE,
-                    summed = FALSE
-                )
-            )
-        },
-        "transform = TRUE | cpp = FALSE | summed = FALSE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[3]],
-                    transform = TRUE,
-                    cpp = FALSE,
-                    summed = FALSE
-                )
-            )
-        },
-        "transform = FALSE | cpp = TRUE | summed = FALSE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[2]],
-                    transform = FALSE,
-                    cpp = TRUE,
-                    summed = FALSE
-                )
-            )
-        },
-        "transform = TRUE | cpp = TRUE | summed = FALSE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[3]],
-                    transform = TRUE,
-                    cpp = TRUE,
-                    summed = FALSE
-                )
-            )
-        },
-        "transform = FALSE | cpp = FALSE | summed = TRUE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[2]],
-                    transform = FALSE,
-                    cpp = FALSE,
-                    summed = TRUE
-                )
-            )
-        },
-        "transform = TRUE | cpp = FALSE | summed = TRUE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[3]],
-                    transform = TRUE,
-                    cpp = FALSE,
-                    summed = TRUE
-                )
-            )
-        },
-        "transform = FALSE | cpp = TRUE | summed = TRUE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[2]],
-                    transform = FALSE,
-                    cpp = TRUE,
-                    summed = TRUE
-                )
-            )
-        },
-        "transform = TRUE | cpp = TRUE | summed = TRUE" = function() {
-            return(
-                mll(
-                    benchmark_args[["mll"]][[1]],
-                    benchmark_args[["mll"]][[3]],
-                    transform = TRUE,
-                    cpp = TRUE,
-                    summed = TRUE
-                )
-            )
-        }
-    ),
-
-    # moving_options.R
-    "agents_between_goal" = list(
-        " | " = function() {
-            return(
-                agents_between_goal(
-                    benchmark_args[["agents_between_goal"]][[1]], 
-                    benchmark_args[["agents_between_goal"]][[2]]
-                )
-            )
-        }
-    ),
-    "compute_centers" = list(
-        "cpp = FALSE" = function() {
-            return(
-                compute_centers(
-                    benchmark_args[["compute_centers"]][[1]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                compute_centers(
-                    benchmark_args[["compute_centers"]][[1]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "moving_options" = list(
-        "cpp = FALSE" = function() {
-            return(
-                moving_options(
-                    benchmark_args[["moving_options"]][[1]],
-                    benchmark_args[["moving_options"]][[2]],
-                    supermarket,
-                    benchmark_args[["moving_options"]][[3]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                moving_options(
-                    benchmark_args[["moving_options"]][[1]],
-                    benchmark_args[["moving_options"]][[2]],
-                    supermarket,
-                    benchmark_args[["moving_options"]][[3]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "overlap_with_objects" = list(
-        "cpp = FALSE" = function() {
-            return(
-                overlap_with_objects(
-                    benchmark_args[["overlap_with_objects"]][[1]],
-                    supermarket,
-                    benchmark_args[["overlap_with_objects"]][[2]],
-                    benchmark_args[["overlap_with_objects"]][[3]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                overlap_with_objects(
-                    benchmark_args[["overlap_with_objects"]][[1]],
-                    supermarket,
-                    benchmark_args[["overlap_with_objects"]][[2]],
-                    benchmark_args[["overlap_with_objects"]][[3]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-
-    # objects.R
-    "add_nodes" = list(
-        "polygon | only_corners = FALSE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[1]],
-                    space_between = 0.5,
-                    only_corners = FALSE
-                )
-            )
-        },
-        "rectangle | only_corners = FALSE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[2]],
-                    space_between = 0.5,
-                    only_corners = FALSE
-                )
-            )
-        },
-        "circle | only_corners = FALSE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[3]],
-                    space_between = 0.5,
-                    only_corners = FALSE
-                )
-            )
-        },
-        "polygon | only_corners = TRUE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[1]],
-                    space_between = 0.5,
-                    only_corners = TRUE
-                )
-            )
-        },
-        "rectangle | only_corners = TRUE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[2]],
-                    space_between = 0.5,
-                    only_corners = TRUE
-                )
-            )
-        },
-        "circle | only_corners = TRUE" = function() {
-            return(
-                add_nodes(
-                    benchmark_args[["add_nodes"]][[3]],
-                    space_between = 0.5,
-                    only_corners = TRUE
-                )
-            )
-        }
-    ),
-    "enlarge" = list(
-        "polygon" = function() {
-            return(
-                enlarge(
-                    benchmark_args[["enlarge"]][[1]],
-                    0.5
-                )
-            )
-        },
-        "rectangle" = function() {
-            return(
-                enlarge(
-                    benchmark_args[["enlarge"]][[2]],
-                    0.5
-                )
-            )
-        },
-        "circle" = function() {
-            return(
-                enlarge(
-                    benchmark_args[["enlarge"]][[3]],
-                    0.5
-                )
-            )
-        }
-    ),
-    "in_object" = list(
-        "polygon | cpp = FALSE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[1]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "rectangle | cpp = FALSE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[2]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "circle | cpp = FALSE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[3]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "polygon | cpp = TRUE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[1]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        },
-        "rectangle | cpp = TRUE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[2]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        },
-        "circle | cpp = TRUE" = function() {
-             return(
-                in_object(
-                    benchmark_args[["in_object"]][[3]],
-                    benchmark_args[["in_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        }
-    ),
-    "polygon" = list(
-        " | " = function() {
-            return(
-                polygon(
-                    points = benchmark_args[["polygon"]][[1]]
-                )
-            )
-        }
-    ),
-    "rectangle" = list(
-        " | " = function() {
-            return(
-                rectangle(
-                    center = benchmark_args[["rectangle"]][[1]],
-                    size = benchmark_args[["rectangle"]][[2]]
-                )
-            )
-        }
-    ),
-    "circle" = list(
-        " | " = function() {
-            return(
-                circle(
-                    center = benchmark_args[["circle"]][[1]],
-                    radius = benchmark_args[["circle"]][[2]]
-                )
-            )
-        }
-    ),
-    "intersects" = list(
-        "polygon | polygon" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[1]],
-                    benchmark_args[["intersects"]][[1]]
-                )
-            )
-        },
-        "polygon | rectangle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[1]],
-                    benchmark_args[["intersects"]][[2]]
-                )
-            )
-        },
-        "polygon | circle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[1]],
-                    benchmark_args[["intersects"]][[3]]
-                )
-            )
-        },
-        "rectangle | polygon" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[2]],
-                    benchmark_args[["intersects"]][[1]]
-                )
-            )
-        },
-        "rectangle | rectangle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[2]],
-                    benchmark_args[["intersects"]][[2]]
-                )
-            )
-        },
-        "rectangle | circle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[2]],
-                    benchmark_args[["intersects"]][[3]]
-                )
-            )
-        },
-        "circle | polygon" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[3]],
-                    benchmark_args[["intersects"]][[1]]
-                )
-            )
-        },
-        "circle | rectangle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[3]],
-                    benchmark_args[["intersects"]][[2]]
-                )
-            )
-        },
-        "circle | circle" = function() {
-            return(
-                intersects(
-                    benchmark_args[["intersects"]][[3]],
-                    benchmark_args[["intersects"]][[3]]
-                )
-            )
-        }
-    ),
-    "line_intersection" = list(
-        "polygon | cpp = FALSE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[1]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "rectangle | cpp = FALSE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[2]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "circle | cpp = FALSE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[3]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "polygon | cpp = TRUE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[1]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = TRUE
-                )
-            )
-        },
-        "rectangle | cpp = TRUE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[2]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = TRUE
-                )
-            )
-        },
-        "circle | cpp = TRUE" = function() {
-            return(
-                line_intersection(
-                    benchmark_args[["line_intersection"]][[3]],
-                    benchmark_args[["line_intersection"]][[4]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "nodes_on_circumference" = list(
-        "polygon | cpp = FALSE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[1]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "rectangle | cpp = FALSE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[2]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "circle | cpp = FALSE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[3]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "polygon | cpp = TRUE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[1]],
-                    cpp = TRUE
-                )
-            )
-        },
-        "rectangle | cpp = TRUE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[2]],
-                    cpp = TRUE
-                )
-            )
-        },
-        "circle | cpp = TRUE" = function() {
-            return(
-                nodes_on_circumference(
-                    benchmark_args[["nodes_on_circumference"]][[3]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "out_object" = list(
-        "polygon | cpp = FALSE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[1]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "rectangle | cpp = FALSE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[2]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "circle | cpp = FALSE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[3]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = FALSE
-                )
-             )
-        },
-        "polygon | cpp = TRUE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[1]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        },
-        "rectangle | cpp = TRUE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[2]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        },
-        "circle | cpp = TRUE" = function() {
-             return(
-                out_object(
-                    benchmark_args[["out_object"]][[3]],
-                    benchmark_args[["out_object"]][[4]],
-                    cpp = TRUE
-                )
-             )
-        }
-    ),
-    "rng_point" = list(
-        "polygon | middle_edge = FALSE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[1]],
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "rectangle | middle_edge = FALSE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[2]],
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "circle | middle_edge = FALSE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[3]],
-                    middle_edge = FALSE
-                )
-            )
-        },
-        "polygon | middle_edge = TRUE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[1]],
-                    middle_edge = TRUE
-                )
-            )
-        },
-        "rectangle | middle_edge = TRUE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[2]],
-                    middle_edge = TRUE
-                )
-            )
-        },
-        "circle | middle_edge = TRUE" = function() {
-            return(
-                rng_point(
-                    benchmark_args[["rng_point"]][[3]],
-                    middle_edge = TRUE
-                )
-            )
-        }
-    ),
-
-    # plot.R
-    "plot" = list(
-        "agent | optimize = FALSE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[1]]
-                )
-            )
-        },
-        "background | optimize = FALSE" = function() {
-            return(
-                plot(
-                    supermarket,
-                    optimize = FALSE
-                )
-            )
-        },
-        "polygon | optimize = FALSE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[2]]
-                )
-            )
-        },
-        "rectangle | optimize = FALSE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[3]]
-                )
-            )
-        },
-        "circle | optimize = FALSE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[4]]
-                )
-            )
-        },
-        "state | optimize = FALSE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[5]],
-                    optimize = FALSE
-                )
-            )
-        },
-        "agent | optimize = TRUE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[1]]
-                )
-            )
-        },
-        "background | optimize = TRUE" = function() {
-            return(
-                plot(
-                    supermarket,
-                    optimize = TRUE
-                )
-            )
-        },
-        "polygon | optimize = TRUE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[2]]
-                )
-            )
-        },
-        "rectangle | optimize = TRUE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[3]]
-                )
-            )
-        },
-        "circle | optimize = TRUE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[4]]
-                )
-            )
-        },
-        "state | optimize = TRUE" = function() {
-            return(
-                plot(
-                    benchmark_args[["plot"]][[5]],
-                    optimize = TRUE
-                )
-            )
-        }
-    ),
-
-    # routing.R
-    "adjust_edges" = list(
-        "few edges | reevaluate = FALSE" = function() {
-            return(
-                adjust_edges(
-                    benchmark_args[["adjust_edges"]][[1]],
-                    benchmark_args[["adjust_edges"]][[2]],
-                    supermarket, 
-                    new_objects = benchmark_args[["adjust_edges"]][[3]],
-                    precomputed_edges = few_edges,
-                    reevaluate = FALSE
-                )
-            )
-        },
-        "many edges | reevaluate = FALSE" = function() {
-            return(
-                adjust_edges(
-                    benchmark_args[["adjust_edges"]][[1]],
-                    benchmark_args[["adjust_edges"]][[2]],
-                    supermarket, 
-                    new_objects = benchmark_args[["adjust_edges"]][[3]],
-                    precomputed_edges = many_edges,
-                    reevaluate = FALSE
-                )
-            )
-        },
-        "few edges | reevaluate = TRUE" = function() {
-            return(
-                adjust_edges(
-                    benchmark_args[["adjust_edges"]][[1]],
-                    benchmark_args[["adjust_edges"]][[2]],
-                    supermarket, 
-                    new_objects = benchmark_args[["adjust_edges"]][[3]],
-                    precomputed_edges = few_edges,
-                    reevaluate = TRUE
-                )
-            )
-        },
-        "many edges | reevaluate = TRUE" = function() {
-            return(
-                adjust_edges(
-                    benchmark_args[["adjust_edges"]][[1]],
-                    benchmark_args[["adjust_edges"]][[2]],
-                    supermarket, 
-                    new_objects = benchmark_args[["adjust_edges"]][[3]],
-                    precomputed_edges = many_edges,
-                    reevaluate = TRUE
-                )
-            )
-        }
-    ),
-    "combine_nodes" = list(
-        "single" = function() {
-            return(
-                combine_nodes(
-                    benchmark_args[["combine_nodes"]][[1]]
-                )
-            )
-        },
-        "pair" = function() {
-            return(
-                combine_nodes(
-                    benchmark_args[["combine_nodes"]][[1]],
-                    benchmark_args[["combine_nodes"]][[1]]
-                )
-            )
-        }
-    ),
-    "compute_edges" = list(
-        "unlimited | many_nodes = FALSE" = function() {
-            return(
-                compute_edges(
-                    supermarket, 
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "limited access | many_nodes = FALSE" = function() {
-            return(
-                compute_edges(
-                    benchmark_args[["compute_edges"]][[1]], 
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "unlimited | many_nodes = TRUE" = function() {
-            return(
-                compute_edges(
-                    supermarket, 
-                    many_nodes = TRUE
-                )
-            )
-        },
-        "limited access | many_nodes = TRUE" = function() {
-            return(
-                compute_edges(
-                    benchmark_args[["compute_edges"]][[1]], 
-                    many_nodes = TRUE
-                )
-            )
-        }
-    ),
-    "create_edges" = list(
-        "unlimited | many_nodes = FALSE" = function() {
-            return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
-                    supermarket, 
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "limited access | many_nodes = FALSE" = function() {
-            return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
-                    benchmark_args[["create_edges"]][[3]], 
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "unlimited | many_nodes = TRUE" = function() {
-            return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
-                    supermarket, 
-                    many_nodes = TRUE
-                )
-            )
-        },
-        "limited access | many_nodes = TRUE" = function() {
-            return(
-                create_edges(
-                    benchmark_args[["create_edges"]][[1]],
-                    benchmark_args[["create_edges"]][[2]],
-                    benchmark_args[["create_edges"]][[3]], 
-                    many_nodes = TRUE
-                )
-            )
-        }
-    ),
-    "create_nodes" = list(
-        "many_nodes = FALSE" = function() {
-            return(
-                create_nodes(
-                    benchmark_args[["create_nodes"]][[1]],
-                    benchmark_args[["create_nodes"]][[2]],
-                    supermarket, 
-                    many_nodes = FALSE
-                )
-            )
-        },
-        "many_nodes = TRUE" = function() {
-            return(
-                create_nodes(
-                    benchmark_args[["create_nodes"]][[1]],
-                    benchmark_args[["create_nodes"]][[2]],
-                    supermarket, 
-                    many_nodes = TRUE
-                )
-            )
-        }
-    ),
-    "evaluate_edges" = list(
-        "unlimited | few nodes" = function() {
-            return(
-                evaluate_edges(
-                    benchmark_args[["evaluate_edges"]][[1]],
-                    supermarket,
-                    0.5
-                )
-            )
-        },
-        "limited access | few nodes" = function() {
-            return(
-                evaluate_edges(
-                    benchmark_args[["evaluate_edges"]][[1]],
-                    benchmark_args[["evaluate_edges"]][[3]],
-                    0.5
-                )
-            )
-        },
-        "unlimited | many nodes" = function() {
-            return(
-                evaluate_edges(
-                    benchmark_args[["evaluate_edges"]][[2]],
-                    supermarket,
-                    0.5
-                )
-            )
-        },
-        "limited access | many nodes" = function() {
-            return(
-                evaluate_edges(
-                    benchmark_args[["evaluate_edges"]][[2]],
-                    benchmark_args[["evaluate_edges"]][[3]],
-                    0.5
-                )
-            )
-        }
-    ),
-    "prune_edges" = list(
-        "cpp = FALSE" = function() {
-            return(
-                prune_edges(
-                    benchmark_args[["prune_edges"]][[1]],
-                    benchmark_args[["prune_edges"]][[2]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                prune_edges(
-                    benchmark_args[["prune_edges"]][[1]],
-                    benchmark_args[["prune_edges"]][[2]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-
-    # simulate.R
-    "add_agent" = list(
-        "sort_goals = FALSE | individual_differences = FALSE" = function() {
-            return(
-                add_agent(
-                    benchmark_args[["add_agent"]][[1]],
-                    sort_goals = FALSE,
-                    individual_differences = FALSE
-                )
-            )
-        },
-        "sort_goals = TRUE | individual_differences = FALSE" = function() {
-            return(
-                add_agent(
-                    benchmark_args[["add_agent"]][[1]],
-                    sort_goals = TRUE,
-                    individual_differences = FALSE
-                )
-            )
-        },
-        "sort_goals = FALSE | individual_differences = TRUE" = function() {
-            return(
-                add_agent(
-                    benchmark_args[["add_agent"]][[1]],
-                    sort_goals = FALSE,
-                    individual_differences = TRUE
-                )
-            )
-        },
-        "sort_goals = TRUE | individual_differences = TRUE" = function() {
-            return(
-                add_agent(
-                    benchmark_args[["add_agent"]][[1]],
-                    sort_goals = TRUE,
-                    individual_differences = TRUE
-                )
-            )
-        }
-    ),
-    "create_initial_condition" = list(
-        " | " = function() {
-            return(
-                create_initial_condition(
-                    benchmark_args[["create_initial_condition"]][[1]],
-                    benchmark_args[["create_initial_condition"]][[2]],
-                    goal_number = benchmark_args[["create_initial_condition"]][[3]]
-                )
-            )
-        }
-    ),
-    "simulate" = list(
-        "precompute_edges = FALSE | many_nodes = FALSE" = function() {
-            return(
-                capture.output(
-                    simulate(
-                        benchmark_args[["simulate"]][[1]],
-                        iterations = benchmark_args[["simulate"]][[2]],
-                        max_agents = 70,
-                        initial_agents = benchmark_args[["simulate"]][[3]],
-                        precompute_edges = FALSE,
-                        many_nodes = FALSE
-                    )
-                )
-            )
-        },
-        "precompute_edges = TRUE | many_nodes = FALSE" = function() {
-            return(
-                capture.output(
-                    simulate(
-                        benchmark_args[["simulate"]][[1]],
-                        iterations = benchmark_args[["simulate"]][[2]],
-                        max_agents = 70,
-                        initial_agents = benchmark_args[["simulate"]][[3]],
-                        precompute_edges = TRUE,
-                        many_nodes = FALSE
-                    )
-                )
-            )
-        },
-        "precompute_edges = FALSE | many_nodes = TRUE" = function() {
-            return(
-                capture.output(
-                    simulate(
-                        benchmark_args[["simulate"]][[1]],
-                        iterations = benchmark_args[["simulate"]][[2]],
-                        max_agents = 70,
-                        initial_agents = benchmark_args[["simulate"]][[3]],
-                        precompute_edges = FALSE,
-                        many_nodes = TRUE
-                    )
-                )
-            )
-        },
-        "precompute_edges = TRUE | many_nodes = TRUE" = function() {
-            return(
-                capture.output(
-                    simulate(
-                        benchmark_args[["simulate"]][[1]],
-                        iterations = benchmark_args[["simulate"]][[2]],
-                        max_agents = 70,
-                        initial_agents = benchmark_args[["simulate"]][[3]],
-                        precompute_edges = TRUE,
-                        many_nodes = TRUE
-                    )
-                )
-            )
-        }
-    ),
-
-    # update-R
-    "create_agent_specifications" = list(
-        "cpp = FALSE" = function() {
-            return(
-                create_agent_specifications(
-                    benchmark_args[["create_agent_specifications"]][[1]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                create_agent_specifications(
-                    benchmark_args[["create_agent_specifications"]][[1]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "predict_movement" = list(
-        "cpp = FALSE" = function() {
-            return(
-                predict_movement(
-                    benchmark_args[["predict_movement"]][[1]],
-                    cpp = FALSE
-                )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                predict_movement(
-                    benchmark_args[["predict_movement"]][[1]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
+    # Finally, load the initial condition for the simulate benchmark
+    inx <- qs2::qs_read(file.path("tests", "testthat", "data", "benchmark_inx.qs2"))
+    data_inx <- unpack_trace(list(inx), cpp = FALSE)
     
-    # utility.R
-    "compute_utility_variables" = list(
-        "cpp = FALSE" = function() {
-            return(
-                compute_utility_variables(
-                    benchmark_args[["compute_utility_variables"]][[1]]@agents[[3]],
-                    benchmark_args[["compute_utility_variables"]][[1]],
-                    benchmark_args[["compute_utility_variables"]][[1]]@setting,
-                    benchmark_args[["compute_utility_variables"]][[2]],
-                    benchmark_args[["compute_utility_variables"]][[3]],
-                    benchmark_args[["compute_utility_variables"]][[4]],
+    # Create and return the list of arguments needed for benchmarking
+    return(
+        list(
+            # background.R
+            "compute_limited_access" = list(
+                segment(from = c(0, 0), to = c(1, 1))
+            ),
+            "background" = list(
+                rectangle(center = c(0, 0), size = c(2, 2)),
+                lapply(1:10, \(x) rectangle(center = c(0, 0), size = c(1, 1))),
+                lapply(1:10, \(x) segment(from = c(-1, -1), to = c(1, 1)))
+            ),
+            "limit_access" = list(
+                background(
+                    shape = rectangle(center = c(0, 0), size = c(2, 2)),
+                    objects = lapply(1:10, \(x) rectangle(center = c(0, 0), size = c(1, 1))),
+                    limited_access = lapply(1:10, \(x) segment(from = c(-1, -1), to = c(1, 1)))
+                ),
+                c(0, -0.5),
+                agent(center = c(0, -0.5), radius = 0.25)
+            ),
+
+            # data.R
+            "time_series" = list(
+                qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
+            ),
+            "to_trace" = list(
+                data_bench[data_bench$iteration <= 14, ],
+                supermarket
+            ),
+            "unpack_trace" = list(
+                qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
+            ),
+
+            # general.R
+            "line_line_intersection" = list(
+                cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100)),
+                cbind(rep(20, 100), rep(1, 100), rep(1, 100), rep(20, 100))
+            ),
+            "perpendicular_orientation" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1), 
+                c(0.1, 0.2)
+            ),
+
+            # goals.R
+            "add_goal" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(0, 0), size = c(1, 1)), 
+                circle(center = c(0, 0), radius = 1)
+            ),
+            "change" = list(
+                goal(id = "goal exit", position = c(0, 13), counter = 10)
+            ),
+            "find_path" = list(
+                goal(id = "goal exit", position = c(0, 13)),
+                agent(center = c(0.3, 0.5), radius = 0.25)
+            ),
+            "goal_stack" = list(
+                10,
+                10
+            ),
+            "goal" = list(
+                c(1, 2)
+            ),
+            "interact" = list(
+                goal(id = "goal exit", position = c(0, 13), counter = 10)
+            ),
+
+            # likelihood.R
+            "mll" = list(
+                data_bench,
+                params_bounded,
+                params_real
+            ),
+
+            # moving_options.R
+            "agents_between_goal" = list(
+                agent(
+                    center = c(1, 1), 
+                    radius = 0.25, 
+                    current_goal = goal(
+                        position = c(0, 13), 
+                        path = matrix(c(0, 13), nrow = 1)
+                    )
+                ),
+                state(
+                    iteration = 0,
+                    setting = supermarket,
+                    agents = append(
+                        agent(
+                            center = c(1, 1), 
+                            radius = 0.25, 
+                            current_goal = goal(
+                                position = c(0, 13), 
+                                path = matrix(c(0, 13), nrow = 1)
+                            )
+                        ),
+                        lapply(1:10, \(x) agent(center = runif(2, 1, 20), radius = 0.25))
+                    )
+                )
+            ),
+            "compute_centers" = list(
+                agent(
+                    center = c(1, 1), 
+                    radius = 0.25, 
+                    current_goal = goal(
+                        position = c(0, 13), 
+                        path = matrix(c(0, 13), nrow = 1)
+                    )
+                )
+            ),
+            "moving_options" = list(
+                agent(
+                    center = c(1, 1), 
+                    radius = 0.25, 
+                    current_goal = goal(
+                        position = c(0, 13), 
+                        path = matrix(c(0, 13), nrow = 1)
+                    )
+                ),
+                state(
+                    iteration = 0,
+                    setting = supermarket,
+                    agents = append(
+                        agent(
+                            center = c(1, 1), 
+                            radius = 0.25, 
+                            current_goal = goal(
+                                position = c(0, 13), 
+                                path = matrix(c(0, 13), nrow = 1)
+                            )
+                        ),
+                        lapply(1:10, \(x) agent(center = runif(2, 1, 20), radius = 0.25))
+                    )
+                ),
+                compute_centers(
+                    agent(
+                        center = c(1, 1), 
+                        radius = 0.25, 
+                        current_goal = goal(
+                            position = c(0, 13), 
+                            path = matrix(c(0, 13), nrow = 1)
+                        )
+                    ),
                     cpp = FALSE
                 )
-            )
-        },
-        "cpp = TRUE" = function() {
-            return(
-                compute_utility_variables(
-                    benchmark_args[["compute_utility_variables"]][[1]]@agents[[3]],
-                    benchmark_args[["compute_utility_variables"]][[1]],
-                    benchmark_args[["compute_utility_variables"]][[1]]@setting,
-                    benchmark_args[["compute_utility_variables"]][[2]],
-                    benchmark_args[["compute_utility_variables"]][[3]],
-                    benchmark_args[["compute_utility_variables"]][[4]],
-                    cpp = TRUE
-                )
-            )
-        }
-    ),
-    "utility" = list(
-        "data | cpp = FALSE" = function() {
-            return(
-                utility(
-                    benchmark_args[["utility"]][[1]][1, ],
-                    benchmark_args[["utility"]][[2]],
+            ),
+            "overlap_with_objects" = list(
+                agent(
+                    center = c(1, 1), 
+                    radius = 0.25, 
+                    current_goal = goal(
+                        position = c(0, 13), 
+                        path = matrix(c(0, 13), nrow = 1)
+                    )
+                ),
+                compute_centers(
+                    agent(
+                        center = c(1, 1), 
+                        radius = 0.25, 
+                        current_goal = goal(
+                            position = c(0, 13), 
+                            path = matrix(c(0, 13), nrow = 1)
+                        )
+                    ),
                     cpp = FALSE
+                ),
+                matrix(TRUE, nrow = 11, ncol = 3)
+            ),
+
+            # objects.R
+            "add_nodes" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1)
+            ),
+            "enlarge" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1)
+            ),
+            "in_object" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1),
+                cbind(rep(1, 100), rep(2, 100))
+            ),
+            "polygon" = list(
+                rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))
+            ),
+            "rectangle" = list(
+                c(1, 2),
+                c(1, 1)
+            ),
+            "circle" = list(
+                c(1, 2),
+                1
+            ),
+            "intersects" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1)        
+            ),
+            "line_intersection" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1),
+                cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100))
+            ),
+            "nodes_on_circumference" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1)
+            ),
+            "out_object" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(1, 2), size = c(1, 1)),
+                circle(center = c(1, 2), radius = 1),
+                cbind(rep(1, 100), rep(2, 100))
+            ),
+            "rng_point" = list(
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(0, 0), size = c(1, 1)), 
+                circle(center = c(0, 0), radius = 1)
+            ),
+
+            # plot.R
+            "plot" = list(
+                agent(
+                    center = c(0, 0), 
+                    radius = 0.25, 
+                    current_goal = goal(position = c(10, 0))
+                ),
+                polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
+                rectangle(center = c(0, 0), size = c(1, 1)), 
+                circle(center = c(0, 0), radius = 1),
+                inx
+            ),
+
+            # routing.R
+            "adjust_edges" = list(
+                c(0.3, 0.5), 
+                c(0, 13),
+                lapply(1:10, \(x) agent(center = c(2, 1), radius = 0.25))
+            ),
+            "combine_nodes" = list(
+                data.frame(
+                    node_ID = paste0("node_", 1:100), 
+                    X = 1:100, 
+                    Y = 1:100
                 )
-            )
-        },
-        "trace | cpp = FALSE" = function() {
-            return(
-                utility(
-                    benchmark_args[["utility"]][[3]]@agents[[1]],
-                    benchmark_args[["utility"]][[3]],
-                    benchmark_args[["utility"]][[3]]@setting,
-                    benchmark_args[["utility"]][[4]],
-                    benchmark_args[["utility"]][[5]],
-                    benchmark_args[["utility"]][[6]],
-                    cpp = FALSE
+            ),
+            "compute_edges" = list(
+                background(
+                    shape = shape(supermarket),
+                    objects = objects(supermarket),
+                    limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
                 )
-            )
-        },
-        "data | cpp = TRUE" = function() {
-            return(
-                utility(
-                    benchmark_args[["utility"]][[1]][1, ],
-                    benchmark_args[["utility"]][[2]],
-                    cpp = TRUE
+            ),
+            "create_edges" = list(
+                c(0.3, 0.5), 
+                c(0, 13),
+                background(
+                    shape = shape(supermarket),
+                    objects = objects(supermarket),
+                    limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
                 )
-            )
-        },
-        "trace | cpp = TRUE" = function() {
-            return(
-                utility(
-                    benchmark_args[["utility"]][[3]]@agents[[1]],
-                    benchmark_args[["utility"]][[3]],
-                    benchmark_args[["utility"]][[3]]@setting,
-                    benchmark_args[["utility"]][[4]],
-                    benchmark_args[["utility"]][[5]],
-                    benchmark_args[["utility"]][[6]],
-                    cpp = TRUE
+            ),
+            "create_nodes" = list(
+                c(0.3, 0.5), 
+                c(0, 13)
+            ),
+            "evaluate_edges" = list(
+                few_uneval_edges, 
+                many_uneval_edges,
+                background(
+                    shape = shape(supermarket),
+                    objects = objects(supermarket),
+                    limited_access = lapply(1:10, \(x) segment(from = c(0, 0), to = c(40, 25)))
                 )
+            ),
+            "prune_edges" = list(
+                objects(supermarket),
+                cbind(rep(1, 100), rep(1, 100), rep(20, 100), rep(20, 100))
+            ),
+
+            # simulate.R
+            "add_agent" = list(
+                predped(
+                    id = "benchmark",
+                    setting = supermarket,
+                    archetypes = "BaselineEuropean"
+                )
+            ),
+            "create_initial_condition" = list(
+                10, 
+                predped(
+                    id = "benchmark",
+                    setting = supermarket,
+                    archetypes = "BaselineEuropean"
+                ),
+                10
+            ),
+            "simulate" = list(
+                predped(
+                    id = "benchmark",
+                    setting = supermarket, 
+                    archetypes = "BaselineEuropean"
+                ),
+                1,
+                inx@agents
+            ),
+
+            # update-R
+            "create_agent_specifications" = list(
+                lapply(1:100, \(x) agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0))
+            ),
+            "predict_movement" = list(
+                agent(center = c(-1, 0), radius = 0.2, speed = 2, orientation = 0)
+            ),
+
+            # utility.R
+            "compute_utility_variables" = list(
+                inx,
+                create_agent_specifications(inx@agents, cpp = FALSE),
+                matrix(1, nrow = 33, ncol = 2),
+                matrix(TRUE, nrow = 11, ncol = 3)
+            ),
+            "utility" = list(
+                data_inx[data_inx$status == "move", ],
+                params_bounded,
+                inx,
+                create_agent_specifications(inx@agents, cpp = FALSE),
+                matrix(1, nrow = 33, ncol = 2),
+                matrix(TRUE, nrow = 11, ncol = 3)
             )
-        }
+        )
     )
-)
+}
+
+
+
+#' Load the tests for the benchmark
+#' 
+#' This function serves as a wrapper around a named list defining the benchmarks
+#' used for each function. This allows the use of more optimized methods for 
+#' loading the arguments of these functions (e.g., through the use of the 
+#' \code{qs2} extension instead of the native \code{.Rds}) and for the package 
+#' to not require loading this variable unless absolutely necessary (i.e., when 
+#' the function is called).
+#' 
+#' @return Returns a named list containing the tests for the benchmarks together
+#' with an indicator defining the arguments that have been varied across 
+#' different benchmarks.
+#' 
+#' @noExport
+load_benchmark <- function() { 
+    # Load the arguments that go into the tests
+    args <- load_benchmark_arguments()
+
+    # Create and return the list containing the tests
+    return(
+        list(
+            # background.R
+            "compute_limited_access" = list(
+                " | " = function() {
+                    return(
+                        compute_limited_access(
+                            args[["compute_limited_access"]][[1]]
+                        )
+                    )
+                }
+            ),
+            "background" = list(
+                "no limited_access" = function() {
+                    return(
+                        background(
+                            args[["background"]][[1]],
+                            args[["background"]][[2]]
+                        )
+                    )
+                },
+                "limited_access" = function() {
+                    return(
+                        background(
+                            args[["background"]][[1]],
+                            args[["background"]][[2]],
+                            args[["background"]][[3]]
+                        )
+                    )
+                }
+            ),
+            "limit_access" = list(
+                "coordinate" = function() {
+                    return(
+                        limit_access(
+                            args[["limit_access"]][[1]], 
+                            args[["limit_access"]][[2]]
+                        )
+                    )
+                },
+                "agent" = function() {
+                    return(
+                        limit_access(
+                            args[["limit_access"]][[1]], 
+                            args[["limit_access"]][[3]]
+                        )
+                    )
+                }
+            ),
+
+            # data.R
+            "time_series" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        time_series(
+                            args[["time_series"]][[1]], 
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        time_series(
+                            args[["time_series"]][[1]], 
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "to_trace" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        to_trace(
+                            args[["to_trace"]][[1]],
+                            args[["to_trace"]][[2]], 
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        to_trace(
+                            args[["to_trace"]][[1]],
+                            args[["to_trace"]][[2]], 
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "unpack_trace" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        unpack_trace(
+                            args[["unpack_trace"]][[1]], 
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        unpack_trace(
+                            args[["unpack_trace"]][[1]], 
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # general.R
+            "line_line_intersection" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        line_line_intersection(
+                            args[["line_line_intersection"]][[1]],
+                            args[["line_line_intersection"]][[2]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        line_line_intersection(
+                            args[["line_line_intersection"]][[1]],
+                            args[["line_line_intersection"]][[2]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "perpendicular_orientation" = list(
+                "polygon" = function() {
+                    return(
+                        perpendicular_orientation(
+                            args[["perpendicular_orientation"]][[1]],
+                            args[["perpendicular_orientation"]][[4]]
+                        )
+                    )
+                },
+                "rectangle" = function() {
+                    return(
+                        perpendicular_orientation(
+                            args[["perpendicular_orientation"]][[2]],
+                            args[["perpendicular_orientation"]][[4]]
+                        )
+                    )
+                },
+                "circle" = function() {
+                    return(
+                        perpendicular_orientation(
+                            args[["perpendicular_orientation"]][[3]],
+                            args[["perpendicular_orientation"]][[4]]
+                        )
+                    )
+                }
+            ),
+
+            # goals.R
+            "add_goal" = list(
+                "polygon | middle_edge = FALSE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[1]],
+                            supermarket,
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "rectangle | middle_edge = FALSE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[2]],
+                            supermarket,
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "circle | middle_edge = FALSE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[3]],
+                            supermarket
+                        )
+                    )
+                },
+                "polygon | middle_edge = TRUE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[1]],
+                            supermarket,
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "rectangle | middle_edge = TRUE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[2]],
+                            supermarket,
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "circle | middle_edge = TRUE" = function() {
+                    return(
+                        add_goal(
+                            args[["add_goal"]][[3]],
+                            supermarket
+                        )
+                    )
+                }
+            ),
+            "change" = list(
+                " | " = function() {
+                    return(
+                        change(
+                            args[["change"]][[1]], 
+                            supermarket, 
+                            counter = 5
+                        )
+                    )
+                }
+            ),
+            "find_path" = list(
+                "precomputed | many_nodes = FALSE | reevaluate = FALSE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = few_edges,
+                            reevaluate = FALSE
+                        )
+                    )
+                },
+                "precomputed | many_nodes = TRUE | reevaluate = FALSE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = many_edges,
+                            reevaluate = FALSE
+                        )
+                    )
+                },
+                "precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = few_edges,
+                            reevaluate = TRUE
+                        )
+                    )
+                },
+                "precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = many_edges,
+                            reevaluate = TRUE
+                        )
+                    )
+                },
+                "not precomputed | many_nodes = FALSE | reevaluate = FALSE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = NULL,
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "not precomputed | many_nodes = TRUE | reevaluate = FALSE" = function() {
+                    return(
+                        find_path(
+                            args[["find_path"]][[1]],
+                            args[["find_path"]][[2]],
+                            supermarket,
+                            precomputed_edges = NULL,
+                            many_nodes = TRUE
+                        )
+                    )
+                },
+                "not precomputed | many_nodes = FALSE | reevaluate = TRUE" = function() {
+                    return(NA)
+                },
+                "not precomputed | many_nodes = TRUE | reevaluate = TRUE" = function() {
+                    return(NA)
+                }
+            ),
+            "goal_stack" = list(
+                " | " = function() {
+                    return(
+                        goal_stack(
+                            args[["goal_stack"]][[1]],
+                            supermarket,
+                            counter = args[["goal_stack"]][[2]]
+                        )
+                    )
+                }
+            ),
+            "goal" = list(
+                " | " = function() {
+                    return(
+                        goal(
+                            position = args[["goal"]][[1]]
+                        )
+                    )
+                }
+            ),
+            "interact" = list(
+                " | " = function() {
+                    return(
+                        interact(
+                            args[["interact"]][[1]]
+                        )
+                    )
+                }
+            ),
+
+            # likelihood.R
+            "mll" = list(
+                "transform = FALSE | cpp = FALSE | summed = FALSE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[2]],
+                            transform = FALSE,
+                            cpp = FALSE,
+                            summed = FALSE
+                        )
+                    )
+                },
+                "transform = TRUE | cpp = FALSE | summed = FALSE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[3]],
+                            transform = TRUE,
+                            cpp = FALSE,
+                            summed = FALSE
+                        )
+                    )
+                },
+                "transform = FALSE | cpp = TRUE | summed = FALSE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[2]],
+                            transform = FALSE,
+                            cpp = TRUE,
+                            summed = FALSE
+                        )
+                    )
+                },
+                "transform = TRUE | cpp = TRUE | summed = FALSE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[3]],
+                            transform = TRUE,
+                            cpp = TRUE,
+                            summed = FALSE
+                        )
+                    )
+                },
+                "transform = FALSE | cpp = FALSE | summed = TRUE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[2]],
+                            transform = FALSE,
+                            cpp = FALSE,
+                            summed = TRUE
+                        )
+                    )
+                },
+                "transform = TRUE | cpp = FALSE | summed = TRUE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[3]],
+                            transform = TRUE,
+                            cpp = FALSE,
+                            summed = TRUE
+                        )
+                    )
+                },
+                "transform = FALSE | cpp = TRUE | summed = TRUE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[2]],
+                            transform = FALSE,
+                            cpp = TRUE,
+                            summed = TRUE
+                        )
+                    )
+                },
+                "transform = TRUE | cpp = TRUE | summed = TRUE" = function() {
+                    return(
+                        mll(
+                            args[["mll"]][[1]],
+                            args[["mll"]][[3]],
+                            transform = TRUE,
+                            cpp = TRUE,
+                            summed = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # moving_options.R
+            "agents_between_goal" = list(
+                " | " = function() {
+                    return(
+                        agents_between_goal(
+                            args[["agents_between_goal"]][[1]], 
+                            args[["agents_between_goal"]][[2]]
+                        )
+                    )
+                }
+            ),
+            "compute_centers" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        compute_centers(
+                            args[["compute_centers"]][[1]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        compute_centers(
+                            args[["compute_centers"]][[1]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "moving_options" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        moving_options(
+                            args[["moving_options"]][[1]],
+                            args[["moving_options"]][[2]],
+                            supermarket,
+                            args[["moving_options"]][[3]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        moving_options(
+                            args[["moving_options"]][[1]],
+                            args[["moving_options"]][[2]],
+                            supermarket,
+                            args[["moving_options"]][[3]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "overlap_with_objects" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        overlap_with_objects(
+                            args[["overlap_with_objects"]][[1]],
+                            supermarket,
+                            args[["overlap_with_objects"]][[2]],
+                            args[["overlap_with_objects"]][[3]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        overlap_with_objects(
+                            args[["overlap_with_objects"]][[1]],
+                            supermarket,
+                            args[["overlap_with_objects"]][[2]],
+                            args[["overlap_with_objects"]][[3]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # objects.R
+            "add_nodes" = list(
+                "polygon | only_corners = FALSE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[1]],
+                            space_between = 0.5,
+                            only_corners = FALSE
+                        )
+                    )
+                },
+                "rectangle | only_corners = FALSE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[2]],
+                            space_between = 0.5,
+                            only_corners = FALSE
+                        )
+                    )
+                },
+                "circle | only_corners = FALSE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[3]],
+                            space_between = 0.5,
+                            only_corners = FALSE
+                        )
+                    )
+                },
+                "polygon | only_corners = TRUE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[1]],
+                            space_between = 0.5,
+                            only_corners = TRUE
+                        )
+                    )
+                },
+                "rectangle | only_corners = TRUE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[2]],
+                            space_between = 0.5,
+                            only_corners = TRUE
+                        )
+                    )
+                },
+                "circle | only_corners = TRUE" = function() {
+                    return(
+                        add_nodes(
+                            args[["add_nodes"]][[3]],
+                            space_between = 0.5,
+                            only_corners = TRUE
+                        )
+                    )
+                }
+            ),
+            "enlarge" = list(
+                "polygon" = function() {
+                    return(
+                        enlarge(
+                            args[["enlarge"]][[1]],
+                            0.5
+                        )
+                    )
+                },
+                "rectangle" = function() {
+                    return(
+                        enlarge(
+                            args[["enlarge"]][[2]],
+                            0.5
+                        )
+                    )
+                },
+                "circle" = function() {
+                    return(
+                        enlarge(
+                            args[["enlarge"]][[3]],
+                            0.5
+                        )
+                    )
+                }
+            ),
+            "in_object" = list(
+                "polygon | cpp = FALSE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[1]],
+                            args[["in_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "rectangle | cpp = FALSE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[2]],
+                            args[["in_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "circle | cpp = FALSE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[3]],
+                            args[["in_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "polygon | cpp = TRUE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[1]],
+                            args[["in_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "rectangle | cpp = TRUE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[2]],
+                            args[["in_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "circle | cpp = TRUE" = function() {
+                    return(
+                        in_object(
+                            args[["in_object"]][[3]],
+                            args[["in_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "polygon" = list(
+                " | " = function() {
+                    return(
+                        polygon(
+                            points = args[["polygon"]][[1]]
+                        )
+                    )
+                }
+            ),
+            "rectangle" = list(
+                " | " = function() {
+                    return(
+                        rectangle(
+                            center = args[["rectangle"]][[1]],
+                            size = args[["rectangle"]][[2]]
+                        )
+                    )
+                }
+            ),
+            "circle" = list(
+                " | " = function() {
+                    return(
+                        circle(
+                            center = args[["circle"]][[1]],
+                            radius = args[["circle"]][[2]]
+                        )
+                    )
+                }
+            ),
+            "intersects" = list(
+                "polygon | polygon" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[1]],
+                            args[["intersects"]][[1]]
+                        )
+                    )
+                },
+                "polygon | rectangle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[1]],
+                            args[["intersects"]][[2]]
+                        )
+                    )
+                },
+                "polygon | circle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[1]],
+                            args[["intersects"]][[3]]
+                        )
+                    )
+                },
+                "rectangle | polygon" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[2]],
+                            args[["intersects"]][[1]]
+                        )
+                    )
+                },
+                "rectangle | rectangle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[2]],
+                            args[["intersects"]][[2]]
+                        )
+                    )
+                },
+                "rectangle | circle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[2]],
+                            args[["intersects"]][[3]]
+                        )
+                    )
+                },
+                "circle | polygon" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[3]],
+                            args[["intersects"]][[1]]
+                        )
+                    )
+                },
+                "circle | rectangle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[3]],
+                            args[["intersects"]][[2]]
+                        )
+                    )
+                },
+                "circle | circle" = function() {
+                    return(
+                        intersects(
+                            args[["intersects"]][[3]],
+                            args[["intersects"]][[3]]
+                        )
+                    )
+                }
+            ),
+            "line_intersection" = list(
+                "polygon | cpp = FALSE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[1]],
+                            args[["line_intersection"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "rectangle | cpp = FALSE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[2]],
+                            args[["line_intersection"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "circle | cpp = FALSE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[3]],
+                            args[["line_intersection"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "polygon | cpp = TRUE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[1]],
+                            args[["line_intersection"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "rectangle | cpp = TRUE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[2]],
+                            args[["line_intersection"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "circle | cpp = TRUE" = function() {
+                    return(
+                        line_intersection(
+                            args[["line_intersection"]][[3]],
+                            args[["line_intersection"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "nodes_on_circumference" = list(
+                "polygon | cpp = FALSE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[1]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "rectangle | cpp = FALSE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[2]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "circle | cpp = FALSE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[3]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "polygon | cpp = TRUE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[1]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "rectangle | cpp = TRUE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[2]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "circle | cpp = TRUE" = function() {
+                    return(
+                        nodes_on_circumference(
+                            args[["nodes_on_circumference"]][[3]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "out_object" = list(
+                "polygon | cpp = FALSE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[1]],
+                            args[["out_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "rectangle | cpp = FALSE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[2]],
+                            args[["out_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "circle | cpp = FALSE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[3]],
+                            args[["out_object"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "polygon | cpp = TRUE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[1]],
+                            args[["out_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "rectangle | cpp = TRUE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[2]],
+                            args[["out_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "circle | cpp = TRUE" = function() {
+                    return(
+                        out_object(
+                            args[["out_object"]][[3]],
+                            args[["out_object"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "rng_point" = list(
+                "polygon | middle_edge = FALSE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[1]],
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "rectangle | middle_edge = FALSE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[2]],
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "circle | middle_edge = FALSE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[3]],
+                            middle_edge = FALSE
+                        )
+                    )
+                },
+                "polygon | middle_edge = TRUE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[1]],
+                            middle_edge = TRUE
+                        )
+                    )
+                },
+                "rectangle | middle_edge = TRUE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[2]],
+                            middle_edge = TRUE
+                        )
+                    )
+                },
+                "circle | middle_edge = TRUE" = function() {
+                    return(
+                        rng_point(
+                            args[["rng_point"]][[3]],
+                            middle_edge = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # plot.R
+            "plot" = list(
+                "agent | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[1]]
+                        )
+                    )
+                },
+                "background | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            supermarket,
+                            optimize = FALSE
+                        )
+                    )
+                },
+                "polygon | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[2]]
+                        )
+                    )
+                },
+                "rectangle | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[3]]
+                        )
+                    )
+                },
+                "circle | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[4]]
+                        )
+                    )
+                },
+                "state | optimize = FALSE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[5]],
+                            optimize = FALSE
+                        )
+                    )
+                },
+                "agent | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[1]]
+                        )
+                    )
+                },
+                "background | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            supermarket,
+                            optimize = TRUE
+                        )
+                    )
+                },
+                "polygon | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[2]]
+                        )
+                    )
+                },
+                "rectangle | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[3]]
+                        )
+                    )
+                },
+                "circle | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[4]]
+                        )
+                    )
+                },
+                "state | optimize = TRUE" = function() {
+                    return(
+                        plot(
+                            args[["plot"]][[5]],
+                            optimize = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # routing.R
+            "adjust_edges" = list(
+                "few edges | reevaluate = FALSE" = function() {
+                    return(
+                        adjust_edges(
+                            args[["adjust_edges"]][[1]],
+                            args[["adjust_edges"]][[2]],
+                            supermarket, 
+                            new_objects = args[["adjust_edges"]][[3]],
+                            precomputed_edges = few_edges,
+                            reevaluate = FALSE
+                        )
+                    )
+                },
+                "many edges | reevaluate = FALSE" = function() {
+                    return(
+                        adjust_edges(
+                            args[["adjust_edges"]][[1]],
+                            args[["adjust_edges"]][[2]],
+                            supermarket, 
+                            new_objects = args[["adjust_edges"]][[3]],
+                            precomputed_edges = many_edges,
+                            reevaluate = FALSE
+                        )
+                    )
+                },
+                "few edges | reevaluate = TRUE" = function() {
+                    return(
+                        adjust_edges(
+                            args[["adjust_edges"]][[1]],
+                            args[["adjust_edges"]][[2]],
+                            supermarket, 
+                            new_objects = args[["adjust_edges"]][[3]],
+                            precomputed_edges = few_edges,
+                            reevaluate = TRUE
+                        )
+                    )
+                },
+                "many edges | reevaluate = TRUE" = function() {
+                    return(
+                        adjust_edges(
+                            args[["adjust_edges"]][[1]],
+                            args[["adjust_edges"]][[2]],
+                            supermarket, 
+                            new_objects = args[["adjust_edges"]][[3]],
+                            precomputed_edges = many_edges,
+                            reevaluate = TRUE
+                        )
+                    )
+                }
+            ),
+            "combine_nodes" = list(
+                "single" = function() {
+                    return(
+                        combine_nodes(
+                            args[["combine_nodes"]][[1]]
+                        )
+                    )
+                },
+                "pair" = function() {
+                    return(
+                        combine_nodes(
+                            args[["combine_nodes"]][[1]],
+                            args[["combine_nodes"]][[1]]
+                        )
+                    )
+                }
+            ),
+            "compute_edges" = list(
+                "unlimited | many_nodes = FALSE" = function() {
+                    return(
+                        compute_edges(
+                            supermarket, 
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "limited access | many_nodes = FALSE" = function() {
+                    return(
+                        compute_edges(
+                            args[["compute_edges"]][[1]], 
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "unlimited | many_nodes = TRUE" = function() {
+                    return(
+                        compute_edges(
+                            supermarket, 
+                            many_nodes = TRUE
+                        )
+                    )
+                },
+                "limited access | many_nodes = TRUE" = function() {
+                    return(
+                        compute_edges(
+                            args[["compute_edges"]][[1]], 
+                            many_nodes = TRUE
+                        )
+                    )
+                }
+            ),
+            "create_edges" = list(
+                "unlimited | many_nodes = FALSE" = function() {
+                    return(
+                        create_edges(
+                            args[["create_edges"]][[1]],
+                            args[["create_edges"]][[2]],
+                            supermarket, 
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "limited access | many_nodes = FALSE" = function() {
+                    return(
+                        create_edges(
+                            args[["create_edges"]][[1]],
+                            args[["create_edges"]][[2]],
+                            args[["create_edges"]][[3]], 
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "unlimited | many_nodes = TRUE" = function() {
+                    return(
+                        create_edges(
+                            args[["create_edges"]][[1]],
+                            args[["create_edges"]][[2]],
+                            supermarket, 
+                            many_nodes = TRUE
+                        )
+                    )
+                },
+                "limited access | many_nodes = TRUE" = function() {
+                    return(
+                        create_edges(
+                            args[["create_edges"]][[1]],
+                            args[["create_edges"]][[2]],
+                            args[["create_edges"]][[3]], 
+                            many_nodes = TRUE
+                        )
+                    )
+                }
+            ),
+            "create_nodes" = list(
+                "many_nodes = FALSE" = function() {
+                    return(
+                        create_nodes(
+                            args[["create_nodes"]][[1]],
+                            args[["create_nodes"]][[2]],
+                            supermarket, 
+                            many_nodes = FALSE
+                        )
+                    )
+                },
+                "many_nodes = TRUE" = function() {
+                    return(
+                        create_nodes(
+                            args[["create_nodes"]][[1]],
+                            args[["create_nodes"]][[2]],
+                            supermarket, 
+                            many_nodes = TRUE
+                        )
+                    )
+                }
+            ),
+            "evaluate_edges" = list(
+                "unlimited | few nodes" = function() {
+                    return(
+                        evaluate_edges(
+                            args[["evaluate_edges"]][[1]],
+                            supermarket,
+                            0.5
+                        )
+                    )
+                },
+                "limited access | few nodes" = function() {
+                    return(
+                        evaluate_edges(
+                            args[["evaluate_edges"]][[1]],
+                            args[["evaluate_edges"]][[3]],
+                            0.5
+                        )
+                    )
+                },
+                "unlimited | many nodes" = function() {
+                    return(
+                        evaluate_edges(
+                            args[["evaluate_edges"]][[2]],
+                            supermarket,
+                            0.5
+                        )
+                    )
+                },
+                "limited access | many nodes" = function() {
+                    return(
+                        evaluate_edges(
+                            args[["evaluate_edges"]][[2]],
+                            args[["evaluate_edges"]][[3]],
+                            0.5
+                        )
+                    )
+                }
+            ),
+            "prune_edges" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        prune_edges(
+                            args[["prune_edges"]][[1]],
+                            args[["prune_edges"]][[2]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        prune_edges(
+                            args[["prune_edges"]][[1]],
+                            args[["prune_edges"]][[2]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+
+            # simulate.R
+            "add_agent" = list(
+                "sort_goals = FALSE | individual_differences = FALSE" = function() {
+                    return(
+                        add_agent(
+                            args[["add_agent"]][[1]],
+                            sort_goals = FALSE,
+                            individual_differences = FALSE
+                        )
+                    )
+                },
+                "sort_goals = TRUE | individual_differences = FALSE" = function() {
+                    return(
+                        add_agent(
+                            args[["add_agent"]][[1]],
+                            sort_goals = TRUE,
+                            individual_differences = FALSE
+                        )
+                    )
+                },
+                "sort_goals = FALSE | individual_differences = TRUE" = function() {
+                    return(
+                        add_agent(
+                            args[["add_agent"]][[1]],
+                            sort_goals = FALSE,
+                            individual_differences = TRUE
+                        )
+                    )
+                },
+                "sort_goals = TRUE | individual_differences = TRUE" = function() {
+                    return(
+                        add_agent(
+                            args[["add_agent"]][[1]],
+                            sort_goals = TRUE,
+                            individual_differences = TRUE
+                        )
+                    )
+                }
+            ),
+            "create_initial_condition" = list(
+                " | " = function() {
+                    return(
+                        create_initial_condition(
+                            args[["create_initial_condition"]][[1]],
+                            args[["create_initial_condition"]][[2]],
+                            goal_number = args[["create_initial_condition"]][[3]]
+                        )
+                    )
+                }
+            ),
+            "simulate" = list(
+                "precompute_edges = FALSE | many_nodes = FALSE" = function() {
+                    return(
+                        capture.output(
+                            simulate(
+                                args[["simulate"]][[1]],
+                                iterations = args[["simulate"]][[2]],
+                                max_agents = 70,
+                                initial_agents = args[["simulate"]][[3]],
+                                precompute_edges = FALSE,
+                                many_nodes = FALSE
+                            )
+                        )
+                    )
+                },
+                "precompute_edges = TRUE | many_nodes = FALSE" = function() {
+                    return(
+                        capture.output(
+                            simulate(
+                                args[["simulate"]][[1]],
+                                iterations = args[["simulate"]][[2]],
+                                max_agents = 70,
+                                initial_agents = args[["simulate"]][[3]],
+                                precompute_edges = TRUE,
+                                many_nodes = FALSE
+                            )
+                        )
+                    )
+                },
+                "precompute_edges = FALSE | many_nodes = TRUE" = function() {
+                    return(
+                        capture.output(
+                            simulate(
+                                args[["simulate"]][[1]],
+                                iterations = args[["simulate"]][[2]],
+                                max_agents = 70,
+                                initial_agents = args[["simulate"]][[3]],
+                                precompute_edges = FALSE,
+                                many_nodes = TRUE
+                            )
+                        )
+                    )
+                },
+                "precompute_edges = TRUE | many_nodes = TRUE" = function() {
+                    return(
+                        capture.output(
+                            simulate(
+                                args[["simulate"]][[1]],
+                                iterations = args[["simulate"]][[2]],
+                                max_agents = 70,
+                                initial_agents = args[["simulate"]][[3]],
+                                precompute_edges = TRUE,
+                                many_nodes = TRUE
+                            )
+                        )
+                    )
+                }
+            ),
+
+            # update-R
+            "create_agent_specifications" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        create_agent_specifications(
+                            args[["create_agent_specifications"]][[1]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        create_agent_specifications(
+                            args[["create_agent_specifications"]][[1]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "predict_movement" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        predict_movement(
+                            args[["predict_movement"]][[1]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        predict_movement(
+                            args[["predict_movement"]][[1]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            
+            # utility.R
+            "compute_utility_variables" = list(
+                "cpp = FALSE" = function() {
+                    return(
+                        compute_utility_variables(
+                            args[["compute_utility_variables"]][[1]]@agents[[3]],
+                            args[["compute_utility_variables"]][[1]],
+                            args[["compute_utility_variables"]][[1]]@setting,
+                            args[["compute_utility_variables"]][[2]],
+                            args[["compute_utility_variables"]][[3]],
+                            args[["compute_utility_variables"]][[4]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "cpp = TRUE" = function() {
+                    return(
+                        compute_utility_variables(
+                            args[["compute_utility_variables"]][[1]]@agents[[3]],
+                            args[["compute_utility_variables"]][[1]],
+                            args[["compute_utility_variables"]][[1]]@setting,
+                            args[["compute_utility_variables"]][[2]],
+                            args[["compute_utility_variables"]][[3]],
+                            args[["compute_utility_variables"]][[4]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            ),
+            "utility" = list(
+                "data | cpp = FALSE" = function() {
+                    return(
+                        utility(
+                            args[["utility"]][[1]][1, ],
+                            args[["utility"]][[2]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "trace | cpp = FALSE" = function() {
+                    return(
+                        utility(
+                            args[["utility"]][[3]]@agents[[1]],
+                            args[["utility"]][[3]],
+                            args[["utility"]][[3]]@setting,
+                            args[["utility"]][[4]],
+                            args[["utility"]][[5]],
+                            args[["utility"]][[6]],
+                            cpp = FALSE
+                        )
+                    )
+                },
+                "data | cpp = TRUE" = function() {
+                    return(
+                        utility(
+                            args[["utility"]][[1]][1, ],
+                            args[["utility"]][[2]],
+                            cpp = TRUE
+                        )
+                    )
+                },
+                "trace | cpp = TRUE" = function() {
+                    return(
+                        utility(
+                            args[["utility"]][[3]]@agents[[1]],
+                            args[["utility"]][[3]],
+                            args[["utility"]][[3]]@setting,
+                            args[["utility"]][[4]],
+                            args[["utility"]][[5]],
+                            args[["utility"]][[6]],
+                            cpp = TRUE
+                        )
+                    )
+                }
+            )
+        )
+    )
+}
                            
 # Create a variable that tells us what the hierarchy between the functions is
 benchmark_hierarchy <- list(
