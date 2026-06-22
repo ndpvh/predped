@@ -38,30 +38,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ekalman_smooth_rcpp
-List ekalman_smooth_rcpp(NumericVector x_obs, NumericVector y_obs, NumericVector t_obs, NumericVector speed_obs, NumericVector theta_obs, arma::mat R_mat, arma::mat P0_mat, arma::vec x0, double q_pos_x, double q_pos_y, double q_v, double q_th, double mean_dt, bool optimal);
-RcppExport SEXP _predped_ekalman_smooth_rcpp(SEXP x_obsSEXP, SEXP y_obsSEXP, SEXP t_obsSEXP, SEXP speed_obsSEXP, SEXP theta_obsSEXP, SEXP R_matSEXP, SEXP P0_matSEXP, SEXP x0SEXP, SEXP q_pos_xSEXP, SEXP q_pos_ySEXP, SEXP q_vSEXP, SEXP q_thSEXP, SEXP mean_dtSEXP, SEXP optimalSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x_obs(x_obsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type y_obs(y_obsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type t_obs(t_obsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type speed_obs(speed_obsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type theta_obs(theta_obsSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type R_mat(R_matSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type P0_mat(P0_matSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type x0(x0SEXP);
-    Rcpp::traits::input_parameter< double >::type q_pos_x(q_pos_xSEXP);
-    Rcpp::traits::input_parameter< double >::type q_pos_y(q_pos_ySEXP);
-    Rcpp::traits::input_parameter< double >::type q_v(q_vSEXP);
-    Rcpp::traits::input_parameter< double >::type q_th(q_thSEXP);
-    Rcpp::traits::input_parameter< double >::type mean_dt(mean_dtSEXP);
-    Rcpp::traits::input_parameter< bool >::type optimal(optimalSEXP);
-    rcpp_result_gen = Rcpp::wrap(ekalman_smooth_rcpp(x_obs, y_obs, t_obs, speed_obs, theta_obs, R_mat, P0_mat, x0, q_pos_x, q_pos_y, q_v, q_th, mean_dt, optimal));
-    return rcpp_result_gen;
-END_RCPP
-}
 // unique
 std::unordered_set<std::string> unique(CharacterVector x);
 RcppExport SEXP _predped_unique(SEXP xSEXP) {
@@ -497,7 +473,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 2},
     {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 5},
-    {"_predped_ekalman_smooth_rcpp", (DL_FUNC) &_predped_ekalman_smooth_rcpp, 14},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
     {"_predped_line_line_intersection_rcpp", (DL_FUNC) &_predped_line_line_intersection_rcpp, 2},
     {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 7},
