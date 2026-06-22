@@ -1,7 +1,7 @@
 testthat::test_that("Utility data R and Rcpp converge", {
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- readRDS(file.path("data", "data_utility.Rds"))
+    data <- qs2::qs_read(file.path("data", "data_utility.qs2"))
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
