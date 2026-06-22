@@ -149,3 +149,80 @@ testthat::test_that("Compute utility variables agent R and Rcpp converge", {
 
     testthat::expect_true(all(result))
 })
+
+testthat::test_that("Test the get_angles function", {
+    # Create a mock environment that will serve as the test
+    setting <- predped::background(
+        shape = predped::rectangle(center = c(0, 0), size = c(2, 5)),
+        objects = list(),
+        entrance = c(0, -2.5),
+        exit = c(0, 2.5)
+    )
+
+    # Create a set of agents who are walking in the environment
+    agents <- lapply(
+        c(0, pi/2, pi),
+        function(x) predped::agent(
+            center = c(0, -1) + 0.5 * c(cos(x), sin(x)),
+            radius = 0.25,
+            orientation = 90, 
+            speed = 1,
+            current_goal = predped::goal(position = c(0, 2.5 - 1e-2), counter = 5),
+            goals = list()
+        )
+    )
+
+    # Create a state
+    my_state <- predped::state(
+        iteration = 0,
+        setting = setting,
+        agents = agents
+    )
+
+    # From this state, derive the agent specifications
+    specs <- create_agent_specifications(agents)
+
+
+
+    # Closest individual: Base it on the current position so that we can get 
+    # references
+    tst <- sapply(
+        1:3,
+        function(i) get_angles(
+            i, 
+            specs$group, 
+            predped::position(agents[[i]]), 
+            predped::orientation(agents[[i]]),  
+            specs$position, 
+            predped::position(agents[[i]]) |>
+                matrix(nrow = 1),
+            any_member = FALSE
+        ) |>
+            as.numeric() |>
+            `names<-` (NULL)
+    )
+    ref <- c(3 * pi/4, 2 * pi - pi/4, pi/4)
+
+    testthat::expect_equal(tst, ref)
+
+    # Any member of the group: Base it on the current position so that we can get 
+    # references
+    tst <- sapply(
+        1:3,
+        function(i) get_angles(
+            i, 
+            specs$group, 
+            predped::position(agents[[i]]), 
+            predped::orientation(agents[[i]]),  
+            specs$position, 
+            predped::position(agents[[i]]) |>
+                matrix(nrow = 1),
+            any_member = TRUE
+        ) |>
+            as.numeric() |>
+            `names<-` (NULL)
+    )
+    ref <- c(3 * pi/4, 2 * pi - pi/4, 2 * pi)
+
+    testthat::expect_equal(tst, ref)
+})

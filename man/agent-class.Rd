@@ -51,6 +51,19 @@ represents the current goal of the agent.}
 \item{\code{goals}}{List of goals the agent has to achieve. The current goal is not 
 included in this list.}
 
+\item{\code{current_group_goal}}{Object of class \code{\link[predped]{goal-class}} which
+represents the current goal of the agent's group.}
+
+\item{\code{group_goals}}{List of goals the agent's group has to achieve. The current 
+goal is not included in this list.}
+
+\item{\code{group_representative}}{Logical denoting whether the agent is the representative of their group. 
+The representative is the only one in the group that completes the group goals, hence also leading
+the group towards the group goals.}
+
+\item{\code{individual_goals}}{List of goals the agent has to achieve that are not shared with their group.
+These will be completes after the agent's group goals are completed.}
+
 \item{\code{parameters}}{Dataframe containing the values of the parameters for the 
 agent. Should contain all parameters relevant for the utility functions 
 (use \code{predped::draw_parameters(1)} for an example).}
@@ -71,6 +84,10 @@ variables relevant to compute the utilities.}
 \code{\link[predped]{cell}},
 \code{\link[predped]{current_goal}},
 \code{\link[predped]{goals}},
+\code{\link[predped]{current_group_goal}},
+\code{\link[predped]{group_goals}},
+\code{\link[predped]{group_representative}},
+\code{\link[predped]{individual_goals}},
 \code{\link[predped]{group}},
 \code{\link[predped]{id}},
 \code{\link[predped]{orientation}},

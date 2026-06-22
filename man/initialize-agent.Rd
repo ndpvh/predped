@@ -14,6 +14,10 @@
   current_goal = NULL,
   goals = list(),
   group = 0,
+  current_group_goal = NULL,
+  group_goals = list(),
+  group_representative = FALSE,
+  individual_goals = list(),
   status = "move",
   waiting_counter = 0,
   cell = 0,
@@ -52,6 +56,20 @@ included in this list. Defaults to an empty list.}
 \item{group}{Numeric indicating the group to which the agent belongs. 
 Influences the behavior of the agent through the social utility functions.
 Defaults to \code{0}.}
+
+\item{current_group_goal}{Object of class \code{\link[predped]{goal-class}} which
+represents the current goal of the agent's group. Defaults to a placeholder of class 
+class \code{\link[predped]{goal-class}}.}
+
+\item{group_goals}{List of goals the agent's group has to achieve. The current 
+goal is not included in this list. Defaults to an empty list.}
+
+\item{group_representative}{Logical denoting whether the agent is the representative of 
+their group. The representative is the only one in the group that completes the group 
+goals, hence also leading the group towards the group goals. Defaults to \code{FALSE}.}
+
+\item{individual_goals}{List of goals the agent has to achieve that are not shared with their group.
+These will be completes after the agent's group goals are completed. Defaults to an empty list.}
 
 \item{status}{Character denoting the current status of the agent, or what they
 will be doing to make the next decision. Is one of \code{"move"} (the agent 
@@ -107,6 +125,10 @@ my_agent@radius
 \code{\link[predped]{current_goal}},
 \code{\link[predped]{goals}},
 \code{\link[predped]{group}},
+\code{\link[predped]{current_group_goal}},
+\code{\link[predped]{group_goals}},
+\code{\link[predped]{group_representative}},
+\code{\link[predped]{individual_goals}},
 \code{\link[predped]{id}},
 \code{\link[predped]{orientation}},
 \code{\link[predped]{parameters}}

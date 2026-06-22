@@ -382,3 +382,13 @@ multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "leng
     if (!is.null(stored)) return(stored)
     return(default)
 }
+# Character to integer function (used in agent.R for group splitting)
+char2int <- function(x) { 
+    # Convert the character to its integer representation
+    x <- utf8ToInt(x)
+
+    # Multiplies each integer by its position in the string
+    x <- x * seq_along(x)
+
+    return(sum(x))
+}

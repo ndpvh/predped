@@ -26,6 +26,7 @@
   step_report = 1,
   goal_number = 5,
   goal_duration = function(x) rnorm(x, 10, 2),
+  individual_goal_number = NULL,
   precompute_goal_paths = TRUE,
   sort_goals = TRUE,
   adaptive_goal_sorting = TRUE,
@@ -119,6 +120,11 @@ goals the agents should accomplish. It's exact value is handled by
 
 \item{goal_duration}{Numeric, vector, or function that defines the duration of
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
+
+\item{individual_goal_number}{Numeric denoting the number of goals that should be 
+assigned to each agent individually after completing their group goals. Generates a 
+separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+\code{NULL}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
 \code{\link[predped]{find_path}} for each of the generated goals

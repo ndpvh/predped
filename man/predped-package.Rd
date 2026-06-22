@@ -23,6 +23,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Niels Vanhasbroeck \email{niels.vanhasbroeck@gmail.com} (\href{https://orcid.org/0000-0002-7423-0090}{ORCID})
   \item Andrew Heathcote \email{ajheathcote@gmail.com} [contributor, funder]
 }
 
@@ -31,6 +32,7 @@ Other contributors:
   \item Malte Lüken [contributor]
   \item Alexander Anderson [contributor]
   \item Ece Yatıkçı [contributor]
+  \item Jakub Jurak [contributor]
 }
 
 }

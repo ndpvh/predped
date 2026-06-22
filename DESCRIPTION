@@ -1,7 +1,7 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 0.2.0
+Version: 0.3.0
 Date: 2026-02-05
 Description: 
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
@@ -21,7 +21,10 @@ Authors@R: c(
            role = "ctb"), 
     person("Ece",
            "Yatıkçı",
-           role = "ctb"), 
+           role = "ctb"),
+    person("Jakub",
+           "Jurak",
+           role = "ctb"),
     person("Andrew",
            "Heathcote", 
            email = "ajheathcote@gmail.com",
@@ -46,7 +49,6 @@ Imports:
     matrixStats,
     expm
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.3.3
 Collate:
     'predped-package.R'
     'RcppExports.R'
@@ -85,3 +87,4 @@ Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0
