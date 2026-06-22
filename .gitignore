@@ -62,7 +62,6 @@ inst/doc
 README_*
 *_cache
 man/figures/trace_train.gif
-.positai
 
 scripts/
 gifs/
