@@ -57,10 +57,10 @@ benchmark <- function(x = NULL,
 
     # Load all tests used in the benchmark
     benchmark_test <- load_benchmark()
-    benchmark_hierarchy <- load_benchmark_hierarchy()
+    specs <- load_benchmark_specifications()
 
-    caption <- benchmark_hierarchy$caption 
-    hierarchy <- benchmark_hierarchy$hierarchy
+    caption <- specs$caption 
+    hierarchy <- specs$hierarchy
 
     # Define the functions to include in the benchmark. If x is NULL, then we 
     # include all functions in the benchmark
@@ -2335,7 +2335,7 @@ load_benchmark <- function() {
 #' test under the \code{"caption"} label.
 #' 
 #' @noExport
-load_benchmark_hierarchy <- function() { 
+load_benchmark_specifications <- function() { 
     return(
         list(
             "hierarchy" = list(
