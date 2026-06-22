@@ -1238,7 +1238,8 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 
 #' Getter/Setter for the \code{setting}-slot
 #' 
-#' Works for the \code{\link[predped]{state-class}}.
+#' Works for the \code{\link[predped]{state-class}} and 
+#' \code{\link[predped]{trace-class}}.
 #' 
 #' @param object An instance of the \code{\link[predped]{state-class}}.
 #' @param value Value with which to replace the original value of the 
@@ -1268,6 +1269,7 @@ setGeneric("radius<-", function(object, value) standardGeneric("radius<-"))
 #' 
 #' @seealso 
 #' \code{\link[predped]{state-class}}
+#' \code{\link[predped]{trace-class}}
 #' 
 #' 
 #' @rdname setting
@@ -1425,6 +1427,46 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 
 
 
+#' Getter/Setter for the \code{states}-slot
+#' 
+#' Works for \code{\link[predped]{trace-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{trace-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{states} slot.
+#' 
+#' @examples
+#' # Initialize trace
+#' setting <- background(shape = rectangle(center = c(0, 0), size = c(5, 5)),
+#'                       objects = list(circle(center = c(0, 0), radius = 1)))
+#' my_trace <- trace(time_step = 0.5, 
+#'                   setting = setting)
+#' 
+#' # Access the states slot for the trace
+#' states(my_trace)
+#' 
+#' # Change the states slot for the agent
+#' states(my_trace)[[1]] <- list(agent(center = c(-2, 0), radius = 0.25))
+#' states(my_trace)
+#' 
+#' @seealso 
+#' \code{\link[predped]{trace-class}}
+#' 
+#' 
+#' @rdname states
+#' 
+#' @concept getter
+#' 
+#' @export
+setGeneric("states", function(object) standardGeneric("states"))
+
+#' @rdname states
+#' 
+#' @export
+setGeneric("states<-", function(object, value) standardGeneric("states<-"))
+
+
+
 #' Getter/Setter for the \code{status}-slot
 #' 
 #' Works for \code{\link[predped]{agent-class}}.
@@ -1461,6 +1503,46 @@ setGeneric("status", function(object) standardGeneric("status"))
 #' 
 #' @export
 setGeneric("status<-", function(object, value) standardGeneric("status<-"))
+
+
+
+#' Getter/Setter for the \code{time_step}-slot
+#' 
+#' Works for \code{\link[predped]{trace-class}}.
+#' 
+#' @param object An instance of the \code{\link[predped]{trace-class}}.
+#' @param value Value with which to replace the original value of the 
+#' \code{states} slot.
+#' 
+#' @examples
+#' # Initialize trace
+#' setting <- background(shape = rectangle(center = c(0, 0), size = c(5, 5)),
+#'                       objects = list(circle(center = c(0, 0), radius = 1)))
+#' my_trace <- trace(time_step = 0.5, 
+#'                   setting = setting)
+#' 
+#' # Access the time_step slot for the trace
+#' time_step(my_trace)
+#' 
+#' # Change the time_step slot for the agent
+#' time_step(my_trace) <- 1
+#' time_step(my_trace)
+#' 
+#' @seealso 
+#' \code{\link[predped]{trace-class}}
+#' 
+#' 
+#' @rdname time_step
+#' 
+#' @concept getter
+#' 
+#' @export
+setGeneric("time_step", function(object) standardGeneric("time_step"))
+
+#' @rdname time_step
+#' 
+#' @export
+setGeneric("time_step<-", function(object, value) standardGeneric("time_step<-"))
 
 
 
