@@ -38,7 +38,6 @@ Depends:
     R (>= 4.3.0)
 Imports: 
     Rcpp (>= 1.0.14),
-    qs2 (>= 0.1.0),
     methods,
     cppRouting,
     m4ma,
@@ -82,7 +81,8 @@ Suggests:
     knitr,
     kableExtra,
     rmarkdown,
-    nloptr
+    nloptr,
+    qs2 (>= 0.1.0)
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3
