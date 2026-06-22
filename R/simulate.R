@@ -755,33 +755,12 @@ add_group <- function(model,
 
     # Loop over these agents
     for(i in 2:agent_number) {
-        # Create a temporary agent as a copy of the first simulated agent
-        tmp_agent <- agents[[1]]
-
-        # Change this temporary agent's characterstics based on simulated
-        # parameters
-        tmp <- model_parameters[["params_archetypes"]]
-        mean_params <- tmp[tmp$name == idx[i - 1], ]
-        params <- generate_parameters(1,
-                                      mean = mean_params,
-                                      Sigma = model_parameters[["params_sigma"]][[idx[i - 1]]],
-                                      bounds = model_parameters[["params_bounds"]],
-                                      archetype = idx[i - 1],
-                                      individual_differences = individual_differences)
-
-        id(tmp_agent) <- paste(sample(letters, 5, replace = TRUE), collapse = "")
-        radius(tmp_agent) <- params$radius
-        color(tmp_agent) <- mean_params$color
-        speed(tmp_agent) <- standing_start
-        # Spawn a fresh agent from scratch
         # This guarantees they generate unique individual goal stacks and parameters
         follower_args <- c(list(model = model, 
                                 standing_start = standing_start, 
                                 individual_differences = individual_differences), 
-                           args)
-        
+                           args)        
         tmp_agent <- do.call(add_agent, follower_args)
-
 
         # Sync their group goals to match the leader perfectly
         group(tmp_agent) <- group(agents[[1]])

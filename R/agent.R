@@ -237,7 +237,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@color <- color
     .Object@cell_centers <- cell_centers
     .Object@extra_objects <- extra_objects
-    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 16) |>
+    .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 17) |>
         as.data.frame() |>
         setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 
                    "id_distance", "id_check", "id_ingroup", "ba_angle", 
