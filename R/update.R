@@ -998,14 +998,11 @@ update_goal <- function(agent,
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
         if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
-            if(length(goals(agent)) != 0) {
-                goals(agent) <- append(current_goal(agent),
-                                       goals(agent))
-                current_goal(agent) <- goals(agent)[[2]]
-                goals(agent) <- goals(agent)[-2]
-                status(agent) <- "plan"
-            # --- NEW: Prevent Followers from abandoning the group ---
-            if (!group_representative(agent)) {
+            # First check whether the agent is the group representative (always
+            # the case when the agent is running around as an individual). If 
+            # not, they cannot take action and have to wait for the representative
+            # to make a choice regarding goal updating
+            if(!group_representative(agent)) {
                 waiting_counter(agent) <- 5 # Keep waiting patiently
             } else {
                 if(length(goals(agent)) != 0) {
@@ -1022,7 +1019,7 @@ update_goal <- function(agent,
                 } else {
                     if (nrow(current_goal(agent)@path) > 0) {
                         status(agent) <- "reorient"
-                    }else {
+                    } else {
                         status(agent) <- "plan"
                     }
                 }
