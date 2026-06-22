@@ -45,6 +45,103 @@ setMethod("update", "state", function(object,
     agent_list <- agents(object)
     background <- setting(object)
 
+    # Dynamic Group Representative Election 
+    if (length(agent_list) > 0) {
+        agent_groups <- sapply(agent_list, group)
+        unique_groups <- unique(agent_groups)
+         
+        for (g in unique_groups) {
+            g_indices <- which(agent_groups == g)
+
+            # Check if this group currently has a representative
+            current_rep_logical <- sapply(agent_list[g_indices], group_representative)
+
+            # Logic for when group representative leaves the group because they have no more group goals left
+            if(!any(current_rep_logical)) {
+                for (idx in g_indices) {
+                    agent <- agent_list[[idx]]
+
+                    # Check if agent has any individual goals left
+                    if(length(individual_goals(agent)) > 0) {
+                        group(agent) <- char2int(id(agent))
+                        group_representative(agent) <- TRUE
+                        current_goal(agent) <- individual_goals(agent)[[1]]
+                        individual_goals(agent) <- individual_goals(agent)[-1]
+                        current_goal(agent)@path <- matrix(numeric(0), ncol = 2)
+                        status(agent) <- "plan"
+                    } else {
+                        exits <- exit(background)
+                        if(nrow(exits) > 1) {
+                            distances <- (position(agent)[1] - exits[,1])^2 + (position(agent)[2] - exits[,2])^2
+                            exits <- exits[which.min(distances),]
+                        }
+                        current_goal(agent) <- goal(id = "goal exit", position = as.numeric(exits))
+                        current_goal(agent)@path <- matrix(numeric(0), ncol = 2)
+                        status(agent) <- "plan"
+                        group(agent) <- char2int(id(agent))
+                        group_representative(agent) <- TRUE
+                    }
+                    agent_list[[idx]] <- agent
+                }
+                next
+            }
+            
+            # Logic for electing a new representative who is closest to the active group goal
+            if (length(g_indices) > 1) {
+                # Identify the current representative to get the true active goal
+                if (any(current_rep_logical)) {
+                    current_rep_idx <- g_indices[which(current_rep_logical)[1]]
+                } else {
+                    current_rep_idx <- g_indices[1] # Safety fallback
+                }
+                
+                # Get the position of the active group goal
+                ref_goal_pos <- matrix(current_group_goal(agent_list[[current_rep_idx]])@position, ncol = 2)
+                
+                # Calculate everyone's distance to that goal
+                distances <- sapply(g_indices, function(idx) {
+                    m4ma::dist1(position(agent_list[[idx]]), ref_goal_pos)
+                })
+                
+                # Elect the new representative (the closest one)
+                current_rep_dist <- distances[which(g_indices == current_rep_idx)]
+                min_dist <- min(distances)
+                potential_new_rep_idx <- g_indices[which.min(distances)]
+
+                # Safeguard against infinite election loop error
+                if((current_rep_dist - min_dist) > 0.25) {
+                    new_rep_idx <- potential_new_rep_idx
+                } else {
+                    new_rep_idx <- current_rep_idx
+                }
+
+                # Memory sync
+                if (new_rep_idx != current_rep_idx) {
+                    new_rep_agent <- agent_list[[new_rep_idx]]
+                    current_rep_agent <- agent_list[[current_rep_idx]]
+
+                    current_group_goal(new_rep_agent) <- current_group_goal(current_rep_agent)
+                    group_goals(new_rep_agent) <- group_goals(current_rep_agent)
+                    current_goal(new_rep_agent) <- current_goal(current_rep_agent)
+                    goals(new_rep_agent) <- goals(current_rep_agent)
+
+                    status(new_rep_agent) <- "plan"
+
+                    agent_list[[new_rep_idx]] <- new_rep_agent
+                   
+                }
+                
+                # Apply the roles
+                for (idx in g_indices) {
+                    group_representative(agent_list[[idx]]) <- (idx == new_rep_idx)
+                }
+            } else if (length(g_indices) == 1) {
+                # Solo agents are always their own representative
+                group_representative(agent_list[[g_indices[1]]]) <- TRUE
+            }
+        }
+    }
+
     # Create agent-specifications. Are used in the utility-function and used to
     # be created there. Moved it here to reduce computational cost (which increases
     # exponentially with more agents)
@@ -112,7 +209,8 @@ setMethod("update", "state", function(object,
                                               gc_distance = NA,
                                               gc_radius = NA, 
                                               gc_nped = NA,
-                                              vf_angles = NA)
+                                              vf_angles = NA,
+                                              lgvf_data = NA)
 
         # Update the agent himself
         agent_list[[i]] <- update(agent, 
@@ -560,6 +658,32 @@ update_goal <- function(agent,
     space_between <- space_between * radius(agent)
     standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
+    # Synchronisation with group representative
+    if (!group_representative(agent)) {
+        # Find the group representative in the state
+        rep_agents <- Filter(function(x) group_representative(x) && group(x) == group(agent), agents(state))
+        
+        if (length(rep_agents) > 0) {
+            rep_agent <- rep_agents[[1]]
+
+            # Check if the representative has moved on to a new group goal
+            if (id(current_group_goal(agent)) != id(current_group_goal(rep_agent))) {
+                
+                # Sync group goals
+                current_group_goal(agent) <- current_group_goal(rep_agent)
+                group_goals(agent) <- group_goals(rep_agent)
+
+                # Sync the individual goals to match
+                current_goal(agent) <- current_goal(rep_agent)
+                goals(agent) <- goals(rep_agent)
+
+                # Force recalculation of path
+                status(agent) <- "plan"
+            }
+        }
+    }
+    
+    
     # Extract objects and shape of the environment
     obj <- objects(background)
     shp <- shape(background)
@@ -576,11 +700,16 @@ update_goal <- function(agent,
         # interaction phase.
         if(current_goal(agent)@id == "goal exit") {
             status(agent) <- "exit"
-        } else {
+        } else if (group_representative(agent)) {
+            # Only the representative interacts
             status(agent) <- "completing goal"                    
             co_1 <- position(agent)
             co_2 <- current_goal(agent)@position 
             orientation(agent) <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
+        } else {
+            # Followers wait patiently nearby
+            status(agent) <- "wait"
+            waiting_counter(agent) <- 5
         }
     }
 
@@ -597,6 +726,22 @@ update_goal <- function(agent,
             if(length(goals(agent)) > 0) {
                 current_goal(agent) <- goals(agent)[[1]]
                 goals(agent) <- goals(agent)[-1]
+                
+                # Update group tracker
+                if (group_representative(agent)) {
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- goals(agent)
+                }
+                
+            } else if (length(individual_goals(agent)) > 0) {
+
+                # Separates the agent from group/group utility functions
+                group(agent) <- char2int(id(agent))
+                group_representative(agent) <- TRUE 
+
+                current_goal(agent) <- individual_goals(agent)[[1]]
+                individual_goals(agent) <- individual_goals(agent)[-1]
+                
             } else {
                 # When there are multiple exits, use an algorithm to make the 
                 # agent decide which one to go to 
@@ -609,6 +754,12 @@ update_goal <- function(agent,
                 
                 current_goal(agent) <- goal(id = "goal exit",
                                             position = as.numeric(exits))
+                                            
+                # Update Group Tracker
+                if (group_representative(agent)) {
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- list()
+                }
             }
 
             # Replan if the goal paths were not precomputed yet
@@ -699,7 +850,11 @@ update_goal <- function(agent,
             # other agents that this agent should account for when planning),
             # we need to put `reevaluate` to TRUE so that old edges can be 
             # deleted (if necessary)
+
+            
             blocking_agents <- agents_between_goal(agent, state)
+
+
             current_goal(agent)@path <- find_path(current_goal(agent), 
                                                   agent, 
                                                   background,
@@ -776,7 +931,11 @@ update_goal <- function(agent,
         # If no agents are blocking access to the goal, allow the agent to move
         # again
         if(!any(blocking_agents)) {
-            status(agent) <- "reorient"
+            if (nrow(current_goal(agent)@path) > 0) {
+                status(agent) <- "reorient"
+            } else {
+                status(agent) <- "plan"
+            }
         }
 
         # If counter is low enough, the agent will have to reroute his approach
@@ -784,14 +943,28 @@ update_goal <- function(agent,
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
         if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
-            if(length(goals(agent)) != 0) {
-                goals(agent) <- append(current_goal(agent), 
-                                       goals(agent))
-                current_goal(agent) <- goals(agent)[[2]]
-                goals(agent) <- goals(agent)[-2]
-                status(agent) <- "plan"
+            # --- NEW: Prevent Followers from abandoning the group ---
+            if (!group_representative(agent)) {
+                waiting_counter(agent) <- 5 # Keep waiting patiently
             } else {
-                status(agent) <- "reorient"
+                if(length(goals(agent)) != 0) {
+                    goals(agent) <- append(current_goal(agent), 
+                                           goals(agent))
+                    current_goal(agent) <- goals(agent)[[2]]
+                    goals(agent) <- goals(agent)[-2]
+                    
+                    # --- NEW: Sync group goal if Rep dynamically sorted ---
+                    current_group_goal(agent) <- current_goal(agent)
+                    group_goals(agent) <- goals(agent)
+                    
+                    status(agent) <- "plan"
+                } else {
+                    if (nrow(current_goal(agent)@path) > 0) {
+                        status(agent) <- "reorient"
+                    }else {
+                        status(agent) <- "plan"
+                    }
+                }
             }
         }
     }
@@ -876,8 +1049,6 @@ update_goal <- function(agent,
 
     return(agent)
 }
-
-
 
 
 

@@ -25,7 +25,7 @@ with.}
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{segment-class}}
 
-Other objects: 
+Other objects:
 \code{\link{circle-class}},
 \code{\link{polygon-class}},
 \code{\link{rectangle-class}}

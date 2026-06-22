@@ -227,8 +227,15 @@ setMethod("utility", "data.frame", function(object,
                                      object$vf_angles[[1]])
     }
 
+    # Logarithmic Group-Attracted Visual Field utility: Check whether people are any group
+    # members and, if so, compute the utility
 
-
+    if(!is.null(object$lgvf_data[[1]])) {
+        V <- V + lgvf_utility(parameters[["a_lgvf"]],
+                              parameters[["b_lgvf"]],
+                              parameters[["e_lgvf"]],
+                              object$lgvf_data[[1]])
+    }
 
 
     ############################################################################
@@ -438,6 +445,18 @@ setMethod("compute_utility_variables", "agent", function(object,
                                     agent_specifications$predictions,
                                     centers,
                                     any_member = TRUE))
+    
+    
+    # Logarithmic Group-Attracted Visual Field utility: Required variable is the distance 
+    # and angles of one or more other pedestrians.
+    uv$lgvf_data <- list(get_group_member_data(uv$agent_idx,
+                                                agent_specifications$group,
+                                                position(object),
+                                                orientation(object),
+                                                agent_specifications$predictions,
+                                                centers))
+    
+
 
     return(uv)       
 })
@@ -753,7 +772,7 @@ vf_utility_continuous <- function(b_vf,
     }
 
     # Calculate visual field utility
-    visual_field_utility <- -sapply(rel_anlges, 
+    visual_field_utility <- -sapply(rel_angles, 
                                     \(x) b_vf * fx(x))
 
     # Return the visual field utility
@@ -804,6 +823,130 @@ vf_utility_discrete <- function(b_vf,
     # Return the visual field utility
     return(visual_field_utility)
 }
+
+##################################################################################
+# NEW UTILITY FUNCTION
+
+#' Get Distances and Angles to Group Members
+#' 
+#' Finds the predicted positions of the group members and calculates the
+#' distances and relative angles from all candidate cells to each member.
+#' This functions as the alternative to distance_group_centroid and
+#' get_angles for the lgvf_utility.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the predictions.
+#' @param agent_group Numeric vector with the group membership of all pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
+#' @param centers Numerical matrix containing the coordinates at each candidate cell.
+#'
+#' @return A list containing the distances, relative angles and number of 
+#' group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{lgvf_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+get_group_member_data <- function(agent_idx, 
+                                    agent_group, 
+                                    position, 
+                                    orientation, 
+                                    predictions, 
+                                    centers) {
+    
+    # Identify in-group pedestrians
+    predictions <- predictions[-agent_idx, , drop = FALSE]
+    ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    predictions <- predictions[ingroup, , drop = FALSE]
+    nped <- dim(predictions)[1]
+    
+    if (nped == 0) {
+        return(NULL)    
+    }
+
+    # Return lists of distances and angles for all members of in-group
+    all_distances <- list()
+    all_rel_angles <- list()
+    orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+
+    # Loop over all in-group members to calculate distances and relative angles
+    for (i in 1:nped) {
+
+        # Distances
+        target_ped <- predictions[i, ]
+        all_distances[[i]] <- m4ma::dist1_rcpp(target_ped, centers)
+
+        # Angles
+        angles <- atan2(target_ped[2] - centers[,2], target_ped[1] - centers[,1])
+        rel_angles <- angles - orientations
+        rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
+        rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
+        all_rel_angles[[i]] <- rel_angles
+    }
+
+    return(list(distances = all_distances, rel_angles = all_rel_angles, nped = nped))
+}
+
+
+#' Logarithmic Group-Attracted Visual Field Utility (LGVF)
+#' 
+#' Unifies the previous social utility functions WB, GC and VF into one utility function.
+#' Applies a logarithmic penalty based on distances to group members, and adds 
+#' an additional penalty if that member is outside the extended visual field.
+#'
+#' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+#' @param distances Numeric vector of distances from candidate cells to the member.
+#' @param rel_angles Numeric vector of relative angles from candidate cells to the member.
+#' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+#'
+#' @return Numeric vector containing the LGVF utility for each cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_group_member_data}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+lgvf_utility <- function(a_lgvf, 
+                              b_lgvf, 
+                              e_lgvf,
+                              group_member_data,
+                              vf_limit = 135 * pi / 180) {
+    
+    if (is.null(group_member_data)) {
+        return(numeric(33))
+    }
+
+    total_util <- numeric(33)
+    nped <- group_member_data$nped
+
+    # Loop over all in-group members to calculate and sum their utilities
+    for (i in 1:nped) {
+        # Target members data
+        distances <- group_member_data$distances[[i]]
+        rel_angles <- group_member_data$rel_angles[[i]]
+
+        # Base utility
+        base_util <- -b_lgvf * abs(log(distances) - log(e_lgvf))^a_lgvf
+
+        # Penalty
+        in_vf <- abs(rel_angles) <= vf_limit
+        penalty <- ifelse(in_vf, 0, -b_lgvf / (distances^a_lgvf))
+
+        # Total utility for this member
+        total_util <- total_util + base_util + penalty
+    }
+    
+    # Averaged to avoid scaling issues with large groups
+    return(total_util/nped) 
+}
+
+
 
 # #' Transform utility to probability
 # #'

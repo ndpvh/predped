@@ -366,6 +366,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_group_member_data_rcpp
+RObject get_group_member_data_rcpp(int agent_idx, NumericVector agent_group, NumericVector position, double orientation, NumericMatrix predictions, NumericMatrix centers);
+RcppExport SEXP _predped_get_group_member_data_rcpp(SEXP agent_idxSEXP, SEXP agent_groupSEXP, SEXP positionSEXP, SEXP orientationSEXP, SEXP predictionsSEXP, SEXP centersSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type agent_idx(agent_idxSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type agent_group(agent_groupSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type position(positionSEXP);
+    Rcpp::traits::input_parameter< double >::type orientation(orientationSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type predictions(predictionsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_group_member_data_rcpp(agent_idx, agent_group, position, orientation, predictions, centers));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_utility_variables_rcpp
 DataFrame compute_utility_variables_rcpp(S4 agent, S4 state, S4 background, List agent_specifications, NumericMatrix centers, LogicalMatrix check_original);
 RcppExport SEXP _predped_compute_utility_variables_rcpp(SEXP agentSEXP, SEXP stateSEXP, SEXP backgroundSEXP, SEXP agent_specificationsSEXP, SEXP centersSEXP, SEXP check_originalSEXP) {
@@ -407,6 +423,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type b_visual_field(b_visual_fieldSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type relative_angles(relative_anglesSEXP);
     rcpp_result_gen = Rcpp::wrap(vf_utility_rcpp(b_visual_field, relative_angles));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lgvf_utility_rcpp
+NumericVector lgvf_utility_rcpp(double a_lgvf, double b_lgvf, double e_lgvf, List group_member_data, double vf_limit);
+RcppExport SEXP _predped_lgvf_utility_rcpp(SEXP a_lgvfSEXP, SEXP b_lgvfSEXP, SEXP e_lgvfSEXP, SEXP group_member_dataSEXP, SEXP vf_limitSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type a_lgvf(a_lgvfSEXP);
+    Rcpp::traits::input_parameter< double >::type b_lgvf(b_lgvfSEXP);
+    Rcpp::traits::input_parameter< double >::type e_lgvf(e_lgvfSEXP);
+    Rcpp::traits::input_parameter< List >::type group_member_data(group_member_dataSEXP);
+    Rcpp::traits::input_parameter< double >::type vf_limit(vf_limitSEXP);
+    rcpp_result_gen = Rcpp::wrap(lgvf_utility_rcpp(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -465,9 +496,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_create_agent_specifications_rcpp", (DL_FUNC) &_predped_create_agent_specifications_rcpp, 3},
     {"_predped_distance_group_centroid_rcpp", (DL_FUNC) &_predped_distance_group_centroid_rcpp, 3},
     {"_predped_get_angles_rcpp", (DL_FUNC) &_predped_get_angles_rcpp, 7},
+    {"_predped_get_group_member_data_rcpp", (DL_FUNC) &_predped_get_group_member_data_rcpp, 6},
     {"_predped_compute_utility_variables_rcpp", (DL_FUNC) &_predped_compute_utility_variables_rcpp, 6},
     {"_predped_gc_utility_rcpp", (DL_FUNC) &_predped_gc_utility_rcpp, 6},
     {"_predped_vf_utility_rcpp", (DL_FUNC) &_predped_vf_utility_rcpp, 2},
+    {"_predped_lgvf_utility_rcpp", (DL_FUNC) &_predped_lgvf_utility_rcpp, 5},
     {"_predped_utility_rcpp", (DL_FUNC) &_predped_utility_rcpp, 2},
     {"_predped_utility_agent_rcpp", (DL_FUNC) &_predped_utility_agent_rcpp, 6},
     {NULL, NULL, 0}
