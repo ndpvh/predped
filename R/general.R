@@ -368,20 +368,6 @@ raycasting <- function(coords, x) {
 # Vectorized version of seq, used in `overlap_with_objects`
 multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "length.out"))
 
-
-# Internal helper: resolve time_step from stored attribute, explicit argument,
-# or hard default. Pass explicit=NULL to mean "use stored or default".
-.get_time_step <- function(x = NULL, explicit = NULL, default = 0.5) {
-    stored <- attr(x, "time_step")
-    if (!is.null(explicit)) {
-        if (!is.null(stored) && !isTRUE(all.equal(explicit, stored)))
-            warning("Supplied time_step (", explicit, ") differs from value stored ",
-                    "in data/trace (", stored, "). Using supplied value.")
-        return(explicit)
-    }
-    if (!is.null(stored)) return(stored)
-    return(default)
-}
 # Character to integer function (used in agent.R for group splitting)
 char2int <- function(x) { 
     # Convert the character to its integer representation
@@ -391,4 +377,66 @@ char2int <- function(x) {
     x <- x * seq_along(x)
 
     return(sum(x))
+}
+
+#' Transform a list of states to a trace
+#'
+#' @param states List of objects of the \code{\link[predped]{state-class}}
+#' @param ... Additional arguments defining the \code{id} or \code{time_step}
+#' to be maintained in the trace.
+#' 
+#' @return Object of the \code{\link[predped]{trace-class}}
+#' 
+#' @examples
+#' # This is my example
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}}
+#' 
+#' @rdname state_to_trace
+#' 
+#' @concept helper
+#' 
+#' @export
+state_to_trace <- function(states, 
+                           ...) {
+
+    # Instantiate the trace
+    output <- trace(setting = states[[1]]@setting, 
+                    states = lapply(states, agents),
+                    variables = lapply(states, variables),
+                    ...)
+
+    return(output)
+}
+
+#' Transform a list of trace to a state
+#'
+#' @param trace List of objects of the \code{\link[predped]{trace-class}}
+#' 
+#' @return List of objects of the \code{\link[predped]{state-class}}
+#' 
+#' @examples
+#' # This is my example
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}}
+#' 
+#' @rdname trace_to_state
+#' 
+#' @concept helper
+#' 
+#' @export
+trace_to_state <- function(trace) {
+
+    # Peform the transformation
+    states <- lapply(seq_along(trace@states), 
+                     function(i) state(iteration = i - 1, 
+                                       setting = trace@setting, 
+                                       agents = trace@states[[i]], 
+                                       variables = trace@variables[[i]]))
+
+    return(output)
 }

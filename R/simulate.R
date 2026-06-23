@@ -137,9 +137,16 @@
 #' with which to start the simulation. Defaults to \code{NULL}, meaning the
 #' simulation starts with an empty room.
 #' @param initial_condition Object of the \code{\link[predped]{state-class}}
-#' containing the initial state at which to start the simulation. Defaults to
-#' \code{NULL}, meaning the simulation starts with an empty room. Ignored when
-#' \code{initial_agents} or \code{initial_number_agents} is provided.
+#' containing the initial state at which to start the simulation or an object of
+#' the \code{\link[predped]{trace-class}} for which the final state will be used
+#' as an initial condition. Defaults to \code{NULL}, meaning the simulation 
+#' starts with an empty room. Ignored when \code{initial_agents} or 
+#' \code{initial_number_agents} is provided. Note that if a 
+#' \code{\link[predped]{trace-class}} is provided, the result will only contain 
+#' the final state of this class as an initial condition. Furthermore note that
+#' in this case, the \code{time_step} argument of this function is ignored and,
+#' instead, the \code{time_step} provided in the \code{\link[predped]{trace-class}}
+#' will be used instead.
 #' @param initial_number_agents Numeric denoting the number of agents that
 #' the simulation should start out with. Defaults to \code{NULL}, meaning the
 #' simulation should start with no agents in the room. Ignored if
@@ -168,8 +175,8 @@
 #' @param ... Arguments passed on to the \code{\link[predped]{simulate.state}}
 #' function.
 #'
-#' @return List of objects of the \code{\link{state-class}} containing the
-#' result of the simulation.
+#' @return Object of the \code{\link[predped]{trace-class}} containing the result
+#' of the simulation.
 #'
 #' @examples
 #' # Create a setting in which to simulate. Note that this setting also serves
@@ -200,8 +207,8 @@
 #'
 #' # Check some interesting statistics, such as the length of the trace and the
 #' # number of agents in the room.
-#' length(trace)
-#' sapply(trace, \(x) length(x@agents))
+#' length(trace@states)
+#' sapply(trace@states, \(x) length(x@agents))
 #'
 #' # If you wish to plot the trace, you can simply use the plot function.
 #' plt <- plot(trace)
@@ -209,6 +216,8 @@
 #'
 #' @seealso
 #' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}},
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate
@@ -253,6 +262,10 @@ setMethod("simulate", "predped", function(object,
                                           fx = \(x) x,
                                           cpp = TRUE,
                                           ...) {
+
+    # Initialize the resulting trace as NULL. Allows us to adequately differentiate
+    # initial conditions
+    output <- NULL
 
     # Simulate the iterations after which agents should be added to the simulation
     # (`add_agent`) and the number of goals each agent should pursue (`goal_number`).
@@ -323,7 +336,26 @@ setMethod("simulate", "predped", function(object,
                         "with your model."))
         }
 
-        state <- initial_condition
+        # Check whether the initial condition is a state or a trace. 
+        if(inherits(initial_condition, "state")) {
+            state <- initial_condition
+
+        } else {
+            # Create a trace that will contain the output
+            output <- initial_condition 
+
+            output@states <- list(output@states[[length(output@states)]])
+            output@variables <- list(output@variables[[length(output@variables)]])
+
+            # Additionally create a state that can be used for the simulation
+            state <- predped::state(iteration = 0,
+                                    setting = object@setting,
+                                    agents = output@states[[1]],
+                                    iteration_variables = data.frame(max_agents = max_agents[1:iterations],
+                                                                     goal_number = goal_number[1:iterations],
+                                                                     add_agent_index = add_agent_index[1:iterations]),
+                                    variables = output@variables[[1]])
+        }
 
         # Check whether iteration_variables is defined for this initial condition.
         # If not, then we will have to create them ourselves
@@ -346,40 +378,52 @@ setMethod("simulate", "predped", function(object,
         }
     }
 
-    trace <- list(state)
+    # Instantiate the resulting trace, containing the initial condition in its 
+    # corresponding slots. Only useful if a trace was not provided as an initial
+    # condition.
+    if(is.null(output)) {
+        output <- trace(setting = object@setting, 
+                        time_step = time_step, 
+                        states = list(state@agents), 
+                        variables = list(state@variables))
+    }
 
     # Print that the model is being simulated if no feedback is desired
     cat(paste0("\rYour model: ", id(object), " is being simulated"), paste0(rep(" ", 10), collapse = ""))
 
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
-        altered_state <- fx(trace[[i]])
-        trace[[i + 1]] <- simulate(altered_state,
-                                   model = object,
-                                   add_agent = (i %in% iteration_variables(altered_state)$add_agent_index) &
-                                               (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
-                                   group_size = group_size,
-                                   goal_number = iteration_variables(altered_state)$goal_number[i],
-                                   individual_goal_number = individual_goal_number,
-                                   time_step = time_step,
-                                   space_between = space_between,
-                                   standing_start = standing_start,
-                                   precomputed_edges = edges,
-                                   many_nodes = many_nodes,
-                                   precomputed_goals = precomputed_goals,
-                                   precompute_goal_paths = precompute_goal_paths,
-                                   middle_edge = middle_edge,
-                                   individual_differences = individual_differences,
-                                   plot_live = plot_live,
-                                   plot_time = delay,
-                                   cpp = cpp,
-                                   ...)
+        # Change the state through the function fx and the simulate function
+        state <- fx(state)
+        state <- simulate(state,
+                          model = object,
+                          add_agent = (i %in% iteration_variables(state)$add_agent_index) &
+                                      (length(agents(state)) < iteration_variables(state)$max_agents[i]),
+                          group_size = group_size,
+                          goal_number = iteration_variables(state)$goal_number[i],
+                          individual_goal_number = individual_goal_number,
+                          time_step = output@time_step,
+                          space_between = space_between,
+                          standing_start = standing_start,
+                          precomputed_edges = edges,
+                          many_nodes = many_nodes,
+                          precomputed_goals = precomputed_goals,
+                          precompute_goal_paths = precompute_goal_paths,
+                          middle_edge = middle_edge,
+                          individual_differences = individual_differences,
+                          plot_live = plot_live,
+                          plot_time = delay,
+                          cpp = cpp,
+                          ...)
+
+        # Save the necessary variables in the trace
+        output@states[[i + 1]] <- state@agents 
+        output@variables[[i + 1]] <- state@variables
     }
 
     cat("\n")
 
-    attr(trace, "time_step") <- time_step
-    return(trace)
+    return(output)
 })
 
 #' Simulate a single state for the M4MA

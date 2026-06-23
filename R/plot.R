@@ -685,6 +685,26 @@ setMethod("plot", "state", function(x,
     }
 })
 
+#' @rdname plot
+setMethod("plot", "trace", function(x,
+                                    ...) {
+
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            paste(
+                "The `ggplot2` package is required to `plot` objects defined by the `predped` package.",
+                "Please install."
+            )
+        )
+    }
+
+    # Transform the trace to a list of states, then use the plot function as 
+    # created for these states.
+    states <- trace_to_state(x)
+
+    return(plot(states, ...))
+})
+
 #' Plot the edges in a \code{\link[predped]{background-class}}
 #'
 #' The color of the edges is determined by the argument \code{object.color},

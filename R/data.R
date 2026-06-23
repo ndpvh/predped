@@ -4,9 +4,7 @@
 
 #' Transform trace to time-series
 #'
-#' @param trace List of objects of the \code{\link[predped]{state-class}}
-#' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' @param trace Object of the \code{\link[predped]{trace-class}}
 #' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 #' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #'
@@ -19,23 +17,21 @@
 #'
 #' @export
 time_series <- function(trace,
-                        time_step = NULL,
                         cpp = TRUE) {
 
-    time_step <- .get_time_step(trace, explicit = time_step)
-
     if(cpp) {
-        result <- time_series_rcpp(trace, time_step)
-        attr(result, "time_step") <- time_step
-        return(result)
+        return(time_series_rcpp(trace))
     }
+
+    # Extract the time step from the trace
+    time_step <- trace@time_step
 
     # Create a function that will extract all details of the agents from a
     # particular state.
-    extract_state <- function(y) {
-        y <- lapply(y@agents,
-                    \(a) data.frame(iteration = y@iteration,
-                                    time = y@iteration * time_step,
+    extract_state <- function(agents, iteration) {
+        y <- lapply(agents,
+                    \(a) data.frame(iteration = iteration,
+                                    time = iteration * time_step,
                                     id = id(a),
                                     x = position(a)[1],
                                     y = position(a)[2],
@@ -52,11 +48,11 @@ time_series <- function(trace,
     }
 
     # Iterate over each object in the list and extract the state.
-    x <- lapply(trace, extract_state)
+    x <- lapply(seq_along(trace@states), 
+                function(i) extract_state(trace@states[[i]], i - 1))
     x <- do.call("rbind", x)
     rownames(x) <- NULL
 
-    attr(x, "time_step") <- time_step
     return(x)
 }
 
@@ -69,7 +65,7 @@ time_series <- function(trace,
 #' use if you want to go from a trace to a data.frame that can be used in
 #' M4MA-based estimations.
 #'
-#' @param trace List of objects of the \code{\link[predped]{state-class}}
+#' @param trace List of objects of the \code{\link[predped]{trace-class}}
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Is used to create
 #' the cell positions that the agent might move to. Defaults to a matrix in
@@ -85,8 +81,6 @@ time_series <- function(trace,
 #' @param stay_stopped Logical denoting whether agents will predict others that
 #' are currently not moving to remain immobile in the next iteration. Defaults
 #' to \code{TRUE}.
-#' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 #' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #'
@@ -107,35 +101,32 @@ unpack_trace <- function(trace,
                              rep(times = 3) |>
                              matrix(ncol = 3),
                          stay_stopped = TRUE,
-                         time_step = NULL,
                          cpp = TRUE) {
-
-    time_step <- .get_time_step(trace, explicit = time_step)
 
     # If Rcpp alternative requested, then let them use it
     if(cpp) {
-        result <- unpack_trace_rcpp(trace,
-                                    velocities,
-                                    orientations,
-                                    stay_stopped,
-                                    time_step)
-        attr(result, "time_step") <- time_step
-        return(result)
+        return(unpack_trace_rcpp(trace,
+                                 velocities,
+                                 orientations,
+                                 stay_stopped))
     }
+
+    # Extract the time step from the trace
+    time_step <- trace@time_step
 
     # Create a function that will extract all details of the agents from a
     # particular state.
-    extract_state <- function(y) {
+    extract_state <- function(agents, iteration) {
         # Loop over all of the agents and create their own row in the dataframe.
         # This will consist of all variables included in the time_series function
         # and the utility variables that are used as an input to the utility
         # functions.
-        y <- lapply(y@agents,
+        y <- lapply(agents,
                     function(a) {
                         # Simple time-series such as the one defined in the
                         # designated function
-                        time_series <- data.frame(iteration = y@iteration,
-                                                  time = y@iteration * time_step,
+                        time_series <- data.frame(iteration = iteration,
+                                                  time = iteration * time_step,
                                                   id = id(a),
                                                   x = position(a)[1],
                                                   y = position(a)[2],
@@ -158,10 +149,15 @@ unpack_trace <- function(trace,
     }
 
     # Iterate over each object in the list and extract the state.
-    x <- lapply(trace, extract_state)
+    x <- lapply(seq_along(trace@states), 
+                function(i) extract_state(trace@states[[i]], i - 1))
     x <- do.call("rbind", x)
     rownames(x) <- NULL
 
+
+    # Create a continuous time-variable in seconds
+    attr(x, "time_step") <- time_step
+    
     # Create a continuous time-variable in seconds
     attr(x, "time_step") <- time_step
     return(x)
@@ -203,7 +199,8 @@ unpack_trace <- function(trace,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' to \code{NULL}, in which case the time step is taken as the between-subject
+#' average within-subject time between observations.
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
 #' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
@@ -213,6 +210,8 @@ unpack_trace <- function(trace,
 #' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 #' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #' @param ... Arguments passed to \code{\link[predped]{find_path}}.
+#' 
+#' @return Object of the \code{\link[predped]{trace-class}}.
 #'
 #' @examples
 #' # This is my example
@@ -235,7 +234,17 @@ to_trace <- function(data,
                      cpp = TRUE,
                      ...) {
 
-    time_step <- .get_time_step(data, explicit = time_step)
+    # If the time step is not provided by the user, use the average time between
+    # each observation, averaging within participants and across participants.
+    # Note that this may not be realistic when there is a great deviation in the 
+    # sampling rate over time.
+    if(is.null(time_step)) {
+        time_step <- sapply(unique(data$id), 
+                            function(x) data$time[data$id == x] |>
+                                diff() |>
+                                mean())
+        time_step <- mean(time_step)
+    }
 
     # Resolve a_turning / b_turning: explicit args take priority, then per-agent
     # values from attr(data,"pars"), then archetype defaults.
@@ -259,8 +268,9 @@ to_trace <- function(data,
     # factor(id) fallback below, producing a different numbering.
     if ("group" %in% colnames(data)) {
         first_occ <- !duplicated(data$id)
-        group_map <- list(id    = data$id   [first_occ],
+        group_map <- list(id = data$id[first_occ],
                           group = data$group[first_occ])
+
     } else {
         group_map <- NULL
     }
@@ -310,20 +320,18 @@ to_trace <- function(data,
 
     # Loop over each of the iterations and add the agents to the states of the
     # trace.
-    trace <- list()
+    output <- trace(setting = background, 
+                    time_step = time_step, 
+                    states = list())
     N <- max(data$iteration)
     for(i in seq_len(N)) {
-        # Add state to the trace and adjust the iteration number
-        trace[[i]] <- dummy_state
-        trace[[i]]@iteration <- i
-
         # Select the data for that iteration
         iter_data <- data[data$iteration == i, ]
 
         # If no data is available, then we cannot add any agents to the current
         # iteration. Otherwise, we can continue
         if(nrow(iter_data) == 0) {
-            trace[[i]]@agents <- list()   # ensure empty states carry no agents
+            output@states[[i]] <- list()
             next
         }
 
@@ -332,10 +340,10 @@ to_trace <- function(data,
         # room to the dummy state, will allow us to be more accurate in checks
         # etc.
         if(i > 1) {
-            dummy_state@agents <- trace[[i - 1]]@agents
+            dummy_state@agents <- output@states[[i - 1]]
         }
 
-        trace[[i]]@agents <- lapply(
+        output@states[[i]] <- lapply(
             seq_len(nrow(iter_data)),
             function(j) {
                 # General agent characteristics
@@ -439,14 +447,13 @@ to_trace <- function(data,
         )
 
         # Update agent_specifications
-        agent_specifications <- create_agent_specifications(trace[[i]]@agents,
+        agent_specifications <- create_agent_specifications(output@states[[i]],
                                                             stay_stopped = stay_stopped,
-                                                            time_step = time_step,
+                                                            time_step = output@time_step,
                                                             cpp = cpp)
     }
-
-    attr(trace, "time_step") <- time_step
-    return(trace)
+    
+    return(output)
 }
 
 #' Add motion variables to data
@@ -478,7 +485,8 @@ to_trace <- function(data,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
+#' to \code{NULL}, in which case the time step is taken as the between-subject
+#' average within-subject time between observations.
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
 #' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
@@ -506,7 +514,17 @@ add_motion_variables <- function(data,
                                  a_turning = 2,
                                  b_turning = 0.2) {
 
-    time_step <- .get_time_step(data, explicit = time_step)
+    # If the time step is not provided by the user, use the average time between
+    # each observation, averaging within participants and across participants.
+    # Note that this may not be realistic when there is a great deviation in the 
+    # sampling rate over time.
+    if(is.null(time_step)) {
+        time_step <- sapply(unique(data$id), 
+                            function(x) data$time[data$id == x] |>
+                                diff() |>
+                                mean())
+        time_step <- mean(time_step)
+    }
 
     # Define the times at which the simulation ran and define the bins and
     # iterations that come with it
@@ -605,7 +623,7 @@ add_motion_variables <- function(data,
         # Slowing factor: mirrors compute_centers where the actual displacement
         # is speed0 * slow * vel_ring * dt, so observed d_speed = slow * vel_ring.
         # Dividing by slow recovers the ring-velocity ratio for threshold comparison.
-        slow <- pmax(1e-6, 1 - b_t * sin(abs(d_orientation * pi / 180) / 2) ^ a_t)
+        slow <- pmax(1e-6, 1 - b_t * sin(abs(d_orientation * pi / 180) / 2)^a_t)
         d_speed_adj <- d_speed / slow
 
         ring <- rowSums(
@@ -656,6 +674,5 @@ add_motion_variables <- function(data,
         new_data <- new_data[, !(colnames(new_data) %in% c("x0", "y0", "speed0", "orientation0"))]
     }
 
-    attr(new_data, "time_step") <- time_step
     return(new_data)
 }
