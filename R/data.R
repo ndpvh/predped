@@ -199,14 +199,17 @@ unpack_trace <- function(trace,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{NULL}, in which case the time step is taken as the between-subject
-#' average within-subject time between observations.
+#' to \code{NULL}, in which case the time step is derived by the 
+#' \code{\link[predped]{get_time_step}} function with summarizing function 
+#' \code{fx}.
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
 #' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
 #' @param stay_stopped Logical denoting whether agents will predict others that
 #' are currently not moving to remain immobile in the next iteration. Is needed
 #' to compute the utility variables accurately. Defaults to \code{TRUE}.
+#' @param fx A summarizing function that should be used to derive the time step
+#' if it is not provided through the \code{time_step} argument. 
 #' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 #' (\code{FALSE}) version of this function. Defaults to \code{TRUE}.
 #' @param ... Arguments passed to \code{\link[predped]{find_path}}.
@@ -231,6 +234,7 @@ to_trace <- function(data,
                      time_step = NULL,
                      standing_start = 0.25,
                      stay_stopped = TRUE,
+                     fx = mean,
                      cpp = TRUE,
                      ...) {
 
@@ -239,11 +243,7 @@ to_trace <- function(data,
     # Note that this may not be realistic when there is a great deviation in the 
     # sampling rate over time.
     if(is.null(time_step)) {
-        time_step <- sapply(unique(data$id), 
-                            function(x) data$time[data$id == x] |>
-                                diff() |>
-                                mean())
-        time_step <- mean(time_step)
+        time_step <- get_time_step(data, fx = fx)
     }
 
     # Resolve a_turning / b_turning: explicit args take priority, then per-agent
@@ -485,8 +485,9 @@ to_trace <- function(data,
 #' \code{310}, \code{287.5} (note that the larger angles are actually the
 #' negative symmetric versions of the smaller angles).
 #' @param time_step Numeric denoting the time between each iteration. Defaults
-#' to \code{NULL}, in which case the time step is taken as the between-subject
-#' average within-subject time between observations.
+#' to \code{NULL}, in which case the time step is derived by the 
+#' \code{\link[predped]{get_time_step}} function with summarizing function 
+#' \code{fx}.
 #' @param standing_start Numeric denoting the speed below which the cell is
 #' set to \code{0} (stopped). Matches the \code{standing_start} parameter in
 #' \code{\link[predped]{update_position}}. Defaults to \code{0.25}.
@@ -495,6 +496,8 @@ to_trace <- function(data,
 #' the previous time point) alongside their current alternatives. Useful when
 #' one wants to compute the values of the utility-related variables from the
 #' data. Defaults to \code{FALSE}.
+#' @param fx A summarizing function that should be used to derive the time step
+#' if it is not provided through the \code{time_step} argument. 
 #'
 #' @examples
 #' # This is my example
@@ -512,18 +515,15 @@ add_motion_variables <- function(data,
                                  standing_start = 0.25,
                                  initial_conditions = FALSE,
                                  a_turning = 2,
-                                 b_turning = 0.2) {
+                                 b_turning = 0.2, 
+                                 fx = mean) {
 
     # If the time step is not provided by the user, use the average time between
     # each observation, averaging within participants and across participants.
     # Note that this may not be realistic when there is a great deviation in the 
     # sampling rate over time.
     if(is.null(time_step)) {
-        time_step <- sapply(unique(data$id), 
-                            function(x) data$time[data$id == x] |>
-                                diff() |>
-                                mean())
-        time_step <- mean(time_step)
+        time_step <- get_time_step(data, fx = fx)
     }
 
     # Define the times at which the simulation ran and define the bins and

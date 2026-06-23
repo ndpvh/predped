@@ -6,7 +6,7 @@
 #' 
 #' @param data Data.frame containing at least "id", "time", "x", "y", "goal_x",
 #' "goal_y", and "goal_id". If it does not have the utility variables yet, these
-#' will add them to the data.frame.
+#' will be added to the data.frame.
 #' @param parameters Numeric vector or matrix containing the parameters to be 
 #' used. Should be specified in the same order as specified in 
 #' \code{"parameter_names"}. If a matrix, each row should contain parameters to 
@@ -30,9 +30,12 @@
 #' If \code{FALSE}, the function will instead return a list of vectors containing
 #' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 #' their own corrections (if needed). Defaults to \code{FALSE}.
-#' @param time_step Numeric denoting the number of seconds each discrete step in
-#' time should mimic. Passed to \code{\link[predped]{add_motion_variables}} when
-#' motion variables are not yet present in \code{data}. Defaults to \code{0.5}.
+#' @param time_step Numeric denoting the time between each iteration. Defaults
+#' to \code{NULL}, in which case the time step is derived by the 
+#' \code{\link[predped]{get_time_step}} function with summarizing function 
+#' \code{fx}.
+#' @param fx A summarizing function that should be used to derive the time step
+#' if it is not provided through the \code{time_step} argument. 
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 #' In a typical estimation situation, these motion variables should already be
 #' in \code{data}.
@@ -54,7 +57,13 @@ mll <- function(data,
                 time_step = NULL,
                 ...) {
 
-    time_step <- .get_time_step(data, explicit = time_step)
+    # If the time step is not provided by the user, use the average time between
+    # each observation, averaging within participants and across participants.
+    # Note that this may not be realistic when there is a great deviation in the 
+    # sampling rate over time.
+    if(is.null(time_step)) {
+        time_step <- get_time_step(data, fx = fx)
+    }
 
     # Check whether the utility variables are in there. Just checked for one and
     # assumed that the others are there as well
