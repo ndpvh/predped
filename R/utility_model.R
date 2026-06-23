@@ -468,17 +468,9 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' functions.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
-#' @param state Object of the \code{\link[predped]{state-class}}.
-#' @param background Object of the \code{\link[predped]{background-class}}.
-#' @param agent_specifications List created by the 
-#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
-#' information of all agents within the current \code{state} and allows for the
-#' communication between the \code{predped} simulation functions and the 
-#' \code{m4ma} utility functions.
-#' @param centers Numerical matrix containing the coordinates at each position
-#' the object can be moved to. Should have one row for each cell.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @inheritParams to_trace
+#' @param ... Additional arguments passed on to \code{\link[predped]{to_trace}}
+#' and \code{\link[predped]{unpack_trace}}
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.
@@ -498,12 +490,23 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' @export 
 setMethod("compute_utility_variables", "data.frame", function(object,
                                                               background,
+                                                              b_turning = NULL,
+                                                              a_turning = NULL,
                                                               time_step = NULL,
-                                                              standing_start = 0.25) {
-    time_step <- .get_time_step(object, explicit = time_step)
-    trace <- to_trace(object, background, time_step = time_step,
-                      standing_start = standing_start)
-    return(unpack_trace(trace, time_step = time_step))
+                                                              standing_start = 0.25,
+                                                              fx = mean,
+                                                              ...) {
+
+    trace <- to_trace(object, 
+                      background,
+                      b_turning = b_turning, 
+                      a_turning = a_turning,
+                      time_step = time_step,
+                      standing_start = standing_start,
+                      fx = fx,
+                      ...)
+
+    return(unpack_trace(trace, ...))
 })
 
 
