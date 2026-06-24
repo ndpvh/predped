@@ -49,14 +49,16 @@ using namespace Rcpp;
 //' 
 //' @export
 // [[Rcpp::export]]
-DataFrame time_series_rcpp(List trace, 
-                           double time_step = 0.5) {
+DataFrame time_series_rcpp(S4 trace) {
+
+    // Extract the states and time step
+    List states = trace.slot("states");
+    double time_step = trace.slot("time_step");
 
     // Find out how many rows the dataframe should have
     int N = 0;
-    for(int i = 0; i < trace.length(); i++) {
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+    for(int i = 0; i < states.length(); i++) {
+        List agents = states[i];
         N += agents.length();
     }
 
@@ -80,10 +82,9 @@ DataFrame time_series_rcpp(List trace,
 
     // Loop over the different instances in the trace.
     int idx = 0;
-    for(int i = 0; i < trace.length(); i++) {
+    for(int i = 0; i < states.length(); i++) {
         // Extract the state and its agents from the trace
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+        List agents = states[i];
 
         if(agents.length() == 0) {
             continue;
@@ -92,7 +93,7 @@ DataFrame time_series_rcpp(List trace,
         // Loop over each of the agents separately
         for(int j = 0; j < agents.length(); j++) {
             // Extract state variables
-            int iteration_j = state.slot("iteration");
+            int iteration_j = i;
             double time_j = iteration_j * time_step;
 
             iteration[idx] = iteration_j;
@@ -204,17 +205,20 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @export
 // [[Rcpp::export]]
-DataFrame unpack_trace_rcpp(List trace, 
+DataFrame unpack_trace_rcpp(S4 trace, 
                             NumericMatrix velocities,
                             NumericMatrix orientations,
-                            bool stay_stopped = true,
-                            double time_step = 0.5) {
+                            bool stay_stopped = true) {
+
+    // Extract the states and time step
+    List states = trace.slot("states");
+    double time_step = trace.slot("time_step");
+    S4 setting = trace.slot("setting");
 
     // Find out how many rows the dataframe should have
     int N = 0;
-    for(int i = 0; i < trace.length(); i++) {
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+    for(int i = 0; i < states.length(); i++) {
+        List agents = states[i];
         N += agents.length();
     }
 
@@ -260,17 +264,15 @@ DataFrame unpack_trace_rcpp(List trace,
     NA_logical[0] = NA_LOGICAL;
 
     // Loop over the different instances in the trace.
-    List copy_trace = clone(trace);
+    List copy_states = clone(states);
     int idx = 0;
-    for(int i = 0; i < trace.length(); i++) {
+    for(int i = 0; i < states.length(); i++) {
         // Extract the state and its agents from the trace
-        S4 state = copy_trace[i];
-        List agents = state.slot("agents");
+        List agents = copy_states[i];
 
         if(agents.length() == 0) {
             continue;
         }
-        S4 setting = state.slot("setting");
 
         // Create the agent specifications list as used in the lower level 
         // utility functions
@@ -283,7 +285,7 @@ DataFrame unpack_trace_rcpp(List trace,
         // Loop over each of the agents separately
         for(int j = 0; j < agents.length(); j++) {
             // Extract state variables
-            int iteration_j = state.slot("iteration");
+            int iteration_j = i;
             double time_j = iteration_j * time_step;
 
             iteration[idx] = iteration_j;

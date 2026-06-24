@@ -17,8 +17,8 @@
 #' @concept data
 #' 
 #' @export
-time_series_rcpp <- function(trace, time_step = 0.5) {
-    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace, time_step)
+time_series_rcpp <- function(trace) {
+    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace)
 }
 
 #' Transform trace to comprehensive data.frame
@@ -59,8 +59,8 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' @concept data
 #' 
 #' @export
-unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE, time_step = 0.5) {
-    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step)
+unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE) {
+    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped)
 }
 
 unique <- function(x) {
