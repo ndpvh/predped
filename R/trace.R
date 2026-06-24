@@ -162,9 +162,7 @@ setMethod("show", "trace", function(object) {
 #' @concept general
 #' 
 #' @export
-setGeneric("append_trace", 
-           function(object, ...) standardGeneric("append_trace"),
-           signature = "trace")
+setGeneric("append_trace", function(object, state, ...) standardGeneric("append_trace"))
 
 #' @rdname append_trace
 setMethod("append_trace", 
@@ -260,7 +258,7 @@ setMethod("states<-", "trace", function(object, value) {
     # Perform a check before allowing this: If the new value for the `states` 
     # slot does not match the variables slot, then you cannot perform this 
     # operation in good conscience
-    if(length(trace@variables) != length(value)) {
+    if(length(object@variables) != length(value)) {
         stop("The provided value for the slot `states` does not have the same ",
              "length as the `variables` slot in the trace.", 
              "Both need to be the same length.")
@@ -303,7 +301,7 @@ setMethod("variables<-", "trace", function(object, value) {
     # Perform a check before allowing this: If the new value for the `variables` 
     # slot does not match the states slot, then you cannot perform this 
     # operation in good conscience
-    if(length(trace@states) != length(value)) {
+    if(length(object@states) != length(value)) {
         stop("The provided value for the slot `variables` does not have the same ",
              "length as the `states` slot in the trace.", 
              "Both need to be the same length.")
