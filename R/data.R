@@ -153,7 +153,7 @@ unpack_trace <- function(trace,
                 function(i) extract_state(trace@states[[i]], i - 1))
     x <- do.call("rbind", x)
     rownames(x) <- NULL
-    
+
     return(x)
 }
 
@@ -648,7 +648,7 @@ add_motion_variables <- function(data,
             seq_along(ring),
             \(j) ifelse(
                 positions$speed[j] < standing_start,
-                0,
+                standing_start,
                 cells[cone[j], ring[j]]
             )
         )

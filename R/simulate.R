@@ -103,7 +103,7 @@
 #' average.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
@@ -240,7 +240,7 @@ setMethod("simulate", "predped", function(object,
                                           max_agents = 20,
                                           iterations = 1800,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
-                                          standing_start = 0.1,
+                                          standing_start = 0.25,
                                           initial_agents = NULL,
                                           initial_condition = NULL,
                                           initial_number_agents = NULL,
@@ -573,7 +573,7 @@ setMethod("simulate", "state", function(object,
                                                          350, 340, 327.5, 310, 287.5) |>
                                             rep(times = 3) |>
                                             matrix(ncol = 3),
-                                        standing_start = 0.1,
+                                        standing_start = 0.25,
                                         close_enough = 2,
                                         space_between = 1.25,
                                         stay_stopped = TRUE,
@@ -718,7 +718,7 @@ setMethod("simulate", "state", function(object,
 #' to \code{1}.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
@@ -766,7 +766,7 @@ setMethod("simulate", "state", function(object,
 #     then
 add_group <- function(model,
                       agent_number = 1,
-                      standing_start = 0.1,
+                      standing_start = 0.25,
                       individual_differences = FALSE,
                       ...) {
 
@@ -873,7 +873,7 @@ add_group <- function(model,
 #' therefore might not work for the moment.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
@@ -928,7 +928,7 @@ add_agent <- function(model,
                       many_nodes = !is.null(precomputed_edges),
                       space_between = 1.25,
                       position = NULL,
-                      standing_start = 0.1,
+                      standing_start = 0.25,
                       individual_differences = FALSE,
                       return_characteristics = FALSE) {
 
