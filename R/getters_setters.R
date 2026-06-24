@@ -1632,9 +1632,11 @@ setGeneric("utility_variables<-", function(object, value) standardGeneric("utili
 
 #' Getter/Setter for the \code{variables}-slot
 #' 
-#' Works for the \code{\link[predped]{state-class}}.
+#' Works for the \code{\link[predped]{state-class}} and the 
+#' \code{\link[predped]{trace-class}}.
 #' 
-#' @param object An instance of the \code{\link[predped]{state-class}}.
+#' @param object An instance of the \code{\link[predped]{state-class}} or the 
+#' \code{\link[predped]{trace-class}}.
 #' @param value Value with which to replace the original value of the 
 #' \code{variables} slot.
 #' 

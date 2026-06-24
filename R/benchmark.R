@@ -424,7 +424,7 @@ knitr_table <- function(x,
 #' 
 #' @return Returns a named list containing the arguments for the benchmarks.
 #' 
-#' @noExport
+#' @noRd
 load_benchmark_arguments <- function() {
     # Check whether the qs2 package is installed.
     if(!requireNamespace("qs2")) {
@@ -824,7 +824,7 @@ load_benchmark_arguments <- function() {
 #' with an indicator defining the arguments that have been varied across 
 #' different benchmarks.
 #' 
-#' @noExport
+#' @noRd
 load_benchmark <- function() { 
     # Load the arguments that go into the tests
     args <- load_benchmark_arguments()
@@ -2334,7 +2334,7 @@ load_benchmark <- function() {
 #' under the \code{"hierarchy"} label and accompanying captions explaining the 
 #' test under the \code{"caption"} label.
 #' 
-#' @noExport
+#' @noRd
 load_benchmark_specifications <- function() { 
     return(
         list(
