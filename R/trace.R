@@ -119,12 +119,12 @@ setMethod("initialize", "trace", function(.Object,
 #' @export
 setMethod("show", "trace", function(object) {
     cat("Trace Attributes", "\n")
-    cat("id:", object@id, "\n")
-    cat("time step:", object@time_step, "\n")
-    cat("number of iterations:", length(object@states), "\n")
-    cat("variables accounted for:\n")
-    cat("    ", names(object@variables), "\n\n")
-    cat("For more information, please call the attributes of the trace separately.")
+    cat("  id:", object@id, "\n")
+    cat("  time step:", object@time_step, "\n")
+    cat("  number of iterations:", length(object@states), "\n")
+    cat("  variables accounted for:\n")
+    cat("    ", names(object@variables[[length(object@variables)]]), "\n\n")
+    cat("For more information, please call the attributes of the trace separately.\n")
 })
 
 #' Append values to the trace
