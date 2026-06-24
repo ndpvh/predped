@@ -432,7 +432,7 @@ state_to_trace <- function(states,
 trace_to_state <- function(trace) {
 
     # Peform the transformation
-    states <- lapply(seq_along(trace@states), 
+    output <- lapply(seq_along(trace@states), 
                      function(i) state(iteration = i - 1, 
                                        setting = trace@setting, 
                                        agents = trace@states[[i]], 
