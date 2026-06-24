@@ -187,8 +187,9 @@ setMethod("append_trace",
     }
 
     # Add these lists to the corresponding slots.
-    object@states <- append(object@states, agents)
-    object@variables <- append(object@variables, variables)
+    N <- length(object@states)
+    object@states[[N + 1]] <- agents
+    object@variables[[N + 1]] <- variables
 
     return(object)
 })
@@ -199,9 +200,10 @@ setMethod("append_trace",
           function(object, 
                    state) {
 
-    # Add the information of the state to the corresponding slots.
-    object@states <- append(object@states, state@agents)
-    object@variables <- append(object@variables, state@variables)
+    # Add these lists to the corresponding slots.
+    N <- length(object@states)
+    object@states[[N + 1]] <- state@agents
+    object@variables[[N + 1]] <- state@variables
 
     return(object)
 })
