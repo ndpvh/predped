@@ -58,6 +58,7 @@ Collate:
     'goals.R'
     'agent.R'
     'state.R'
+    'trace.R'
     'moving_options.R'
     'general.R'
     'parameters.R'
