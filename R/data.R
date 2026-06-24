@@ -153,13 +153,7 @@ unpack_trace <- function(trace,
                 function(i) extract_state(trace@states[[i]], i - 1))
     x <- do.call("rbind", x)
     rownames(x) <- NULL
-
-
-    # Create a continuous time-variable in seconds
-    attr(x, "time_step") <- time_step
     
-    # Create a continuous time-variable in seconds
-    attr(x, "time_step") <- time_step
     return(x)
 }
 
