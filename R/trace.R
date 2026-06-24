@@ -35,15 +35,19 @@ trace <- setClass("trace",
 
 #' Constructor for the \code{\link[predped]{trace-class}}
 #' 
-#' @param id Character that serves as an identifier for the trace.
+#' @param id Character that serves as an identifier for the trace. Defaults to 
+#' an indicator \code{"trace"} pasted together with a random 5-letter string.
 #' @param time_step Numerical denoting the time that passes at each iteration in
-#' seconds.
-#' @param setting Object of the \code{\link[predped]{background-class}}.
+#' seconds. Defaults to \code{0.5}.
+#' @param setting Object of the \code{\link[predped]{background-class}}. Defaults
+#' to \code{NULL}, in which case the constructor will throw an error as this is
+#' a slot that needs to be specified.
 #' @param states List of lists containing the state of the 
-#' \code{\link[predped]{agent-class}}s at each iteration. 
+#' \code{\link[predped]{agent-class}}s at each iteration. Defaults to an empty 
+#' list.
 #' @param variables List of list of user-specified variables that are used to 
 #' control the simulation (see the \code{fx} argument of 
-#' \code{\link[predped]{simulate}}) at each iteration.
+#' \code{\link[predped]{simulate}}) at each iteration. Defaults to an empty list.
 #' 
 #' @return Object of the \code{\link[predped]{trace-class}}
 #' 
@@ -78,11 +82,19 @@ trace <- setClass("trace",
 #' 
 #' @export
 setMethod("initialize", "trace", function(.Object,
-                                          setting, 
+                                          setting = NULL, 
                                           id = character(0),
                                           time_step = 0.5,
                                           states = list(),
                                           variables = list()) {
+
+    # If no setting is provided, throw an error
+    if(is.null(setting)) {
+        stop("A setting needs to be defined in order to define a trace.")
+    }
+
+    # Check whether any states/variables have been defined. If so, then the other 
+    # needs to match the length
 
     .Object@id <- ifelse(length(id) == 0,
                          paste(
@@ -163,6 +175,15 @@ setMethod("states", "trace", function(object) {
 
 #' @rdname states
 setMethod("states<-", "trace", function(object, value) {
+    # Perform a check before allowing this: If the new value for the `states` 
+    # slot does not match the variables slot, then you cannot perform this 
+    # operation in good conscience
+    if(length(trace@variables) != length(value)) {
+        stop("The provided value for the slot `states` does not have the same ",
+             "length as the `variables` slot in the trace.", 
+             "Both need to be the same length.")
+    }
+
     object@states <- value
     return(object)
 })
@@ -185,5 +206,27 @@ setMethod("time_step<-", "trace", function(object, value) {
     } 
 
     object@time_step <- value
+    return(object)
+})
+
+
+
+#' @rdname variables
+setMethod("variables", "trace", function(object) {
+    return(object@variables)
+})
+
+#' @rdname variables
+setMethod("variables<-", "trace", function(object, value) {
+    # Perform a check before allowing this: If the new value for the `variables` 
+    # slot does not match the states slot, then you cannot perform this 
+    # operation in good conscience
+    if(length(trace@states) != length(value)) {
+        stop("The provided value for the slot `variables` does not have the same ",
+             "length as the `states` slot in the trace.", 
+             "Both need to be the same length.")
+    }
+
+    object@variables <- value
     return(object)
 })
