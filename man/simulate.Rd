@@ -61,9 +61,16 @@ with which to start the simulation. Defaults to \code{NULL}, meaning the
 simulation starts with an empty room.}
 
 \item{initial_condition}{Object of the \code{\link[predped]{state-class}}
-containing the initial state at which to start the simulation. Defaults to
-\code{NULL}, meaning the simulation starts with an empty room. Ignored when
-\code{initial_agents} or \code{initial_number_agents} is provided.}
+containing the initial state at which to start the simulation or an object of
+the \code{\link[predped]{trace-class}} for which the final state will be used
+as an initial condition. Defaults to \code{NULL}, meaning the simulation 
+starts with an empty room. Ignored when \code{initial_agents} or 
+\code{initial_number_agents} is provided. Note that if a 
+\code{\link[predped]{trace-class}} is provided, the result will only contain 
+the final state of this class as an initial condition. Furthermore note that
+in this case, the \code{time_step} argument of this function is ignored and,
+instead, the \code{time_step} provided in the \code{\link[predped]{trace-class}}
+will be used instead.}
 
 \item{initial_number_agents}{Numeric denoting the number of agents that
 the simulation should start out with. Defaults to \code{NULL}, meaning the
@@ -146,8 +153,8 @@ remains unaltered.}
 function.}
 }
 \value{
-List of objects of the \code{\link{state-class}} containing the
-result of the simulation.
+Object of the \code{\link[predped]{trace-class}} containing the result
+of the simulation.
 }
 \description{
 This function allows users to simulate data from their specified
@@ -259,8 +266,8 @@ trace <- simulate(my_model,
 
 # Check some interesting statistics, such as the length of the trace and the
 # number of agents in the room.
-length(trace)
-sapply(trace, \(x) length(x@agents))
+length(trace@states)
+sapply(trace@states, \(x) length(x@agents))
 
 # If you wish to plot the trace, you can simply use the plot function.
 plt <- plot(trace)
@@ -269,6 +276,8 @@ plt[[1]]
 }
 \seealso{
 \code{\link[predped]{simulate.state}},
+\code{\link[predped]{state-class}},
+\code{\link[predped]{trace-class}},
 \code{\link[predped]{update}}
 }
 \concept{simulation}

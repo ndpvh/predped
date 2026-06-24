@@ -4,13 +4,10 @@
 \alias{time_series}
 \title{Transform trace to time-series}
 \usage{
-time_series(trace, time_step = NULL, cpp = TRUE)
+time_series(trace, cpp = TRUE)
 }
 \arguments{
-\item{trace}{List of objects of the \code{\link[predped]{state-class}}}
-
-\item{time_step}{Numeric denoting the time between each iteration. Defaults
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
+\item{trace}{Object of the \code{\link[predped]{trace-class}}}
 
 \item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}

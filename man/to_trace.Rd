@@ -14,6 +14,7 @@ to_trace(
   time_step = NULL,
   standing_start = 0.25,
   stay_stopped = TRUE,
+  fx = mean,
   cpp = TRUE,
   ...
 )
@@ -41,7 +42,9 @@ assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
 negative symmetric versions of the smaller angles).}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
 
 \item{standing_start}{Numeric denoting the speed below which the cell is
 set to \code{0} (stopped). Matches the \code{standing_start} parameter in
@@ -51,10 +54,16 @@ set to \code{0} (stopped). Matches the \code{standing_start} parameter in
 are currently not moving to remain immobile in the next iteration. Is needed
 to compute the utility variables accurately. Defaults to \code{TRUE}.}
 
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+
 \item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed to \code{\link[predped]{find_path}}.}
+}
+\value{
+Object of the \code{\link[predped]{trace-class}}.
 }
 \description{
 This function does the opposite of \code{\link[predped]{unpack_trace}}. It

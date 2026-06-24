@@ -12,7 +12,8 @@ add_motion_variables(
   standing_start = 0.25,
   initial_conditions = FALSE,
   a_turning = 2,
-  b_turning = 0.2
+  b_turning = 0.2,
+  fx = mean
 )
 }
 \arguments{
@@ -29,7 +30,9 @@ assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
 negative symmetric versions of the smaller angles).}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
 
 \item{standing_start}{Numeric denoting the speed below which the cell is
 set to \code{0} (stopped). Matches the \code{standing_start} parameter in
@@ -40,6 +43,9 @@ include the initial conditions (that is, speed, orientation, and position at
 the previous time point) alongside their current alternatives. Useful when
 one wants to compute the values of the utility-related variables from the
 data. Defaults to \code{FALSE}.}
+
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
 }
 \description{
 This function adds several motion variables to an already existing dataset.

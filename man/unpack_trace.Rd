@@ -10,12 +10,11 @@ unpack_trace(
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
   stay_stopped = TRUE,
-  time_step = NULL,
   cpp = TRUE
 )
 }
 \arguments{
-\item{trace}{List of objects of the \code{\link[predped]{state-class}}}
+\item{trace}{List of objects of the \code{\link[predped]{trace-class}}}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
@@ -34,9 +33,6 @@ versions of the smaller angles).}
 \item{stay_stopped}{Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
-
-\item{time_step}{Numeric denoting the time between each iteration. Defaults
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 
 \item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}

@@ -7,6 +7,7 @@
 \alias{plot,object-method}
 \alias{plot,segment-method}
 \alias{plot,state-method}
+\alias{plot,trace-method}
 \title{Plot an object}
 \usage{
 \S4method{plot}{agent}(
@@ -88,6 +89,8 @@
   optimize = TRUE,
   ...
 )
+
+\S4method{plot}{trace}(x, y, ...)
 }
 \arguments{
 \item{x}{Object of the \code{\link[predped]{background-class}},
