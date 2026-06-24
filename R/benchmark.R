@@ -408,6 +408,299 @@ knitr_table <- function(x,
 
 
 
+################################################################################
+# DATA RELEVANT TO THE BENCHMARKS
+
+# Load all data so that it's available to the benchmark functions. Would've 
+# loved to see this done another way, but couldn't immediately find one that 
+# would work with changing paths in tests vs internal functions.
+load(file.path("data", "supermarket.rda"))
+load(file.path("data", "benchmark_few_edges.rda"))
+load(file.path("data", "benchmark_many_edges.rda"))
+load(file.path("data", "benchmark_few_edges_uneval.rda"))
+load(file.path("data", "benchmark_many_edges_uneval.rda"))
+load(file.path("data", "benchmark_data.rda"))
+load(file.path("data", "benchmark_inx.rda"))
+load(file.path("data", "benchmark_inx_data.rda"))
+load(file.path("data", "benchmark_trace.rda"))
+load(file.path("data", "benchmark_params_bounded.rda"))
+load(file.path("data", "benchmark_params_real.rda"))
+
+#' Default supermarket
+#' 
+#' This variable contains the default supermarket used in the benchmarks and 
+#' and tests, as well as some substantive studies. The supermarket is coded as 
+#' an instance of the \code{\link[predped]{background-class}} and is based on 
+#' the blueprints of an Albert Heijn supermarket based in Amsterdam.
+#' 
+#' @format Instance of the \code{\link[predped]{background-class}}
+#' 
+#' @export
+"supermarket"
+
+#' Edges of an environment (\code{many_nodes = FALSE})
+#' 
+#' This variable contains the result of running \code{compute_edges} in a 
+#' particular environment while setting the option \code{many_nodes = FALSE}.
+#' It mainly serves as a variable used to benchmark some of the functions related
+#' to routing.
+#' 
+#' @format Named list with three slots:
+#' \describe{
+#'   \item{\code{"nodes"}}{data.frame with 3 columns containing the identifier 
+#'                         of the node along with its coordinates.}
+#'   \item{\code{"edges"}}{data.frame with 3 columns denoting the identifier of 
+#'                         the starting and end node of the edge, as well as the 
+#'                         distance between them}
+#'   \item{\code{"edges_with_coords"}}{data.frame containing the same information 
+#'                                     as in \code{"edges"}, but now accompanied
+#'                                     with the coordinates of each node in a 
+#'                                     pair.}
+#'}
+#' 
+#' @export
+"benchmark_few_edges"
+
+#' Edges of an environment (\code{many_nodes = TRUE})
+#' 
+#' This variable contains the result of running \code{compute_edges} in a 
+#' particular environment while setting the option \code{many_nodes = TRUE}.
+#' It mainly serves as a variable used to benchmark some of the functions related
+#' to routing.
+#' 
+#' @format Named list with three slots:
+#' \describe{
+#'   \item{\code{"nodes"}}{data.frame with 3 columns containing the identifier 
+#'                         of the node along with its coordinates.}
+#'   \item{\code{"edges"}}{data.frame with 3 columns denoting the identifier of 
+#'                         the starting and end node of the edge, as well as the 
+#'                         distance between them}
+#'   \item{\code{"edges_with_coords"}}{data.frame containing the same information 
+#'                                     as in \code{"edges"}, but now accompanied
+#'                                     with the coordinates of each node in a 
+#'                                     pair.}
+#'}
+#' 
+#' @export
+"benchmark_many_edges"
+
+#' Raw edges of an environment (\code{many_nodes = FALSE})
+#' 
+#' This variable contains the result of running \code{create_edges} in a 
+#' particular environment while setting the option \code{many_nodes = FALSE} and 
+#' without evaluating which edges cannot serve as navigation lines due to objects
+#' being in the way. It mainly serves as a variable used to benchmark some of the 
+#' functions related to routing.
+#' 
+#' @format Named list with three slots:
+#' \describe{
+#'   \item{\code{"nodes"}}{data.frame with 3 columns containing the identifier 
+#'                         of the node along with its coordinates.}
+#'   \item{\code{"edges"}}{data.frame with 3 columns denoting the identifier of 
+#'                         the starting and end node of the edge, as well as the 
+#'                         distance between them}
+#'   \item{\code{"edges_with_coords"}}{data.frame containing the same information 
+#'                                     as in \code{"edges"}, but now accompanied
+#'                                     with the coordinates of each node in a 
+#'                                     pair.}
+#'}
+#' 
+#' @export
+"benchmark_few_edges_uneval"
+
+#' Raw edges of an environment (\code{many_nodes = TRUE})
+#' 
+#' This variable contains the result of running \code{create_edges} in a 
+#' particular environment while setting the option \code{many_nodes = TRUE} and 
+#' without evaluating which edges cannot serve as navigation lines due to objects
+#' being in the way. It mainly serves as a variable used to benchmark some of the 
+#' functions related to routing.
+#' 
+#' @format Named list with three slots:
+#' \describe{
+#'   \item{\code{"nodes"}}{data.frame with 3 columns containing the identifier 
+#'                         of the node along with its coordinates.}
+#'   \item{\code{"edges"}}{data.frame with 3 columns denoting the identifier of 
+#'                         the starting and end node of the edge, as well as the 
+#'                         distance between them}
+#'   \item{\code{"edges_with_coords"}}{data.frame containing the same information 
+#'                                     as in \code{"edges"}, but now accompanied
+#'                                     with the coordinates of each node in a 
+#'                                     pair.}
+#'}
+#' 
+#' @export
+"benchmark_many_edges_uneval"
+
+#' Benchmark data
+#' 
+#' This data.frame contains data of a long-corridor type of simulation, letting 
+#' several people walk from one end of a seemingly infinite corridor to the other 
+#' side. This is used to benchmark and evaluate some of the functions related 
+#' to data handling, as well as the likelihood function.
+#' 
+#' @format A data frame with 1000 rows and 30 variables:
+#' \describe{
+#'   \item{\code{iteration}}{Integer denoting the iteration number}
+#'   \item{\code{time}}{Numeric denoting the time of the measurement}
+#'   \item{\code{id}}{Character denoting the identifier of an agent}
+#'   \item{\code{x}, \code{y}}{Numeric denoting the position of the agent}
+#'   \item{\code{speed}}{Numeric denoting the speed of the agent}
+#'   \item{\code{orientation}}{Numeric denoting the orientation of the agent}
+#'   \item{\code{cell}}{Integer denoting the cell the agent moved to on this 
+#'                      iteration}
+#'   \item{\code{group}}{Numeric denoting group the agent belongs to}
+#'   \item{\code{status}}{Character denoting what the agent was doing on this 
+#'                        iteration}
+#'   \item{\code{goal_id}}{Character denoting the identifier of the agent's 
+#'                         current goal}
+#'   \item{\code{goal_x}, \code{goal_y}}{Numeric denoting the position of the
+#'                                       agent's current goal}
+#'   \item{\code{radius}}{Numeric denoting agent's size}
+#'   \item{\code{agent_idx}}{Integer denoting the index of the agent in the 
+#'                           shared specification list (utility-related)}
+#'   \item{\code{check}}{List containing a logical matrix denoting the locations 
+#'                       the agent can and cannot move to (utility-related)}
+#'   \item{\code{ps_speed}, \code{ps_distance}}{Numeric denoting the speed of 
+#'                                              the agent and the distance from 
+#'                                              the current goal, used to 
+#'                                              evaluate the preferred speed 
+#'                                              utility function (utility-related)}
+#'   \item{\code{gd_angle}}{List containing a numeric matrix of size 
+#'                          \eqn{1 \times 11}} containing the relative angles to 
+#'                          the goals for each cone the agent potentially may 
+#'                          have moved to
+#'   \item{\code{id_distance}, \code{id_check}, \code{id_ingroup}}{
+#'         List containing a numeric matrix of size \eqn{A \times 33} containing
+#'         the distance to other agents from each cell, a logical matrix of size
+#'         \eqn{11 \times 3} containing an update of cells the agent can and 
+#'         cannot move to when taking agents into account, and a logical vector
+#'         denoting whether the other agents belong to the current agents ingroup.
+#'         This information is used to evaluate the interpersonal distance 
+#'         utility function (utility-related).}
+#'   \item{\code{ba_angle}, \code{ba_cones}}{}
+#'   \item{\code{fl_leaders}, \code{wb_buddies}}{List containing the leaders and
+#'         buddies needed to evaluate the follow-the-leader and walk-beside 
+#'         utility functions (utility-related).}
+#'   \item{\code{gc_distance}, \code{gc_radius}}{List containing a numeric vector 
+#'         of size \eqn{33} containing the distance of a particular cell to the
+#'         predicted position of the group centroid and the radius of the agent
+#'         itself. Used to evaluate the group-centroid utility function (utility-
+#'         based).}
+#'   \item{\code{vf_angles}}{List containing a numeric vector of size \eqn{33} 
+#'                           containing the relative angles of the agent's 
+#'                           group members towards the agent for each cell. Used
+#'                           to evaluate the visual-field utility function 
+#'                           (utility-based).}
+#' }
+#' 
+#' @export
+"benchmark_data"
+
+#' Initial condition used in benchmarks
+#' 
+#' This variable contains an instance of the \code{\link[predped]{state-class}}
+#' that serves as an initial condition in the benchmarks.
+#' 
+#' @format Instance of the \code{\link[predped]{state-class}}
+#' 
+#' @export
+"benchmark_inx"
+
+#' Initial condition used in benchmarks (data)
+#' 
+#' This data.frame contains an initial condition that is used in the benchmarks.
+#' 
+#' @format A data frame with 70 rows and 30 variables:
+#' \describe{
+#'   \item{\code{iteration}}{Integer denoting the iteration number}
+#'   \item{\code{time}}{Numeric denoting the time of the measurement}
+#'   \item{\code{id}}{Character denoting the identifier of an agent}
+#'   \item{\code{x}, \code{y}}{Numeric denoting the position of the agent}
+#'   \item{\code{speed}}{Numeric denoting the speed of the agent}
+#'   \item{\code{orientation}}{Numeric denoting the orientation of the agent}
+#'   \item{\code{cell}}{Integer denoting the cell the agent moved to on this 
+#'                      iteration}
+#'   \item{\code{group}}{Numeric denoting group the agent belongs to}
+#'   \item{\code{status}}{Character denoting what the agent was doing on this 
+#'                        iteration}
+#'   \item{\code{goal_id}}{Character denoting the identifier of the agent's 
+#'                         current goal}
+#'   \item{\code{goal_x}, \code{goal_y}}{Numeric denoting the position of the
+#'                                       agent's current goal}
+#'   \item{\code{radius}}{Numeric denoting agent's size}
+#'   \item{\code{agent_idx}}{Integer denoting the index of the agent in the 
+#'                           shared specification list (utility-related)}
+#'   \item{\code{check}}{List containing a logical matrix denoting the locations 
+#'                       the agent can and cannot move to (utility-related)}
+#'   \item{\code{ps_speed}, \code{ps_distance}}{Numeric denoting the speed of 
+#'                                              the agent and the distance from 
+#'                                              the current goal, used to 
+#'                                              evaluate the preferred speed 
+#'                                              utility function (utility-related)}
+#'   \item{\code{gd_angle}}{List containing a numeric matrix of size 
+#'                          \eqn{1 \times 11}} containing the relative angles to 
+#'                          the goals for each cone the agent potentially may 
+#'                          have moved to
+#'   \item{\code{id_distance}, \code{id_check}, \code{id_ingroup}}{
+#'         List containing a numeric matrix of size \eqn{A \times 33} containing
+#'         the distance to other agents from each cell, a logical matrix of size
+#'         \eqn{11 \times 3} containing an update of cells the agent can and 
+#'         cannot move to when taking agents into account, and a logical vector
+#'         denoting whether the other agents belong to the current agents ingroup.
+#'         This information is used to evaluate the interpersonal distance 
+#'         utility function (utility-related).}
+#'   \item{\code{ba_angle}, \code{ba_cones}}{}
+#'   \item{\code{fl_leaders}, \code{wb_buddies}}{List containing the leaders and
+#'         buddies needed to evaluate the follow-the-leader and walk-beside 
+#'         utility functions (utility-related).}
+#'   \item{\code{gc_distance}, \code{gc_radius}}{List containing a numeric vector 
+#'         of size \eqn{33} containing the distance of a particular cell to the
+#'         predicted position of the group centroid and the radius of the agent
+#'         itself. Used to evaluate the group-centroid utility function (utility-
+#'         based).}
+#'   \item{\code{vf_angles}}{List containing a numeric vector of size \eqn{33} 
+#'                           containing the relative angles of the agent's 
+#'                           group members towards the agent for each cell. Used
+#'                           to evaluate the visual-field utility function 
+#'                           (utility-based).}
+#' }
+#' 
+#' @export
+"benchmark_inx_data"
+
+#' Trace used in benchmarks
+#' 
+#' This variable contains an instance of the \code{\link[predped]{trace-class}}
+#' that serves in the benchmarks for testing data handling functions.
+#' 
+#' @format Instance of the \code{\link[predped]{trace-class}}
+#' 
+#' @export
+"benchmark_trace"
+
+#' Benchmarked parameters (bounded)
+#' 
+#' This data.frame contains a set of bounded parameters used to benchmark the 
+#' parameter-related functions.
+#' 
+#' @format A data.frame with the rougly the same columns as the archetypes 
+#' datasets, see \code{\link[predped]{load_parameters}}
+#' 
+#' @export
+"benchmark_params_bounded"
+
+#' Benchmarked parameters (unbounded)
+#' 
+#' This data.frame contains a set of unbounded parameters used to benchmark the 
+#' parameter-related functions.
+#' 
+#' @format A data.frame with the rougly the same columns as the archetypes 
+#' datasets, see \code{\link[predped]{load_parameters}}
+#' 
+#' @export
+"benchmark_params_real"
+
 
 
 ################################################################################
@@ -416,57 +709,12 @@ knitr_table <- function(x,
 #' Load the arguments for the benchmark
 #' 
 #' This function serves as a wrapper around a named list defining the arguments
-#' provided to the functions that should be benchmarked. This allows the use of 
-#' more optimized methods for loading the arguments of these functions (e.g., 
-#' through the use of the \code{qs2} extension instead of the native \code{.Rds}) 
-#' and for the package to not require loading this variable unless absolutely 
-#' necessary (i.e., when the function is called).
+#' provided to the functions that should be benchmarked. 
 #' 
 #' @return Returns a named list containing the arguments for the benchmarks.
 #' 
 #' @noRd
-load_benchmark_arguments <- function() {
-    # Check whether the qs2 package is installed.
-    if(!requireNamespace("qs2")) {
-        stop(
-            paste(
-                "The `qs2` package is required to run the benchmarks of this package.",
-                "Please install."
-            )
-        )
-    }
-
-    # Load in the supermarket environment and its precomputed edges that serve as 
-    # input to some of these benchmarks
-    supermarket <- qs2::qs_read(file.path("tests", "testthat", "data", "supermarket.qs2"))
-    few_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "few_edges_bench.qs2"))
-    many_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "many_edges_bench.qs2"))
-
-    # Introduce unevaluated edges as well: More representative of what's going on 
-    # down below
-    few_uneval_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "few_uneval_edges_bench.qs2"))
-    many_uneval_edges <- qs2::qs_read(file.path("tests", "testthat", "data", "many_uneval_edges_bench.qs2"))
-
-    # Do the same for a dataset and parameters that will serve as input to some 
-    # benchmarks
-    params_bounded <- params_from_csv[["params_archetypes"]][1, -c(1:2)]
-    params_real <- to_unbounded(params_bounded, params_from_csv[["params_bounds"]])
-
-    data_1 <- qs2::qs_read(file.path("tests", "testthat", "data", "data_mll_benchmark.qs2"))
-    data_1 <- data_1[data_1$id == "eqdyv", ][1:100, ]
-    data_bench <- lapply(
-        1:10, 
-        function(i) {
-            data_1$id <- paste0("person_", i)
-            return(data_1)
-        }
-    )
-    data_bench <- do.call("rbind", data_bench)
-
-    # Finally, load the initial condition for the simulate benchmark
-    inx <- qs2::qs_read(file.path("tests", "testthat", "data", "benchmark_inx.qs2"))
-    data_inx <- unpack_trace(list(inx), cpp = FALSE)
-    
+load_benchmark_arguments <- function() {    
     # Create and return the list of arguments needed for benchmarking
     return(
         list(
@@ -490,16 +738,12 @@ load_benchmark_arguments <- function() {
             ),
 
             # data.R
-            "time_series" = list(
-                qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
-            ),
+            "time_series" = list(benchmark_trace),
             "to_trace" = list(
-                data_bench[data_bench$iteration <= 14, ],
+                benchmark_data[benchmark_data$iteration <= 14, ],
                 supermarket
             ),
-            "unpack_trace" = list(
-                qs2::qs_read(file.path("tests", "testthat", "data", "trace_mll_bench.qs2"))[1:10]
-            ),
+            "unpack_trace" = list(benchmark_trace),
 
             # general.R
             "line_line_intersection" = list(
@@ -539,9 +783,9 @@ load_benchmark_arguments <- function() {
 
             # likelihood.R
             "mll" = list(
-                data_bench,
-                params_bounded,
-                params_real
+                benchmark_data,
+                benchmark_params_bounded,
+                benchmark_params_real
             ),
 
             # moving_options.R
@@ -705,7 +949,7 @@ load_benchmark_arguments <- function() {
                 polygon(points = rbind(c(1, 1), c(1, -1), c(-1, -1), c(-1, 1))),
                 rectangle(center = c(0, 0), size = c(1, 1)), 
                 circle(center = c(0, 0), radius = 1),
-                inx
+                benchmark_inx
             ),
 
             # routing.R
@@ -742,8 +986,8 @@ load_benchmark_arguments <- function() {
                 c(0, 13)
             ),
             "evaluate_edges" = list(
-                few_uneval_edges, 
-                many_uneval_edges,
+                benchmark_few_edges_uneval, 
+                benchmark_many_edges_uneval,
                 background(
                     shape = shape(supermarket),
                     objects = objects(supermarket),
@@ -779,7 +1023,7 @@ load_benchmark_arguments <- function() {
                     archetypes = "BaselineEuropean"
                 ),
                 1,
-                inx@agents
+                benchmark_inx@agents
             ),
 
             # update-R
@@ -792,16 +1036,16 @@ load_benchmark_arguments <- function() {
 
             # utility.R
             "compute_utility_variables" = list(
-                inx,
-                create_agent_specifications(inx@agents, cpp = FALSE),
+                benchmark_inx,
+                create_agent_specifications(benchmark_inx@agents, cpp = FALSE),
                 matrix(1, nrow = 33, ncol = 2),
                 matrix(TRUE, nrow = 11, ncol = 3)
             ),
             "utility" = list(
-                data_inx[data_inx$status == "move", ],
-                params_bounded,
-                inx,
-                create_agent_specifications(inx@agents, cpp = FALSE),
+                benchmark_inx_data[benchmark_inx_data$status == "move", ],
+                benchmark_params_bounded,
+                benchmark_inx,
+                create_agent_specifications(benchmark_inx@agents, cpp = FALSE),
                 matrix(1, nrow = 33, ncol = 2),
                 matrix(TRUE, nrow = 11, ncol = 3)
             )
@@ -814,11 +1058,7 @@ load_benchmark_arguments <- function() {
 #' Load the tests for the benchmark
 #' 
 #' This function serves as a wrapper around a named list defining the benchmarks
-#' used for each function. This allows the use of more optimized methods for 
-#' loading the arguments of these functions (e.g., through the use of the 
-#' \code{qs2} extension instead of the native \code{.Rds}) and for the package 
-#' to not require loading this variable unless absolutely necessary (i.e., when 
-#' the function is called).
+#' used for each function.
 #' 
 #' @return Returns a named list containing the tests for the benchmarks together
 #' with an indicator defining the arguments that have been varied across 
@@ -1059,7 +1299,7 @@ load_benchmark <- function() {
                             args[["find_path"]][[1]],
                             args[["find_path"]][[2]],
                             supermarket,
-                            precomputed_edges = few_edges,
+                            precomputed_edges = benchmark_few_edges,
                             reevaluate = FALSE
                         )
                     )
@@ -1070,7 +1310,7 @@ load_benchmark <- function() {
                             args[["find_path"]][[1]],
                             args[["find_path"]][[2]],
                             supermarket,
-                            precomputed_edges = many_edges,
+                            precomputed_edges = benchmark_many_edges,
                             reevaluate = FALSE
                         )
                     )
@@ -1081,7 +1321,7 @@ load_benchmark <- function() {
                             args[["find_path"]][[1]],
                             args[["find_path"]][[2]],
                             supermarket,
-                            precomputed_edges = few_edges,
+                            precomputed_edges = benchmark_few_edges,
                             reevaluate = TRUE
                         )
                     )
@@ -1092,7 +1332,7 @@ load_benchmark <- function() {
                             args[["find_path"]][[1]],
                             args[["find_path"]][[2]],
                             supermarket,
-                            precomputed_edges = many_edges,
+                            precomputed_edges = benchmark_many_edges,
                             reevaluate = TRUE
                         )
                     )
@@ -1882,7 +2122,7 @@ load_benchmark <- function() {
                             args[["adjust_edges"]][[2]],
                             supermarket, 
                             new_objects = args[["adjust_edges"]][[3]],
-                            precomputed_edges = few_edges,
+                            precomputed_edges = benchmark_few_edges,
                             reevaluate = FALSE
                         )
                     )
@@ -1894,7 +2134,7 @@ load_benchmark <- function() {
                             args[["adjust_edges"]][[2]],
                             supermarket, 
                             new_objects = args[["adjust_edges"]][[3]],
-                            precomputed_edges = many_edges,
+                            precomputed_edges = benchmark_many_edges,
                             reevaluate = FALSE
                         )
                     )
@@ -1906,7 +2146,7 @@ load_benchmark <- function() {
                             args[["adjust_edges"]][[2]],
                             supermarket, 
                             new_objects = args[["adjust_edges"]][[3]],
-                            precomputed_edges = few_edges,
+                            precomputed_edges = benchmark_few_edges,
                             reevaluate = TRUE
                         )
                     )
@@ -1918,7 +2158,7 @@ load_benchmark <- function() {
                             args[["adjust_edges"]][[2]],
                             supermarket, 
                             new_objects = args[["adjust_edges"]][[3]],
-                            precomputed_edges = many_edges,
+                            precomputed_edges = benchmark_many_edges,
                             reevaluate = TRUE
                         )
                     )
