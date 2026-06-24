@@ -127,6 +127,88 @@ setMethod("show", "trace", function(object) {
     cat("For more information, please call the attributes of the trace separately.")
 })
 
+#' Append values to the trace
+#' 
+#' Method used for appending values to the \code{states} and \code{variables} 
+#' slots of a \code{\link[predped]{trace-class}}. Note that this method can only 
+#' append a single additional state to the trace. 
+#' 
+#' @param object Object of the \code{\link[predped]{trace-class}} to which you 
+#' would like to append the values of \code{states} and \code{variables}.
+#' @param state Object of the \code{\link[predped]{state-class}} containing the 
+#' current state that you would like to append to the trace.
+#' @param agents List of instances of the \code{\link[predped]{agent-class}}
+#' containing the agents at the current state. Defaults to \code{NULL}, meaning
+#' meaning no agents are found at the current trace.
+#' @param variables Named list containing the values of the variables at the 
+#' current state. Defaults to \code{NULL}, meaning no variables are currently 
+#' tracked in the trace.
+#' 
+#' @return Object of the \code{\link[predped]{trace-class}} with appended values 
+#' for its slots \code{states} and \code{variables}. Note that if both the 
+#' arguments \code{agents} and \code{variables} are NULL, empty lists are added
+#' to both slots.
+#' 
+#' @examples 
+#' # This is my example
+#' 
+#' @seealso 
+#' \code{\link[predped]{agent-class}},
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}}
+#' 
+#' @rdname append_trace
+#' 
+#' @concept general
+#' 
+#' @export
+setGeneric("append_trace", 
+           function(object, ...) standardGeneric("append_trace"),
+           signature = "trace")
+
+#' @rdname append_trace
+setMethod("append_trace", 
+          signature(object = "trace"), 
+          function(object, 
+                   agents = NULL, 
+                   variables = NULL) {
+    
+    # Transform the NULLs to empty lists
+    if(is.null(agents)) {
+        agents <- list()
+    }
+
+    if(is.null(variables)) {
+        variables <- list()
+    }
+
+    # Check whether both slots are actually lists. If not, appending cannot be 
+    # performed
+    if(!inherits(agents, "list") | !inherits(variables, "list")) {
+        stop("The provided `agents` or `variables` are not lists. Cannot proceed.")
+    }
+
+    # Add these lists to the corresponding slots.
+    object@states <- append(object@states, agents)
+    object@variables <- append(object@variables, variables)
+
+    return(object)
+})
+
+#' @rdname append_trace
+setMethod("append_trace", 
+          signature(object = "trace", state = "state"), 
+          function(object, 
+                   state) {
+
+    # Add the information of the state to the corresponding slots.
+    object@states <- append(object@states, state@agents)
+    object@variables <- append(object@variables, state@variables)
+
+    return(object)
+})
+
+
 
 
 

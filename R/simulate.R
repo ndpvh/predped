@@ -417,8 +417,7 @@ setMethod("simulate", "predped", function(object,
                           ...)
 
         # Save the necessary variables in the trace
-        output@states[[i + 1]] <- state@agents 
-        output@variables[[i + 1]] <- state@variables
+        output <- append_trace(output, state)
     }
 
     cat("\n")
