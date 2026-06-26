@@ -512,6 +512,22 @@ add_motion_variables <- function(data,
                                  b_turning = 0.2, 
                                  fx = mean) {
 
+    # Check whether all needed columns are part of the data.frame already. If so, 
+    # then we move on immediately
+    if(initial_conditions) {
+        cols <- c("iteration", "time", "id", "x", "y", "speed", "orientation", 
+                  "speed0", "orientation0", "x0", "y0", "cell", "group", 
+                  "status", "goal_id", "goal_x", "goal_y", "radius")
+
+    } else {
+        cols <- c("iteration", "time", "id", "x", "y", "speed", "orientation", 
+                "cell", "group", "status", "goal_id", "goal_x", "goal_y", "radius")
+    }
+
+    if(all(cols %in% colnames(data))) {
+        return(data)
+    }
+
     # If the time step is not provided by the user, use the average time between
     # each observation, averaging within participants and across participants.
     # Note that this may not be realistic when there is a great deviation in the 
@@ -648,7 +664,7 @@ add_motion_variables <- function(data,
             seq_along(ring),
             \(j) ifelse(
                 positions$speed[j] < standing_start,
-                standing_start,
+                0,
                 cells[cone[j], ring[j]]
             )
         )
