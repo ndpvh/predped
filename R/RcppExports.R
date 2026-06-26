@@ -190,6 +190,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' agent whenever they move to the respective cell of this matrix.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param threshold Numeric denoting a minimal value the slowing factor can
+#' take on when computing the cell centers. Defaults to \code{1e-6}.
 #'
 #' @return Numeric matrix of (x, y) coordinates for each cell
 #'
@@ -244,8 +246,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' @concept movement
 #'
 #' @export
-compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5) {
-    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step)
+compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5, threshold = 1e-6) {
+    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step, threshold)
 }
 
 #' Check agent and object overlap
