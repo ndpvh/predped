@@ -585,18 +585,23 @@ update_position <- function(agent,
         } else {
             position(agent) <- centers[cell, ]
 
-            # Update speed to be either higher than or equal to `standing_start`
-            acceleration <- velocities[cell]
-            speed(agent) <- speed(agent) * acceleration
-            # speed(agent) <- pmax(speed(agent) * acceleration,
-            #                      standing_start * parameters(agent)[["preferred_speed"]])
-            # speed(agent) <- pmax(speed(agent) * acceleration,standing_start)
             # Update orientation to be in degrees and relative to the current
             # orientation of the agent
             rel_orientation <- ifelse(orientations >= 180,
                                       orientations - 360,
                                       orientations)[cell]
             orientation(agent) <- (orientation(agent) + rel_orientation) %% 360
+
+            # Update speed. Note that we change the velocities so that the 
+            # biomechanical limitations are taken into account, limiting how 
+            # much the agent can actually accelerate depending on the 
+            # orientation.
+            a <- parameters(agent)[["a_turning"]]
+            b <- parameters(agent)[["b_turning"]]
+            slow <- pmax(1e-6, 1 - b * sin(abs(orientations * pi / 180) / 2)^a)
+
+            acceleration <- (velocities * slow)[cell]
+            speed(agent) <- pmax(speed(agent) * acceleration, standing_start)            
         }
     }
 
