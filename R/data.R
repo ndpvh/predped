@@ -281,6 +281,11 @@ to_trace <- function(data,
         b_turning = b_turning
     )
 
+    # Change the speed of the agents when they fall below the threshold of the 
+    # standing_start. In actual data, it's useful to keep it at 0, but once you 
+    # want to go back to a trace, we need to make it predped-foolproof.
+    data$speed[data$speed < standing_start] <- standing_start
+
     # Assign each person to a group: If provided in the data, use that value.
     # If not, make a new one.  Use named-vector lookup to avoid merge() which
     # reorders rows and breaks the iteration loop below.
@@ -347,14 +352,7 @@ to_trace <- function(data,
                 dummy_agent@orientation <- iter_data$orientation[j]
                 dummy_agent@cell <- iter_data$cell[j]
                 dummy_agent@group <- iter_data$group[j]
-
-                # If a person has a low speed, we will invoke a non-moving status
-                #
-                # This may not adequately reflect what the agent is actually
-                # doing, but this does not matter for our purposes
-                dummy_agent@status <- ifelse(iter_data$speed[j] == 0,
-                                             "wait",
-                                             "move")
+                dummy_agent@status <- iter_data$status[j]
 
                 # Goal characteristics
                 dummy_goal@id <- iter_data$goal_id[j]
@@ -493,8 +491,26 @@ to_trace <- function(data,
 #' @param fx A summarizing function that should be used to derive the time step
 #' if it is not provided through the \code{time_step} argument. 
 #'
+#' @return A data.frame with predped-relevant motion variables derived from the 
+#' provided data, including the speeds and orientations, cells that the agents 
+#' moved to, the status of the agents, and the original positions, ids, and goals
+#' that were included in the original dataset.
+#' 
 #' @examples
-#' # This is my example
+#' # Create a minimal working example dataset from scratch
+#' data <- data.frame(
+#'   "time" = seq(0, 10, 1),
+#'   "id" = rep("participant", 11),
+#'   "x" = cos(seq(0, 2 * pi, length.out = 11)),
+#'   "y" = sin(seq(0, 2 * pi, length.out = 11)),
+#'   "goal_id" = rep("goal", 11),
+#'   "goal_x" = rep(0, 11),
+#'   "goal_y" = rep(0, 11)
+#' )
+#' 
+#' # Add the motion variables to this dataset
+#' add_motion_variables(data)
+#' 
 #'
 #' @rdname add_motion_variables
 #'
@@ -604,6 +620,40 @@ add_motion_variables <- function(data,
             positions$orientation
         )
         positions$orientation <- positions$orientation * 180 / pi
+
+        # For the orientations, agents are always assumed to have the orientation 
+        # 0 when they don't move, as assumed by the atan2 function. However, this 
+        # is unlikely. Unfortunately, however, we have no way of going from data 
+        # to an informed guess of what the actual orientation may be (e.g., are 
+        # agents looking around?), so our actual best guess is to keep their 
+        # previous orientation. 
+        #
+        # Additionally, we want to make a guess as to what the agent is doing at 
+        # a particular time, differentiating between moving and waiting/completing
+        # a goal/... For this, the current speed needs to be equal to the 
+        # standing_start as well as at least one of the speeds next to it. If
+        # so, we'll add a "wait" status. Note that this may not reflect what the 
+        # agent is actually doing, but this shouldn't matter for our purposes 
+        # (that is, deriving utilities from data).
+        #
+        # Perform both adjustments in a loop.
+        check <- logical(nrow(positions))
+        for(j in seq_len(nrow(positions))) {
+            # Adjustmemt of the orientation
+            if(is.na(positions$speed[j])) {
+                next
+            }
+
+            if((positions$speed[j] == 0) & (j != 1)) {
+                positions$orientation[j] <- positions$orientation[j - 1]
+            }
+
+            # Adjustment of the status of the agent
+            idx <- seq(j - 1, j + 1, by = 1)
+            summed <- sum(positions$speed[idx] == 0, na.rm = TRUE)
+            check[j] <- (summed >= 2) & (positions$speed[j] == 0)
+        }
+        positions$status <- ifelse(check, "wait", "move")
 
         # Adjust so you have initial speeds and orientations coupled to initial
         # positions. Is needed in order to accurately compute cell centers
