@@ -382,7 +382,7 @@ to_trace <- function(data,
                     copy@parameters$a_turning <- if (length(a_turning) > 1)
                         a_turning[[as.character(iter_data$id[j])]] else a_turning
                 }
-                
+
                 dummy_agent@cell_centers <- compute_centers(copy,
                                                             velocities = velocities |>
                                                                 rep(each = length(orientations)) |>
@@ -579,8 +579,8 @@ add_motion_variables <- function(data,
                     "iteration" = iterations[j],
                     "time" = steps[j],
                     "id" = i,
-                    "x" = mean(agent_data$x[idx]),
-                    "y" = mean(agent_data$y[idx]),
+                    "x" = mean(agent_data$x[idx], na.rm = TRUE),
+                    "y" = mean(agent_data$y[idx], na.rm = TRUE),
                     "goal_id" = agent_data$goal_id[idx][1],
                     "goal_x" = agent_data$goal_x[idx][1],
                     "goal_y" = agent_data$goal_y[idx][1]
@@ -590,6 +590,11 @@ add_motion_variables <- function(data,
         positions <- as.matrix(positions) |>
             t() |>
             as.data.frame()
+
+        # Remove all NAs: Imposed in the sapply above by assuming all agents 
+        # have been in the data at all times. If not taken care of, the NAs 
+        # will propagate
+        positions <- positions[!is.na(positions$goal_id), ]
 
         # Change all numerics to numeric
         for(j in c("iteration", "time", "x", "y", "goal_x", "goal_y")) {
