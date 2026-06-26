@@ -283,8 +283,11 @@ to_trace <- function(data,
 
     # Change the speed of the agents when they fall below the threshold of the 
     # standing_start. In actual data, it's useful to keep it at 0, but once you 
-    # want to go back to a trace, we need to make it predped-foolproof.
+    # want to go back to a trace, we need to make it predped-foolproof. We also
+    # need to do this for speed0, as this is what the computation of the centers
+    # is based on
     data$speed[data$speed < standing_start] <- standing_start
+    data$speed0[data$speed0 < standing_start] <- standing_start
 
     # Assign each person to a group: If provided in the data, use that value.
     # If not, make a new one.  Use named-vector lookup to avoid merge() which
@@ -379,7 +382,7 @@ to_trace <- function(data,
                     copy@parameters$a_turning <- if (length(a_turning) > 1)
                         a_turning[[as.character(iter_data$id[j])]] else a_turning
                 }
-
+                
                 dummy_agent@cell_centers <- compute_centers(copy,
                                                             velocities = velocities |>
                                                                 rep(each = length(orientations)) |>
@@ -722,6 +725,7 @@ add_motion_variables <- function(data,
         # Delete rows with NA and add the agent-specific information to the
         # agent list
         positions <- positions[!is.na(positions$cell), ]
+        positions <- positions[!is.na(positions$speed0), ]
         per_agent[[i]] <- positions
     }
 
