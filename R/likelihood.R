@@ -55,6 +55,7 @@ mll <- function(data,
                 cpp = TRUE,
                 summed = FALSE,
                 time_step = NULL,
+                fx = mean,
                 ...) {
 
     # If the time step is not provided by the user, use the average time between
