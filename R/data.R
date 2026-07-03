@@ -240,20 +240,13 @@ to_trace <- function(data,
         time_step <- get_time_step(data, fx = fx)
     }
 
-    # Resolve a_turning / b_turning: explicit args take priority, then per-agent
-    # values from attr(data,"pars"), then archetype defaults.
-    pars_attr <- attr(data, "pars")
-    if (is.null(a_turning)) {
-        if (!is.null(pars_attr) && "a_turning" %in% colnames(pars_attr))
-            a_turning <- setNames(unlist(pars_attr[, "a_turning"]), rownames(pars_attr))
-        else
-            a_turning <- 2
+    # Check whether a_turning and b_turning are specified. If not, take on the 
+    # defaults of predped
+    if(is.null(a_turning)) {
+        a_turning <- 2
     }
-    if (is.null(b_turning)) {
-        if (!is.null(pars_attr) && "b_turning" %in% colnames(pars_attr))
-            b_turning <- setNames(unlist(pars_attr[, "b_turning"]), rownames(pars_attr))
-        else
-            b_turning <- 0.2
+    if(is.null(b_turning)) {
+        b_turning <- 0.2
     }
 
     # Save group mapping before add_motion_variables: it rebuilds positions from
