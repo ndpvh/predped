@@ -705,30 +705,39 @@ NumericVector lgvf_utility_rcpp(double a_lgvf,
                                 double b_lgvf, 
                                 double e_lgvf,
                                 List group_member_data,
-                                double vf_limit = 135 * M_PI / 180) {
+                                double vf_limit = 135. * M_PI / 180.) {
     
+    // Extract all needed information from the list
     int nped = group_member_data["nped"];
     List distances_list = group_member_data["distances"];
     List rel_angles_list = group_member_data["rel_angles"];
 
-    NumericVector first_dist = as<NumericVector>(distances_list[0]);
-    int n_cells = first_dist.length();
+    // Reserve some memory for the distances and relative angles. Furthermore 
+    // extract the number of cells
+    NumericVector distances = as<NumericVector>(distances_list[0]);
+    NumericVector rel_angles = as<NumericVector>(rel_angles_list[0]);
+    int n_cells = distances.length();
 
+    // Reserve some memory for the utilies themselves
     NumericVector total_util(n_cells);
+    double base_util = 0.;
+    double penalty = 0.;
 
+    // Loop over the pedestrians of the ingroup
     for(int i = 0; i < nped; i++) {
-        NumericVector distances = as<NumericVector>(distances_list[i]);
-        NumericVector rel_angles = as<NumericVector>(rel_angles_list[i]);
+        distances = as<NumericVector>(distances_list[i]);
+        rel_angles = as<NumericVector>(rel_angles_list[i]);
 
+        // Loop over the different cells the agent may move to
         for(int j = 0; j < n_cells; j++) {
             double dist = distances[j];
             double r_angle = rel_angles[j];
 
-            double base_util = -b_lgvf * std::pow(std::abs(std::log(dist) - std::log(e_lgvf)), a_lgvf);
-
+            base_util = -b_lgvf * pow(std::abs(std::log(dist) - std::log(e_lgvf)), a_lgvf);
+            
             bool in_vf = std::abs(r_angle) <= vf_limit;
-            double penalty = in_vf ? 0.0 : (-b_lgvf / std::pow(dist, a_lgvf));
-
+            penalty = in_vf ? 0.0 : (-b_lgvf / pow(dist, a_lgvf));
+            
             total_util[j] += base_util + penalty;
         }
     }
