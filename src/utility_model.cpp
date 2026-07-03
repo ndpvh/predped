@@ -190,41 +190,70 @@ RObject get_group_member_data_rcpp(int agent_idx,
                                    NumericMatrix predictions, 
                                    NumericMatrix centers) {
     
+    // Get the total number of pedestrians in the simulation
     int nped = predictions.nrow();
-    if(nped == 0) {
-        return R_NilValue;
+
+    // Identify all ingroup pedestrians and update the predictions to match
+    int group = agent_group[agent_idx - 1];
+    LogicalVector ingroup(nped);
+    for(int i = 0; i < nped; i++) {
+        if(i != agent_idx - 1) {
+            ingroup[i] = (agent_group[i] == group);
+        }        
     }
 
-    List all_distances(nped);
-    List all_rel_angles(nped);
+    // Update the number of pedestrians and return NULL if no group members
+    // have been identified
+    int total_ped = sum(ingroup);
+    if(total_ped == 0) {
+        return R_NilValue;
+    }
+    
+    // Generate list in which all needed data will be stored
+    List all_distances(total_ped);
+    List all_rel_angles(total_ped);
 
+    // Compute the new orientation of the agent when moving to each center
     NumericVector orientations(centers.nrow());
-    for(int j = 0; j < centers.nrow(); j++) {
-        orientations[j] = atan2(
-            centers(j, 1) - position[1], 
-            centers(j, 0) - position[0]
+    for(int i = 0; i < centers.nrow(); i++) {
+        orientations[i] = atan2(
+            centers(i, 1) - position[1], 
+            centers(i, 0) - position[0]
         );
     }
 
+    // Loop over each of the group members and compute the relative distance 
+    // towards them as well as the relative orientation (whether the agent will 
+    // still be able to perceive them)
+    int j = 0;
     for(int i = 0; i < nped; i++) {
-        NumericVector target_ped = predictions(i, _);
-        all_distances[i] = dist1(target_ped, centers);
+        // Only bother if the pedestrian is an ingroup member
+        if(ingroup[i]) {
+            // Compute the distances from the agent at the centers to the group
+            // members expected position
+            NumericVector target_ped = predictions(i, _);
+            all_distances[j] = dist1(target_ped, centers);
 
-        NumericVector rel_angles(centers.nrow());
-        for(int j = 0; j < centers.nrow(); j++) {
-            double angle = atan2(
-                target_ped[1] - centers(j, 1), 
-                target_ped[0] - centers(j, 0)
-            );
-            
-            double r_angle = angle - orientations[j];
+            // Compute the relative angles from the agent to the group member
+            // when at their expected position
+            NumericVector rel_angles(centers.nrow());
+            for(int k = 0; k < centers.nrow(); k++) {
+                double angle = atan2(
+                    target_ped[1] - centers(k, 1), 
+                    target_ped[0] - centers(k, 0)
+                );
+                
+                double r_angle = angle - orientations[k];
 
-            while(r_angle < -M_PI) r_angle += 2 * M_PI;
-            while(r_angle > M_PI) r_angle -= 2 * M_PI;
+                while(r_angle < -M_PI) r_angle += 2 * M_PI;
+                while(r_angle > M_PI) r_angle -= 2 * M_PI;
 
-            rel_angles[j] = r_angle;
+                rel_angles[k] = r_angle;
+            }
+            all_rel_angles[j] = rel_angles;
+
+            j++;
         }
-        all_rel_angles[i] = rel_angles;
     }
 
     return List::create(

@@ -450,11 +450,11 @@ setMethod("compute_utility_variables", "agent", function(object,
     # Logarithmic Group-Attracted Visual Field utility: Required variable is the distance 
     # and angles of one or more other pedestrians.
     uv$lgvf_data <- list(get_group_member_data(uv$agent_idx,
-                                                agent_specifications$group,
-                                                position(object),
-                                                orientation(object),
-                                                agent_specifications$predictions,
-                                                centers))
+                                               agent_specifications$group,
+                                               position(object),
+                                               orientation(object),
+                                               agent_specifications$predictions,
+                                               centers))
     
 
 
@@ -857,11 +857,11 @@ vf_utility_discrete <- function(b_vf,
 #' @concept utility
 #' @export
 get_group_member_data <- function(agent_idx, 
-                                    agent_group, 
-                                    position, 
-                                    orientation, 
-                                    predictions, 
-                                    centers) {
+                                  agent_group, 
+                                  position, 
+                                  orientation, 
+                                  predictions, 
+                                  centers) {
     
     # Identify in-group pedestrians
     predictions <- predictions[-agent_idx, , drop = FALSE]
@@ -880,7 +880,6 @@ get_group_member_data <- function(agent_idx,
 
     # Loop over all in-group members to calculate distances and relative angles
     for (i in 1:nped) {
-
         # Distances
         target_ped <- predictions[i, ]
         all_distances[[i]] <- m4ma::dist1_rcpp(target_ped, centers)
