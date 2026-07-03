@@ -161,7 +161,7 @@ mll <- function(data,
 
                            # Transform likelihoods that fall below a particular 
                            # threshold
-                           L[log(L) < -10] <- exp(-10)
+                           L[log(L) < -100] <- exp(-100)
                       
                            # Convert likelihoods to min-log-likelihood. 1 was added
                            # to each likelihood to ensure that 0 probability will 

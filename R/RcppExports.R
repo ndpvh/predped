@@ -821,7 +821,7 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' 
 #' @concept utility
 #' @export
-lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135 * M_PI / 180) {
+lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135. * M_PI / 180.) {
     .Call('_predped_lgvf_utility_rcpp', PACKAGE = 'predped', a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit)
 }
 
