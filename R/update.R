@@ -579,7 +579,7 @@ update_position <- function(agent,
         # (moving to another location with a different speed and orientation).
         # If stopped, we need to reset the agent's velocity
         if(cell == 0) {
-            speed(agent) <- standing_start # * parameters(agent)[["preferred_speed"]]
+            speed(agent) <- standing_start
             # status(agent) <- "reorient" # Was originally handled earlier, but made an infinite loop in current version of the code
 
         } else {
@@ -707,7 +707,6 @@ update_goal <- function(agent,
     # Adjust the relative measures to account for the radius of the agent
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
-    standing_start <- standing_start * parameters(agent)[["preferred_speed"]]
 
     # Synchronisation with group representative
     if (!group_representative(agent)) {
