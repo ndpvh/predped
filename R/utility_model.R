@@ -918,10 +918,10 @@ get_group_member_data <- function(agent_idx,
 #' @concept utility
 #' @export
 lgvf_utility <- function(a_lgvf, 
-                              b_lgvf, 
-                              e_lgvf,
-                              group_member_data,
-                              vf_limit = 135 * pi / 180) {
+                         b_lgvf, 
+                         e_lgvf,
+                         group_member_data,
+                         vf_limit = 135 * pi / 180) {
     
     if (is.null(group_member_data)) {
         return(numeric(33))
@@ -938,7 +938,7 @@ lgvf_utility <- function(a_lgvf,
 
         # Base utility
         base_util <- -b_lgvf * abs(log(distances) - log(e_lgvf))^a_lgvf
-
+        
         # Penalty
         in_vf <- abs(rel_angles) <= vf_limit
         penalty <- ifelse(in_vf, 0, -b_lgvf / (distances^a_lgvf))
