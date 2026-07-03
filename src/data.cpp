@@ -256,6 +256,7 @@ DataFrame unpack_trace_rcpp(S4 trace,
     NumericVector gc_radius(N);
     IntegerVector gc_nped(N);
     List vf_angles(N);
+    List lgvf_data(N);
 
     // Create some NA vectors that correspond to the R alternative. Used whenever
     // the utility variables are not defined at a given iteration for a given 
@@ -344,7 +345,7 @@ DataFrame unpack_trace_rcpp(S4 trace,
             // all utility values infinite) can have non-NA utility_variables
             // even though they did not complete a genuine movement step. Only
             // copy utility variables for agents that are actually moving.
-            if(!any(tmp_check).is_true() && (status_j == "move" || status_j == "completing goal")) {
+            if(!any(tmp_check).is_true()) { // && (status_j == "move" || status_j == "completing goal")) {
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
@@ -364,6 +365,7 @@ DataFrame unpack_trace_rcpp(S4 trace,
                 double gc_radius_j = uv_j["gc_radius"];
                 int gc_nped_j = uv_j["gc_nped"];
                 List vf_angles_j = uv_j["vf_angles"];
+                List lgvf_data_j = uv_j["lgvf_data"];
 
                 agent_idx[idx] = agent_idx_j;
                 check[idx] = check_j;
@@ -381,6 +383,7 @@ DataFrame unpack_trace_rcpp(S4 trace,
                 gc_radius[idx] = gc_radius_j;
                 gc_nped[idx] = gc_nped_j;
                 vf_angles[idx] = vf_angles_j[0];
+                lgvf_data[idx] = lgvf_data_j[0];
 
             // If the agent is not moving, then you cannot compute the utility
             // variables. We therefore fill the variables with NAs.
@@ -401,6 +404,7 @@ DataFrame unpack_trace_rcpp(S4 trace,
                 gc_radius[idx] = NA_REAL;
                 gc_nped[idx] = NA_INTEGER;
                 vf_angles[idx] = NA_logical;
+                lgvf_data[idx] = NA_logical;
             }
 
             // Update the index
@@ -440,7 +444,8 @@ DataFrame unpack_trace_rcpp(S4 trace,
         Named("gc_distance") = gc_distance,
         Named("gc_radius") = gc_radius,
         Named("gc_nped") = gc_nped,
-        Named("vf_angles") = vf_angles
+        Named("vf_angles") = vf_angles,
+        Named("lgvf_data") = lgvf_data
     );
 
     data.attr("class") = "data.frame";
