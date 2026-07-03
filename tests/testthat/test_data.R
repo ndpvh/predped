@@ -27,16 +27,18 @@ testthat::test_that("Transforming to trace works", {
         ref@setting
     )
 
-    # Do some checks on the trace itself
-    testthat::expect_equal(length(tst@states), 11)
+    # Do some checks on the trace itself. Note that `to_trace` will let the trace
+    # start at the first observed time (iteration 1), but discared initial 
+    # conditions
+    testthat::expect_equal(length(tst@states), 10)
     testthat::expect_equal(
         sapply(tst@states, length),
-        c(0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3)
+        c(0, 0, 1, 1, 1, 2, 2, 2, 2, 2)
     )
 })
 
 testthat::test_that("Unpacking trace from R and Rcpp is same", {
-    trace <- qs2::qs_read(file.path("data", "data__trace.qs2"))
+    trace <- qs2::qs_read(file.path("data", "data__trace_social.qs2"))
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
     tst <- predped::unpack_trace(trace, cpp = TRUE)
