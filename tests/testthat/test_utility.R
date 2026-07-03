@@ -1,12 +1,12 @@
 testthat::test_that("Utility data R and Rcpp converge", {
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- qs2::qs_read(file.path("data", "data_utility.qs2"))
+    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
     params <- predped::params_from_csv[["params_archetypes"]]
-    params <- params[params$name == "SocialBaselineEuropean", ]
+    params <- params[params$name == "Friends", ]
 
     # Create test and reference and compare both across all datapoints
     result <- logical(100)
@@ -29,7 +29,10 @@ testthat::test_that("Utility data R and Rcpp converge", {
 })
 
 testthat::test_that("Utility agent R and Rcpp converge", {
-    trace <- qs2::qs_read(file.path("data", "trace_utility.qs2"))
+    trace <- qs2::qs_read(file.path("data", "utility__trace_social.qs2"))
+
+    # For my convenience, first transform the trace to a list of states
+    trace <- trace_to_state(trace)
 
     # Loop over 10 of the traces
     result <- logical(10)
@@ -90,7 +93,10 @@ testthat::test_that("Utility agent R and Rcpp converge", {
 })
 
 testthat::test_that("Compute utility variables agent R and Rcpp converge", {
-    trace <- qs2::qs_read(file.path("data", "trace_utility.qs2"))
+    trace <- qs2::qs_read(file.path("data", "utility__trace_social.qs2"))
+
+    # For my convenience, first transform the trace to a list of states
+    trace <- trace_to_state(trace)
 
     # Loop over 10 of the traces
     result <- logical(10)
