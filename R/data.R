@@ -182,8 +182,10 @@ unpack_trace <- function(trace,
 #' @param b_turning,a_turning Numeric denoting the values of the parameters
 #' \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
 #' For more information, see the documentation of
-#' \code{\link[predped]{compute_centers}}. Defaults to \code{NULL}, meaning that
-#' this relationship takes on the default values of \code{predped}.
+#' \code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+#' numeric vector, where each value in the vector denotes the values of the 
+#' parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+#' that this relationship takes on the default values of \code{predped}. 
 #' @param velocities Numeric vector denoting the changes in speeds as assumed by
 #' the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
 #' (deceleration).
@@ -368,12 +370,18 @@ to_trace <- function(data,
                 copy@orientation <- as.numeric(iter_data$orientation0[j])
 
                 if(!is.null(b_turning)) {
-                    copy@parameters$b_turning <- if (length(b_turning) > 1)
-                        b_turning[[as.character(iter_data$id[j])]] else b_turning
+                    copy@parameters$b_turning <- ifelse(
+                        length(b_turning) > 1,
+                        b_turning[[as.character(iter_data$id[j])]],
+                        b_turning
+                    )
                 }
                 if(!is.null(a_turning)) {
-                    copy@parameters$a_turning <- if (length(a_turning) > 1)
-                        a_turning[[as.character(iter_data$id[j])]] else a_turning
+                    copy@parameters$a_turning <- ifelse(
+                        length(a_turning) > 1,
+                        a_turning[[as.character(iter_data$id[j])]],
+                        a_turning
+                    )
                 }
 
                 dummy_agent@cell_centers <- compute_centers(copy,
@@ -484,6 +492,13 @@ to_trace <- function(data,
 #' the previous time point) alongside their current alternatives. Useful when
 #' one wants to compute the values of the utility-related variables from the
 #' data. Defaults to \code{FALSE}.
+#' @param b_turning,a_turning Numeric denoting the values of the parameters
+#' \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
+#' For more information, see the documentation of
+#' \code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+#' numeric vector, where each value in the vector denotes the values of the 
+#' parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+#' that this relationship takes on the default values of \code{predped}. 
 #' @param fx A summarizing function that should be used to derive the time step
 #' if it is not provided through the \code{time_step} argument. 
 #'
@@ -677,14 +692,23 @@ add_motion_variables <- function(data,
             )
         )
 
-        # Per-agent turning parameters (scalar or named vector)
-        a_t <- if (length(a_turning) > 1) a_turning[[as.character(i)]] else a_turning
-        b_t <- if (length(b_turning) > 1) b_turning[[as.character(i)]] else b_turning
+        # Find the turning parameters for the agent. Either specific to the 
+        # agent or general-purpose defaults
+        a <- ifelse(
+            length(a_turning) > 1, 
+            a_turning[as.character(i)],
+            a_turning
+        )
+        b <- ifelse(
+            length(b_turning) > 1, 
+            b_turning[as.character(i)],
+            b_turning
+        )
 
         # Slowing factor: mirrors compute_centers where the actual displacement
         # is speed0 * slow * vel_ring * dt, so observed d_speed = slow * vel_ring.
         # Dividing by slow recovers the ring-velocity ratio for threshold comparison.
-        slow <- pmax(1e-6, 1 - b_t * sin(abs(d_orientation * pi / 180) / 2)^a_t)
+        slow <- pmax(1e-6, 1 - b * sin(abs(d_orientation * pi / 180) / 2)^a)
         d_speed_adj <- d_speed / slow
 
         ring <- rowSums(
