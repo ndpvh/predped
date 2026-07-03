@@ -12,7 +12,7 @@
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
-  standing_start = 0.1,
+  standing_start = 0.25,
   close_enough = 2,
   space_between = 1.25,
   stay_stopped = TRUE,
@@ -69,7 +69,7 @@ versions of the smaller angles).}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{close_enough}{Numeric denoting how close (in radii) the agent needs to
 be to an object in order to interact with it. Defaults to \code{2}, meaning the

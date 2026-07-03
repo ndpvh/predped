@@ -51,8 +51,10 @@ or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
 \item{b_turning, a_turning}{Numeric denoting the values of the parameters
 \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
 For more information, see the documentation of
-\code{\link[predped]{compute_centers}}. Defaults to \code{NULL}, meaning that
-this relationship takes on the default values of \code{predped}.}
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
 
 \item{time_step}{Numeric denoting the time between each iteration. Defaults
 to \code{NULL}, in which case the time step is derived by the 

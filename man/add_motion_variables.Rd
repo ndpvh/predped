@@ -44,8 +44,22 @@ the previous time point) alongside their current alternatives. Useful when
 one wants to compute the values of the utility-related variables from the
 data. Defaults to \code{FALSE}.}
 
+\item{b_turning, a_turning}{Numeric denoting the values of the parameters
+\eqn{b} and \eqn{a} for the relationship between orientation and velocity.
+For more information, see the documentation of
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
+
 \item{fx}{A summarizing function that should be used to derive the time step
 if it is not provided through the \code{time_step} argument.}
+}
+\value{
+A data.frame with predped-relevant motion variables derived from the 
+provided data, including the speeds and orientations, cells that the agents 
+moved to, the status of the agents, and the original positions, ids, and goals
+that were included in the original dataset.
 }
 \description{
 This function adds several motion variables to an already existing dataset.
@@ -67,7 +81,20 @@ The provided dataset should at least have the following columns:
    move to while their position was being measured.
 }
 \examples{
-# This is my example
+# Create a minimal working example dataset from scratch
+data <- data.frame(
+  "time" = seq(0, 10, 1),
+  "id" = rep("participant", 11),
+  "x" = cos(seq(0, 2 * pi, length.out = 11)),
+  "y" = sin(seq(0, 2 * pi, length.out = 11)),
+  "goal_id" = rep("goal", 11),
+  "goal_x" = rep(0, 11),
+  "goal_y" = rep(0, 11)
+)
+
+# Add the motion variables to this dataset
+add_motion_variables(data)
+
 
 }
 \concept{data}

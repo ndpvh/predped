@@ -4,7 +4,15 @@
 \alias{compute_centers_rcpp}
 \title{Compute cell centers}
 \usage{
-compute_centers_rcpp(agent, a, b, velocities, orientations, time_step = 0.5)
+compute_centers_rcpp(
+  agent,
+  a,
+  b,
+  velocities,
+  orientations,
+  time_step = 0.5,
+  threshold = 1e-06
+)
 }
 \arguments{
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
@@ -23,6 +31,9 @@ agent whenever they move to the respective cell of this matrix.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
+
+\item{threshold}{Numeric denoting a minimal value the slowing factor can
+take on when computing the cell centers. Defaults to \code{1e-6}.}
 }
 \value{
 Numeric matrix of (x, y) coordinates for each cell

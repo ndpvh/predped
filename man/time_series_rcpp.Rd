@@ -4,7 +4,7 @@
 \alias{time_series_rcpp}
 \title{Transform trace to time-series}
 \usage{
-time_series_rcpp(trace, time_step = 0.5)
+time_series_rcpp(trace)
 }
 \arguments{
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}

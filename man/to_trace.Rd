@@ -28,8 +28,10 @@ containing the setting in which the data were gathered.}
 \item{b_turning, a_turning}{Numeric denoting the values of the parameters
 \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
 For more information, see the documentation of
-\code{\link[predped]{compute_centers}}. Defaults to \code{NULL}, meaning that
-this relationship takes on the default values of \code{predped}.}
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
 
 \item{velocities}{Numeric vector denoting the changes in speeds as assumed by
 the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}

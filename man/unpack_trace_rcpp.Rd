@@ -4,13 +4,7 @@
 \alias{unpack_trace_rcpp}
 \title{Transform trace to comprehensive data.frame}
 \usage{
-unpack_trace_rcpp(
-  trace,
-  velocities,
-  orientations,
-  stay_stopped = TRUE,
-  time_step = 0.5
-)
+unpack_trace_rcpp(trace, velocities, orientations, stay_stopped = TRUE)
 }
 \arguments{
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}

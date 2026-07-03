@@ -9,7 +9,7 @@
   max_agents = 20,
   iterations = 1800,
   add_agent_after = function(x) rnorm(x, 60, 15),
-  standing_start = 0.1,
+  standing_start = 0.25,
   initial_agents = NULL,
   initial_condition = NULL,
   initial_number_agents = NULL,
@@ -54,7 +54,7 @@ average.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{initial_agents}{List of objects of the \code{\link[predped]{agent-class}}
 with which to start the simulation. Defaults to \code{NULL}, meaning the

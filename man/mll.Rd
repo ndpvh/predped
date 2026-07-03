@@ -13,6 +13,7 @@ mll(
   cpp = TRUE,
   summed = FALSE,
   time_step = NULL,
+  fx = mean,
   ...
 )
 }
@@ -55,6 +56,9 @@ to \code{NULL}, in which case the time step is derived by the
 \code{\link[predped]{get_time_step}} function with summarizing function 
 \code{fx}.}
 
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
 In a typical estimation situation, these motion variables should already be
 in \code{data}.
@@ -62,9 +66,6 @@ in \code{data}.
  @return Either named vector containing the summed min-log-likelihood 
 (\code{summed = TRUE}) or named list with vectors of raw likelihoods
 (\code{summed = FALSE}) per person in the dataset.}
-
-\item{fx}{A summarizing function that should be used to derive the time step
-if it is not provided through the \code{time_step} argument.}
 }
 \description{
 Use data to compute the min-log-likelihood of choosing a given observed cell  
