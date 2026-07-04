@@ -12,29 +12,27 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // time_series_rcpp
-DataFrame time_series_rcpp(List trace, double time_step);
-RcppExport SEXP _predped_time_series_rcpp(SEXP traceSEXP, SEXP time_stepSEXP) {
+DataFrame time_series_rcpp(S4 trace);
+RcppExport SEXP _predped_time_series_rcpp(SEXP traceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type trace(traceSEXP);
-    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
-    rcpp_result_gen = Rcpp::wrap(time_series_rcpp(trace, time_step));
+    Rcpp::traits::input_parameter< S4 >::type trace(traceSEXP);
+    rcpp_result_gen = Rcpp::wrap(time_series_rcpp(trace));
     return rcpp_result_gen;
 END_RCPP
 }
 // unpack_trace_rcpp
-DataFrame unpack_trace_rcpp(List trace, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped, double time_step);
-RcppExport SEXP _predped_unpack_trace_rcpp(SEXP traceSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP, SEXP time_stepSEXP) {
+DataFrame unpack_trace_rcpp(S4 trace, NumericMatrix velocities, NumericMatrix orientations, bool stay_stopped);
+RcppExport SEXP _predped_unpack_trace_rcpp(SEXP traceSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP stay_stoppedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type trace(traceSEXP);
+    Rcpp::traits::input_parameter< S4 >::type trace(traceSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type velocities(velocitiesSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type orientations(orientationsSEXP);
     Rcpp::traits::input_parameter< bool >::type stay_stopped(stay_stoppedSEXP);
-    Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
-    rcpp_result_gen = Rcpp::wrap(unpack_trace_rcpp(trace, velocities, orientations, stay_stopped, time_step));
+    rcpp_result_gen = Rcpp::wrap(unpack_trace_rcpp(trace, velocities, orientations, stay_stopped));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -242,8 +240,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_centers_rcpp
-Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent, double a, double b, Rcpp::NumericVector velocities, Rcpp::NumericVector orientations, double time_step);
-RcppExport SEXP _predped_compute_centers_rcpp(SEXP agentSEXP, SEXP aSEXP, SEXP bSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP time_stepSEXP) {
+Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent, double a, double b, Rcpp::NumericVector velocities, Rcpp::NumericVector orientations, double time_step, double threshold);
+RcppExport SEXP _predped_compute_centers_rcpp(SEXP agentSEXP, SEXP aSEXP, SEXP bSEXP, SEXP velocitiesSEXP, SEXP orientationsSEXP, SEXP time_stepSEXP, SEXP thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -253,7 +251,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type velocities(velocitiesSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type orientations(orientationsSEXP);
     Rcpp::traits::input_parameter< double >::type time_step(time_stepSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_centers_rcpp(agent, a, b, velocities, orientations, time_step));
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_centers_rcpp(agent, a, b, velocities, orientations, time_step, threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -471,8 +470,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 2},
-    {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 5},
+    {"_predped_time_series_rcpp", (DL_FUNC) &_predped_time_series_rcpp, 1},
+    {"_predped_unpack_trace_rcpp", (DL_FUNC) &_predped_unpack_trace_rcpp, 4},
     {"_predped_unique", (DL_FUNC) &_predped_unique, 1},
     {"_predped_line_line_intersection_rcpp", (DL_FUNC) &_predped_line_line_intersection_rcpp, 2},
     {"_predped_mll_rcpp", (DL_FUNC) &_predped_mll_rcpp, 7},
@@ -487,7 +486,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_predped_predClose", (DL_FUNC) &_predped_predClose, 8},
     {"_predped_blockedAngle", (DL_FUNC) &_predped_blockedAngle, 6},
     {"_predped_bodyObjectOK", (DL_FUNC) &_predped_bodyObjectOK, 4},
-    {"_predped_compute_centers_rcpp", (DL_FUNC) &_predped_compute_centers_rcpp, 6},
+    {"_predped_compute_centers_rcpp", (DL_FUNC) &_predped_compute_centers_rcpp, 7},
     {"_predped_overlap_with_objects_rcpp", (DL_FUNC) &_predped_overlap_with_objects_rcpp, 5},
     {"_predped_moving_options_rcpp", (DL_FUNC) &_predped_moving_options_rcpp, 4},
     {"_predped_nodes_on_circumference_rcpp", (DL_FUNC) &_predped_nodes_on_circumference_rcpp, 2},

@@ -18,7 +18,7 @@ add_agent(
   many_nodes = !is.null(precomputed_edges),
   space_between = 1.25,
   position = NULL,
-  standing_start = 0.1,
+  standing_start = 0.25,
   individual_differences = FALSE,
   return_characteristics = FALSE
 )
@@ -67,7 +67,7 @@ containing the nodes and edges the agent can use to plan its path. Defauls
 to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
-\item{many_nodes}{Logical denoting whether to use many nodes when computing 
+\item{many_nodes}{Logical denoting whether to use many nodes when computing
 the edges. Defaults to \code{FALSE} if \code{precomputed_edges = FALSE}.}
 
 \item{space_between}{Numeric denoting the space that should be left between
@@ -83,14 +83,14 @@ therefore might not work for the moment.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{individual_differences}{Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.
 Defaults to \code{FALSE}.}
 
-\item{return_characteristics}{Logical denoting whether to return the 
-characteristics of the generated agents in a list (\code{TRUE}) or as part 
+\item{return_characteristics}{Logical denoting whether to return the
+characteristics of the generated agents in a list (\code{TRUE}) or as part
 of an agent (\code{FALSE}). Defaults to \code{FALSE}.}
 }
 \value{

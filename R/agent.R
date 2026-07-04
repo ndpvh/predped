@@ -48,6 +48,7 @@
 #' move to at a particular iteration.
 #' @slot utility_variables Data.frame precomputed containing values for all the 
 #' variables relevant to compute the utilities.
+#' @slot extra_objects [DESCRIPTION TO BE WRITTEN]
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
@@ -76,7 +77,7 @@
 #' @concept classes
 #'
 #' @export
-agent <- setClass("agent", 
+agent <- setClass("agent",
                   list(id = "character",
                        speed = "numeric",
                        orientation = "numeric",
@@ -93,7 +94,8 @@ agent <- setClass("agent",
                        parameters = "data.frame",
                        color = "character",
                        cell_centers = "matrix",
-                       utility_variables = "data.frame"), 
+                       utility_variables = "data.frame",
+                       extra_objects = "list"),
                   contains = c("circle"))
 
 #' Constructor for the \code{\link[predped]{agent-class}}
@@ -157,6 +159,7 @@ agent <- setClass("agent",
 #' @param utility_variables Data.frame precomputed containing values for all the 
 #' variables relevant to compute the utilities. Should usually not be provided 
 #' or altered by the user.
+#' @param extra_objects [DESCRIPTION TO BE WRITTEN]
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}
 #' 
@@ -193,7 +196,7 @@ agent <- setClass("agent",
 #' 
 #' @export
 setMethod("initialize", "agent", function(.Object,
-                                          center, 
+                                          center,
                                           radius,
                                           id = character(0),
                                           speed = 0.1,
@@ -208,10 +211,11 @@ setMethod("initialize", "agent", function(.Object,
                                           status = "move",
                                           waiting_counter = 0,
                                           cell = 0,
-                                          parameters = data.frame(),                                   
+                                          parameters = data.frame(),
                                           color = "black",
                                           cell_centers = matrix(0, nrow = 33, ncol = 2),
-                                          utility_variables = data.frame()) {
+                                          utility_variables = data.frame(),
+                                          extra_objects = list()) {
 
     # Use the circular object as the basis of the agent     
     .Object <- callNextMethod(.Object, 
@@ -234,6 +238,7 @@ setMethod("initialize", "agent", function(.Object,
     .Object@cell <- cell    
     .Object@color <- color
     .Object@cell_centers <- cell_centers
+    .Object@extra_objects <- extra_objects
     .Object@utility_variables <- matrix(NA, nrow = 1, ncol = 17) |>
         as.data.frame() |>
         setNames(c("agent_idx", "check", "ps_speed", "ps_distance", "gd_angle", 

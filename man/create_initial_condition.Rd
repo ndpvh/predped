@@ -42,7 +42,7 @@ to \code{NULL}, triggering the creation of these edges whenever they are
 needed.}
 
 \item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
-(\code{FALSE}) alternatives for the lower-level functions. Defaults to 
+(\code{FALSE}) alternatives for the lower-level functions. Defaults to
 \code{TRUE}.}
 
 \item{...}{Additional arguments provided to \code{\link[predped]{add_agent}}.}

@@ -17,21 +17,30 @@ lgvf_utility(
 
 \item{b_lgvf}{Numeric denoting the slope (weight) of the utility function.}
 
-\item{e_lgvf}{Numeric denoting the optimal comfortable distance (epsilon) to maintain.}
+\item{e_lgvf}{Numeric denoting the optimal comfortable distance (epsilon) to 
+maintain.}
+
+\item{group_member_data}{Named list containing the number of pedestrians as an 
+integer (under \code{"nped"}), a list containing a numeric vector of distances
+of each cell center to each group member (under \code{"distances"}), and a 
+list of numeric vectors containing the relative angle at which the group member
+would find itself relative to the orientation of agent when moving to a 
+particular cell center.}
 
 \item{vf_limit}{Numeric denoting the visual field limit (default 135 degrees in radians).}
-
-\item{distances}{Numeric vector of distances from candidate cells to the member.}
-
-\item{rel_angles}{Numeric vector of relative angles from candidate cells to the member.}
 }
 \value{
 Numeric vector containing the LGVF utility for each cell.
 }
 \description{
-Unifies the previous social utility functions WB, GC and VF into one utility function.
-Applies a logarithmic penalty based on distances to group members, and adds 
-an additional penalty if that member is outside the extended visual field.
+Unifies the previous social utility functions WB, GC and VF into one utility 
+function. Applies a logarithmic penalty based on distances to group members, 
+and adds an additional penalty if that member is outside the extended visual 
+field.
+}
+\examples{
+# TO BE WRITTEN
+
 }
 \seealso{
 \code{\link[predped]{get_group_member_data}},

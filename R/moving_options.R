@@ -298,7 +298,7 @@ compute_centers <- function(agent,
     # Define a slowing factor that depends on the turning angle or change in
     # direction
     angles <- orientations * pi / 180
-    slow <- 1 - b * sin(abs(angles) / 2)^a
+    slow <- pmax(1e-6, 1 - b * sin(abs(angles) / 2)^a)
 
     # Create a matrix of velocities based on the slow factor, the ring multipliers,
     # and the agents current speed, furthermore taking into account the time

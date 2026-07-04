@@ -9,25 +9,25 @@ predict_movement(agent, stay_stopped = TRUE, time_step = 0.5, cpp = TRUE)
 \arguments{
 \item{agent}{Object of the \code{\link[predped]{agent-class}}.}
 
-\item{stay_stopped}{Logical denoting whether agents will predict others that 
-are currently not moving to remain immobile in the next iteration. Defaults 
+\item{stay_stopped}{Logical denoting whether agents will predict others that
+are currently not moving to remain immobile in the next iteration. Defaults
 to \code{TRUE}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
-\item{cpp}{Logical denoting whether to use the Rcpp alternative of this 
-function (\code{TRUE}) or the R alternative (\code{FALSE}). Defaults to 
+\item{cpp}{Logical denoting whether to use the Rcpp alternative of this
+function (\code{TRUE}) or the R alternative (\code{FALSE}). Defaults to
 \code{TRUE}.}
 }
 \value{
-Numeric matrix containing the predicted positions all agents if 
+Numeric matrix containing the predicted positions all agents if
 they all maintain their speed and direction.
 }
 \description{
-Uses the agents' current speed and orientation to determine where the agent 
-might end up in the next step, assuming that they do not change direction or 
-speed. This information is used by other agents to determine where (not) to 
+Uses the agents' current speed and orientation to determine where the agent
+might end up in the next step, assuming that they do not change direction or
+speed. This information is used by other agents to determine where (not) to
 go to avoid collisions.
 }
 \seealso{

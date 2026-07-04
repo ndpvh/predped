@@ -3,223 +3,160 @@
 #   - Create tests for probit and normal transformation
 
 testthat::test_that("Loading parameters works", {
-    # local_directory <- file.path(".", "tests", "testthat")
-    local_directory <- file.path(".")
+    # List all files in the data-directory and select those of relevance
+    files <- list.files(file.path("data"))
+    files <- files[grepl("parameters__", files, fixed = TRUE)]
 
-    ############################################################################
-    # LET'S DO THIS METHODICALLY, I.E. PER TYPE OF EXTENSION
+    # Create the reference. Is a reduced version consisting of only a few 
+    # archetypes
+    ref_full <- params_from_csv
+    ref_part <- params_from_csv
 
+    archetypes <- c("BaselineEuropean", "BigRushingDutch", "Friends")
+    ref_part$params_archetypes <- ref_part$params_archetypes[ref_part$params_archetypes$name %in% archetypes, ]
+    ref_part$params_sigma <- ref_part$params_sigma[archetypes]
 
+    # Create a comparison function building on those targets we are interested 
+    # in. We don't use identical here because it's too strict, but just examine
+    # the information relevant to make predped work
+    compare <- function(target, reference) {
+        output <- logical(8)
 
+        # Compare the params_archetypes. Here, column names and values should 
+        # match
+        i <- "params_archetypes"
+        output[1] <- all(colnames(reference[[i]]) == colnames(target[[i]]))
+        output[2] <- all(reference[[i]] == target[[i]])
 
-    # Create a universal testing function
-    test_function <- function(ref, params, to_check) {
-        tst <- lapply(seq_along(ref),
-                  function(i) {
-                      # Just checking what we have here
-                      idx <- to_check[[i]]
+        # Compare the params_sigma. Here, we need to look at the values, 
+        # names of the lists, rownames, and column names
+        i <- "params_sigma"
+        output[3] <- all(names(reference[[i]]) == names(target[[i]]))
+        output[4] <- sapply(names(reference[[i]]), 
+                            function(x) all(reference[[i]][[x]] == target[[i]][[x]])) |>
+            all()
+        output[5] <- sapply(names(reference[[i]]), 
+                            function(x) all(rownames(reference[[i]][[x]]) == rownames(target[[i]][[x]]))) |>
+            all()
+        output[6] <- sapply(names(reference[[i]]), 
+                            function(x) all(colnames(reference[[i]][[x]]) == colnames(target[[i]][[x]]))) |>
+            all()
 
-                      # Do the actual check
-                      return(Reduce("&", 
-                                    lapply(idx, 
-                                           function(x) {
-                                               # Distinguish params_archetypes from lists
-                                               if(is.list(ref[[i]]) & !is.data.frame(ref[[i]])) {
-                                                   # Distinguish params_sigma from lists
-                                                   if(all(names(ref[[i]]) %in% c("BaselineEuropean", "DrunkAussie", "Rushed"))) {
-                                                       check <- sapply(names(ref[[i]]), 
-                                                                       \(y) all(ref[[i]][[y]] == params[[i]][[x]][[y]]))
-                                                   } else {
-                                                       # Distinguish params_sigma from others
-                                                       if(all(names(ref[[i]][[x]]) %in% c("BaselineEuropean", "DrunkAussie", "Rushed"))) {
-                                                           check <- sapply(names(ref[[i]][[x]]), 
-                                                                           \(y) all(ref[[i]][[x]][[y]] == params[[i]][[x]][[y]]))
-                                                       } else {
-                                                           check <- ref[[i]][[x]] == params[[i]][[x]]
-                                                       }
-                                                   }
+        # Compare the params_bounds. Here, we look at the values and the 
+        # rownames
+        i <- "params_bounds"
+        output[7] <- all(rownames(reference[[i]]) == rownames(target[[i]]))
+        output[8] <- all(reference[[i]] == target[[i]])
 
-                                                   return(all(check))
-
-                                               } else {
-                                                   return(all(ref[[i]] == params[[i]][[x]]))
-                                               }
-                                           })))  
-                  })
-        return(tst)
+        # Return the result
+        return(all(output))
     }
 
 
 
-
-
+    #####################################################################
     # Rda
 
     # Define the files to be read in
-    files <- c("a_valid", 
-               "b_valid", 
-               "s_valid", 
-               "list_a_valid", 
-               "list_b_valid", 
-               "list_s_valid", 
-               "list_ab_valid", 
-               "list_as_valid", 
-               "list_sb_valid", 
-               "list_all_valid")
+    rda_files <- files[grepl(".Rda", files, fixed = TRUE)]
 
-    # Define which slots to check for their content per file
-    to_check <- list(c("params_archetypes"), 
-                     c("params_bounds"), 
-                     c("params_sigma"), 
-                     c("params_archetypes"), 
-                     c("params_bounds"), 
-                     c("params_sigma"), 
-                     c("params_archetypes", "params_bounds"), 
-                     c("params_archetypes", "params_sigma"), 
-                     c("params_sigma", "params_bounds"), 
-                     c("params_archetypes", "params_sigma", "params_bounds"))
-
-    # Create a reference by reading all of these in
-    ref <- lapply(files, 
-                  \(x) readRDS(file.path(local_directory, "data", paste0(x, ".Rda"))))
+    # Define the expectations: Whenever params_bounds is the only thing, then 
+    # we assume the full reference, otherwise we assume only a part of the 
+    # full parameter set
+    refs <- lapply(rda_files, 
+                   function(x) {
+                       if(x %in% c("parameters__bounds.Rda", "parameters__list_bounds.Rda")) {
+                           return(ref_full)
+                       } else {
+                           return(ref_part)
+                       }
+                   })
     
-    # Test whether you can read everything in
-    params <- lapply(files, 
-                     \(x) load_parameters(file.path(local_directory, "data", paste0(x, ".Rda"))))
-
-    # First check, are all the components defined
-    tst <- lapply(params, 
-                  \(x) all(names(x) %in% c("params_archetypes", "params_sigma", "params_bounds")))
-    testthat::expect_true(Reduce("&", tst))
-
-    # Now check the content of these components    
-    testthat::expect_true(Reduce("&", test_function(ref, params, to_check)))
+    # Loop over each of these files and perform the checks
+    tst <- lapply(seq_along(rda_files), 
+                  function(i) compare(load_parameters(file.path("data", rda_files[i])),
+                                      refs[[i]])) |>
+        as.logical()
+    testthat::expect_true(all(tst))
 
 
 
+    #####################################################################
+    # Rds
 
+    # Define the files to be read in
+    rds_files <- files[grepl(".Rds", files, fixed = TRUE)]
 
-    # Rds: Same files and checks as Rda
-
-    # Create a reference by reading all of these in
-    ref <- lapply(files, 
-                  \(x) readRDS(file.path(local_directory, "data", paste0(x, ".Rds"))))
+    # Define the expectations: Whenever params_bounds is the only thing, then 
+    # we assume the full reference, otherwise we assume only a part of the 
+    # full parameter set
+    refs <- lapply(rds_files, 
+                   function(x) {
+                       if(x %in% c("parameters__bounds.Rds", "parameters__list_bounds.Rds")) {
+                           return(ref_full)
+                       } else {
+                           return(ref_part)
+                       }
+                   })
     
-    # Test whether you can read everything in
-    params <- lapply(files, 
-                     \(x) load_parameters(file.path(local_directory, "data", paste0(x, ".Rds"))))
-
-    # First check, are all the components defined
-    tst <- lapply(params, 
-                  \(x) all(names(x) %in% c("params_archetypes", "params_sigma", "params_bounds")))
-    testthat::expect_true(Reduce("&", tst))
-
-    # Now check the content of these components    
-    testthat::expect_true(Reduce("&", test_function(ref, params, to_check)))
+    # Loop over each of these files and perform the checks
+    tst <- lapply(seq_along(rds_files), 
+                  function(i) compare(load_parameters(file.path("data", rds_files[i])),
+                                      refs[[i]])) |>
+        as.logical()
+    testthat::expect_true(all(tst))
 
 
 
-
-
+    #####################################################################
     # csv
 
     # Define the files to be read in
-    files <- c("a_valid", 
-               "b_valid")
-
-    # Define which slots to check for their content per file
-    to_check <- list(c("params_archetypes"), 
-                     c("params_bounds"))
-
-    # Create a reference by reading all of these in
-    ref <- lapply(files, 
-                  \(x) read.table(file.path(local_directory, "data", paste0(x, ".csv")), 
-                                  sep = ",",
-                                  header = TRUE))
+    csv_files <- files[grepl(".csv", files, fixed = TRUE)]
     
-    # Test whether you can read everything in
-    params <- lapply(files, 
-                     \(x) load_parameters(file.path(local_directory, "data", paste0(x, ".csv"))))
-
-    # First check, are all the components defined
-    tst <- lapply(params, 
-                  \(x) all(names(x) %in% c("params_archetypes", "params_sigma", "params_bounds")))
-    testthat::expect_true(Reduce("&", tst))
-
-    # Now check the content of these components    
-    testthat::expect_true(Reduce("&", test_function(ref, params, to_check)))
-
-
-
-
-
-    # txt: Uses same files as csv
-
-    # Create a reference by reading all of these in
-    ref <- lapply(files, 
-                  \(x) read.table(file.path(local_directory, "data", paste0(x, ".txt")), 
-                                  sep = ",",
-                                  header = TRUE))
+    # Define the expectations: Whenever params_bounds is the only thing, then 
+    # we assume the full reference, otherwise we assume only a part of the 
+    # full parameter set
+    refs <- lapply(csv_files, 
+                   function(x) {
+                       if(x == "parameters__bounds.csv") {
+                           return(ref_full)
+                       } else {
+                           return(ref_part)
+                       }
+                   })
     
-    # Test whether you can read everything in
-    params <- lapply(files, 
-                     \(x) load_parameters(file.path(local_directory, "data", paste0(x, ".txt"))))
+    # Loop over each of these files and perform the checks
+    tst <- lapply(seq_along(csv_files), 
+                  function(i) compare(load_parameters(file.path("data", csv_files[i])),
+                                      refs[[i]])) |>
+        as.logical()
+    testthat::expect_true(all(tst))
 
-    # First check, are all the components defined
-    tst <- lapply(params, 
-                  \(x) all(names(x) %in% c("params_archetypes", "params_sigma", "params_bounds")))
-    testthat::expect_true(Reduce("&", tst))
 
-    # Now check the content of these components    
-    testthat::expect_true(Reduce("&", test_function(ref, params, to_check)))
+
+    #####################################################################
+    # txt
+
+    # Define the files to be read in
+    txt_files <- files[grepl(".txt", files, fixed = TRUE)]
+    
+    # Define the expectations: Whenever params_bounds is the only thing, then 
+    # we assume the full reference, otherwise we assume only a part of the 
+    # full parameter set
+    refs <- lapply(txt_files, 
+                   function(x) {
+                       if(x == "parameters__bounds.txt") {
+                           return(ref_full)
+                       } else {
+                           return(ref_part)
+                       }
+                   })
+    
+    # Loop over each of these files and perform the checks
+    tst <- lapply(seq_along(txt_files), 
+                  function(i) compare(load_parameters(file.path("data", txt_files[i])),
+                                      refs[[i]])) |>
+        as.logical()
+    testthat::expect_true(all(tst))
 })
-
-# testthat::test_that("Parameter exponentiation works", {
-#     # BaselineEuropean parameters
-#     parameters <- c("rU" = 1, "bS" = 10000, "bWB" = 0, "aWB" = 0, "bFL" = 2,
-#                        "aFL" = 2, "dFL" = 0, "bCA" = 1, "bCAlr" = 10, "aCA" = 2,
-#                        "bBA" = 4, "aBA" = 2, "bGA" = 10, "aGA" = 2, "bPS" = 2,
-#                        "aPS" = 2, "sPref" = 125, "sSlow" = 1, "bID" = 2,
-#                        "aID" = 2, "dID" = 0, "Central" = 0, "NonCentral" = 0,
-#                        "acc" = 0, "const" = 0, "dec" = 0)
-#     reference <- c("rU" = exp(1), "bS" = exp(10000), "bWB" = exp(0), "aWB" = exp(0),
-#                       "bFL" = exp(2), "aFL" = exp(2), "dFL" = exp(0), "bCA" = exp(1),
-#                       "bCAlr" = exp(10), "aCA" = exp(2), "bBA" = exp(4), "aBA" = exp(2),
-#                       "bGA" = exp(10), "aGA" = exp(2), "bPS" = exp(2), "aPS" = exp(2),
-#                       "sPref" = exp(125), "sSlow" = exp(1), "bID" = exp(2), "aID" = exp(2),
-#                       "dID" = exp(0), "Central" = pnorm(0), "NonCentral" = pnorm(0),
-#                       "acc" = pnorm(0), "const" = pnorm(0), "dec" = pnorm(0))
-
-#     transformed_parameters <- predped::transform_exponentiate(parameters)
-#     testthat::expect_equal(transformed_parameters, reference)
-# })
-
-# testthat::test_that("Parameter logarithmizing works", {
-#     # BaselineEuropean parameters
-#     parameters <- c("rU" = 1, "bS" = 10000, "bWB" = 0, "aWB" = 0, "bFL" = 2,
-#                        "aFL" = 2, "dFL" = 0, "bCA" = 1, "bCAlr" = 10, "aCA" = 2,
-#                        "bBA" = 4, "aBA" = 2, "bGA" = 10, "aGA" = 2, "bPS" = 2,
-#                        "aPS" = 2, "sPref" = 125, "sSlow" = 1, "bID" = 2,
-#                        "aID" = 2, "dID" = 0, "Central" = 0, "NonCentral" = 0,
-#                        "acc" = 0, "const" = 0, "dec" = 0)
-
-#     transformed_parameters <- predped::transform_exponentiate(parameters)
-#     twice_transformed <- predped::transform_logarithmic(transformed_parameters)
-
-#     # Given that exp(10000) gives back Inf, but the reverse is not possible, we
-#     # need to impose that they are equal in both variables to be compared
-#     twice_transformed[["bS"]] <- 10000
-
-#     testthat::expect_equal(twice_transformed, parameters)
-# })
-
-# testthat::test_that("Nest association parameter transformation works", {
-#     # Real parameters inbetween 0 and 1
-#     parameters <- c("Central" = 0, "NonCentral" = 0.2, "acc" = 0.4,
-#                        "const" = 0.6, "dec" = 0.8)
-#     reference <- c("Central" = 1, "NonCentral" = 0.8^(-1), "acc" = 0.6^(-1),
-#                       "const" = 0.4^(-1), "dec" = 0.2^(-1))
-
-#     transformed_parameters <- predped::transform_mu(parameters)
-#     testthat::expect_equal(transformed_parameters, reference)
-# })

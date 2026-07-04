@@ -15,7 +15,16 @@
   cpp = TRUE
 )
 
-\S4method{compute_utility_variables}{data.frame}(object, background)
+\S4method{compute_utility_variables}{data.frame}(
+  object,
+  background,
+  b_turning = NULL,
+  a_turning = NULL,
+  time_step = NULL,
+  standing_start = 0.25,
+  fx = function(x) mean(x, na.rm = TRUE),
+  ...
+)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{agent-class}}.}
@@ -38,6 +47,29 @@ can move to a given cell (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{cpp}{Logical denoting whether to use the Rcpp alternative (\code{TRUE})
 or the R alternative of this function (\code{FALSE}). Defaults to \code{TRUE}.}
+
+\item{b_turning, a_turning}{Numeric denoting the values of the parameters
+\eqn{b} and \eqn{a} for the relationship between orientation and velocity.
+For more information, see the documentation of
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
+
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
+
+\item{standing_start}{Numeric denoting the speed below which the cell is
+set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+\code{\link[predped]{update_position}}. Defaults to \code{0.25}.}
+
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+
+\item{...}{Additional arguments passed on to \code{\link[predped]{to_trace}}
+and \code{\link[predped]{unpack_trace}}}
 }
 \value{
 Data.frame containing all of the needed variables to be able to 
@@ -56,6 +88,13 @@ values of a whole range of variables that are used within the utility
 functions.
 }
 \seealso{
+\code{\link[predped]{simulate}},
+\code{\link[predped]{simulate.state}},
+\code{\link[predped]{update-agent}},
+\code{\link[predped]{update}},
+\code{\link[predped]{update_position}},
+\code{\link[predped]{update}}
+
 \code{\link[predped]{simulate}},
 \code{\link[predped]{simulate.state}},
 \code{\link[predped]{update-agent}},

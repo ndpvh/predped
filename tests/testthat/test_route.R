@@ -66,7 +66,7 @@ testthat::test_that("Creating nodes works (few)", {
                                  cpp = FALSE)
 
     # Create the reference (from a previous run that looked right)
-    ref <- readRDS(file.path(".", "data", "ref_nodes_few.Rds"))
+    ref <- qs2::qs_read(file.path(".", "data", "routing__few_nodes.qs2"))
 
     testthat::expect_equal(tst, ref)
 
@@ -99,7 +99,7 @@ testthat::test_that("Creating nodes works (many)", {
                                  many_nodes = TRUE)
 
     # Create the reference (from a previous run that looked right)
-    ref <- readRDS(file.path(".", "data", "ref_nodes_many.Rds"))
+    ref <- qs2::qs_read(file.path(".", "data", "routing__many_nodes.qs2"))
 
     testthat::expect_equal(tst, ref)
 
@@ -357,7 +357,7 @@ testthat::test_that("Creating edges with one-directional flow works", {
 
     # Load in the reference (originally done on a piece of paper and then 
     # adjusted to fit the algorithm)
-    ref <- readRDS(file.path(".", "data", "unidirectional_edges.Rds"))
+    ref <- qs2::qs_read(file.path(".", "data", "routing__unidirectional.qs2"))
 
     # Compute the edges
     tst <- predped::create_edges(c(-0.75, 0), 

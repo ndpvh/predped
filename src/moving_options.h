@@ -9,7 +9,8 @@ Rcpp::NumericMatrix compute_centers_rcpp(
     double b, 
     Rcpp::NumericVector velocities,
     Rcpp::NumericVector orientations,
-    double time_step
+    double time_step,
+    double threshold
 );
 
 Rcpp::LogicalMatrix overlap_with_objects_rcpp(

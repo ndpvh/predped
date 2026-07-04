@@ -378,3 +378,98 @@ char2int <- function(x) {
 
     return(sum(x))
 }
+
+#' Transform a list of states to a trace
+#'
+#' @param states List of objects of the \code{\link[predped]{state-class}}
+#' @param ... Additional arguments defining the \code{id} or \code{time_step}
+#' to be maintained in the trace.
+#' 
+#' @return Object of the \code{\link[predped]{trace-class}}
+#' 
+#' @examples
+#' # This is my example
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}}
+#' 
+#' @rdname state_to_trace
+#' 
+#' @concept helper
+#' 
+#' @export
+state_to_trace <- function(states, 
+                           ...) {
+
+    # Instantiate the trace
+    output <- trace(setting = states[[1]]@setting, 
+                    states = lapply(states, agents),
+                    variables = lapply(states, variables),
+                    ...)
+
+    return(output)
+}
+
+#' Transform a list of trace to a state
+#'
+#' @param trace List of objects of the \code{\link[predped]{trace-class}}
+#' 
+#' @return List of objects of the \code{\link[predped]{state-class}}
+#' 
+#' @examples
+#' # This is my example
+#' 
+#' @seealso 
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}}
+#' 
+#' @rdname trace_to_state
+#' 
+#' @concept helper
+#' 
+#' @export
+trace_to_state <- function(trace) {
+
+    # Peform the transformation
+    output <- lapply(seq_along(trace@states), 
+                     function(i) state(iteration = i - 1, 
+                                       setting = trace@setting, 
+                                       agents = trace@states[[i]], 
+                                       variables = trace@variables[[i]]))
+
+    return(output)
+}
+
+#' Derive time between observations from data
+#' 
+#' These data should comply to the same restrictions as for using the 
+#' \code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
+#' functions. For more information, look at the documentation of these functions.
+#' 
+#' @param data A data.frame complying to the same restrictions as for the 
+#' \code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
+#' functions. 
+#' @param fx A summarizing function that should be used to aggregate the result
+#' across participants. Defaults to \code{mean}. Note that this function is 
+#' executed twice: First within-participants and then between-participants.
+#' 
+#' @return Numeric denoting the aggregated time step in the data.
+#' 
+#' @examples 
+#' # This is my example
+#' 
+#' @rdname get_time_step
+#' 
+#' @concept helper
+#' 
+#' @export 
+get_time_step <- function(data, 
+                          fx = mean) {
+
+    time_step <- sapply(unique(data$id), 
+                        function(x) data$time[data$id == x] |>
+                            diff() |>
+                            fx())
+    return(fx(time_step))
+}

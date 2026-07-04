@@ -6,8 +6,6 @@
 #' Rcpp alternative for \code{\link[predped]{time_series}}.
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -17,8 +15,8 @@
 #' @concept data
 #' 
 #' @export
-time_series_rcpp <- function(trace, time_step = 0.5) {
-    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace, time_step)
+time_series_rcpp <- function(trace) {
+    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace)
 }
 
 #' Transform trace to comprehensive data.frame
@@ -48,8 +46,6 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -59,8 +55,8 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' @concept data
 #' 
 #' @export
-unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE, time_step = 0.5) {
-    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step)
+unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE) {
+    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped)
 }
 
 unique <- function(x) {
@@ -190,6 +186,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' agent whenever they move to the respective cell of this matrix.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param threshold Numeric denoting a minimal value the slowing factor can
+#' take on when computing the cell centers. Defaults to \code{1e-6}.
 #'
 #' @return Numeric matrix of (x, y) coordinates for each cell
 #'
@@ -244,8 +242,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' @concept movement
 #'
 #' @export
-compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5) {
-    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step)
+compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5, threshold = 1e-6) {
+    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step, threshold)
 }
 
 #' Check agent and object overlap
@@ -819,7 +817,7 @@ vf_utility_rcpp <- function(b_visual_field, relative_angles) {
 #' 
 #' @concept utility
 #' @export
-lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135 * M_PI / 180) {
+lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135. * M_PI / 180.) {
     .Call('_predped_lgvf_utility_rcpp', PACKAGE = 'predped', a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit)
 }
 

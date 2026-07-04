@@ -283,6 +283,28 @@ load_parameters <- function(x = NULL,
         message(paste0("Unable to determine which aspect of the parameters has been provided. ", 
                        "Returning default parameters instead."))
     }
+
+    # Only retain those parameter sets that are present in both params_archetypes
+    # and params_sigma. If there is no overlap, give back the original 
+    # params_from_csv
+    archetypes_1 <- params_from_csv[["params_archetypes"]]$name 
+    archetypes_2 <- names(params_from_csv[["params_sigma"]])
+
+    archetypes <- table(c(archetypes_1, archetypes_2))
+    archetypes <- names(archetypes)[archetypes == 2]
+
+    if(length(archetypes) == 0) {
+        warning("Parameter sets contained in `params_archetypes` and `params_sigma`", 
+                "do not match. Returning the default parameters of predped.")
+        return(predped::params_from_csv)
+
+    } else {
+        idx <- params_from_csv[["params_archetypes"]]$name %in% archetypes
+        params_from_csv[["params_archetypes"]] <- params_from_csv[["params_archetypes"]][idx, ]
+
+        idx <- names(params_from_csv[["params_sigma"]]) %in% archetypes 
+        params_from_csv[["params_sigma"]] <- params_from_csv[["params_sigma"]][idx]
+    }
     
     return(params_from_csv)
 }
