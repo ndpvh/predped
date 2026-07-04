@@ -35,6 +35,7 @@ trace <- setClass("trace",
 
 #' Constructor for the \code{\link[predped]{trace-class}}
 #' 
+#' @param .Object For this class, should be left unspecified (see Example).
 #' @param id Character that serves as an identifier for the trace. Defaults to 
 #' an indicator \code{"trace"} pasted together with a random 5-letter string.
 #' @param time_step Numerical denoting the time that passes at each iteration in
@@ -60,7 +61,7 @@ trace <- setClass("trace",
 #' 
 #' # Initialize trace
 #' my_trace <- trace(
-#'   id = "my trace"
+#'   id = "my trace",
 #'   time_step = 1,
 #'   setting = setting
 #' )
@@ -143,6 +144,7 @@ setMethod("show", "trace", function(object) {
 #' @param variables Named list containing the values of the variables at the 
 #' current state. Defaults to \code{NULL}, meaning no variables are currently 
 #' tracked in the trace.
+#' @param ... Additional arguments specified in the methods.
 #' 
 #' @return Object of the \code{\link[predped]{trace-class}} with appended values 
 #' for its slots \code{states} and \code{variables}. Note that if both the 

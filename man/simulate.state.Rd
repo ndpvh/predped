@@ -20,7 +20,7 @@
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   plot_live = FALSE,
-  plot_time = 0.2,
+  plot_time = 0.4,
   report = FALSE,
   print_iteration = FALSE,
   step_report = 1,
@@ -101,7 +101,7 @@ simulation is going on. Defaults to \code{FALSE}.}
 
 \item{plot_time}{Numeric denoting the amount of time (in seconds) to wait
 between iterations, i.e., the time between updating the plot. Defaults to
-`0.2`.}
+\code{0.4}.}
 
 \item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
@@ -166,10 +166,6 @@ instead (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed on to the \code{\link[predped]{plot}} method (if
 \code{plot_live = TRUE}).}
-
-\item{delay}{Numeric denoting the time (in seconds) to pause between each
-plotted iteration when \code{plot_live = TRUE}. A small pause is needed to
-allow the graphics device to refresh. Defaults to \code{0.4}.}
 }
 \value{
 Object of the \code{\link[predped]{state-class}}.

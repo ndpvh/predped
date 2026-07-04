@@ -6,8 +6,6 @@
 #' Rcpp alternative for \code{\link[predped]{time_series}}.
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -48,8 +46,6 @@ time_series_rcpp <- function(trace) {
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example

@@ -75,6 +75,8 @@ move to at a particular iteration.}
 
 \item{\code{utility_variables}}{Data.frame precomputed containing values for all the 
 variables relevant to compute the utilities.}
+
+\item{\code{extra_objects}}{[DESCRIPTION TO BE WRITTEN]}
 }}
 
 \seealso{

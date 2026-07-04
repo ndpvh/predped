@@ -14,7 +14,7 @@ to_trace(
   time_step = NULL,
   standing_start = 0.25,
   stay_stopped = TRUE,
-  fx = mean,
+  fx = function(x) mean(x, na.rm = TRUE),
   cpp = TRUE,
   ...
 )

@@ -26,8 +26,6 @@
   many_nodes = precompute_edges,
   individual_differences = FALSE,
   group_size = matrix(1, nrow = 1, ncol = 2),
-  plot_live = FALSE,
-  delay = 0.4,
   fx = function(x) x,
   cpp = TRUE,
   ...
@@ -267,7 +265,7 @@ trace <- simulate(my_model,
 # Check some interesting statistics, such as the length of the trace and the
 # number of agents in the room.
 length(trace@states)
-sapply(trace@states, \(x) length(x@agents))
+sapply(trace@states, \(x) length(x))
 
 # If you wish to plot the trace, you can simply use the plot function.
 plt <- plot(trace)

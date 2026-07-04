@@ -14,6 +14,8 @@
 )
 }
 \arguments{
+\item{.Object}{For this class, should be left unspecified (see Example).}
+
 \item{setting}{Object of the \code{\link[predped]{background-class}}. Defaults
 to \code{NULL}, in which case the constructor will throw an error as this is
 a slot that needs to be specified.}
@@ -47,7 +49,7 @@ setting <- background(
 
 # Initialize trace
 my_trace <- trace(
-  id = "my trace"
+  id = "my trace",
   time_step = 1,
   setting = setting
 )

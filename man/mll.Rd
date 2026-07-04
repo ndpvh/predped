@@ -13,7 +13,7 @@ mll(
   cpp = TRUE,
   summed = FALSE,
   time_step = NULL,
-  fx = mean,
+  fx = function(x) mean(x, na.rm = TRUE),
   ...
 )
 }

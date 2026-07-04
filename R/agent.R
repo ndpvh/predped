@@ -48,6 +48,7 @@
 #' move to at a particular iteration.
 #' @slot utility_variables Data.frame precomputed containing values for all the 
 #' variables relevant to compute the utilities.
+#' @slot extra_objects [DESCRIPTION TO BE WRITTEN]
 #' 
 #' @seealso 
 #' \code{\link[predped]{circle-class}},
@@ -158,6 +159,7 @@ agent <- setClass("agent",
 #' @param utility_variables Data.frame precomputed containing values for all the 
 #' variables relevant to compute the utilities. Should usually not be provided 
 #' or altered by the user.
+#' @param extra_objects [DESCRIPTION TO BE WRITTEN]
 #' 
 #' @return Object of the \code{\link[predped]{agent-class}}
 #' 

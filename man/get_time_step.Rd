@@ -8,7 +8,7 @@ get_time_step(data, fx = mean)
 }
 \arguments{
 \item{data}{A data.frame complying to the same restrictions as for the 
-\code{\link[predped]{to_trace} and \code{\link[predped]{add_motion_variables}}}
+\code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
 functions.}
 
 \item{fx}{A summarizing function that should be used to aggregate the result
@@ -20,7 +20,7 @@ Numeric denoting the aggregated time step in the data.
 }
 \description{
 These data should comply to the same restrictions as for using the 
-\code{\link[predped]{to_trace} and \code{\link[predped]{add_motion_variables}}}
+\code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
 functions. For more information, look at the documentation of these functions.
 }
 \examples{

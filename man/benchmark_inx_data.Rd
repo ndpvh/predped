@@ -48,7 +48,8 @@ A data frame with 70 rows and 30 variables:
   \item{\code{fl_leaders}, \code{wb_buddies}}{List containing the leaders and
         buddies needed to evaluate the follow-the-leader and walk-beside 
         utility functions (utility-related).}
-  \item{\code{gc_distance}, \code{gc_radius}}{List containing a numeric vector 
+  \item{\code{gc_distance}, \code{gc_radius}, \code{gc_nped}}{List containing 
+        an integer denoting the number of group members, a numeric vector 
         of size \eqn{33} containing the distance of a particular cell to the
         predicted position of the group centroid and the radius of the agent
         itself. Used to evaluate the group-centroid utility function (utility-

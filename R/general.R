@@ -444,11 +444,11 @@ trace_to_state <- function(trace) {
 #' Derive time between observations from data
 #' 
 #' These data should comply to the same restrictions as for using the 
-#' \code{\link[predped]{to_trace} and \code{\link[predped]{add_motion_variables}}}
+#' \code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
 #' functions. For more information, look at the documentation of these functions.
 #' 
 #' @param data A data.frame complying to the same restrictions as for the 
-#' \code{\link[predped]{to_trace} and \code{\link[predped]{add_motion_variables}}}
+#' \code{\link[predped]{to_trace}} and \code{\link[predped]{add_motion_variables}}
 #' functions. 
 #' @param fx A summarizing function that should be used to aggregate the result
 #' across participants. Defaults to \code{mean}. Note that this function is 

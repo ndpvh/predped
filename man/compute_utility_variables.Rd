@@ -22,7 +22,7 @@
   a_turning = NULL,
   time_step = NULL,
   standing_start = 0.25,
-  fx = mean,
+  fx = function(x) mean(x, na.rm = TRUE),
   ...
 )
 }

@@ -103,6 +103,8 @@ by the user.}
 \item{utility_variables}{Data.frame precomputed containing values for all the 
 variables relevant to compute the utilities. Should usually not be provided 
 or altered by the user.}
+
+\item{extra_objects}{[DESCRIPTION TO BE WRITTEN]}
 }
 \value{
 Object of the \code{\link[predped]{agent-class}}

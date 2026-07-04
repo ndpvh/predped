@@ -13,7 +13,7 @@ add_motion_variables(
   initial_conditions = FALSE,
   a_turning = 2,
   b_turning = 0.2,
-  fx = mean
+  fx = function(x) mean(x, na.rm = TRUE)
 )
 }
 \arguments{

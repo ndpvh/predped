@@ -19,6 +19,8 @@ would like to append the values of \code{states} and \code{variables}.}
 \item{state}{Object of the \code{\link[predped]{state-class}} containing the 
 current state that you would like to append to the trace.}
 
+\item{...}{Additional arguments specified in the methods.}
+
 \item{agents}{List of instances of the \code{\link[predped]{agent-class}}
 containing the agents at the current state. Defaults to \code{NULL}, meaning
 meaning no agents are found at the current trace.}

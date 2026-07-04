@@ -1440,7 +1440,9 @@ setGeneric("speed<-", function(object, value) standardGeneric("speed<-"))
 #' setting <- background(shape = rectangle(center = c(0, 0), size = c(5, 5)),
 #'                       objects = list(circle(center = c(0, 0), radius = 1)))
 #' my_trace <- trace(time_step = 0.5, 
-#'                   setting = setting)
+#'                   setting = setting,
+#'                   states = list(list()),
+#'                   variables = list(list()))
 #' 
 #' # Access the states slot for the trace
 #' states(my_trace)

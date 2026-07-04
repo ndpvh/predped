@@ -90,7 +90,7 @@
   ...
 )
 
-\S4method{plot}{trace}(x, y, ...)
+\S4method{plot}{trace}(x, iterations = NULL, ...)
 }
 \arguments{
 \item{x}{Object of the \code{\link[predped]{background-class}},
@@ -193,6 +193,10 @@ to \code{10}.}
 
 \item{axis.text.size}{Numeric denoting the text size of the axis text.
 Defaults to \code{8}.}
+
+\item{iterations}{Integer vector denoting the iterations of the 
+\code{\link[predped]{trace-class}} you would like to plot. Defaults to 
+\code{NULL}, meaning that all iterations will be plotted.}
 }
 \value{
 Either a geom or a ggplot, depending on the object provided (see

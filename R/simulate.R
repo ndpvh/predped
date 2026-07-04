@@ -208,7 +208,7 @@
 #' # Check some interesting statistics, such as the length of the trace and the
 #' # number of agents in the room.
 #' length(trace@states)
-#' sapply(trace@states, \(x) length(x@agents))
+#' sapply(trace@states, \(x) length(x))
 #'
 #' # If you wish to plot the trace, you can simply use the plot function.
 #' plt <- plot(trace)
@@ -257,8 +257,6 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          plot_live = FALSE,
-                                          delay = 0.4,
                                           fx = \(x) x,
                                           cpp = TRUE,
                                           ...) {
@@ -411,8 +409,6 @@ setMethod("simulate", "predped", function(object,
                           precompute_goal_paths = precompute_goal_paths,
                           middle_edge = middle_edge,
                           individual_differences = individual_differences,
-                          plot_live = plot_live,
-                          plot_time = delay,
                           cpp = cpp,
                           ...)
 
@@ -488,12 +484,9 @@ setMethod("simulate", "predped", function(object,
 #' that has not been tested yet, and therefore might not work for the moment.
 #' @param plot_live Logical denoting whether to plot each iteration while the
 #' simulation is going on. Defaults to \code{FALSE}.
-#' @param delay Numeric denoting the time (in seconds) to pause between each
-#' plotted iteration when \code{plot_live = TRUE}. A small pause is needed to
-#' allow the graphics device to refresh. Defaults to \code{0.4}.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
 #' between iterations, i.e., the time between updating the plot. Defaults to
-#' `0.2`.
+#' \code{0.4}.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
@@ -581,7 +574,7 @@ setMethod("simulate", "state", function(object,
                                         precomputed_edges = NULL,
                                         many_nodes = !is.null(precomputed_edges),
                                         plot_live = FALSE,
-                                        plot_time = 0.2,
+                                        plot_time = 0.4,
                                         report = FALSE,
                                         print_iteration = FALSE,
                                         step_report = 1,

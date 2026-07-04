@@ -898,18 +898,27 @@ get_group_member_data <- function(agent_idx,
 
 #' Logarithmic Group-Attracted Visual Field Utility (LGVF)
 #' 
-#' Unifies the previous social utility functions WB, GC and VF into one utility function.
-#' Applies a logarithmic penalty based on distances to group members, and adds 
-#' an additional penalty if that member is outside the extended visual field.
+#' Unifies the previous social utility functions WB, GC and VF into one utility 
+#' function. Applies a logarithmic penalty based on distances to group members, 
+#' and adds an additional penalty if that member is outside the extended visual 
+#' field.
 #'
 #' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
 #' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
-#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
-#' @param distances Numeric vector of distances from candidate cells to the member.
-#' @param rel_angles Numeric vector of relative angles from candidate cells to the member.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to 
+#' maintain.
+#' @param group_member_data Named list containing the number of pedestrians as an 
+#' integer (under \code{"nped"}), a list containing a numeric vector of distances
+#' of each cell center to each group member (under \code{"distances"}), and a 
+#' list of numeric vectors containing the relative angle at which the group member
+#' would find itself relative to the orientation of agent when moving to a 
+#' particular cell center.
 #' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
 #'
 #' @return Numeric vector containing the LGVF utility for each cell. 
+#' 
+#' @examples 
+#' # TO BE WRITTEN
 #' 
 #' @seealso 
 #' \code{\link[predped]{get_group_member_data}},
