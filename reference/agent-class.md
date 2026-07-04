@@ -67,6 +67,29 @@ in the simulation or estimation (e.g., speed and orientation).
   List of goals the agent has to achieve. The current goal is not
   included in this list.
 
+- `current_group_goal`:
+
+  Object of class
+  [`goal-class`](https://github.com/ndpvh/predped/reference/goal-class.md)
+  which represents the current goal of the agent's group.
+
+- `group_goals`:
+
+  List of goals the agent's group has to achieve. The current goal is
+  not included in this list.
+
+- `group_representative`:
+
+  Logical denoting whether the agent is the representative of their
+  group. The representative is the only one in the group that completes
+  the group goals, hence also leading the group towards the group goals.
+
+- `individual_goals`:
+
+  List of goals the agent has to achieve that are not shared with their
+  group. These will be completes after the agent's group goals are
+  completed.
+
 - `parameters`:
 
   Dataframe containing the values of the parameters for the agent.
@@ -87,6 +110,10 @@ in the simulation or estimation (e.g., speed and orientation).
   Data.frame precomputed containing values for all the variables
   relevant to compute the utilities.
 
+- `extra_objects`:
+
+  \[DESCRIPTION TO BE WRITTEN\]
+
 ## See also
 
 [`circle-class`](https://github.com/ndpvh/predped/reference/circle-class.md),
@@ -95,6 +122,10 @@ in the simulation or estimation (e.g., speed and orientation).
 [`cell`](https://github.com/ndpvh/predped/reference/cell.md),
 [`current_goal`](https://github.com/ndpvh/predped/reference/current_goal.md),
 [`goals`](https://github.com/ndpvh/predped/reference/goals.md),
+[`current_group_goal`](https://github.com/ndpvh/predped/reference/current_group_goal.md),
+[`group_goals`](https://github.com/ndpvh/predped/reference/group_goals.md),
+[`group_representative`](https://github.com/ndpvh/predped/reference/group_representative.md),
+[`individual_goals`](https://github.com/ndpvh/predped/reference/individual_goals.md),
 [`group`](https://github.com/ndpvh/predped/reference/group.md),
 [`id`](https://github.com/ndpvh/predped/reference/id.md),
 [`orientation`](https://github.com/ndpvh/predped/reference/orientation.md),

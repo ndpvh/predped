@@ -15,7 +15,7 @@ simulate(
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
-  standing_start = 0.1,
+  standing_start = 0.25,
   close_enough = 2,
   space_between = 1.25,
   stay_stopped = TRUE,
@@ -23,12 +23,13 @@ simulate(
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   plot_live = FALSE,
-  plot_time = 0.2,
+  plot_time = 0.4,
   report = FALSE,
   print_iteration = FALSE,
   step_report = 1,
   goal_number = 5,
   goal_duration = function(x) rnorm(x, 10, 2),
+  individual_goal_number = NULL,
   precompute_goal_paths = TRUE,
   sort_goals = TRUE,
   adaptive_goal_sorting = TRUE,
@@ -88,7 +89,7 @@ simulate(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - close_enough:
 
@@ -132,13 +133,13 @@ simulate(
 - plot_live:
 
   Logical denoting whether to plot each iteration while the simulation
-  is going on. Defaults to \`FALSE\`.
+  is going on. Defaults to `FALSE`.
 
 - plot_time:
 
   Numeric denoting the amount of time (in seconds) to wait between
   iterations, i.e., the time between updating the plot. Defaults to
-  \`0.2\`.
+  `0.4`.
 
 - report:
 
@@ -168,6 +169,13 @@ simulate(
 
   Numeric, vector, or function that defines the duration of the goals of
   the agents. Defaults to `\(n) rnorm(n, 10, 2)`.
+
+- individual_goal_number:
+
+  Numeric denoting the number of goals that should be assigned to each
+  agent individually after completing their group goals. Generates a
+  separate goal stack of size `individual_goal_number` for each agent.
+  Defaults to `NULL`.
 
 - precompute_goal_paths:
 

@@ -12,12 +12,13 @@ simulate(
   max_agents = 20,
   iterations = 1800,
   add_agent_after = function(x) rnorm(x, 60, 15),
-  standing_start = 0.1,
+  standing_start = 0.25,
   initial_agents = NULL,
   initial_condition = NULL,
   initial_number_agents = NULL,
   goal_number = function(x) rnorm(x, 10, 2),
   goal_duration = function(x) rnorm(x, 10, 2),
+  individual_goal_number = NULL,
   precompute_goal_paths = FALSE,
   sort_goals = TRUE,
   precomputed_goals = NULL,
@@ -66,7 +67,7 @@ simulate(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - initial_agents:
 
@@ -79,9 +80,20 @@ simulate(
 
   Object of the
   [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
-  containing the initial state at which to start the simulation.
+  containing the initial state at which to start the simulation or an
+  object of the
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
+  for which the final state will be used as an initial condition.
   Defaults to `NULL`, meaning the simulation starts with an empty room.
   Ignored when `initial_agents` or `initial_number_agents` is provided.
+  Note that if a
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
+  is provided, the result will only contain the final state of this
+  class as an initial condition. Furthermore note that in this case, the
+  `time_step` argument of this function is ignored and, instead, the
+  `time_step` provided in the
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
+  will be used instead.
 
 - initial_number_agents:
 
@@ -100,6 +112,13 @@ simulate(
 
   Numeric, vector, or function that defines the duration of the goals of
   the agents. Defaults to `\(n) rnorm(n, 10, 2)`.
+
+- individual_goal_number:
+
+  Numeric denoting the number of goals that should be assigned to each
+  agent individually after completing their group goals. Generates a
+  separate goal stack of size `individual_goal_number` for each agent.
+  Defaults to `NULL`.
 
 - precompute_goal_paths:
 
@@ -195,8 +214,8 @@ simulate(
 
 ## Value
 
-List of objects of the
-[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+Object of the
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
 containing the result of the simulation.
 
 ## Details
@@ -334,7 +353,10 @@ Arguments that handle feedback during the simulation.
 
 ## See also
 
-`simulate.state`, [`update`](https://rdrr.io/r/stats/update.html)
+`simulate.state`,
+[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md),
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md),
+[`update`](https://rdrr.io/r/stats/update.html)
 
 ## Examples
 
@@ -365,13 +387,13 @@ trace <- simulate(my_model,
                   iterations = 10,
                   add_agent_after = 5)
 #> 
-#> Precomputing edgesYour model: model qtgcu is being simulated           
+#> Precomputing edgesYour model: model gmiyl is being simulated           
 
 # Check some interesting statistics, such as the length of the trace and the
 # number of agents in the room.
-length(trace)
+length(trace@states)
 #> [1] 11
-sapply(trace, \(x) length(x@agents))
+sapply(trace@states, \(x) length(x))
 #>  [1] 0 1 1 1 1 1 1 1 1 1 1
 
 # If you wish to plot the trace, you can simply use the plot function.

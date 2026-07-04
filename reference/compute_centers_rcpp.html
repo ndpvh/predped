@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,15 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compute_centers_rcpp</span><span class="op">(</span><span class="va">agent</span>, <span class="va">a</span>, <span class="va">b</span>, <span class="va">velocities</span>, <span class="va">orientations</span>, time_step <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compute_centers_rcpp</span><span class="op">(</span></span>
+<span>  <span class="va">agent</span>,</span>
+<span>  <span class="va">a</span>,</span>
+<span>  <span class="va">b</span>,</span>
+<span>  <span class="va">velocities</span>,</span>
+<span>  <span class="va">orientations</span>,</span>
+<span>  time_step <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">1e-06</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,6 +92,11 @@ agent whenever they move to the respective cell of this matrix.</p></dd>
 <dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
 <dd><p>Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to <code>0.5</code>, or half a second.</p></dd>
+
+
+<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
+<dd><p>Numeric denoting a minimal value the slowing factor can
+take on when computing the cell centers. Defaults to <code>1e-6</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

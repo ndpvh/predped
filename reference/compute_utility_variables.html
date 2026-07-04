@@ -17,7 +17,7 @@ functions."><script type="text/javascript" async="" src="https://cdnjs.cloudflar
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,16 @@ functions.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">compute_utility_variables</span><span class="op">(</span><span class="va">object</span>, <span class="va">background</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">compute_utility_variables</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">background</span>,</span>
+<span>  b_turning <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  a_turning <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  time_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  fx <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -119,6 +128,39 @@ can move to a given cell (<code>TRUE</code>) or not (<code>FALSE</code>).</p></d
 <dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
 <dd><p>Logical denoting whether to use the Rcpp alternative (<code>TRUE</code>)
 or the R alternative of this function (<code>FALSE</code>). Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-b-turning-a-turning">b_turning, a_turning<a class="anchor" aria-label="anchor" href="#arg-b-turning-a-turning"></a></dt>
+<dd><p>Numeric denoting the values of the parameters
+\(b\) and \(a\) for the relationship between orientation and velocity.
+For more information, see the documentation of
+<code><a href="compute_centers.html">compute_centers</a></code>. Alternatively can also be a named
+numeric vector, where each value in the vector denotes the values of the
+parameters for each agent in the data.frame.Defaults to <code>NULL</code>, meaning
+that this relationship takes on the default values of <code>predped</code>.</p></dd>
+
+
+<dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
+<dd><p>Numeric denoting the time between each iteration. Defaults
+to <code>NULL</code>, in which case the time step is derived by the
+<code><a href="get_time_step.html">get_time_step</a></code> function with summarizing function
+<code>fx</code>.</p></dd>
+
+
+<dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
+<dd><p>Numeric denoting the speed below which the cell is
+set to <code>0</code> (stopped). Matches the <code>standing_start</code> parameter in
+<code><a href="update_position.html">update_position</a></code>. Defaults to <code>0.25</code>.</p></dd>
+
+
+<dt id="arg-fx">fx<a class="anchor" aria-label="anchor" href="#arg-fx"></a></dt>
+<dd><p>A summarizing function that should be used to derive the time step
+if it is not provided through the <code>time_step</code> argument.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments passed on to <code><a href="to_trace.html">to_trace</a></code>
+and <code><a href="unpack_trace.html">unpack_trace</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">

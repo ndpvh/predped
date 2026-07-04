@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the two slots that were specified</span></span></span>
 <span class="r-in"><span><span class="va">my_model</span><span class="op">@</span><span class="va">id</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "model efxwn"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "model gdefr"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">my_model</span><span class="op">@</span><span class="va">parameters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params_archetypes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               name          color radius slowing_time preferred_speed</span>
@@ -153,9 +153,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a_buddy a_group_centroid b_group_centroid b_visual_field central non_central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       0                0                0              0       0           0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3       0                0                0              0       0           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   acceleration constant_speed deceleration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            0              0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   acceleration constant_speed deceleration a_lgvf b_lgvf e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            0              0            0      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3            0              0            0      0      0      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params_sigma</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params_sigma$BaselineEuropean</span>
@@ -193,6 +193,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration            0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed          0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration            0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                  0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                  0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                  0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       stop_utility reroute b_turning a_turning</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                        0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                  0.00     0.0       0.0         0</span>
@@ -227,6 +230,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                  0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                  0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                        0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                        0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                        0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_current_direction a_current_direction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                                0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                          0.0                   0</span>
@@ -261,6 +267,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                          0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                        0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                          0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                                0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                                0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                                0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       blr_current_direction b_goal_direction a_goal_direction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                                    0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                              0             0.00                0</span>
@@ -295,6 +304,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                              0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                            0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                              0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                                    0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                                    0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                                    0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_blocked a_blocked b_interpersonal a_interpersonal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                     0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time               0.00         0            0.00               0</span>
@@ -329,6 +341,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration               0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed             0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration               0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                     0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                     0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                     0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       d_interpersonal b_preferred_speed a_preferred_speed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                              0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                        0              0.00                 0</span>
@@ -363,6 +378,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                        0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                      0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                        0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                              0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                              0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                              0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_leader a_leader d_leader b_buddy a_buddy</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                       0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                 0        0        0       0       0</span>
@@ -397,6 +415,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                 0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed               0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                 0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                       0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                       0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                       0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                               0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                         0                0              0       0</span>
@@ -431,6 +452,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                         0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                       0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                         0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                               0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                               0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                               0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       non_central acceleration constant_speed deceleration</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                          0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                    0            0              0            0</span>
@@ -465,6 +489,46 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                    0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                  0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                    0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       a_lgvf b_lgvf e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> preferred_speed            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> randomness                 0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stop_utility               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reroute                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_turning                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_turning                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_current_direction        0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_current_direction        0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> blr_current_direction      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_goal_direction           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_goal_direction           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_blocked                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_blocked                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_preferred_speed          0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_preferred_speed          0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_buddy                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_buddy                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_group_centroid           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_group_centroid           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_visual_field             0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> central                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> non_central                0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> acceleration               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed             0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> deceleration               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                     0      0      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params_sigma$DrunkAussie</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       radius slowing_time preferred_speed randomness</span>
@@ -501,6 +565,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration            0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed          0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration            0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                  0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                  0.00          0.0            0.00        0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                  0.00          0.0            0.00        0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       stop_utility reroute b_turning a_turning</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                        0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                  0.00     0.0       0.0         0</span>
@@ -535,6 +602,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                  0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                  0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                        0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                        0.00     0.0       0.0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                        0.00     0.0       0.0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_current_direction a_current_direction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                                0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                          0.0                   0</span>
@@ -569,6 +639,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                          0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                        0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                          0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                                0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                                0.0                   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                                0.0                   0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       blr_current_direction b_goal_direction a_goal_direction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                                    0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                              0             0.00                0</span>
@@ -603,6 +676,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                              0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                            0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                              0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                                    0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                                    0             0.00                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                                    0             0.00                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_blocked a_blocked b_interpersonal a_interpersonal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                     0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time               0.00         0            0.00               0</span>
@@ -637,6 +713,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration               0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed             0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration               0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                     0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                     0.00         0            0.00               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                     0.00         0            0.00               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       d_interpersonal b_preferred_speed a_preferred_speed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                              0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                        0              0.00                 0</span>
@@ -671,6 +750,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                        0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                      0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                        0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                              0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                              0              0.00                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                              0              0.00                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       b_leader a_leader d_leader b_buddy a_buddy</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                       0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                 0        0        0       0       0</span>
@@ -705,6 +787,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                 0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed               0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                 0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                       0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                       0        0        0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                       0        0        0       0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                               0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                         0                0              0       0</span>
@@ -739,6 +824,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                         0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                       0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                         0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                               0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                               0                0              0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                               0                0              0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       non_central acceleration constant_speed deceleration</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius                          0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time                    0            0              0            0</span>
@@ -773,6 +861,46 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration                    0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed                  0            0              0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration                    0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                          0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       a_lgvf b_lgvf e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> preferred_speed            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> randomness                 0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stop_utility               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reroute                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_turning                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_turning                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_current_direction        0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_current_direction        0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> blr_current_direction      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_goal_direction           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_goal_direction           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_blocked                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_blocked                  0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_interpersonal            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_preferred_speed          0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_preferred_speed          0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_leader                   0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_buddy                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_buddy                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_group_centroid           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_group_centroid           0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_visual_field             0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> central                    0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> non_central                0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> acceleration               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed             0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> deceleration               0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                     0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                     0      0      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $params_bounds</span>
@@ -810,6 +938,9 @@ Defaults to an equal probability for each of the archetypes.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration          0e+00 1.0e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed        0e+00 1.0e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration          0e+00 1.0e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                0e+00 3.0e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                0e+00 2.0e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                0e+00 2.0e+01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">my_model</span><span class="op">@</span><span class="va">weights</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9 0.1</span>

@@ -86,7 +86,7 @@ my_model <- predped(setting = my_background,
 
 # Access the two slots that were specified
 my_model@id
-#> [1] "model efxwn"
+#> [1] "model gdefr"
 head(my_model@parameters)
 #> $params_archetypes
 #>               name          color radius slowing_time preferred_speed
@@ -107,9 +107,9 @@ head(my_model@parameters)
 #>   a_buddy a_group_centroid b_group_centroid b_visual_field central non_central
 #> 1       0                0                0              0       0           0
 #> 3       0                0                0              0       0           0
-#>   acceleration constant_speed deceleration
-#> 1            0              0            0
-#> 3            0              0            0
+#>   acceleration constant_speed deceleration a_lgvf b_lgvf e_lgvf
+#> 1            0              0            0      0      0      0
+#> 3            0              0            0      0      0      0
 #> 
 #> $params_sigma
 #> $params_sigma$BaselineEuropean
@@ -147,6 +147,9 @@ head(my_model@parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -181,6 +184,9 @@ head(my_model@parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -215,6 +221,9 @@ head(my_model@parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -249,6 +258,9 @@ head(my_model@parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -283,6 +295,9 @@ head(my_model@parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -317,6 +332,9 @@ head(my_model@parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -351,6 +369,9 @@ head(my_model@parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -385,6 +406,9 @@ head(my_model@parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -419,6 +443,46 @@ head(my_model@parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$DrunkAussie
 #>                       radius slowing_time preferred_speed randomness
@@ -455,6 +519,9 @@ head(my_model@parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -489,6 +556,9 @@ head(my_model@parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -523,6 +593,9 @@ head(my_model@parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -557,6 +630,9 @@ head(my_model@parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -591,6 +667,9 @@ head(my_model@parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -625,6 +704,9 @@ head(my_model@parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -659,6 +741,9 @@ head(my_model@parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -693,6 +778,9 @@ head(my_model@parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -727,6 +815,46 @@ head(my_model@parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> 
 #> $params_bounds
@@ -764,6 +892,9 @@ head(my_model@parameters)
 #> acceleration          0e+00 1.0e+00
 #> constant_speed        0e+00 1.0e+00
 #> deceleration          0e+00 1.0e+00
+#> a_lgvf                0e+00 3.0e+00
+#> b_lgvf                0e+00 2.0e+01
+#> e_lgvf                0e+00 2.0e+01
 #> 
 my_model@weights
 #> [1] 0.9 0.1

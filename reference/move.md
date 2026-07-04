@@ -84,7 +84,7 @@ moved_circle
 #> <0 x 0 matrix>
 #> 
 #> Slot "id":
-#> [1] "object qlrol"
+#> [1] "object gbcin"
 #> 
 #> Slot "moveable":
 #> [1] FALSE

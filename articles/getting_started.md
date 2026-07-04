@@ -11,7 +11,8 @@ information on how to run simulations, we refer readers to the vignette
 for the basic workflow and to the vignette [*Advanced
 Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)
 for some additional functionalities provided within `predped`.
-Information on how to estimate the M4MA can be found in the vignette
+Information on how to estimate the parameters of an M4MA model from
+movement data can be found in the vignette
 [*Estimation*](https://ndpvh.github.io/predped/articles/estimation.html).
 
 ## Installation
@@ -50,8 +51,8 @@ For users, the S4 class serves as an *object* that contains a specific
 (fixed) set of *attributes* or characteristics. For example, a room may
 be treated as an object, containing a particular shape and a set of
 objects that are inside of it (e.g., a living room may consist of a
-couch, some closets, and a coffee table). For example, `predped` allows
-for the definition of several shapes, namely
+couch, some closets, and a coffee table). `predped` allows for the
+definition of several shape types, namely
 [`rectangle`](https://ndpvh.github.io/predped/reference/rectangle-class.html)s,
 [`polygon`](https://ndpvh.github.io/predped/reference/polygon-class.html)s,
 and
@@ -159,7 +160,7 @@ circle(
 #> [1] TRUE
 ```
 
-Importantly, the real strength of the S4 class does not lie only in its
+Importantly, the real strength of the S4 class is not only in its
 attributes, but also in the creation of *methods*, functions of which
 their underlying computations differ depending on the object’s class.
 Take, for example, the computation of the area of different shapes. For
@@ -235,10 +236,10 @@ The getters/setters defined in `predped` serve two purposes. First, they
 make it easier for users to work with the objects provided by the
 package. Second, they ensure that if an object’s attribute is changed,
 that all attributes that depend on this change are changed as well. For
-example, the coordinates of the rectangles four defining corners depend
-on both the size of the rectangle and its center. Changing one of the
-two thus changes these coordinates. To ensure that this happens, we need
-to use the setters rather than overwriting the attribute manually:
+example, the coordinates of a rectangles corners depend on both the size
+of the rectangle and its center. Changing one of the two thus changes
+these coordinates. To ensure that this happens, we need to use the
+setters rather than overwriting the attribute manually:
 
 ``` r
 
@@ -303,7 +304,7 @@ Objects in space:
     rectangle;
   - `size`: Numeric vector of two values defining the width and height
     of the rectangle;
-  - `orientation`: Numeric denoting the orientation of the rectangle in
+  - `orientation`: Numeric denoting the direct the agent is facing in
     radians;
   - `points`: Numeric matrix containing the coordinates of the corners
     of the rectangle in clockwise fashion;
@@ -333,7 +334,8 @@ Objects in space:
   - `speed`: Numeric denoting the speed of the agent;
   - `orientation`: Numeric denoting the orientation of the agent in
     degrees;
-  - `status`: Character denoting what the agent is doing;
+  - `status`: Character denoting what the agent is doing (e.g., move,
+    plan etc.) ;
   - `current_goal`, `goals`: An instance of the
     [`goal`](https://ndpvh.github.io/predped/reference/goal.html) class
     and a collection of these respectively, denoting what the agent
@@ -350,7 +352,7 @@ Space itself:
     class that defines the shape of the setting;
   - `objects`: A list of
     [`object`](https://ndpvh.github.io/predped/reference/object.html)s
-    defining the obstacles in the setting;
+    defining the objects in the setting;
   - `entrance`, `exit`: Numeric matrices defining the entrances and/or
     exits of the space;
 - [`goal`](https://ndpvh.github.io/predped/reference/goal.html): A goal
@@ -372,8 +374,9 @@ Others:
     [`background`](https://ndpvh.github.io/predped/reference/background.html)
     class denoting the setting agents have to walk in;
   - `archetypes`, `weights`: Character vector denoting which agent
-    archetypes are expected to walk within the setting, and with what
-    particular probability you would find them there;
+    archetypes (i.e., a type of agent defined by a set of parameters)
+    are expected to walk into the setting, and with what probability the
+    next is of that type;
 - [`state`](https://ndpvh.github.io/predped/reference/state.html):
   Defines one particular iteration of the simulation;
   - `iteration`: Numeric denoting the iteration number;

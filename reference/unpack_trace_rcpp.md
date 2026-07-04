@@ -7,13 +7,7 @@ function.
 ## Usage
 
 ``` r
-unpack_trace_rcpp(
-  trace,
-  velocities,
-  orientations,
-  stay_stopped = TRUE,
-  time_step = 0.5
-)
+unpack_trace_rcpp(trace, velocities, orientations, stay_stopped = TRUE)
 ```
 
 ## Arguments
@@ -46,11 +40,6 @@ unpack_trace_rcpp(
   Logical denoting whether agents will predict others that are currently
   not moving to remain immobile in the next iteration. Defaults to
   `TRUE`.
-
-- time_step:
-
-  Numeric denoting the time between each iteration. Defaults to `0.5`
-  (the same as in [`simulate`](https://rdrr.io/r/stats/simulate.html)).
 
 ## Details
 

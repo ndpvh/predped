@@ -11,7 +11,7 @@ will share the same goals."><script type="text/javascript" async="" src="https:/
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@ will share the same goals.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_group</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  agent_number <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  standing_start <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  individual_differences <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -83,7 +83,7 @@ to <code>1</code>.</p></dd>
 <dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
 <dd><p>Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-<code>0.1</code>.</p></dd>
+<code>0.25</code>.</p></dd>
 
 
 <dt id="arg-individual-differences">individual_differences<a class="anchor" aria-label="anchor" href="#arg-individual-differences"></a></dt>
@@ -128,43 +128,46 @@ Defaults to <code>FALSE</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get id's, parameters, and number of goals</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">agents</span>, <span class="va">id</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   tkovh   hlcph   lxbgr   zauzb   iykap </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "tkovh" "hlcph" "lxbgr" "zauzb" "iykap" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tkovh   gzuhz   rvvqe   hfatj   aheyt </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "tkovh" "gzuhz" "rvvqe" "hfatj" "aheyt" </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">agents</span>, <span class="va">parameters</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       [,1]  [,2]  [,3]  [,4]  [,5] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius                0.25  0.25  0.25  0.25  0.25 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time          1     1     1     1     1    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> preferred_speed       1.25  1.25  1.25  1.25  1.25 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> randomness            0.1   0.1   0.1   0.1   0.1  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stop_utility          10000 10000 10000 10000 10000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reroute               10    10    10    10    10   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_turning             0.2   0.2   0.2   0.2   0.2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_turning             2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_current_direction   1     1     1     1     1    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_current_direction   2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> blr_current_direction 10    10    10    10    10   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_goal_direction      10    10    10    10    10   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_goal_direction      2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_blocked             4     4     4     4     4    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_blocked             2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_interpersonal       2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_interpersonal       2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_interpersonal       0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_preferred_speed     2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_preferred_speed     2     2     2     2     2    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_leader              0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_leader              0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_leader              0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_buddy               0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_buddy               0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a_group_centroid      0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_group_centroid      0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b_visual_field        0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> central               0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> non_central           0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> acceleration          0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed        0     0     0     0     0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> deceleration          0     0     0     0     0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       [,1]  [,2]  [,3] [,4] [,5] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                0.25  0.25  0.25 0.25 0.25 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> slowing_time          1     1     1    1    1    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> preferred_speed       1.25  1.25  1    1    1.25 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> randomness            0.1   0.1   5    5    0.1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stop_utility          10000 10000 1000 1000 10000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reroute               10    10    20   20   10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_turning             0.2   0.2   0.2  0.2  0.2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_turning             2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_current_direction   1     1     1    1    1    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_current_direction   2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> blr_current_direction 10    10    0.1  0.1  10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_goal_direction      10    10    10   10   10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_goal_direction      2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_blocked             4     4     4    4    4    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_blocked             2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_interpersonal       2     2     1    1    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_interpersonal       2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_interpersonal       0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_preferred_speed     2     2     1    1    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_preferred_speed     2     2     2    2    2    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_leader              0     0     1    1    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_leader              0     0     2    2    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_leader              0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_buddy               0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_buddy               0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_group_centroid      0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_group_centroid      0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_visual_field        0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> central               0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> non_central           0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> acceleration          0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed        0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> deceleration          0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                0     0     0    0    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                0     0     0    0    0    </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">agents</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="goals.html">goals</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4 4 4 4 4</span>
 <span class="r-in"><span></span></span>

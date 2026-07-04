@@ -1,7 +1,9 @@
 # Getter/Setter for the `setting`-slot
 
 Works for the
-[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md).
+[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+and
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md).
 
 ## Usage
 
@@ -14,6 +16,12 @@ setting(object) <- value
 setting(object)
 
 # S4 method for class 'state'
+setting(object) <- value
+
+# S4 method for class 'trace'
+setting(object)
+
+# S4 method for class 'trace'
 setting(object) <- value
 
 # S4 method for class 'predped'
@@ -37,6 +45,7 @@ setting(object) <- value
 ## See also
 
 [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
 
 ## Examples
 
@@ -55,11 +64,11 @@ setting(my_state)
 #> Background Attributes 
 #> entrance: 
 #>      [,1] [,2]
-#> [1,]    0    1
+#> [1,]    0   -1
 #> 
-#> exit: 0 1 
+#> exit: 0 -1 
 #>      [,1] [,2]
-#> [1,]    0    1
+#> [1,]    0   -1
 #> 
 #> limited_access (number): 0 
 #> objects (number): 1 

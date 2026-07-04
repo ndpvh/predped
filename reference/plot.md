@@ -90,6 +90,9 @@ plot(
   optimize = TRUE,
   ...
 )
+
+# S4 method for class 'trace'
+plot(x, iterations = NULL, ...)
 ```
 
 ## Arguments
@@ -253,6 +256,13 @@ plot(
 - axis.text.size:
 
   Numeric denoting the text size of the axis text. Defaults to `8`.
+
+- iterations:
+
+  Integer vector denoting the iterations of the
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
+  you would like to plot. Defaults to `NULL`, meaning that all
+  iterations will be plotted.
 
 ## Value
 

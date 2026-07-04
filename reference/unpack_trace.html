@@ -17,7 +17,7 @@ M4MA-based estimations."><script type="text/javascript" async="" src="https://cd
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,6 @@ M4MA-based estimations.</p>
 <span>  orientations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">72.5</span>, <span class="fl">50</span>, <span class="fl">32.5</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">350</span>, <span class="fl">340</span>, <span class="fl">327.5</span>, <span class="fl">310</span>, <span class="fl">287.5</span><span class="op">)</span>,</span>
 <span>    times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
 <span>  stay_stopped <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  time_step <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  cpp <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,7 +82,7 @@ M4MA-based estimations.</p>
 
 
 <dl><dt id="arg-trace">trace<a class="anchor" aria-label="anchor" href="#arg-trace"></a></dt>
-<dd><p>List of objects of the <code><a href="state-class.html">state-class</a></code></p></dd>
+<dd><p>List of objects of the <code><a href="trace-class.html">trace-class</a></code></p></dd>
 
 
 <dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
@@ -108,11 +107,6 @@ versions of the smaller angles).</p></dd>
 <dd><p>Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Defaults
 to <code>TRUE</code>.</p></dd>
-
-
-<dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
-<dd><p>Numeric denoting the time between each iteration. Defaults
-to <code>0.5</code> (the same as in <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>).</p></dd>
 
 
 <dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>

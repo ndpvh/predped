@@ -10,7 +10,7 @@ values), but will share the same goals.
 add_group(
   model,
   agent_number = 1,
-  standing_start = 0.1,
+  standing_start = 0.25,
   individual_differences = FALSE,
   ...
 )
@@ -30,7 +30,7 @@ add_group(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - individual_differences:
 
@@ -75,43 +75,46 @@ agents <- add_group(my_model,
 
 # Get id's, parameters, and number of goals
 sapply(agents, id)
-#>   tkovh   hlcph   lxbgr   zauzb   iykap 
-#> "tkovh" "hlcph" "lxbgr" "zauzb" "iykap" 
+#>   tkovh   gzuhz   rvvqe   hfatj   aheyt 
+#> "tkovh" "gzuhz" "rvvqe" "hfatj" "aheyt" 
 sapply(agents, parameters)
-#>                       [,1]  [,2]  [,3]  [,4]  [,5] 
-#> radius                0.25  0.25  0.25  0.25  0.25 
-#> slowing_time          1     1     1     1     1    
-#> preferred_speed       1.25  1.25  1.25  1.25  1.25 
-#> randomness            0.1   0.1   0.1   0.1   0.1  
-#> stop_utility          10000 10000 10000 10000 10000
-#> reroute               10    10    10    10    10   
-#> b_turning             0.2   0.2   0.2   0.2   0.2  
-#> a_turning             2     2     2     2     2    
-#> b_current_direction   1     1     1     1     1    
-#> a_current_direction   2     2     2     2     2    
-#> blr_current_direction 10    10    10    10    10   
-#> b_goal_direction      10    10    10    10    10   
-#> a_goal_direction      2     2     2     2     2    
-#> b_blocked             4     4     4     4     4    
-#> a_blocked             2     2     2     2     2    
-#> b_interpersonal       2     2     2     2     2    
-#> a_interpersonal       2     2     2     2     2    
-#> d_interpersonal       0     0     0     0     0    
-#> b_preferred_speed     2     2     2     2     2    
-#> a_preferred_speed     2     2     2     2     2    
-#> b_leader              0     0     0     0     0    
-#> a_leader              0     0     0     0     0    
-#> d_leader              0     0     0     0     0    
-#> b_buddy               0     0     0     0     0    
-#> a_buddy               0     0     0     0     0    
-#> a_group_centroid      0     0     0     0     0    
-#> b_group_centroid      0     0     0     0     0    
-#> b_visual_field        0     0     0     0     0    
-#> central               0     0     0     0     0    
-#> non_central           0     0     0     0     0    
-#> acceleration          0     0     0     0     0    
-#> constant_speed        0     0     0     0     0    
-#> deceleration          0     0     0     0     0    
+#>                       [,1]  [,2]  [,3] [,4] [,5] 
+#> radius                0.25  0.25  0.25 0.25 0.25 
+#> slowing_time          1     1     1    1    1    
+#> preferred_speed       1.25  1.25  1    1    1.25 
+#> randomness            0.1   0.1   5    5    0.1  
+#> stop_utility          10000 10000 1000 1000 10000
+#> reroute               10    10    20   20   10   
+#> b_turning             0.2   0.2   0.2  0.2  0.2  
+#> a_turning             2     2     2    2    2    
+#> b_current_direction   1     1     1    1    1    
+#> a_current_direction   2     2     2    2    2    
+#> blr_current_direction 10    10    0.1  0.1  10   
+#> b_goal_direction      10    10    10   10   10   
+#> a_goal_direction      2     2     2    2    2    
+#> b_blocked             4     4     4    4    4    
+#> a_blocked             2     2     2    2    2    
+#> b_interpersonal       2     2     1    1    2    
+#> a_interpersonal       2     2     2    2    2    
+#> d_interpersonal       0     0     0    0    0    
+#> b_preferred_speed     2     2     1    1    2    
+#> a_preferred_speed     2     2     2    2    2    
+#> b_leader              0     0     1    1    0    
+#> a_leader              0     0     2    2    0    
+#> d_leader              0     0     0    0    0    
+#> b_buddy               0     0     0    0    0    
+#> a_buddy               0     0     0    0    0    
+#> a_group_centroid      0     0     0    0    0    
+#> b_group_centroid      0     0     0    0    0    
+#> b_visual_field        0     0     0    0    0    
+#> central               0     0     0    0    0    
+#> non_central           0     0     0    0    0    
+#> acceleration          0     0     0    0    0    
+#> constant_speed        0     0     0    0    0    
+#> deceleration          0     0     0    0    0    
+#> a_lgvf                0     0     0    0    0    
+#> b_lgvf                0     0     0    0    0    
+#> e_lgvf                0     0     0    0    0    
 sapply(agents, \(x) length(goals(x)))
 #> [1] 4 4 4 4 4
 ```

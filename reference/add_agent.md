@@ -10,6 +10,7 @@ add_agent(
   group_number = 1,
   goal_number = 5,
   goal_duration = function(x) rnorm(x, 10, 2),
+  individual_goal_number = NULL,
   precompute_goal_paths = TRUE,
   sort_goals = TRUE,
   precomputed_goals = NULL,
@@ -18,7 +19,7 @@ add_agent(
   many_nodes = !is.null(precomputed_edges),
   space_between = 1.25,
   position = NULL,
-  standing_start = 0.1,
+  standing_start = 0.25,
   individual_differences = FALSE,
   return_characteristics = FALSE
 )
@@ -47,6 +48,13 @@ add_agent(
 
   Numeric, vector, or function that defines the duration of the goals of
   the agents. Defaults to `\(n) rnorm(n, 10, 2)`.
+
+- individual_goal_number:
+
+  Numeric denoting the number of goals that should be assigned to each
+  agent individually after completing their group goals. Generates a
+  separate goal stack of size `individual_goal_number` for each agent.
+  Defaults to `NULL`.
 
 - precompute_goal_paths:
 
@@ -108,7 +116,7 @@ add_agent(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - individual_differences:
 
@@ -156,6 +164,9 @@ my_agent
 #> color: goldenrod 
 #> current_goal: (a) position: -0.5070711 -0.2293804 (b) path: -0.5070711 -0.2293804 
 #> goals (number): 4 
+#> group_goals (number): 0 
+#> group_representative: FALSE 
+#> individual_goals (number): 0 
 #> group: 1 
 #> id: aaglv 
 #> orientation: 0 
@@ -194,9 +205,12 @@ my_agent
 #> acceleration             0.00
 #> constant_speed           0.00
 #> deceleration             0.00
+#> a_lgvf                   0.00
+#> b_lgvf                   0.00
+#> e_lgvf                   0.00
 #> 
 #> radius: 0.25 
-#> speed: 0.1 
+#> speed: 0.25 
 #> status: move 
 #> 
 #> For more detailed information, please extract the wanted information from the agent directly.

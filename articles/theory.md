@@ -44,23 +44,24 @@ only leave a grocery store after finding all of the items they want to
 buy. Similarly, an agent who needs to catch a train can only do so after
 buying a ticket and finding the track at which the train leaves. The
 goal stack therefore plays an crucial role in guiding a pedestrian’s
-behavior: Without goals, there would be no movement.
+behavior: without goals, there would be no movement.
 
-According to the M4MA, goals contain two primary characteristics, namely
-a location (i.e., where to find the goal) and a timer (i.e., how long it
-takes to complete the goal). This allows agents to plan ahead on the
-order in which to achieve goals and defines how long they will interact
-with a particular goal, therefore controlling the length of periods of
-standstill as well as of movement. Note that this implies, though, that
-all agents have intimate knowledge about the space that they will walk
-into: Only then do they know exactly where to find their goals and how
-long they will take. For most purposes, however, this is a realistic
-assumption to take.
+In M4MA, goals contain two primary characteristics, a location (i.e.,
+where to find the goal) and a timer (i.e., how long it takes to complete
+the goal). This allows agents to plan ahead about the order in which to
+achieve goals, and defines how long they will interact with a particular
+goal, therefore controlling the length of periods of standstill as well
+as of movement. Note that this implies that all agents have intimate
+knowledge about the space that they will walk into: only then do they
+know exactly where to find their goals and how long they will take. For
+most purposes this is a realistic assumption to take, but as discussed
+below, M4MA also enables the addition of extra functionality to
+accomodate different assumptions.
 
 Within `predped`, the goal stack is contained within the
 [`agent`](https://ndpvh.github.io/predped/reference/agent.html) itself,
 specifically under the slots `current_goal` and `goal_stack`. The former
-contains the goals that the agent currently wants to achieve while the
+contains the goal that the agent currently wants to achieve while the
 latter contains goals that the agent needs to achieve later on. Each
 goal is furthermore coded as an instance of the
 [`goal`](https://ndpvh.github.io/predped/reference/goal.html) class,
@@ -68,13 +69,13 @@ containing the defining features `id`, `position`, and `counter`,
 representing an identifier, the location of the goal, and the number of
 iterations it takes to complete the goal.
 
-Note that the strategic level’s role is retricted to what happens
-*before* the agent enters the room. When the agent has entered the room,
-the tactical and operational level take over. This is also reflected
-within the package: All functions related to the strategic level are
-called during the creation of an agent and are not used once the agent
-has been created. For more information on these functions, we refer the
-interested reader to the documentation of
+Note that the strategic level’s role is restricted to what happens
+*before* the agent enters an environment. When the agent has entered the
+environment, the tactical and operational level take over. This is also
+reflected within the package: All functions related to the strategic
+level are called during the creation of an agent and are not used once
+the agent has been created. For more information on these functions, we
+refer the interested reader to the documentation of
 [`add_agent`](https://ndpvh.github.io/predped/reference/add_agent.html),
 [`add_group`](https://ndpvh.github.io/predped/reference/add_group.html),
 and
@@ -82,20 +83,20 @@ and
 
 ## Tactical Level
 
-On the tactical level the M4MA places routing decisions, the
-manipulation of the goals within the goal stack, and other tactical
+The tactical level of M4MA determines routing decisions, the
+manipulation of the goals within the goal stack, and other related
 decisions that influence the operational level. Regarding routing, the
 M4MA assumes that goals can be subdivided in two parts, namely
 *activitiy goals* which represent the end goal (e.g., getting the
 grocery item) and *path points* that represent locations that can be
-used to navigate the space between two points. Navigating the space from
-one’s current location to the end goal’s location therefore entails
-stringing together a series of path points within the space so as to end
-at the end goal’s location (see the Figure below). Importantly, this
-requires that an agent is able to see the next location that they move
-to (it being a path point or end goal). If this is not the case, the
-agent will choose one of several ways to resolve this issue, as we will
-detail below.
+used to navigate the space between two activity goals. Navigating the
+space from one’s current location to the end goal’s location therefore
+entails stringing together a series of path points within the space so
+as to end at the end goal’s location (see the Figure below).
+Importantly, this requires that an agent is able to see the next
+location that they move to (it being a path point or end goal). If this
+is not the case, the agent will choose one of several ways to resolve
+this issue, as we will detail below.
 
 ![Visualization of routing within the M4MA. One sees an agent at the
 bottom-left side of a minimal environment with three horizontally placed
@@ -109,9 +110,9 @@ Within `predped`, path points are created and connected through the
 function. To find the path from an agent’s location to their goal’s
 location, `predped` makes use of the
 [`find_path`](https://ndpvh.github.io/predped/reference/find_path.html)
-function, relying on a greedy algorithm implemented in the `cppRouting`
-package (Larmet, 2022), saving this path in the `path` slot in the
-relevant instance of the
+function, by default relying on a greedy algorithm implemented in the
+`cppRouting` package (Larmet, 2022), saving this path in the `path` slot
+in the relevant instance of the
 [`goal`](https://ndpvh.github.io/predped/reference/goal.html) class.
 
 Regarding goal manipulation, there are two ways in which agents can
@@ -119,8 +120,8 @@ handle goals. First, they can reach a goal’s location and start
 interacting with the goal, waiting at the specified location for a
 determinate amount of time. In `predped`, this amounts to reducing the
 value of the `counter` slot by 1 at each iteration. Once the `counter`
-reaches 0, the goal is marked as completed and the first goal in the
-`goal_stack` is selected as the next goal to be achieved, first
+reaches 0, the goal is marked as completed and the next goal in the
+`goal_stack` is selected as the current goal to be achieved, first
 searching for the path towards that goal through the
 [`find_path`](https://ndpvh.github.io/predped/reference/find_path.html)
 function. Second, agents can decide that a particular goal is currently
@@ -140,52 +141,51 @@ to leave the space (see the next paragraph).
 
 Outside of routing and goal manipulation, the tactical level also
 encompasses several additional tactical decisions that influence the
-operational level. For one, agents have several ways of aleviating
+operational level. For one, agents have several ways of alleviating
 difficulties when they lose sight of their next path point or goal
 location, specifically by reorienting – turning in different directions
 and choosing one that provides a clear path – or rerouting – finding a
-new path to the goal location. Addditionally, agents can choose to wait
+new path to the goal location. Additionally, agents can choose to wait
 for a specific amount of time, triggered only when either another agent
 is interacting with a goal close to theirs or when rerouting did not
 yield an alternative route. These types of decisions are capture through
 the `status` slot of the agent, in this case taking on the values
-`"reorient"`, `"reroute"`, and `"wait"` respectively. Other `status`es
-of the agents are `"move"` (when an agent moves around),
-`"completing goal"` (when an agent is interacting with their goal),
-`"plan"` (when finding a path to their next goal), and `"exit"` (when
-the agent is ready to exit the space).
+`"reorient"`, `"reroute"`, and `"wait"` respectively. Other values of
+`status` are `"move"` (when an agent moves around), `"completing goal"`
+(when an agent is interacting with their goal), `"plan"` (when finding a
+path to their next goal), and `"exit"` (when the agent is ready to exit
+the space).
 
 Another tactical decision is the agent’s tendency to slow down when they
 approach a goal location, preventing them from overshooting the goal
 (Robin et al., 2009). Within the M4MA, this adjustment is made at the
 tactical level, directly affecting the agent’s current speed so that
-they would arrive at the goal in particular time (by default 1sec or 2
-iterations). Within `predped`, this is captured through the parameters
+they would arrive at the goal in particular time (by default 1 sec or 2
+iterations). Within `predped`, this is set through the parameters
 `slowing_time`, which can be accessed through calling the
 [`load_parameters`](https://ndpvh.github.io/predped/reference/load_parameters.html)
 function.
 
-Finally, tactics are also affected by group membership, which affects
-both the routing decisions of the group members as well as the value of
-some of the utility functions more directly. For example, agents in the
-same group typically don’t mind having a closer interpersonal distance
-to ingroup members rather than outgroup members or stick together more
-often. These tactical decision are captured within the utility functions
-at the operational level itself and will be elaborated on in that
-section.
+Finally, tactics also depend on group membership, which affects both the
+routing decisions of the group members and the value of some of the
+operational level utility functions more directly. For example, agents
+in the same group typically don’t mind having a closer interpersonal
+distance to in-group members rather than out-group members or stick
+together more often. These tactical decision are captured within the
+utility functions at the operational level itself and will be elaborated
+on in that section.
 
 Importantly, the tactical level can be used to accommodate situations
 where agents do not know goal locations and have to explore the area
-first to find their goals. For exmaple, in an earlier version of M4MA,
-agents could walk along the aisles in a supermarket before being able to
-see the items on their shopping list, adding their location to the goal
-stack as the next activity. More generally, the tactical level could be
-used to reconfigure other aspects of the model so that goals may
-influence the operational level (e.g., increasing agent’s preferred
-speed when their train is about to leave). Although not part of the
-default behavior in `predped`, we do provide ways for people to include
-their own set of tactical decisions of this level within simulations
-(see [*Advanced
+first to find their goals (e.g., agents could walk along the aisles in a
+supermarket before being able to see the items on their shopping list,
+adding their location to the goal stack as the next activity). More
+generally, the tactical level could be used to reconfigure other aspects
+of the model so that goals may influence the operational level (e.g.,
+increasing agent’s preferred speed when their train is about to leave).
+Although not part of the default behavior in `predped`, we do provide
+ways for people to include their own set of tactical decisions of this
+level within simulations (see [*Advanced
 Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)).
 
 ## Operational Level
@@ -193,17 +193,16 @@ Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)
 On the operational level, the M4MA describes how agents make
 step-by-step decisions while navigating the space. Step-by-step
 decisions are assumed to be taken once in a particular cycle, by default
-every 500msec. To guide this type of movement on the operational level,
-we first define all discrete step choices an agent has every cycle and
-then define the probability with which the agent chooses each discrete
-choice.
+every half second. To guide this type of movement on the operational
+level, we first determine all valid discrete step choices an agent has
+every cycle, and then define the probability with which the agent
+chooses each.
 
 ### Discrete Step Choices
 
-The M4MA states that on every cycle (by default 0.5sec) an agent chooses
-one of 34 discrete velocity options, 33 of which are composed by
-crossing 11 direction options or “cones” that describe turns relative to
-the current direction
+Oon every cycle or iteration an agent chooses one of 34 discrete
+velocity options, 33 of which are composed by crossing 11 direction
+options or “cones” that describe turns relative to the current direction
 ($`a \in \{-72.5^\circ, -50^\circ, -32.5^\circ, -20^\circ, -10^\circ, 0^\circ, 10^\circ, 20^\circ, 32.5^\circ, 50^\circ, 72.5^\circ\}`$)
 and 3 speed options or “rings” that describe how speed changes relative
 the current speed ( multiplier $`s \in \{0.5, 1, 1.5\}`$; see the Figure
@@ -215,8 +214,8 @@ based on the angle of turning and the change of
 speed.](../reference/figures/step_choices.png)
 
 Several things are of note here. First, as one may have noticed when
-examining the picture above, the M4MA includes a biomechanical slowing
-so that agents have difficulty maintaining or accelerating their speeds
+examining the picture above, the M4MA includes a bio-mechanical slowing
+so that agents are less able to maintain or accelerate their speeds
 while turning. Within `predped`, this slowing factor is taken into
 account when computing these discrete choices in `predped`s
 [`compute_centers`](https://ndpvh.github.io/predped/reference/compute_centers.html)
@@ -233,27 +232,27 @@ and can be summarized mathematically as:
 where $`i \in \{1, 2, \cdots, 33\}`$ represents the discrete choice of
 interest, $`a_i`$ is the turning angle for this choice, $`s_i`$ is the
 speed for this choice if the agent were not turning, $`s_i^*`$
-represents the biomechanically corrected speed, and $`\beta_{turn}`$ and
-$`\alpha_{turn}`$ are the parameters that guide this biomechanical
+represents the bio-mechanically corrected speed, and $`\beta_{turn}`$
+and $`\alpha_{turn}`$ are the parameters that guide this biomechanical
 slowing. Within `predped`, we allow each agent to have a different rate
-of slowing as capture through their parameters `b_turning` and
+of slowing as captured through their parameters `b_turning` and
 `a_turning` (see
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
 
-Additionally, under the hood we are required to index the rings and
-cones in a particular reproducible way. In `predped`, rings are numbered
-$`r \in \{1, 2, 3\}`$, with $`r = 1`$ corresponding to acceleration,
-$`r = 2`$ to maintaining speed, and $`r = 3`$ to decelerating. Cones are
-numbered $`k \in \{1, \hdots, 11\}`$ from left to right from the agent’s
-perspective. The set of locations corresponding to each option is
-described as a “cell” and the set of cells defines the agent’s spatial
-“field of operations” for the current cycle. Hence, each of these
-$`i = \{1, \hdots, 33\}`$ choices corresponds to moving to a new
-location and, typically, a change in direction and/or speed. The index
-for each of the cells is found by multplying the ring identifier with
-the cone identifier, so that cells are numbered $`1, \hdots, 11`$ from
-left to right in the acceleration ring, $`12, \hdots, 22`$ in the
-constant speed cone, and $`23, \hdots, 33`$ in the deceleration cone.
+Additionally, under the hood we index the rings and cones as followed.
+Rings are numbered $`r \in \{1, 2, 3\}`$, with $`r = 1`$ corresponding
+to acceleration, $`r = 2`$ to maintaining speed, and $`r = 3`$ to
+decelerating. Cones are numbered $`k \in \{1, \hdots, 11\}`$ from left
+to right from the agent’s perspective. The set of locations
+corresponding to each option is described as a “cell” and the set of
+cells defines the agent’s spatial “field of operations” for the current
+cycle. Hence, each of these $`i = \{1, \hdots, 33\}`$ choices
+corresponds to moving to a new location and, typically, a change in
+direction and/or speed. The index for each of the cells is found by
+multplying the ring identifier with the cone identifier, so that cells
+are numbered $`1, \hdots, 11`$ from left to right in the acceleration
+ring, $`12, \hdots, 22`$ in the constant speed cone, and
+$`23, \hdots, 33`$ in the deceleration cone.
 
 #### The 34th Option
 
@@ -262,12 +261,13 @@ pedestrians were assumed to be always in motion. In contrast, the M4MA
 allows agents to stop for one of three reasons: (a) no cell is available
 (e.g., all cells are blocked by objects or other pedestrians in a
 crowded scenario), (b) one or more cells are available but none have an
-acceptably high utility (see later on), and (c) agents are performing an
+acceptably high utility (see below), and (c) agents are performing an
 activity (e.g., buying a ticket). Hence, we added a 34$`^{th}`$ option
 that allows agents to stop, corresponding to the current location and
-direction being maintained while reducing their speed to zero. When
-movement subsequently recommences speed is set to a low value controlled
-through the `standing_start` argument of
+direction being maintained while reducing their speed to zero. Before
+movement subsequently recommences the agent first reorients to the next
+goal and speed is set to a low value controlled through the
+`standing_start` argument of
 [`simulate`](https:ndpvh.github.io/predped/reference/simulate.html).
 
 ### Probability of Moving to a Cell
@@ -299,7 +299,7 @@ Using these probabilities, agent’s randomly select one of the options
 according to a multinomial distribution and, once selected, change their
 position to the chosen cell.
 
-A two-stage procedure is used to determine each of the 33 cells’
+A two-stage procedure is used to determine each of the first 33 cells’
 utility. In the first stage, we set the utility of a particular cell to
 $`-\infty`$ when it is not accessible. This is the case when a cell is
 currently occupied or movement to the cell is obstructed by other
@@ -353,13 +353,14 @@ such as identifiers and predictions (the output of
 allowing mapping to the utility functions contained in the `m4ma`
 package).
 
-Up to now, we have only defined the utility of moving to one of the 33
-new locations, but not about the utility of standing still. For this,
-the M4MA sets the utility of the agent’s $`34^{th}`$ cell to a fixed
-value $`\upsilon_j`$, ensuring agent’s will only stop when no other good
-options are available (i.e., when all utilities $`u_{ij} < \upsilon_j`$
-in the deterministic case). The value of $`\upsilon_j`$ is contained in
-the parameter list of the agent as `stop_utility` (see again
+Up to now, we have only defined the utility of moving to one of the
+first 33 new locations, but not about the utility of standing still. For
+this, the M4MA sets the utility of the agent’s $`34^{th}`$ cell to a
+fixed value $`\upsilon_j`$, ensuring agent’s will only stop when no
+other good options are available (i.e., when all utilities
+$`u_{ij} < \upsilon_j`$ in the deterministic case). The value of
+$`\upsilon_j`$ is contained in the parameter list of the agent as
+`stop_utility` (see again
 [`params_from_csv`](https://ndpvh.github.io/predped/reference/params_from_csv.html)).
 
 In the remainder of this section, we will highlight the different
@@ -401,9 +402,9 @@ dimensions are displayed in the following Table.
 
 In what follows, we give a detailed overview of the utility functions
 themselves. Note that all parameters that we discuss are assumed to be
-positively valued. Furthermore note that, for simplicities sake, we
-won’t index the different utility functions $`f`$ and parameters
-$`\alpha`$, $`\beta`$,… with their respective abbreviation for the
+positively valued. Furthermore note that, for simplicity’s sake, we
+won’t subscript the different utility functions ($`f`$) and parameters
+($`\alpha`$, $`\beta`$,…) with their respective abbreviation for the
 utility function (e.g., *CD* for *current direction*), ensuring clean
 equations for each utility function.
 
@@ -463,10 +464,6 @@ less steep towards the left or right side relative to the current
 direction at 0 degrees, otherwise resembling the set of functions
 described before.](theory_files/figure-html/unnamed-chunk-5-1.png)
 
-For identifiability purposes, we set `b_current_direction = 1` for all
-archetypes uses in `predped`, weighing the influence of the other
-utility functions relative to this one.
-
 #### Preferred Speed
 
 The preferred speed utility function creates a tendency for pedestrians
@@ -519,7 +516,7 @@ degrees and define the utility function as:
 \end{equation}
 ```
 
-This utility functiona gain resembles the others already discussed, this
+This utility function again resembles the others already discussed, this
 time attaining a maximal value of $`0`$ when the goal direction aligns
 perfectly with the cone.
 
@@ -803,6 +800,60 @@ otherwise.](theory_files/figure-html/unnamed-chunk-9-1.png)
 In `predped`, this utility functions parameter $`\beta`$ is called
 `b_visual_field`.
 
+#### Logarithmic Group-Attracted Visual Field (LGVF)
+
+The LGVF utility function attracts agents towards positions in which
+they see their group members and are close to them, up to a comfortable
+distance. The LGVF takes on the same assumptions as the group centroid
+and visual field utility functions, mainly that agents want to walk
+together as a whole and maintain visual contact of each other.
+Therefore, the LGVF is a comprehensive social utility functions that
+combines the roles of the group centroid, visual field, and walk beside
+utility functions.
+
+Firstly, we identify all the agents that belong to the ingroup of the
+agent. Secondly, we define the set of all the ingroup agents as . To
+compute the LGVF, for each cell , we compute the distance $`d_{ij}`$ and
+the angle $`a_{ij}`$ to the predicted position of the group member . The
+utility with regard to a single group member, using the defined distance
+and angle is:
+
+``` math
+\begin{equation}
+\begin{split}
+u^{LGVF}_{ij} &= -\beta_{LGVF}(|\log(d_{ij}) - \log(\epsilon_{LGVF})|)^{\alpha_{LGVF}} -
+\begin{cases}
+    0 & \text{if } \alpha_{ij} \in [-135^\circ, 135^\circ] \\
+    \delta_{LGVF} & \text{if } \alpha_{ij} \notin [-135^\circ, 135^\circ]
+\end{cases}
+\\
+\delta_{LGVF} &= -\frac{\beta_{LGVF}}{d_{ij}^{\alpha_{LGVF}}}
+\end{split}
+\end{equation}
+```
+and the full utility with regard to all group members is defined as: %
+Utility
+``` math
+u_i^{LGVF} = \frac{1}{|A|}\sum_{j\in A}{u_{ij}^{LGVF}}
+```
+
+In this function, there are two components: the base utility and the
+visual field penalty. The base utility is a logarithmic ratio between
+the distance of the agent and their group members, this utility is
+optimal when the agent is a distance of $`\epsilon_{LGVF}`$ from their
+group members, acting similarly to the group centroid. The visual field
+penalty is a discrete penalty that is added when the agent cannot see
+their group members, which is defined as being outside of an extended
+visual field of $`[-135^\circ, 135^\circ]`$.
+
+![Visualization of the logarithmic gap-based utility function with and
+without delta penalty across varying alpha and beta
+parameters.](theory_files/figure-html/unnamed-chunk-10-1.png)
+
+In `predped`, the parameters $`\alpha_{LGVF}`$, $`\beta_{LGVF}`$, and
+$`\epsilon_{LGVF}`$ are called `a_lgvf`, `b_lgvf`, and `epsilon_lgvf`
+respectively.
+
 ## Discussion
 
 The M4MA’s utility framework is designed to be extensible, allowing the
@@ -818,9 +869,9 @@ Heathcote or Niels Vanhasbroeck.
 
 It is furthermore useful to note that the M4MA is an estimable model,
 meaning that most (if not all) of the parameters discussed in this
-section can be derived based on walking data. To see how you can use
-`predped` for these types of estimations, we refer the interested reader
-to the vignette on
+section can be derived based on walking data of sufficent quality. To
+see how you can use `predped` for these types of estimations, we refer
+the interested reader to the vignette on
 [*Estimation*](https://ndpvh.github.io/predped/articles/estimation.html).
 
 ## References

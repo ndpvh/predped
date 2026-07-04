@@ -66,6 +66,10 @@ head(parameters)
 #> 16     SocialBigRushingDutch         salmon   0.29          1.0           2.000
 #> 17         SocialDrunkAussie      goldenrod   0.25          1.0           1.000
 #> 18 SocialCautiousOldEuropean         grey50   0.25          1.0           0.500
+#> 19                Colleagues          brown   0.25          1.0           1.270
+#> 20                   Couples           pink   0.25          1.0           1.100
+#> 21                  Families         purple   0.25          1.0           1.090
+#> 22                   Friends      turquoise   0.25          1.0           1.140
 #>    randomness stop_utility reroute b_turning a_turning b_current_direction
 #> 1       0.100        10000      10       0.2         2                   1
 #> 2       0.001       100000      20       0.2         2                   1
@@ -85,6 +89,10 @@ head(parameters)
 #> 16      0.001       100000      20       0.2         2                   1
 #> 17      5.000         1000      20       0.2         2                   1
 #> 18      0.001          100       5       0.2         2                   1
+#> 19      0.100        10000      10       0.2         2                   1
+#> 20      0.100        10000      10       0.2         2                   1
+#> 21      0.100        10000      10       0.2         2                   1
+#> 22      0.100        10000      10       0.2         2                   1
 #>    a_current_direction blr_current_direction b_goal_direction a_goal_direction
 #> 1                    2                  10.0               10                2
 #> 2                    2                  10.0               20                2
@@ -104,6 +112,10 @@ head(parameters)
 #> 16                   2                  10.0               20                2
 #> 17                   2                   0.1               10                2
 #> 18                   2                  10.0               10                2
+#> 19                   2                  10.0               10                2
+#> 20                   2                  10.0               10                2
+#> 21                   2                  10.0               10                2
+#> 22                   2                  10.0               10                2
 #>    b_blocked a_blocked b_interpersonal a_interpersonal d_interpersonal
 #> 1          4         2             2.0               2               0
 #> 2          2         2             1.0               2               0
@@ -123,6 +135,10 @@ head(parameters)
 #> 16         2         2             1.0               2               0
 #> 17         4         2             1.0               2               0
 #> 18         4         2             4.0               2               0
+#> 19         4         2             2.0               2               0
+#> 20         4         2             2.0               2               0
+#> 21         4         2             2.0               2               0
+#> 22         4         2             2.0               2               0
 #>    b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy
 #> 1                  2                 2      0.0        0        0       0
 #> 2                  4                 2      1.0        2        0       0
@@ -142,6 +158,10 @@ head(parameters)
 #> 16                 4                 2      1.0        2       50      50
 #> 17                 1                 2      1.0        2       50      50
 #> 18                 2                 2      2.0        2       50      50
+#> 19                 2                 2      0.0        0        0       0
+#> 20                 2                 2      0.0        0        0       0
+#> 21                 2                 2      0.0        0        0       0
+#> 22                 2                 2      0.0        0        0       0
 #>    a_buddy a_group_centroid b_group_centroid b_visual_field central non_central
 #> 1        0                0                0              0       0           0
 #> 2        0                0                0              0       0           0
@@ -161,25 +181,33 @@ head(parameters)
 #> 16       2                2                4             60       0           0
 #> 17       2                2                4             60       0           0
 #> 18       2                2                4             60       0           0
-#>    acceleration constant_speed deceleration
-#> 1             0              0            0
-#> 2             0              0            0
-#> 3             0              0            0
-#> 4             0              0            0
-#> 5             0              0            0
-#> 6             0              0            0
-#> 7             0              0            0
-#> 8             0              0            0
-#> 9             0              0            0
-#> 10            0              0            0
-#> 11            0              0            0
-#> 12            0              0            0
-#> 13            0              0            0
-#> 14            0              0            0
-#> 15            0              0            0
-#> 16            0              0            0
-#> 17            0              0            0
-#> 18            0              0            0
+#> 19       0                0                0              0       0           0
+#> 20       0                0                0              0       0           0
+#> 21       0                0                0              0       0           0
+#> 22       0                0                0              0       0           0
+#>    acceleration constant_speed deceleration a_lgvf b_lgvf e_lgvf
+#> 1             0              0            0      0      0  0.000
+#> 2             0              0            0      0      0  0.000
+#> 3             0              0            0      0      0  0.000
+#> 4             0              0            0      0      0  0.000
+#> 5             0              0            0      0      0  0.000
+#> 6             0              0            0      0      0  0.000
+#> 7             0              0            0      0      0  0.000
+#> 8             0              0            0      0      0  0.000
+#> 9             0              0            0      0      0  0.000
+#> 10            0              0            0      0      0  0.000
+#> 11            0              0            0      0      0  0.000
+#> 12            0              0            0      0      0  0.000
+#> 13            0              0            0      0      0  0.000
+#> 14            0              0            0      0      0  0.000
+#> 15            0              0            0      0      0  0.000
+#> 16            0              0            0      0      0  0.000
+#> 17            0              0            0      0      0  0.000
+#> 18            0              0            0      0      0  0.000
+#> 19            0              0            0      2      2  0.851
+#> 20            0              0            0      1      4  0.714
+#> 21            0              0            0      4      1  0.863
+#> 22            0              0            0      1      3  0.792
 #> 
 #> $params_sigma
 #> $params_sigma$BaselineEuropean
@@ -217,6 +245,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -251,6 +282,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -285,6 +319,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -319,6 +356,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -353,6 +393,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -387,6 +430,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -421,6 +467,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -455,6 +504,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -489,6 +541,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$BigRushingDutch
 #>                       radius slowing_time preferred_speed randomness
@@ -525,6 +617,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -559,6 +654,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -593,6 +691,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -627,6 +728,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -661,6 +765,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -695,6 +802,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -729,6 +839,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -763,6 +876,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -797,6 +913,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$DrunkAussie
 #>                       radius slowing_time preferred_speed randomness
@@ -833,6 +989,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -867,6 +1026,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -901,6 +1063,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -935,6 +1100,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -969,6 +1137,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -1003,6 +1174,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -1037,6 +1211,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -1071,6 +1248,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -1105,6 +1285,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$CautiousOldEuropean
 #>                       radius slowing_time preferred_speed randomness
@@ -1141,6 +1361,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -1175,6 +1398,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -1209,6 +1435,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -1243,6 +1472,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -1277,6 +1509,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -1311,6 +1546,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -1345,6 +1583,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -1379,6 +1620,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -1413,6 +1657,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$Rushed
 #>                       radius slowing_time preferred_speed randomness
@@ -1449,6 +1733,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -1483,6 +1770,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -1517,6 +1807,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -1551,6 +1844,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -1585,6 +1881,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -1619,6 +1918,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -1653,6 +1955,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -1687,6 +1992,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -1721,6 +2029,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$Distracted
 #>                       radius slowing_time preferred_speed randomness
@@ -1757,6 +2105,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -1791,6 +2142,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -1825,6 +2179,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -1859,6 +2216,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -1893,6 +2253,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -1927,6 +2290,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -1961,6 +2327,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -1995,6 +2364,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -2029,6 +2401,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$BaselineEuropean1
 #>                       radius slowing_time preferred_speed randomness
@@ -2065,6 +2477,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -2099,6 +2514,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -2133,6 +2551,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -2167,6 +2588,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -2201,6 +2625,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -2235,6 +2662,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -2269,6 +2699,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -2303,6 +2736,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -2337,6 +2773,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$BigRushingDutch1
 #>                       radius slowing_time preferred_speed randomness
@@ -2373,6 +2849,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -2407,6 +2886,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -2441,6 +2923,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -2475,6 +2960,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -2509,6 +2997,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -2543,6 +3034,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -2577,6 +3071,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -2611,6 +3108,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -2645,6 +3145,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$DrunkAussie1
 #>                       radius slowing_time preferred_speed randomness
@@ -2681,6 +3221,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -2715,6 +3258,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -2749,6 +3295,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -2783,6 +3332,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -2817,6 +3369,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -2851,6 +3406,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -2885,6 +3443,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -2919,6 +3480,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -2953,6 +3517,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$CautiousOldEuropean1
 #>                       radius slowing_time preferred_speed randomness
@@ -2989,6 +3593,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -3023,6 +3630,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -3057,6 +3667,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -3091,6 +3704,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -3125,6 +3741,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -3159,6 +3778,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -3193,6 +3815,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -3227,6 +3852,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -3261,6 +3889,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$Rushed1
 #>                       radius slowing_time preferred_speed randomness
@@ -3297,6 +3965,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -3331,6 +4002,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -3365,6 +4039,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -3399,6 +4076,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -3433,6 +4113,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -3467,6 +4150,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -3501,6 +4187,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -3535,6 +4224,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -3569,6 +4261,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$Distracted1
 #>                       radius slowing_time preferred_speed randomness
@@ -3605,6 +4337,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -3639,6 +4374,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -3673,6 +4411,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -3707,6 +4448,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -3741,6 +4485,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -3775,6 +4522,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -3809,6 +4559,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -3843,6 +4596,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -3877,6 +4633,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$Lost
 #>                       radius slowing_time preferred_speed randomness
@@ -3913,6 +4709,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -3947,6 +4746,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -3981,6 +4783,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -4015,6 +4820,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -4049,6 +4857,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -4083,6 +4894,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -4117,6 +4931,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -4151,6 +4968,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -4185,6 +5005,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$SociallyAnxious
 #>                       radius slowing_time preferred_speed randomness
@@ -4221,6 +5081,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -4255,6 +5118,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -4289,6 +5155,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -4323,6 +5192,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -4357,6 +5229,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -4391,6 +5266,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -4425,6 +5303,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -4459,6 +5340,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -4493,6 +5377,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$SocialBaselineEuropean
 #>                       radius slowing_time preferred_speed randomness
@@ -4529,6 +5453,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -4563,6 +5490,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -4597,6 +5527,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -4631,6 +5564,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -4665,6 +5601,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -4699,6 +5638,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -4733,6 +5675,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -4767,6 +5712,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -4801,6 +5749,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$SocialBigRushingDutch
 #>                       radius slowing_time preferred_speed randomness
@@ -4837,6 +5825,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -4871,6 +5862,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -4905,6 +5899,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -4939,6 +5936,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -4973,6 +5973,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -5007,6 +6010,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -5041,6 +6047,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -5075,6 +6084,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -5109,6 +6121,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$SocialDrunkAussie
 #>                       radius slowing_time preferred_speed randomness
@@ -5145,6 +6197,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -5179,6 +6234,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -5213,6 +6271,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -5247,6 +6308,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -5281,6 +6345,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -5315,6 +6382,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -5349,6 +6419,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -5383,6 +6456,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -5417,6 +6493,46 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> $params_sigma$SocialCautiousOldEuropean
 #>                       radius slowing_time preferred_speed randomness
@@ -5453,6 +6569,9 @@ head(parameters)
 #> acceleration            0.00          0.0            0.00        0.0
 #> constant_speed          0.00          0.0            0.00        0.0
 #> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
 #>                       stop_utility reroute b_turning a_turning
 #> radius                        0.00     0.0       0.0         0
 #> slowing_time                  0.00     0.0       0.0         0
@@ -5487,6 +6606,9 @@ head(parameters)
 #> acceleration                  0.00     0.0       0.0         0
 #> constant_speed                0.00     0.0       0.0         0
 #> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
 #>                       b_current_direction a_current_direction
 #> radius                                0.0                   0
 #> slowing_time                          0.0                   0
@@ -5521,6 +6643,9 @@ head(parameters)
 #> acceleration                          0.0                   0
 #> constant_speed                        0.0                   0
 #> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
 #>                       blr_current_direction b_goal_direction a_goal_direction
 #> radius                                    0             0.00                0
 #> slowing_time                              0             0.00                0
@@ -5555,6 +6680,9 @@ head(parameters)
 #> acceleration                              0             0.00                0
 #> constant_speed                            0             0.00                0
 #> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
 #>                       b_blocked a_blocked b_interpersonal a_interpersonal
 #> radius                     0.00         0            0.00               0
 #> slowing_time               0.00         0            0.00               0
@@ -5589,6 +6717,9 @@ head(parameters)
 #> acceleration               0.00         0            0.00               0
 #> constant_speed             0.00         0            0.00               0
 #> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
 #>                       d_interpersonal b_preferred_speed a_preferred_speed
 #> radius                              0              0.00                 0
 #> slowing_time                        0              0.00                 0
@@ -5623,6 +6754,9 @@ head(parameters)
 #> acceleration                        0              0.00                 0
 #> constant_speed                      0              0.00                 0
 #> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
 #>                       b_leader a_leader d_leader b_buddy a_buddy
 #> radius                       0        0        0       0       0
 #> slowing_time                 0        0        0       0       0
@@ -5657,6 +6791,9 @@ head(parameters)
 #> acceleration                 0        0        0       0       0
 #> constant_speed               0        0        0       0       0
 #> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
 #>                       a_group_centroid b_group_centroid b_visual_field central
 #> radius                               0                0              0       0
 #> slowing_time                         0                0              0       0
@@ -5691,6 +6828,9 @@ head(parameters)
 #> acceleration                         0                0              0       0
 #> constant_speed                       0                0              0       0
 #> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
 #>                       non_central acceleration constant_speed deceleration
 #> radius                          0            0              0            0
 #> slowing_time                    0            0              0            0
@@ -5725,6 +6865,1534 @@ head(parameters)
 #> acceleration                    0            0              0            0
 #> constant_speed                  0            0              0            0
 #> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
+#> 
+#> $params_sigma$Colleagues
+#>                       radius slowing_time preferred_speed randomness
+#> radius                  0.15          0.0            0.00        0.0
+#> slowing_time            0.00          0.1            0.00        0.0
+#> preferred_speed         0.00          0.0            0.05        0.0
+#> randomness              0.00          0.0            0.00        0.1
+#> stop_utility            0.00          0.0            0.00        0.0
+#> reroute                 0.00          0.0            0.00        0.0
+#> b_turning               0.00          0.0            0.00        0.0
+#> a_turning               0.00          0.0            0.00        0.0
+#> b_current_direction     0.00          0.0            0.00        0.0
+#> a_current_direction     0.00          0.0            0.00        0.0
+#> blr_current_direction   0.00          0.0            0.00        0.0
+#> b_goal_direction        0.00          0.0            0.00        0.0
+#> a_goal_direction        0.00          0.0            0.00        0.0
+#> b_blocked               0.00          0.0            0.00        0.0
+#> a_blocked               0.00          0.0            0.00        0.0
+#> b_interpersonal         0.00          0.0            0.00        0.0
+#> a_interpersonal         0.00          0.0            0.00        0.0
+#> d_interpersonal         0.00          0.0            0.00        0.0
+#> b_preferred_speed       0.00          0.0            0.00        0.0
+#> a_preferred_speed       0.00          0.0            0.00        0.0
+#> b_leader                0.00          0.0            0.00        0.0
+#> a_leader                0.00          0.0            0.00        0.0
+#> d_leader                0.00          0.0            0.00        0.0
+#> b_buddy                 0.00          0.0            0.00        0.0
+#> a_buddy                 0.00          0.0            0.00        0.0
+#> a_group_centroid        0.00          0.0            0.00        0.0
+#> b_group_centroid        0.00          0.0            0.00        0.0
+#> b_visual_field          0.00          0.0            0.00        0.0
+#> central                 0.00          0.0            0.00        0.0
+#> non_central             0.00          0.0            0.00        0.0
+#> acceleration            0.00          0.0            0.00        0.0
+#> constant_speed          0.00          0.0            0.00        0.0
+#> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
+#>                       stop_utility reroute b_turning a_turning
+#> radius                        0.00     0.0       0.0         0
+#> slowing_time                  0.00     0.0       0.0         0
+#> preferred_speed               0.00     0.0       0.0         0
+#> randomness                    0.00     0.0       0.0         0
+#> stop_utility                  0.01     0.0       0.0         0
+#> reroute                       0.00     0.1       0.0         0
+#> b_turning                     0.00     0.0       0.1         0
+#> a_turning                     0.00     0.0       0.0         0
+#> b_current_direction           0.00     0.0       0.0         0
+#> a_current_direction           0.00     0.0       0.0         0
+#> blr_current_direction         0.00     0.0       0.0         0
+#> b_goal_direction              0.00     0.0       0.0         0
+#> a_goal_direction              0.00     0.0       0.0         0
+#> b_blocked                     0.00     0.0       0.0         0
+#> a_blocked                     0.00     0.0       0.0         0
+#> b_interpersonal               0.00     0.0       0.0         0
+#> a_interpersonal               0.00     0.0       0.0         0
+#> d_interpersonal               0.00     0.0       0.0         0
+#> b_preferred_speed             0.00     0.0       0.0         0
+#> a_preferred_speed             0.00     0.0       0.0         0
+#> b_leader                      0.00     0.0       0.0         0
+#> a_leader                      0.00     0.0       0.0         0
+#> d_leader                      0.00     0.0       0.0         0
+#> b_buddy                       0.00     0.0       0.0         0
+#> a_buddy                       0.00     0.0       0.0         0
+#> a_group_centroid              0.00     0.0       0.0         0
+#> b_group_centroid              0.00     0.0       0.0         0
+#> b_visual_field                0.00     0.0       0.0         0
+#> central                       0.00     0.0       0.0         0
+#> non_central                   0.00     0.0       0.0         0
+#> acceleration                  0.00     0.0       0.0         0
+#> constant_speed                0.00     0.0       0.0         0
+#> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
+#>                       b_current_direction a_current_direction
+#> radius                                0.0                   0
+#> slowing_time                          0.0                   0
+#> preferred_speed                       0.0                   0
+#> randomness                            0.0                   0
+#> stop_utility                          0.0                   0
+#> reroute                               0.0                   0
+#> b_turning                             0.0                   0
+#> a_turning                             0.0                   0
+#> b_current_direction                   0.1                   0
+#> a_current_direction                   0.0                   0
+#> blr_current_direction                 0.0                   0
+#> b_goal_direction                      0.0                   0
+#> a_goal_direction                      0.0                   0
+#> b_blocked                             0.0                   0
+#> a_blocked                             0.0                   0
+#> b_interpersonal                       0.0                   0
+#> a_interpersonal                       0.0                   0
+#> d_interpersonal                       0.0                   0
+#> b_preferred_speed                     0.0                   0
+#> a_preferred_speed                     0.0                   0
+#> b_leader                              0.0                   0
+#> a_leader                              0.0                   0
+#> d_leader                              0.0                   0
+#> b_buddy                               0.0                   0
+#> a_buddy                               0.0                   0
+#> a_group_centroid                      0.0                   0
+#> b_group_centroid                      0.0                   0
+#> b_visual_field                        0.0                   0
+#> central                               0.0                   0
+#> non_central                           0.0                   0
+#> acceleration                          0.0                   0
+#> constant_speed                        0.0                   0
+#> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
+#>                       blr_current_direction b_goal_direction a_goal_direction
+#> radius                                    0             0.00                0
+#> slowing_time                              0             0.00                0
+#> preferred_speed                           0             0.00                0
+#> randomness                                0             0.00                0
+#> stop_utility                              0             0.00                0
+#> reroute                                   0             0.00                0
+#> b_turning                                 0             0.00                0
+#> a_turning                                 0             0.00                0
+#> b_current_direction                       0             0.00                0
+#> a_current_direction                       0             0.00                0
+#> blr_current_direction                     0             0.00                0
+#> b_goal_direction                          0             0.15                0
+#> a_goal_direction                          0             0.00                0
+#> b_blocked                                 0             0.00                0
+#> a_blocked                                 0             0.00                0
+#> b_interpersonal                           0             0.00                0
+#> a_interpersonal                           0             0.00                0
+#> d_interpersonal                           0             0.00                0
+#> b_preferred_speed                         0             0.00                0
+#> a_preferred_speed                         0             0.00                0
+#> b_leader                                  0             0.00                0
+#> a_leader                                  0             0.00                0
+#> d_leader                                  0             0.00                0
+#> b_buddy                                   0             0.00                0
+#> a_buddy                                   0             0.00                0
+#> a_group_centroid                          0             0.00                0
+#> b_group_centroid                          0             0.00                0
+#> b_visual_field                            0             0.00                0
+#> central                                   0             0.00                0
+#> non_central                               0             0.00                0
+#> acceleration                              0             0.00                0
+#> constant_speed                            0             0.00                0
+#> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
+#>                       b_blocked a_blocked b_interpersonal a_interpersonal
+#> radius                     0.00         0            0.00               0
+#> slowing_time               0.00         0            0.00               0
+#> preferred_speed            0.00         0            0.00               0
+#> randomness                 0.00         0            0.00               0
+#> stop_utility               0.00         0            0.00               0
+#> reroute                    0.00         0            0.00               0
+#> b_turning                  0.00         0            0.00               0
+#> a_turning                  0.00         0            0.00               0
+#> b_current_direction        0.00         0            0.00               0
+#> a_current_direction        0.00         0            0.00               0
+#> blr_current_direction      0.00         0            0.00               0
+#> b_goal_direction           0.00         0            0.00               0
+#> a_goal_direction           0.00         0            0.00               0
+#> b_blocked                  0.15         0            0.00               0
+#> a_blocked                  0.00         0            0.00               0
+#> b_interpersonal            0.00         0            0.15               0
+#> a_interpersonal            0.00         0            0.00               0
+#> d_interpersonal            0.00         0            0.00               0
+#> b_preferred_speed          0.00         0            0.00               0
+#> a_preferred_speed          0.00         0            0.00               0
+#> b_leader                   0.00         0            0.00               0
+#> a_leader                   0.00         0            0.00               0
+#> d_leader                   0.00         0            0.00               0
+#> b_buddy                    0.00         0            0.00               0
+#> a_buddy                    0.00         0            0.00               0
+#> a_group_centroid           0.00         0            0.00               0
+#> b_group_centroid           0.00         0            0.00               0
+#> b_visual_field             0.00         0            0.00               0
+#> central                    0.00         0            0.00               0
+#> non_central                0.00         0            0.00               0
+#> acceleration               0.00         0            0.00               0
+#> constant_speed             0.00         0            0.00               0
+#> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
+#>                       d_interpersonal b_preferred_speed a_preferred_speed
+#> radius                              0              0.00                 0
+#> slowing_time                        0              0.00                 0
+#> preferred_speed                     0              0.00                 0
+#> randomness                          0              0.00                 0
+#> stop_utility                        0              0.00                 0
+#> reroute                             0              0.00                 0
+#> b_turning                           0              0.00                 0
+#> a_turning                           0              0.00                 0
+#> b_current_direction                 0              0.00                 0
+#> a_current_direction                 0              0.00                 0
+#> blr_current_direction               0              0.00                 0
+#> b_goal_direction                    0              0.00                 0
+#> a_goal_direction                    0              0.00                 0
+#> b_blocked                           0              0.00                 0
+#> a_blocked                           0              0.00                 0
+#> b_interpersonal                     0              0.00                 0
+#> a_interpersonal                     0              0.00                 0
+#> d_interpersonal                     0              0.00                 0
+#> b_preferred_speed                   0              0.15                 0
+#> a_preferred_speed                   0              0.00                 0
+#> b_leader                            0              0.00                 0
+#> a_leader                            0              0.00                 0
+#> d_leader                            0              0.00                 0
+#> b_buddy                             0              0.00                 0
+#> a_buddy                             0              0.00                 0
+#> a_group_centroid                    0              0.00                 0
+#> b_group_centroid                    0              0.00                 0
+#> b_visual_field                      0              0.00                 0
+#> central                             0              0.00                 0
+#> non_central                         0              0.00                 0
+#> acceleration                        0              0.00                 0
+#> constant_speed                      0              0.00                 0
+#> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
+#>                       b_leader a_leader d_leader b_buddy a_buddy
+#> radius                       0        0        0       0       0
+#> slowing_time                 0        0        0       0       0
+#> preferred_speed              0        0        0       0       0
+#> randomness                   0        0        0       0       0
+#> stop_utility                 0        0        0       0       0
+#> reroute                      0        0        0       0       0
+#> b_turning                    0        0        0       0       0
+#> a_turning                    0        0        0       0       0
+#> b_current_direction          0        0        0       0       0
+#> a_current_direction          0        0        0       0       0
+#> blr_current_direction        0        0        0       0       0
+#> b_goal_direction             0        0        0       0       0
+#> a_goal_direction             0        0        0       0       0
+#> b_blocked                    0        0        0       0       0
+#> a_blocked                    0        0        0       0       0
+#> b_interpersonal              0        0        0       0       0
+#> a_interpersonal              0        0        0       0       0
+#> d_interpersonal              0        0        0       0       0
+#> b_preferred_speed            0        0        0       0       0
+#> a_preferred_speed            0        0        0       0       0
+#> b_leader                     0        0        0       0       0
+#> a_leader                     0        0        0       0       0
+#> d_leader                     0        0        0       0       0
+#> b_buddy                      0        0        0       0       0
+#> a_buddy                      0        0        0       0       0
+#> a_group_centroid             0        0        0       0       0
+#> b_group_centroid             0        0        0       0       0
+#> b_visual_field               0        0        0       0       0
+#> central                      0        0        0       0       0
+#> non_central                  0        0        0       0       0
+#> acceleration                 0        0        0       0       0
+#> constant_speed               0        0        0       0       0
+#> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
+#>                       a_group_centroid b_group_centroid b_visual_field central
+#> radius                               0                0              0       0
+#> slowing_time                         0                0              0       0
+#> preferred_speed                      0                0              0       0
+#> randomness                           0                0              0       0
+#> stop_utility                         0                0              0       0
+#> reroute                              0                0              0       0
+#> b_turning                            0                0              0       0
+#> a_turning                            0                0              0       0
+#> b_current_direction                  0                0              0       0
+#> a_current_direction                  0                0              0       0
+#> blr_current_direction                0                0              0       0
+#> b_goal_direction                     0                0              0       0
+#> a_goal_direction                     0                0              0       0
+#> b_blocked                            0                0              0       0
+#> a_blocked                            0                0              0       0
+#> b_interpersonal                      0                0              0       0
+#> a_interpersonal                      0                0              0       0
+#> d_interpersonal                      0                0              0       0
+#> b_preferred_speed                    0                0              0       0
+#> a_preferred_speed                    0                0              0       0
+#> b_leader                             0                0              0       0
+#> a_leader                             0                0              0       0
+#> d_leader                             0                0              0       0
+#> b_buddy                              0                0              0       0
+#> a_buddy                              0                0              0       0
+#> a_group_centroid                     0                0              0       0
+#> b_group_centroid                     0                0              0       0
+#> b_visual_field                       0                0              0       0
+#> central                              0                0              0       0
+#> non_central                          0                0              0       0
+#> acceleration                         0                0              0       0
+#> constant_speed                       0                0              0       0
+#> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
+#>                       non_central acceleration constant_speed deceleration
+#> radius                          0            0              0            0
+#> slowing_time                    0            0              0            0
+#> preferred_speed                 0            0              0            0
+#> randomness                      0            0              0            0
+#> stop_utility                    0            0              0            0
+#> reroute                         0            0              0            0
+#> b_turning                       0            0              0            0
+#> a_turning                       0            0              0            0
+#> b_current_direction             0            0              0            0
+#> a_current_direction             0            0              0            0
+#> blr_current_direction           0            0              0            0
+#> b_goal_direction                0            0              0            0
+#> a_goal_direction                0            0              0            0
+#> b_blocked                       0            0              0            0
+#> a_blocked                       0            0              0            0
+#> b_interpersonal                 0            0              0            0
+#> a_interpersonal                 0            0              0            0
+#> d_interpersonal                 0            0              0            0
+#> b_preferred_speed               0            0              0            0
+#> a_preferred_speed               0            0              0            0
+#> b_leader                        0            0              0            0
+#> a_leader                        0            0              0            0
+#> d_leader                        0            0              0            0
+#> b_buddy                         0            0              0            0
+#> a_buddy                         0            0              0            0
+#> a_group_centroid                0            0              0            0
+#> b_group_centroid                0            0              0            0
+#> b_visual_field                  0            0              0            0
+#> central                         0            0              0            0
+#> non_central                     0            0              0            0
+#> acceleration                    0            0              0            0
+#> constant_speed                  0            0              0            0
+#> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
+#> 
+#> $params_sigma$Couples
+#>                       radius slowing_time preferred_speed randomness
+#> radius                  0.15          0.0            0.00        0.0
+#> slowing_time            0.00          0.1            0.00        0.0
+#> preferred_speed         0.00          0.0            0.05        0.0
+#> randomness              0.00          0.0            0.00        0.1
+#> stop_utility            0.00          0.0            0.00        0.0
+#> reroute                 0.00          0.0            0.00        0.0
+#> b_turning               0.00          0.0            0.00        0.0
+#> a_turning               0.00          0.0            0.00        0.0
+#> b_current_direction     0.00          0.0            0.00        0.0
+#> a_current_direction     0.00          0.0            0.00        0.0
+#> blr_current_direction   0.00          0.0            0.00        0.0
+#> b_goal_direction        0.00          0.0            0.00        0.0
+#> a_goal_direction        0.00          0.0            0.00        0.0
+#> b_blocked               0.00          0.0            0.00        0.0
+#> a_blocked               0.00          0.0            0.00        0.0
+#> b_interpersonal         0.00          0.0            0.00        0.0
+#> a_interpersonal         0.00          0.0            0.00        0.0
+#> d_interpersonal         0.00          0.0            0.00        0.0
+#> b_preferred_speed       0.00          0.0            0.00        0.0
+#> a_preferred_speed       0.00          0.0            0.00        0.0
+#> b_leader                0.00          0.0            0.00        0.0
+#> a_leader                0.00          0.0            0.00        0.0
+#> d_leader                0.00          0.0            0.00        0.0
+#> b_buddy                 0.00          0.0            0.00        0.0
+#> a_buddy                 0.00          0.0            0.00        0.0
+#> a_group_centroid        0.00          0.0            0.00        0.0
+#> b_group_centroid        0.00          0.0            0.00        0.0
+#> b_visual_field          0.00          0.0            0.00        0.0
+#> central                 0.00          0.0            0.00        0.0
+#> non_central             0.00          0.0            0.00        0.0
+#> acceleration            0.00          0.0            0.00        0.0
+#> constant_speed          0.00          0.0            0.00        0.0
+#> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
+#>                       stop_utility reroute b_turning a_turning
+#> radius                        0.00     0.0       0.0         0
+#> slowing_time                  0.00     0.0       0.0         0
+#> preferred_speed               0.00     0.0       0.0         0
+#> randomness                    0.00     0.0       0.0         0
+#> stop_utility                  0.01     0.0       0.0         0
+#> reroute                       0.00     0.1       0.0         0
+#> b_turning                     0.00     0.0       0.1         0
+#> a_turning                     0.00     0.0       0.0         0
+#> b_current_direction           0.00     0.0       0.0         0
+#> a_current_direction           0.00     0.0       0.0         0
+#> blr_current_direction         0.00     0.0       0.0         0
+#> b_goal_direction              0.00     0.0       0.0         0
+#> a_goal_direction              0.00     0.0       0.0         0
+#> b_blocked                     0.00     0.0       0.0         0
+#> a_blocked                     0.00     0.0       0.0         0
+#> b_interpersonal               0.00     0.0       0.0         0
+#> a_interpersonal               0.00     0.0       0.0         0
+#> d_interpersonal               0.00     0.0       0.0         0
+#> b_preferred_speed             0.00     0.0       0.0         0
+#> a_preferred_speed             0.00     0.0       0.0         0
+#> b_leader                      0.00     0.0       0.0         0
+#> a_leader                      0.00     0.0       0.0         0
+#> d_leader                      0.00     0.0       0.0         0
+#> b_buddy                       0.00     0.0       0.0         0
+#> a_buddy                       0.00     0.0       0.0         0
+#> a_group_centroid              0.00     0.0       0.0         0
+#> b_group_centroid              0.00     0.0       0.0         0
+#> b_visual_field                0.00     0.0       0.0         0
+#> central                       0.00     0.0       0.0         0
+#> non_central                   0.00     0.0       0.0         0
+#> acceleration                  0.00     0.0       0.0         0
+#> constant_speed                0.00     0.0       0.0         0
+#> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
+#>                       b_current_direction a_current_direction
+#> radius                                0.0                   0
+#> slowing_time                          0.0                   0
+#> preferred_speed                       0.0                   0
+#> randomness                            0.0                   0
+#> stop_utility                          0.0                   0
+#> reroute                               0.0                   0
+#> b_turning                             0.0                   0
+#> a_turning                             0.0                   0
+#> b_current_direction                   0.1                   0
+#> a_current_direction                   0.0                   0
+#> blr_current_direction                 0.0                   0
+#> b_goal_direction                      0.0                   0
+#> a_goal_direction                      0.0                   0
+#> b_blocked                             0.0                   0
+#> a_blocked                             0.0                   0
+#> b_interpersonal                       0.0                   0
+#> a_interpersonal                       0.0                   0
+#> d_interpersonal                       0.0                   0
+#> b_preferred_speed                     0.0                   0
+#> a_preferred_speed                     0.0                   0
+#> b_leader                              0.0                   0
+#> a_leader                              0.0                   0
+#> d_leader                              0.0                   0
+#> b_buddy                               0.0                   0
+#> a_buddy                               0.0                   0
+#> a_group_centroid                      0.0                   0
+#> b_group_centroid                      0.0                   0
+#> b_visual_field                        0.0                   0
+#> central                               0.0                   0
+#> non_central                           0.0                   0
+#> acceleration                          0.0                   0
+#> constant_speed                        0.0                   0
+#> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
+#>                       blr_current_direction b_goal_direction a_goal_direction
+#> radius                                    0             0.00                0
+#> slowing_time                              0             0.00                0
+#> preferred_speed                           0             0.00                0
+#> randomness                                0             0.00                0
+#> stop_utility                              0             0.00                0
+#> reroute                                   0             0.00                0
+#> b_turning                                 0             0.00                0
+#> a_turning                                 0             0.00                0
+#> b_current_direction                       0             0.00                0
+#> a_current_direction                       0             0.00                0
+#> blr_current_direction                     0             0.00                0
+#> b_goal_direction                          0             0.15                0
+#> a_goal_direction                          0             0.00                0
+#> b_blocked                                 0             0.00                0
+#> a_blocked                                 0             0.00                0
+#> b_interpersonal                           0             0.00                0
+#> a_interpersonal                           0             0.00                0
+#> d_interpersonal                           0             0.00                0
+#> b_preferred_speed                         0             0.00                0
+#> a_preferred_speed                         0             0.00                0
+#> b_leader                                  0             0.00                0
+#> a_leader                                  0             0.00                0
+#> d_leader                                  0             0.00                0
+#> b_buddy                                   0             0.00                0
+#> a_buddy                                   0             0.00                0
+#> a_group_centroid                          0             0.00                0
+#> b_group_centroid                          0             0.00                0
+#> b_visual_field                            0             0.00                0
+#> central                                   0             0.00                0
+#> non_central                               0             0.00                0
+#> acceleration                              0             0.00                0
+#> constant_speed                            0             0.00                0
+#> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
+#>                       b_blocked a_blocked b_interpersonal a_interpersonal
+#> radius                     0.00         0            0.00               0
+#> slowing_time               0.00         0            0.00               0
+#> preferred_speed            0.00         0            0.00               0
+#> randomness                 0.00         0            0.00               0
+#> stop_utility               0.00         0            0.00               0
+#> reroute                    0.00         0            0.00               0
+#> b_turning                  0.00         0            0.00               0
+#> a_turning                  0.00         0            0.00               0
+#> b_current_direction        0.00         0            0.00               0
+#> a_current_direction        0.00         0            0.00               0
+#> blr_current_direction      0.00         0            0.00               0
+#> b_goal_direction           0.00         0            0.00               0
+#> a_goal_direction           0.00         0            0.00               0
+#> b_blocked                  0.15         0            0.00               0
+#> a_blocked                  0.00         0            0.00               0
+#> b_interpersonal            0.00         0            0.15               0
+#> a_interpersonal            0.00         0            0.00               0
+#> d_interpersonal            0.00         0            0.00               0
+#> b_preferred_speed          0.00         0            0.00               0
+#> a_preferred_speed          0.00         0            0.00               0
+#> b_leader                   0.00         0            0.00               0
+#> a_leader                   0.00         0            0.00               0
+#> d_leader                   0.00         0            0.00               0
+#> b_buddy                    0.00         0            0.00               0
+#> a_buddy                    0.00         0            0.00               0
+#> a_group_centroid           0.00         0            0.00               0
+#> b_group_centroid           0.00         0            0.00               0
+#> b_visual_field             0.00         0            0.00               0
+#> central                    0.00         0            0.00               0
+#> non_central                0.00         0            0.00               0
+#> acceleration               0.00         0            0.00               0
+#> constant_speed             0.00         0            0.00               0
+#> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
+#>                       d_interpersonal b_preferred_speed a_preferred_speed
+#> radius                              0              0.00                 0
+#> slowing_time                        0              0.00                 0
+#> preferred_speed                     0              0.00                 0
+#> randomness                          0              0.00                 0
+#> stop_utility                        0              0.00                 0
+#> reroute                             0              0.00                 0
+#> b_turning                           0              0.00                 0
+#> a_turning                           0              0.00                 0
+#> b_current_direction                 0              0.00                 0
+#> a_current_direction                 0              0.00                 0
+#> blr_current_direction               0              0.00                 0
+#> b_goal_direction                    0              0.00                 0
+#> a_goal_direction                    0              0.00                 0
+#> b_blocked                           0              0.00                 0
+#> a_blocked                           0              0.00                 0
+#> b_interpersonal                     0              0.00                 0
+#> a_interpersonal                     0              0.00                 0
+#> d_interpersonal                     0              0.00                 0
+#> b_preferred_speed                   0              0.15                 0
+#> a_preferred_speed                   0              0.00                 0
+#> b_leader                            0              0.00                 0
+#> a_leader                            0              0.00                 0
+#> d_leader                            0              0.00                 0
+#> b_buddy                             0              0.00                 0
+#> a_buddy                             0              0.00                 0
+#> a_group_centroid                    0              0.00                 0
+#> b_group_centroid                    0              0.00                 0
+#> b_visual_field                      0              0.00                 0
+#> central                             0              0.00                 0
+#> non_central                         0              0.00                 0
+#> acceleration                        0              0.00                 0
+#> constant_speed                      0              0.00                 0
+#> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
+#>                       b_leader a_leader d_leader b_buddy a_buddy
+#> radius                       0        0        0       0       0
+#> slowing_time                 0        0        0       0       0
+#> preferred_speed              0        0        0       0       0
+#> randomness                   0        0        0       0       0
+#> stop_utility                 0        0        0       0       0
+#> reroute                      0        0        0       0       0
+#> b_turning                    0        0        0       0       0
+#> a_turning                    0        0        0       0       0
+#> b_current_direction          0        0        0       0       0
+#> a_current_direction          0        0        0       0       0
+#> blr_current_direction        0        0        0       0       0
+#> b_goal_direction             0        0        0       0       0
+#> a_goal_direction             0        0        0       0       0
+#> b_blocked                    0        0        0       0       0
+#> a_blocked                    0        0        0       0       0
+#> b_interpersonal              0        0        0       0       0
+#> a_interpersonal              0        0        0       0       0
+#> d_interpersonal              0        0        0       0       0
+#> b_preferred_speed            0        0        0       0       0
+#> a_preferred_speed            0        0        0       0       0
+#> b_leader                     0        0        0       0       0
+#> a_leader                     0        0        0       0       0
+#> d_leader                     0        0        0       0       0
+#> b_buddy                      0        0        0       0       0
+#> a_buddy                      0        0        0       0       0
+#> a_group_centroid             0        0        0       0       0
+#> b_group_centroid             0        0        0       0       0
+#> b_visual_field               0        0        0       0       0
+#> central                      0        0        0       0       0
+#> non_central                  0        0        0       0       0
+#> acceleration                 0        0        0       0       0
+#> constant_speed               0        0        0       0       0
+#> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
+#>                       a_group_centroid b_group_centroid b_visual_field central
+#> radius                               0                0              0       0
+#> slowing_time                         0                0              0       0
+#> preferred_speed                      0                0              0       0
+#> randomness                           0                0              0       0
+#> stop_utility                         0                0              0       0
+#> reroute                              0                0              0       0
+#> b_turning                            0                0              0       0
+#> a_turning                            0                0              0       0
+#> b_current_direction                  0                0              0       0
+#> a_current_direction                  0                0              0       0
+#> blr_current_direction                0                0              0       0
+#> b_goal_direction                     0                0              0       0
+#> a_goal_direction                     0                0              0       0
+#> b_blocked                            0                0              0       0
+#> a_blocked                            0                0              0       0
+#> b_interpersonal                      0                0              0       0
+#> a_interpersonal                      0                0              0       0
+#> d_interpersonal                      0                0              0       0
+#> b_preferred_speed                    0                0              0       0
+#> a_preferred_speed                    0                0              0       0
+#> b_leader                             0                0              0       0
+#> a_leader                             0                0              0       0
+#> d_leader                             0                0              0       0
+#> b_buddy                              0                0              0       0
+#> a_buddy                              0                0              0       0
+#> a_group_centroid                     0                0              0       0
+#> b_group_centroid                     0                0              0       0
+#> b_visual_field                       0                0              0       0
+#> central                              0                0              0       0
+#> non_central                          0                0              0       0
+#> acceleration                         0                0              0       0
+#> constant_speed                       0                0              0       0
+#> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
+#>                       non_central acceleration constant_speed deceleration
+#> radius                          0            0              0            0
+#> slowing_time                    0            0              0            0
+#> preferred_speed                 0            0              0            0
+#> randomness                      0            0              0            0
+#> stop_utility                    0            0              0            0
+#> reroute                         0            0              0            0
+#> b_turning                       0            0              0            0
+#> a_turning                       0            0              0            0
+#> b_current_direction             0            0              0            0
+#> a_current_direction             0            0              0            0
+#> blr_current_direction           0            0              0            0
+#> b_goal_direction                0            0              0            0
+#> a_goal_direction                0            0              0            0
+#> b_blocked                       0            0              0            0
+#> a_blocked                       0            0              0            0
+#> b_interpersonal                 0            0              0            0
+#> a_interpersonal                 0            0              0            0
+#> d_interpersonal                 0            0              0            0
+#> b_preferred_speed               0            0              0            0
+#> a_preferred_speed               0            0              0            0
+#> b_leader                        0            0              0            0
+#> a_leader                        0            0              0            0
+#> d_leader                        0            0              0            0
+#> b_buddy                         0            0              0            0
+#> a_buddy                         0            0              0            0
+#> a_group_centroid                0            0              0            0
+#> b_group_centroid                0            0              0            0
+#> b_visual_field                  0            0              0            0
+#> central                         0            0              0            0
+#> non_central                     0            0              0            0
+#> acceleration                    0            0              0            0
+#> constant_speed                  0            0              0            0
+#> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
+#> 
+#> $params_sigma$Families
+#>                       radius slowing_time preferred_speed randomness
+#> radius                  0.15          0.0            0.00        0.0
+#> slowing_time            0.00          0.1            0.00        0.0
+#> preferred_speed         0.00          0.0            0.05        0.0
+#> randomness              0.00          0.0            0.00        0.1
+#> stop_utility            0.00          0.0            0.00        0.0
+#> reroute                 0.00          0.0            0.00        0.0
+#> b_turning               0.00          0.0            0.00        0.0
+#> a_turning               0.00          0.0            0.00        0.0
+#> b_current_direction     0.00          0.0            0.00        0.0
+#> a_current_direction     0.00          0.0            0.00        0.0
+#> blr_current_direction   0.00          0.0            0.00        0.0
+#> b_goal_direction        0.00          0.0            0.00        0.0
+#> a_goal_direction        0.00          0.0            0.00        0.0
+#> b_blocked               0.00          0.0            0.00        0.0
+#> a_blocked               0.00          0.0            0.00        0.0
+#> b_interpersonal         0.00          0.0            0.00        0.0
+#> a_interpersonal         0.00          0.0            0.00        0.0
+#> d_interpersonal         0.00          0.0            0.00        0.0
+#> b_preferred_speed       0.00          0.0            0.00        0.0
+#> a_preferred_speed       0.00          0.0            0.00        0.0
+#> b_leader                0.00          0.0            0.00        0.0
+#> a_leader                0.00          0.0            0.00        0.0
+#> d_leader                0.00          0.0            0.00        0.0
+#> b_buddy                 0.00          0.0            0.00        0.0
+#> a_buddy                 0.00          0.0            0.00        0.0
+#> a_group_centroid        0.00          0.0            0.00        0.0
+#> b_group_centroid        0.00          0.0            0.00        0.0
+#> b_visual_field          0.00          0.0            0.00        0.0
+#> central                 0.00          0.0            0.00        0.0
+#> non_central             0.00          0.0            0.00        0.0
+#> acceleration            0.00          0.0            0.00        0.0
+#> constant_speed          0.00          0.0            0.00        0.0
+#> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
+#>                       stop_utility reroute b_turning a_turning
+#> radius                        0.00     0.0       0.0         0
+#> slowing_time                  0.00     0.0       0.0         0
+#> preferred_speed               0.00     0.0       0.0         0
+#> randomness                    0.00     0.0       0.0         0
+#> stop_utility                  0.01     0.0       0.0         0
+#> reroute                       0.00     0.1       0.0         0
+#> b_turning                     0.00     0.0       0.1         0
+#> a_turning                     0.00     0.0       0.0         0
+#> b_current_direction           0.00     0.0       0.0         0
+#> a_current_direction           0.00     0.0       0.0         0
+#> blr_current_direction         0.00     0.0       0.0         0
+#> b_goal_direction              0.00     0.0       0.0         0
+#> a_goal_direction              0.00     0.0       0.0         0
+#> b_blocked                     0.00     0.0       0.0         0
+#> a_blocked                     0.00     0.0       0.0         0
+#> b_interpersonal               0.00     0.0       0.0         0
+#> a_interpersonal               0.00     0.0       0.0         0
+#> d_interpersonal               0.00     0.0       0.0         0
+#> b_preferred_speed             0.00     0.0       0.0         0
+#> a_preferred_speed             0.00     0.0       0.0         0
+#> b_leader                      0.00     0.0       0.0         0
+#> a_leader                      0.00     0.0       0.0         0
+#> d_leader                      0.00     0.0       0.0         0
+#> b_buddy                       0.00     0.0       0.0         0
+#> a_buddy                       0.00     0.0       0.0         0
+#> a_group_centroid              0.00     0.0       0.0         0
+#> b_group_centroid              0.00     0.0       0.0         0
+#> b_visual_field                0.00     0.0       0.0         0
+#> central                       0.00     0.0       0.0         0
+#> non_central                   0.00     0.0       0.0         0
+#> acceleration                  0.00     0.0       0.0         0
+#> constant_speed                0.00     0.0       0.0         0
+#> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
+#>                       b_current_direction a_current_direction
+#> radius                                0.0                   0
+#> slowing_time                          0.0                   0
+#> preferred_speed                       0.0                   0
+#> randomness                            0.0                   0
+#> stop_utility                          0.0                   0
+#> reroute                               0.0                   0
+#> b_turning                             0.0                   0
+#> a_turning                             0.0                   0
+#> b_current_direction                   0.1                   0
+#> a_current_direction                   0.0                   0
+#> blr_current_direction                 0.0                   0
+#> b_goal_direction                      0.0                   0
+#> a_goal_direction                      0.0                   0
+#> b_blocked                             0.0                   0
+#> a_blocked                             0.0                   0
+#> b_interpersonal                       0.0                   0
+#> a_interpersonal                       0.0                   0
+#> d_interpersonal                       0.0                   0
+#> b_preferred_speed                     0.0                   0
+#> a_preferred_speed                     0.0                   0
+#> b_leader                              0.0                   0
+#> a_leader                              0.0                   0
+#> d_leader                              0.0                   0
+#> b_buddy                               0.0                   0
+#> a_buddy                               0.0                   0
+#> a_group_centroid                      0.0                   0
+#> b_group_centroid                      0.0                   0
+#> b_visual_field                        0.0                   0
+#> central                               0.0                   0
+#> non_central                           0.0                   0
+#> acceleration                          0.0                   0
+#> constant_speed                        0.0                   0
+#> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
+#>                       blr_current_direction b_goal_direction a_goal_direction
+#> radius                                    0             0.00                0
+#> slowing_time                              0             0.00                0
+#> preferred_speed                           0             0.00                0
+#> randomness                                0             0.00                0
+#> stop_utility                              0             0.00                0
+#> reroute                                   0             0.00                0
+#> b_turning                                 0             0.00                0
+#> a_turning                                 0             0.00                0
+#> b_current_direction                       0             0.00                0
+#> a_current_direction                       0             0.00                0
+#> blr_current_direction                     0             0.00                0
+#> b_goal_direction                          0             0.15                0
+#> a_goal_direction                          0             0.00                0
+#> b_blocked                                 0             0.00                0
+#> a_blocked                                 0             0.00                0
+#> b_interpersonal                           0             0.00                0
+#> a_interpersonal                           0             0.00                0
+#> d_interpersonal                           0             0.00                0
+#> b_preferred_speed                         0             0.00                0
+#> a_preferred_speed                         0             0.00                0
+#> b_leader                                  0             0.00                0
+#> a_leader                                  0             0.00                0
+#> d_leader                                  0             0.00                0
+#> b_buddy                                   0             0.00                0
+#> a_buddy                                   0             0.00                0
+#> a_group_centroid                          0             0.00                0
+#> b_group_centroid                          0             0.00                0
+#> b_visual_field                            0             0.00                0
+#> central                                   0             0.00                0
+#> non_central                               0             0.00                0
+#> acceleration                              0             0.00                0
+#> constant_speed                            0             0.00                0
+#> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
+#>                       b_blocked a_blocked b_interpersonal a_interpersonal
+#> radius                     0.00         0            0.00               0
+#> slowing_time               0.00         0            0.00               0
+#> preferred_speed            0.00         0            0.00               0
+#> randomness                 0.00         0            0.00               0
+#> stop_utility               0.00         0            0.00               0
+#> reroute                    0.00         0            0.00               0
+#> b_turning                  0.00         0            0.00               0
+#> a_turning                  0.00         0            0.00               0
+#> b_current_direction        0.00         0            0.00               0
+#> a_current_direction        0.00         0            0.00               0
+#> blr_current_direction      0.00         0            0.00               0
+#> b_goal_direction           0.00         0            0.00               0
+#> a_goal_direction           0.00         0            0.00               0
+#> b_blocked                  0.15         0            0.00               0
+#> a_blocked                  0.00         0            0.00               0
+#> b_interpersonal            0.00         0            0.15               0
+#> a_interpersonal            0.00         0            0.00               0
+#> d_interpersonal            0.00         0            0.00               0
+#> b_preferred_speed          0.00         0            0.00               0
+#> a_preferred_speed          0.00         0            0.00               0
+#> b_leader                   0.00         0            0.00               0
+#> a_leader                   0.00         0            0.00               0
+#> d_leader                   0.00         0            0.00               0
+#> b_buddy                    0.00         0            0.00               0
+#> a_buddy                    0.00         0            0.00               0
+#> a_group_centroid           0.00         0            0.00               0
+#> b_group_centroid           0.00         0            0.00               0
+#> b_visual_field             0.00         0            0.00               0
+#> central                    0.00         0            0.00               0
+#> non_central                0.00         0            0.00               0
+#> acceleration               0.00         0            0.00               0
+#> constant_speed             0.00         0            0.00               0
+#> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
+#>                       d_interpersonal b_preferred_speed a_preferred_speed
+#> radius                              0              0.00                 0
+#> slowing_time                        0              0.00                 0
+#> preferred_speed                     0              0.00                 0
+#> randomness                          0              0.00                 0
+#> stop_utility                        0              0.00                 0
+#> reroute                             0              0.00                 0
+#> b_turning                           0              0.00                 0
+#> a_turning                           0              0.00                 0
+#> b_current_direction                 0              0.00                 0
+#> a_current_direction                 0              0.00                 0
+#> blr_current_direction               0              0.00                 0
+#> b_goal_direction                    0              0.00                 0
+#> a_goal_direction                    0              0.00                 0
+#> b_blocked                           0              0.00                 0
+#> a_blocked                           0              0.00                 0
+#> b_interpersonal                     0              0.00                 0
+#> a_interpersonal                     0              0.00                 0
+#> d_interpersonal                     0              0.00                 0
+#> b_preferred_speed                   0              0.15                 0
+#> a_preferred_speed                   0              0.00                 0
+#> b_leader                            0              0.00                 0
+#> a_leader                            0              0.00                 0
+#> d_leader                            0              0.00                 0
+#> b_buddy                             0              0.00                 0
+#> a_buddy                             0              0.00                 0
+#> a_group_centroid                    0              0.00                 0
+#> b_group_centroid                    0              0.00                 0
+#> b_visual_field                      0              0.00                 0
+#> central                             0              0.00                 0
+#> non_central                         0              0.00                 0
+#> acceleration                        0              0.00                 0
+#> constant_speed                      0              0.00                 0
+#> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
+#>                       b_leader a_leader d_leader b_buddy a_buddy
+#> radius                       0        0        0       0       0
+#> slowing_time                 0        0        0       0       0
+#> preferred_speed              0        0        0       0       0
+#> randomness                   0        0        0       0       0
+#> stop_utility                 0        0        0       0       0
+#> reroute                      0        0        0       0       0
+#> b_turning                    0        0        0       0       0
+#> a_turning                    0        0        0       0       0
+#> b_current_direction          0        0        0       0       0
+#> a_current_direction          0        0        0       0       0
+#> blr_current_direction        0        0        0       0       0
+#> b_goal_direction             0        0        0       0       0
+#> a_goal_direction             0        0        0       0       0
+#> b_blocked                    0        0        0       0       0
+#> a_blocked                    0        0        0       0       0
+#> b_interpersonal              0        0        0       0       0
+#> a_interpersonal              0        0        0       0       0
+#> d_interpersonal              0        0        0       0       0
+#> b_preferred_speed            0        0        0       0       0
+#> a_preferred_speed            0        0        0       0       0
+#> b_leader                     0        0        0       0       0
+#> a_leader                     0        0        0       0       0
+#> d_leader                     0        0        0       0       0
+#> b_buddy                      0        0        0       0       0
+#> a_buddy                      0        0        0       0       0
+#> a_group_centroid             0        0        0       0       0
+#> b_group_centroid             0        0        0       0       0
+#> b_visual_field               0        0        0       0       0
+#> central                      0        0        0       0       0
+#> non_central                  0        0        0       0       0
+#> acceleration                 0        0        0       0       0
+#> constant_speed               0        0        0       0       0
+#> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
+#>                       a_group_centroid b_group_centroid b_visual_field central
+#> radius                               0                0              0       0
+#> slowing_time                         0                0              0       0
+#> preferred_speed                      0                0              0       0
+#> randomness                           0                0              0       0
+#> stop_utility                         0                0              0       0
+#> reroute                              0                0              0       0
+#> b_turning                            0                0              0       0
+#> a_turning                            0                0              0       0
+#> b_current_direction                  0                0              0       0
+#> a_current_direction                  0                0              0       0
+#> blr_current_direction                0                0              0       0
+#> b_goal_direction                     0                0              0       0
+#> a_goal_direction                     0                0              0       0
+#> b_blocked                            0                0              0       0
+#> a_blocked                            0                0              0       0
+#> b_interpersonal                      0                0              0       0
+#> a_interpersonal                      0                0              0       0
+#> d_interpersonal                      0                0              0       0
+#> b_preferred_speed                    0                0              0       0
+#> a_preferred_speed                    0                0              0       0
+#> b_leader                             0                0              0       0
+#> a_leader                             0                0              0       0
+#> d_leader                             0                0              0       0
+#> b_buddy                              0                0              0       0
+#> a_buddy                              0                0              0       0
+#> a_group_centroid                     0                0              0       0
+#> b_group_centroid                     0                0              0       0
+#> b_visual_field                       0                0              0       0
+#> central                              0                0              0       0
+#> non_central                          0                0              0       0
+#> acceleration                         0                0              0       0
+#> constant_speed                       0                0              0       0
+#> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
+#>                       non_central acceleration constant_speed deceleration
+#> radius                          0            0              0            0
+#> slowing_time                    0            0              0            0
+#> preferred_speed                 0            0              0            0
+#> randomness                      0            0              0            0
+#> stop_utility                    0            0              0            0
+#> reroute                         0            0              0            0
+#> b_turning                       0            0              0            0
+#> a_turning                       0            0              0            0
+#> b_current_direction             0            0              0            0
+#> a_current_direction             0            0              0            0
+#> blr_current_direction           0            0              0            0
+#> b_goal_direction                0            0              0            0
+#> a_goal_direction                0            0              0            0
+#> b_blocked                       0            0              0            0
+#> a_blocked                       0            0              0            0
+#> b_interpersonal                 0            0              0            0
+#> a_interpersonal                 0            0              0            0
+#> d_interpersonal                 0            0              0            0
+#> b_preferred_speed               0            0              0            0
+#> a_preferred_speed               0            0              0            0
+#> b_leader                        0            0              0            0
+#> a_leader                        0            0              0            0
+#> d_leader                        0            0              0            0
+#> b_buddy                         0            0              0            0
+#> a_buddy                         0            0              0            0
+#> a_group_centroid                0            0              0            0
+#> b_group_centroid                0            0              0            0
+#> b_visual_field                  0            0              0            0
+#> central                         0            0              0            0
+#> non_central                     0            0              0            0
+#> acceleration                    0            0              0            0
+#> constant_speed                  0            0              0            0
+#> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
+#> 
+#> $params_sigma$Friends
+#>                       radius slowing_time preferred_speed randomness
+#> radius                  0.15          0.0            0.00        0.0
+#> slowing_time            0.00          0.1            0.00        0.0
+#> preferred_speed         0.00          0.0            0.05        0.0
+#> randomness              0.00          0.0            0.00        0.1
+#> stop_utility            0.00          0.0            0.00        0.0
+#> reroute                 0.00          0.0            0.00        0.0
+#> b_turning               0.00          0.0            0.00        0.0
+#> a_turning               0.00          0.0            0.00        0.0
+#> b_current_direction     0.00          0.0            0.00        0.0
+#> a_current_direction     0.00          0.0            0.00        0.0
+#> blr_current_direction   0.00          0.0            0.00        0.0
+#> b_goal_direction        0.00          0.0            0.00        0.0
+#> a_goal_direction        0.00          0.0            0.00        0.0
+#> b_blocked               0.00          0.0            0.00        0.0
+#> a_blocked               0.00          0.0            0.00        0.0
+#> b_interpersonal         0.00          0.0            0.00        0.0
+#> a_interpersonal         0.00          0.0            0.00        0.0
+#> d_interpersonal         0.00          0.0            0.00        0.0
+#> b_preferred_speed       0.00          0.0            0.00        0.0
+#> a_preferred_speed       0.00          0.0            0.00        0.0
+#> b_leader                0.00          0.0            0.00        0.0
+#> a_leader                0.00          0.0            0.00        0.0
+#> d_leader                0.00          0.0            0.00        0.0
+#> b_buddy                 0.00          0.0            0.00        0.0
+#> a_buddy                 0.00          0.0            0.00        0.0
+#> a_group_centroid        0.00          0.0            0.00        0.0
+#> b_group_centroid        0.00          0.0            0.00        0.0
+#> b_visual_field          0.00          0.0            0.00        0.0
+#> central                 0.00          0.0            0.00        0.0
+#> non_central             0.00          0.0            0.00        0.0
+#> acceleration            0.00          0.0            0.00        0.0
+#> constant_speed          0.00          0.0            0.00        0.0
+#> deceleration            0.00          0.0            0.00        0.0
+#> a_lgvf                  0.00          0.0            0.00        0.0
+#> b_lgvf                  0.00          0.0            0.00        0.0
+#> e_lgvf                  0.00          0.0            0.00        0.0
+#>                       stop_utility reroute b_turning a_turning
+#> radius                        0.00     0.0       0.0         0
+#> slowing_time                  0.00     0.0       0.0         0
+#> preferred_speed               0.00     0.0       0.0         0
+#> randomness                    0.00     0.0       0.0         0
+#> stop_utility                  0.01     0.0       0.0         0
+#> reroute                       0.00     0.1       0.0         0
+#> b_turning                     0.00     0.0       0.1         0
+#> a_turning                     0.00     0.0       0.0         0
+#> b_current_direction           0.00     0.0       0.0         0
+#> a_current_direction           0.00     0.0       0.0         0
+#> blr_current_direction         0.00     0.0       0.0         0
+#> b_goal_direction              0.00     0.0       0.0         0
+#> a_goal_direction              0.00     0.0       0.0         0
+#> b_blocked                     0.00     0.0       0.0         0
+#> a_blocked                     0.00     0.0       0.0         0
+#> b_interpersonal               0.00     0.0       0.0         0
+#> a_interpersonal               0.00     0.0       0.0         0
+#> d_interpersonal               0.00     0.0       0.0         0
+#> b_preferred_speed             0.00     0.0       0.0         0
+#> a_preferred_speed             0.00     0.0       0.0         0
+#> b_leader                      0.00     0.0       0.0         0
+#> a_leader                      0.00     0.0       0.0         0
+#> d_leader                      0.00     0.0       0.0         0
+#> b_buddy                       0.00     0.0       0.0         0
+#> a_buddy                       0.00     0.0       0.0         0
+#> a_group_centroid              0.00     0.0       0.0         0
+#> b_group_centroid              0.00     0.0       0.0         0
+#> b_visual_field                0.00     0.0       0.0         0
+#> central                       0.00     0.0       0.0         0
+#> non_central                   0.00     0.0       0.0         0
+#> acceleration                  0.00     0.0       0.0         0
+#> constant_speed                0.00     0.0       0.0         0
+#> deceleration                  0.00     0.0       0.0         0
+#> a_lgvf                        0.00     0.0       0.0         0
+#> b_lgvf                        0.00     0.0       0.0         0
+#> e_lgvf                        0.00     0.0       0.0         0
+#>                       b_current_direction a_current_direction
+#> radius                                0.0                   0
+#> slowing_time                          0.0                   0
+#> preferred_speed                       0.0                   0
+#> randomness                            0.0                   0
+#> stop_utility                          0.0                   0
+#> reroute                               0.0                   0
+#> b_turning                             0.0                   0
+#> a_turning                             0.0                   0
+#> b_current_direction                   0.1                   0
+#> a_current_direction                   0.0                   0
+#> blr_current_direction                 0.0                   0
+#> b_goal_direction                      0.0                   0
+#> a_goal_direction                      0.0                   0
+#> b_blocked                             0.0                   0
+#> a_blocked                             0.0                   0
+#> b_interpersonal                       0.0                   0
+#> a_interpersonal                       0.0                   0
+#> d_interpersonal                       0.0                   0
+#> b_preferred_speed                     0.0                   0
+#> a_preferred_speed                     0.0                   0
+#> b_leader                              0.0                   0
+#> a_leader                              0.0                   0
+#> d_leader                              0.0                   0
+#> b_buddy                               0.0                   0
+#> a_buddy                               0.0                   0
+#> a_group_centroid                      0.0                   0
+#> b_group_centroid                      0.0                   0
+#> b_visual_field                        0.0                   0
+#> central                               0.0                   0
+#> non_central                           0.0                   0
+#> acceleration                          0.0                   0
+#> constant_speed                        0.0                   0
+#> deceleration                          0.0                   0
+#> a_lgvf                                0.0                   0
+#> b_lgvf                                0.0                   0
+#> e_lgvf                                0.0                   0
+#>                       blr_current_direction b_goal_direction a_goal_direction
+#> radius                                    0             0.00                0
+#> slowing_time                              0             0.00                0
+#> preferred_speed                           0             0.00                0
+#> randomness                                0             0.00                0
+#> stop_utility                              0             0.00                0
+#> reroute                                   0             0.00                0
+#> b_turning                                 0             0.00                0
+#> a_turning                                 0             0.00                0
+#> b_current_direction                       0             0.00                0
+#> a_current_direction                       0             0.00                0
+#> blr_current_direction                     0             0.00                0
+#> b_goal_direction                          0             0.15                0
+#> a_goal_direction                          0             0.00                0
+#> b_blocked                                 0             0.00                0
+#> a_blocked                                 0             0.00                0
+#> b_interpersonal                           0             0.00                0
+#> a_interpersonal                           0             0.00                0
+#> d_interpersonal                           0             0.00                0
+#> b_preferred_speed                         0             0.00                0
+#> a_preferred_speed                         0             0.00                0
+#> b_leader                                  0             0.00                0
+#> a_leader                                  0             0.00                0
+#> d_leader                                  0             0.00                0
+#> b_buddy                                   0             0.00                0
+#> a_buddy                                   0             0.00                0
+#> a_group_centroid                          0             0.00                0
+#> b_group_centroid                          0             0.00                0
+#> b_visual_field                            0             0.00                0
+#> central                                   0             0.00                0
+#> non_central                               0             0.00                0
+#> acceleration                              0             0.00                0
+#> constant_speed                            0             0.00                0
+#> deceleration                              0             0.00                0
+#> a_lgvf                                    0             0.00                0
+#> b_lgvf                                    0             0.00                0
+#> e_lgvf                                    0             0.00                0
+#>                       b_blocked a_blocked b_interpersonal a_interpersonal
+#> radius                     0.00         0            0.00               0
+#> slowing_time               0.00         0            0.00               0
+#> preferred_speed            0.00         0            0.00               0
+#> randomness                 0.00         0            0.00               0
+#> stop_utility               0.00         0            0.00               0
+#> reroute                    0.00         0            0.00               0
+#> b_turning                  0.00         0            0.00               0
+#> a_turning                  0.00         0            0.00               0
+#> b_current_direction        0.00         0            0.00               0
+#> a_current_direction        0.00         0            0.00               0
+#> blr_current_direction      0.00         0            0.00               0
+#> b_goal_direction           0.00         0            0.00               0
+#> a_goal_direction           0.00         0            0.00               0
+#> b_blocked                  0.15         0            0.00               0
+#> a_blocked                  0.00         0            0.00               0
+#> b_interpersonal            0.00         0            0.15               0
+#> a_interpersonal            0.00         0            0.00               0
+#> d_interpersonal            0.00         0            0.00               0
+#> b_preferred_speed          0.00         0            0.00               0
+#> a_preferred_speed          0.00         0            0.00               0
+#> b_leader                   0.00         0            0.00               0
+#> a_leader                   0.00         0            0.00               0
+#> d_leader                   0.00         0            0.00               0
+#> b_buddy                    0.00         0            0.00               0
+#> a_buddy                    0.00         0            0.00               0
+#> a_group_centroid           0.00         0            0.00               0
+#> b_group_centroid           0.00         0            0.00               0
+#> b_visual_field             0.00         0            0.00               0
+#> central                    0.00         0            0.00               0
+#> non_central                0.00         0            0.00               0
+#> acceleration               0.00         0            0.00               0
+#> constant_speed             0.00         0            0.00               0
+#> deceleration               0.00         0            0.00               0
+#> a_lgvf                     0.00         0            0.00               0
+#> b_lgvf                     0.00         0            0.00               0
+#> e_lgvf                     0.00         0            0.00               0
+#>                       d_interpersonal b_preferred_speed a_preferred_speed
+#> radius                              0              0.00                 0
+#> slowing_time                        0              0.00                 0
+#> preferred_speed                     0              0.00                 0
+#> randomness                          0              0.00                 0
+#> stop_utility                        0              0.00                 0
+#> reroute                             0              0.00                 0
+#> b_turning                           0              0.00                 0
+#> a_turning                           0              0.00                 0
+#> b_current_direction                 0              0.00                 0
+#> a_current_direction                 0              0.00                 0
+#> blr_current_direction               0              0.00                 0
+#> b_goal_direction                    0              0.00                 0
+#> a_goal_direction                    0              0.00                 0
+#> b_blocked                           0              0.00                 0
+#> a_blocked                           0              0.00                 0
+#> b_interpersonal                     0              0.00                 0
+#> a_interpersonal                     0              0.00                 0
+#> d_interpersonal                     0              0.00                 0
+#> b_preferred_speed                   0              0.15                 0
+#> a_preferred_speed                   0              0.00                 0
+#> b_leader                            0              0.00                 0
+#> a_leader                            0              0.00                 0
+#> d_leader                            0              0.00                 0
+#> b_buddy                             0              0.00                 0
+#> a_buddy                             0              0.00                 0
+#> a_group_centroid                    0              0.00                 0
+#> b_group_centroid                    0              0.00                 0
+#> b_visual_field                      0              0.00                 0
+#> central                             0              0.00                 0
+#> non_central                         0              0.00                 0
+#> acceleration                        0              0.00                 0
+#> constant_speed                      0              0.00                 0
+#> deceleration                        0              0.00                 0
+#> a_lgvf                              0              0.00                 0
+#> b_lgvf                              0              0.00                 0
+#> e_lgvf                              0              0.00                 0
+#>                       b_leader a_leader d_leader b_buddy a_buddy
+#> radius                       0        0        0       0       0
+#> slowing_time                 0        0        0       0       0
+#> preferred_speed              0        0        0       0       0
+#> randomness                   0        0        0       0       0
+#> stop_utility                 0        0        0       0       0
+#> reroute                      0        0        0       0       0
+#> b_turning                    0        0        0       0       0
+#> a_turning                    0        0        0       0       0
+#> b_current_direction          0        0        0       0       0
+#> a_current_direction          0        0        0       0       0
+#> blr_current_direction        0        0        0       0       0
+#> b_goal_direction             0        0        0       0       0
+#> a_goal_direction             0        0        0       0       0
+#> b_blocked                    0        0        0       0       0
+#> a_blocked                    0        0        0       0       0
+#> b_interpersonal              0        0        0       0       0
+#> a_interpersonal              0        0        0       0       0
+#> d_interpersonal              0        0        0       0       0
+#> b_preferred_speed            0        0        0       0       0
+#> a_preferred_speed            0        0        0       0       0
+#> b_leader                     0        0        0       0       0
+#> a_leader                     0        0        0       0       0
+#> d_leader                     0        0        0       0       0
+#> b_buddy                      0        0        0       0       0
+#> a_buddy                      0        0        0       0       0
+#> a_group_centroid             0        0        0       0       0
+#> b_group_centroid             0        0        0       0       0
+#> b_visual_field               0        0        0       0       0
+#> central                      0        0        0       0       0
+#> non_central                  0        0        0       0       0
+#> acceleration                 0        0        0       0       0
+#> constant_speed               0        0        0       0       0
+#> deceleration                 0        0        0       0       0
+#> a_lgvf                       0        0        0       0       0
+#> b_lgvf                       0        0        0       0       0
+#> e_lgvf                       0        0        0       0       0
+#>                       a_group_centroid b_group_centroid b_visual_field central
+#> radius                               0                0              0       0
+#> slowing_time                         0                0              0       0
+#> preferred_speed                      0                0              0       0
+#> randomness                           0                0              0       0
+#> stop_utility                         0                0              0       0
+#> reroute                              0                0              0       0
+#> b_turning                            0                0              0       0
+#> a_turning                            0                0              0       0
+#> b_current_direction                  0                0              0       0
+#> a_current_direction                  0                0              0       0
+#> blr_current_direction                0                0              0       0
+#> b_goal_direction                     0                0              0       0
+#> a_goal_direction                     0                0              0       0
+#> b_blocked                            0                0              0       0
+#> a_blocked                            0                0              0       0
+#> b_interpersonal                      0                0              0       0
+#> a_interpersonal                      0                0              0       0
+#> d_interpersonal                      0                0              0       0
+#> b_preferred_speed                    0                0              0       0
+#> a_preferred_speed                    0                0              0       0
+#> b_leader                             0                0              0       0
+#> a_leader                             0                0              0       0
+#> d_leader                             0                0              0       0
+#> b_buddy                              0                0              0       0
+#> a_buddy                              0                0              0       0
+#> a_group_centroid                     0                0              0       0
+#> b_group_centroid                     0                0              0       0
+#> b_visual_field                       0                0              0       0
+#> central                              0                0              0       0
+#> non_central                          0                0              0       0
+#> acceleration                         0                0              0       0
+#> constant_speed                       0                0              0       0
+#> deceleration                         0                0              0       0
+#> a_lgvf                               0                0              0       0
+#> b_lgvf                               0                0              0       0
+#> e_lgvf                               0                0              0       0
+#>                       non_central acceleration constant_speed deceleration
+#> radius                          0            0              0            0
+#> slowing_time                    0            0              0            0
+#> preferred_speed                 0            0              0            0
+#> randomness                      0            0              0            0
+#> stop_utility                    0            0              0            0
+#> reroute                         0            0              0            0
+#> b_turning                       0            0              0            0
+#> a_turning                       0            0              0            0
+#> b_current_direction             0            0              0            0
+#> a_current_direction             0            0              0            0
+#> blr_current_direction           0            0              0            0
+#> b_goal_direction                0            0              0            0
+#> a_goal_direction                0            0              0            0
+#> b_blocked                       0            0              0            0
+#> a_blocked                       0            0              0            0
+#> b_interpersonal                 0            0              0            0
+#> a_interpersonal                 0            0              0            0
+#> d_interpersonal                 0            0              0            0
+#> b_preferred_speed               0            0              0            0
+#> a_preferred_speed               0            0              0            0
+#> b_leader                        0            0              0            0
+#> a_leader                        0            0              0            0
+#> d_leader                        0            0              0            0
+#> b_buddy                         0            0              0            0
+#> a_buddy                         0            0              0            0
+#> a_group_centroid                0            0              0            0
+#> b_group_centroid                0            0              0            0
+#> b_visual_field                  0            0              0            0
+#> central                         0            0              0            0
+#> non_central                     0            0              0            0
+#> acceleration                    0            0              0            0
+#> constant_speed                  0            0              0            0
+#> deceleration                    0            0              0            0
+#> a_lgvf                          0            0              0            0
+#> b_lgvf                          0            0              0            0
+#> e_lgvf                          0            0              0            0
+#>                       a_lgvf b_lgvf e_lgvf
+#> radius                     0      0      0
+#> slowing_time               0      0      0
+#> preferred_speed            0      0      0
+#> randomness                 0      0      0
+#> stop_utility               0      0      0
+#> reroute                    0      0      0
+#> b_turning                  0      0      0
+#> a_turning                  0      0      0
+#> b_current_direction        0      0      0
+#> a_current_direction        0      0      0
+#> blr_current_direction      0      0      0
+#> b_goal_direction           0      0      0
+#> a_goal_direction           0      0      0
+#> b_blocked                  0      0      0
+#> a_blocked                  0      0      0
+#> b_interpersonal            0      0      0
+#> a_interpersonal            0      0      0
+#> d_interpersonal            0      0      0
+#> b_preferred_speed          0      0      0
+#> a_preferred_speed          0      0      0
+#> b_leader                   0      0      0
+#> a_leader                   0      0      0
+#> d_leader                   0      0      0
+#> b_buddy                    0      0      0
+#> a_buddy                    0      0      0
+#> a_group_centroid           0      0      0
+#> b_group_centroid           0      0      0
+#> b_visual_field             0      0      0
+#> central                    0      0      0
+#> non_central                0      0      0
+#> acceleration               0      0      0
+#> constant_speed             0      0      0
+#> deceleration               0      0      0
+#> a_lgvf                     0      0      0
+#> b_lgvf                     0      0      0
+#> e_lgvf                     0      0      0
 #> 
 #> 
 #> $params_bounds
@@ -5762,5 +8430,8 @@ head(parameters)
 #> acceleration          0e+00 1.0e+00
 #> constant_speed        0e+00 1.0e+00
 #> deceleration          0e+00 1.0e+00
+#> a_lgvf                0e+00 3.0e+00
+#> b_lgvf                0e+00 2.0e+01
+#> e_lgvf                0e+00 2.0e+01
 #> 
 ```

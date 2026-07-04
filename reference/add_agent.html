@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@
 <span>  group_number <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  goal_number <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  goal_duration <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  individual_goal_number <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  precompute_goal_paths <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sort_goals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  precomputed_goals <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -65,7 +66,7 @@
 <span>  many_nodes <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">precomputed_edges</span><span class="op">)</span>,</span>
 <span>  space_between <span class="op">=</span> <span class="fl">1.25</span>,</span>
 <span>  position <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  standing_start <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  individual_differences <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_characteristics <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -93,6 +94,13 @@ goals the agents should accomplish. It's exact value is handled by
 <dt id="arg-goal-duration">goal_duration<a class="anchor" aria-label="anchor" href="#arg-goal-duration"></a></dt>
 <dd><p>Numeric, vector, or function that defines the duration of
 the goals of the agents. Defaults to <code>\(n) rnorm(n, 10, 2)</code>.</p></dd>
+
+
+<dt id="arg-individual-goal-number">individual_goal_number<a class="anchor" aria-label="anchor" href="#arg-individual-goal-number"></a></dt>
+<dd><p>Numeric denoting the number of goals that should be
+assigned to each agent individually after completing their group goals. Generates a
+separate goal stack of size <code>individual_goal_number</code> for each agent. Defaults to
+<code>NULL</code>.</p></dd>
 
 
 <dt id="arg-precompute-goal-paths">precompute_goal_paths<a class="anchor" aria-label="anchor" href="#arg-precompute-goal-paths"></a></dt>
@@ -154,7 +162,7 @@ therefore might not work for the moment.</p></dd>
 <dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
 <dd><p>Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-<code>0.1</code>.</p></dd>
+<code>0.25</code>.</p></dd>
 
 
 <dt id="arg-individual-differences">individual_differences<a class="anchor" aria-label="anchor" href="#arg-individual-differences"></a></dt>
@@ -203,6 +211,9 @@ of an agent (<code>FALSE</code>). Defaults to <code>FALSE</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> color: goldenrod </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> current_goal: (a) position: -0.5070711 -0.2293804 (b) path: -0.5070711 -0.2293804 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> goals (number): 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> group_goals (number): 0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> group_representative: FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> individual_goals (number): 0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> group: 1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> id: aaglv </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> orientation: 0 </span>
@@ -241,9 +252,12 @@ of an agent (<code>FALSE</code>). Defaults to <code>FALSE</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> acceleration             0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constant_speed           0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> deceleration             0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a_lgvf                   0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b_lgvf                   0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> e_lgvf                   0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius: 0.25 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> speed: 0.1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> speed: 0.25 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> status: move </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For more detailed information, please extract the wanted information from the agent directly.</span>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,6 +168,13 @@
 
         <dt>
 
+          <code><a href="initialize-trace.html">initialize(<i>&lt;trace&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Constructor for the <code><a href="https://rdrr.io/pkg/predped/man/trace-class.html" class="external-link">trace-class</a></code></dd>
+
+        <dt>
+
           <code><a href="object-class.html">object-class</a></code>
 
         </dt>
@@ -207,6 +214,13 @@
 
         </dt>
         <dd>An S4 Class to Represent the State</dd>
+
+        <dt>
+
+          <code><a href="trace-class.html">trace-class</a></code> <code><a href="trace-class.html">trace</a></code>
+
+        </dt>
+        <dd>An S4 Class to Represent a Trace.</dd>
       </dl></div><div class="section level2">
       <h2 id="general-methods">General Methods<a class="anchor" aria-label="anchor" href="#general-methods"></a></h2>
 
@@ -219,7 +233,7 @@
 
       <dl><dt>
 
-          <code><a href="plot.html">plot(<i>&lt;agent&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;background&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;list&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;object&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;segment&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;state&gt;</i>)</a></code>
+          <code><a href="plot.html">plot(<i>&lt;agent&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;background&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;list&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;object&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;segment&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;state&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;trace&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot an object</dd>
@@ -251,6 +265,13 @@
 
         </dt>
         <dd>Show method for the <code><a href="https://rdrr.io/pkg/predped/man/predped-class.html" class="external-link">predped-class</a></code></dd>
+
+        <dt>
+
+          <code><a href="show-trace-method.html">show(<i>&lt;trace&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Show method for the <code><a href="https://rdrr.io/pkg/predped/man/trace-class.html" class="external-link">trace-class</a></code></dd>
       </dl></div><div class="section level2">
       <h2 id="object-manipulation">Object Manipulation<a class="anchor" aria-label="anchor" href="#object-manipulation"></a></h2>
 
@@ -709,6 +730,34 @@
 
         <dt>
 
+          <code><a href="get_group_member_data.html">get_group_member_data()</a></code>
+
+        </dt>
+        <dd>Get Distances and Angles to Group Members</dd>
+
+        <dt>
+
+          <code><a href="get_group_member_data_rcpp.html">get_group_member_data_rcpp()</a></code>
+
+        </dt>
+        <dd>Get Distances and Angles to Group Members</dd>
+
+        <dt>
+
+          <code><a href="lgvf_utility.html">lgvf_utility()</a></code>
+
+        </dt>
+        <dd>Logarithmic Group-Attracted Visual Field Utility (LGVF)</dd>
+
+        <dt>
+
+          <code><a href="lgvf_utility_rcpp.html">lgvf_utility_rcpp()</a></code>
+
+        </dt>
+        <dd>Logarithmic Group-Attracted Visual Field Utility (LGVF)</dd>
+
+        <dt>
+
           <code><a href="utility-agent.html">utility(<i>&lt;agent&gt;</i>)</a></code>
 
         </dt>
@@ -872,6 +921,92 @@
         </dt>
         <dd>Transform trace to comprehensive data.frame</dd>
       </dl></div><div class="section level2">
+      <h2 id="benchmark">Benchmark<a class="anchor" aria-label="anchor" href="#benchmark"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="benchmark_data.html">benchmark_data</a></code>
+
+        </dt>
+        <dd>Benchmark data</dd>
+
+        <dt>
+
+          <code><a href="benchmark_few_edges.html">benchmark_few_edges</a></code>
+
+        </dt>
+        <dd>Edges of an environment (<code>many_nodes = FALSE</code>)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_few_edges_uneval.html">benchmark_few_edges_uneval</a></code>
+
+        </dt>
+        <dd>Raw edges of an environment (<code>many_nodes = FALSE</code>)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_inx.html">benchmark_inx</a></code>
+
+        </dt>
+        <dd>Initial condition used in benchmarks</dd>
+
+        <dt>
+
+          <code><a href="benchmark_inx_data.html">benchmark_inx_data</a></code>
+
+        </dt>
+        <dd>Initial condition used in benchmarks (data)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_many_edges.html">benchmark_many_edges</a></code>
+
+        </dt>
+        <dd>Edges of an environment (<code>many_nodes = TRUE</code>)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_many_edges_uneval.html">benchmark_many_edges_uneval</a></code>
+
+        </dt>
+        <dd>Raw edges of an environment (<code>many_nodes = TRUE</code>)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_params_bounded.html">benchmark_params_bounded</a></code>
+
+        </dt>
+        <dd>Benchmarked parameters (bounded)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_params_real.html">benchmark_params_real</a></code>
+
+        </dt>
+        <dd>Benchmarked parameters (unbounded)</dd>
+
+        <dt>
+
+          <code><a href="benchmark_trace.html">benchmark_trace</a></code>
+
+        </dt>
+        <dd>Trace used in benchmarks</dd>
+
+        <dt>
+
+          <code><a href="supermarket.html">supermarket</a></code>
+
+        </dt>
+        <dd>Default supermarket</dd>
+      </dl></div><div class="section level2">
       <h2 id="helper-functions">Helper Functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h2>
 
 
@@ -882,6 +1017,13 @@
 
 
       <dl><dt>
+
+          <code><a href="append_trace.html">append_trace()</a></code>
+
+        </dt>
+        <dd>Append values to the trace</dd>
+
+        <dt>
 
           <code><a href="benchmark.html">benchmark()</a></code>
 
@@ -925,6 +1067,13 @@
 
         <dt>
 
+          <code><a href="get_time_step.html">get_time_step()</a></code>
+
+        </dt>
+        <dd>Derive time between observations from data</dd>
+
+        <dt>
+
           <code><a href="line_line_intersection.html">line_line_intersection()</a></code>
 
         </dt>
@@ -957,6 +1106,20 @@
 
         </dt>
         <dd>Raycasting algorithm</dd>
+
+        <dt>
+
+          <code><a href="state_to_trace.html">state_to_trace()</a></code>
+
+        </dt>
+        <dd>Transform a list of states to a trace</dd>
+
+        <dt>
+
+          <code><a href="trace_to_state.html">trace_to_state()</a></code>
+
+        </dt>
+        <dd>Transform a list of trace to a state</dd>
 
         <dt>
 
@@ -1039,6 +1202,13 @@
 
         <dt>
 
+          <code><a href="current_group_goal.html">current_group_goal()</a></code> <code><a href="current_group_goal.html">`current_group_goal&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>current_group_goal</code>-slot</dd>
+
+        <dt>
+
           <code><a href="done.html">done()</a></code> <code><a href="done.html">`done&lt;-`()</a></code>
 
         </dt>
@@ -1088,10 +1258,31 @@
 
         <dt>
 
+          <code><a href="group_goals.html">group_goals()</a></code> <code><a href="group_goals.html">`group_goals&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>group_goals</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="group_representative.html">group_representative()</a></code> <code><a href="group_representative.html">`group_representative&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>group_representative</code>-slot</dd>
+
+        <dt>
+
           <code><a href="id.html">id()</a></code> <code><a href="id.html">`id&lt;-`()</a></code>
 
         </dt>
         <dd>Getter/Setter for the <code>id</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="individual_goals.html">individual_goals()</a></code> <code><a href="individual_goals.html">`individual_goals&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>individual_goals</code>-slot</dd>
 
         <dt>
 
@@ -1200,10 +1391,24 @@
 
         <dt>
 
+          <code><a href="states.html">states()</a></code> <code><a href="states.html">`states&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>states</code>-slot</dd>
+
+        <dt>
+
           <code><a href="status.html">status()</a></code> <code><a href="status.html">`status&lt;-`()</a></code>
 
         </dt>
         <dd>Getter/Setter for the <code>status</code>-slot</dd>
+
+        <dt>
+
+          <code><a href="time_step.html">time_step()</a></code> <code><a href="time_step.html">`time_step&lt;-`()</a></code>
+
+        </dt>
+        <dd>Getter/Setter for the <code>time_step</code>-slot</dd>
 
         <dt>
 

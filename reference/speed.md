@@ -42,12 +42,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the speed slot for the agent
 speed(my_agent)
-#> ojehh 
+#> rtvur 
 #>     1 
 
 # Change the speed slot for the agent
 speed(my_agent) <- 2
 speed(my_agent)
-#> ojehh 
+#> rtvur 
 #>     2 
 ```

@@ -66,7 +66,7 @@ limited_access(my_background)
 #> [1] 0.7853982
 #> 
 #> Slot "id":
-#> [1] "object qzexb"
+#> [1] "object corlw"
 #> 
 #> Slot "moveable":
 #> [1] FALSE
@@ -97,7 +97,7 @@ limited_access(my_background)
 #> [1] -0.7853982
 #> 
 #> Slot "id":
-#> [1] "object bqedz"
+#> [1] "object awxnj"
 #> 
 #> Slot "moveable":
 #> [1] FALSE

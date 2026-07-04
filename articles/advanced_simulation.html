@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,8 +79,8 @@
     
 <p>In the vignette <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link"><em>Simulations</em></a>,
 we explained the basic workflow behind performing a simulation. In this
-vignette, we will dive deeper into tweaks one can do to further
-personalize these simulations.</p>
+vignette, we will dive deeper into tweaks one can do to further refine
+simulations.</p>
 <div class="section level2">
 <h2 id="initial-conditions">Initial Conditions<a class="anchor" aria-label="anchor" href="#initial-conditions"></a>
 </h2>
@@ -91,15 +91,15 @@ be occasions where the user may want to start a simulation from a
 particular <em>initial condition</em> or initial state, for example
 starting with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
-number of people in the room or continuing a previous simulation from a
+number of agents in the space or continuing a previous simulation from a
 particular iteration thereof. In this section, we will describe several
 ways in which users can provide initial conditions to the <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>
 function.</p>
 <p>While we will only focus on the <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>
 function, some of the functionality underlying the creation of initial
 conditions is handled by a dedicated function, namely <a href="https://ndpvh.github.io/predped/reference/create_initial_condition.html" class="external-link"><code>create_initial_condition</code></a>.
-Please consult its documentation for an overview of all functionalities
-underlying this function.</p>
+Please consult its documentation for an overview of its full
+functionality.</p>
 <div class="section level3">
 <h3 id="initial-state">Initial <code>state</code><a class="anchor" aria-label="anchor" href="#initial-state"></a>
 </h3>
@@ -130,8 +130,11 @@ following example:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Continue starting from the last state in </span></span>
-<span><span class="co"># this trace</span></span>
-<span><span class="va">my_state</span> <span class="op">&lt;-</span> <span class="va">trace</span><span class="op">[[</span><span class="fl">101</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co"># this trace. For this, we need to first</span></span>
+<span><span class="co"># transform the trace to a list of states</span></span>
+<span><span class="va">list_of_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trace_to_state.html">trace_to_state</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span></span>
+<span><span class="va">my_state</span> <span class="op">&lt;-</span> <span class="va">list_of_states</span><span class="op">[[</span><span class="fl">101</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
 <span><span class="va">continued_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
 <span>  <span class="va">my_predped</span>,</span>
 <span>  max_agents <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -140,7 +143,7 @@ following example:</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Note that providing a <code>state</code> to the
 <code>initial_condition</code> argument only works if both the
-<code>state</code> and the model – here, varaibles
+<code>state</code> and the model – here, variables
 <code>initial_state</code> and <code>my_predped</code> – both contain
 the same environment under their slot <code>setting</code>. Furthermore
 note that the only property of the <code>state</code> that is retained
@@ -155,8 +158,8 @@ next approach for controlling initial conditions.</p>
 that serve as the first people in the room. This list can be provided to
 the <code>initial_agents</code> argument of <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Retrieve the agents-list from an initial state</span></span>
-<span><span class="va">my_agents</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/agents.html">agents</a></span><span class="op">(</span><span class="va">my_state</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Retrieve the list of agents from the initial trace</span></span>
+<span><span class="va">my_agents</span> <span class="op">&lt;-</span> <span class="va">trace</span><span class="op">@</span><span class="va">states</span><span class="op">[[</span><span class="fl">101</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Simulate using this initial list of agents</span></span>
 <span><span class="va">continued_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
@@ -211,7 +214,7 @@ environment.</p>
 <h3 id="precedence">Precedence<a class="anchor" aria-label="anchor" href="#precedence"></a>
 </h3>
 <p>It is useful to know which arguments take precedence when specifying
-multiple of them at once (though this is not recommended). The argument
+many at once (though this is not recommended). The argument
 <code>initial_agents</code> takes precedence, followed by
 <code>initial_number_agents</code> and, finally,
 <code>initial_condition</code>.</p>
@@ -220,13 +223,12 @@ multiple of them at once (though this is not recommended). The argument
 <div class="section level2">
 <h2 id="one-directional-flow">One-directional Flow<a class="anchor" aria-label="anchor" href="#one-directional-flow"></a>
 </h2>
-<p>Up to now, we have assumed pedestrian flow to be bidirectional, that
-is that pedestrians are able to walk in two directions across the whole
-environment. However, there are cases in which pedestrian flow is
+<p>Up to now, we have assumed pedestrian flow to be be unrestricted in
+terms of direction. However, there are cases in which pedestrian flow is
 limited to only a single direction, which is for example the case at art
 exhibitions, gates at the metro station, or the one-directional aisles
 in the supermarkets during the COVID-19 pandemic. Given the ubiquity of
-unidirectional flow, we included functionalities to restrict pedestrian
+unidirectional flow, we included functionality to restrict pedestrian
 movement to a single direction through the definition of <a href="https://npdvh.github.io/predped/reference/segment.html" class="external-link"><code>segment</code></a>s
 and providing them to the <code>limited_access</code> slot of the <a href="https://npdvh.github.io/predped/reference/background.html" class="external-link"><code>background</code></a>
 class. In <code>predped</code>, <a href="https://npdvh.github.io/predped/reference/segment.html" class="external-link"><code>segment</code></a>s
@@ -364,9 +366,8 @@ method once again:</p>
 <p>This figure again shows the train station, but includes arrows that
 point in the direction that agents can move into at the specified
 locations. Note that the segments were added at the end of the gates
-rather than in the middle of them: Experience teaches us that agents
-have the tendency to move into closed gates before realizing they are
-not accessible, a problem that is still under investigation.</p>
+rather than in the middle of them to prevent agents moving to closed
+gates before realizing they are not accessible.</p>
 <p>To see unidirectionality in action, we create another instance of the
 <code>predped</code> class and simulate movement data within this
 restricted train station:</p>
@@ -409,7 +410,7 @@ restricted train station:</p>
 <h2 id="situational-changes">Situational Changes<a class="anchor" aria-label="anchor" href="#situational-changes"></a>
 </h2>
 <p>A lot of the functionality that we displayed up to now has assumed
-that you can prespecify the behavior of the agents, meaning you do not
+that you can pre-specify the behavior of the agents, meaning you do not
 control the behavior of the agents once the simulation is running. Yet,
 the user may wish to more directly influence the course of a simulation,
 for example to urge pedestrians to perform an evacuation, to let agents
@@ -482,12 +483,12 @@ simplified supermarket environment:</p>
 <p><img src="advanced_simulation_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="Visualization of a simplified supermarket environment to be used in our simulations. There is a clearly delineated area in which agents can enter the store and another area where they are allowed to leave, presenting a realistic depiction of how an actual store would work." width="700" style="display: block; margin: auto;"></p>
 <p>Within our simulation, we want agents to enter the room, walk around
 to get the items they want to buy, but then be forced to evacuate at a
-particular time during the evacuation. To achieve this, we have to
-specify the <code>fx</code> argument, providing it with a function that
-takes in the state at each iteration of the simulation and allows the
-user to make a set of desired changes to this state. For our evacuation
-procedure, we create the function <code>start_evacuation</code>,
-starting an evacuation after <code>100</code> iterations:</p>
+particular time. To achieve this, we have to specify the <code>fx</code>
+argument, providing it with a function that takes in the state at each
+iteration of the simulation and allows the user to make a set of desired
+changes to this state. For our evacuation procedure, we create the
+function <code>start_evacuation</code>, starting an evacuation after
+<code>100</code> iterations:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start_evacuation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Check whether the current iteration is greater than </span></span>
@@ -569,7 +570,8 @@ triggering them to leave the environment.</li>
 <span></span>
 <span><span class="co"># Provide a cue of when the evacuation starts</span></span>
 <span><span class="va">plt</span><span class="op">[[</span><span class="fl">101</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">trace</span><span class="op">[[</span><span class="fl">101</span><span class="op">]</span><span class="op">]</span>, </span>
+<span>  <span class="va">trace</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">101</span>, </span>
 <span>  segment.hjust <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  shape.fill <span class="op">=</span> <span class="st">"red"</span></span>
 <span><span class="op">)</span></span>
@@ -583,7 +585,7 @@ triggering them to leave the environment.</li>
 <p><img src="../reference/figures/supermarket.gif" class="r-plt" alt="Visualization of the results of the code run above. Readers can see agents come in, achieving some of their goals within the store, only for them to be interrupted by the start of the evacuation procedure (signalled by a red flash), forcing them to evacuate the space." style="display: block; margin: auto;"></p>
 <p>Of course, you are not limited to changing the agents, but can also
 change the environment itself. For example, if we want to allow agents
-to ignore the unidirectionality imposed at the beginning of the
+to ignore the uni-directionality imposed at the beginning of the
 simulation, we can empty the <code>limited_access</code> slot once the
 evacuation has started:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -619,14 +621,13 @@ worry about the implementational details of the package.</p>
 </h3>
 <p>If one wants to create even more complicated situations, one can
 leverage the <code>variables</code> slot of the <a href="https://ndpvh.github.io/predped/reference/state" class="external-link"><code>state</code></a>
-class to make bookkeeping across the simulation easier. This slot keeps
-hold of a named list containing all variables relevant to your
-simulation. Keeping within our evacuation example, we may want to keep
-track of how long it takes each agent to leave the room after the
-evacuation has been signalled. We can achieve this by creating a
-variables of times in the variable <code>slot</code> and updating it
-accordingly, for example redefining <code>start_evacuation</code>
-as:</p>
+class to make bookkeeping across the simulation easier. This slot
+contains a named list of all variables relevant to your simulation.
+Following our evacuation example, we may want to keep track of how long
+it takes each agent to leave the room after the evacuation has been
+signaled. We can achieve this by creating a variables of times in the
+variable <code>slot</code> and updating it accordingly, for example
+redefining <code>start_evacuation</code> as:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start_evacuation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Ensures the start of the evacuation and creates the variable of interest</span></span>
@@ -676,18 +677,18 @@ iteration:</p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Precomputing edgesYour model: model ydgab is being simulated</span></span></code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/variables.html">variables</a></span><span class="op">(</span><span class="va">trace</span><span class="op">[[</span><span class="fl">251</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">times</span></span>
-<span><span class="co">#&gt; donzm eyqaz llyry mvzfl owfjm rbnvd kheaq oggxf dobyg senmi wvijj iypko </span></span>
-<span><span class="co">#&gt;    67    23    98   113    47    80   102    19    93    41     6     3</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/variables.html">variables</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span><span class="op">[[</span><span class="fl">251</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">times</span></span>
+<span><span class="co">#&gt; obfsp azhsq yryhv iaxva lsvwt meczt aqgxz ntwow vodht rjkrd vbuem </span></span>
+<span><span class="co">#&gt;    81    31    74    35    42    13    17    26     6    10     3</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="using-your-own-parameters">Using your Own Parameters<a class="anchor" aria-label="anchor" href="#using-your-own-parameters"></a>
 </h2>
-<p>While we provide a lot of prespecified agent types to choose from,
+<p>While we provide a lot of pre-specified agent types to choose from,
 one may wish to play around with the parameters themselves to
-personalize their own simulations. In this case, one may wish to save
-the parameters for future use. In this case, you can let the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>predped</code></a>
+personalize their own simulations. In this case, you can save the
+parameters for future use by letting the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>predped</code></a>
 constructor know what parameters you would want to use by specifying the
 <code>filename</code> argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">

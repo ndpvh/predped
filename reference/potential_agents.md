@@ -55,8 +55,11 @@ potential_agents(my_state)
 #> color: black 
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
+#> group_goals (number): 0 
+#> group_representative: FALSE 
+#> individual_goals (number): 0 
 #> group: 0 
-#> id: uarcl 
+#> id: nmvae 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]
@@ -93,6 +96,9 @@ potential_agents(my_state)
 #> acceleration              0.00
 #> constant_speed            0.00
 #> deceleration              0.00
+#> a_lgvf                    0.00
+#> b_lgvf                    0.00
+#> e_lgvf                    0.00
 #> 
 #> radius: 0.25 
 #> speed: 0.1 
@@ -111,8 +117,11 @@ potential_agents(my_state)
 #> color: black 
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
+#> group_goals (number): 0 
+#> group_representative: FALSE 
+#> individual_goals (number): 0 
 #> group: 0 
-#> id: nwzdg 
+#> id: izhrx 
 #> orientation: 0 
 #> parameters: 
 #>                           [,1]
@@ -149,6 +158,9 @@ potential_agents(my_state)
 #> acceleration              0.00
 #> constant_speed            0.00
 #> deceleration              0.00
+#> a_lgvf                    0.00
+#> b_lgvf                    0.00
+#> e_lgvf                    0.00
 #> 
 #> radius: 0.25 
 #> speed: 0.1 

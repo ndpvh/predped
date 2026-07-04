@@ -13,7 +13,7 @@ update_position(
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
-  standing_start = 0.1,
+  standing_start = 0.25,
   time_step = 0.5,
   report = TRUE,
   print_iteration = TRUE,
@@ -66,7 +66,7 @@ update_position(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - time_step:
 

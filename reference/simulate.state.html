@@ -9,7 +9,7 @@ a single previous state."><script type="text/javascript" async="" src="https://c
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ a single previous state.</p>
 <span>  velocities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
 <span>  orientations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">72.5</span>, <span class="fl">50</span>, <span class="fl">32.5</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">350</span>, <span class="fl">340</span>, <span class="fl">327.5</span>, <span class="fl">310</span>, <span class="fl">287.5</span><span class="op">)</span>,</span>
 <span>    times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  standing_start <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  close_enough <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  space_between <span class="op">=</span> <span class="fl">1.25</span>,</span>
 <span>  stay_stopped <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -72,12 +72,13 @@ a single previous state.</p>
 <span>  precomputed_edges <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  many_nodes <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">precomputed_edges</span><span class="op">)</span>,</span>
 <span>  plot_live <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  plot_time <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  plot_time <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  report <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  print_iteration <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  step_report <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  goal_number <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  goal_duration <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  individual_goal_number <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  precompute_goal_paths <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sort_goals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  adaptive_goal_sorting <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -137,7 +138,7 @@ versions of the smaller angles).</p></dd>
 <dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
 <dd><p>Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-<code>0.1</code>.</p></dd>
+<code>0.25</code>.</p></dd>
 
 
 <dt id="arg-close-enough">close_enough<a class="anchor" aria-label="anchor" href="#arg-close-enough"></a></dt>
@@ -179,13 +180,13 @@ or to use many more (see <code><a href="create_edges.html">create_edges</a></cod
 
 <dt id="arg-plot-live">plot_live<a class="anchor" aria-label="anchor" href="#arg-plot-live"></a></dt>
 <dd><p>Logical denoting whether to plot each iteration while the
-simulation is going on. Defaults to `FALSE`.</p></dd>
+simulation is going on. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-plot-time">plot_time<a class="anchor" aria-label="anchor" href="#arg-plot-time"></a></dt>
 <dd><p>Numeric denoting the amount of time (in seconds) to wait
 between iterations, i.e., the time between updating the plot. Defaults to
-`0.2`.</p></dd>
+<code>0.4</code>.</p></dd>
 
 
 <dt id="arg-report">report<a class="anchor" aria-label="anchor" href="#arg-report"></a></dt>
@@ -214,6 +215,13 @@ goals the agents should accomplish. It's exact value is handled by
 <dt id="arg-goal-duration">goal_duration<a class="anchor" aria-label="anchor" href="#arg-goal-duration"></a></dt>
 <dd><p>Numeric, vector, or function that defines the duration of
 the goals of the agents. Defaults to <code>\(n) rnorm(n, 10, 2)</code>.</p></dd>
+
+
+<dt id="arg-individual-goal-number">individual_goal_number<a class="anchor" aria-label="anchor" href="#arg-individual-goal-number"></a></dt>
+<dd><p>Numeric denoting the number of goals that should be
+assigned to each agent individually after completing their group goals. Generates a
+separate goal stack of size <code>individual_goal_number</code> for each agent. Defaults to
+<code>NULL</code>.</p></dd>
 
 
 <dt id="arg-precompute-goal-paths">precompute_goal_paths<a class="anchor" aria-label="anchor" href="#arg-precompute-goal-paths"></a></dt>

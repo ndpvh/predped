@@ -42,12 +42,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the cell slot for the agent
 cell(my_agent)
-#> tlmpw 
+#> rtesa 
 #>     1 
 
 # Change the cell slot for the agent
 cell(my_agent) <- 2
 cell(my_agent)
-#> tlmpw 
+#> rtesa 
 #>     2 
 ```

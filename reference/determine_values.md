@@ -81,5 +81,5 @@ determine_values(number, 5)
 determine_values(numeric_vector, 5)
 #>  [1] 1 2 1 2 1 2 1 2 1 2
 determine_values(generating_function, 5)
-#> [1]  6  6  3  9 10
+#> [1]  4  4 10 10  3
 ```

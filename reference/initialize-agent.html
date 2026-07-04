@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,13 +63,18 @@
 <span>  current_goal <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  group <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  current_group_goal <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group_goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  group_representative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  individual_goals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  status <span class="op">=</span> <span class="st">"move"</span>,</span>
 <span>  waiting_counter <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cell <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  cell_centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fl">33</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  utility_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  utility_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  extra_objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -123,6 +128,28 @@ Influences the behavior of the agent through the social utility functions.
 Defaults to <code>0</code>.</p></dd>
 
 
+<dt id="arg-current-group-goal">current_group_goal<a class="anchor" aria-label="anchor" href="#arg-current-group-goal"></a></dt>
+<dd><p>Object of class <code><a href="goal-class.html">goal-class</a></code> which
+represents the current goal of the agent's group. Defaults to a placeholder of class
+class <code><a href="goal-class.html">goal-class</a></code>.</p></dd>
+
+
+<dt id="arg-group-goals">group_goals<a class="anchor" aria-label="anchor" href="#arg-group-goals"></a></dt>
+<dd><p>List of goals the agent's group has to achieve. The current
+goal is not included in this list. Defaults to an empty list.</p></dd>
+
+
+<dt id="arg-group-representative">group_representative<a class="anchor" aria-label="anchor" href="#arg-group-representative"></a></dt>
+<dd><p>Logical denoting whether the agent is the representative of
+their group. The representative is the only one in the group that completes the group
+goals, hence also leading the group towards the group goals. Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-individual-goals">individual_goals<a class="anchor" aria-label="anchor" href="#arg-individual-goals"></a></dt>
+<dd><p>List of goals the agent has to achieve that are not shared with their group.
+These will be completes after the agent's group goals are completed. Defaults to an empty list.</p></dd>
+
+
 <dt id="arg-status">status<a class="anchor" aria-label="anchor" href="#arg-status"></a></dt>
 <dd><p>Character denoting the current status of the agent, or what they
 will be doing to make the next decision. Is one of <code>"move"</code> (the agent
@@ -169,6 +196,10 @@ by the user.</p></dd>
 variables relevant to compute the utilities. Should usually not be provided
 or altered by the user.</p></dd>
 
+
+<dt id="arg-extra-objects">extra_objects<a class="anchor" aria-label="anchor" href="#arg-extra-objects"></a></dt>
+<dd><p>[DESCRIPTION TO BE WRITTEN]</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -181,6 +212,10 @@ or altered by the user.</p></dd>
 <code><a href="current_goal.html">current_goal</a></code>,
 <code><a href="goals.html">goals</a></code>,
 <code><a href="group.html">group</a></code>,
+<code><a href="current_group_goal.html">current_group_goal</a></code>,
+<code><a href="group_goals.html">group_goals</a></code>,
+<code><a href="group_representative.html">group_representative</a></code>,
+<code><a href="individual_goals.html">individual_goals</a></code>,
 <code><a href="id.html">id</a></code>,
 <code><a href="orientation.html">orientation</a></code>,
 <code><a href="parameters.html">parameters</a></code>

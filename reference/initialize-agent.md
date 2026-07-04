@@ -17,13 +17,18 @@ initialize(
   current_goal = NULL,
   goals = list(),
   group = 0,
+  current_group_goal = NULL,
+  group_goals = list(),
+  group_representative = FALSE,
+  individual_goals = list(),
   status = "move",
   waiting_counter = 0,
   cell = 0,
   parameters = data.frame(),
   color = "black",
   cell_centers = matrix(0, nrow = 33, ncol = 2),
-  utility_variables = data.frame()
+  utility_variables = data.frame(),
+  extra_objects = list()
 )
 ```
 
@@ -77,6 +82,32 @@ initialize(
   the behavior of the agent through the social utility functions.
   Defaults to `0`.
 
+- current_group_goal:
+
+  Object of class
+  [`goal-class`](https://github.com/ndpvh/predped/reference/goal-class.md)
+  which represents the current goal of the agent's group. Defaults to a
+  placeholder of class class
+  [`goal-class`](https://github.com/ndpvh/predped/reference/goal-class.md).
+
+- group_goals:
+
+  List of goals the agent's group has to achieve. The current goal is
+  not included in this list. Defaults to an empty list.
+
+- group_representative:
+
+  Logical denoting whether the agent is the representative of their
+  group. The representative is the only one in the group that completes
+  the group goals, hence also leading the group towards the group goals.
+  Defaults to `FALSE`.
+
+- individual_goals:
+
+  List of goals the agent has to achieve that are not shared with their
+  group. These will be completes after the agent's group goals are
+  completed. Defaults to an empty list.
+
 - status:
 
   Character denoting the current status of the agent, or what they will
@@ -123,6 +154,10 @@ initialize(
   relevant to compute the utilities. Should usually not be provided or
   altered by the user.
 
+- extra_objects:
+
+  \[DESCRIPTION TO BE WRITTEN\]
+
 ## Value
 
 Object of the
@@ -135,6 +170,10 @@ Object of the
 [`current_goal`](https://github.com/ndpvh/predped/reference/current_goal.md),
 [`goals`](https://github.com/ndpvh/predped/reference/goals.md),
 [`group`](https://github.com/ndpvh/predped/reference/group.md),
+[`current_group_goal`](https://github.com/ndpvh/predped/reference/current_group_goal.md),
+[`group_goals`](https://github.com/ndpvh/predped/reference/group_goals.md),
+[`group_representative`](https://github.com/ndpvh/predped/reference/group_representative.md),
+[`individual_goals`](https://github.com/ndpvh/predped/reference/individual_goals.md),
 [`id`](https://github.com/ndpvh/predped/reference/id.md),
 [`orientation`](https://github.com/ndpvh/predped/reference/orientation.md),
 [`parameters`](https://github.com/ndpvh/predped/reference/parameters.md)

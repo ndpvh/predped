@@ -6,7 +6,15 @@ Rcpp alternative to
 ## Usage
 
 ``` r
-compute_centers_rcpp(agent, a, b, velocities, orientations, time_step = 0.5)
+compute_centers_rcpp(
+  agent,
+  a,
+  b,
+  velocities,
+  orientations,
+  time_step = 0.5,
+  threshold = 1e-06
+)
 ```
 
 ## Arguments
@@ -38,6 +46,11 @@ compute_centers_rcpp(agent, a, b, velocities, orientations, time_step = 0.5)
 
   Numeric denoting the number of seconds each discrete step in time
   should mimic. Defaults to `0.5`, or half a second.
+
+- threshold:
+
+  Numeric denoting a minimal value the slowing factor can take on when
+  computing the cell centers. Defaults to `1e-6`.
 
 ## Value
 

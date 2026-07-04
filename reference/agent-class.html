@@ -13,7 +13,7 @@ estimation (e.g., speed and orientation)."><script type="text/javascript" async=
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,6 +123,27 @@ represents the current goal of the agent.</p></dd>
 included in this list.</p></dd>
 
 
+<dt><code>current_group_goal</code></dt>
+<dd><p>Object of class <code><a href="goal-class.html">goal-class</a></code> which
+represents the current goal of the agent's group.</p></dd>
+
+
+<dt><code>group_goals</code></dt>
+<dd><p>List of goals the agent's group has to achieve. The current
+goal is not included in this list.</p></dd>
+
+
+<dt><code>group_representative</code></dt>
+<dd><p>Logical denoting whether the agent is the representative of their group.
+The representative is the only one in the group that completes the group goals, hence also leading
+the group towards the group goals.</p></dd>
+
+
+<dt><code>individual_goals</code></dt>
+<dd><p>List of goals the agent has to achieve that are not shared with their group.
+These will be completes after the agent's group goals are completed.</p></dd>
+
+
 <dt><code>parameters</code></dt>
 <dd><p>Dataframe containing the values of the parameters for the
 agent. Should contain all parameters relevant for the utility functions
@@ -143,6 +164,10 @@ move to at a particular iteration.</p></dd>
 variables relevant to compute the utilities.</p></dd>
 
 
+<dt><code>extra_objects</code></dt>
+<dd><p>[DESCRIPTION TO BE WRITTEN]</p></dd>
+
+
 </dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -152,6 +177,10 @@ variables relevant to compute the utilities.</p></dd>
 <code><a href="cell.html">cell</a></code>,
 <code><a href="current_goal.html">current_goal</a></code>,
 <code><a href="goals.html">goals</a></code>,
+<code><a href="current_group_goal.html">current_group_goal</a></code>,
+<code><a href="group_goals.html">group_goals</a></code>,
+<code><a href="group_representative.html">group_representative</a></code>,
+<code><a href="individual_goals.html">individual_goals</a></code>,
 <code><a href="group.html">group</a></code>,
 <code><a href="id.html">id</a></code>,
 <code><a href="orientation.html">orientation</a></code>,

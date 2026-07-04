@@ -167,6 +167,6 @@ my_agent <- agent(center = c(0.7, 0.7), radius = 0.25)
 find_path(my_goal, 
           my_agent,
           my_background)
-#>              x         y
-#> [1,] 0.3169533 0.3995505
+#>                x         y
+#> [1,] -0.04859238 0.5076798
 ```

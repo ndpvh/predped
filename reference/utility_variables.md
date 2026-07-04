@@ -48,8 +48,8 @@ utility_variables(my_agent)
 #> 1        NA    NA       NA          NA       NA          NA       NA         NA
 #>   ba_angle ba_cones fl_leaders wb_buddies gc_distance gc_radius gc_nped
 #> 1       NA       NA         NA         NA          NA        NA      NA
-#>   vf_angles
-#> 1        NA
+#>   vf_angles lgvf_data
+#> 1        NA        NA
 
 # Change the utility_variables slot for the agent
 utility_variables(my_agent) <- data.frame(value = 1)

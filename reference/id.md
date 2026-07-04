@@ -32,6 +32,12 @@ id(object)
 # S4 method for class 'agent'
 id(object) <- value
 
+# S4 method for class 'trace'
+id(object)
+
+# S4 method for class 'trace'
+id(object) <- value
+
 # S4 method for class 'predped'
 id(object)
 

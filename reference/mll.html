@@ -11,7 +11,7 @@ of the model."><script type="text/javascript" async="" src="https://cdnjs.cloudf
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,8 @@ of the model.</p>
 <span>  bounds <span class="op">=</span> <span class="va">params_from_csv</span><span class="op">[[</span><span class="st">"params_bounds"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  cpp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  summed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  time_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fx <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -77,7 +79,7 @@ of the model.</p>
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Data.frame containing at least "id", "time", "x", "y", "goal_x",
 "goal_y", and "goal_id". If it does not have the utility variables yet, these
-will add them to the data.frame.</p></dd>
+will be added to the data.frame.</p></dd>
 
 
 <dt id="arg-parameters">parameters<a class="anchor" aria-label="anchor" href="#arg-parameters"></a></dt>
@@ -119,6 +121,18 @@ min-log-likelihood for each individual with a correction to avoid <code>-Inf</co
 If <code>FALSE</code>, the function will instead return a list of vectors containing
 the raw likelihoods (not min-log-likelihoods!), allowing users to specify
 their own corrections (if needed). Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
+<dd><p>Numeric denoting the time between each iteration. Defaults
+to <code>NULL</code>, in which case the time step is derived by the
+<code><a href="get_time_step.html">get_time_step</a></code> function with summarizing function
+<code>fx</code>.</p></dd>
+
+
+<dt id="arg-fx">fx<a class="anchor" aria-label="anchor" href="#arg-fx"></a></dt>
+<dd><p>A summarizing function that should be used to derive the time step
+if it is not provided through the <code>time_step</code> argument.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

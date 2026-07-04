@@ -10,12 +10,13 @@ update_goal(
   state,
   background,
   seen,
-  standing_start = 0.1,
+  standing_start = 0.25,
   close_enough = 2,
   space_between = 1.25,
   precomputed_edges = NULL,
   many_nodes = !is.null(precomputed_edges),
   adaptive_goal_sorting = TRUE,
+  stuck_threshold = 3L,
   report = FALSE,
   print_iteration = FALSE,
   cpp = TRUE
@@ -47,7 +48,7 @@ update_goal(
 - standing_start:
 
   Numeric denoting the factor of their preferred speed that agents move
-  when they just came from standing still. Defaults to `0.1`.
+  when they just came from standing still. Defaults to `0.25`.
 
 - close_enough:
 
@@ -82,6 +83,13 @@ update_goal(
   Logical denoting whether agents have the ability to change the order
   of their goals adaptively throughout the simulation. Defaults to
   `TRUE`.
+
+- stuck_threshold:
+
+  Integer. Number of consecutive blocked-goal entries before mechanism 1
+  (head-on deadlock rerouting) fires. On the first blocked entry
+  mechanism 2 (goal-zone congestion deferral) is attempted instead.
+  Defaults to `3L`.
 
 - report:
 

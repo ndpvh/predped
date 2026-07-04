@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,8 +87,8 @@ Background</em></a>. For information on how to run simulations, we refer
 readers to the vignette <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link"><em>Simulations</em></a>
 for the basic workflow and to the vignette <a href="https://ndpvh.github.io/predped/articles/advanced_simulation.html" class="external-link"><em>Advanced
 Simulations</em></a> for some additional functionalities provided within
-<code>predped</code>. Information on how to estimate the M4MA can be
-found in the vignette <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link"><em>Estimation</em></a>.</p>
+<code>predped</code>. Information on how to estimate the parameters of
+an M4MA model from movement data can be found in the vignette <a href="https://ndpvh.github.io/predped/articles/estimation.html" class="external-link"><em>Estimation</em></a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -120,9 +120,9 @@ object-oriented programming and S4 classes more generally.</p>
 specific (fixed) set of <em>attributes</em> or characteristics. For
 example, a room may be treated as an object, containing a particular
 shape and a set of objects that are inside of it (e.g., a living room
-may consist of a couch, some closets, and a coffee table). For example,
-<code>predped</code> allows for the definition of several shapes, namely
-<a href="https://ndpvh.github.io/predped/reference/rectangle-class.html" class="external-link"><code>rectangle</code></a>s,
+may consist of a couch, some closets, and a coffee table).
+<code>predped</code> allows for the definition of several shape types,
+namely <a href="https://ndpvh.github.io/predped/reference/rectangle-class.html" class="external-link"><code>rectangle</code></a>s,
 <a href="https://ndpvh.github.io/predped/reference/polygon-class.html" class="external-link"><code>polygon</code></a>s,
 and <a href="https://ndpvh.github.io/predped/reference/circle-class.html" class="external-link"><code>circle</code></a>s,
 which can be created by calling their constructor and defining their
@@ -224,9 +224,9 @@ characteristics:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Slot "interactable":</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>Importantly, the real strength of the S4 class does not lie only in
-its attributes, but also in the creation of <em>methods</em>, functions
-of which their underlying computations differ depending on the object’s
+<p>Importantly, the real strength of the S4 class is not only in its
+attributes, but also in the creation of <em>methods</em>, functions of
+which their underlying computations differ depending on the object’s
 class. Take, for example, the computation of the area of different
 shapes. For rectangles, the area can be computed as:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mi>w</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
@@ -290,11 +290,11 @@ provided to it. Exemplified with the rectangle we made earlier:</p>
 purposes. First, they make it easier for users to work with the objects
 provided by the package. Second, they ensure that if an object’s
 attribute is changed, that all attributes that depend on this change are
-changed as well. For example, the coordinates of the rectangles four
-defining corners depend on both the size of the rectangle and its
-center. Changing one of the two thus changes these coordinates. To
-ensure that this happens, we need to use the setters rather than
-overwriting the attribute manually:</p>
+changed as well. For example, the coordinates of a rectangles corners
+depend on both the size of the rectangle and its center. Changing one of
+the two thus changes these coordinates. To ensure that this happens, we
+need to use the setters rather than overwriting the attribute
+manually:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a rectangle with a given size</span></span>
 <span><span class="va">my_rectangle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rectangle-class.html">rectangle</a></span><span class="op">(</span></span>
@@ -365,8 +365,8 @@ center of the rectangle;</li>
 <code>size</code>: Numeric vector of two values defining the width
 and height of the rectangle;</li>
 <li>
-<code>orientation</code>: Numeric denoting the orientation of the
-rectangle in radians;</li>
+<code>orientation</code>: Numeric denoting the direct the agent is
+facing in radians;</li>
 <li>
 <code>points</code>: Numeric matrix containing the coordinates of
 the corners of the rectangle in clockwise fashion;</li>
@@ -419,8 +419,8 @@ their attributes with <a href="https://ndpvh.github.io/predped/reference/circle.
 <code>orientation</code>: Numeric denoting the orientation of the
 agent in degrees;</li>
 <li>
-<code>status</code>: Character denoting what the agent is
-doing;</li>
+<code>status</code>: Character denoting what the agent is doing
+(e.g., move, plan etc.) ;</li>
 <li>
 <code>current_goal</code>, <code>goals</code>: An instance of the <a href="https://ndpvh.github.io/predped/reference/goal.html" class="external-link"><code>goal</code></a>
 class and a collection of these respectively, denoting what the agent
@@ -442,7 +442,7 @@ The setting in which the agents walk around;
 class that defines the shape of the setting;</li>
 <li>
 <code>objects</code>: A list of <a href="https://ndpvh.github.io/predped/reference/object.html" class="external-link"><code>object</code></a>s
-defining the obstacles in the setting;</li>
+defining the objects in the setting;</li>
 <li>
 <code>entrance</code>, <code>exit</code>: Numeric matrices defining
 the entrances and/or exits of the space;</li>
@@ -481,8 +481,9 @@ used for a simulation;
 class denoting the setting agents have to walk in;</li>
 <li>
 <code>archetypes</code>, <code>weights</code>: Character vector
-denoting which agent archetypes are expected to walk within the setting,
-and with what particular probability you would find them there;</li>
+denoting which agent archetypes (i.e., a type of agent defined by a set
+of parameters) are expected to walk into the setting, and with what
+probability the next is of that type;</li>
 </ul>
 </li>
 <li>

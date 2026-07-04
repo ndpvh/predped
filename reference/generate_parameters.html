@@ -9,7 +9,7 @@ parameters to be used in simulation."><script type="text/javascript" async="" sr
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -175,29 +175,29 @@ function.</p>
 <span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">generate_parameters</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      radius slowing_time preferred_speed randomness stop_utility   reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2476285    1.1082649        1.281888 0.10444394    10031.062  9.491371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2386299    1.0243900        1.229275 0.11267521    10340.805 10.480950</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2370365    0.9893258        1.189598 0.07260163    10280.482  9.960191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.2585052    0.9661647        1.355738 0.11972814     9744.742 10.478425</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2485657    0.9122877        1.195922 0.09370872    10104.520 10.878481</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2441243    1.1032897        1.264805 0.09766157    10423.610 10.727450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2517194    0.9757366        1.290145 0.04524117     9712.305  8.196912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2484244    1.0046285        1.290394 0.08275572     9993.118  8.582732</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.2558896    0.9759652        1.263390 0.11591617     9603.723 10.625717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2517657    0.9958707        1.207432 0.07279814     9918.527 10.469219</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.1950871         2           0.9496390                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2421611         2           0.9580037                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.1652041         2           1.1813542                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.1982872         2           1.1537426                   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2026871         2           0.9678876                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.2047671         2           1.1849026                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2048117         2           1.3082050                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.2203179         2           0.8907058                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.1948534         2           1.3232414                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.2158429         2           1.0950839                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   blr_current_direction b_goal_direction a_goal_direction b_blocked a_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    10        11.705623                2  4.141124         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    10         8.420216                2  5.051235         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    10        10.210274                2  5.389299         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    10        10.629605                2  3.546915         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    10         9.793571                2  4.251361         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    10         8.423245                2  4.008381         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    10        11.976694                2  5.287782         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    10         9.848939                2  4.226951         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    10         7.553959                2  4.344917         2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    10        11.981158                2  3.334899         2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   b_interpersonal a_interpersonal d_interpersonal b_preferred_speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.994146               2               0         1.9845856</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        1.665658               2               0         0.8855753</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1.817663               2               0         1.6584604</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        2.335323               2               0         2.0701238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1.632801               2               0         2.1780386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.564919               2               0          2.228301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        2.614970               2               0          1.333030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        2.977035               2               0          1.758503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        2.553351               2               0          2.513710</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1.926506               2               0          1.740262</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a_preferred_speed b_leader a_leader d_leader b_buddy a_buddy a_group_centroid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                 2        0        0        0       0       0                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                 2        0        0        0       0       0                0</span>
@@ -210,12 +210,12 @@ function.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3                0              0       0           0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4                0              0       0           0            0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                0              0       0           0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   constant_speed deceleration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4              0            0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   constant_speed deceleration a_lgvf b_lgvf e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              0            0      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0            0      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3              0            0      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4              0            0      0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5              0            0      0      0      0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Note that you can turn individual differences off</span></span></span>
 <span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">generate_parameters</span><span class="op">(</span><span class="fl">5</span>, individual_differences <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
@@ -232,6 +232,8 @@ function.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        0        0       0       0                0                0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   b_visual_field central non_central acceleration constant_speed deceleration</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1              0       0           0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   a_lgvf b_lgvf e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0      0      0</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

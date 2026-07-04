@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,7 +136,10 @@
 <span>  dark_mode <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  optimize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'trace'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, iterations <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -300,6 +303,12 @@ to <code>10</code>.</p></dd>
 <dt id="arg-axis-text-size">axis.text.size<a class="anchor" aria-label="anchor" href="#arg-axis-text-size"></a></dt>
 <dd><p>Numeric denoting the text size of the axis text.
 Defaults to <code>8</code>.</p></dd>
+
+
+<dt id="arg-iterations">iterations<a class="anchor" aria-label="anchor" href="#arg-iterations"></a></dt>
+<dd><p>Integer vector denoting the iterations of the
+<code><a href="trace-class.html">trace-class</a></code> you would like to plot. Defaults to
+<code>NULL</code>, meaning that all iterations will be plotted.</p></dd>
 
 </dl></div>
     <div class="section level2">

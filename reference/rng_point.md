@@ -61,7 +61,7 @@ Furthermore note that `forbidden` is ignored for the
 my_circle <- circle(center = c(0, 0), 
                     radius = 1)
 rng_point(my_circle)
-#> [1]  0.99660769 -0.08229897
+#> [1] -0.9733740  0.2292228
 
 # Generate a point on the circumference of the circle with limitations, so 
 # that it cannot lie between the angles (0, pi/2) and (pi, 3 * pi/2), 
@@ -72,5 +72,5 @@ my_circle <- circle(center = c(0, 0),
                     forbidden = rbind(c(0, pi/2), 
                                       c(pi, 3 * pi/2)))
 rng_point(my_circle)
-#> [1] -0.8352959  0.5498007
+#> [1]  0.4775451 -0.8786072
 ```

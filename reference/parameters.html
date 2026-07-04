@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,37 +98,41 @@
 <span class="r-in"><span><span class="co"># Access the parameters slot for the agent</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2463262    0.9494592        1.263288  0.1623876     10192.85 8.657848</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2360685    0.9958521        1.261666 0.09512897      10029.5 10.55578</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1810312         2           0.9485869                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1922396         2           0.9067952                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         8.505427                2  4.412557</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         9.709835                2  4.186261</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        1.926026               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        2.408568               2               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius          1.400041                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          1.326547                 2        0        0        0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration a_lgvf b_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius      0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Change the parameters slot for the agent</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_parameters.html">generate_parameters</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">my_agent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           radius slowing_time preferred_speed randomness stop_utility  reroute</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2538798    0.9946231        1.181065  0.1166939     10401.98 10.24248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.2466142    0.9485268         1.15088 0.09688066     9737.849 9.627921</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_turning a_turning b_current_direction a_current_direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1891056         2           0.9392615                   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius 0.1613132         2            1.084877                   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        blr_current_direction b_goal_direction a_goal_direction b_blocked</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         11.93149                2  4.750318</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius                    10         9.432476                2  5.625974</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_blocked b_interpersonal a_interpersonal d_interpersonal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        1.955604               2               0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius         2        2.234487               2               0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius          2.585462                 2        0        0        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius          3.282353                 2        0        0        0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        a_buddy a_group_centroid b_group_centroid b_visual_field central</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> radius       0                0                0              0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        non_central acceleration constant_speed deceleration a_lgvf b_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius           0            0              0            0      0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        e_lgvf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> radius      0</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

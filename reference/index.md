@@ -88,6 +88,12 @@
   Constructor for the
   [`state-class`](https://rdrr.io/pkg/predped/man/state-class.html)
 
+- [`initialize(`*`<trace>`*`)`](https://github.com/ndpvh/predped/reference/initialize-trace.md)
+  :
+
+  Constructor for the
+  [`trace-class`](https://rdrr.io/pkg/predped/man/trace-class.html)
+
 - [`object-class`](https://github.com/ndpvh/predped/reference/object-class.md)
   : An S4 Abstract Base Class to Represent Objects
 
@@ -111,6 +117,10 @@
   [`state`](https://github.com/ndpvh/predped/reference/state-class.md) :
   An S4 Class to Represent the State
 
+- [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
+  [`trace`](https://github.com/ndpvh/predped/reference/trace-class.md) :
+  An S4 Class to Represent a Trace.
+
 ## General Methods
 
 - [`plot(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
@@ -119,6 +129,7 @@
   [`plot(`*`<object>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
   [`plot(`*`<segment>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
   [`plot(`*`<state>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
+  [`plot(`*`<trace>`*`)`](https://github.com/ndpvh/predped/reference/plot.md)
   : Plot an object
 
 - [`show(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/show-agent-method.md)
@@ -144,6 +155,12 @@
 
   Show method for the
   [`predped-class`](https://rdrr.io/pkg/predped/man/predped-class.html)
+
+- [`show(`*`<trace>`*`)`](https://github.com/ndpvh/predped/reference/show-trace-method.md)
+  :
+
+  Show method for the
+  [`trace-class`](https://rdrr.io/pkg/predped/man/trace-class.html)
 
 ## Object Manipulation
 
@@ -288,6 +305,14 @@
   : Angle between agent and group members
 - [`get_angles_rcpp()`](https://github.com/ndpvh/predped/reference/get_angles_rcpp.md)
   : Angle between agent and group members
+- [`get_group_member_data()`](https://github.com/ndpvh/predped/reference/get_group_member_data.md)
+  : Get Distances and Angles to Group Members
+- [`get_group_member_data_rcpp()`](https://github.com/ndpvh/predped/reference/get_group_member_data_rcpp.md)
+  : Get Distances and Angles to Group Members
+- [`lgvf_utility()`](https://github.com/ndpvh/predped/reference/lgvf_utility.md)
+  : Logarithmic Group-Attracted Visual Field Utility (LGVF)
+- [`lgvf_utility_rcpp()`](https://github.com/ndpvh/predped/reference/lgvf_utility_rcpp.md)
+  : Logarithmic Group-Attracted Visual Field Utility (LGVF)
 - [`utility(`*`<agent>`*`)`](https://github.com/ndpvh/predped/reference/utility-agent.md)
   : Compute the utilities on the agent level
 - [`utility(`*`<data.frame>`*`)`](https://github.com/ndpvh/predped/reference/utility-data.frame.md)
@@ -337,7 +362,53 @@
 - [`unpack_trace_rcpp()`](https://github.com/ndpvh/predped/reference/unpack_trace_rcpp.md)
   : Transform trace to comprehensive data.frame
 
+## Benchmark
+
+- [`benchmark_data`](https://github.com/ndpvh/predped/reference/benchmark_data.md)
+  : Benchmark data
+
+- [`benchmark_few_edges`](https://github.com/ndpvh/predped/reference/benchmark_few_edges.md)
+  :
+
+  Edges of an environment (`many_nodes = FALSE`)
+
+- [`benchmark_few_edges_uneval`](https://github.com/ndpvh/predped/reference/benchmark_few_edges_uneval.md)
+  :
+
+  Raw edges of an environment (`many_nodes = FALSE`)
+
+- [`benchmark_inx`](https://github.com/ndpvh/predped/reference/benchmark_inx.md)
+  : Initial condition used in benchmarks
+
+- [`benchmark_inx_data`](https://github.com/ndpvh/predped/reference/benchmark_inx_data.md)
+  : Initial condition used in benchmarks (data)
+
+- [`benchmark_many_edges`](https://github.com/ndpvh/predped/reference/benchmark_many_edges.md)
+  :
+
+  Edges of an environment (`many_nodes = TRUE`)
+
+- [`benchmark_many_edges_uneval`](https://github.com/ndpvh/predped/reference/benchmark_many_edges_uneval.md)
+  :
+
+  Raw edges of an environment (`many_nodes = TRUE`)
+
+- [`benchmark_params_bounded`](https://github.com/ndpvh/predped/reference/benchmark_params_bounded.md)
+  : Benchmarked parameters (bounded)
+
+- [`benchmark_params_real`](https://github.com/ndpvh/predped/reference/benchmark_params_real.md)
+  : Benchmarked parameters (unbounded)
+
+- [`benchmark_trace`](https://github.com/ndpvh/predped/reference/benchmark_trace.md)
+  : Trace used in benchmarks
+
+- [`supermarket`](https://github.com/ndpvh/predped/reference/supermarket.md)
+  : Default supermarket
+
 ## Helper Functions
+
+- [`append_trace()`](https://github.com/ndpvh/predped/reference/append_trace.md)
+  : Append values to the trace
 
 - [`benchmark()`](https://github.com/ndpvh/predped/reference/benchmark.md)
   : Benchmark the package
@@ -356,6 +427,9 @@
 
 - [`find_class()`](https://github.com/ndpvh/predped/reference/find_class.md)
   : Find all objects of a given class
+
+- [`get_time_step()`](https://github.com/ndpvh/predped/reference/get_time_step.md)
+  : Derive time between observations from data
 
 - [`line_line_intersection()`](https://github.com/ndpvh/predped/reference/line_line_intersection.md)
   : Compute the line-line intersection between several segments. Is a
@@ -378,6 +452,12 @@
 
 - [`raycasting()`](https://github.com/ndpvh/predped/reference/raycasting.md)
   : Raycasting algorithm
+
+- [`state_to_trace()`](https://github.com/ndpvh/predped/reference/state_to_trace.md)
+  : Transform a list of states to a trace
+
+- [`trace_to_state()`](https://github.com/ndpvh/predped/reference/trace_to_state.md)
+  : Transform a list of trace to a state
 
 - [`transform_df()`](https://github.com/ndpvh/predped/reference/transform_df.md)
   : Transform to dataframe of segments
@@ -438,6 +518,12 @@
 
   Getter/Setter for the `current_goal`-slot
 
+- [`current_group_goal()`](https://github.com/ndpvh/predped/reference/current_group_goal.md)
+  [`` `current_group_goal<-`() ``](https://github.com/ndpvh/predped/reference/current_group_goal.md)
+  :
+
+  Getter/Setter for the `current_group_goal`-slot
+
 - [`done()`](https://github.com/ndpvh/predped/reference/done.md)
   [`` `done<-`() ``](https://github.com/ndpvh/predped/reference/done.md)
   :
@@ -480,10 +566,28 @@
 
   Getter/Setter for the `group`-slot
 
+- [`group_goals()`](https://github.com/ndpvh/predped/reference/group_goals.md)
+  [`` `group_goals<-`() ``](https://github.com/ndpvh/predped/reference/group_goals.md)
+  :
+
+  Getter/Setter for the `group_goals`-slot
+
+- [`group_representative()`](https://github.com/ndpvh/predped/reference/group_representative.md)
+  [`` `group_representative<-`() ``](https://github.com/ndpvh/predped/reference/group_representative.md)
+  :
+
+  Getter/Setter for the `group_representative`-slot
+
 - [`id()`](https://github.com/ndpvh/predped/reference/id.md)
   [`` `id<-`() ``](https://github.com/ndpvh/predped/reference/id.md) :
 
   Getter/Setter for the `id`-slot
+
+- [`individual_goals()`](https://github.com/ndpvh/predped/reference/individual_goals.md)
+  [`` `individual_goals<-`() ``](https://github.com/ndpvh/predped/reference/individual_goals.md)
+  :
+
+  Getter/Setter for the `individual_goals`-slot
 
 - [`iteration()`](https://github.com/ndpvh/predped/reference/iteration.md)
   [`` `iteration<-`() ``](https://github.com/ndpvh/predped/reference/iteration.md)
@@ -579,11 +683,23 @@
 
   Getter/Setter for the `speed`-slot
 
+- [`states()`](https://github.com/ndpvh/predped/reference/states.md)
+  [`` `states<-`() ``](https://github.com/ndpvh/predped/reference/states.md)
+  :
+
+  Getter/Setter for the `states`-slot
+
 - [`status()`](https://github.com/ndpvh/predped/reference/status.md)
   [`` `status<-`() ``](https://github.com/ndpvh/predped/reference/status.md)
   :
 
   Getter/Setter for the `status`-slot
+
+- [`time_step()`](https://github.com/ndpvh/predped/reference/time_step.md)
+  [`` `time_step<-`() ``](https://github.com/ndpvh/predped/reference/time_step.md)
+  :
+
+  Getter/Setter for the `time_step`-slot
 
 - [`to()`](https://github.com/ndpvh/predped/reference/to.md)
   [`` `to<-`() ``](https://github.com/ndpvh/predped/reference/to.md) :

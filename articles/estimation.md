@@ -1,9 +1,9 @@
 # Estimation
 
 One of the major advances of the Minds for Mobile Agents model (M4MA) is
-the ability to estimate its parameters on data. In this vignette, we
-will illustrate this through two examples, one starting from the `trace`
-output from the
+the ability to estimate its operational parameters on movement data of
+sufficient quality. In this vignette, we will illustrate this through
+two examples, one starting from the `trace` output from the
 [`simulate`](https://ndpvh.github.io/predped/reference/simulate)
 function and the other starting from a `data.frame` containing measured
 movement data.
@@ -23,23 +23,23 @@ install.packages("nloptr")
 library(nloptr)
 ```
 
-For more information on the package and the NLopt library, we refer the
+For more information on the package and the nlopt library, we refer the
 interested reader to the dedicated documentation sites (`nloptr`:
 <https://astamm.github.io/nloptr>; NLopt:
 <https://nlopt.readthedocs.io/en/latest>).
 
 ## Disclaimer
 
-At the moment of writing, we are performing recovery studies to ensure
-the quality of the estimation of the M4MAs parameters. While likelihood
-profiles look good, we are not sure yet how much movement data is needed
-to ensure unbiased estimates with small standard errors. For now, we
-therefore do not guarantee accurate results when performing estimations
-on your own movement data.
-
-Furthermore note that the computation of the likelihood has not been
-adequately optimzed yet. For large datasets, the estimation procedure
-may therefore be rather slow.
+Note that data quality is determined by factors that commonly affect
+estimation in most domains, including: 1) the level of noise added by
+measurement (less is better!), 2) the lengths movements observed (longer
+is better!), and 3) the type of interactions among agents observed (some
+utilities are only identified if the behaviors they govern are observed
+in sufficient quantity). Experimentation is required to determine what
+level of quality is adequate in a specific scenario. Also note that the
+computation of the likelihood can become slow in large scenarios, so
+estimation may be practically difficult without large computing
+resources.
 
 ## Starting from a Trace
 
@@ -66,8 +66,8 @@ function:
 data <- unpack_trace(trace)
 ```
 
-The variable `data` contains a bunch of information in a variety of
-columns, namely:
+The variable `data` contains information in a variety of columns,
+namely:
 
 ``` r
 
@@ -77,12 +77,13 @@ colnames(data)
 #> [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  
 #> [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"
 #> [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" 
-#> [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"
+#> [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"  
+#> [31] "lgvf_data"
 ```
 
-Of these, some indicate some attributes of the agent at a particular
-time (e.g., position in `x` and `y`, speed and orientation in `speed`
-and `orientation`) but also the cell that they selected (`cell`) and
+Of these, some indicate attributes of the agent at a particular time
+(e.g., position in `x` and `y`, speed and orientation in `speed` and
+`orientation`) but also the cell that they selected (`cell`) and
 variables that are relevant for computing the utility of that decision
 (e.g., `check`, `ps_speed`, `gd_angle`,…). The contents of the latter
 set of columns depend heavily on the requirements of the utility
@@ -90,33 +91,36 @@ functions defined in the [`m4ma`](https://github.com/m4ma/m4ma) package
 and we refer the interested reader to its documentation for a full
 explanation (<https://research-software-directory.org/software/m4ma>).
 
-Second, we need to delete datapoints that are not of interest for the
-estimation procedure. Given that the M4MAs parameters guide movement, we
-can only use those datapoints at which agents were moving around. Within
-a `trace`, the easiest way in which to spot whether this is the case is
-by filtering out any rows in which the utility variables are `NA`,
-indicating that they were not used during that iteration:
+Second, we need to delete data points that are not relevant for
+estimation. Given that the M4MAs operational parameters guide movement,
+we can only use those data points at which agents were moving around
+(except in cases where stopping is determined by the `stop_utility`
+parameter). Within a `trace`, the easiest way in which to spot whether
+this is the case is by filtering out any rows in which the utility
+variables are `NA`, indicating that they were not used during that
+iteration:
 
 ``` r
 
 dim(data)
-#> [1] 804  30
+#> [1] 804  31
 
 data <- data[!is.na(data$check), ]
 
 dim(data)
-#> [1] 419  30
+#> [1] 390  31
 ```
 
 Note that this step is not necessary for the code to run, but that a
 warning would be thrown in case `NA` are left in the data.
 
-Finally, once the data has been filtered to contain only movement data,
-we can compute the likelihood of the data under a particular set of
-parameters. Calling this likelihood $`L`$, then one can compute the
-negative log-likelihood $`-\log(L)`$ with the
-[`mll`](https://ndpvh.github.io/predped/reference/mll.html) function as
-follows:
+Finally, once the data has been filtered to contain only
+utility-governed data, we can compute the likelihood of that data under
+a particular set of operational parameters. Calling this likelihood
+$`L`$, then one can compute the negative log-likelihood $`-\log(L)`$
+(i.e., a value for which smaller magnitudes indicate a better fit) with
+the [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function
+as follows:
 
 ``` r
 
@@ -136,8 +140,8 @@ mll(
   transform = FALSE,
   summed = TRUE
 )
-#>    grazd    ihvmf    mlchb    nxpju    womdz 
-#> 196.1544 186.6085 142.5374 178.6028 142.5474
+#>    eqivl    lalcs    ljafq    nvdbz    uiexk 
+#> 120.1554 219.0927 217.3531 162.2373 132.4960
 ```
 
 The output of this call to
@@ -149,12 +153,12 @@ In this piece of code, we specified the argument `transform = FALSE` to
 communicate that the provided parameters are on the bounded scale rather
 than the unbounded scale (see *Parameters* in the vignette on
 [*Simulations*](https://ndpvh.github.io/predped/articles/simulation.html)).
-When using an optimizer, it may be interesting to let the optimizer work
-on the unbounded (real) scale instead, in which case you can specify
-`transform = TRUE`. Additionally, we specified `summed = TRUE` to get
-the summed value for the negative log-likelihood across all datapoints
-of a particular agent. If you wish to see the values of the negative
-log-likelihood for each datapoint individually, you can set
+When using an optimizer, it is usually better to let it work on an
+unbounded scale (i.e., the full real line), in which case you can
+specify `transform = TRUE`. Additionally, we specified `summed = TRUE`
+to get the summed value for the negative log-likelihood across all data
+points of a particular agent. If you wish to see the values of the
+negative log-likelihood for each data point individually, you can set
 `summed = FALSE`.
 
 The call to the
@@ -162,16 +166,16 @@ The call to the
 will serve as the basic building block of the estimation procedure,
 which we dive more into in the next section.
 
-### Optimization
+### Bounded Optimization
 
-Typically, we want to estimate a set of unknown parameters to the data
-that is available to us. To achieve this via the `nloptr` package, we
-need to first define an *objective function*, that is a function that
-outputs a value to be minimized by the optimizer through changing a
-vector of parameters that serve as an input to this function. In our
-case, the objective function will be a wrapper around the
+Typically, we want to estimate a set of unknown parameters best
+describing our data. To achieve this via the `nloptr` package, we need
+to first define an *objective function*, that is a function that outputs
+a value to be minimized by the optimizer through changing a vector of
+parameters that serve as an input to this function. In our case, the
+objective function will be a wrapper around the
 [`mll`](https://ndpvh.github.io/predped/reference/mll.html) function,
-summing all of the negative log-likelihoods together into one single
+summing negative log-likelihoods across agents into one single
 `objective` value:
 
 ``` r
@@ -242,9 +246,9 @@ fit
 #> Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 
 #> Number of inequality constraints:  0 
 #> Number of equality constraints:    0 
-#> Current value of objective function:  739.726257900465 
-#> Current value of controls: 0.25 1.5 2.085 4.166683 500005 16 0.5 1.5 10 1.5 3.375 10 1.5 10.025 1.5 10 1.5 
-#> 0.5 10 1.5 160 1.5 110 110 1.5 2 10 55 0.5 0.5 0.5 0.5 0.5
+#> Current value of objective function:  566.319619486245 
+#> Current value of controls: 0.25 0.8333333 1.255 2.50005 500005 16 0.5 1.5 10 1.5 3.375 10 1.5 10.025 1.5 
+#> 10 1.5 0.5 10 1.5 160 1.5 110 110 1.5 2 10 55 0.5 0.5 0.5 0.5 0.5 1.5 10 10
 ```
 
 ### Individual Parameters
@@ -271,7 +275,7 @@ objective_function <- function(parameters) {
   parameters <- matrix(
     parameters,
     nrow = n, 
-    ncol = 33
+    ncol = 36
   )
 
   # Compute the objective
@@ -297,7 +301,7 @@ objective function, in this case:
 # Extract the bounds of the parameters
 bounds <- load_parameters()$params_bounds |>
   rep(each = n) |>
-  matrix(nrow = 33 * n, ncol = 2)
+  matrix(nrow = 36 * n, ncol = 2)
 
 # Define the initial condition for the algorithm. Take the middle of the 
 # interval defined by the bounds
@@ -335,9 +339,9 @@ fit
 #> Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 
 #> Number of inequality constraints:  0 
 #> Number of equality constraints:    0 
-#> Current value of objective function:  3598.79453227266 
-#> Current value of controls: 0.25 0.25 0.2833333 0.2833333 0.2833333 1.5 1.5 1.5 0.8333333 2.166667 1.255 
-#> 0.425 1.255 0.425 2.085 2.50005 2.50005 2.50005 0.8334167 2.50005 500005 500005 
+#> Current value of objective function:  4408.02012172839 
+#> Current value of controls: 0.25 0.25 0.2833333 0.2833333 0.2833333 1.5 1.5 1.5 0.8333333 1.5 1.255 1.255 
+#> 1.255 1.255 1.255 2.50005 2.50005 2.50005 0.8334167 2.50005 500005 500005 
 #> 500005 500005 500005 16 16 16 16 16 0.5 0.5 0.5 0.5 0.5 1.5 1.5 1.5 1.5 1.5 10 
 #> 10 10 10 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 10 10 10 10 
 #> 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 1.5 1.5 1.5 1.5 1.5 
@@ -345,7 +349,7 @@ fit
 #> 1.5 1.5 1.5 160 160 160 160 160 1.5 1.5 1.5 1.5 1.5 110 110 110 110 110 110 110 
 #> 110 110 110 1.5 1.5 1.5 1.5 1.5 2 2 2 2 2 10 10 10 10 10 55 55 55 55 55 0.5 0.5 
 #> 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 
-#> 0.5 0.5 0.5
+#> 0.5 0.5 0.5 1.5 1.5 1.5 1.5 1.5 10 10 10 10 10 10 10 10 10 10
 ```
 
 In this case, it may be useful to transform the parameters back to the
@@ -369,56 +373,55 @@ fit$solution |>
   `rownames<-` (ids) |>
   `colnames<-` (params)
 #>          radius slowing_time preferred_speed randomness stop_utility reroute
-#> grazd 0.2500000    1.5000000           1.255  2.5000500       500005      16
-#> ihvmf 0.2500000    1.5000000           0.425  2.5000500       500005      16
-#> mlchb 0.2833333    1.5000000           1.255  2.5000500       500005      16
-#> nxpju 0.2833333    0.8333333           0.425  0.8334167       500005      16
-#> womdz 0.2833333    2.1666667           2.085  2.5000500       500005      16
+#> eqivl 0.2500000    1.5000000           1.255  2.5000500       500005      16
+#> lalcs 0.2500000    1.5000000           1.255  2.5000500       500005      16
+#> ljafq 0.2833333    1.5000000           1.255  2.5000500       500005      16
+#> nvdbz 0.2833333    0.8333333           1.255  0.8334167       500005      16
+#> uiexk 0.2833333    1.5000000           1.255  2.5000500       500005      16
 #>       b_turning a_turning b_current_direction a_current_direction
-#> grazd       0.5       1.5                  10                 1.5
-#> ihvmf       0.5       1.5                  10                 1.5
-#> mlchb       0.5       1.5                  10                 1.5
-#> nxpju       0.5       1.5                  10                 1.5
-#> womdz       0.5       1.5                  10                 1.5
+#> eqivl       0.5       1.5                  10                 1.5
+#> lalcs       0.5       1.5                  10                 1.5
+#> ljafq       0.5       1.5                  10                 1.5
+#> nvdbz       0.5       1.5                  10                 1.5
+#> uiexk       0.5       1.5                  10                 1.5
 #>       blr_current_direction b_goal_direction a_goal_direction b_blocked
-#> grazd                10.025               10              1.5    10.025
-#> ihvmf                10.025               10              1.5    10.025
-#> mlchb                10.025               10              1.5    10.025
-#> nxpju                10.025               10              1.5    10.025
-#> womdz                10.025               10              1.5    10.025
+#> eqivl                10.025               10              1.5    10.025
+#> lalcs                10.025               10              1.5    10.025
+#> ljafq                10.025               10              1.5    10.025
+#> nvdbz                10.025               10              1.5    10.025
+#> uiexk                10.025               10              1.5    10.025
 #>       a_blocked b_interpersonal a_interpersonal d_interpersonal
-#> grazd       1.5              10             1.5             0.5
-#> ihvmf       1.5              10             1.5             0.5
-#> mlchb       1.5              10             1.5             0.5
-#> nxpju       1.5              10             1.5             0.5
-#> womdz       1.5              10             1.5             0.5
+#> eqivl       1.5              10             1.5             0.5
+#> lalcs       1.5              10             1.5             0.5
+#> ljafq       1.5              10             1.5             0.5
+#> nvdbz       1.5              10             1.5             0.5
+#> uiexk       1.5              10             1.5             0.5
 #>       b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy
-#> grazd                10               1.5      160      1.5      110     110
-#> ihvmf                10               1.5      160      1.5      110     110
-#> mlchb                10               1.5      160      1.5      110     110
-#> nxpju                10               1.5      160      1.5      110     110
-#> womdz                10               1.5      160      1.5      110     110
+#> eqivl                10               1.5      160      1.5      110     110
+#> lalcs                10               1.5      160      1.5      110     110
+#> ljafq                10               1.5      160      1.5      110     110
+#> nvdbz                10               1.5      160      1.5      110     110
+#> uiexk                10               1.5      160      1.5      110     110
 #>       a_buddy a_group_centroid b_group_centroid b_visual_field central
-#> grazd     1.5                2               10             55     0.5
-#> ihvmf     1.5                2               10             55     0.5
-#> mlchb     1.5                2               10             55     0.5
-#> nxpju     1.5                2               10             55     0.5
-#> womdz     1.5                2               10             55     0.5
-#>       non_central acceleration constant_speed deceleration
-#> grazd         0.5          0.5            0.5          0.5
-#> ihvmf         0.5          0.5            0.5          0.5
-#> mlchb         0.5          0.5            0.5          0.5
-#> nxpju         0.5          0.5            0.5          0.5
-#> womdz         0.5          0.5            0.5          0.5
+#> eqivl     1.5                2               10             55     0.5
+#> lalcs     1.5                2               10             55     0.5
+#> ljafq     1.5                2               10             55     0.5
+#> nvdbz     1.5                2               10             55     0.5
+#> uiexk     1.5                2               10             55     0.5
+#>       non_central acceleration constant_speed deceleration a_lgvf b_lgvf e_lgvf
+#> eqivl         0.5          0.5            0.5          0.5    1.5     10     10
+#> lalcs         0.5          0.5            0.5          0.5    1.5     10     10
+#> ljafq         0.5          0.5            0.5          0.5    1.5     10     10
+#> nvdbz         0.5          0.5            0.5          0.5    1.5     10     10
+#> uiexk         0.5          0.5            0.5          0.5    1.5     10     10
 ```
 
 ### Unbounded Estimation
 
 The algorithm that we used before requires us to impose bounds on the
-parameters. In some cases, however, it may be more useful to use an
-optimizer that operates on the real scale, rather than on a bounded one.
-In this case, we change the argument `transform` to `TRUE` and change
-the call to `nloptr` as follows:
+parameters. Often, however, optimization works best if the entire real
+line can be searched. In this case, we change the argument `transform`
+to `TRUE` and change the call to `nloptr` as follows:
 
 ``` r
 
@@ -437,7 +440,7 @@ objective_function <- function(parameters) {
 }
 
 # Change the initial condition
-x0 <- numeric(33)
+x0 <- numeric(36)
 
 # Perform the estimation procedure with an algorithm that does not require 
 # bounds to be specified
@@ -470,17 +473,18 @@ fit
 #> Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 
 #> Number of inequality constraints:  0 
 #> Number of equality constraints:    0 
-#> Current value of objective function:  429.316084129412 
-#> Current value of controls: -2.594467 -0.5634537 0.5070385 -0.2047041 0.6581698 0.2549867 0.2549867 
-#> 0.06491596 -1.421626 -0.4919096 -0.0133553 10.21004 -0.3960335 -0.6823948 
-#> -0.004831927 -0.3530833 -0.01361795 -11.13464 0.2360346 0.7072078 -2.224339 
-#> 7.560695 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 
-#> 0.2549867 0.2549867 0.2549867 -0.1656554
+#> Current value of objective function:  348.816056297911 
+#> Current value of controls: -0.7980488 -0.8443498 0.2125047 -0.4001295 0.3627438 0.3627438 0.3627438 
+#> 0.3627438 -1.334698 -0.2805176 -0.1662079 9.372625 -0.5136853 -0.5633863 
+#> -1.038879 -0.7917356 -0.1031646 8.877348 0.3623326 -0.09864396 -1.521471 
+#> 0.28125 0.3627438 0.3627438 0.3627438 0.3627438 0.3627438 0.3346864 0.3346864 
+#> 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864
 ```
 
 Importantly, the parameters now have been estimated to be on the real
-scale, yet the parameters of the M4MA need to be defined on the bounded
-scale. To transform the parameters to their proper values, we use the
+line, yet the parameters of the M4MA need are naturally defined on
+bounded scales. To transform the parameters to their natural values, we
+use the
 [`to_bounded`](https://ndpvh.github.io/predped/reference/to_bounded.html)
 function:
 
@@ -503,50 +507,52 @@ transformed <- to_bounded(
 )
 transformed
 #>           radius slowing_time preferred_speed randomness stop_utility  reroute
-#> radius 0.2004737     1.073126        1.737901   2.094566     744788.1 18.81773
+#> radius 0.2212421     0.898474        1.464517   1.722718     641605.4 19.96485
 #>        b_turning a_turning b_current_direction a_current_direction
-#> radius 0.6006333  1.577639            1.551349           0.9341749
+#> radius 0.6416018  1.924806            1.819753            1.168621
 #>        blr_current_direction b_goal_direction a_goal_direction b_blocked
-#> radius               9.91871               20          1.03812  4.987519
+#> radius              8.708234               20        0.9112081  5.767389
 #>        a_blocked b_interpersonal a_interpersonal d_interpersonal
-#> radius  1.494217         7.24026        1.483702    4.254342e-29
+#> radius 0.4482917        4.285149        1.376749               1
 #>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader  b_buddy
-#> radius          11.86594          2.280844   4.1801        3 132.1393 132.1393
-#>        a_buddy a_group_centroid b_group_centroid b_visual_field   central
-#> radius  1.8019         2.402533         12.01267       66.06967 0.6006333
-#>        non_central acceleration constant_speed deceleration
-#> radius   0.6006333    0.6006333      0.6006333    0.4342141
+#> radius          12.82897          1.382131 20.50266 1.832222 141.1524 141.1524
+#>         a_buddy a_group_centroid b_group_centroid b_visual_field   central
+#> radius 1.924806         2.566407         12.83204       69.41761 0.6310692
+#>        non_central acceleration constant_speed deceleration   a_lgvf   b_lgvf
+#> radius   0.6310692    0.6310692      0.6310692    0.6310692 1.893207 12.62138
+#>          e_lgvf
+#> radius 12.62138
 ```
 
 ## Starting from Data
 
 Within `predped`, we also allow users to estimate the M4MA on their data
-directly. Consider the following dataset taken from a simplified train
+directly. Consider the following data set taken from a simplified train
 station, for example (see [*Advanced
 Simulations*](https://ndpvh.github.io/predped/articles/advnaced_simulation.html)):
 
 ``` r
 
 head(data)
-#>       time passenger        x             y
-#> 1 2.403958         1 4.692500  3.765789e-17
-#> 2 2.932846         1 4.606273 -4.020823e-02
-#> 3 3.413369         1 4.488606 -1.225997e-01
-#> 4 4.063040         1 4.281833 -1.780042e-01
-#> 5 4.453463         1 3.988913 -3.145950e-01
-#> 6 4.992690         1 3.591787 -5.926661e-01
+#>        time passenger         x           y
+#> 1 0.4090724        11 -4.537391 -0.09881539
+#> 2 0.9447560        11 -4.334378 -0.28484220
+#> 3 1.5367148        11 -4.029859 -0.56388241
+#> 4 2.0341893        11 -3.725340 -0.84292263
+#> 5 2.5059533        11 -3.573081 -0.98244273
+#> 6 2.9901712        11 -3.573081 -0.98244273
 ```
 
-In this dataset, we measured the positions (`x` and `y`) of different
+In this data set, we measured the positions (`x` and `y`) of different
 passengers (`passenger`) at several time points (`time`). To go from
-this dataset to one that we can use for the estimation procedure, we
+this data set to one that we can use for the estimation procedure, we
 need to take the following steps.
 
-First, we need the dataset to conform to the standards of `predped`.
+First, we need the data set to conform to the standards of `predped`.
 This means that:
 
 - The `time` variable needs to show discrete jumps conforming the
-  `time_step` defined by the M4MA, it being $`500`$msec;
+  `time_step` defined by the M4MA (by default, half a second);
 - A variable `iteration` needs to be added showing the iteration at
   which the positions were measured;
 - The `passenger` variable needs to be renamed to the `predped` internal
@@ -606,13 +612,13 @@ data <- do.call("rbind", data)
 data <- data[order(data$time), ]
 
 head(data)
-#>         time passenger        x             y
-#> 218 2.653958         1 4.692500  3.765789e-17
-#> 219 3.153958         1 4.606273 -4.020823e-02
-#> 220 3.653958         1 4.488606 -1.225997e-01
-#> 221 4.153958         1 4.281833 -1.780042e-01
-#> 222 4.653958         1 3.988913 -3.145950e-01
-#> 223 5.153958         1 3.591787 -5.926661e-01
+#>         time passenger         x           y
+#> 80 0.6590724        11 -4.537391 -0.09881539
+#> 81 1.1590724        11 -4.334378 -0.28484220
+#> 82 1.6590724        11 -4.029859 -0.56388241
+#> 83 2.1590724        11 -3.725340 -0.84292263
+#> 84 2.6590724        11 -3.573081 -0.98244273
+#> 85 3.1590724        11 -3.573081 -0.98244273
 ```
 
 The `iteration` variable requires integer values denoting the bin in
@@ -623,13 +629,13 @@ perform the following computation:
 
 data$iteration <- (data$time - min(data$time)) / 0.5 + 1
 head(data)
-#>         time passenger        x             y iteration
-#> 218 2.653958         1 4.692500  3.765789e-17         1
-#> 219 3.153958         1 4.606273 -4.020823e-02         2
-#> 220 3.653958         1 4.488606 -1.225997e-01         3
-#> 221 4.153958         1 4.281833 -1.780042e-01         4
-#> 222 4.653958         1 3.988913 -3.145950e-01         5
-#> 223 5.153958         1 3.591787 -5.926661e-01         6
+#>         time passenger         x           y iteration
+#> 80 0.6590724        11 -4.537391 -0.09881539         1
+#> 81 1.1590724        11 -4.334378 -0.28484220         2
+#> 82 1.6590724        11 -4.029859 -0.56388241         3
+#> 83 2.1590724        11 -3.725340 -0.84292263         4
+#> 84 2.6590724        11 -3.573081 -0.98244273         5
+#> 85 3.1590724        11 -3.573081 -0.98244273         6
 ```
 
 The column `passenger` can be renamed to `id` in the following way:
@@ -638,13 +644,24 @@ The column `passenger` can be renamed to `id` in the following way:
 
 colnames(data)[2] <- "id"
 head(data)
-#>         time id        x             y iteration
-#> 218 2.653958  1 4.692500  3.765789e-17         1
-#> 219 3.153958  1 4.606273 -4.020823e-02         2
-#> 220 3.653958  1 4.488606 -1.225997e-01         3
-#> 221 4.153958  1 4.281833 -1.780042e-01         4
-#> 222 4.653958  1 3.988913 -3.145950e-01         5
-#> 223 5.153958  1 3.591787 -5.926661e-01         6
+#>         time id         x           y iteration
+#> 80 0.6590724 11 -4.537391 -0.09881539         1
+#> 81 1.1590724 11 -4.334378 -0.28484220         2
+#> 82 1.6590724 11 -4.029859 -0.56388241         3
+#> 83 2.1590724 11 -3.725340 -0.84292263         4
+#> 84 2.6590724 11 -3.573081 -0.98244273         5
+#> 85 3.1590724 11 -3.573081 -0.98244273         6
+```
+
+For estimation to work, we need to have at least 2 values per
+participant so that their speeds and orientations can be derived. We
+therefore need to delete any participant that does not have sufficient
+values in the data as follows:
+
+``` r
+
+frequencies <- table(data$id)
+data <- data[data$id %in% names(frequencies)[frequencies >= 2], ]
 ```
 
 Now that the dataset conforms to `predped`s standards, we have to
@@ -659,7 +676,7 @@ simplified train station that looks as follows:
 collected. Gates can be found on the left and right side of the space,
 and four exits and entrances can be found in the middle of each side of
 the rectangular
-space.](estimation_files/figure-html/unnamed-chunk-23-1.png)
+space.](estimation_files/figure-html/unnamed-chunk-24-1.png)
 
 Note that when there are restrictions in flow, this is ideally included
 in the creation of this background (see [*Advanced
@@ -668,12 +685,12 @@ Simulations*](https://ndpvh.github.io/predped/reference/advanced_simulation.html
 Additionally, we need to include information on the goals that the
 people were trying to achieve within this environment, information that
 is necessary due to the M4MAs assumption that movement within space is
-guided by people’s goals. Specifically, we need to define the position
-of the goal as well as attach an identifier to this goal, each
-respectively contained in the `goal_x`, `goal_y`, and `goal_id` columns
-in the data. In this case, we know that each person was walking towards
-a particular exit of the space. Based on this information, we add the
-required columns as follows:
+guided by goals. Specifically, we need to define the position of the
+goal as well as attach an identifier to this goal, each respectively
+contained in the `goal_x`, `goal_y`, and `goal_id` columns in the data.
+In this case, we know that each person was walking towards a particular
+exit of the space. Based on this information, we add the required
+columns as follows:
 
 ``` r
 
@@ -711,13 +728,13 @@ for(i in seq_along(mapping)) {
 }
 
 head(data)
-#>         time id        x             y iteration goal_x goal_y          goal_id
-#> 218 2.653958  1 4.692500  3.765789e-17         1      0   -2.5 moving to exit 1
-#> 219 3.153958  1 4.606273 -4.020823e-02         2      0   -2.5 moving to exit 1
-#> 220 3.653958  1 4.488606 -1.225997e-01         3      0   -2.5 moving to exit 1
-#> 221 4.153958  1 4.281833 -1.780042e-01         4      0   -2.5 moving to exit 1
-#> 222 4.653958  1 3.988913 -3.145950e-01         5      0   -2.5 moving to exit 1
-#> 223 5.153958  1 3.591787 -5.926661e-01         6      0   -2.5 moving to exit 1
+#>         time id         x           y iteration goal_x goal_y          goal_id
+#> 80 0.6590724 11 -4.537391 -0.09881539         1     -5      0 moving to exit 2
+#> 81 1.1590724 11 -4.334378 -0.28484220         2     -5      0 moving to exit 2
+#> 82 1.6590724 11 -4.029859 -0.56388241         3     -5      0 moving to exit 2
+#> 83 2.1590724 11 -3.725340 -0.84292263         4     -5      0 moving to exit 2
+#> 84 2.6590724 11 -3.573081 -0.98244273         5     -5      0 moving to exit 2
+#> 85 3.1590724 11 -3.573081 -0.98244273         6     -5      0 moving to exit 2
 ```
 
 Once the setting and the people’s goals have been defined, we can
@@ -737,7 +754,8 @@ colnames(utility_data)
 #> [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  
 #> [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"
 #> [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" 
-#> [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"
+#> [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"  
+#> [31] "lgvf_data"
 ```
 
 As shown, the result contains all of the same columns as the ones found

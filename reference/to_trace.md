@@ -21,9 +21,10 @@ to_trace(
   a_turning = NULL,
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -10, -20, -32.5, -50, -72.5),
-  time_step = 0.5,
-  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4)/time_step,
+  time_step = NULL,
+  standing_start = 0.25,
   stay_stopped = TRUE,
+  fx = function(x) mean(x, na.rm = TRUE),
   cpp = TRUE,
   ...
 )
@@ -47,8 +48,10 @@ to_trace(
   relationship between orientation and velocity. For more information,
   see the documentation of
   [`compute_centers`](https://github.com/ndpvh/predped/reference/compute_centers.md).
-  Defaults to `NULL`, meaning that this relationship takes on the
-  default values of `predped`.
+  Alternatively can also be a named numeric vector, where each value in
+  the vector denotes the values of the parameters for each agent in the
+  data.frame.Defaults to `NULL`, meaning that this relationship takes on
+  the default values of `predped`.
 
 - velocities:
 
@@ -64,20 +67,28 @@ to_trace(
 
 - time_step:
 
-  Numeric denoting the time between each iteration. Defaults to `0.5`
-  (the same as in [`simulate`](https://rdrr.io/r/stats/simulate.html)).
+  Numeric denoting the time between each iteration. Defaults to `NULL`,
+  in which case the time step is derived by the
+  [`get_time_step`](https://github.com/ndpvh/predped/reference/get_time_step.md)
+  function with summarizing function `fx`.
 
-- threshold:
+- standing_start:
 
-  Numeric denoting under which observed value for speed the cell to
-  which an agent has moved should be put to \`0\`. Defaults to a value
-  based on the observed measurement error in our system.
+  Numeric denoting the speed below which the cell is set to `0`
+  (stopped). Matches the `standing_start` parameter in
+  [`update_position`](https://github.com/ndpvh/predped/reference/update_position.md).
+  Defaults to `0.25`.
 
 - stay_stopped:
 
   Logical denoting whether agents will predict others that are currently
   not moving to remain immobile in the next iteration. Is needed to
   compute the utility variables accurately. Defaults to `TRUE`.
+
+- fx:
+
+  A summarizing function that should be used to derive the time step if
+  it is not provided through the `time_step` argument.
 
 - cpp:
 
@@ -88,6 +99,11 @@ to_trace(
 
   Arguments passed to
   [`find_path`](https://github.com/ndpvh/predped/reference/find_path.md).
+
+## Value
+
+Object of the
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md).
 
 ## Examples
 

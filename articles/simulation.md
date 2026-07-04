@@ -32,8 +32,8 @@ defining the following attributes:
   restrict the movement of the agents within the space (see [*Advanced
   Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)).
 
-As an example, let’s define a rectangular environment that represents
-our office:
+As an example, let’s define a rectangular environment that represents an
+office:
 
 ``` r
 
@@ -110,8 +110,8 @@ interacted with. However, as this assumption may not apply to all
 situations, we also allow users to limit the interactability of the
 objects in their environment. This is done in two ways.
 
-First, users can make a complete object non-interactable by setting the
-`interactable` argument of the constructors for `rectangle`s,
+First, users can make an object completely non-interactable by setting
+the `interactable` argument of the constructors for `rectangle`s,
 `polygon`s, and `circle`s to `FALSE`, such as in the following examples:
 
 ``` r
@@ -267,8 +267,7 @@ my_background <- background(
 )
 ```
 
-We can then visualize these locations as through calling the `plot`
-method:
+We can then visualize these locations by calling the `plot` method:
 
 ``` r
 
@@ -314,8 +313,7 @@ environments. These are included here:
 
 Once an environment has been defined, one should define the
 characteristics of the agents that are expected to walk around in this
-environment. The mapping of the setting with the agents is achieved
-through specifying an instance of the
+environment. An agent is an instance of the
 [`predped`](https://ndpvh.github.io/predped/reference/predped.html)
 class. It has the following attributes:
 
@@ -340,16 +338,16 @@ my_predped <- predped(setting = my_background)
 my_predped
 #> Model object:
 #> ID: model eqmfa 
-#> Parameters taken from the BaselineEuropean, BigRushingDutch, DrunkAussie, CautiousOldEuropean, Rushed, Distracted, BaselineEuropean1, BigRushingDutch1, DrunkAussie1, CautiousOldEuropean1, Rushed1, Distracted1, Lost, SociallyAnxious, SocialBaselineEuropean, SocialBigRushingDutch, SocialDrunkAussie, SocialCautiousOldEuropean archetypes.
+#> Parameters taken from the BaselineEuropean, BigRushingDutch, DrunkAussie, CautiousOldEuropean, Rushed, Distracted, BaselineEuropean1, BigRushingDutch1, DrunkAussie1, CautiousOldEuropean1, Rushed1, Distracted1, Lost, SociallyAnxious, SocialBaselineEuropean, SocialBigRushingDutch, SocialDrunkAussie, SocialCautiousOldEuropean, Colleagues, Couples, Families, Friends archetypes.
 ```
 
 This specification connects the previously defined environment to the
 type of agents that should walk around in it. By default, all archetypes
-defined in the project’s can join the simulation with an equal
-probability. If you wish to limit the number of types of agents that can
-walk around in the simulation and/or wish to change these probabilities,
-one can specify the `archetypes` and `weights` arguments of the
-constructor. For example, specifying:
+(i.e., types of agents) defined in the project’s can join the simulation
+with an equal probability. If you wish to limit the number of types of
+agents that can walk around in the simulation and/or wish to change
+these probabilities, one can specify the `archetypes` and `weights`
+arguments of the constructor. For example, specifying:
 
 ``` r
 
@@ -419,14 +417,15 @@ colnames(params$params_archetypes)
 #> [25] "d_leader"              "b_buddy"               "a_buddy"              
 #> [28] "a_group_centroid"      "b_group_centroid"      "b_visual_field"       
 #> [31] "central"               "non_central"           "acceleration"         
-#> [34] "constant_speed"        "deceleration"
+#> [34] "constant_speed"        "deceleration"          "a_lgvf"               
+#> [37] "b_lgvf"                "e_lgvf"
 ```
 
 The column `name` contains the name of the agent type, `color` contains
 the color that is used to visualize the agent in simulation plots, and
 `radius` determines the size of the agent. After these initial three
-columns follow a bunch of parameters used by the utility functions on
-the operational level, namely:
+columns follow parameters used by the utility functions on the
+operational level, namely:
 
 - `randomness`: Controls the randomness of the decisions of the agent;
 - `stop_utility`: Controls the utility of stopping instead of moving,
@@ -434,9 +433,9 @@ the operational level, namely:
 - `reroute`: Controls the agent’s tendency to reroute when their route
   is blocked by other agents;
 - `a_turning`, `b_turning`: Controls the biomechanical limitations in
-  the maintainence of your speed while turning;
+  the maintainence of speed while turning;
 - `preferred_speed`, `a_preferred_speed`, `b_preferred_speed`:
-  Parameters that control the utility of continuing to move at your
+  Parameters that control the utility of continuing to move at the
   preferred speed;
 - `slowing_time`: Controls the time needed for the agent to slow down
   when approaching a goal;
@@ -459,11 +458,14 @@ the operational level, namely:
 - `a_group_centroid`, `b_group_centroid`: Controls the extent to which
   agents within a social group will tend to stick together;
 - `b_visual_field`: Controls the extent to which agents within a social
-  group will try to keep each other in a field of vision.
+  group will try to keep each other in a field of vision;
+- `a_lgvf`, `b_lgvf`, `e_lgvf`: An improved social utility function that
+  merges the principles of the group centroid and visual field utility
+  functions described in the previous two bullet points.
 
 The parameter names follow a particular convention, where for the
 typical utility function we use `a` is used for an exponent, `b` for a
-slope, and `d` for a difference between ingroup and outgroup members
+slope, and `d` for a difference between in-group and out-group members
 before the underscore `_`, and the name of the utility function after.
 
 The values contained within this `data.frame` represent average values
@@ -531,19 +533,27 @@ head(params$params_sigma$BaselineEuropean)
 #> randomness                     0                0              0       0
 #> stop_utility                   0                0              0       0
 #> reroute                        0                0              0       0
-#>                 non_central acceleration constant_speed deceleration
-#> radius                    0            0              0            0
-#> slowing_time              0            0              0            0
-#> preferred_speed           0            0              0            0
-#> randomness                0            0              0            0
-#> stop_utility              0            0              0            0
-#> reroute                   0            0              0            0
+#>                 non_central acceleration constant_speed deceleration a_lgvf
+#> radius                    0            0              0            0      0
+#> slowing_time              0            0              0            0      0
+#> preferred_speed           0            0              0            0      0
+#> randomness                0            0              0            0      0
+#> stop_utility              0            0              0            0      0
+#> reroute                   0            0              0            0      0
+#>                 b_lgvf e_lgvf
+#> radius               0      0
+#> slowing_time         0      0
+#> preferred_speed      0      0
+#> randomness           0      0
+#> stop_utility         0      0
+#> reroute              0      0
 ```
 
-Note that this matrix is *not* a covariance matrix. Instead, it contains
-the standard deviations of each parameter on its diagonal and the
-correlations between each parameter on its off-diagonal, thus containing
-the following structure:
+Note that this matrix is *not* a covariance matrix, although for brevity
+will at times refer to it as such. Instead, it contains the standard
+deviations of each parameter on its diagonal and the correlations
+between each parameter on its off-diagonal, thus containing the
+following structure:
 
 ``` math
 \begin{equation}
@@ -558,11 +568,11 @@ the following structure:
 
 where $`p`$ is the number of parameters.
 
-Computing the covariance matrix can be achieved through the following
-equation, defining $`\Lambda`$ as a diagonal matrix containing the
-standard deviations of the parameters and $`R`$ as the matrix containing
-the correlations on its off-diagonal and $`1`$’s on its diagonal, we can
-construct the covariance matrix $`\Sigma`$ as follows:
+Computing this matrix can be achieved through the following equation,
+defining $`\Lambda`$ as a diagonal matrix containing the standard
+deviations of the parameters and $`R`$ as the matrix containing the
+correlations on its off-diagonal and $`1`$’s on its diagonal, we can
+construct the matrix $`\Sigma`$ as follows:
 
 ``` math
 \begin{equation}
@@ -574,11 +584,11 @@ construct the covariance matrix $`\Sigma`$ as follows:
 ```
 where $`T`$ denotes the transpose.
 
-We additionally note that the covariance matrix $`\Sigma`$ does not act
-on the raw (bounded) values of the parameters defined by the
-`data.frame` in `"params_archetypes"`. Instead, it acts on a transformed
-unbounded version of these parameters, as explained below. The nature of
-this transformation falls outside of the scope of this vignette.
+We additionally note that the matrix $`\Sigma`$ does not act on the raw
+(bounded) values of the parameters defined by the `data.frame` in
+`"params_archetypes"`. Instead, it acts on a transformed unbounded
+version of these parameters, as explained below. The nature of this
+transformation falls outside of the scope of this vignette.
 
 The final slot of the parameter list is `"params_bounds"`, a matrix
 containing the bounds of each of the parameters. By default, these
@@ -621,6 +631,9 @@ params$params_bounds
 #> acceleration          0e+00 1.0e+00
 #> constant_speed        0e+00 1.0e+00
 #> deceleration          0e+00 1.0e+00
+#> a_lgvf                0e+00 3.0e+00
+#> b_lgvf                0e+00 2.0e+01
+#> e_lgvf                0e+00 2.0e+01
 ```
 
 Lower and upper bounds for each of the parameters are contained in the
@@ -682,7 +695,7 @@ play around with this, you can simply change the variables `means`,
 
 ## Performing the Simulation
 
-With the hefty work done, we can finally go on to simulating pedestrian
+With the setup work done, we can finally go on to simulating pedestrian
 behavior as predicted by the M4MA. Having `my_predped` as the instance
 of the
 [`predped`](https://ndpvh.github.io/predped/reference/predped.html)
@@ -703,11 +716,26 @@ trace <- simulate(
 #> Precomputing edgesYour model: model amrew is being simulated
 ```
 
-The variable `trace` is a list containing instances of the
-[`state`](https://ndpvh.github.io/predped/reference/state) class.
-Essentially, this class contains all information about the agents,
-environment, and other variables that are relevant for the simulation at
-each iteration. It has the following (relevant) slots:
+The variable `trace` is in fact an instance of the
+[`trace`](https://ndpvh.github.io/predped/reference/trace) class. This
+class contains all information relevant to the pedestrian behavior
+simulated by `predped`. It has the following attributes:
+
+- `id`: An identifier for the trace;
+- `time_step`: A numeric denoting the time step between each iteration;
+- `setting`: The environment in which agents are walking around;
+- `states`: An ordered list of lists containing the agents that are
+  present in the environment at a particular iteration;
+- `variables`: An ordered list of named lists containing variables that
+  can be adjusted or used throughout the simulation (see [*Advanced
+  Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)).
+
+Note that originally, the `trace` consisted of a list of instances of
+the [`state`](https://ndpvh.github.io/predped/reference/state) class,
+essentially containing all information about the agents, environment,
+and other variables that are relevant for the simulation at each
+iteration. Given that the underlying functions still make use of this
+class, it is useful to review its slots:
 
 - `iteration`: The iteration number;
 - `setting`: The environment in which the agents are walking around;
@@ -722,15 +750,29 @@ each iteration. It has the following (relevant) slots:
 - `iteration_variables`: A `data.frame` containing information for the
   simulation at each iteration. Is slowly being phased out.
 
+To allow for backward compatibility, we provide functions that can
+transform one type of trace to the other, specifically
+[`trace_to_state`](https://ndpvh.github.io/predped/reference/trace_to_state)
+for transforming a `trace` to a list of `state`s and
+[`state_to_trace`](https://ndpvh.github.io/predped/reference/state_to_trace)
+for transforming a list of `state`s to a `trace`. Generally, you should
+not need to use these functions that often.
+
 One can visualize both a single state of the simulation, or all states
 at once by calling the
 [`plot`](https://ndpvh.github.io/predped/articles/plot.html) function:
 
 ``` r
 
-# Plot a single state
-plt <- plot(trace[[10]])
+# Plot a single iteration of the trace
+plt <- plot(
+  trace, 
+  iterations = 10
+)
+#> 
+#> Making plot for state 9
 plt
+#> [[1]]
 ```
 
 ![The plot shows the environment
@@ -765,15 +807,16 @@ full-length simulation study, we recommend setting the `plot_live`
 argument of
 [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) to
 `TRUE` instead. Note that `plot_live` is experimental and is known to
-not function equally well across different IDE’s.
+not function equally well across different IDE’s. Setting a longer delay
+can sometimes help.
 
 ## Recap
 
-In short, one can use the `predped` package to simulate data according
+In summary, one can use the `predped` package to simulate data according
 to the M4MA by adhering to a particular workflow. Specifically, users
 need to specify (a) an environment, (b) the characteristics of the
 agents, and (c) the simulation characteristics. A minimal working
-example that combines all of these is shown the following bit of code:
+example that combines all of these is shown the following code:
 
 ``` r
 

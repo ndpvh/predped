@@ -78,7 +78,7 @@ my_goal
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal lmneh 
+#> id: goal cqwsn 
 #> path:
 #>      [,1] [,2]
 #> 
@@ -95,13 +95,13 @@ my_background <- background(shape = rectangle(center = c(0, 0),
 change(my_goal, setting = my_background)
 #> Goal Attributes 
 #> busy: FALSE 
-#> counter: 11 
+#> counter: 13 
 #> done: FALSE 
-#> id: goal gfcdc 
+#> id: goal pgqnk 
 #> path:
 #>      [,1] [,2]
 #> 
-#> position: 0.5070711 0.1954518 
+#> position: 0.5070711 0.2548186 
 #> 
 #> For more detailed information, please extract the wanted information from the background directly.
 
@@ -114,7 +114,7 @@ change(my_goal, goal_list = goal_list)
 #> busy: FALSE 
 #> counter: 5 
 #> done: FALSE 
-#> id: goal fdjpg 
+#> id: goal vjkyb 
 #> path:
 #>      [,1] [,2]
 #> 

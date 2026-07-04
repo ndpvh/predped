@@ -44,12 +44,12 @@ my_agent <- agent(center = c(0, 0),
 
 # Access the waiting_counter slot for the agent
 waiting_counter(my_agent)
-#> abwba 
+#> znszq 
 #>     0 
 
 # Change the waiting_counter slot for the agent
 waiting_counter(my_agent) <- 5
 waiting_counter(my_agent)
-#> abwba 
+#> znszq 
 #>     5 
 ```

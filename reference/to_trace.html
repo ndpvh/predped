@@ -21,7 +21,7 @@ saved under "goal_x" and "goal_y", and their id to "goal_id".'><script type="tex
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +80,10 @@ saved under "goal_x" and "goal_y", and their id to "goal_id".</p>
 <span>  a_turning <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  velocities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>  orientations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">72.5</span>, <span class="fl">50</span>, <span class="fl">32.5</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">10</span>, <span class="op">-</span><span class="fl">20</span>, <span class="op">-</span><span class="fl">32.5</span>, <span class="op">-</span><span class="fl">50</span>, <span class="op">-</span><span class="fl">72.5</span><span class="op">)</span>,</span>
-<span>  time_step <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="fl">0.975</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fl">0.035</span>, <span class="fl">4</span> <span class="op">*</span> <span class="fl">0.035</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span><span class="op">/</span><span class="va">time_step</span>,</span>
+<span>  time_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  stay_stopped <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fx <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  cpp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -105,8 +106,10 @@ containing the setting in which the data were gathered.</p></dd>
 <dd><p>Numeric denoting the values of the parameters
 \(b\) and \(a\) for the relationship between orientation and velocity.
 For more information, see the documentation of
-<code><a href="compute_centers.html">compute_centers</a></code>. Defaults to <code>NULL</code>, meaning that
-this relationship takes on the default values of <code>predped</code>.</p></dd>
+<code><a href="compute_centers.html">compute_centers</a></code>. Alternatively can also be a named
+numeric vector, where each value in the vector denotes the values of the
+parameters for each agent in the data.frame.Defaults to <code>NULL</code>, meaning
+that this relationship takes on the default values of <code>predped</code>.</p></dd>
 
 
 <dt id="arg-velocities">velocities<a class="anchor" aria-label="anchor" href="#arg-velocities"></a></dt>
@@ -125,19 +128,26 @@ negative symmetric versions of the smaller angles).</p></dd>
 
 <dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>
 <dd><p>Numeric denoting the time between each iteration. Defaults
-to <code>0.5</code> (the same as in <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></code>).</p></dd>
+to <code>NULL</code>, in which case the time step is derived by the
+<code><a href="get_time_step.html">get_time_step</a></code> function with summarizing function
+<code>fx</code>.</p></dd>
 
 
-<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
-<dd><p>Numeric denoting under which observed value for speed the
-cell to which an agent has moved should be put to `0`. Defaults to a value
-based on the observed measurement error in our system.</p></dd>
+<dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
+<dd><p>Numeric denoting the speed below which the cell is
+set to <code>0</code> (stopped). Matches the <code>standing_start</code> parameter in
+<code><a href="update_position.html">update_position</a></code>. Defaults to <code>0.25</code>.</p></dd>
 
 
 <dt id="arg-stay-stopped">stay_stopped<a class="anchor" aria-label="anchor" href="#arg-stay-stopped"></a></dt>
 <dd><p>Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Is needed
 to compute the utility variables accurately. Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-fx">fx<a class="anchor" aria-label="anchor" href="#arg-fx"></a></dt>
+<dd><p>A summarizing function that should be used to derive the time step
+if it is not provided through the <code>time_step</code> argument.</p></dd>
 
 
 <dt id="arg-cpp">cpp<a class="anchor" aria-label="anchor" href="#arg-cpp"></a></dt>
@@ -149,6 +159,10 @@ to compute the utility variables accurately. Defaults to <code>TRUE</code>.</p><
 <dd><p>Arguments passed to <code><a href="find_path.html">find_path</a></code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Object of the <code><a href="trace-class.html">trace-class</a></code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

@@ -16,7 +16,6 @@ unpack_trace(
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
   stay_stopped = TRUE,
-  time_step = 0.5,
   cpp = TRUE
 )
 ```
@@ -26,7 +25,7 @@ unpack_trace(
 - trace:
 
   List of objects of the
-  [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md)
 
 - velocities:
 
@@ -51,11 +50,6 @@ unpack_trace(
   Logical denoting whether agents will predict others that are currently
   not moving to remain immobile in the next iteration. Defaults to
   `TRUE`.
-
-- time_step:
-
-  Numeric denoting the time between each iteration. Defaults to `0.5`
-  (the same as in [`simulate`](https://rdrr.io/r/stats/simulate.html)).
 
 - cpp:
 

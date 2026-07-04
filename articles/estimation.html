@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,9 +78,10 @@
     
     
 <p>One of the major advances of the Minds for Mobile Agents model (M4MA)
-is the ability to estimate its parameters on data. In this vignette, we
-will illustrate this through two examples, one starting from the
-<code>trace</code> output from the <a href="https://ndpvh.github.io/predped/reference/simulate" class="external-link"><code>simulate</code></a>
+is the ability to estimate its operational parameters on movement data
+of sufficient quality. In this vignette, we will illustrate this through
+two examples, one starting from the <code>trace</code> output from the
+<a href="https://ndpvh.github.io/predped/reference/simulate" class="external-link"><code>simulate</code></a>
 function and the other starting from a <code>data.frame</code>
 containing measured movement data.</p>
 <p>Note that for the estimation, <code>predped</code> only concerns
@@ -94,21 +95,22 @@ use this package, one can execute the following two commands:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nloptr"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/astamm/nloptr" class="external-link">nloptr</a></span><span class="op">)</span></span></code></pre></div>
-<p>For more information on the package and the NLopt library, we refer
+<p>For more information on the package and the nlopt library, we refer
 the interested reader to the dedicated documentation sites
 (<code>nloptr</code>: <a href="https://astamm.github.io/nloptr" class="external-link uri">https://astamm.github.io/nloptr</a>; NLopt: <a href="https://nlopt.readthedocs.io/en/latest" class="external-link uri">https://nlopt.readthedocs.io/en/latest</a>).</p>
 <div class="section level2">
 <h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
 </h2>
-<p>At the moment of writing, we are performing recovery studies to
-ensure the quality of the estimation of the M4MAs parameters. While
-likelihood profiles look good, we are not sure yet how much movement
-data is needed to ensure unbiased estimates with small standard errors.
-For now, we therefore do not guarantee accurate results when performing
-estimations on your own movement data.</p>
-<p>Furthermore note that the computation of the likelihood has not been
-adequately optimzed yet. For large datasets, the estimation procedure
-may therefore be rather slow.</p>
+<p>Note that data quality is determined by factors that commonly affect
+estimation in most domains, including: 1) the level of noise added by
+measurement (less is better!), 2) the lengths movements observed (longer
+is better!), and 3) the type of interactions among agents observed (some
+utilities are only identified if the behaviors they govern are observed
+in sufficient quantity). Experimentation is required to determine what
+level of quality is adequate in a specific scenario. Also note that the
+computation of the likelihood can become slow in large scenarios, so
+estimation may be practically difficult without large computing
+resources.</p>
 </div>
 <div class="section level2">
 <h2 id="starting-from-a-trace">Starting from a Trace<a class="anchor" aria-label="anchor" href="#starting-from-a-trace"></a>
@@ -127,8 +129,8 @@ parameters of the M4MA to the data contained within this
 function:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack_trace.html">unpack_trace</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span></span></code></pre></div>
-<p>The variable <code>data</code> contains a bunch of information in a
-variety of columns, namely:</p>
+<p>The variable <code>data</code> contains information in a variety of
+columns, namely:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "iteration"   "time"        "id"          "x"           "y"          </span></span>
@@ -136,9 +138,10 @@ variety of columns, namely:</p>
 <span><span class="co">#&gt; [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  </span></span>
 <span><span class="co">#&gt; [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"</span></span>
 <span><span class="co">#&gt; [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" </span></span>
-<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"</span></span></code></pre></div>
-<p>Of these, some indicate some attributes of the agent at a particular
-time (e.g., position in <code>x</code> and <code>y</code>, speed and
+<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"  </span></span>
+<span><span class="co">#&gt; [31] "lgvf_data"</span></span></code></pre></div>
+<p>Of these, some indicate attributes of the agent at a particular time
+(e.g., position in <code>x</code> and <code>y</code>, speed and
 orientation in <code>speed</code> and <code>orientation</code>) but also
 the cell that they selected (<code>cell</code>) and variables that are
 relevant for computing the utility of that decision (e.g.,
@@ -147,31 +150,33 @@ contents of the latter set of columns depend heavily on the requirements
 of the utility functions defined in the <a href="https://github.com/m4ma/m4ma" class="external-link"><code>m4ma</code></a> package and we
 refer the interested reader to its documentation for a full explanation
 (<a href="https://research-software-directory.org/software/m4ma" class="external-link uri">https://research-software-directory.org/software/m4ma</a>).</p>
-<p>Second, we need to delete datapoints that are not of interest for the
-estimation procedure. Given that the M4MAs parameters guide movement, we
-can only use those datapoints at which agents were moving around. Within
-a <code>trace</code>, the easiest way in which to spot whether this is
-the case is by filtering out any rows in which the utility variables are
-<code>NA</code>, indicating that they were not used during that
-iteration:</p>
+<p>Second, we need to delete data points that are not relevant for
+estimation. Given that the M4MAs operational parameters guide movement,
+we can only use those data points at which agents were moving around
+(except in cases where stopping is determined by the
+<code>stop_utility</code> parameter). Within a <code>trace</code>, the
+easiest way in which to spot whether this is the case is by filtering
+out any rows in which the utility variables are <code>NA</code>,
+indicating that they were not used during that iteration:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 804  30</span></span>
+<span><span class="co">#&gt; [1] 804  31</span></span>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">check</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 419  30</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 390  31</span></span></code></pre></div>
 <p>Note that this step is not necessary for the code to run, but that a
 warning would be thrown in case <code>NA</code> are left in the
 data.</p>
-<p>Finally, once the data has been filtered to contain only movement
-data, we can compute the likelihood of the data under a particular set
-of parameters. Calling this likelihood
+<p>Finally, once the data has been filtered to contain only
+utility-governed data, we can compute the likelihood of that data under
+a particular set of operational parameters. Calling this likelihood
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>,
 then one can compute the negative log-likelihood
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">-\log(L)</annotation></semantics></math>
-with the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+(i.e., a value for which smaller magnitudes indicate a better fit) with
+the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
 function as follows:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define a set of parameters to be evaluated. For illustration purposes, we use</span></span>
@@ -190,8 +195,8 @@ function as follows:</p>
 <span>  transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  summed <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;    grazd    ihvmf    mlchb    nxpju    womdz </span></span>
-<span><span class="co">#&gt; 196.1544 186.6085 142.5374 178.6028 142.5474</span></span></code></pre></div>
+<span><span class="co">#&gt;    eqivl    lalcs    ljafq    nvdbz    uiexk </span></span>
+<span><span class="co">#&gt; 120.1554 219.0927 217.3531 162.2373 132.4960</span></span></code></pre></div>
 <p>The output of this call to <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
 is a named vector displaying the summed negative log-likelihood of the
 data under the provided parameters.</p>
@@ -199,28 +204,27 @@ data under the provided parameters.</p>
 <code>transform = FALSE</code> to communicate that the provided
 parameters are on the bounded scale rather than the unbounded scale (see
 <em>Parameters</em> in the vignette on <a href="https://ndpvh.github.io/predped/articles/simulation.html" class="external-link"><em>Simulations</em></a>).
-When using an optimizer, it may be interesting to let the optimizer work
-on the unbounded (real) scale instead, in which case you can specify
-<code>transform = TRUE</code>. Additionally, we specified
+When using an optimizer, it is usually better to let it work on an
+unbounded scale (i.e., the full real line), in which case you can
+specify <code>transform = TRUE</code>. Additionally, we specified
 <code>summed = TRUE</code> to get the summed value for the negative
-log-likelihood across all datapoints of a particular agent. If you wish
-to see the values of the negative log-likelihood for each datapoint
+log-likelihood across all data points of a particular agent. If you wish
+to see the values of the negative log-likelihood for each data point
 individually, you can set <code>summed = FALSE</code>.</p>
 <p>The call to the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
 function will serve as the basic building block of the estimation
 procedure, which we dive more into in the next section.</p>
 <div class="section level3">
-<h3 id="optimization">Optimization<a class="anchor" aria-label="anchor" href="#optimization"></a>
+<h3 id="bounded-optimization">Bounded Optimization<a class="anchor" aria-label="anchor" href="#bounded-optimization"></a>
 </h3>
-<p>Typically, we want to estimate a set of unknown parameters to the
-data that is available to us. To achieve this via the
-<code>nloptr</code> package, we need to first define an <em>objective
-function</em>, that is a function that outputs a value to be minimized
-by the optimizer through changing a vector of parameters that serve as
-an input to this function. In our case, the objective function will be a
-wrapper around the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
-function, summing all of the negative log-likelihoods together into one
-single <code>objective</code> value:</p>
+<p>Typically, we want to estimate a set of unknown parameters best
+describing our data. To achieve this via the <code>nloptr</code>
+package, we need to first define an <em>objective function</em>, that is
+a function that outputs a value to be minimized by the optimizer through
+changing a vector of parameters that serve as an input to this function.
+In our case, the objective function will be a wrapper around the <a href="https://ndpvh.github.io/predped/reference/mll.html" class="external-link"><code>mll</code></a>
+function, summing negative log-likelihoods across agents into one single
+<code>objective</code> value:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">objective_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
@@ -284,9 +288,9 @@ algorithm (Jones et al., 1993), for example, we get:</p>
 <span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
 <span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
 <span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
-<span><span class="co">#&gt; Current value of objective function:  739.726257900465 </span></span>
-<span><span class="co">#&gt; Current value of controls: 0.25 1.5 2.085 4.166683 500005 16 0.5 1.5 10 1.5 3.375 10 1.5 10.025 1.5 10 1.5 </span></span>
-<span><span class="co">#&gt; 0.5 10 1.5 160 1.5 110 110 1.5 2 10 55 0.5 0.5 0.5 0.5 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; Current value of objective function:  566.319619486245 </span></span>
+<span><span class="co">#&gt; Current value of controls: 0.25 0.8333333 1.255 2.50005 500005 16 0.5 1.5 10 1.5 3.375 10 1.5 10.025 1.5 </span></span>
+<span><span class="co">#&gt; 10 1.5 0.5 10 1.5 160 1.5 110 110 1.5 2 10 55 0.5 0.5 0.5 0.5 0.5 1.5 10 10</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="individual-parameters">Individual Parameters<a class="anchor" aria-label="anchor" href="#individual-parameters"></a>
@@ -310,7 +314,7 @@ objective function so that:</p>
 <span>  <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
 <span>    <span class="va">parameters</span>,</span>
 <span>    nrow <span class="op">=</span> <span class="va">n</span>, </span>
-<span>    ncol <span class="op">=</span> <span class="fl">33</span></span>
+<span>    ncol <span class="op">=</span> <span class="fl">36</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Compute the objective</span></span>
@@ -333,7 +337,7 @@ function, in this case:</p>
 <code class="sourceCode R"><span><span class="co"># Extract the bounds of the parameters</span></span>
 <span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">params_bounds</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span>each <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">33</span> <span class="op">*</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">36</span> <span class="op">*</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define the initial condition for the algorithm. Take the middle of the </span></span>
 <span><span class="co"># interval defined by the bounds</span></span>
@@ -371,9 +375,9 @@ function, in this case:</p>
 <span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
 <span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
 <span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
-<span><span class="co">#&gt; Current value of objective function:  3598.79453227266 </span></span>
-<span><span class="co">#&gt; Current value of controls: 0.25 0.25 0.2833333 0.2833333 0.2833333 1.5 1.5 1.5 0.8333333 2.166667 1.255 </span></span>
-<span><span class="co">#&gt; 0.425 1.255 0.425 2.085 2.50005 2.50005 2.50005 0.8334167 2.50005 500005 500005 </span></span>
+<span><span class="co">#&gt; Current value of objective function:  4408.02012172839 </span></span>
+<span><span class="co">#&gt; Current value of controls: 0.25 0.25 0.2833333 0.2833333 0.2833333 1.5 1.5 1.5 0.8333333 1.5 1.255 1.255 </span></span>
+<span><span class="co">#&gt; 1.255 1.255 1.255 2.50005 2.50005 2.50005 0.8334167 2.50005 500005 500005 </span></span>
 <span><span class="co">#&gt; 500005 500005 500005 16 16 16 16 16 0.5 0.5 0.5 0.5 0.5 1.5 1.5 1.5 1.5 1.5 10 </span></span>
 <span><span class="co">#&gt; 10 10 10 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 10 10 10 10 </span></span>
 <span><span class="co">#&gt; 10 1.5 1.5 1.5 1.5 1.5 10.025 10.025 10.025 10.025 10.025 1.5 1.5 1.5 1.5 1.5 </span></span>
@@ -381,7 +385,7 @@ function, in this case:</p>
 <span><span class="co">#&gt; 1.5 1.5 1.5 160 160 160 160 160 1.5 1.5 1.5 1.5 1.5 110 110 110 110 110 110 110 </span></span>
 <span><span class="co">#&gt; 110 110 110 1.5 1.5 1.5 1.5 1.5 2 2 2 2 2 10 10 10 10 10 55 55 55 55 55 0.5 0.5 </span></span>
 <span><span class="co">#&gt; 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 </span></span>
-<span><span class="co">#&gt; 0.5 0.5 0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.5 0.5 0.5 1.5 1.5 1.5 1.5 1.5 10 10 10 10 10 10 10 10 10 10</span></span></code></pre></div>
 <p>In this case, it may be useful to transform the parameters back to
 the matrix introduced in the objective function and provide it with
 matching column names denoting the parameters and row names denoting the
@@ -401,57 +405,56 @@ participants themselves:</p>
 <span>  <span class="fu">`rownames&lt;-`</span> <span class="op">(</span><span class="va">ids</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">`colnames&lt;-`</span> <span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          radius slowing_time preferred_speed randomness stop_utility reroute</span></span>
-<span><span class="co">#&gt; grazd 0.2500000    1.5000000           1.255  2.5000500       500005      16</span></span>
-<span><span class="co">#&gt; ihvmf 0.2500000    1.5000000           0.425  2.5000500       500005      16</span></span>
-<span><span class="co">#&gt; mlchb 0.2833333    1.5000000           1.255  2.5000500       500005      16</span></span>
-<span><span class="co">#&gt; nxpju 0.2833333    0.8333333           0.425  0.8334167       500005      16</span></span>
-<span><span class="co">#&gt; womdz 0.2833333    2.1666667           2.085  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; eqivl 0.2500000    1.5000000           1.255  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; lalcs 0.2500000    1.5000000           1.255  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; ljafq 0.2833333    1.5000000           1.255  2.5000500       500005      16</span></span>
+<span><span class="co">#&gt; nvdbz 0.2833333    0.8333333           1.255  0.8334167       500005      16</span></span>
+<span><span class="co">#&gt; uiexk 0.2833333    1.5000000           1.255  2.5000500       500005      16</span></span>
 <span><span class="co">#&gt;       b_turning a_turning b_current_direction a_current_direction</span></span>
-<span><span class="co">#&gt; grazd       0.5       1.5                  10                 1.5</span></span>
-<span><span class="co">#&gt; ihvmf       0.5       1.5                  10                 1.5</span></span>
-<span><span class="co">#&gt; mlchb       0.5       1.5                  10                 1.5</span></span>
-<span><span class="co">#&gt; nxpju       0.5       1.5                  10                 1.5</span></span>
-<span><span class="co">#&gt; womdz       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; eqivl       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; lalcs       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; ljafq       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; nvdbz       0.5       1.5                  10                 1.5</span></span>
+<span><span class="co">#&gt; uiexk       0.5       1.5                  10                 1.5</span></span>
 <span><span class="co">#&gt;       blr_current_direction b_goal_direction a_goal_direction b_blocked</span></span>
-<span><span class="co">#&gt; grazd                10.025               10              1.5    10.025</span></span>
-<span><span class="co">#&gt; ihvmf                10.025               10              1.5    10.025</span></span>
-<span><span class="co">#&gt; mlchb                10.025               10              1.5    10.025</span></span>
-<span><span class="co">#&gt; nxpju                10.025               10              1.5    10.025</span></span>
-<span><span class="co">#&gt; womdz                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; eqivl                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; lalcs                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; ljafq                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; nvdbz                10.025               10              1.5    10.025</span></span>
+<span><span class="co">#&gt; uiexk                10.025               10              1.5    10.025</span></span>
 <span><span class="co">#&gt;       a_blocked b_interpersonal a_interpersonal d_interpersonal</span></span>
-<span><span class="co">#&gt; grazd       1.5              10             1.5             0.5</span></span>
-<span><span class="co">#&gt; ihvmf       1.5              10             1.5             0.5</span></span>
-<span><span class="co">#&gt; mlchb       1.5              10             1.5             0.5</span></span>
-<span><span class="co">#&gt; nxpju       1.5              10             1.5             0.5</span></span>
-<span><span class="co">#&gt; womdz       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; eqivl       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; lalcs       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; ljafq       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; nvdbz       1.5              10             1.5             0.5</span></span>
+<span><span class="co">#&gt; uiexk       1.5              10             1.5             0.5</span></span>
 <span><span class="co">#&gt;       b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy</span></span>
-<span><span class="co">#&gt; grazd                10               1.5      160      1.5      110     110</span></span>
-<span><span class="co">#&gt; ihvmf                10               1.5      160      1.5      110     110</span></span>
-<span><span class="co">#&gt; mlchb                10               1.5      160      1.5      110     110</span></span>
-<span><span class="co">#&gt; nxpju                10               1.5      160      1.5      110     110</span></span>
-<span><span class="co">#&gt; womdz                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; eqivl                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; lalcs                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; ljafq                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; nvdbz                10               1.5      160      1.5      110     110</span></span>
+<span><span class="co">#&gt; uiexk                10               1.5      160      1.5      110     110</span></span>
 <span><span class="co">#&gt;       a_buddy a_group_centroid b_group_centroid b_visual_field central</span></span>
-<span><span class="co">#&gt; grazd     1.5                2               10             55     0.5</span></span>
-<span><span class="co">#&gt; ihvmf     1.5                2               10             55     0.5</span></span>
-<span><span class="co">#&gt; mlchb     1.5                2               10             55     0.5</span></span>
-<span><span class="co">#&gt; nxpju     1.5                2               10             55     0.5</span></span>
-<span><span class="co">#&gt; womdz     1.5                2               10             55     0.5</span></span>
-<span><span class="co">#&gt;       non_central acceleration constant_speed deceleration</span></span>
-<span><span class="co">#&gt; grazd         0.5          0.5            0.5          0.5</span></span>
-<span><span class="co">#&gt; ihvmf         0.5          0.5            0.5          0.5</span></span>
-<span><span class="co">#&gt; mlchb         0.5          0.5            0.5          0.5</span></span>
-<span><span class="co">#&gt; nxpju         0.5          0.5            0.5          0.5</span></span>
-<span><span class="co">#&gt; womdz         0.5          0.5            0.5          0.5</span></span></code></pre></div>
+<span><span class="co">#&gt; eqivl     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; lalcs     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; ljafq     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; nvdbz     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt; uiexk     1.5                2               10             55     0.5</span></span>
+<span><span class="co">#&gt;       non_central acceleration constant_speed deceleration a_lgvf b_lgvf e_lgvf</span></span>
+<span><span class="co">#&gt; eqivl         0.5          0.5            0.5          0.5    1.5     10     10</span></span>
+<span><span class="co">#&gt; lalcs         0.5          0.5            0.5          0.5    1.5     10     10</span></span>
+<span><span class="co">#&gt; ljafq         0.5          0.5            0.5          0.5    1.5     10     10</span></span>
+<span><span class="co">#&gt; nvdbz         0.5          0.5            0.5          0.5    1.5     10     10</span></span>
+<span><span class="co">#&gt; uiexk         0.5          0.5            0.5          0.5    1.5     10     10</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="unbounded-estimation">Unbounded Estimation<a class="anchor" aria-label="anchor" href="#unbounded-estimation"></a>
 </h3>
 <p>The algorithm that we used before requires us to impose bounds on the
-parameters. In some cases, however, it may be more useful to use an
-optimizer that operates on the real scale, rather than on a bounded one.
-In this case, we change the argument <code>transform</code> to
-<code>TRUE</code> and change the call to <code>nloptr</code> as
-follows:</p>
+parameters. Often, however, optimization works best if the entire real
+line can be searched. In this case, we change the argument
+<code>transform</code> to <code>TRUE</code> and change the call to
+<code>nloptr</code> as follows:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Change the objective function to operate on the real scale</span></span>
 <span><span class="va">objective_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
@@ -468,7 +471,7 @@ follows:</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Change the initial condition</span></span>
-<span><span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">33</span><span class="op">)</span></span>
+<span><span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">36</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform the estimation procedure with an algorithm that does not require </span></span>
 <span><span class="co"># bounds to be specified</span></span>
@@ -501,15 +504,16 @@ follows:</p>
 <span><span class="co">#&gt; Termination conditions:  maxeval: 1000   xtol_abs: 1e-04 ftol_abs: 1e-04 </span></span>
 <span><span class="co">#&gt; Number of inequality constraints:  0 </span></span>
 <span><span class="co">#&gt; Number of equality constraints:    0 </span></span>
-<span><span class="co">#&gt; Current value of objective function:  429.316084129412 </span></span>
-<span><span class="co">#&gt; Current value of controls: -2.594467 -0.5634537 0.5070385 -0.2047041 0.6581698 0.2549867 0.2549867 </span></span>
-<span><span class="co">#&gt; 0.06491596 -1.421626 -0.4919096 -0.0133553 10.21004 -0.3960335 -0.6823948 </span></span>
-<span><span class="co">#&gt; -0.004831927 -0.3530833 -0.01361795 -11.13464 0.2360346 0.7072078 -2.224339 </span></span>
-<span><span class="co">#&gt; 7.560695 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 0.2549867 </span></span>
-<span><span class="co">#&gt; 0.2549867 0.2549867 0.2549867 -0.1656554</span></span></code></pre></div>
+<span><span class="co">#&gt; Current value of objective function:  348.816056297911 </span></span>
+<span><span class="co">#&gt; Current value of controls: -0.7980488 -0.8443498 0.2125047 -0.4001295 0.3627438 0.3627438 0.3627438 </span></span>
+<span><span class="co">#&gt; 0.3627438 -1.334698 -0.2805176 -0.1662079 9.372625 -0.5136853 -0.5633863 </span></span>
+<span><span class="co">#&gt; -1.038879 -0.7917356 -0.1031646 8.877348 0.3623326 -0.09864396 -1.521471 </span></span>
+<span><span class="co">#&gt; 0.28125 0.3627438 0.3627438 0.3627438 0.3627438 0.3627438 0.3346864 0.3346864 </span></span>
+<span><span class="co">#&gt; 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864 0.3346864</span></span></code></pre></div>
 <p>Importantly, the parameters now have been estimated to be on the real
-scale, yet the parameters of the M4MA need to be defined on the bounded
-scale. To transform the parameters to their proper values, we use the <a href="https://ndpvh.github.io/predped/reference/to_bounded.html" class="external-link"><code>to_bounded</code></a>
+line, yet the parameters of the M4MA need are naturally defined on
+bounded scales. To transform the parameters to their natural values, we
+use the <a href="https://ndpvh.github.io/predped/reference/to_bounded.html" class="external-link"><code>to_bounded</code></a>
 function:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the bounds of the parameters</span></span>
@@ -529,48 +533,50 @@ function:</p>
 <span><span class="op">)</span></span>
 <span><span class="va">transformed</span></span>
 <span><span class="co">#&gt;           radius slowing_time preferred_speed randomness stop_utility  reroute</span></span>
-<span><span class="co">#&gt; radius 0.2004737     1.073126        1.737901   2.094566     744788.1 18.81773</span></span>
+<span><span class="co">#&gt; radius 0.2212421     0.898474        1.464517   1.722718     641605.4 19.96485</span></span>
 <span><span class="co">#&gt;        b_turning a_turning b_current_direction a_current_direction</span></span>
-<span><span class="co">#&gt; radius 0.6006333  1.577639            1.551349           0.9341749</span></span>
+<span><span class="co">#&gt; radius 0.6416018  1.924806            1.819753            1.168621</span></span>
 <span><span class="co">#&gt;        blr_current_direction b_goal_direction a_goal_direction b_blocked</span></span>
-<span><span class="co">#&gt; radius               9.91871               20          1.03812  4.987519</span></span>
+<span><span class="co">#&gt; radius              8.708234               20        0.9112081  5.767389</span></span>
 <span><span class="co">#&gt;        a_blocked b_interpersonal a_interpersonal d_interpersonal</span></span>
-<span><span class="co">#&gt; radius  1.494217         7.24026        1.483702    4.254342e-29</span></span>
+<span><span class="co">#&gt; radius 0.4482917        4.285149        1.376749               1</span></span>
 <span><span class="co">#&gt;        b_preferred_speed a_preferred_speed b_leader a_leader d_leader  b_buddy</span></span>
-<span><span class="co">#&gt; radius          11.86594          2.280844   4.1801        3 132.1393 132.1393</span></span>
-<span><span class="co">#&gt;        a_buddy a_group_centroid b_group_centroid b_visual_field   central</span></span>
-<span><span class="co">#&gt; radius  1.8019         2.402533         12.01267       66.06967 0.6006333</span></span>
-<span><span class="co">#&gt;        non_central acceleration constant_speed deceleration</span></span>
-<span><span class="co">#&gt; radius   0.6006333    0.6006333      0.6006333    0.4342141</span></span></code></pre></div>
+<span><span class="co">#&gt; radius          12.82897          1.382131 20.50266 1.832222 141.1524 141.1524</span></span>
+<span><span class="co">#&gt;         a_buddy a_group_centroid b_group_centroid b_visual_field   central</span></span>
+<span><span class="co">#&gt; radius 1.924806         2.566407         12.83204       69.41761 0.6310692</span></span>
+<span><span class="co">#&gt;        non_central acceleration constant_speed deceleration   a_lgvf   b_lgvf</span></span>
+<span><span class="co">#&gt; radius   0.6310692    0.6310692      0.6310692    0.6310692 1.893207 12.62138</span></span>
+<span><span class="co">#&gt;          e_lgvf</span></span>
+<span><span class="co">#&gt; radius 12.62138</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="starting-from-data">Starting from Data<a class="anchor" aria-label="anchor" href="#starting-from-data"></a>
 </h2>
 <p>Within <code>predped</code>, we also allow users to estimate the M4MA
-on their data directly. Consider the following dataset taken from a
+on their data directly. Consider the following data set taken from a
 simplified train station, for example (see <a href="https://ndpvh.github.io/predped/articles/advnaced_simulation.html" class="external-link"><em>Advanced
 Simulations</em></a>):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       time passenger        x             y</span></span>
-<span><span class="co">#&gt; 1 2.403958         1 4.692500  3.765789e-17</span></span>
-<span><span class="co">#&gt; 2 2.932846         1 4.606273 -4.020823e-02</span></span>
-<span><span class="co">#&gt; 3 3.413369         1 4.488606 -1.225997e-01</span></span>
-<span><span class="co">#&gt; 4 4.063040         1 4.281833 -1.780042e-01</span></span>
-<span><span class="co">#&gt; 5 4.453463         1 3.988913 -3.145950e-01</span></span>
-<span><span class="co">#&gt; 6 4.992690         1 3.591787 -5.926661e-01</span></span></code></pre></div>
-<p>In this dataset, we measured the positions (<code>x</code> and
+<span><span class="co">#&gt;        time passenger         x           y</span></span>
+<span><span class="co">#&gt; 1 0.4090724        11 -4.537391 -0.09881539</span></span>
+<span><span class="co">#&gt; 2 0.9447560        11 -4.334378 -0.28484220</span></span>
+<span><span class="co">#&gt; 3 1.5367148        11 -4.029859 -0.56388241</span></span>
+<span><span class="co">#&gt; 4 2.0341893        11 -3.725340 -0.84292263</span></span>
+<span><span class="co">#&gt; 5 2.5059533        11 -3.573081 -0.98244273</span></span>
+<span><span class="co">#&gt; 6 2.9901712        11 -3.573081 -0.98244273</span></span></code></pre></div>
+<p>In this data set, we measured the positions (<code>x</code> and
 <code>y</code>) of different passengers (<code>passenger</code>) at
-several time points (<code>time</code>). To go from this dataset to one
+several time points (<code>time</code>). To go from this data set to one
 that we can use for the estimation procedure, we need to take the
 following steps.</p>
-<p>First, we need the dataset to conform to the standards of
+<p>First, we need the data set to conform to the standards of
 <code>predped</code>. This means that:</p>
 <ul>
 <li>The <code>time</code> variable needs to show discrete jumps
-conforming the <code>time_step</code> defined by the M4MA, it being
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>500</mn><annotation encoding="application/x-tex">500</annotation></semantics></math>msec;</li>
+conforming the <code>time_step</code> defined by the M4MA (by default,
+half a second);</li>
 <li>A variable <code>iteration</code> needs to be added showing the
 iteration at which the positions were measured;</li>
 <li>The <code>passenger</code> variable needs to be renamed to the
@@ -629,58 +635,65 @@ code:</p>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         time passenger        x             y</span></span>
-<span><span class="co">#&gt; 218 2.653958         1 4.692500  3.765789e-17</span></span>
-<span><span class="co">#&gt; 219 3.153958         1 4.606273 -4.020823e-02</span></span>
-<span><span class="co">#&gt; 220 3.653958         1 4.488606 -1.225997e-01</span></span>
-<span><span class="co">#&gt; 221 4.153958         1 4.281833 -1.780042e-01</span></span>
-<span><span class="co">#&gt; 222 4.653958         1 3.988913 -3.145950e-01</span></span>
-<span><span class="co">#&gt; 223 5.153958         1 3.591787 -5.926661e-01</span></span></code></pre></div>
+<span><span class="co">#&gt;         time passenger         x           y</span></span>
+<span><span class="co">#&gt; 80 0.6590724        11 -4.537391 -0.09881539</span></span>
+<span><span class="co">#&gt; 81 1.1590724        11 -4.334378 -0.28484220</span></span>
+<span><span class="co">#&gt; 82 1.6590724        11 -4.029859 -0.56388241</span></span>
+<span><span class="co">#&gt; 83 2.1590724        11 -3.725340 -0.84292263</span></span>
+<span><span class="co">#&gt; 84 2.6590724        11 -3.573081 -0.98244273</span></span>
+<span><span class="co">#&gt; 85 3.1590724        11 -3.573081 -0.98244273</span></span></code></pre></div>
 <p>The <code>iteration</code> variable requires integer values denoting
 the bin in which the position was measured. To compute this variable, we
 can perform the following computation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span><span class="op">$</span><span class="va">iteration</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         time passenger        x             y iteration</span></span>
-<span><span class="co">#&gt; 218 2.653958         1 4.692500  3.765789e-17         1</span></span>
-<span><span class="co">#&gt; 219 3.153958         1 4.606273 -4.020823e-02         2</span></span>
-<span><span class="co">#&gt; 220 3.653958         1 4.488606 -1.225997e-01         3</span></span>
-<span><span class="co">#&gt; 221 4.153958         1 4.281833 -1.780042e-01         4</span></span>
-<span><span class="co">#&gt; 222 4.653958         1 3.988913 -3.145950e-01         5</span></span>
-<span><span class="co">#&gt; 223 5.153958         1 3.591787 -5.926661e-01         6</span></span></code></pre></div>
+<span><span class="co">#&gt;         time passenger         x           y iteration</span></span>
+<span><span class="co">#&gt; 80 0.6590724        11 -4.537391 -0.09881539         1</span></span>
+<span><span class="co">#&gt; 81 1.1590724        11 -4.334378 -0.28484220         2</span></span>
+<span><span class="co">#&gt; 82 1.6590724        11 -4.029859 -0.56388241         3</span></span>
+<span><span class="co">#&gt; 83 2.1590724        11 -3.725340 -0.84292263         4</span></span>
+<span><span class="co">#&gt; 84 2.6590724        11 -3.573081 -0.98244273         5</span></span>
+<span><span class="co">#&gt; 85 3.1590724        11 -3.573081 -0.98244273         6</span></span></code></pre></div>
 <p>The column <code>passenger</code> can be renamed to <code>id</code>
 in the following way:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"id"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         time id        x             y iteration</span></span>
-<span><span class="co">#&gt; 218 2.653958  1 4.692500  3.765789e-17         1</span></span>
-<span><span class="co">#&gt; 219 3.153958  1 4.606273 -4.020823e-02         2</span></span>
-<span><span class="co">#&gt; 220 3.653958  1 4.488606 -1.225997e-01         3</span></span>
-<span><span class="co">#&gt; 221 4.153958  1 4.281833 -1.780042e-01         4</span></span>
-<span><span class="co">#&gt; 222 4.653958  1 3.988913 -3.145950e-01         5</span></span>
-<span><span class="co">#&gt; 223 5.153958  1 3.591787 -5.926661e-01         6</span></span></code></pre></div>
+<span><span class="co">#&gt;         time id         x           y iteration</span></span>
+<span><span class="co">#&gt; 80 0.6590724 11 -4.537391 -0.09881539         1</span></span>
+<span><span class="co">#&gt; 81 1.1590724 11 -4.334378 -0.28484220         2</span></span>
+<span><span class="co">#&gt; 82 1.6590724 11 -4.029859 -0.56388241         3</span></span>
+<span><span class="co">#&gt; 83 2.1590724 11 -3.725340 -0.84292263         4</span></span>
+<span><span class="co">#&gt; 84 2.6590724 11 -3.573081 -0.98244273         5</span></span>
+<span><span class="co">#&gt; 85 3.1590724 11 -3.573081 -0.98244273         6</span></span></code></pre></div>
+<p>For estimation to work, we need to have at least 2 values per
+participant so that their speeds and orientations can be derived. We
+therefore need to delete any participant that does not have sufficient
+values in the data as follows:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">frequencies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">id</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">frequencies</span><span class="op">)</span><span class="op">[</span><span class="va">frequencies</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">]</span>, <span class="op">]</span></span></code></pre></div>
 <p>Now that the dataset conforms to <code>predped</code>s standards, we
 have to compute the values of the input variables for the input
 functions. For this, we first need to translate the environment in which
 the data were collected to an instance of the <a href="https://ndpvh.github.io/predped/reference/background.html" class="external-link"><code>background</code></a>
 to the best of our abilities. In this case, we collected the data in a
 simplified train station that looks as follows:</p>
-<p><img src="estimation_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="Visualization of the simplified train station in which the data were collected. Gates can be found on the left and right side of the space, and four exits and entrances can be found in the middle of each side of the rectangular space." width="700" style="display: block; margin: auto;"></p>
+<p><img src="estimation_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="Visualization of the simplified train station in which the data were collected. Gates can be found on the left and right side of the space, and four exits and entrances can be found in the middle of each side of the rectangular space." width="700" style="display: block; margin: auto;"></p>
 <p>Note that when there are restrictions in flow, this is ideally
 included in the creation of this background (see <a href="https://ndpvh.github.io/predped/reference/advanced_simulation.html" class="external-link"><em>Advanced
 Simulations</em></a>).</p>
 <p>Additionally, we need to include information on the goals that the
 people were trying to achieve within this environment, information that
 is necessary due to the M4MAs assumption that movement within space is
-guided by people’s goals. Specifically, we need to define the position
-of the goal as well as attach an identifier to this goal, each
-respectively contained in the <code>goal_x</code>, <code>goal_y</code>,
-and <code>goal_id</code> columns in the data. In this case, we know that
+guided by goals. Specifically, we need to define the position of the
+goal as well as attach an identifier to this goal, each respectively
+contained in the <code>goal_x</code>, <code>goal_y</code>, and
+<code>goal_id</code> columns in the data. In this case, we know that
 each person was walking towards a particular exit of the space. Based on
 this information, we add the required columns as follows:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform the mapping of a person with their goal position</span></span>
 <span><span class="va">mapping</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="st">"exit 1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">12</span>, <span class="fl">14</span>, <span class="fl">21</span>, <span class="fl">23</span>, <span class="fl">28</span>, <span class="fl">32</span>, <span class="fl">33</span><span class="op">)</span>, </span>
@@ -715,17 +728,17 @@ this information, we add the required columns as follows:</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         time id        x             y iteration goal_x goal_y          goal_id</span></span>
-<span><span class="co">#&gt; 218 2.653958  1 4.692500  3.765789e-17         1      0   -2.5 moving to exit 1</span></span>
-<span><span class="co">#&gt; 219 3.153958  1 4.606273 -4.020823e-02         2      0   -2.5 moving to exit 1</span></span>
-<span><span class="co">#&gt; 220 3.653958  1 4.488606 -1.225997e-01         3      0   -2.5 moving to exit 1</span></span>
-<span><span class="co">#&gt; 221 4.153958  1 4.281833 -1.780042e-01         4      0   -2.5 moving to exit 1</span></span>
-<span><span class="co">#&gt; 222 4.653958  1 3.988913 -3.145950e-01         5      0   -2.5 moving to exit 1</span></span>
-<span><span class="co">#&gt; 223 5.153958  1 3.591787 -5.926661e-01         6      0   -2.5 moving to exit 1</span></span></code></pre></div>
+<span><span class="co">#&gt;         time id         x           y iteration goal_x goal_y          goal_id</span></span>
+<span><span class="co">#&gt; 80 0.6590724 11 -4.537391 -0.09881539         1     -5      0 moving to exit 2</span></span>
+<span><span class="co">#&gt; 81 1.1590724 11 -4.334378 -0.28484220         2     -5      0 moving to exit 2</span></span>
+<span><span class="co">#&gt; 82 1.6590724 11 -4.029859 -0.56388241         3     -5      0 moving to exit 2</span></span>
+<span><span class="co">#&gt; 83 2.1590724 11 -3.725340 -0.84292263         4     -5      0 moving to exit 2</span></span>
+<span><span class="co">#&gt; 84 2.6590724 11 -3.573081 -0.98244273         5     -5      0 moving to exit 2</span></span>
+<span><span class="co">#&gt; 85 3.1590724 11 -3.573081 -0.98244273         6     -5      0 moving to exit 2</span></span></code></pre></div>
 <p>Once the setting and the people’s goals have been defined, we can
 compute the input variables for the utility functions through the <a href="https://ndpvh.github.io/predped/reference/compute_utility_variables.html" class="external-link"><code>compute_utility_variables</code></a>
 function as follows:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">utility_data</span> <span class="op">&lt;-</span> <span class="fu">compute_utility_variables</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">train_station</span></span>
@@ -736,7 +749,8 @@ function as follows:</p>
 <span><span class="co">#&gt; [11] "goal_id"     "goal_x"      "goal_y"      "radius"      "agent_idx"  </span></span>
 <span><span class="co">#&gt; [16] "check"       "ps_speed"    "ps_distance" "gd_angle"    "id_distance"</span></span>
 <span><span class="co">#&gt; [21] "id_check"    "id_ingroup"  "ba_angle"    "ba_cones"    "fl_leaders" </span></span>
-<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"</span></span></code></pre></div>
+<span><span class="co">#&gt; [26] "wb_buddies"  "gc_distance" "gc_radius"   "gc_nped"     "vf_angles"  </span></span>
+<span><span class="co">#&gt; [31] "lgvf_data"</span></span></code></pre></div>
 <p>As shown, the result contains all of the same columns as the ones
 found in the transformed <code>trace</code> in the previous section.
 From here on, the steps to take in the estimation routine are thus the

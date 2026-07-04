@@ -13,7 +13,7 @@ determine where the agent will move next)."><script type="text/javascript" async
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,8 @@ determine where the agent will move next).</p>
 <span>  precomputed_edges <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  many_nodes <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">precomputed_edges</span><span class="op">)</span>,</span>
 <span>  adaptive_goal_sorting <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  standing_start <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  stuck_threshold <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  standing_start <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  time_step <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  report <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  print_iteration <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -162,10 +163,17 @@ to change the order of their goals adaptively throughout the simulation.
 Defaults to <code>TRUE</code>.</p></dd>
 
 
+<dt id="arg-stuck-threshold">stuck_threshold<a class="anchor" aria-label="anchor" href="#arg-stuck-threshold"></a></dt>
+<dd><p>Integer. Number of consecutive blocked-goal entries
+before mechanism 1 (head-on deadlock rerouting) fires. On the first blocked
+entry mechanism 2 (goal-zone congestion deferral) is attempted instead.
+Defaults to <code>3L</code>.</p></dd>
+
+
 <dt id="arg-standing-start">standing_start<a class="anchor" aria-label="anchor" href="#arg-standing-start"></a></dt>
 <dd><p>Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-<code>0.1</code>.</p></dd>
+<code>0.25</code>.</p></dd>
 
 
 <dt id="arg-time-step">time_step<a class="anchor" aria-label="anchor" href="#arg-time-step"></a></dt>

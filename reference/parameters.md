@@ -52,35 +52,39 @@ my_agent <- agent(center = c(0, 0),
 # Access the parameters slot for the agent
 parameters(my_agent)
 #>           radius slowing_time preferred_speed randomness stop_utility  reroute
-#> radius 0.2463262    0.9494592        1.263288  0.1623876     10192.85 8.657848
+#> radius 0.2360685    0.9958521        1.261666 0.09512897      10029.5 10.55578
 #>        b_turning a_turning b_current_direction a_current_direction
-#> radius 0.1810312         2           0.9485869                   2
+#> radius 0.1922396         2           0.9067952                   2
 #>        blr_current_direction b_goal_direction a_goal_direction b_blocked
-#> radius                    10         8.505427                2  4.412557
+#> radius                    10         9.709835                2  4.186261
 #>        a_blocked b_interpersonal a_interpersonal d_interpersonal
-#> radius         2        1.926026               2               0
+#> radius         2        2.408568               2               0
 #>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy
-#> radius          1.400041                 2        0        0        0       0
+#> radius          1.326547                 2        0        0        0       0
 #>        a_buddy a_group_centroid b_group_centroid b_visual_field central
 #> radius       0                0                0              0       0
-#>        non_central acceleration constant_speed deceleration
-#> radius           0            0              0            0
+#>        non_central acceleration constant_speed deceleration a_lgvf b_lgvf
+#> radius           0            0              0            0      0      0
+#>        e_lgvf
+#> radius      0
 
 # Change the parameters slot for the agent
 parameters(my_agent) <- generate_parameters(1)
 parameters(my_agent)
 #>           radius slowing_time preferred_speed randomness stop_utility  reroute
-#> radius 0.2538798    0.9946231        1.181065  0.1166939     10401.98 10.24248
+#> radius 0.2466142    0.9485268         1.15088 0.09688066     9737.849 9.627921
 #>        b_turning a_turning b_current_direction a_current_direction
-#> radius 0.1891056         2           0.9392615                   2
+#> radius 0.1613132         2            1.084877                   2
 #>        blr_current_direction b_goal_direction a_goal_direction b_blocked
-#> radius                    10         11.93149                2  4.750318
+#> radius                    10         9.432476                2  5.625974
 #>        a_blocked b_interpersonal a_interpersonal d_interpersonal
-#> radius         2        1.955604               2               0
+#> radius         2        2.234487               2               0
 #>        b_preferred_speed a_preferred_speed b_leader a_leader d_leader b_buddy
-#> radius          2.585462                 2        0        0        0       0
+#> radius          3.282353                 2        0        0        0       0
 #>        a_buddy a_group_centroid b_group_centroid b_visual_field central
 #> radius       0                0                0              0       0
-#>        non_central acceleration constant_speed deceleration
-#> radius           0            0              0            0
+#>        non_central acceleration constant_speed deceleration a_lgvf b_lgvf
+#> radius           0            0              0            0      0      0
+#>        e_lgvf
+#> radius      0
 ```

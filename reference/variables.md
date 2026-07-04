@@ -1,7 +1,9 @@
 # Getter/Setter for the `variables`-slot
 
 Works for the
-[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md).
+[`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+and the
+[`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md).
 
 ## Usage
 
@@ -15,6 +17,12 @@ variables(object)
 
 # S4 method for class 'state'
 variables(object) <- value
+
+# S4 method for class 'trace'
+variables(object)
+
+# S4 method for class 'trace'
+variables(object) <- value
 ```
 
 ## Arguments
@@ -22,7 +30,9 @@ variables(object) <- value
 - object:
 
   An instance of the
-  [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md).
+  [`state-class`](https://github.com/ndpvh/predped/reference/state-class.md)
+  or the
+  [`trace-class`](https://github.com/ndpvh/predped/reference/trace-class.md).
 
 - value:
 

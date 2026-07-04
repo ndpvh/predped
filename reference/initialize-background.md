@@ -121,7 +121,7 @@ my_background@shape
 #> numeric(0)
 #> 
 #> Slot "id":
-#> [1] "object aahks"
+#> [1] "object cewpz"
 #> 
 #> Slot "moveable":
 #> [1] FALSE
