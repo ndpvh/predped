@@ -230,7 +230,7 @@ to_trace <- function(data,
                      time_step = NULL,
                      standing_start = 0.25,
                      stay_stopped = TRUE,
-                     fx = mean,
+                     fx = function(x) mean(x, na.rm = TRUE),
                      cpp = TRUE,
                      ...) {
 
@@ -240,6 +240,16 @@ to_trace <- function(data,
     # sampling rate over time.
     if(is.null(time_step)) {
         time_step <- get_time_step(data, fx = fx)
+
+        if(is.na(time_step)) {
+            warning("The derived time_step is NA, typically indicating that one ",
+                    "or more participants may have only a single observation. ",
+                    "Consider deleting these participants from the dataset, ",
+                    "providing an NA-resistant function in `fx`, or setting the ",
+                    "argument `time_step` manually. Proceeding with the default ",
+                    "value.")
+            time_step <- 0.5
+        }
     }
 
     # Check whether a_turning and b_turning are specified. If not, take on the 
@@ -537,7 +547,7 @@ add_motion_variables <- function(data,
                                  initial_conditions = FALSE,
                                  a_turning = 2,
                                  b_turning = 0.2, 
-                                 fx = mean) {
+                                 fx = function(x) mean(x, na.rm = TRUE)) {
 
     # Check whether all needed columns are part of the data.frame already. If so, 
     # then we move on immediately
@@ -561,6 +571,15 @@ add_motion_variables <- function(data,
     # sampling rate over time.
     if(is.null(time_step)) {
         time_step <- get_time_step(data, fx = fx)
+
+        if(is.na(time_step)) {
+            warning("The derived time_step is NA, typically indicating that one ",
+                    "or more participants may have only a single observation. ",
+                    "Consider deleting these participants from the dataset, ",
+                    "providing an NA-resistant function in `fx`, or setting the ",
+                    "argument `time_step` manually. Proceeding with the default ",
+                    "value.")
+            time_step <- 0.5
     }
 
     # Define the times at which the simulation ran and define the bins and
