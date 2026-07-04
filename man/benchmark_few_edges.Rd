@@ -27,4 +27,5 @@ particular environment while setting the option \code{many_nodes = FALSE}.
 It mainly serves as a variable used to benchmark some of the functions related
 to routing.
 }
+\concept{benchmark}
 \keyword{datasets}

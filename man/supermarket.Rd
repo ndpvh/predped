@@ -16,4 +16,5 @@ and tests, as well as some substantive studies. The supermarket is coded as
 an instance of the \code{\link[predped]{background-class}} and is based on 
 the blueprints of an Albert Heijn supermarket based in Amsterdam.
 }
+\concept{benchmark}
 \keyword{datasets}

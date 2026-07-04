@@ -161,7 +161,7 @@ setMethod("show", "trace", function(object) {
 #' 
 #' @rdname append_trace
 #' 
-#' @concept general
+#' @concept helper
 #' 
 #' @export
 setGeneric("append_trace", function(object, state, ...) standardGeneric("append_trace"))

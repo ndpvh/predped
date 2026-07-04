@@ -70,4 +70,5 @@ several people walk from one end of a seemingly infinite corridor to the other
 side. This is used to benchmark and evaluate some of the functions related 
 to data handling, as well as the likelihood function.
 }
+\concept{benchmark}
 \keyword{datasets}

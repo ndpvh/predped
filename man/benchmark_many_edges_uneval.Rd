@@ -28,4 +28,5 @@ without evaluating which edges cannot serve as navigation lines due to objects
 being in the way. It mainly serves as a variable used to benchmark some of the 
 functions related to routing.
 }
+\concept{benchmark}
 \keyword{datasets}

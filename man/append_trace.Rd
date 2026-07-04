@@ -49,4 +49,4 @@ append a single additional state to the trace.
 \code{\link[predped]{state-class}},
 \code{\link[predped]{trace-class}}
 }
-\concept{general}
+\concept{helper}

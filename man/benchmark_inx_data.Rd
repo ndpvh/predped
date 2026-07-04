@@ -67,4 +67,5 @@ benchmark_inx_data
 \description{
 This data.frame contains an initial condition that is used in the benchmarks.
 }
+\concept{benchmark}
 \keyword{datasets}

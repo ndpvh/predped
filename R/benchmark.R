@@ -435,6 +435,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #' 
 #' @format Instance of the \code{\link[predped]{background-class}}
 #' 
+#' @rdname supermarket
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "supermarket"
 
@@ -458,6 +462,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                                     pair.}
 #'}
 #' 
+#' @rdname benchmark_few_edges
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "benchmark_few_edges"
 
@@ -480,6 +488,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                                     with the coordinates of each node in a 
 #'                                     pair.}
 #'}
+#' 
+#' @rdname benchmark_many_edges
+#' 
+#' @concept benchmark
 #' 
 #' @export
 "benchmark_many_edges"
@@ -505,6 +517,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                                     pair.}
 #'}
 #' 
+#' @rdname benchmark_few_edges_uneval
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "benchmark_few_edges_uneval"
 
@@ -528,6 +544,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                                     with the coordinates of each node in a 
 #'                                     pair.}
 #'}
+#' 
+#' @rdname benchmark_many_edges_uneval
+#' 
+#' @concept benchmark
 #' 
 #' @export
 "benchmark_many_edges_uneval"
@@ -595,6 +615,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                           (utility-based).}
 #' }
 #' 
+#' @rdname benchmark_data
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "benchmark_data"
 
@@ -604,6 +628,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #' that serves as an initial condition in the benchmarks.
 #' 
 #' @format Instance of the \code{\link[predped]{state-class}}
+#' 
+#' @rdname benchmark_inx
+#' 
+#' @concept benchmark
 #' 
 #' @export
 "benchmark_inx"
@@ -668,6 +696,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #'                           (utility-based).}
 #' }
 #' 
+#' @rdname benchmark_inx_data
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "benchmark_inx_data"
 
@@ -677,6 +709,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #' that serves in the benchmarks for testing data handling functions.
 #' 
 #' @format Instance of the \code{\link[predped]{trace-class}}
+#' 
+#' @rdname benchmark_trace
+#' 
+#' @concept benchmark
 #' 
 #' @export
 "benchmark_trace"
@@ -689,6 +725,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #' @format A data.frame with the rougly the same columns as the archetypes 
 #' datasets, see \code{\link[predped]{load_parameters}}
 #' 
+#' @rdname benchmark_params_bounded
+#' 
+#' @concept benchmark
+#' 
 #' @export
 "benchmark_params_bounded"
 
@@ -699,6 +739,10 @@ load(file.path("data", "benchmark_params_real.rda"))
 #' 
 #' @format A data.frame with the rougly the same columns as the archetypes 
 #' datasets, see \code{\link[predped]{load_parameters}}
+#' 
+#' @rdname benchmark_params_real
+#' 
+#' @concept benchmark
 #' 
 #' @export
 "benchmark_params_real"

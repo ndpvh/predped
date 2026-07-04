@@ -14,4 +14,5 @@ benchmark_inx
 This variable contains an instance of the \code{\link[predped]{state-class}}
 that serves as an initial condition in the benchmarks.
 }
+\concept{benchmark}
 \keyword{datasets}

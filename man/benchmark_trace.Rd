@@ -14,4 +14,5 @@ benchmark_trace
 This variable contains an instance of the \code{\link[predped]{trace-class}}
 that serves in the benchmarks for testing data handling functions.
 }
+\concept{benchmark}
 \keyword{datasets}

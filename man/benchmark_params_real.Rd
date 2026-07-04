@@ -15,4 +15,5 @@ benchmark_params_real
 This data.frame contains a set of unbounded parameters used to benchmark the 
 parameter-related functions.
 }
+\concept{benchmark}
 \keyword{datasets}

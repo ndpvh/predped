@@ -15,4 +15,5 @@ benchmark_params_bounded
 This data.frame contains a set of bounded parameters used to benchmark the 
 parameter-related functions.
 }
+\concept{benchmark}
 \keyword{datasets}
