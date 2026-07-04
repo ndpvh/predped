@@ -221,3 +221,32 @@ testthat::test_that("Perpendicular orientation making works", {
 
     testthat::expect_equal(tst, ref)
 })
+
+testthat::test_that("Transformation between trace and states works", {
+    # Create a trace to start out with.
+    my_background <- background(shape = rectangle(center = c(0, 0), size = c(5, 5)),
+                                objects = list(circle(center = c(0, 0), radius = 1)))
+    my_agents <- list(agent(center = c(-2, 0), radius = 0.25), 
+                      agent(center = c(2, 0), radius = 0.25))
+    my_vars <- list(list("vars" = 1), list("vars" = 2))
+
+    ref <- trace(id = "my trace", 
+                 time_step = 1, 
+                 setting = my_background, 
+                 states = list(my_agents, my_agents), 
+                 variables = my_vars)
+
+    # Transform twice: Once to a list of states, once to a trace with whatever 
+    # additional information we need. Test the first superficially and the latter
+    # should be entirely equal to its reference, providing a more strict test
+    tst <- trace_to_state(ref)
+
+    testthat::expect_equal(length(tst), 2)
+    testthat::expect_true(inherits(tst, "list"))
+    testthat::expect_true(inherits(tst[[1]], "state"))
+
+    tst <- state_to_trace(tst, 
+                          time_step = ref@time_step, 
+                          id = ref@id)
+    testthat::expect_equal(ref, tst)
+})

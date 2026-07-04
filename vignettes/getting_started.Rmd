@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 library(predped)
 ```
 
-The `predped` package serves as a coding interface to use the Minds for Mobile Agents pedestrian model, hereafter abbreviated as M4MA. On this page, we will focus on how to install of `predped` and on its underlying logic. For the theoretical background of `predped` and details on the M4MA, we refer the interested reader to the vignette [_Theoretical Background_](https://ndpvh.github.io/predped/articles/theory.html). For information on how to run simulations, we refer readers to the vignette [_Simulations_](https://ndpvh.github.io/predped/articles/simulation.html) for the basic workflow and to the vignette [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html) for some additional functionalities provided within `predped`. Information on how to estimate the M4MA can be found in the vignette [_Estimation_](https://ndpvh.github.io/predped/articles/estimation.html).
+The `predped` package serves as a coding interface to use the Minds for Mobile Agents pedestrian model, hereafter abbreviated as M4MA. On this page, we will focus on how to install of `predped` and on its underlying logic. For the theoretical background of `predped` and details on the M4MA, we refer the interested reader to the vignette [_Theoretical Background_](https://ndpvh.github.io/predped/articles/theory.html). For information on how to run simulations, we refer readers to the vignette [_Simulations_](https://ndpvh.github.io/predped/articles/simulation.html) for the basic workflow and to the vignette [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html) for some additional functionalities provided within `predped`. Information on how to estimate the parameters of an M4MA model from movement data can be found in the vignette [_Estimation_](https://ndpvh.github.io/predped/articles/estimation.html).
 
 
 
@@ -47,7 +47,7 @@ The package has been designed to allow a great deal of flexibility on the side o
 
 ## Object-oriented programming
 
-For users, the S4 class serves as an _object_ that contains a specific (fixed) set of _attributes_ or characteristics. For example, a room may be treated as an object, containing a particular shape and a set of objects that are inside of it (e.g., a living room may consist of a couch, some closets, and a coffee table). For example, `predped` allows for the definition of several shapes, namely [`rectangle`](https://ndpvh.github.io/predped/reference/rectangle-class.html)s, [`polygon`](https://ndpvh.github.io/predped/reference/polygon-class.html)s, and [`circle`](https://ndpvh.github.io/predped/reference/circle-class.html)s, which can be created by calling their constructor and defining their characteristics:
+For users, the S4 class serves as an _object_ that contains a specific (fixed) set of _attributes_ or characteristics. For example, a room may be treated as an object, containing a particular shape and a set of objects that are inside of it (e.g., a living room may consist of a couch, some closets, and a coffee table). `predped` allows for the definition of several shape types, namely [`rectangle`](https://ndpvh.github.io/predped/reference/rectangle-class.html)s, [`polygon`](https://ndpvh.github.io/predped/reference/polygon-class.html)s, and [`circle`](https://ndpvh.github.io/predped/reference/circle-class.html)s, which can be created by calling their constructor and defining their characteristics:
 
 ```{r}
 # Main characteristics of rectangle are `center` and `size`
@@ -72,7 +72,7 @@ circle(
 )
 ```
 
-Importantly, the real strength of the S4 class does not lie only in its attributes, but also in the creation of _methods_, functions of which their underlying computations differ depending on the object's class. Take, for example, the computation of the area of different shapes. For rectangles, the area can be computed as:
+Importantly, the real strength of the S4 class is not only in its attributes, but also in the creation of _methods_, functions of which their underlying computations differ depending on the object's class. Take, for example, the computation of the area of different shapes. For rectangles, the area can be computed as:
 
 \begin{equation}
   A = w h
@@ -115,7 +115,7 @@ size(my_rectangle) <- c(1, 1)
 size(my_rectangle)
 ```
 
-The getters/setters defined in `predped` serve two purposes. First, they make it easier for users to work with the objects provided by the package. Second, they ensure that if an object's attribute is changed, that all attributes that depend on this change are changed as well. For example, the coordinates of the rectangles four defining corners depend on both the size of the rectangle and its center. Changing one of the two thus changes these coordinates. To ensure that this happens, we need to use the setters rather than overwriting the attribute manually: 
+The getters/setters defined in `predped` serve two purposes. First, they make it easier for users to work with the objects provided by the package. Second, they ensure that if an object's attribute is changed, that all attributes that depend on this change are changed as well. For example, the coordinates of a rectangles corners depend on both the size of the rectangle and its center. Changing one of the two thus changes these coordinates. To ensure that this happens, we need to use the setters rather than overwriting the attribute manually: 
 
 ```{r}
 # Create a rectangle with a given size
@@ -150,7 +150,7 @@ Objects in space:
 - [`rectangle`](https://ndpvh.github.io/predped/reference/rectangle.html): An object of a rectangular shape;
   - `center`: Numeric vector with two values defining the center of the rectangle; 
   - `size`: Numeric vector of two values defining the width and height of the rectangle; 
-  - `orientation`: Numeric denoting the orientation of the rectangle in radians;
+  - `orientation`: Numeric denoting the direct the agent is facing in radians;
   - `points`: Numeric matrix containing the coordinates of the corners of the rectangle in clockwise fashion;
 - [`polygon`](https://ndpvh.github.io/predped/reference/polygon.html): An object of a regular or irregular shape defined by the coordinates of its corners; 
   - `points`: Numeric matrix containing the coordinates of the corners of the rectangle in clockwise fashion;
@@ -163,7 +163,7 @@ Objects in space:
 - [`agent`](https://ndpvh.github.io/predped/reference/agent.html): An agent that walks around according to the principles of the M4MA. In `predped`, agents are circular, meaning they share some of their attributes with [`circle`](https://ndpvh.github.io/predped/reference/circle.html);
   - `speed`: Numeric denoting the speed of the agent;
   - `orientation`: Numeric denoting the orientation of the agent in degrees; 
-  - `status`: Character denoting what the agent is doing; 
+  - `status`: Character denoting what the agent is doing (e.g., move, plan etc.) ; 
   - `current_goal`, `goals`: An instance of the [`goal`](https://ndpvh.github.io/predped/reference/goal.html) class and a collection of these respectively, denoting what the agent wants to achieve in the environment; 
   - `parameters`: A `data.frame` containing the parameter values for this agent.
 
@@ -171,7 +171,7 @@ Space itself:
 
 - [`background`](https://ndpvh.github.io/predped/reference/background.html): The setting in which the agents walk around; 
   - `shape`: An instance of the [`object`](https://ndpvh.github.io/predped/reference/object.html) class that defines the shape of the setting;
-  - `objects`: A list of [`object`](https://ndpvh.github.io/predped/reference/object.html)s defining the obstacles in the setting;
+  - `objects`: A list of [`object`](https://ndpvh.github.io/predped/reference/object.html)s defining the objects in the setting;
   - `entrance`, `exit`: Numeric matrices defining the entrances and/or exits of the space; 
 - [`goal`](https://ndpvh.github.io/predped/reference/goal.html): A goal that the agent wants to achieve within the setting;
   - `id`: Character denoting the identifier of the goal;
@@ -184,7 +184,7 @@ Others:
 - [`predped`](https://ndpvh.github.io/predped/reference/background.html): Relates a particular set of agent characteristics to a setting, to be used for a simulation;
   - `id`: Character denoting the identifier of the `predped` model;
   - `setting`: An instance of the [`background`](https://ndpvh.github.io/predped/reference/background.html) class denoting the setting agents have to walk in; 
-  - `archetypes`, `weights`: Character vector denoting which agent archetypes are expected to walk within the setting, and with what particular probability you would find them there;
+  - `archetypes`, `weights`: Character vector denoting which agent archetypes (i.e., a type of agent defined by a set of parameters) are expected to walk into the setting, and with what probability the next is of that type;
 - [`state`](https://ndpvh.github.io/predped/reference/state.html): Defines one particular iteration of the simulation;
   - `iteration`: Numeric denoting the iteration number; 
   - `setting`: An instance of the [`background`](https://ndpvh.github.io/predped/reference/background.html) class denoting the setting agents were walking in at this iteration; 

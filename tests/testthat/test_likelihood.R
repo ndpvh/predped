@@ -93,13 +93,13 @@ testthat::test_that("Likelihood R and Rcpp converge", {
 
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
     data <- data[!is.na(data$ps_speed), ]
     data <- data[1:100, ]
 
-    # Retrieve the parameters of the SocialBaselineEuropean
+    # Retrieve the parameters of the Friends
     params <- predped::params_from_csv[["params_archetypes"]]
-    params <- params[params$name == "SocialBaselineEuropean", ]
+    params <- params[params$name == "Friends", ]
 
     # Create test and reference and compare both across all datapoints. Here, 
     # we don't transform the parameters
@@ -123,12 +123,12 @@ testthat::test_that("Likelihood R and Rcpp converge", {
 
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- readRDS(file.path("data", "data_mll.Rds"))
+    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
     params <- predped::params_from_csv[["params_archetypes"]]
-    params <- params[params$name == "SocialBaselineEuropean", ]
+    params <- params[params$name == "Friends", ]
 
     # Create test and reference and compare both across all datapoints. Here, 
     # we don't transform the parameters

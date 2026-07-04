@@ -227,8 +227,15 @@ setMethod("utility", "data.frame", function(object,
                                      object$vf_angles[[1]])
     }
 
+    # Logarithmic Group-Attracted Visual Field utility: Check whether people are any group
+    # members and, if so, compute the utility
 
-
+    if(!is.null(object$lgvf_data[[1]])) {
+        V <- V + lgvf_utility(parameters[["a_lgvf"]],
+                              parameters[["b_lgvf"]],
+                              parameters[["e_lgvf"]],
+                              object$lgvf_data[[1]])
+    }
 
 
     ############################################################################
@@ -438,6 +445,18 @@ setMethod("compute_utility_variables", "agent", function(object,
                                     agent_specifications$predictions,
                                     centers,
                                     any_member = TRUE))
+    
+    
+    # Logarithmic Group-Attracted Visual Field utility: Required variable is the distance 
+    # and angles of one or more other pedestrians.
+    uv$lgvf_data <- list(get_group_member_data(uv$agent_idx,
+                                               agent_specifications$group,
+                                               position(object),
+                                               orientation(object),
+                                               agent_specifications$predictions,
+                                               centers))
+    
+
 
     return(uv)       
 })
@@ -449,17 +468,9 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' functions.
 #' 
 #' @param object Object of the \code{\link[predped]{agent-class}}.
-#' @param state Object of the \code{\link[predped]{state-class}}.
-#' @param background Object of the \code{\link[predped]{background-class}}.
-#' @param agent_specifications List created by the 
-#' \code{\link[predped]{create_agent_specifications}} function. Contains all 
-#' information of all agents within the current \code{state} and allows for the
-#' communication between the \code{predped} simulation functions and the 
-#' \code{m4ma} utility functions.
-#' @param centers Numerical matrix containing the coordinates at each position
-#' the object can be moved to. Should have one row for each cell.
-#' @param check Logical matrix of dimensions 11 x 3 denoting whether an agent 
-#' can move to a given cell (\code{TRUE}) or not (\code{FALSE}).
+#' @inheritParams to_trace
+#' @param ... Additional arguments passed on to \code{\link[predped]{to_trace}}
+#' and \code{\link[predped]{unpack_trace}}
 #' 
 #' @return Data.frame containing all of the needed variables to be able to 
 #' compute the values of the utility functions.
@@ -478,10 +489,24 @@ setMethod("compute_utility_variables", "agent", function(object,
 #' 
 #' @export 
 setMethod("compute_utility_variables", "data.frame", function(object,
-                                                              background) {
-    # Transform the data to a trace and then back to a dataframe
-    trace <- to_trace(object, background)
-    return(unpack_trace(trace))
+                                                              background,
+                                                              b_turning = NULL,
+                                                              a_turning = NULL,
+                                                              time_step = NULL,
+                                                              standing_start = 0.25,
+                                                              fx = function(x) mean(x, na.rm = TRUE),
+                                                              ...) {
+
+    trace <- to_trace(object, 
+                      background,
+                      b_turning = b_turning, 
+                      a_turning = a_turning,
+                      time_step = time_step,
+                      standing_start = standing_start,
+                      fx = fx,
+                      ...)
+
+    return(unpack_trace(trace, ...))
 })
 
 
@@ -693,7 +718,7 @@ get_angles <- function (agent_idx,
         # to other pedestrians in the group at the next time step.
         nearest_ped <- m4ma::dist1_rcpp(position, predictions)
         nearest_ped <- predictions[which.min(nearest_ped),]
-        orientations <- atan2(centers[,2] - positions[2], centers[,1] - position[1])
+        orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
 
         # Get angle from cell centers of pedestrian `n`
         # to predicted position of the nearest group member.
@@ -753,7 +778,7 @@ vf_utility_continuous <- function(b_vf,
     }
 
     # Calculate visual field utility
-    visual_field_utility <- -sapply(rel_anlges, 
+    visual_field_utility <- -sapply(rel_angles, 
                                     \(x) b_vf * fx(x))
 
     # Return the visual field utility
@@ -804,6 +829,138 @@ vf_utility_discrete <- function(b_vf,
     # Return the visual field utility
     return(visual_field_utility)
 }
+
+##################################################################################
+# NEW UTILITY FUNCTION
+
+#' Get Distances and Angles to Group Members
+#' 
+#' Finds the predicted positions of the group members and calculates the
+#' distances and relative angles from all candidate cells to each member.
+#' This functions as the alternative to distance_group_centroid and
+#' get_angles for the lgvf_utility.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the predictions.
+#' @param agent_group Numeric vector with the group membership of all pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
+#' @param centers Numerical matrix containing the coordinates at each candidate cell.
+#'
+#' @return A list containing the distances, relative angles and number of 
+#' group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{lgvf_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+get_group_member_data <- function(agent_idx, 
+                                  agent_group, 
+                                  position, 
+                                  orientation, 
+                                  predictions, 
+                                  centers) {
+    
+    # Identify in-group pedestrians
+    predictions <- predictions[-agent_idx, , drop = FALSE]
+    ingroup <- agent_group[-agent_idx] == agent_group[agent_idx]
+    predictions <- predictions[ingroup, , drop = FALSE]
+    nped <- dim(predictions)[1]
+    
+    if (nped == 0) {
+        return(NULL)    
+    }
+
+    # Return lists of distances and angles for all members of in-group
+    all_distances <- list()
+    all_rel_angles <- list()
+    orientations <- atan2(centers[,2] - position[2], centers[,1] - position[1])
+
+    # Loop over all in-group members to calculate distances and relative angles
+    for (i in 1:nped) {
+        # Distances
+        target_ped <- predictions[i, ]
+        all_distances[[i]] <- m4ma::dist1_rcpp(target_ped, centers)
+
+        # Angles
+        angles <- atan2(target_ped[2] - centers[,2], target_ped[1] - centers[,1])
+        rel_angles <- angles - orientations
+        rel_angles <- ifelse(rel_angles < -pi, rel_angles + 2*pi, rel_angles)
+        rel_angles <- ifelse(rel_angles > pi, rel_angles - 2*pi, rel_angles)
+        all_rel_angles[[i]] <- rel_angles
+    }
+
+    return(list(distances = all_distances, rel_angles = all_rel_angles, nped = nped))
+}
+
+
+#' Logarithmic Group-Attracted Visual Field Utility (LGVF)
+#' 
+#' Unifies the previous social utility functions WB, GC and VF into one utility 
+#' function. Applies a logarithmic penalty based on distances to group members, 
+#' and adds an additional penalty if that member is outside the extended visual 
+#' field.
+#'
+#' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to 
+#' maintain.
+#' @param group_member_data Named list containing the number of pedestrians as an 
+#' integer (under \code{"nped"}), a list containing a numeric vector of distances
+#' of each cell center to each group member (under \code{"distances"}), and a 
+#' list of numeric vectors containing the relative angle at which the group member
+#' would find itself relative to the orientation of agent when moving to a 
+#' particular cell center.
+#' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+#'
+#' @return Numeric vector containing the LGVF utility for each cell. 
+#' 
+#' @examples 
+#' # TO BE WRITTEN
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_group_member_data}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+lgvf_utility <- function(a_lgvf, 
+                         b_lgvf, 
+                         e_lgvf,
+                         group_member_data,
+                         vf_limit = 135 * pi / 180) {
+    
+    if (is.null(group_member_data)) {
+        return(numeric(33))
+    }
+
+    total_util <- numeric(33)
+    nped <- group_member_data$nped
+
+    # Loop over all in-group members to calculate and sum their utilities
+    for (i in 1:nped) {
+        # Target members data
+        distances <- group_member_data$distances[[i]]
+        rel_angles <- group_member_data$rel_angles[[i]]
+
+        # Base utility
+        base_util <- -b_lgvf * abs(log(distances) - log(e_lgvf))^a_lgvf
+        
+        # Penalty
+        in_vf <- abs(rel_angles) <= vf_limit
+        penalty <- ifelse(in_vf, 0, -b_lgvf / (distances^a_lgvf))
+
+        # Total utility for this member
+        total_util <- total_util + base_util + penalty
+    }
+    
+    # Averaged to avoid scaling issues with large groups
+    return(total_util/nped) 
+}
+
+
 
 # #' Transform utility to probability
 # #'

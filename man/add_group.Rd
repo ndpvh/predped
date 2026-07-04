@@ -7,7 +7,7 @@
 add_group(
   model,
   agent_number = 1,
-  standing_start = 0.1,
+  standing_start = 0.25,
   individual_differences = FALSE,
   ...
 )
@@ -20,7 +20,7 @@ to \code{1}.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{individual_differences}{Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.

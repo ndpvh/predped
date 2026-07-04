@@ -12,13 +12,15 @@ mll(
   bounds = params_from_csv[["params_bounds"]],
   cpp = TRUE,
   summed = FALSE,
+  time_step = NULL,
+  fx = function(x) mean(x, na.rm = TRUE),
   ...
 )
 }
 \arguments{
 \item{data}{Data.frame containing at least "id", "time", "x", "y", "goal_x",
 "goal_y", and "goal_id". If it does not have the utility variables yet, these
-will add them to the data.frame.}
+will be added to the data.frame.}
 
 \item{parameters}{Numeric vector or matrix containing the parameters to be 
 used. Should be specified in the same order as specified in 
@@ -49,8 +51,16 @@ If \code{FALSE}, the function will instead return a list of vectors containing
 the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 their own corrections (if needed). Defaults to \code{FALSE}.}
 
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
+
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+
 \item{...}{Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-In a typical estimation situation, these motion variables should already be 
+In a typical estimation situation, these motion variables should already be
 in \code{data}.
 
  @return Either named vector containing the summed min-log-likelihood 

@@ -28,6 +28,8 @@ using namespace Rcpp;
 //' agent whenever they move to the respective cell of this matrix.
 //' @param time_step Numeric denoting the number of seconds each discrete step in
 //' time should mimic. Defaults to \code{0.5}, or half a second.
+//' @param threshold Numeric denoting a minimal value the slowing factor can
+//' take on when computing the cell centers. Defaults to \code{1e-6}.
 //'
 //' @return Numeric matrix of (x, y) coordinates for each cell
 //'
@@ -88,7 +90,8 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
                                          double b,
                                          Rcpp::NumericVector velocities,
                                          Rcpp::NumericVector orientations,
-                                         double time_step = 0.5) {
+                                         double time_step = 0.5,
+                                         double threshold = 1e-6) {
 
     // Preallocate some variables, including the matrix in which the centers
     // will be saved
@@ -111,6 +114,11 @@ Rcpp::NumericMatrix compute_centers_rcpp(Rcpp::S4 agent,
         // Define a slowing factor that depends on the turning angle or change in
         // direction
         slow = 1. - b * pow(sin(fabs(angles[i]) / 2), a);
+
+        // Introduce a boundary to how low this factor can be
+        if(slow < threshold) {
+            slow = threshold;
+        }
 
         // Adjust the velocity of the agent
         velocity = speed * slow * velocities[i] * time_step;

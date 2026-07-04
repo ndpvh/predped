@@ -37,8 +37,6 @@ using namespace Rcpp;
 //' Rcpp alternative for \code{\link[predped]{time_series}}.
 //' 
 //' @param trace List of objects of the \code{\link[predped]{state-class}}
-//' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
@@ -49,14 +47,16 @@ using namespace Rcpp;
 //' 
 //' @export
 // [[Rcpp::export]]
-DataFrame time_series_rcpp(List trace, 
-                           double time_step = 0.5) {
+DataFrame time_series_rcpp(S4 trace) {
+
+    // Extract the states and time step
+    List states = trace.slot("states");
+    double time_step = trace.slot("time_step");
 
     // Find out how many rows the dataframe should have
     int N = 0;
-    for(int i = 0; i < trace.length(); i++) {
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+    for(int i = 0; i < states.length(); i++) {
+        List agents = states[i];
         N += agents.length();
     }
 
@@ -80,10 +80,9 @@ DataFrame time_series_rcpp(List trace,
 
     // Loop over the different instances in the trace.
     int idx = 0;
-    for(int i = 0; i < trace.length(); i++) {
+    for(int i = 0; i < states.length(); i++) {
         // Extract the state and its agents from the trace
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+        List agents = states[i];
 
         if(agents.length() == 0) {
             continue;
@@ -92,7 +91,7 @@ DataFrame time_series_rcpp(List trace,
         // Loop over each of the agents separately
         for(int j = 0; j < agents.length(); j++) {
             // Extract state variables
-            int iteration_j = state.slot("iteration");
+            int iteration_j = i;
             double time_j = iteration_j * time_step;
 
             iteration[idx] = iteration_j;
@@ -192,8 +191,6 @@ DataFrame time_series_rcpp(List trace,
 //' @param stay_stopped Logical denoting whether agents will predict others that 
 //' are currently not moving to remain immobile in the next iteration. Defaults 
 //' to \code{TRUE}.
-//' @param time_step Numeric denoting the time between each iteration. Defaults 
-//' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 //' 
 //' @examples
 //' # This is my example
@@ -204,17 +201,20 @@ DataFrame time_series_rcpp(List trace,
 //' 
 //' @export
 // [[Rcpp::export]]
-DataFrame unpack_trace_rcpp(List trace, 
+DataFrame unpack_trace_rcpp(S4 trace, 
                             NumericMatrix velocities,
                             NumericMatrix orientations,
-                            bool stay_stopped = true,
-                            double time_step = 0.5) {
+                            bool stay_stopped = true) {
+
+    // Extract the states and time step
+    List states = trace.slot("states");
+    double time_step = trace.slot("time_step");
+    S4 setting = trace.slot("setting");
 
     // Find out how many rows the dataframe should have
     int N = 0;
-    for(int i = 0; i < trace.length(); i++) {
-        S4 state = trace[i];
-        List agents = state.slot("agents");
+    for(int i = 0; i < states.length(); i++) {
+        List agents = states[i];
         N += agents.length();
     }
 
@@ -252,6 +252,7 @@ DataFrame unpack_trace_rcpp(List trace,
     NumericVector gc_radius(N);
     IntegerVector gc_nped(N);
     List vf_angles(N);
+    List lgvf_data(N);
 
     // Create some NA vectors that correspond to the R alternative. Used whenever
     // the utility variables are not defined at a given iteration for a given 
@@ -260,17 +261,15 @@ DataFrame unpack_trace_rcpp(List trace,
     NA_logical[0] = NA_LOGICAL;
 
     // Loop over the different instances in the trace.
-    List copy_trace = clone(trace);
+    List copy_states = clone(states);
     int idx = 0;
-    for(int i = 0; i < trace.length(); i++) {
+    for(int i = 0; i < states.length(); i++) {
         // Extract the state and its agents from the trace
-        S4 state = copy_trace[i];
-        List agents = state.slot("agents");
+        List agents = copy_states[i];
 
         if(agents.length() == 0) {
             continue;
         }
-        S4 setting = state.slot("setting");
 
         // Create the agent specifications list as used in the lower level 
         // utility functions
@@ -283,7 +282,7 @@ DataFrame unpack_trace_rcpp(List trace,
         // Loop over each of the agents separately
         for(int j = 0; j < agents.length(); j++) {
             // Extract state variables
-            int iteration_j = state.slot("iteration");
+            int iteration_j = i;
             double time_j = iteration_j * time_step;
 
             iteration[idx] = iteration_j;
@@ -328,17 +327,21 @@ DataFrame unpack_trace_rcpp(List trace,
             // Access the utility variables slot in the agent class. 
             DataFrame uv_j = as<DataFrame>(agent.slot("utility_variables"));
 
-            // Do a small check of whether the current utility variables are 
+            // Do a small check of whether the current utility variables are
             // filled with information. If not, then we cannot preallocate.
-            // For this, I use one of the variables that should always be 
+            // For this, I use one of the variables that should always be
             // defined.
             NumericVector tmp = uv_j["ps_speed"];
             LogicalVector tmp_check = Rcpp::is_na(tmp);
 
-            // Assign different values to the resulting DataFrame depending on 
-            // the status of the agent. This approach taken to allow for 
-            // the correct preallocation in different variables
-            if(!any(tmp_check).is_true()) {
+            // Assign different values to the resulting DataFrame depending on
+            // the status of the agent. This approach taken to allow for
+            // the correct preallocation in different variables.
+            // Guard with status check: agents forced to reorient mid-move (e.g.
+            // all utility values infinite) can have non-NA utility_variables
+            // even though they did not complete a genuine movement step. Only
+            // copy utility variables for agents that are actually moving.
+            if(!any(tmp_check).is_true()) { // && (status_j == "move" || status_j == "completing goal")) {
                 // Save each of the individual columns within their respective
                 // vectors or lists to be used later.
                 int agent_idx_j = uv_j["agent_idx"];
@@ -358,6 +361,7 @@ DataFrame unpack_trace_rcpp(List trace,
                 double gc_radius_j = uv_j["gc_radius"];
                 int gc_nped_j = uv_j["gc_nped"];
                 List vf_angles_j = uv_j["vf_angles"];
+                List lgvf_data_j = uv_j["lgvf_data"];
 
                 agent_idx[idx] = agent_idx_j;
                 check[idx] = check_j;
@@ -375,6 +379,7 @@ DataFrame unpack_trace_rcpp(List trace,
                 gc_radius[idx] = gc_radius_j;
                 gc_nped[idx] = gc_nped_j;
                 vf_angles[idx] = vf_angles_j[0];
+                lgvf_data[idx] = lgvf_data_j[0];
 
             // If the agent is not moving, then you cannot compute the utility
             // variables. We therefore fill the variables with NAs.
@@ -395,6 +400,7 @@ DataFrame unpack_trace_rcpp(List trace,
                 gc_radius[idx] = NA_REAL;
                 gc_nped[idx] = NA_INTEGER;
                 vf_angles[idx] = NA_logical;
+                lgvf_data[idx] = NA_logical;
             }
 
             // Update the index
@@ -434,7 +440,8 @@ DataFrame unpack_trace_rcpp(List trace,
         Named("gc_distance") = gc_distance,
         Named("gc_radius") = gc_radius,
         Named("gc_nped") = gc_nped,
-        Named("vf_angles") = vf_angles
+        Named("vf_angles") = vf_angles,
+        Named("lgvf_data") = lgvf_data
     );
 
     data.attr("class") = "data.frame";

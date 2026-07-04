@@ -162,6 +162,107 @@ RObject get_angles_rcpp(int agent_idx,
     return rel_angles;
 }
 
+//' Get Distances and Angles to Group Members
+//' 
+//' Rcpp version of \code{\link[predped]{get_group_member_data}}.
+//'
+//' @param agent_idx Numeric denoting the position of the agent in the predictions.
+//' @param agent_group Numeric vector with the group membership of all pedestrians.
+//' @param position Numeric vector denoting the current position of the agent.
+//' @param orientation Numeric denoting the current orientation of the agent.
+//' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
+//' @param centers Numerical matrix containing the coordinates at each candidate cell.
+//'
+//' @return A list containing the distances, relative angles and number of 
+//' group members.
+//' 
+//' @seealso 
+//' \code{\link[predped]{lgvf_utility}},
+//' \code{\link[predped]{utility-agent}}
+//' 
+//' @concept utility
+//' @export
+// [[Rcpp::export]]
+RObject get_group_member_data_rcpp(int agent_idx, 
+                                   NumericVector agent_group, 
+                                   NumericVector position, 
+                                   double orientation, 
+                                   NumericMatrix predictions, 
+                                   NumericMatrix centers) {
+    
+    // Get the total number of pedestrians in the simulation
+    int nped = predictions.nrow();
+
+    // Identify all ingroup pedestrians and update the predictions to match
+    int group = agent_group[agent_idx - 1];
+    LogicalVector ingroup(nped);
+    for(int i = 0; i < nped; i++) {
+        if(i != agent_idx - 1) {
+            ingroup[i] = (agent_group[i] == group);
+        }        
+    }
+
+    // Update the number of pedestrians and return NULL if no group members
+    // have been identified
+    int total_ped = sum(ingroup);
+    if(total_ped == 0) {
+        return R_NilValue;
+    }
+    
+    // Generate list in which all needed data will be stored
+    List all_distances(total_ped);
+    List all_rel_angles(total_ped);
+
+    // Compute the new orientation of the agent when moving to each center
+    NumericVector orientations(centers.nrow());
+    for(int i = 0; i < centers.nrow(); i++) {
+        orientations[i] = atan2(
+            centers(i, 1) - position[1], 
+            centers(i, 0) - position[0]
+        );
+    }
+
+    // Loop over each of the group members and compute the relative distance 
+    // towards them as well as the relative orientation (whether the agent will 
+    // still be able to perceive them)
+    int j = 0;
+    for(int i = 0; i < nped; i++) {
+        // Only bother if the pedestrian is an ingroup member
+        if(ingroup[i]) {
+            // Compute the distances from the agent at the centers to the group
+            // members expected position
+            NumericVector target_ped = predictions(i, _);
+            all_distances[j] = dist1(target_ped, centers);
+
+            // Compute the relative angles from the agent to the group member
+            // when at their expected position
+            NumericVector rel_angles(centers.nrow());
+            for(int k = 0; k < centers.nrow(); k++) {
+                double angle = atan2(
+                    target_ped[1] - centers(k, 1), 
+                    target_ped[0] - centers(k, 0)
+                );
+                
+                double r_angle = angle - orientations[k];
+
+                while(r_angle < -M_PI) r_angle += 2 * M_PI;
+                while(r_angle > M_PI) r_angle -= 2 * M_PI;
+
+                rel_angles[k] = r_angle;
+            }
+            all_rel_angles[j] = rel_angles;
+
+            j++;
+        }
+    }
+
+    return List::create(
+        Named("distances") = all_distances,
+        Named("rel_angles") = all_rel_angles,
+        Named("nped") = nped
+    );
+}
+
 //' Compute utility variables
 //' 
 //' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
@@ -423,6 +524,17 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         true
     );
 
+    // Logarithmic Group-Attracted Visual Field utility: Required variable is the distance 
+    // and angles of one or more other pedestrians.
+    RObject lgvf_data = get_group_member_data_rcpp(
+        agent_idx, 
+        agent_specifications["group"],
+        agent.slot("center"),
+        agent.slot("orientation"),
+        predictions_ingroup,
+        centers
+    );
+
     // Create the list that will contain all of the needed information. 
     // Afterwards, convert to a DataFrame as expected by the utility
     // functions. This is the preferred way of doing things in Rcpp.
@@ -442,7 +554,8 @@ DataFrame compute_utility_variables_rcpp(S4 agent,
         Named("gc_distance") = List::create(gc_distance),
         Named("gc_radius") = gc_radius,
         Named("gc_nped") = gc_nped,
-        Named("vf_angles") = List::create(vf_angles)
+        Named("vf_angles") = List::create(vf_angles),
+        Named("lgvf_data") = List::create(lgvf_data)
     );
 
     // Change attribute to DataFrame and return
@@ -568,6 +681,70 @@ NumericVector vf_utility_rcpp(double b_visual_field,
 
     return V;
 }
+
+//' Logarithmic Group-Attracted Visual Field Utility (LGVF)
+//' 
+//' Rcpp alternative to the \code{lgvf_utility} function.
+//'
+//' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+//' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+//' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+//' @param group_member_data List containing distances and relative angles to members.
+//' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+//'
+//' @return Numeric vector containing the LGVF utility for each cell. 
+//' 
+//' @seealso 
+//' \code{\link[predped]{get_group_member_data_rcpp}},
+//' \code{\link[predped]{utility-agent}}
+//' 
+//' @concept utility
+//' @export
+// [[Rcpp::export]]
+NumericVector lgvf_utility_rcpp(double a_lgvf, 
+                                double b_lgvf, 
+                                double e_lgvf,
+                                List group_member_data,
+                                double vf_limit = 135. * M_PI / 180.) {
+    
+    // Extract all needed information from the list
+    int nped = group_member_data["nped"];
+    List distances_list = group_member_data["distances"];
+    List rel_angles_list = group_member_data["rel_angles"];
+
+    // Reserve some memory for the distances and relative angles. Furthermore 
+    // extract the number of cells
+    NumericVector distances = as<NumericVector>(distances_list[0]);
+    NumericVector rel_angles = as<NumericVector>(rel_angles_list[0]);
+    int n_cells = distances.length();
+
+    // Reserve some memory for the utilies themselves
+    NumericVector total_util(n_cells);
+    double base_util = 0.;
+    double penalty = 0.;
+
+    // Loop over the pedestrians of the ingroup
+    for(int i = 0; i < nped; i++) {
+        distances = as<NumericVector>(distances_list[i]);
+        rel_angles = as<NumericVector>(rel_angles_list[i]);
+
+        // Loop over the different cells the agent may move to
+        for(int j = 0; j < n_cells; j++) {
+            double dist = distances[j];
+            double r_angle = rel_angles[j];
+
+            base_util = -b_lgvf * pow(std::abs(std::log(dist) - std::log(e_lgvf)), a_lgvf);
+            
+            bool in_vf = std::abs(r_angle) <= vf_limit;
+            penalty = in_vf ? 0.0 : (-b_lgvf / pow(dist, a_lgvf));
+            
+            total_util[j] += base_util + penalty;
+        }
+    }
+    
+    return total_util / nped; 
+}
+
 
 //' Utility
 //'
@@ -764,8 +941,17 @@ NumericVector utility_rcpp(DataFrame data,
         );
     }
 
-
-
+    // Logarithmic Group-Attracted Visual Field utility: Check whether people are any group
+    // members and, if so, compute the utility
+    List lgvf_data_list = data["lgvf_data"];
+    if(!(lgvf_data_list[0] == R_NilValue)) {
+        V += lgvf_utility_rcpp(
+            parameters["a_lgvf"],
+            parameters["b_lgvf"],
+            parameters["e_lgvf"],
+            as<List>(lgvf_data_list[0])
+        );
+    }
 
 
     // Add the stopping utility to the vector and transform them according to the 
@@ -776,6 +962,8 @@ NumericVector utility_rcpp(DataFrame data,
 
     return V;    
 }
+
+
 
 //' Utility
 //'

@@ -103,7 +103,7 @@
 #' average.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
@@ -112,6 +112,10 @@
 #' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param individual_goal_number Numeric denoting the number of goals that should be 
+#' assigned to each agent individually after completing their group goals. Generates a 
+#' separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+#' \code{NULL}.
 #' @param precompute_goal_paths Logical denoting whether to run the
 #' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
@@ -133,9 +137,16 @@
 #' with which to start the simulation. Defaults to \code{NULL}, meaning the
 #' simulation starts with an empty room.
 #' @param initial_condition Object of the \code{\link[predped]{state-class}}
-#' containing the initial state at which to start the simulation. Defaults to
-#' \code{NULL}, meaning the simulation starts with an empty room. Ignored when
-#' \code{initial_agents} or \code{initial_number_agents} is provided.
+#' containing the initial state at which to start the simulation or an object of
+#' the \code{\link[predped]{trace-class}} for which the final state will be used
+#' as an initial condition. Defaults to \code{NULL}, meaning the simulation 
+#' starts with an empty room. Ignored when \code{initial_agents} or 
+#' \code{initial_number_agents} is provided. Note that if a 
+#' \code{\link[predped]{trace-class}} is provided, the result will only contain 
+#' the final state of this class as an initial condition. Furthermore note that
+#' in this case, the \code{time_step} argument of this function is ignored and,
+#' instead, the \code{time_step} provided in the \code{\link[predped]{trace-class}}
+#' will be used instead.
 #' @param initial_number_agents Numeric denoting the number of agents that
 #' the simulation should start out with. Defaults to \code{NULL}, meaning the
 #' simulation should start with no agents in the room. Ignored if
@@ -164,8 +175,8 @@
 #' @param ... Arguments passed on to the \code{\link[predped]{simulate.state}}
 #' function.
 #'
-#' @return List of objects of the \code{\link{state-class}} containing the
-#' result of the simulation.
+#' @return Object of the \code{\link[predped]{trace-class}} containing the result
+#' of the simulation.
 #'
 #' @examples
 #' # Create a setting in which to simulate. Note that this setting also serves
@@ -196,8 +207,8 @@
 #'
 #' # Check some interesting statistics, such as the length of the trace and the
 #' # number of agents in the room.
-#' length(trace)
-#' sapply(trace, \(x) length(x@agents))
+#' length(trace@states)
+#' sapply(trace@states, \(x) length(x))
 #'
 #' # If you wish to plot the trace, you can simply use the plot function.
 #' plt <- plot(trace)
@@ -205,10 +216,12 @@
 #'
 #' @seealso
 #' \code{\link[predped]{simulate.state}},
+#' \code{\link[predped]{state-class}},
+#' \code{\link[predped]{trace-class}},
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate
-#' 
+#'
 #' @concept simulation
 #'
 #' @export
@@ -227,12 +240,13 @@ setMethod("simulate", "predped", function(object,
                                           max_agents = 20,
                                           iterations = 1800,
                                           add_agent_after = \(x) rnorm(x, 60, 15),
-                                          standing_start = 0.1,
+                                          standing_start = 0.25,
                                           initial_agents = NULL,
                                           initial_condition = NULL,
                                           initial_number_agents = NULL,
                                           goal_number = \(x) rnorm(x, 10, 2),
                                           goal_duration = \(x) rnorm(x, 10, 2),
+                                          individual_goal_number = NULL,
                                           precompute_goal_paths = FALSE,
                                           sort_goals = TRUE,
                                           precomputed_goals = NULL,
@@ -243,9 +257,13 @@ setMethod("simulate", "predped", function(object,
                                           many_nodes = precompute_edges,
                                           individual_differences = FALSE,
                                           group_size = matrix(1, nrow = 1, ncol = 2),
-                                          fx = \(x) x,         
-                                          cpp = TRUE,                                 
+                                          fx = \(x) x,
+                                          cpp = TRUE,
                                           ...) {
+
+    # Initialize the resulting trace as NULL. Allows us to adequately differentiate
+    # initial conditions
+    output <- NULL
 
     # Simulate the iterations after which agents should be added to the simulation
     # (`add_agent`) and the number of goals each agent should pursue (`goal_number`).
@@ -305,8 +323,8 @@ setMethod("simulate", "predped", function(object,
         add_agent_index <- add_agent_index[-1]
     }
 
-    # Initialize the trace and state lists. Two cases. Either the initial state 
-    # already exists, which case we just use this one, or we create an empty 
+    # Initialize the trace and state lists. Two cases. Either the initial state
+    # already exists, which case we just use this one, or we create an empty
     # state and check whether there are any agents to add to this state.
     if(!is.null(initial_condition)) {
         if(!identical(initial_condition@setting, object@setting)) {
@@ -316,7 +334,26 @@ setMethod("simulate", "predped", function(object,
                         "with your model."))
         }
 
-        state <- initial_condition
+        # Check whether the initial condition is a state or a trace. 
+        if(inherits(initial_condition, "state")) {
+            state <- initial_condition
+
+        } else {
+            # Create a trace that will contain the output
+            output <- initial_condition 
+
+            output@states <- list(output@states[[length(output@states)]])
+            output@variables <- list(output@variables[[length(output@variables)]])
+
+            # Additionally create a state that can be used for the simulation
+            state <- predped::state(iteration = 0,
+                                    setting = object@setting,
+                                    agents = output@states[[1]],
+                                    iteration_variables = data.frame(max_agents = max_agents[1:iterations],
+                                                                     goal_number = goal_number[1:iterations],
+                                                                     add_agent_index = add_agent_index[1:iterations]),
+                                    variables = output@variables[[1]])
+        }
 
         # Check whether iteration_variables is defined for this initial condition.
         # If not, then we will have to create them ourselves
@@ -331,7 +368,7 @@ setMethod("simulate", "predped", function(object,
                                 agents = list(),
                                 iteration_variables = data.frame(max_agents = max_agents[1:iterations],
                                                                  goal_number = goal_number[1:iterations],
-                                                                 add_agent_index = add_agent_index[1:iterations]), 
+                                                                 add_agent_index = add_agent_index[1:iterations]),
                                 variables = list())
 
         if(!is.null(initial_agents)) {
@@ -339,36 +376,49 @@ setMethod("simulate", "predped", function(object,
         }
     }
 
-    trace <- list(state)
+    # Instantiate the resulting trace, containing the initial condition in its 
+    # corresponding slots. Only useful if a trace was not provided as an initial
+    # condition.
+    if(is.null(output)) {
+        output <- trace(setting = object@setting, 
+                        time_step = time_step, 
+                        states = list(state@agents), 
+                        variables = list(state@variables))
+    }
 
     # Print that the model is being simulated if no feedback is desired
     cat(paste0("\rYour model: ", id(object), " is being simulated"), paste0(rep(" ", 10), collapse = ""))
 
     # Loop over each iteration of the model
     for(i in seq_len(iterations)) {
-        altered_state <- fx(trace[[i]])
-        trace[[i + 1]] <- simulate(altered_state,
-                                   model = object,
-                                   add_agent = (i %in% iteration_variables(altered_state)$add_agent_index) &
-                                               (length(agents(trace[[i]])) < iteration_variables(altered_state)$max_agents[i]),
-                                   group_size = group_size,
-                                   goal_number = iteration_variables(altered_state)$goal_number[i],
-                                   time_step = time_step,
-                                   space_between = space_between,
-                                   standing_start = standing_start,
-                                   precomputed_edges = edges,
-                                   many_nodes = many_nodes,
-                                   precomputed_goals = precomputed_goals,
-                                   precompute_goal_paths = precompute_goal_paths,
-                                   middle_edge = middle_edge,
-                                   individual_differences = individual_differences,
-                                   cpp = cpp,
-                                   ...)
+        # Change the state through the function fx and the simulate function
+        state <- fx(state)
+        state <- simulate(state,
+                          model = object,
+                          add_agent = (i %in% iteration_variables(state)$add_agent_index) &
+                                      (length(agents(state)) < iteration_variables(state)$max_agents[i]),
+                          group_size = group_size,
+                          goal_number = iteration_variables(state)$goal_number[i],
+                          individual_goal_number = individual_goal_number,
+                          time_step = output@time_step,
+                          space_between = space_between,
+                          standing_start = standing_start,
+                          precomputed_edges = edges,
+                          many_nodes = many_nodes,
+                          precomputed_goals = precomputed_goals,
+                          precompute_goal_paths = precompute_goal_paths,
+                          middle_edge = middle_edge,
+                          individual_differences = individual_differences,
+                          cpp = cpp,
+                          ...)
+
+        # Save the necessary variables in the trace
+        output <- append_trace(output, state)
     }
 
     cat("\n")
 
-    return(trace)
+    return(output)
 })
 
 #' Simulate a single state for the M4MA
@@ -397,14 +447,14 @@ setMethod("simulate", "predped", function(object,
 #' social groups).
 #' @param velocities Numeric matrix containing the change in speed for an agent
 #' whenever they move to the respective cell of this matrix. Is used to create
-#' the cell positions that the agent might move to. Defaults to a matrix in 
+#' the cell positions that the agent might move to. Defaults to a matrix in
 #' which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.
 #' @param orientations Numeric matrix containing the change in direction for an
 #' agent whenever they move to the respective cell of this matrix. Is used to
-#' create the cell positions that the agent might move to. Defaults to a matrix 
-#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
-#' \code{287.5} (note that the larger angles are actually the negative symmetric 
+#' create the cell positions that the agent might move to. Defaults to a matrix
+#' in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20},
+#' \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310},
+#' \code{287.5} (note that the larger angles are actually the negative symmetric
 #' versions of the smaller angles).
 #' @param close_enough Numeric denoting how close (in radii) the agent needs to
 #' be to an object in order to interact with it. Defaults to \code{2}, meaning the
@@ -425,30 +475,30 @@ setMethod("simulate", "predped", function(object,
 #' @param many_nodes Logical denoting whether to use the minimal number of nodes
 #' or to use many more (see \code{\link[predped]{create_edges}}). Ignored if
 #' \code{precomputed_edges} is provided. Defaults to \code{FALSE}.
-#' @param adaptive_goal_sorting Logical denoting whether agents have the ability 
-#' to change the order of their goals adaptively throughout the simulation. 
+#' @param adaptive_goal_sorting Logical denoting whether agents have the ability
+#' to change the order of their goals adaptively throughout the simulation.
 #' Defaults to \code{TRUE}.
 #' @param position Numeric denoting the position you would like to assign to an
-#' agent if they are added to the simulation. Defaults to \code{NULL}, making 
-#' the agent start at the entrance. Note that this is an experimental feature 
+#' agent if they are added to the simulation. Defaults to \code{NULL}, making
+#' the agent start at the entrance. Note that this is an experimental feature
 #' that has not been tested yet, and therefore might not work for the moment.
 #' @param plot_live Logical denoting whether to plot each iteration while the
-#' simulation is going on. Defaults to `FALSE`.
+#' simulation is going on. Defaults to \code{FALSE}.
 #' @param plot_time Numeric denoting the amount of time (in seconds) to wait
 #' between iterations, i.e., the time between updating the plot. Defaults to
-#' `0.2`.
+#' \code{0.4}.
 #' @param report Logical denoting whether to report whenever an agent is
 #' reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.
 #' @param print_iteration Logical denoting whether to report each simulated
 #' iteration. Defaults to \code{FALSE}, but can be switched off if desired.
-#' @param step_report Numeric denoting at which iteration to report the 
-#' current iteration in the simulation & the number of agents present 
+#' @param step_report Numeric denoting at which iteration to report the
+#' current iteration in the simulation & the number of agents present
 #' at the current iteration in the simulation. Defaults to 1, which
 #' represents each iteration to be reported.
 #' @param cpp Logical denoting whether to use the Rcpp alternatives for several
 #' of the lower-level functions (\code{TRUE}) or whether to use the R alternatives
 #' instead (\code{FALSE}). Defaults to \code{TRUE}.
-#' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if 
+#' @param ... Arguments passed on to the \code{\link[predped]{plot}} method (if
 #' \code{plot_live = TRUE}).
 #' @inheritParams simulate,predped-method
 #'
@@ -498,7 +548,7 @@ setMethod("simulate", "predped", function(object,
 #' \code{\link[predped]{update}}
 #'
 #' @rdname simulate.state
-#' 
+#'
 #' @concept simulation
 #'
 #' @export
@@ -516,7 +566,7 @@ setMethod("simulate", "state", function(object,
                                                          350, 340, 327.5, 310, 287.5) |>
                                             rep(times = 3) |>
                                             matrix(ncol = 3),
-                                        standing_start = 0.1,
+                                        standing_start = 0.25,
                                         close_enough = 2,
                                         space_between = 1.25,
                                         stay_stopped = TRUE,
@@ -524,12 +574,13 @@ setMethod("simulate", "state", function(object,
                                         precomputed_edges = NULL,
                                         many_nodes = !is.null(precomputed_edges),
                                         plot_live = FALSE,
-                                        plot_time = 0.2,
+                                        plot_time = 0.4,
                                         report = FALSE,
                                         print_iteration = FALSE,
                                         step_report = 1,
                                         goal_number = 5,
                                         goal_duration = \(x) rnorm(x, 10, 2),
+                                        individual_goal_number = NULL,
                                         precompute_goal_paths = TRUE,
                                         sort_goals = TRUE,
                                         adaptive_goal_sorting = TRUE,
@@ -573,6 +624,7 @@ setMethod("simulate", "state", function(object,
                                               standing_start = standing_start,
                                               goal_number = goal_number,
                                               goal_duration = goal_duration,
+                                              individual_goal_number = individual_goal_number,
                                               precompute_goal_paths = precompute_goal_paths,
                                               sort_goals = sort_goals,
                                               precomputed_goals = precomputed_goals,
@@ -637,7 +689,7 @@ setMethod("simulate", "state", function(object,
 
     # If you want to plot the result immediately, do so
     if(plot_live) {
-        print(plot(object, ...))
+        print(plot(object))
         Sys.sleep(plot_time)
     }
 
@@ -659,7 +711,7 @@ setMethod("simulate", "state", function(object,
 #' to \code{1}.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
@@ -696,7 +748,7 @@ setMethod("simulate", "state", function(object,
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_group
-#' 
+#'
 #' @concept simulation
 #'
 #' @export
@@ -707,7 +759,7 @@ setMethod("simulate", "state", function(object,
 #     then
 add_group <- function(model,
                       agent_number = 1,
-                      standing_start = 0.1,
+                      standing_start = 0.25,
                       individual_differences = FALSE,
                       ...) {
 
@@ -721,41 +773,43 @@ add_group <- function(model,
                              individual_differences = individual_differences,
                              ...)
 
+    # Designating this agent as the group representative
+    current_group_goal(agents[[1]]) <- current_goal(agents[[1]])
+    group_goals(agents[[1]]) <- goals(agents[[1]])
+    group_representative(agents[[1]]) <- TRUE
+
     # If only one agent needed, we will return it immediately
     if(agent_number == 1) {
         return(agents)
     }
 
-    # Otherwise, we should loop over all other agents and change their
-    # parameter values (and color) so that each agent is unique.
-    #
-    # First, draw the parameters for each of the new agents
-    model_parameters <- parameters(model)
-    idx <- sample(model@archetypes,
-                  agent_number - 1,
-                  prob = model@weights,
-                  replace = TRUE)
+    #Capture the extra arguments passed via the ellipsis (...)
+    args <- list(...)
+    
+    # Force followers to spawn at the exact same location as the leader
+    args$position <- position(agents[[1]])
 
     # Loop over these agents
     for(i in 2:agent_number) {
-        # Create a temporary agent as a copy of the first simulated agent
-        tmp_agent <- agents[[1]]
+        # This guarantees they generate unique individual goal stacks and parameters
+        follower_args <- c(list(model = model, 
+                                standing_start = standing_start, 
+                                individual_differences = individual_differences), 
+                           args)        
+        tmp_agent <- do.call(add_agent, follower_args)
 
-        # Change this temporary agent's characterstics based on simulated
-        # parameters
-        tmp <- model_parameters[["params_archetypes"]]
-        mean_params <- tmp[tmp$name == idx[i - 1], ]
-        params <- generate_parameters(1,
-                                      mean = mean_params,
-                                      Sigma = model_parameters[["params_sigma"]][[idx[i - 1]]],
-                                      bounds = model_parameters[["params_bounds"]],
-                                      archetype = idx[i - 1],
-                                      individual_differences = individual_differences)
+        # Sync their group goals to match the leader perfectly
+        group(tmp_agent) <- group(agents[[1]])
+        current_goal(tmp_agent) <- current_goal(agents[[1]])
+        goals(tmp_agent) <- goals(agents[[1]])
+        current_group_goal(tmp_agent) <- current_group_goal(agents[[1]])
+        group_goals(tmp_agent) <- group_goals(agents[[1]])
+        
+        # Match the leader's starting orientation so they walk into the room smoothly
+        orientation(tmp_agent) <- orientation(agents[[1]])
 
-        id(tmp_agent) <- paste(sample(letters, 5, replace = TRUE), collapse = "")
-        radius(tmp_agent) <- params$radius
-        color(tmp_agent) <- mean_params$color
-        speed(tmp_agent) <- standing_start * params[["preferred_speed"]]
+        # Ensures they are followers (should be default anyways)
+        group_representative(tmp_agent) <- FALSE
 
         # Add the agent to the list
         agents[[i]] <- tmp_agent
@@ -774,6 +828,10 @@ add_group <- function(model,
 #' \code{\link[predped]{determine_values}}. Defaults to \code{\(n) rnorm(n, 10, 2)}.
 #' @param goal_duration Numeric, vector, or function that defines the duration of
 #' the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.
+#' @param individual_goal_number Numeric denoting the number of goals that should be 
+#' assigned to each agent individually after completing their group goals. Generates a 
+#' separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+#' \code{NULL}.
 #' @param precompute_goal_paths Logical denoting whether to run the
 #' \code{\link[predped]{find_path}} for each of the generated goals
 #' beforehand. Assumes that the agent does all of the goals in the order of the
@@ -795,7 +853,7 @@ add_group <- function(model,
 #' containing the nodes and edges the agent can use to plan its path. Defauls
 #' to \code{NULL}, triggering the creation of these edges whenever they are
 #' needed.
-#' @param many_nodes Logical denoting whether to use many nodes when computing 
+#' @param many_nodes Logical denoting whether to use many nodes when computing
 #' the edges. Defaults to \code{FALSE} if \code{precomputed_edges = FALSE}.
 #' @param space_between Numeric denoting the space that should be left between
 #' an object and the created path points for the agents (in radii). Defaults to
@@ -808,12 +866,12 @@ add_group <- function(model,
 #' therefore might not work for the moment.
 #' @param standing_start Numeric denoting the factor of their preferred speed
 #' that agents move when they just came from standing still. Defaults to
-#' \code{0.1}.
+#' \code{0.25}.
 #' @param individual_differences Logical denoting whether to use the standard
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{FALSE}.
-#' @param return_characteristics Logical denoting whether to return the 
-#' characteristics of the generated agents in a list (\code{TRUE}) or as part 
+#' @param return_characteristics Logical denoting whether to return the
+#' characteristics of the generated agents in a list (\code{TRUE}) or as part
 #' of an agent (\code{FALSE}). Defaults to \code{FALSE}.
 #'
 #' @return List of instances of the \code{\link[predped]{agent-class}}.
@@ -841,7 +899,7 @@ add_group <- function(model,
 #' \code{\link[predped]{simulate.state}}
 #'
 #' @rdname add_agent
-#' 
+#'
 #' @concept simulation
 #'
 #' @export
@@ -854,6 +912,7 @@ add_agent <- function(model,
                       group_number = 1,
                       goal_number = 5,
                       goal_duration = \(x) rnorm(x, 10, 2),
+                      individual_goal_number = NULL,
                       precompute_goal_paths = TRUE,
                       sort_goals = TRUE,
                       precomputed_goals = NULL,
@@ -862,7 +921,7 @@ add_agent <- function(model,
                       many_nodes = !is.null(precomputed_edges),
                       space_between = 1.25,
                       position = NULL,
-                      standing_start = 0.1,
+                      standing_start = 0.25,
                       individual_differences = FALSE,
                       return_characteristics = FALSE) {
 
@@ -935,7 +994,7 @@ add_agent <- function(model,
         } else {
             exits <- exit(background)
             idx <- sample(1:nrow(exits), 1)
-                
+
             goal_stack <- list(goal(id = "goal exit",
                                     position = as.numeric(exits[idx,])))
         }
@@ -943,6 +1002,22 @@ add_agent <- function(model,
         i <- sample(1:length(precomputed_goals), 1)
         goal_stack <- precomputed_goals[[i]]
     }
+
+    # Create the extra individual goal stack if needed
+    if(!is.null(individual_goal_number)) {
+        individual_goal_stack <- goal_stack(individual_goal_number,
+                                            background,
+                                            counter = goal_duration,
+                                            precomputed_edges = precomputed_edges,
+                                            many_nodes = many_nodes,
+                                            starting_position = position,
+                                            precompute_goal_paths = precompute_goal_paths,
+                                            space_between = space_between * radius,
+                                            sort = sort_goals,
+                                            middle_edge = middle_edge)
+    } else {
+        individual_goal_stack <- list()
+    }                                  
 
     # Determine the agent's orientation. This is only triggered if angles wasn't
     # prevously defined as being perpendicular to the entry.
@@ -953,18 +1028,19 @@ add_agent <- function(model,
         angle <- atan2(co_2[2] - co_1[2], co_2[1] - co_1[1]) * 180 / pi
     }
 
-    # If the person wants only the characteristics of the agent, then provide 
-    # them. Note that we put status as "plan" so that agents can find their 
+    # If the person wants only the characteristics of the agent, then provide
+    # them. Note that we put status as "plan" so that agents can find their
     # path
     if(return_characteristics) {
         return(list(id = paste(sample(letters, 5, replace = TRUE), collapse = ""),
-                    position = position, 
-                    radius = radius, 
-                    speed = standing_start * params[["preferred_speed"]],
+                    position = position,
+                    radius = radius,
+                    speed = standing_start,
                     orientation = angle,
-                    parameters = params, 
+                    parameters = params,
                     goals = goal_stack[-1],
                     current_goal = goal_stack[[1]],
+                    individual_goals = individual_goal_stack,
                     color = color,
                     status = "plan",
                     group = group_number))
@@ -973,11 +1049,12 @@ add_agent <- function(model,
     # Create the agent itself
     tmp_agent <- agent(center = position,
                        radius = radius,
-                       speed = standing_start * params[["preferred_speed"]],
+                       speed = standing_start,
                        orientation = angle,
                        parameters = params,
                        goals = goal_stack[-1],
                        current_goal = goal_stack[[1]],
+                       individual_goals = individual_goal_stack,
                        color = color,
                        group = group_number)
 
@@ -1044,7 +1121,7 @@ add_agent <- function(model,
 #' to \code{NULL}, triggering the creation of these edges whenever they are
 #' needed.
 #' @param cpp Logical denoting whether to use the Rcpp (\code{TRUE}) or R
-#' (\code{FALSE}) alternatives for the lower-level functions. Defaults to 
+#' (\code{FALSE}) alternatives for the lower-level functions. Defaults to
 #' \code{TRUE}.
 #' @param ... Additional arguments provided to \code{\link[predped]{add_agent}}.
 #'
@@ -1058,7 +1135,7 @@ add_agent <- function(model,
 #' \code{\link[predped]{simulate}}
 #'
 #' @rdname create_initial_condition
-#' 
+#'
 #' @concept simulation
 #'
 #' @export
@@ -1118,7 +1195,7 @@ create_initial_condition <- function(agent_number,
     }
     coords <- precomputed_edges$edges_with_coords
 
-    # Create different coordinates on which agents can be found along each of 
+    # Create different coordinates on which agents can be found along each of
     # the edges
     n_agents_fit <- sqrt((coords$from_x - coords$to_x)^2 + (coords$from_y - coords$to_y)^2) / max_size
     n_agents_fit <- floor(n_agents_fit)
@@ -1127,22 +1204,33 @@ create_initial_condition <- function(agent_number,
         browser()
     }
 
-    alternatives <- lapply(seq_along(n_agents_fit), 
-                           \(i) cbind(seq(coords$from_x[i], 
-                                          coords$to_x[i], 
+    alternatives <- lapply(seq_along(n_agents_fit),
+                           \(i) cbind(seq(coords$from_x[i],
+                                          coords$to_x[i],
                                           length.out = n_agents_fit[i]),
-                                      seq(coords$from_y[i], 
-                                          coords$to_y[i], 
+                                      seq(coords$from_y[i],
+                                          coords$to_y[i],
                                           length.out = n_agents_fit[i])))
     alternatives <- do.call("rbind", alternatives)
 
-
     # Create a dummy agent. This will allow for faster generation of the initial
-    # condition, as changing an agent's characteristics is faster than the 
+    # condition, as changing an agent's characteristics is faster than the
     # generation of one
     dummy <- agent(center = c(0, 0), radius = 0.25)
     dummy_big <- dummy
     radius(dummy_big) <- 2 * max_size
+
+    # Remove all alternatives that would end with an overlap with the objects
+    # in the space.
+    idx <- lapply(
+        objects(model@setting),
+        function(x) x |>
+            enlarge(extension = space_between * max_size) |>
+            in_object(alternatives)
+    )
+    idx <- do.call("cbind", idx) |>
+        rowSums()
+    alternatives <- alternatives[idx == 0, ]
 
     # Loop over the agents and use `add_agent` to create an initial agent. Note
     # that we have to change some of the characteristics of these agents,
@@ -1151,6 +1239,15 @@ create_initial_condition <- function(agent_number,
     group_number <- 0
     agents <- list()
     for(i in seq_len(agent_number)) {
+        # Check whether we can still add some agents to the list based on the 
+        # positions that are left.
+        if(nrow(alternatives) == 0) {
+            message(paste0("Couldn't add any new agents after ",
+                           length(agents),
+                           " due to crowdiness."))
+            break
+        }
+
         # Sample a random position on which the agent will stand and adjust the
         # dummy
         idx <- sample(1:nrow(alternatives), 1)
@@ -1163,7 +1260,7 @@ create_initial_condition <- function(agent_number,
                                return_characteristics = TRUE,
                                ...)
 
-        # Adjust the dummy's characteristics based on the random ones produced 
+        # Adjust the dummy's characteristics based on the random ones produced
         # here. Also add a group number
         id(dummy) <- new_agent$id
         position(dummy) <- new_agent$position
@@ -1176,7 +1273,7 @@ create_initial_condition <- function(agent_number,
         status(dummy) <- new_agent$status
 
         # Update the group number for the future if `i` is in the indices that
-        # indicate a change in group membership. If the agent belongs to a 
+        # indicate a change in group membership. If the agent belongs to a
         # particular group, then they will receive the goals of the agent before
         # them, otherwise they will receive their own set of goals
         if(i %in% group_indices | i == 1) {
@@ -1184,9 +1281,17 @@ create_initial_condition <- function(agent_number,
 
             goals(dummy) <- new_agent$goals
             current_goal(dummy) <- new_agent$current_goal
+
+            group_representative(dummy) <- TRUE
+            current_group_goal(dummy) <- new_agent$current_goal
+            group_goals(dummy) <- new_agent$goals
         } else {
             goals(dummy) <- goals(agents[[i - 1]])
             current_goal(dummy) <- current_goal(agents[[i - 1]])
+
+            group_representative(dummy) <- FALSE
+            current_group_goal(dummy) <- current_group_goal(agents[[i - 1]])
+            group_goals(dummy) <- group_goals(agents[[i - 1]])
         }
         group(dummy) <- group_number
 
@@ -1201,7 +1306,7 @@ create_initial_condition <- function(agent_number,
         idx <- out_object(dummy_big, alternatives)
         alternatives <- alternatives[idx, ]
 
-        # Check whether we can still add some agents to the list based on the 
+        # Check whether we can still add some agents to the list based on the
         # positions that are left.
         if(nrow(alternatives) == 0) {
             message(paste0("Couldn't add any new agents after ",

@@ -122,8 +122,8 @@ List mll_rcpp(List data,
             L = V[cells[i]] / Rcpp::sum(V);
 
             // Check whether the value exceeds a particular threshold
-            if(log(L) < -10.) {
-                L = exp(-10.);
+            if(log(L) < -100.) {
+                L = exp(-100.);
             }
 
             NumericVector MLL_i = MLL[idx[i]];

@@ -47,4 +47,21 @@ Rcpp::NumericVector vf_utility_rcpp(
     Rcpp::NumericVector relative_angles
 );
 
+Rcpp::RObject get_group_member_data_rcpp(
+    int agent_idx,
+    Rcpp::NumericVector agent_group,
+    Rcpp::NumericVector position,
+    double orientation,
+    Rcpp::NumericMatrix predictions,
+    Rcpp::NumericMatrix centers
+);
+
+Rcpp::NumericVector lgvf_utility_rcpp(
+    double a_lgvf,
+    double b_lgvf,
+    double e_lgvf,
+    Rcpp::List group_member_data,
+    double vf_limit = 135 * M_PI / 180
+);
+
 #endif

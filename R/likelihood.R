@@ -6,7 +6,7 @@
 #' 
 #' @param data Data.frame containing at least "id", "time", "x", "y", "goal_x",
 #' "goal_y", and "goal_id". If it does not have the utility variables yet, these
-#' will add them to the data.frame.
+#' will be added to the data.frame.
 #' @param parameters Numeric vector or matrix containing the parameters to be 
 #' used. Should be specified in the same order as specified in 
 #' \code{"parameter_names"}. If a matrix, each row should contain parameters to 
@@ -30,8 +30,14 @@
 #' If \code{FALSE}, the function will instead return a list of vectors containing
 #' the raw likelihoods (not min-log-likelihoods!), allowing users to specify 
 #' their own corrections (if needed). Defaults to \code{FALSE}.
+#' @param time_step Numeric denoting the time between each iteration. Defaults
+#' to \code{NULL}, in which case the time step is derived by the 
+#' \code{\link[predped]{get_time_step}} function with summarizing function 
+#' \code{fx}.
+#' @param fx A summarizing function that should be used to derive the time step
+#' if it is not provided through the \code{time_step} argument. 
 #' @param ... Additional arguments passed on to \code{\link[predped]{add_motion_variables}}.
-#' In a typical estimation situation, these motion variables should already be 
+#' In a typical estimation situation, these motion variables should already be
 #' in \code{data}.
 #' 
 #'  @return Either named vector containing the summed min-log-likelihood 
@@ -41,19 +47,29 @@
 #' @concept estimation
 #' 
 #' @export 
-mll <- function(data, 
+mll <- function(data,
                 parameters,
                 parameter_names = colnames(params_from_csv[["params_archetypes"]])[-c(1, 2)],
                 transform = TRUE,
                 bounds = params_from_csv[["params_bounds"]],
                 cpp = TRUE,
                 summed = FALSE,
+                time_step = NULL,
+                fx = function(x) mean(x, na.rm = TRUE),
                 ...) {
 
-    # Check whether the utility variables are in there. Just checked for one and 
+    # If the time step is not provided by the user, use the average time between
+    # each observation, averaging within participants and across participants.
+    # Note that this may not be realistic when there is a great deviation in the 
+    # sampling rate over time.
+    if(is.null(time_step)) {
+        time_step <- get_time_step(data, fx = fx)
+    }
+
+    # Check whether the utility variables are in there. Just checked for one and
     # assumed that the others are there as well
     if(!("ps_speed" %in% colnames(data))) {
-        data <- add_motion_variables(data, ...)
+        data <- add_motion_variables(data, time_step = time_step, ...)
 
         # Delete those instances in which a person is not moving around
         data <- data[!is.na(data$ps_speed), ]
@@ -145,7 +161,7 @@ mll <- function(data,
 
                            # Transform likelihoods that fall below a particular 
                            # threshold
-                           L[log(L) < -10] <- exp(-10)
+                           L[log(L) < -100] <- exp(-100)
                       
                            # Convert likelihoods to min-log-likelihood. 1 was added
                            # to each likelihood to ensure that 0 probability will 

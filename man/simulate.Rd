@@ -9,12 +9,13 @@
   max_agents = 20,
   iterations = 1800,
   add_agent_after = function(x) rnorm(x, 60, 15),
-  standing_start = 0.1,
+  standing_start = 0.25,
   initial_agents = NULL,
   initial_condition = NULL,
   initial_number_agents = NULL,
   goal_number = function(x) rnorm(x, 10, 2),
   goal_duration = function(x) rnorm(x, 10, 2),
+  individual_goal_number = NULL,
   precompute_goal_paths = FALSE,
   sort_goals = TRUE,
   precomputed_goals = NULL,
@@ -51,16 +52,23 @@ average.}
 
 \item{standing_start}{Numeric denoting the factor of their preferred speed
 that agents move when they just came from standing still. Defaults to
-\code{0.1}.}
+\code{0.25}.}
 
 \item{initial_agents}{List of objects of the \code{\link[predped]{agent-class}}
 with which to start the simulation. Defaults to \code{NULL}, meaning the
 simulation starts with an empty room.}
 
 \item{initial_condition}{Object of the \code{\link[predped]{state-class}}
-containing the initial state at which to start the simulation. Defaults to
-\code{NULL}, meaning the simulation starts with an empty room. Ignored when
-\code{initial_agents} or \code{initial_number_agents} is provided.}
+containing the initial state at which to start the simulation or an object of
+the \code{\link[predped]{trace-class}} for which the final state will be used
+as an initial condition. Defaults to \code{NULL}, meaning the simulation 
+starts with an empty room. Ignored when \code{initial_agents} or 
+\code{initial_number_agents} is provided. Note that if a 
+\code{\link[predped]{trace-class}} is provided, the result will only contain 
+the final state of this class as an initial condition. Furthermore note that
+in this case, the \code{time_step} argument of this function is ignored and,
+instead, the \code{time_step} provided in the \code{\link[predped]{trace-class}}
+will be used instead.}
 
 \item{initial_number_agents}{Numeric denoting the number of agents that
 the simulation should start out with. Defaults to \code{NULL}, meaning the
@@ -73,6 +81,11 @@ goals the agents should accomplish. It's exact value is handled by
 
 \item{goal_duration}{Numeric, vector, or function that defines the duration of
 the goals of the agents. Defaults to \code{\(n) rnorm(n, 10, 2)}.}
+
+\item{individual_goal_number}{Numeric denoting the number of goals that should be 
+assigned to each agent individually after completing their group goals. Generates a 
+separate goal stack of size \code{individual_goal_number} for each agent. Defaults to 
+\code{NULL}.}
 
 \item{precompute_goal_paths}{Logical denoting whether to run the
 \code{\link[predped]{find_path}} for each of the generated goals
@@ -138,8 +151,8 @@ remains unaltered.}
 function.}
 }
 \value{
-List of objects of the \code{\link{state-class}} containing the
-result of the simulation.
+Object of the \code{\link[predped]{trace-class}} containing the result
+of the simulation.
 }
 \description{
 This function allows users to simulate data from their specified
@@ -251,8 +264,8 @@ trace <- simulate(my_model,
 
 # Check some interesting statistics, such as the length of the trace and the
 # number of agents in the room.
-length(trace)
-sapply(trace, \(x) length(x@agents))
+length(trace@states)
+sapply(trace@states, \(x) length(x))
 
 # If you wish to plot the trace, you can simply use the plot function.
 plt <- plot(trace)
@@ -261,6 +274,8 @@ plt[[1]]
 }
 \seealso{
 \code{\link[predped]{simulate.state}},
+\code{\link[predped]{state-class}},
+\code{\link[predped]{trace-class}},
 \code{\link[predped]{update}}
 }
 \concept{simulation}

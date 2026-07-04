@@ -11,9 +11,10 @@ to_trace(
   a_turning = NULL,
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -10, -20, -32.5, -50, -72.5),
-  time_step = 0.5,
-  threshold = qnorm(0.975, 2 * 0.035, 4 * 0.035^4)/time_step,
+  time_step = NULL,
+  standing_start = 0.25,
   stay_stopped = TRUE,
+  fx = function(x) mean(x, na.rm = TRUE),
   cpp = TRUE,
   ...
 )
@@ -21,49 +22,59 @@ to_trace(
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
 
-\item{background}{Instance of the \code{\link[predped]{background-class}} 
+\item{background}{Instance of the \code{\link[predped]{background-class}}
 containing the setting in which the data were gathered.}
 
-\item{b_turning, a_turning}{Numeric denoting the values of the parameters 
+\item{b_turning, a_turning}{Numeric denoting the values of the parameters
 \eqn{b} and \eqn{a} for the relationship between orientation and velocity.
-For more information, see the documentation of 
-\code{\link[predped]{compute_centers}}. Defaults to \code{NULL}, meaning that 
-this relationship takes on the default values of \code{predped}.}
+For more information, see the documentation of
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
 
-\item{velocities}{Numeric vector denoting the changes in speeds as assumed by 
+\item{velocities}{Numeric vector denoting the changes in speeds as assumed by
 the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
 (deceleration).}
 
-\item{orientations}{Numeric vector denoting the changes in orientation as 
-assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
-\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
-\code{310}, \code{287.5} (note that the larger angles are actually the 
+\item{orientations}{Numeric vector denoting the changes in orientation as
+assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
+\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5},
+\code{310}, \code{287.5} (note that the larger angles are actually the
 negative symmetric versions of the smaller angles).}
 
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
 
-\item{threshold}{Numeric denoting under which observed value for speed the 
-cell to which an agent has moved should be put to `0`. Defaults to a value 
-based on the observed measurement error in our system.}
+\item{standing_start}{Numeric denoting the speed below which the cell is
+set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+\code{\link[predped]{update_position}}. Defaults to \code{0.25}.}
 
 \item{stay_stopped}{Logical denoting whether agents will predict others that
 are currently not moving to remain immobile in the next iteration. Is needed
 to compute the utility variables accurately. Defaults to \code{TRUE}.}
 
-\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R 
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+
+\item{cpp}{Logical denoting whether to use the Rcpp (\code{TRUE}) or R
 (\code{FALSE}) version of this function. Defaults to \code{TRUE}.}
 
 \item{...}{Arguments passed to \code{\link[predped]{find_path}}.}
 }
+\value{
+Object of the \code{\link[predped]{trace-class}}.
+}
 \description{
 This function does the opposite of \code{\link[predped]{unpack_trace}}. It
-takes in a data.frame and return a trace according to \code{predped}s 
-requirements. The data.frame should at least have the column names "x", "y", 
-"time", and "id", containing the coordinates, times at which the data were 
+takes in a data.frame and return a trace according to \code{predped}s
+requirements. The data.frame should at least have the column names "x", "y",
+"time", and "id", containing the coordinates, times at which the data were
 gathered (in seconds), and the id-number of the person whose data it is.
-Additionally, data.frame needs information on the goals that agents were 
-trying to achieve at each timepoint, of which their positions should be 
+Additionally, data.frame needs information on the goals that agents were
+trying to achieve at each timepoint, of which their positions should be
 saved under "goal_x" and "goal_y", and their id to "goal_id".
 }
 \examples{

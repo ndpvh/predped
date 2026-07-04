@@ -8,58 +8,93 @@ add_motion_variables(
   data,
   velocities = c(1.5, 1, 0.5),
   orientations = c(72.5, 50, 32.5, 20, 10, 0, -72.5, -50, -32.5, -20, -10),
-  time_step = 0.5,
-  threshold = qlnorm(0.25, -2.95, 0.64)/time_step,
-  initial_conditions = FALSE
+  time_step = NULL,
+  standing_start = 0.25,
+  initial_conditions = FALSE,
+  a_turning = 2,
+  b_turning = 0.2,
+  fx = function(x) mean(x, na.rm = TRUE)
 )
 }
 \arguments{
 \item{data}{Instance of a data.frame containing the data you want to transform.}
 
-\item{velocities}{Numeric vector denoting the changes in speeds as assumed by 
+\item{velocities}{Numeric vector denoting the changes in speeds as assumed by
 the M4MA. Defaults to \code{1.5} (acceleration), \code{1}, and \code{0.5}
 (deceleration).}
 
-\item{orientations}{Numeric vector denoting the changes in orientation as 
-assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5}, 
-\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, 
-\code{310}, \code{287.5} (note that the larger angles are actually the 
+\item{orientations}{Numeric vector denoting the changes in orientation as
+assumed by the M4MA. Defaults to \code{72.5}, \code{50}, \code{32.5},
+\code{20}, \code{10}, \code{0}, \code{350}, \code{340}, \code{327.5},
+\code{310}, \code{287.5} (note that the larger angles are actually the
 negative symmetric versions of the smaller angles).}
 
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
+\item{time_step}{Numeric denoting the time between each iteration. Defaults
+to \code{NULL}, in which case the time step is derived by the 
+\code{\link[predped]{get_time_step}} function with summarizing function 
+\code{fx}.}
 
-\item{threshold}{Numeric denoting under which observed value for speed the 
-cell to which an agent has moved should be put to `0`. Defaults to a value 
-based on the observed measurement error in our system.}
+\item{standing_start}{Numeric denoting the speed below which the cell is
+set to \code{0} (stopped). Matches the \code{standing_start} parameter in
+\code{\link[predped]{update_position}}. Defaults to \code{0.25}.}
 
-\item{initial_conditions}{Logical denoting whether the added columns should 
+\item{initial_conditions}{Logical denoting whether the added columns should
 include the initial conditions (that is, speed, orientation, and position at
-the previous time point) alongside their current alternatives. Useful when 
-one wants to compute the values of the utility-related variables from the 
+the previous time point) alongside their current alternatives. Useful when
+one wants to compute the values of the utility-related variables from the
 data. Defaults to \code{FALSE}.}
+
+\item{b_turning, a_turning}{Numeric denoting the values of the parameters
+\eqn{b} and \eqn{a} for the relationship between orientation and velocity.
+For more information, see the documentation of
+\code{\link[predped]{compute_centers}}. Alternatively can also be a named 
+numeric vector, where each value in the vector denotes the values of the 
+parameters for each agent in the data.frame.Defaults to \code{NULL}, meaning 
+that this relationship takes on the default values of \code{predped}.}
+
+\item{fx}{A summarizing function that should be used to derive the time step
+if it is not provided through the \code{time_step} argument.}
+}
+\value{
+A data.frame with predped-relevant motion variables derived from the 
+provided data, including the speeds and orientations, cells that the agents 
+moved to, the status of the agents, and the original positions, ids, and goals
+that were included in the original dataset.
 }
 \description{
-This function adds several motion variables to an already existing dataset. 
-These motion variables are then used by \code{predped} to compute utilities, 
-allowing for estimations in the long run. The variables that are added are 
+This function adds several motion variables to an already existing dataset.
+These motion variables are then used by \code{predped} to compute utilities,
+allowing for estimations in the long run. The variables that are added are
 speed, orientation, and the cell to which a person moved (as defined by the
 M4MA).
 }
 \details{
 The provided dataset should at least have the following columns:
- - \code{x}, \code{y}: Coordinates at which a person was standing at a given 
+ - \code{x}, \code{y}: Coordinates at which a person was standing at a given
    time
- - \code{time}: A continuous variable that denotes the time at which the 
+ - \code{time}: A continuous variable that denotes the time at which the
    measurement took place.
  - \code{id}: The identifier given to the person whose position was measured.
- - \code{goal_id}: The identifier given to the goal the person had to move 
+ - \code{goal_id}: The identifier given to the goal the person had to move
    towards while their position was being measured.
- - \code{goal_x}, \code{goal_y}: The position of the goal the person had to 
+ - \code{goal_x}, \code{goal_y}: The position of the goal the person had to
    move to while their position was being measured.
 }
 \examples{
-# This is my example
+# Create a minimal working example dataset from scratch
+data <- data.frame(
+  "time" = seq(0, 10, 1),
+  "id" = rep("participant", 11),
+  "x" = cos(seq(0, 2 * pi, length.out = 11)),
+  "y" = sin(seq(0, 2 * pi, length.out = 11)),
+  "goal_id" = rep("goal", 11),
+  "goal_x" = rep(0, 11),
+  "goal_y" = rep(0, 11)
+)
+
+# Add the motion variables to this dataset
+add_motion_variables(data)
+
 
 }
 \concept{data}

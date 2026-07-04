@@ -8,6 +8,14 @@
 
 library(testthat)
 library(predped)
+if(!requireNamespace("qs2")) {
+    stop(
+        paste(
+            "The `qs2` package is required to test `predped`.",
+            "Please install."
+        )
+    )
+}
 
 RNGkind(kind = "Mersenne-Twister")
 RNGversion("4.3.0")

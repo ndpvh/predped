@@ -12,7 +12,7 @@ update_position(
   velocities = matrix(rep(c(1.5, 1, 0.5), each = 11), ncol = 3),
   orientations = matrix(rep(c(72.5, 50, 32.5, 20, 10, 0, 350, 340, 327.5, 310, 287.5),
     times = 3), ncol = 3),
-  standing_start = 0.1,
+  standing_start = 0.25,
   time_step = 0.5,
   report = TRUE,
   print_iteration = TRUE,
@@ -26,33 +26,33 @@ update_position(
 
 \item{background}{Object of the \code{\link[predped]{background-class}}.}
 
-\item{agent_specifications}{List created by the 
-\code{\link[predped]{create_agent_specifications}} function. Contains all 
+\item{agent_specifications}{List created by the
+\code{\link[predped]{create_agent_specifications}} function. Contains all
 information of all agents within the current \code{state} and allows for the
-communication between the \code{predped} simulation functions and the 
+communication between the \code{predped} simulation functions and the
 \code{m4ma} utility functions.}
 
 \item{velocities}{Numeric matrix containing the change in speed for an agent
 whenever they move to the respective cell of this matrix. Is used to create
-the cell positions that the agent might move to. Defaults to a matrix in 
+the cell positions that the agent might move to. Defaults to a matrix in
 which the columns contain \code{1.5} (acceleration), \code{1}, and \code{0.5}.}
 
 \item{orientations}{Numeric matrix containing the change in direction for an
 agent whenever they move to the respective cell of this matrix. Is used to
-create the cell positions that the agent might move to. Defaults to a matrix 
-in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20}, 
-\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310}, 
-\code{287.5} (note that the larger angles are actually the negative symmetric 
+create the cell positions that the agent might move to. Defaults to a matrix
+in which the rows contain \code{72.5}, \code{50}, \code{32.5}, \code{20},
+\code{10}, \code{0}, \code{350}, \code{340}, \code{327.5}, \code{310},
+\code{287.5} (note that the larger angles are actually the negative symmetric
 versions of the smaller angles).}
 
-\item{standing_start}{Numeric denoting the factor of their preferred speed 
-that agents move when they just came from standing still. Defaults to 
-\code{0.1}.}
+\item{standing_start}{Numeric denoting the factor of their preferred speed
+that agents move when they just came from standing still. Defaults to
+\code{0.25}.}
 
 \item{time_step}{Numeric denoting the number of seconds each discrete step in
 time should mimic. Defaults to \code{0.5}, or half a second.}
 
-\item{report}{Logical denoting whether to report whenever an agent is 
+\item{report}{Logical denoting whether to report whenever an agent is
 reorienting. Defaults to \code{FALSE}, and is usually not needed as feedback.}
 
 \item{print_iteration}{Logical denoting whether to report each simulated

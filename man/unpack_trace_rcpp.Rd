@@ -4,13 +4,7 @@
 \alias{unpack_trace_rcpp}
 \title{Transform trace to comprehensive data.frame}
 \usage{
-unpack_trace_rcpp(
-  trace,
-  velocities,
-  orientations,
-  stay_stopped = TRUE,
-  time_step = 0.5
-)
+unpack_trace_rcpp(trace, velocities, orientations, stay_stopped = TRUE)
 }
 \arguments{
 \item{trace}{List of objects of the \code{\link[predped]{state-class}}}
@@ -32,9 +26,6 @@ versions of the smaller angles).}
 \item{stay_stopped}{Logical denoting whether agents will predict others that 
 are currently not moving to remain immobile in the next iteration. Defaults 
 to \code{TRUE}.}
-
-\item{time_step}{Numeric denoting the time between each iteration. Defaults 
-to \code{0.5} (the same as in \code{\link[predped]{simulate}}).}
 }
 \description{
 Rcpp alternative for the \code{\link[predped]{unpack_trace}} function.

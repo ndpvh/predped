@@ -6,8 +6,6 @@
 #' Rcpp alternative for \code{\link[predped]{time_series}}.
 #' 
 #' @param trace List of objects of the \code{\link[predped]{state-class}}
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -17,8 +15,8 @@
 #' @concept data
 #' 
 #' @export
-time_series_rcpp <- function(trace, time_step = 0.5) {
-    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace, time_step)
+time_series_rcpp <- function(trace) {
+    .Call('_predped_time_series_rcpp', PACKAGE = 'predped', trace)
 }
 
 #' Transform trace to comprehensive data.frame
@@ -48,8 +46,6 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' @param stay_stopped Logical denoting whether agents will predict others that 
 #' are currently not moving to remain immobile in the next iteration. Defaults 
 #' to \code{TRUE}.
-#' @param time_step Numeric denoting the time between each iteration. Defaults 
-#' to \code{0.5} (the same as in \code{\link[predped]{simulate}}).
 #' 
 #' @examples
 #' # This is my example
@@ -59,8 +55,8 @@ time_series_rcpp <- function(trace, time_step = 0.5) {
 #' @concept data
 #' 
 #' @export
-unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE, time_step = 0.5) {
-    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped, time_step)
+unpack_trace_rcpp <- function(trace, velocities, orientations, stay_stopped = TRUE) {
+    .Call('_predped_unpack_trace_rcpp', PACKAGE = 'predped', trace, velocities, orientations, stay_stopped)
 }
 
 unique <- function(x) {
@@ -190,6 +186,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' agent whenever they move to the respective cell of this matrix.
 #' @param time_step Numeric denoting the number of seconds each discrete step in
 #' time should mimic. Defaults to \code{0.5}, or half a second.
+#' @param threshold Numeric denoting a minimal value the slowing factor can
+#' take on when computing the cell centers. Defaults to \code{1e-6}.
 #'
 #' @return Numeric matrix of (x, y) coordinates for each cell
 #'
@@ -244,8 +242,8 @@ bodyObjectOK <- function(radius, centers, objects, check) {
 #' @concept movement
 #'
 #' @export
-compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5) {
-    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step)
+compute_centers_rcpp <- function(agent, a, b, velocities, orientations, time_step = 0.5, threshold = 1e-6) {
+    .Call('_predped_compute_centers_rcpp', PACKAGE = 'predped', agent, a, b, velocities, orientations, time_step, threshold)
 }
 
 #' Check agent and object overlap
@@ -677,6 +675,30 @@ get_angles_rcpp <- function(agent_idx, agent_group, position, orientation, predi
     .Call('_predped_get_angles_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers, any_member)
 }
 
+#' Get Distances and Angles to Group Members
+#' 
+#' Rcpp version of \code{\link[predped]{get_group_member_data}}.
+#'
+#' @param agent_idx Numeric denoting the position of the agent in the predictions.
+#' @param agent_group Numeric vector with the group membership of all pedestrians.
+#' @param position Numeric vector denoting the current position of the agent.
+#' @param orientation Numeric denoting the current orientation of the agent.
+#' @param predictions Numeric matrix with shape N x 2 containing predicted positions.
+#' @param centers Numerical matrix containing the coordinates at each candidate cell.
+#'
+#' @return A list containing the distances, relative angles and number of 
+#' group members.
+#' 
+#' @seealso 
+#' \code{\link[predped]{lgvf_utility}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+get_group_member_data_rcpp <- function(agent_idx, agent_group, position, orientation, predictions, centers) {
+    .Call('_predped_get_group_member_data_rcpp', PACKAGE = 'predped', agent_idx, agent_group, position, orientation, predictions, centers)
+}
+
 #' Compute utility variables
 #' 
 #' Rcpp version of the \code{\link[predped]{compute_utility_variables}} function.
@@ -775,6 +797,28 @@ gc_utility_rcpp <- function(a_group_centroid, b_group_centroid, radius, cell_dis
 #' @export
 vf_utility_rcpp <- function(b_visual_field, relative_angles) {
     .Call('_predped_vf_utility_rcpp', PACKAGE = 'predped', b_visual_field, relative_angles)
+}
+
+#' Logarithmic Group-Attracted Visual Field Utility (LGVF)
+#' 
+#' Rcpp alternative to the \code{lgvf_utility} function.
+#'
+#' @param a_lgvf Numeric denoting the exponent (shape) of the utility function.
+#' @param b_lgvf Numeric denoting the slope (weight) of the utility function.
+#' @param e_lgvf Numeric denoting the optimal comfortable distance (epsilon) to maintain.
+#' @param group_member_data List containing distances and relative angles to members.
+#' @param vf_limit Numeric denoting the visual field limit (default 135 degrees in radians).
+#'
+#' @return Numeric vector containing the LGVF utility for each cell. 
+#' 
+#' @seealso 
+#' \code{\link[predped]{get_group_member_data_rcpp}},
+#' \code{\link[predped]{utility-agent}}
+#' 
+#' @concept utility
+#' @export
+lgvf_utility_rcpp <- function(a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit = 135. * M_PI / 180.) {
+    .Call('_predped_lgvf_utility_rcpp', PACKAGE = 'predped', a_lgvf, b_lgvf, e_lgvf, group_member_data, vf_limit)
 }
 
 #' Utility
