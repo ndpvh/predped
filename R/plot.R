@@ -10,6 +10,9 @@
 #' @param x Object of the \code{\link[predped]{background-class}},
 #' \code{\link[predped]{object-class}}, or \code{\link[predped]{state-class}},
 #' or a list containing multiple of these objects.
+#' @param iterations Integer vector denoting the iterations of the 
+#' \code{\link[predped]{trace-class}} you would like to plot. Defaults to 
+#' \code{NULL}, meaning that all iterations will be plotted.
 #' @param agent.fill Character denoting the color with which the agent should
 #' be filled in. Defaults to \code{"white"} if only plotting an agent or to
 #' \code{shape.fill} when plotting with a \code{background}.
@@ -687,6 +690,7 @@ setMethod("plot", "state", function(x,
 
 #' @rdname plot
 setMethod("plot", "trace", function(x,
+                                    iterations = NULL,
                                     ...) {
 
     if(!requireNamespace("ggplot2")) {
@@ -701,6 +705,11 @@ setMethod("plot", "trace", function(x,
     # Transform the trace to a list of states, then use the plot function as 
     # created for these states.
     states <- trace_to_state(x)
+
+    # Select only the relevant states if desired so
+    if(!is.null(iterations)) {
+        states <- states[iterations]
+    }
 
     return(plot(states, ...))
 })
