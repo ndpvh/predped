@@ -580,6 +580,7 @@ add_motion_variables <- function(data,
                     "argument `time_step` manually. Proceeding with the default ",
                     "value.")
             time_step <- 0.5
+        }
     }
 
     # Define the times at which the simulation ran and define the bins and
