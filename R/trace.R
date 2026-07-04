@@ -262,7 +262,7 @@ setMethod("states<-", "trace", function(object, value) {
     # operation in good conscience
     if(length(object@variables) != length(value)) {
         stop("The provided value for the slot `states` does not have the same ",
-             "length as the `variables` slot in the trace.", 
+             "length as the `variables` slot in the trace. ", 
              "Both need to be the same length.")
     }
 
@@ -305,7 +305,7 @@ setMethod("variables<-", "trace", function(object, value) {
     # operation in good conscience
     if(length(object@states) != length(value)) {
         stop("The provided value for the slot `variables` does not have the same ",
-             "length as the `states` slot in the trace.", 
+             "length as the `states` slot in the trace. ", 
              "Both need to be the same length.")
     }
 
