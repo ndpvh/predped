@@ -303,7 +303,7 @@ objective_function <- function(parameters) {
   parameters <- matrix(
     parameters,
     nrow = n, 
-    ncol = 33
+    ncol = 36
   )
 
   # Compute the objective
@@ -327,7 +327,7 @@ Then, it's just a matter of changing the initial conditions `x0` and the bounds 
 # Extract the bounds of the parameters
 bounds <- load_parameters()$params_bounds |>
   rep(each = n) |>
-  matrix(nrow = 33 * n, ncol = 2)
+  matrix(nrow = 36 * n, ncol = 2)
 
 # Define the initial condition for the algorithm. Take the middle of the 
 # interval defined by the bounds
@@ -392,7 +392,7 @@ objective_function <- function(parameters) {
 }
 
 # Change the initial condition
-x0 <- numeric(33)
+x0 <- numeric(36)
 
 # Perform the estimation procedure with an algorithm that does not require 
 # bounds to be specified
@@ -651,6 +651,13 @@ The column `passenger` can be renamed to `id` in the following way:
 ```{r}
 colnames(data)[2] <- "id"
 head(data)
+```
+
+For estimation to work, we need to have at least 2 values per participant so that their speeds and orientations can be derived. We therefore need to delete any participant that does not have sufficient values in the data as follows:
+
+```{r}
+frequencies <- table(data$id)
+data <- data[data$id %in% names(frequencies)[frequencies >= 2], ]
 ```
 
 Now that the dataset conforms to `predped`s standards, we have to compute the values of the input variables for the input functions. For this, we first need to translate the environment in which the data were collected to an instance of the [`background`](https://ndpvh.github.io/predped/reference/background.html) to the best of our abilities. In this case, we collected the data in a simplified train station that looks as follows:

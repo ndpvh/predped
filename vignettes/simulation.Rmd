@@ -326,7 +326,8 @@ The column `name` contains the name of the agent type, `color` contains the colo
 - `a_leader`, `b_leader`, `d_leader`: Controls the extent to which agents will follow a leader in crowded situations;
 - `a_buddy`, `b_buddy`: Controls the extent to which agents will walk besides others of the ingroup:
 - `a_group_centroid`, `b_group_centroid`: Controls the extent to which agents within a social group will tend to stick together;
-- `b_visual_field`: Controls the extent to which agents within a social group will try to keep each other in a field of vision.
+- `b_visual_field`: Controls the extent to which agents within a social group will try to keep each other in a field of vision;
+- `a_lgvf`, `b_lgvf`, `e_lgvf`: An improved social utility function that merges the principles of the group centroid and visual field utility functions described in the previous two bullet points.
 
 The parameter names follow a particular convention, where for the typical utility function we use `a` is used for an exponent, `b` for a slope, and `d` for a difference between in-group and out-group members before the underscore `_`, and the name of the utility function after.
 
@@ -427,7 +428,15 @@ trace <- simulate(
 )
 ```
 
-The variable `trace` is a list containing instances of the [`state`](https://ndpvh.github.io/predped/reference/state) class. Essentially, this class contains all information about the agents, environment, and other variables that are relevant for the simulation at each iteration. It has the following (relevant) slots:
+The variable `trace` is in fact an instance of the [`trace`](https://ndpvh.github.io/predped/reference/trace) class. This class contains all information relevant to the pedestrian behavior simulated by `predped`. It has the following attributes:
+
+- `id`: An identifier for the trace;
+- `time_step`: A numeric denoting the time step between each iteration;
+- `setting`: The environment in which agents are walking around;
+- `states`: An ordered list of lists containing the agents that are present in the environment at a particular iteration;
+- `variables`: An ordered list of named lists containing variables that can be adjusted or used throughout the simulation (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html)).
+
+Note that originally, the `trace` consisted of a list of instances of the [`state`](https://ndpvh.github.io/predped/reference/state) class, essentially containing all information about the agents, environment, and other variables that are relevant for the simulation at each iteration. Given that the underlying functions still make use of this class, it is useful to review its slots:
 
 - `iteration`: The iteration number;
 - `setting`: The environment in which the agents are walking around;
@@ -436,13 +445,18 @@ The variable `trace` is a list containing instances of the [`state`](https://ndp
 - `variables`: A named list containing variables that can be adjusted or used during the simulation (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html));
 - `iteration_variables`: A `data.frame` containing information for the simulation at each iteration. Is slowly being phased out.
 
+To allow for backward compatibility, we provide functions that can transform one type of trace to the other, specifically [`trace_to_state`](https://ndpvh.github.io/predped/reference/trace_to_state) for transforming a `trace` to a list of `state`s and [`state_to_trace`](https://ndpvh.github.io/predped/reference/state_to_trace) for transforming a list of `state`s to a `trace`. Generally, you should not need to use these functions that often.
+
 One can visualize both a single state of the simulation, or all states at once by calling the [`plot`](https://ndpvh.github.io/predped/articles/plot.html) function:
 
 ```{r}
 #| fig.align = "center",
 #| fig.alt = "The plot shows the environment "
-# Plot a single state
-plt <- plot(trace[[10]])
+# Plot a single iteration of the trace
+plt <- plot(
+  trace, 
+  iterations = 10
+)
 plt
 ```
 

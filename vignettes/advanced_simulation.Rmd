@@ -55,8 +55,11 @@ trace <- simulate(
 )
 
 # Continue starting from the last state in 
-# this trace
-my_state <- trace[[101]]
+# this trace. For this, we need to first
+# transform the trace to a list of states
+list_of_states <- trace_to_state(trace)
+my_state <- list_of_states[[101]]
+
 continued_trace <- simulate(
   my_predped,
   max_agents = 3,
@@ -73,8 +76,8 @@ A second option is to provide a list of [`agent`](https://ndpvh.github.io/predpe
 
 ```{r}
 #| eval = FALSE
-# Retrieve the agents-list from an initial state
-my_agents <- agents(my_state)
+# Retrieve the list of agents from the initial trace
+my_agents <- trace@states[[101]]
 
 # Simulate using this initial list of agents
 continued_trace <- simulate(
@@ -498,7 +501,8 @@ plt <- plot(
 
 # Provide a cue of when the evacuation starts
 plt[[101]] <- plot(
-  trace[[101]], 
+  trace,
+  iterations = 101, 
   segment.hjust = 1,
   shape.fill = "red"
 )
@@ -624,7 +628,7 @@ trace <- simulate(
 ```
 
 ```{r}
-variables(trace[[251]])$times
+variables(trace)[[251]]$times
 ```
 
 
