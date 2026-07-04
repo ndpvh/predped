@@ -32,6 +32,6 @@
 "acceleration",0,1
 "constant_speed",0,1
 "deceleration",0,1
-"a_lgvf",0,200
-"b_lgvf",0,10000
-"e_lgvf",0,200
+"a_lgvf",0,3
+"b_lgvf",0,20
+"e_lgvf",0,20
