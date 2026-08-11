@@ -282,7 +282,7 @@ setMethod("simulate", "predped", function(object,
     # by the `goal` class: To be changed)
     if(typeof(goal_duration) != "closure") {
         number <- goal_duration[1]
-        goal_duration <- function(x) number
+        goal_duration <- function(x) rep(number, x)
     }
 
     # If the edges need to be precomputed, do so already and delete the mock
