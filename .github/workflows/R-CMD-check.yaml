@@ -46,6 +46,5 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          extra-packages: any::qs2
           error-on: '"error"'
           upload-snapshots: true

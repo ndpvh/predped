@@ -88,6 +88,8 @@
 # })
 
 testthat::test_that("Likelihood R and Rcpp converge", {
+    skip_if_not_installed("qs2")
+    
     ############################################################################
     # SUMMED
 

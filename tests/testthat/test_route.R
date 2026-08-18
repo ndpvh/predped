@@ -43,6 +43,8 @@ testthat::test_that("Pruning edges works", {
 })
 
 testthat::test_that("Creating nodes works (few)", {
+    skip_if_not_installed("qs2")
+
     # Create a background
     objects <- list(predped::circle(center = c(0, 0), 
                                     radius = 1), 
@@ -77,6 +79,8 @@ testthat::test_that("Creating nodes works (few)", {
 })
 
 testthat::test_that("Creating nodes works (many)", {
+    skip_if_not_installed("qs2")
+
     # Create a background
     objects <- list(predped::circle(center = c(0, 0), 
                                     radius = 1), 
@@ -339,6 +343,8 @@ testthat::test_that("Adjusting edges gives same output as creating edges", {
 })
 
 testthat::test_that("Creating edges with one-directional flow works", {
+    skip_if_not_installed("qs2")
+    
     # Create an environment in which some access is limited
     setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
                                                               size = c(2, 2)), 
