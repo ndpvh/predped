@@ -2,8 +2,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![version](https://img.shields.io/badge/version-v0.1.0-blue)](https://github.com/ndpvh/predped/releases)
-[![documentation](https://img.shields.io/badge/documentation-v0.1.0-blue)](https://ndpvh.github.io/predped)
+[![version](https://img.shields.io/badge/version-v0.4.0-blue)](https://github.com/ndpvh/predped/releases)
+[![documentation](https://img.shields.io/badge/documentation-v0.4.0-blue)](https://ndpvh.github.io/predped)
 [![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
 [![coverage](https://codecov.io/gh/ndpvh/predped/graph/badge.svg)](https://app.codecov.io/gh/ndpvh/predped)
 [![license: GPL
