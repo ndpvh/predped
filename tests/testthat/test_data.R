@@ -1,4 +1,6 @@
 testthat::test_that("Transforming to time series works", {
+    skip_if_not_installed("qs2")
+
     trace <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
     ref <- qs2::qs_read(file.path(".", "data", "data__time_series.qs2"))
     
@@ -9,6 +11,8 @@ testthat::test_that("Transforming to time series works", {
 
 
 testthat::test_that("Transforming to time series from R and Rcpp is same", {
+    skip_if_not_installed("qs2")
+
     trace <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
 
     ref <- predped::time_series(trace, cpp = FALSE)
@@ -18,6 +22,8 @@ testthat::test_that("Transforming to time series from R and Rcpp is same", {
 })
 
 testthat::test_that("Transforming to trace works", {
+    skip_if_not_installed("qs2")
+
     ref <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
 
     # Transform to a dataframe and back
@@ -38,6 +44,8 @@ testthat::test_that("Transforming to trace works", {
 })
 
 testthat::test_that("Unpacking trace from R and Rcpp is same", {
+    skip_if_not_installed("qs2")
+
     trace <- qs2::qs_read(file.path("data", "data__trace_social.qs2"))
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
@@ -47,6 +55,8 @@ testthat::test_that("Unpacking trace from R and Rcpp is same", {
 })
 
 testthat::test_that("General characteristics for `to_trace` works", {
+    skip_if_not_installed("qs2")
+    
     # Load an example trace
     trace <- qs2::qs_read(file.path(".", "data", "data__trace_long.qs2"))
 
