@@ -88,14 +88,13 @@
 # })
 
 testthat::test_that("Likelihood R and Rcpp converge", {
-    skip_if_not_installed("qs2")
     
     ############################################################################
     # SUMMED
 
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
+    data <- readRDS(file.path("data", "utility__data.Rds"))
     data <- data[!is.na(data$ps_speed), ]
     data <- data[1:100, ]
 
@@ -125,7 +124,7 @@ testthat::test_that("Likelihood R and Rcpp converge", {
 
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
+    data <- readRDS(file.path("data", "utility__data.Rds"))
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
