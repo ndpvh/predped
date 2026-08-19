@@ -28,7 +28,7 @@ conditions is handled by a dedicated function, namely
 Please consult its documentation for an overview of its full
 functionality.
 
-### Initial `state`
+### Initial state
 
 The most straightforward way to include an initial condition is by
 providing an instance of a
@@ -388,13 +388,6 @@ gifski::save_gif(
 )
 ```
 
-``` r
-
-knitr::include_graphics(
-  file.path("../man/figures/unidirectional_example.gif")
-)
-```
-
 ![Visualization of movement within the restricted train station. Agents
 can only cross the gates in the specified direction, successfully
 displaying one-directional flow within
@@ -558,8 +551,8 @@ my_predped <- predped(
 trace <- simulate(
     my_predped, 
     max_agents = 30, 
-    add_agent = 5, 
-    iterations = 250, 
+    add_agent = 15, 
+    iterations = 200, 
     fx = start_evacuation
 )
 
@@ -629,17 +622,20 @@ goals”, including evacuations, experimental designs, peak and off-peak
 densities, and many more situations without having to worry about the
 implementational details of the package.
 
-### Bookkeeping through the `variables` Slot
+### Bookkeeping through the `variables` slot
 
 If one wants to create even more complicated situations, one can
 leverage the `variables` slot of the
-[`state`](https://ndpvh.github.io/predped/reference/state) class to make
-bookkeeping across the simulation easier. This slot contains a named
-list of all variables relevant to your simulation. Following our
-evacuation example, we may want to keep track of how long it takes each
-agent to leave the room after the evacuation has been signaled. We can
-achieve this by creating a variables of times in the variable `slot` and
-updating it accordingly, for example redefining `start_evacuation` as:
+[`state`](https://ndpvh.github.io/predped/reference/state.html) class to
+make bookkeeping across the simulation easier (see also the `variables`
+slot for the
+[`trace`](https://ndpvh.github.io/predped/reference/trace.html) class).
+This slot contains a named list of all variables relevant to your
+simulation. Following our evacuation example, we may want to keep track
+of how long it takes each agent to leave the room after the evacuation
+has been signaled. We can achieve this by creating a variables of times
+in the variable `slot` and updating it accordingly, for example
+redefining `start_evacuation` as:
 
 ``` r
 
@@ -691,14 +687,11 @@ We can then rerun the simulation using the code above and inspect the
 resulting evacuation times by extracting the variable from the final
 iteration:
 
-    #> 
-    #> Precomputing edgesYour model: model ydgab is being simulated
-
 ``` r
 
-variables(trace)[[251]]$times
-#> obfsp azhsq yryhv iaxva lsvwt meczt aqgxz ntwow vodht rjkrd vbuem 
-#>    81    31    74    35    42    13    17    26     6    10     3
+variables(trace)[[201]]$times
+#> jfret teaoe sqsmr shlkp mgvxz tyvfg pgfgv 
+#>    40    56    22    29    45    18    35
 ```
 
 ## Using your Own Parameters

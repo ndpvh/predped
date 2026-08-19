@@ -43,6 +43,7 @@
     <li><a class="dropdown-item" href="articles/estimation.html">Estimation</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -123,7 +124,8 @@
 <span><span class="op">)</span></span></code></pre></div>
 <p>It is good practice to visualize what the environment looks like. For this, we can use the <a href="https://ndpvh.github.io/reference/plot.html" class="external-link"><code>plot</code></a> function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">setting</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">setting</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required namespace: ggplot2</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;"></p>
 <p>Once an environment has been defined, on should link this environment with the characteristics of the agents who are expected to walk around in this environment. This is achieved through defining an instance of the <a href="https://ndpvh.github.io/reference/predped.html" class="external-link"><code>predped</code></a> class, this time defining the <code>setting</code> or environment, the <code>archetypes</code> of the agents expected to walk in it, and the <code>weights</code> or probability with which one expects each archetype to be found within the space.</p>
 <p>Agent characteristics are defined through a <code>data.frame</code> that contains parameter values for a given “class” of people. One such dataframe is provided by us in <em>archetypes.csv</em> and can be called in the package through the variable <a href="https://ndpvh.github.io/reference/params_from_csv.html" class="external-link"><code>params_from_csv</code></a> or through calling the function <a href="https://ndpvh.github.io/reference/load_parameters.html" class="external-link"><code>load_parameters()</code></a>. In this example, we wish to use the <code>"BaselineEuropean"</code>, specifying the model as:</p>
@@ -187,6 +189,7 @@
 <ul>
 <li><a href="https://github.com/Alexanderson31" class="external-link">Alexander Anderson</a></li>
 <li><a href="https://github.com/JorisGoosen" class="external-link">Joris Goossen</a></li>
+<li><a href="https://github.com/kubojurak" class="external-link">Jakub Jurak</a></li>
 <li><a href="https://github.com/maltelueken" class="external-link">Malte Lüken</a></li>
 <li><a href="https://github.com/eceyatikci" class="external-link">Ece Yatıkçı</a></li>
 </ul>
@@ -237,8 +240,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/ndpvh/predped/releases"><img src="https://img.shields.io/badge/version-v0.1.0-blue" alt="version"></a></li>
-<li><a href="https://ndpvh.github.io/predped" class="external-link"><img src="https://img.shields.io/badge/documentation-v0.1.0-blue" alt="documentation"></a></li>
+<li><a href="https://github.com/ndpvh/predped/releases"><img src="https://img.shields.io/badge/version-v0.4.0-blue" alt="version"></a></li>
+<li><a href="https://ndpvh.github.io/predped" class="external-link"><img src="https://img.shields.io/badge/documentation-v0.4.0-blue" alt="documentation"></a></li>
 <li><a href="https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg" alt="build"></a></li>
 <li><a href="https://app.codecov.io/gh/ndpvh/predped" class="external-link"><img src="https://codecov.io/gh/ndpvh/predped/graph/badge.svg" alt="coverage"></a></li>
 <li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="license: GPL v3"></a></li>

@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -499,6 +500,29 @@ iteration;</li>
 <li>
 <code>agents</code>: A list of <a href="https://ndpvh.github.io/predped/reference/agent.html" class="external-link"><code>agent</code></a>s
 that walked around in the setting at this iteration.</li>
+</ul>
+</li>
+<li>
+<a href="https://ndpvh.github.io/predped/reference/trace.html" class="external-link"><code>trace</code></a>:
+Defines a particular set of states that follow each other one after the
+other;
+<ul>
+<li>
+<code>id</code>: Character denoting the identifier of the
+trace;</li>
+<li>
+<code>time_step</code>: Numeric denoting the time that elapses
+between iterations in seconds;</li>
+<li>
+<code>setting</code>: An instance of the <a href="https://ndpvh.github.io/predped/reference/background.html" class="external-link"><code>background</code></a>
+class denoting the setting agents have to walk in;</li>
+<li>
+<code>states</code>: An ordered list of lists of <a href="https://ndpvh.github.io/predped/reference/agent.html" class="external-link"><code>agent</code></a>s
+that walked around in the setting at each iteration;</li>
+<li>
+<code>variables</code>: An ordered list of named lists that contain
+values for variables at each iteration, only relevant when specifying
+the <code>fx</code> argument in <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="external-link"><code>simulate</code></a>.</li>
 </ul>
 </li>
 </ul>

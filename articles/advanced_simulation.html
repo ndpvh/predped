@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -101,7 +102,7 @@ conditions is handled by a dedicated function, namely <a href="https://ndpvh.git
 Please consult its documentation for an overview of its full
 functionality.</p>
 <div class="section level3">
-<h3 id="initial-state">Initial <code>state</code><a class="anchor" aria-label="anchor" href="#initial-state"></a>
+<h3 id="initial-state">Initial state<a class="anchor" aria-label="anchor" href="#initial-state"></a>
 </h3>
 <p>The most straightforward way to include an initial condition is by
 providing an instance of a <a href="https://ndpvh.github.io/predped/reference/state.html" class="external-link"><code>state</code></a>
@@ -400,10 +401,6 @@ restricted train station:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"unidirectional_example.gif"</span><span class="op">)</span>,</span>
 <span>  delay <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../man/figures/unidirectional_example.gif"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/unidirectional_example.gif" class="r-plt" alt="Visualization of movement within the restricted train station. Agents can only cross the gates in the specified direction, successfully displaying one-directional flow within predped." style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
@@ -422,7 +419,7 @@ of the <a href="https://ndpvh.github.io/predped/reference/simulate.html" class="
 function.</p>
 <p>Let’s take the evacuation as an example. First, we create a
 simplified supermarket environment:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a simplified version of a supermarket</span></span>
 <span><span class="va">supermarket</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/background-class.html">background</a></span><span class="op">(</span></span>
 <span>  <span class="co"># Shaking things up: Create a polygon environment</span></span>
@@ -489,7 +486,7 @@ iteration of the simulation and allows the user to make a set of desired
 changes to this state. For our evacuation procedure, we create the
 function <code>start_evacuation</code>, starting an evacuation after
 <code>100</code> iterations:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start_evacuation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Check whether the current iteration is greater than </span></span>
 <span>  <span class="co"># 100. If not, then we do not want to change the state.</span></span>
@@ -543,7 +540,7 @@ triggering them to leave the environment.</li>
 </li>
 </ul>
 <p>With this function defined, we can now run the simulation:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Connect environment to agent characteristics</span></span>
@@ -557,8 +554,8 @@ triggering them to leave the environment.</li>
 <span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span></span>
 <span>    <span class="va">my_predped</span>, </span>
 <span>    max_agents <span class="op">=</span> <span class="fl">30</span>, </span>
-<span>    add_agent <span class="op">=</span> <span class="fl">5</span>, </span>
-<span>    iterations <span class="op">=</span> <span class="fl">250</span>, </span>
+<span>    add_agent <span class="op">=</span> <span class="fl">15</span>, </span>
+<span>    iterations <span class="op">=</span> <span class="fl">200</span>, </span>
 <span>    fx <span class="op">=</span> <span class="va">start_evacuation</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -588,7 +585,7 @@ change the environment itself. For example, if we want to allow agents
 to ignore the uni-directionality imposed at the beginning of the
 simulation, we can empty the <code>limited_access</code> slot once the
 evacuation has started:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start_evacuation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="../reference/iteration.html">iteration</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">==</span> <span class="fl">100</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="../reference/potential_agents.html">potential_agents</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -617,18 +614,20 @@ attain a set of goals”, including evacuations, experimental designs,
 peak and off-peak densities, and many more situations without having to
 worry about the implementational details of the package.</p>
 <div class="section level3">
-<h3 id="bookkeeping-through-the-variables-slot">Bookkeeping through the <code>variables</code> Slot<a class="anchor" aria-label="anchor" href="#bookkeeping-through-the-variables-slot"></a>
+<h3 id="bookkeeping-through-the-variables-slot">Bookkeeping through the <code>variables</code> slot<a class="anchor" aria-label="anchor" href="#bookkeeping-through-the-variables-slot"></a>
 </h3>
 <p>If one wants to create even more complicated situations, one can
-leverage the <code>variables</code> slot of the <a href="https://ndpvh.github.io/predped/reference/state" class="external-link"><code>state</code></a>
-class to make bookkeeping across the simulation easier. This slot
-contains a named list of all variables relevant to your simulation.
-Following our evacuation example, we may want to keep track of how long
-it takes each agent to leave the room after the evacuation has been
-signaled. We can achieve this by creating a variables of times in the
-variable <code>slot</code> and updating it accordingly, for example
-redefining <code>start_evacuation</code> as:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+leverage the <code>variables</code> slot of the <a href="https://ndpvh.github.io/predped/reference/state.html" class="external-link"><code>state</code></a>
+class to make bookkeeping across the simulation easier (see also the
+<code>variables</code> slot for the <a href="https://ndpvh.github.io/predped/reference/trace.html" class="external-link"><code>trace</code></a>
+class). This slot contains a named list of all variables relevant to
+your simulation. Following our evacuation example, we may want to keep
+track of how long it takes each agent to leave the room after the
+evacuation has been signaled. We can achieve this by creating a
+variables of times in the variable <code>slot</code> and updating it
+accordingly, for example redefining <code>start_evacuation</code>
+as:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start_evacuation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Ensures the start of the evacuation and creates the variable of interest</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="../reference/iteration.html">iteration</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">==</span> <span class="fl">100</span><span class="op">)</span> <span class="op">{</span></span>
@@ -674,12 +673,10 @@ redefining <code>start_evacuation</code> as:</p>
 <p>We can then rerun the simulation using the code above and inspect the
 resulting evacuation times by extracting the variable from the final
 iteration:</p>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Precomputing edgesYour model: model ydgab is being simulated</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/variables.html">variables</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span><span class="op">[[</span><span class="fl">251</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">times</span></span>
-<span><span class="co">#&gt; obfsp azhsq yryhv iaxva lsvwt meczt aqgxz ntwow vodht rjkrd vbuem </span></span>
-<span><span class="co">#&gt;    81    31    74    35    42    13    17    26     6    10     3</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/variables.html">variables</a></span><span class="op">(</span><span class="va">trace</span><span class="op">)</span><span class="op">[[</span><span class="fl">201</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">times</span></span>
+<span><span class="co">#&gt; jfret teaoe sqsmr shlkp mgvxz tyvfg pgfgv </span></span>
+<span><span class="co">#&gt;    40    56    22    29    45    18    35</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -691,7 +688,7 @@ personalize their own simulations. In this case, you can save the
 parameters for future use by letting the <a href="https://ndpvh.github.io/predped/reference/predped.html" class="external-link"><code>predped</code></a>
 constructor know what parameters you would want to use by specifying the
 <code>filename</code> argument:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_predped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predped-class.html">predped</a></span><span class="op">(</span></span>
 <span>  setting <span class="op">=</span> <span class="va">my_background</span>, </span>
 <span>  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"path"</span>, <span class="st">"to"</span>, <span class="st">"file"</span><span class="op">)</span></span>
@@ -706,7 +703,7 @@ following:</p>
 class.</li>
 </ul>
 <p>In code, this workflow looks like this:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read in default parameters</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -741,7 +738,7 @@ class.</li>
 of this list and combine it with the defaults of the package. For
 example, we can change and save <code>"params_archetypes"</code> and
 read it in through the <code>predped</code> constructor:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read in default parameters</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -776,7 +773,7 @@ three slots mentioned earlier.</p>
 <code>predped</code> can also deal with changes in a few components in a
 list, as long as they are saved in a list with the correct slot
 names:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read in default parameters</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_parameters.html">load_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>

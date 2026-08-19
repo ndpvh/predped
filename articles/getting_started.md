@@ -386,6 +386,22 @@ Others:
   - `agents`: A list of
     [`agent`](https://ndpvh.github.io/predped/reference/agent.html)s
     that walked around in the setting at this iteration.
+- [`trace`](https://ndpvh.github.io/predped/reference/trace.html):
+  Defines a particular set of states that follow each other one after
+  the other;
+  - `id`: Character denoting the identifier of the trace;
+  - `time_step`: Numeric denoting the time that elapses between
+    iterations in seconds;
+  - `setting`: An instance of the
+    [`background`](https://ndpvh.github.io/predped/reference/background.html)
+    class denoting the setting agents have to walk in;
+  - `states`: An ordered list of lists of
+    [`agent`](https://ndpvh.github.io/predped/reference/agent.html)s
+    that walked around in the setting at each iteration;
+  - `variables`: An ordered list of named lists that contain values for
+    variables at each iteration, only relevant when specifying the `fx`
+    argument in
+    [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html).
 
 ## References
 

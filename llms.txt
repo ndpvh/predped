@@ -98,6 +98,7 @@ this, we can use the
 ``` r
 
 plot(setting)
+#> Loading required namespace: ggplot2
 ```
 
 ![One sees a plot visualizing a circular room with a square gray object
@@ -233,6 +234,7 @@ as well as those who worked with us temporarily (in alphabetical order):
 
 - [Alexander Anderson](https://github.com/Alexanderson31)
 - [Joris Goossen](https://github.com/JorisGoosen)
+- [Jakub Jurak](https://github.com/kubojurak)
 - [Malte Lüken](https://github.com/maltelueken)
 - [Ece Yatıkçı](https://github.com/eceyatikci)
 

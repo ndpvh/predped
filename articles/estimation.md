@@ -43,9 +43,11 @@ resources.
 
 ## Starting from a Trace
 
-Consider a trace that has been saved in the variable `trace`, containing
-a simulation in which people walk around in a minimal supermarket with
-some additional flow indicators to prevent blockages (see [*Advanced
+Consider a
+[`trace`](https://ndpvh.github.io/predped/reference/trace.html) has been
+saved in the variable `trace`, containing a simulation in which people
+walk around in a minimal supermarket with some additional flow
+indicators to prevent blockages (see [*Advanced
 Simulations*](https://ndpvh.github.io/predped/articles/advanced_simulation.html)):
 
 ![Visualization of the minimal supermarket and the agents that walk

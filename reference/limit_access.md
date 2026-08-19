@@ -11,6 +11,9 @@ a matrix of coordinates or an instance of the
 
 ``` r
 limit_access(object, x, ...)
+
+# S4 method for class 'background'
+limit_access(object, x)
 ```
 
 ## Arguments

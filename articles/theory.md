@@ -399,6 +399,7 @@ dimensions are displayed in the following Table.
 | walk-beside | WB | social | attractive | predictive |
 | group centroid | GC | social | attractive | predictive |
 | visual field | VF | social | attractive | predictive |
+| logarithmic group-attracted visual field | LGVF | social | attractive | predictive |
 
 In what follows, we give a detailed overview of the utility functions
 themselves. Note that all parameters that we discuss are assumed to be
@@ -611,7 +612,7 @@ utility function is computed:
 This function takes on the same shape as for the interpersonal distance
 utility function.
 
-In `predped`, the parameters `alpha` and `\beta` are stored as
+In `predped`, the parameters $`\alpha`$ and $`\beta`$ are stored as
 `a_blocked` and `b_blocked`.
 
 #### Follow the Leader
@@ -802,57 +803,53 @@ In `predped`, this utility functions parameter $`\beta`$ is called
 
 #### Logarithmic Group-Attracted Visual Field (LGVF)
 
-The LGVF utility function attracts agents towards positions in which
-they see their group members and are close to them, up to a comfortable
-distance. The LGVF takes on the same assumptions as the group centroid
-and visual field utility functions, mainly that agents want to walk
-together as a whole and maintain visual contact of each other.
-Therefore, the LGVF is a comprehensive social utility functions that
-combines the roles of the group centroid, visual field, and walk beside
-utility functions.
+The logarithmic group-attracted visual field utility function attracts
+agents towards positions in which they see their group members and find
+themselves up to a comfortable distance to them, combining and refining
+the effect of the group centroid and visual field utility functions. The
+idea behind this utility function is therefore the same as for the
+latter two utility functions, namely that agents want to walk together
+and remain in visual contact with each other.
 
-Firstly, we identify all the agents that belong to the ingroup of the
-agent. Secondly, we define the set of all the ingroup agents as . To
-compute the LGVF, for each cell , we compute the distance $`d_{ij}`$ and
-the angle $`a_{ij}`$ to the predicted position of the group member . The
-utility with regard to a single group member, using the defined distance
-and angle is:
+To compute this utility function, we first identify all the agents $`j`$
+that belong to the ingroup of the agent and denote them as the set
+$`A`$. Then, we compute the distance $`d_{ij}`$ and the angle $`a_{ij}`$
+for each cell $`i`$ to the predicted position of the group member $`j`$.
+The utility with regard to a single group member can then be computed
+as:
+
+\$\$\begin{equation} f\_{ij} = -\beta(\|\log(d\_{ij}) -
+\log(\epsilon)\|)^{\alpha} - \begin{cases} 0, & \quad{if \$a\_{ij} \in
+\[-135^\circ, 135^\circ\]\$} \\ -\beta d\_{ij}^{-\alpha}, & \quad{if
+\$a\_{ij} \notin \[-135^\circ, 135^\circ\]\$} \end{cases} \\ ,
+\end{equation}\$\$ which becomes the following when aggregating across
+all group members:
 
 ``` math
 \begin{equation}
-\begin{split}
-u^{LGVF}_{ij} &= -\beta_{LGVF}(|\log(d_{ij}) - \log(\epsilon_{LGVF})|)^{\alpha_{LGVF}} -
-\begin{cases}
-    0 & \text{if } \alpha_{ij} \in [-135^\circ, 135^\circ] \\
-    \delta_{LGVF} & \text{if } \alpha_{ij} \notin [-135^\circ, 135^\circ]
-\end{cases}
-\\
-\delta_{LGVF} &= -\frac{\beta_{LGVF}}{d_{ij}^{\alpha_{LGVF}}}
-\end{split}
+  f_i = \frac{1}{|A|}\sum_{j \in A}{f_{ij}} \: ,
 \end{equation}
 ```
-and the full utility with regard to all group members is defined as: %
-Utility
-``` math
-u_i^{LGVF} = \frac{1}{|A|}\sum_{j\in A}{u_{ij}^{LGVF}}
-```
+where $`|A|`$ denotes the number of group members contained in set $`A`$
+and $`\epsilon`$ denotes a particular optimal distance to keep from
+group members.
 
-In this function, there are two components: the base utility and the
-visual field penalty. The base utility is a logarithmic ratio between
-the distance of the agent and their group members, this utility is
-optimal when the agent is a distance of $`\epsilon_{LGVF}`$ from their
-group members, acting similarly to the group centroid. The visual field
-penalty is a discrete penalty that is added when the agent cannot see
-their group members, which is defined as being outside of an extended
-visual field of $`[-135^\circ, 135^\circ]`$.
+As one may see, this function consists of two components, namely the
+base utility and a visual field penalty. The base utility is a
+logarithmic ratio between the distance of the agent and their group
+members, which becomes optimal when the agent is a distance of
+$`\epsilon`$ away from their group members, therefore acting similarly
+to the group centroid. The visual field penalty is a discrete penalty
+that is added when the agent cannot see their group members, which is
+defined as being outside of an extended visual field of
+$`[-135^\circ, 135^\circ]`$.
 
 ![Visualization of the logarithmic gap-based utility function with and
 without delta penalty across varying alpha and beta
 parameters.](theory_files/figure-html/unnamed-chunk-10-1.png)
 
-In `predped`, the parameters $`\alpha_{LGVF}`$, $`\beta_{LGVF}`$, and
-$`\epsilon_{LGVF}`$ are called `a_lgvf`, `b_lgvf`, and `epsilon_lgvf`
-respectively.
+In `predped`, the parameters $`\alpha`$, $`\beta`$, and $`\epsilon`$ are
+called `a_lgvf`, `b_lgvf`, and `e_lgvf` respectively.
 
 ## Discussion
 

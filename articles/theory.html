@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/estimation.html">Estimation</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -569,6 +570,13 @@ dimensions are displayed in the following Table.</p>
 <td>attractive</td>
 <td>predictive</td>
 </tr>
+<tr class="even">
+<td>logarithmic group-attracted visual field</td>
+<td>LGVF</td>
+<td>social</td>
+<td>attractive</td>
+<td>predictive</td>
+</tr>
 </tbody>
 </table>
 <p>In what follows, we give a detailed overview of the utility functions
@@ -828,9 +836,11 @@ function is computed:</p>
 \end{equation}</annotation></semantics></math></p>
 <p>This function takes on the same shape as for the interpersonal
 distance utility function.</p>
-<p>In <code>predped</code>, the parameters <code>alpha</code> and
-<code>\beta</code> are stored as <code>a_blocked</code> and
-<code>b_blocked</code>.</p>
+<p>In <code>predped</code>, the parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+are stored as <code>a_blocked</code> and <code>b_blocked</code>.</p>
 </div>
 <div class="section level4">
 <h4 id="follow-the-leader">Follow the Leader<a class="anchor" aria-label="anchor" href="#follow-the-leader"></a>
@@ -1046,55 +1056,63 @@ is called <code>b_visual_field</code>.</p>
 <div class="section level4">
 <h4 id="logarithmic-group-attracted-visual-field-lgvf">Logarithmic Group-Attracted Visual Field (LGVF)<a class="anchor" aria-label="anchor" href="#logarithmic-group-attracted-visual-field-lgvf"></a>
 </h4>
-<p>The LGVF utility function attracts agents towards positions in which
-they see their group members and are close to them, up to a comfortable
-distance. The LGVF takes on the same assumptions as the group centroid
-and visual field utility functions, mainly that agents want to walk
-together as a whole and maintain visual contact of each other.
-Therefore, the LGVF is a comprehensive social utility functions that
-combines the roles of the group centroid, visual field, and walk beside
-utility functions.</p>
-<p>Firstly, we identify all the agents that belong to the ingroup of the
-agent. Secondly, we define the set of all the ingroup agents as . To
-compute the LGVF, for each cell , we compute the distance
+<p>The logarithmic group-attracted visual field utility function
+attracts agents towards positions in which they see their group members
+and find themselves up to a comfortable distance to them, combining and
+refining the effect of the group centroid and visual field utility
+functions. The idea behind this utility function is therefore the same
+as for the latter two utility functions, namely that agents want to walk
+together and remain in visual contact with each other.</p>
+<p>To compute this utility function, we first identify all the agents
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+that belong to the ingroup of the agent and denote them as the set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>.
+Then, we compute the distance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">d_{ij}</annotation></semantics></math>
 and the angle
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">a_{ij}</annotation></semantics></math>
-to the predicted position of the group member . The utility with regard
-to a single group member, using the defined distance and angle is:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msubsup><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msubsup></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mi>−</mi><msub><mi>β</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>ϵ</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">|</mo><msup><mo stretchy="false" form="postfix">)</mo><msub><mi>α</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub></msup><mo>−</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>135</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>135</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">]</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>δ</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∉</mo><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>135</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>135</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">]</mo></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>δ</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mi>−</mi><mfrac><msub><mi>β</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><msubsup><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow><msub><mi>α</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub></msubsup></mfrac></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
-\begin{split}
-u^{LGVF}_{ij} &amp;= -\beta_{LGVF}(|\log(d_{ij}) - \log(\epsilon_{LGVF})|)^{\alpha_{LGVF}} -
-\begin{cases}
-    0 &amp; \text{if } \alpha_{ij} \in [-135^\circ, 135^\circ] \\
-    \delta_{LGVF} &amp; \text{if } \alpha_{ij} \notin [-135^\circ, 135^\circ]
-\end{cases}
-\\
-\delta_{LGVF} &amp;= -\frac{\beta_{LGVF}}{d_{ij}^{\alpha_{LGVF}}}
-\end{split}
-\end{equation}</annotation></semantics></math> and the full utility with
-regard to all group members is defined as: % Utility
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>u</mi><mi>i</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msubsup><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false" form="prefix">|</mo><mi>A</mi><mo stretchy="false" form="prefix">|</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>A</mi></mrow></munder><msubsup><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">
-u_i^{LGVF} = \frac{1}{|A|}\sum_{j\in A}{u_{ij}^{LGVF}}
-</annotation></semantics></math></p>
-<p>In this function, there are two components: the base utility and the
-visual field penalty. The base utility is a logarithmic ratio between
-the distance of the agent and their group members, this utility is
-optimal when the agent is a distance of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><annotation encoding="application/x-tex">\epsilon_{LGVF}</annotation></semantics></math>
-from their group members, acting similarly to the group centroid. The
-visual field penalty is a discrete penalty that is added when the agent
-cannot see their group members, which is defined as being outside of an
-extended visual field of
+for each cell
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to the predicted position of the group member
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
+The utility with regard to a single group member can then be computed
+as:</p>
+<p><span class="math display">$$\begin{equation}
+  f_{ij} = -\beta(|\log(d_{ij}) - \log(\epsilon)|)^{\alpha} -
+  \begin{cases}
+      0, &amp; \quad{if $a_{ij} \in [-135^\circ, 135^\circ]$} \\
+      -\beta d_{ij}^{-\alpha}, &amp; \quad{if $a_{ij} \notin
+[-135^\circ, 135^\circ]$}
+  \end{cases} \: ,
+\end{equation}$$</span> which becomes the following when aggregating
+across all group members:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false" form="prefix">|</mo><mi>A</mi><mo stretchy="false" form="prefix">|</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>A</mi></mrow></munder><msub><mi>f</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mspace width="0.222em"></mspace><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+  f_i = \frac{1}{|A|}\sum_{j \in A}{f_{ij}} \: ,
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>A</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|A|</annotation></semantics></math>
+denotes the number of group members contained in set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
+denotes a particular optimal distance to keep from group members.</p>
+<p>As one may see, this function consists of two components, namely the
+base utility and a visual field penalty. The base utility is a
+logarithmic ratio between the distance of the agent and their group
+members, which becomes optimal when the agent is a distance of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
+away from their group members, therefore acting similarly to the group
+centroid. The visual field penalty is a discrete penalty that is added
+when the agent cannot see their group members, which is defined as being
+outside of an extended visual field of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>135</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>135</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-135^\circ, 135^\circ]</annotation></semantics></math>.</p>
 <p><img src="theory_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="Visualization of the logarithmic gap-based utility function with and without delta penalty across varying alpha and beta parameters." width="2256" style="display: block; margin: auto;"></p>
 <p>In <code>predped</code>, the parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{LGVF}</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><annotation encoding="application/x-tex">\beta_{LGVF}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mrow><mi>L</mi><mi>G</mi><mi>V</mi><mi>F</mi></mrow></msub><annotation encoding="application/x-tex">\epsilon_{LGVF}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
 are called <code>a_lgvf</code>, <code>b_lgvf</code>, and
-<code>epsilon_lgvf</code> respectively.</p>
+<code>e_lgvf</code> respectively.</p>
 </div>
 </div>
 </div>
