@@ -365,10 +365,18 @@ raycasting <- function(coords, x) {
     return(!(counter %% 2 == 0))
 }
 
-# Vectorized version of seq, used in `overlap_with_objects`
+#' Vectorized version of seq, used in `overlap_with_objects`
+#' 
+#' @inheritParams seq 
+#' 
+#' @noRd
 multi_seq <- Vectorize(seq.default, vectorize.args = c("from", "to", "by", "length.out"))
 
-# Character to integer function (used in agent.R for group splitting)
+#' Character to integer function (used in agent.R for group splitting)
+#' 
+#' @param x Character that should be turned into a representative integer
+#' 
+#' @noRd
 char2int <- function(x) { 
     # Convert the character to its integer representation
     x <- utf8ToInt(x)

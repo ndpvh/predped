@@ -251,6 +251,7 @@ setMethod("show", "background", function(object) {
 #' @export 
 setGeneric("limit_access", function(object, x, ...) standardGeneric("limit_access"))
 
+#' @rdname limit_access
 setMethod("limit_access", "background", function(object, x) {
 
     # Check whether there are any segments that might limit the access of agents

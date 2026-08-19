@@ -2,9 +2,12 @@
 % Please edit documentation in R/background.R
 \name{limit_access}
 \alias{limit_access}
+\alias{limit_access,background-method}
 \title{Compute which segments can be crossed}
 \usage{
 limit_access(object, x, ...)
+
+\S4method{limit_access}{background}(object, x)
 }
 \arguments{
 \item{object}{Object of the \code{\link[predped]{background-class}}.}

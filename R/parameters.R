@@ -309,8 +309,12 @@ load_parameters <- function(x = NULL,
     return(params_from_csv)
 }
 
-# Silent function that extracts the names of the utility_parameters. Is needed
-# for the other functions in this file to work. Takes in the `params_archetypes`
+#' Function that extracts the names of the utility_parameters. 
+#' 
+#' Is needed for the other functions in this file to work. Takes in the 
+#' `params_archetypes`
+#' 
+#' @noRd
 utility_parameters <- function(x) {
     nest_parameters <- c("central", 
                          "non_central", 
