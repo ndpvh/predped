@@ -81,8 +81,7 @@ Suggests:
     knitr,
     kableExtra,
     rmarkdown,
-    nloptr,
-    qs2 (>= 0.1.0)
+    nloptr
 Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3

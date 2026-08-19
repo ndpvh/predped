@@ -42,7 +42,7 @@ Note that data quality is determined by factors that commonly affect estimation 
 
 # Starting from a Trace 
 
-Consider a trace that has been saved in the variable `trace`, containing a simulation in which people walk around in a minimal supermarket with some additional flow indicators to prevent blockages (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html)):
+Consider a [`trace`](https://ndpvh.github.io/predped/reference/trace.html) has been saved in the variable `trace`, containing a simulation in which people walk around in a minimal supermarket with some additional flow indicators to prevent blockages (see [_Advanced Simulations_](https://ndpvh.github.io/predped/articles/advanced_simulation.html)):
 
 ```{r}
 #| echo = FALSE,

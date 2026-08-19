@@ -2,8 +2,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![version](https://img.shields.io/badge/version-v0.1.0-blue)](https://github.com/ndpvh/predped/releases)
-[![documentation](https://img.shields.io/badge/documentation-v0.1.0-blue)](https://ndpvh.github.io/predped)
+[![version](https://img.shields.io/badge/version-v0.4.0-blue)](https://github.com/ndpvh/predped/releases)
+[![documentation](https://img.shields.io/badge/documentation-v0.4.0-blue)](https://ndpvh.github.io/predped)
 [![build](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ndpvh/predped/actions/workflows/R-CMD-check.yaml)
 [![coverage](https://codecov.io/gh/ndpvh/predped/graph/badge.svg)](https://app.codecov.io/gh/ndpvh/predped)
 [![license: GPL
@@ -106,6 +106,7 @@ this, we can use the
 
 ``` r
 plot(setting)
+#> Loading required namespace: ggplot2
 ```
 
 <img src="man/figures/README-plot-1.png" alt="One sees a plot visualizing a circular room with a square gray object in the middle. This represents the room in which the agents will walk around if the room is used for a simulation." width="60%" style="display: block; margin: auto;" />
@@ -229,6 +230,7 @@ as well as those who worked with us temporarily (in alphabetical order):
 
 - [Alexander Anderson](https://github.com/Alexanderson31)
 - [Joris Goossen](https://github.com/JorisGoosen)
+- [Jakub Jurak](https://github.com/kubojurak)
 - [Malte Lüken](https://github.com/maltelueken)
 - [Ece Yatıkçı](https://github.com/eceyatikci)
 

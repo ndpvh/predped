@@ -145,9 +145,9 @@
 #' @concept parameters
 #' 
 #' @export
-params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv")),
-                        "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
-                        "params_bounds" = readRDS(file.path("archetypes_bounds.Rds")))
+params_from_csv <- list("params_archetypes" = read.csv(file.path("inst", "extdata", "archetypes.csv")),
+                        "params_sigma" = readRDS(file.path("inst", "extdata", "archetypes_sigma.Rds")),
+                        "params_bounds" = readRDS(file.path("inst", "extdata", "archetypes_bounds.Rds")))
 
 #' Load parameters
 #' 
@@ -309,8 +309,12 @@ load_parameters <- function(x = NULL,
     return(params_from_csv)
 }
 
-# Silent function that extracts the names of the utility_parameters. Is needed
-# for the other functions in this file to work. Takes in the `params_archetypes`
+#' Function that extracts the names of the utility_parameters. 
+#' 
+#' Is needed for the other functions in this file to work. Takes in the 
+#' `params_archetypes`
+#' 
+#' @noRd
 utility_parameters <- function(x) {
     nest_parameters <- c("central", 
                          "non_central", 

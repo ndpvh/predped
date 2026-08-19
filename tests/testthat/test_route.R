@@ -43,8 +43,6 @@ testthat::test_that("Pruning edges works", {
 })
 
 testthat::test_that("Creating nodes works (few)", {
-    skip_if_not_installed("qs2")
-
     # Create a background
     objects <- list(predped::circle(center = c(0, 0), 
                                     radius = 1), 
@@ -68,7 +66,7 @@ testthat::test_that("Creating nodes works (few)", {
                                  cpp = FALSE)
 
     # Create the reference (from a previous run that looked right)
-    ref <- qs2::qs_read(file.path(".", "data", "routing__few_nodes.qs2"))
+    ref <- readRDS(file.path(".", "data", "routing__few_nodes.Rds"))
 
     testthat::expect_equal(tst, ref)
 
@@ -79,8 +77,6 @@ testthat::test_that("Creating nodes works (few)", {
 })
 
 testthat::test_that("Creating nodes works (many)", {
-    skip_if_not_installed("qs2")
-
     # Create a background
     objects <- list(predped::circle(center = c(0, 0), 
                                     radius = 1), 
@@ -103,7 +99,7 @@ testthat::test_that("Creating nodes works (many)", {
                                  many_nodes = TRUE)
 
     # Create the reference (from a previous run that looked right)
-    ref <- qs2::qs_read(file.path(".", "data", "routing__many_nodes.qs2"))
+    ref <- readRDS(file.path(".", "data", "routing__many_nodes.Rds"))
 
     testthat::expect_equal(tst, ref)
 
@@ -342,9 +338,7 @@ testthat::test_that("Adjusting edges gives same output as creating edges", {
     #                           color = "red") 
 })
 
-testthat::test_that("Creating edges with one-directional flow works", {
-    skip_if_not_installed("qs2")
-    
+testthat::test_that("Creating edges with one-directional flow works", {    
     # Create an environment in which some access is limited
     setting <- predped::background(shape = predped::rectangle(center = c(0, 0), 
                                                               size = c(2, 2)), 
@@ -363,7 +357,7 @@ testthat::test_that("Creating edges with one-directional flow works", {
 
     # Load in the reference (originally done on a piece of paper and then 
     # adjusted to fit the algorithm)
-    ref <- qs2::qs_read(file.path(".", "data", "routing__unidirectional.qs2"))
+    ref <- readRDS(file.path(".", "data", "routing__unidirectional.Rds"))
 
     # Compute the edges
     tst <- predped::create_edges(c(-0.75, 0), 

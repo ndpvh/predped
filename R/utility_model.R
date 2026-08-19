@@ -3,6 +3,9 @@
 
 # Set up a generic for `utility`. This allows us to differentiate between the 
 # function when all utility variables have been precomputed vs when they haven't.
+#' Generic for utility
+#' 
+#' @noRd
 setGeneric("utility", function(object, ...) standardGeneric("utility"))
 
 #' Compute the utilities on the agent level
@@ -259,6 +262,9 @@ setMethod("utility", "data.frame", function(object,
 
 # Set up a generic for `utility`. This allows us to differentiate between the 
 # function when all utility variables have been precomputed vs when they haven't.
+#' Generic for compute utility variables
+#' 
+#' @noRd
 setGeneric("compute_utility_variables", function(object, ...) standardGeneric("compute_utility_variables"))
 
 #' Compute utility variables
