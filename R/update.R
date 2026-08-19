@@ -165,6 +165,7 @@ setMethod("update", "state", function(object,
     # if(length(obj) == 0 & (inherits(shp, "rectangle") | inherits(shp, "circle"))) {
     if((length(obj) == 0) | (length(agent_list) == 0)) {
         seen <- rep(TRUE, length(agent_list))
+
     } else {
         edges <- sapply(agent_list,
                         function(x) {
@@ -707,6 +708,13 @@ update_goal <- function(agent,
     # Adjust the relative measures to account for the radius of the agent
     close_enough <- close_enough * radius(agent)
     space_between <- space_between * radius(agent)
+
+    # Provide a check for whether seen is actually a value or not. If not, then
+    # we force seen to be FALSE, urging the agent to either find the path when
+    # its status is "plan" or to "reroute" if its status is to move
+    if(is.na(seen)) {
+        seen <- FALSE
+    }
 
     # Synchronisation with group representative
     if (!group_representative(agent)) {
