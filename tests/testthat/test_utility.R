@@ -1,9 +1,7 @@
 testthat::test_that("Utility data R and Rcpp converge", {
-    skip_if_not_installed("qs2")
-
     # Read in some test data. Of these, select only the first 100, as these 
     # already contain all necessary ingredients (social simulation)
-    data <- qs2::qs_read(file.path("data", "utility__data.qs2"))
+    data <- readRDS(file.path("data", "utility__data.Rds"))
     data <- data[1:100, ]
 
     # Retrieve the parameters of the SocialBaselineEuropean
@@ -31,9 +29,7 @@ testthat::test_that("Utility data R and Rcpp converge", {
 })
 
 testthat::test_that("Utility agent R and Rcpp converge", {
-    skip_if_not_installed("qs2")
-
-    trace <- qs2::qs_read(file.path("data", "utility__trace_social.qs2"))
+    trace <- readRDS(file.path("data", "utility__trace_social.Rds"))
 
     # For my convenience, first transform the trace to a list of states
     trace <- trace_to_state(trace)
@@ -96,10 +92,8 @@ testthat::test_that("Utility agent R and Rcpp converge", {
     testthat::expect_true(all(result))
 })
 
-testthat::test_that("Compute utility variables agent R and Rcpp converge", {
-    skip_if_not_installed("qs2")
-    
-    trace <- qs2::qs_read(file.path("data", "utility__trace_social.qs2"))
+testthat::test_that("Compute utility variables agent R and Rcpp converge", {    
+    trace <- readRDS(file.path("data", "utility__trace_social.Rds"))
 
     # For my convenience, first transform the trace to a list of states
     trace <- trace_to_state(trace)

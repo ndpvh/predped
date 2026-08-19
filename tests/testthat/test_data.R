@@ -1,8 +1,6 @@
 testthat::test_that("Transforming to time series works", {
-    skip_if_not_installed("qs2")
-
-    trace <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
-    ref <- qs2::qs_read(file.path(".", "data", "data__time_series.qs2"))
+    trace <- readRDS(file.path(".", "data", "data__trace.Rds"))
+    ref <- readRDS(file.path(".", "data", "data__time_series.Rds"))
     
     tst <- predped::time_series(trace)
 
@@ -11,9 +9,7 @@ testthat::test_that("Transforming to time series works", {
 
 
 testthat::test_that("Transforming to time series from R and Rcpp is same", {
-    skip_if_not_installed("qs2")
-
-    trace <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
+    trace <- readRDS(file.path(".", "data", "data__trace.Rds"))
 
     ref <- predped::time_series(trace, cpp = FALSE)
     tst <- predped::time_series(trace, cpp = TRUE)
@@ -22,9 +18,7 @@ testthat::test_that("Transforming to time series from R and Rcpp is same", {
 })
 
 testthat::test_that("Transforming to trace works", {
-    skip_if_not_installed("qs2")
-
-    ref <- qs2::qs_read(file.path(".", "data", "data__trace.qs2"))
+    ref <- readRDS(file.path(".", "data", "data__trace.Rds"))
 
     # Transform to a dataframe and back
     data <- predped::time_series(ref)
@@ -44,9 +38,7 @@ testthat::test_that("Transforming to trace works", {
 })
 
 testthat::test_that("Unpacking trace from R and Rcpp is same", {
-    skip_if_not_installed("qs2")
-
-    trace <- qs2::qs_read(file.path("data", "data__trace_social.qs2"))
+    trace <- readRDS(file.path("data", "data__trace_social.Rds"))
 
     ref <- predped::unpack_trace(trace, cpp = FALSE)
     tst <- predped::unpack_trace(trace, cpp = TRUE)
@@ -55,10 +47,8 @@ testthat::test_that("Unpacking trace from R and Rcpp is same", {
 })
 
 testthat::test_that("General characteristics for `to_trace` works", {
-    skip_if_not_installed("qs2")
-    
     # Load an example trace
-    trace <- qs2::qs_read(file.path(".", "data", "data__trace_long.qs2"))
+    trace <- readRDS(file.path(".", "data", "data__trace_long.Rds"))
 
     # Transform to data and back to a trace
     ref <- predped::time_series(trace, cpp = TRUE)
@@ -137,7 +127,7 @@ testthat::test_that("General characteristics for `to_trace` works", {
 # in the coming days.
 # testthat::test_that("Computing cell centers for data works", {
 #     # Load an example trace
-#     ref <- qs2::qs_read(file.path(".", "data", "data__trace_long.qs2"))
+#     ref <- readRDS(file.path(".", "data", "data__trace_long.Rds"))
 
 #     # Transform to data and back to a trace
 #     data <- predped::time_series(ref, cpp = FALSE)
@@ -226,7 +216,7 @@ testthat::test_that("General characteristics for `to_trace` works", {
 #
 # testthat::test_that("Computing utility variables for data works", {
 #     # Load in a trace and transform to data
-#     trace <- qs2::qs_read(file.path("data", "trace_data.qs2"))
+#     trace <- readRDS(file.path("data", "trace_data.Rds"))
 #     data <- predped::time_series(trace, cpp = TRUE)
 
 #     # Compute the utility variables for the data

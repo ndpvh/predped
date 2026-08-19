@@ -171,15 +171,17 @@ benchmark <- function(x = NULL,
     return(NULL)
 }
 
-# Function that times the functions user-time
-#
-# @param fx Function that takes in no arguments. In our case a benchmark case 
-# function defining what to do for the benchmark.
-# @param iterations Integer denoting the number of times to run the benchmark 
-# case. Defaults to \code{100}.
-# 
-# @return Integer vector of seconds it took for the function to execute at each
-# iteration
+#' Function that times the functions user-time
+#'
+#' @param fx Function that takes in no arguments. In our case a benchmark case 
+#' function defining what to do for the benchmark.
+#' @param iterations Integer denoting the number of times to run the benchmark 
+#' case. Defaults to \code{100}.
+#' 
+#' @return Integer vector of seconds it took for the function to execute at each
+#' iteration
+#' 
+#' @noRd
 test_times <- function(fx, 
                        iterations = 100,
                        variables = list()) {
@@ -203,13 +205,15 @@ test_times <- function(fx,
     return(times)
 }
 
-# Create a progress bar for the benchmarks
-#
-# @param iteration The iteration number you're currently on
-# @param max The maximal iteration number you can be on
-# @param width The number of vertical bars that make up the progress bar
-#
-# @return NULL
+#' Create a progress bar for the benchmarks
+#'
+#' @param iteration The iteration number you're currently on
+#' @param max The maximal iteration number you can be on
+#' @param width The number of vertical bars that make up the progress bar
+#'
+#' @return NULL
+#' 
+#' @noRd
 progress_bar <- function(iteration,
                          max,
                          width = 20) {
@@ -236,16 +240,18 @@ progress_bar <- function(iteration,
 ################################################################################
 # UTILITY FUNCTIONS FOR CREATING THE HTML
 
-# Create table
-#
-# Use the input of a function list to create a table as defined through 
-# knitr.
-#
-# @param x List containing the entries of the benchmark
-# @param caption Caption to include in the table
-# @param digits Integer denoting the number to which to round the results
-#
-# @return String containing the table as defined by knitr
+#' Create table
+#'
+#' Use the input of a function list to create a table as defined through 
+#' knitr.
+#'
+#' @param x List containing the entries of the benchmark
+#' @param caption Caption to include in the table
+#' @param digits Integer denoting the number to which to round the results
+#'
+#' @return String containing the table as defined by knitr
+#' 
+#' @noRd
 knitr_table <- function(x, 
                         caption = "",
                         digits = 2) {

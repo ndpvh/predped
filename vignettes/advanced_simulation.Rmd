@@ -30,7 +30,7 @@ Up to now, simulations have always started from scratch, having no agents inside
 
 While we will only focus on the [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html) function, some of the functionality underlying the creation of initial conditions is handled by a dedicated function, namely [`create_initial_condition`](https://ndpvh.github.io/predped/reference/create_initial_condition.html). Please consult its documentation for an overview of its full functionality.
 
-## Initial `state`
+## Initial state
 
 The most straightforward way to include an initial condition is by providing an instance of a [`state`](https://ndpvh.github.io/predped/reference/state.html) to the `initial_condition` argument in [`simulate`](https://ndpvh.github.io/predped/reference/simulate.html), which then serves as the first state of the simulation. Assuming we have defined `my_predped` as an instance of the [`predped`](https://ndpvh.github.io/predped/reference/predped.html) class, and furthermore assuming that `initial_state` is an instance of the [`state`](https://ndpvh.github.io/predped/reference/state.html) class that will serve as our initial condition, we can start the simulation from this point by calling: 
 
@@ -350,6 +350,7 @@ gifski::save_gif(
 ```
 
 ```{r}
+#| echo = FALSE,
 #| fig.align = "center",
 #| fig.alt = "Visualization of movement within the restricted train station. Agents can only cross the gates in the specified direction, successfully displaying one-directional flow within predped."
 knitr::include_graphics(
@@ -488,8 +489,8 @@ my_predped <- predped(
 trace <- simulate(
     my_predped, 
     max_agents = 30, 
-    add_agent = 5, 
-    iterations = 250, 
+    add_agent = 15, 
+    iterations = 200, 
     fx = start_evacuation
 )
 
@@ -553,9 +554,9 @@ start_evacuation <- function(state) {
 
 In other words, the `fx` argument allows users to create a whole range of situations that go beyond the simple "walk around and attain a set of goals", including evacuations, experimental designs, peak and off-peak densities, and many more situations without having to worry about the implementational details of the package. 
 
-## Bookkeeping through the `variables` Slot
+## Bookkeeping through the `variables` slot
 
-If one wants to create even more complicated situations, one can leverage the `variables` slot of the [`state`](https://ndpvh.github.io/predped/reference/state) class to make bookkeeping across the simulation easier. This slot contains a named list of all variables relevant to your simulation. Following our evacuation example, we may want to keep track of how long it takes each agent to leave the room after the evacuation has been signaled. We can achieve this by creating a variables of times in the variable `slot` and updating it accordingly, for example redefining `start_evacuation` as:
+If one wants to create even more complicated situations, one can leverage the `variables` slot of the [`state`](https://ndpvh.github.io/predped/reference/state.html) class to make bookkeeping across the simulation easier (see also the `variables` slot for the [`trace`](https://ndpvh.github.io/predped/reference/trace.html) class). This slot contains a named list of all variables relevant to your simulation. Following our evacuation example, we may want to keep track of how long it takes each agent to leave the room after the evacuation has been signaled. We can achieve this by creating a variables of times in the variable `slot` and updating it accordingly, for example redefining `start_evacuation` as:
 
 ```{r}
 start_evacuation <- function(state) {
@@ -607,7 +608,7 @@ We can then rerun the simulation using the code above and inspect the resulting 
 ```{r}
 #| echo = FALSE,
 #| message = FALSE,
-#| cache = TRUE
+#| include = FALSE
 set.seed(1)
 
 # Connect environment to agent characteristics
@@ -621,14 +622,14 @@ my_predped <- predped(
 trace <- simulate(
     my_predped, 
     max_agents = 30, 
-    add_agent = 5, 
-    iterations = 250, 
+    add_agent = 15, 
+    iterations = 200, 
     fx = start_evacuation
 )
 ```
 
 ```{r}
-variables(trace)[[251]]$times
+variables(trace)[[201]]$times
 ```
 
 

@@ -24,7 +24,7 @@ repo:
 
 navbar:
   structure:
-    left: [reference, getting_started, articles]
+    left: [reference, getting_started, articles, changelog]
     right: [search, github, lightswitch]
   components:
     getting_started:
@@ -41,6 +41,9 @@ navbar:
         href: articles/advanced_simulation.html
       - text: Estimation
         href: articles/estimation.html
+    changelog:
+      text: Changelog
+      href: news/index.html
     github:
       icon: fa-github
       href: https://github.com/ndpvh/predped/
