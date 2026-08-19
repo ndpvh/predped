@@ -145,9 +145,9 @@
 #' @concept parameters
 #' 
 #' @export
-params_from_csv <- list("params_archetypes" = read.csv(file.path("archetypes.csv")),
-                        "params_sigma" = readRDS(file.path("archetypes_sigma.Rds")),
-                        "params_bounds" = readRDS(file.path("archetypes_bounds.Rds")))
+params_from_csv <- list("params_archetypes" = read.csv(file.path("inst", "extdata", "archetypes.csv")),
+                        "params_sigma" = readRDS(file.path("inst", "extdata", "archetypes_sigma.Rds")),
+                        "params_bounds" = readRDS(file.path("inst", "extdata", "archetypes_bounds.Rds")))
 
 #' Load parameters
 #' 
