@@ -993,27 +993,30 @@ update_goal <- function(agent,
         # again
         if(!any(blocking_agents)) {
             agent@extra_objects[["stuck_count"]] <- 0L
-            status(agent) <- "reorient"
+
             if (nrow(current_goal(agent)@path) > 0) {
                 status(agent) <- "reorient"
+
             } else {
                 status(agent) <- "plan"
             }
-        }
 
         # If counter is low enough, the agent will have to reroute his approach
         # to the goal. To make sure agents don't get stuck easily, let them
         # pursue another goal and come back later. Only applicable if the agent
         # still has other goals to pursue
-        if(waiting_counter(agent) < 0 & status(agent) != "move" & adaptive_goal_sorting) {
+        } else if(waiting_counter(agent) < 0) {
             # First check whether the agent is the group representative (always
             # the case when the agent is running around as an individual). If 
             # not, they cannot take action and have to wait for the representative
             # to make a choice regarding goal updating
             if(!group_representative(agent)) {
                 waiting_counter(agent) <- 5 # Keep waiting patiently
+
             } else {
-                if(length(goals(agent)) != 0) {
+                # If you can adaptively sort the goals, then change some goals 
+                # around.
+                if(length(goals(agent)) != 0 & adaptive_goal_sorting) {
                     goals(agent) <- append(current_goal(agent), 
                                            goals(agent))
                     current_goal(agent) <- goals(agent)[[2]]
@@ -1024,12 +1027,40 @@ update_goal <- function(agent,
                     group_goals(agent) <- goals(agent)
                     
                     status(agent) <- "plan"
+
+                # If not, then we need another way out of this conundrum. We 
+                # do this by letting the agent move away for a little bit and
+                # then coming back.
                 } else {
-                    if (nrow(current_goal(agent)@path) > 0) {
-                        status(agent) <- "reorient"
+                    # Add the current goal to the goal stack
+                    goals(agent) <- append(current_goal(agent), 
+                                           goals(agent))
+
+                    # Select a path point that is far enough so that you move 
+                    # outside of the range for interacting with a goal
+                    distances <- 
+                        (precomputed_edges$nodes$X - position(agent)[1])^2 + 
+                        (precomputed_edges$nodes$Y - position(agent)[2])^2
+                    idx <- distances >= close_enough + 2
+                    idx <- which(distances == min(distances[idx]))[1]
+
+                    if(!is.na(idx)) {
+                        new_position <- c(precomputed_edges$nodes$X[idx],
+                                          precomputed_edges$nodes$Y[idx])
                     } else {
-                        status(agent) <- "plan"
+                        distances <- 
+                            (position(agent)[1] - exits[,1])^2 + 
+                            (position(agent)[2] - exits[,2])^2
+                        new_position <- as.numeric(exits[which.min(distances), ])
                     }
+
+                    # Add a conflict resolution goal that dictates agents moving 
+                    # out of the way of others temporarily whenever they waited
+                    # for a long time
+                    current_goal(agent) <- goal(id = "goal conflict resolution",
+                                                position = new_position,
+                                                counter = 1)
+                    status(agent) <- "plan"
                 }
             }
         }
