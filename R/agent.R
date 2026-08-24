@@ -145,7 +145,7 @@ agent <- setClass("agent",
 #' goal is not included in this list. Defaults to an empty list.
 #' @param group_representative Logical denoting whether the agent is the representative of 
 #' their group. The representative is the only one in the group that completes the group 
-#' goals, hence also leading the group towards the group goals. Defaults to \code{FALSE}.
+#' goals, hence also leading the group towards the group goals. Defaults to \code{TRUE}.
 #' @param individual_goals List of goals the agent has to achieve that are not shared with their group.
 #' These will be completes after the agent's group goals are completed. Defaults to an empty list.
 #' @param parameters Dataframe containing the values of the parameters for the 
@@ -206,7 +206,7 @@ setMethod("initialize", "agent", function(.Object,
                                           group = 0,
                                           current_group_goal = NULL,
                                           group_goals = list(),
-                                          group_representative = FALSE,
+                                          group_representative = TRUE,
                                           individual_goals = list(),
                                           status = "move",
                                           waiting_counter = 0,
