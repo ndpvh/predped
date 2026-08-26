@@ -61,7 +61,7 @@ states(my_trace)
 #> current_goal: (a) position: 0 0 (b) path:  
 #> goals (number): 0 
 #> group_goals (number): 0 
-#> group_representative: FALSE 
+#> group_representative: TRUE 
 #> individual_goals (number): 0 
 #> group: 0 
 #> id: lpmin 
