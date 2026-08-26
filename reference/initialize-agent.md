@@ -19,7 +19,7 @@ initialize(
   group = 0,
   current_group_goal = NULL,
   group_goals = list(),
-  group_representative = TRUE,
+  group_representative = FALSE,
   individual_goals = list(),
   status = "move",
   waiting_counter = 0,
@@ -100,7 +100,7 @@ initialize(
   Logical denoting whether the agent is the representative of their
   group. The representative is the only one in the group that completes
   the group goals, hence also leading the group towards the group goals.
-  Defaults to `TRUE`.
+  Defaults to `FALSE`.
 
 - individual_goals:
 

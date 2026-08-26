@@ -165,7 +165,7 @@ my_agent
 #> current_goal: (a) position: -0.5070711 -0.2293804 (b) path: -0.5070711 -0.2293804 
 #> goals (number): 4 
 #> group_goals (number): 0 
-#> group_representative: TRUE 
+#> group_representative: FALSE 
 #> individual_goals (number): 0 
 #> group: 1 
 #> id: aaglv 
