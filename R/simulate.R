@@ -808,7 +808,7 @@ add_group <- function(model,
         # Match the leader's starting orientation so they walk into the room smoothly
         orientation(tmp_agent) <- orientation(agents[[1]])
 
-        # Ensures they are followers (should be default anyways)
+        # Ensures they are followers
         group_representative(tmp_agent) <- FALSE
 
         # Add the agent to the list
