@@ -1,8 +1,8 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 0.4.1
-Date: 2026-02-05
+Version: 0.4.2
+Date: 2026-08-27
 Description: 
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
     Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of 
