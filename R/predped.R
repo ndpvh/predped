@@ -141,7 +141,12 @@ setMethod("initialize", "predped", function(.Object,
     # A final check concerns whether the weights add up to 1. If not, then we 
     # simply reweight so that they do
     if(sum(weights) != 1) {
-        message("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
+        # Add a tolerance into this check (seems to be thrown even with the 
+        # defaults due to rounding errors)
+        if(abs(sum(weights) - 1) > 1e-4) { 
+            message("Weights did not add up to 1. Weights slot is reweighted to sum to 1.")
+        }
+        
         weights <- weights / sum(weights)
     }
 
