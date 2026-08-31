@@ -260,3 +260,20 @@ testthat::test_that("Generating parameters works", {
                                   params[, x] >= bounds[x, 1]))
     testthat::expect_true(all(tst))
 })
+
+testthat::test_that("Plotting the distributions for the parameters works", {
+    # Extract bounds. Is going to be useful in these tests.
+    bounds <- params_from_csv$params_bounds
+
+    # Check whether the output is a list when asked for
+    plt <- plot_distribution(100, as_list = TRUE)
+
+    testthat::expect_true(is.list(plt))
+    testthat::expect_equal(names(plt), rownames(bounds))
+    testthat::expect_true(all(sapply(plt, function(x) ggplot2::is_ggplot(x))))
+
+    # Check whether the output is a ggplot object
+    plt <- plot_distribution(100, as_list = FALSE)
+
+    testthat::expect_true(ggplot2::is_ggplot(plt))
+})
