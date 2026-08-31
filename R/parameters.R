@@ -734,6 +734,8 @@ transform_mu <- function(parameters) {
 #' paste them together in one coherent plot. If the latter (\code{FALSE}), then the
 #' \code{ggpubr} package is needed. Defaults to \code{FALSE} if \code{ggpubr} is 
 #' available.
+#' @param bins Integer denoting the number of bins to use for the histograms. 
+#' Defaults to \code{13}.
 #' @param ... Arguments provided to the \code{\link[predped]{generate_parameters}}. 
 #' 
 #' @return Plotted histograms of the prior distribution of parameters under the 
@@ -754,6 +756,7 @@ transform_mu <- function(parameters) {
 #' @export
 plot_distribution <- function(n, 
                               as_list = FALSE, 
+                              bins = 13,
                               ...) {
 
     # Check the dependencies to make this work
@@ -797,21 +800,24 @@ plot_distribution <- function(n,
         # Compute how much variation there is in the parameter
         interval <- diff(bounds[i, ])
 
+        # Define the binwidth for this parameter
+        binwidth <- interval / bins
+
         # Create the general ggplot
         plt[[i]] <- ggplot2::ggplot(data = plot_data,
-                                    ggplot2::aes(x = as.numeric(X))) +
+                                    ggplot2::aes(x = X)) +
             ggplot2::geom_histogram(fill = "gray",
                                     color = "black",
-                                    binwidth = interval / 13) +
+                                    binwidth = binwidth) +
             ggplot2::labs(title = i,
                           x = "",
                           y = "Frequency") +
             ggplot2::scale_x_continuous(labels = \(x) sprintf("%.2f", x),
-                                        limits = bounds[i, ] + c(-0.2, 0.2) * interval) +
-            # ggplot2::scale_x_continuous(labels = scales::scientific) +
+                                        limits = bounds[i, ] + c(-0.1, 0.1) * interval) +
             ggplot2::theme_minimal() +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = -45, 
-                                                               hjust = 0))
+                                                               hjust = 0),
+                           plot.title = ggplot2::element_text(hjust = 0.5))
     })
 
     # Bind plots together and return
@@ -819,8 +825,11 @@ plot_distribution <- function(n,
         names(plt) <- colnames(parameters)
         return(plt)
     } else {
-        return(ggpubr::ggarrange(plotlist = plt, 
+        plt <- ggpubr::ggarrange(plotlist = plt, 
                                  nrow = ceiling(sqrt(length(plt))),
-                                 ncol = ceiling(sqrt(length(plt)))))
+                                 ncol = ceiling(sqrt(length(plt)))) |>
+            suppressWarnings()
+
+        return(plt)
     }
 }
