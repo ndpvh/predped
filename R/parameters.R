@@ -487,7 +487,7 @@ generate_parameters <- function(n = 1,
 #' 
 #' @rdname get_parameters
 #' 
-#' @noRd
+#' @export
 get_parameters <- function(filename = NULL,
                            sep = ",",
                            archetype = "BaselineEuropean",
