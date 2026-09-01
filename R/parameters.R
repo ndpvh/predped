@@ -369,34 +369,12 @@ utility_parameters <- function(x) {
 #' 
 #' @param n Integer denoting the number of parameters to generate. Defaults to 
 #' \code{1}.
-#' @param filename Character denoting the path to a file containing parameters. 
-#' Defaults to \code{NULL}, triggering reading in the csv-files that come with 
-#' predped. 
-#' @param sep Character denoting the separator in case \code{x} is a delimited 
-#' file. Defaults to \code{","}.
-#' @param mean Dataframe containing the means for each of the parameters for 
-#' a given agent. Defaults to \code{NULL}, triggering reading in the data 
-#' instead.
-#' @param Sigma Either a covariance matrix that defines the individual differences
-#' on each of the parameters (when \code{transform_covariance = FALSE}), or a 
-#' matrix containing standard deviations for each of the parameters on its 
-#' diagonal and correlations between the parameters on its off-diagonal (when 
-#' \code{transform_covariance = TRUE}; see \code{\link[predped]{params_from_csv}}). 
-#' Default covariance matrices exist for each of the archetypes in 
-#' \code{\link[predped]{params_from_csv}} and thus changes with the value of 
-#' \code{archetype}. Defaults to \code{NULL}, triggering reading in the data
-#' (but only if \code{individual_differences = TRUE}).
-#' @param bounds Named numeric matrix containing the bounds for each of the 
-#' parameters. Usually provided in the parameter-list under name 
-#' \code{"params_bounds"}. Defaults to \code{NULL}, triggering reading in the 
-#' data (but only if \code{individual_differences = TRUE}).
-#' @param archetype String denoting the archetype to be used for the covariance
-#' matrix. Ignored if \code{Sigma} is provided. Defaults to \code{"BaselineEuropean"}.
 #' @param individual_differences Logical denoting whether to use the standard 
 #' deviations in the parameter list to create some variation in the parameters.
 #' Defaults to \code{TRUE}.
 #' @param transform_covariance Logical denoting whether to transform \code{Sigma}
 #' to a proper covariance matrix or not. Defaults to \code{TRUE}.
+#' @param ... Additional arguments to be passed to \code{\link[predped]{get_parameters}}.
 #' 
 #' @return Data.frame containing the generated parameter values.
 #' 
@@ -423,56 +401,16 @@ utility_parameters <- function(x) {
 #' 
 #' @export  
 generate_parameters <- function(n = 1,
-                                filename = NULL,
-                                sep = ",",
-                                archetype = "BaselineEuropean",
-                                mean = NULL,
-                                Sigma = NULL,
-                                bounds = NULL,
                                 individual_differences = TRUE,
-                                transform_covariance = TRUE) {
+                                transform_covariance = TRUE,
+                                ...) {
 
-    # If the parameters are already defined, then we can just use those instead 
-    # of reading in the complete database. Use-cases are different. The 
-    # arguments `mean`, `Sigma`, and `bounds` will typically be provided within 
-    # a simulation, while the argument `database` will typically be used 
-    # whenever one is trying to visualize the distributions of potential 
-    # parameters.
-    #
-    # Let's check some cases here and fill up the missing parameter specifications
-    # with the one's of `archetype` (but only consider those cases if not all 
-    # of them are missing, as we can then assume they just want to read in the 
-    # parameters through the filename)
-    params <- load_parameters(x = filename, sep = sep)
-    if(is.null(mean) & is.null(Sigma) & is.null(bounds)) {
-        mean <- params[["params_archetypes"]] |>
-            dplyr::filter(name %in% archetype)
-        Sigma <- params[["params_sigma"]][[archetype]]
-        bounds <- params[["params_bounds"]]
-
-    } else {
-        if(is.null(mean)) {
-            warning(paste0("Mean parameters are NULL. Using those of the ", 
-                           archetype, 
-                           "instead."))
-            mean <- params[["params_archetypes"]] |>
-                dplyr::filter(name %in% archetype)
-        }
+    # Define the parameters based on the input to the function
+    params <- get_parameters(...)
     
-        if(is.null(Sigma) & individual_differences) {
-            warning(paste0("Sigma parameters are NULL. Using those of the ", 
-                           archetype, 
-                           "instead."))
-            Sigma <- params[["params_sigma"]][[archetype]]
-        }
-
-        if(is.null(bounds) & individual_differences) {
-            warning(paste0("Bounds of parameters are NULL. Using those of the ", 
-                           archetype, 
-                           "instead."))
-            bounds <- params[["params_bounds"]]
-        }
-    }   
+    mean <- params[["mean"]]
+    Sigma <- params[["Sigma"]]
+    bounds <- params[["bounds"]]
 
     # Extract the names of the utility parameters
     u_params <- utility_parameters(mean)
@@ -512,6 +450,102 @@ generate_parameters <- function(n = 1,
     
 
     return(params[u_params])
+}
+
+#' Get parameters
+#' 
+#' Define a parameter list containing means, covariances, and bounds based on 
+#' either provided user-input or on a provided file. Serves as an internal 
+#' function.
+#' 
+#' @param filename Character denoting the path to a file containing parameters. 
+#' Defaults to \code{NULL}, triggering reading in the csv-files that come with 
+#' predped. 
+#' @param sep Character denoting the separator in case \code{x} is a delimited 
+#' file. Defaults to \code{","}.
+#' @param mean Dataframe containing the means for each of the parameters for 
+#' a given agent. Defaults to \code{NULL}, triggering reading in the data 
+#' instead.
+#' @param Sigma Either a covariance matrix that defines the individual differences
+#' on each of the parameters (when \code{transform_covariance = FALSE}), or a 
+#' matrix containing standard deviations for each of the parameters on its 
+#' diagonal and correlations between the parameters on its off-diagonal (when 
+#' \code{transform_covariance = TRUE}; see \code{\link[predped]{params_from_csv}}). 
+#' Default covariance matrices exist for each of the archetypes in 
+#' \code{\link[predped]{params_from_csv}} and thus changes with the value of 
+#' \code{archetype}. Defaults to \code{NULL}, triggering reading in the data
+#' (but only if \code{individual_differences = TRUE}).
+#' @param bounds Named numeric matrix containing the bounds for each of the 
+#' parameters. Usually provided in the parameter-list under name 
+#' \code{"params_bounds"}. Defaults to \code{NULL}, triggering reading in the 
+#' data (but only if \code{individual_differences = TRUE}).
+#' @param archetype String denoting the archetype to be used for the covariance
+#' matrix. Ignored if \code{Sigma} is provided. Defaults to \code{"BaselineEuropean"}.
+#' 
+#' @return Named list containing slots \code{"mean"}, \code{"Sigma"}, and 
+#' \code{"bounds"}. 
+#' 
+#' @rdname get_parameters
+#' 
+#' @concept parameters
+#' 
+#' @export
+get_parameters <- function(filename = NULL,
+                           sep = ",",
+                           archetype = "BaselineEuropean",
+                           mean = NULL,
+                           Sigma = NULL,
+                           bounds = NULL) {
+
+    # Load the parameters from the provided input (either default or provided
+    # by user)
+    params <- load_parameters(x = filename, sep = sep)
+
+    # If the parameters are already defined, then we can just use those instead 
+    # of reading in the complete database. Use-cases are different. The 
+    # arguments `mean`, `Sigma`, and `bounds` will typically be provided within 
+    # a simulation, while the argument `database` will typically be used 
+    # whenever one is trying to visualize the distributions of potential 
+    # parameters.
+    #
+    # Let's check some cases here and fill up the missing parameter specifications
+    # with the one's of `archetype` (but only consider those cases if not all 
+    # of them are missing, as we can then assume they just want to read in the 
+    # parameters through the filename)    
+    if(is.null(mean) & is.null(Sigma) & is.null(bounds)) {
+        mean <- params[["params_archetypes"]] |>
+            dplyr::filter(name %in% archetype)
+        Sigma <- params[["params_sigma"]][[archetype]]
+        bounds <- params[["params_bounds"]]
+
+    } else {
+        if(is.null(mean)) {
+            warning("Mean parameters are NULL. Using those of the ", 
+                    archetype, 
+                    " instead.")
+            mean <- params[["params_archetypes"]] |>
+                dplyr::filter(name %in% archetype)
+        }
+    
+        if(is.null(Sigma)) {
+            warning("Sigma parameters are NULL. Using those of the ", 
+                    archetype, 
+                    " instead.")
+            Sigma <- params[["params_sigma"]][[archetype]]
+        }
+
+        if(is.null(bounds)) {
+            warning("Bounds of parameters are NULL. Using those of the ", 
+                    archetype, 
+                    " instead.")
+            bounds <- params[["params_bounds"]]
+        }
+    }
+
+    # Return as a named list
+    return(list("mean" = mean,
+                "Sigma" = Sigma,
+                "bounds" = bounds))
 }
 
 #' Transform to real axis
@@ -696,6 +730,13 @@ transform_mu <- function(parameters) {
 #' the provided arguments to visualize the distribution of parameter values 
 #' under the current specifications. 
 #' 
+#' @inheritParams generate_parameters
+#' @param as_list Logical denoting whether to return the plots as a list or to 
+#' paste them together in one coherent plot. If the latter (\code{FALSE}), then the
+#' \code{ggpubr} package is needed. Defaults to \code{FALSE} if \code{ggpubr} is 
+#' available.
+#' @param bins Integer denoting the number of bins to use for the histograms. 
+#' Defaults to \code{13}.
 #' @param ... Arguments provided to the \code{\link[predped]{generate_parameters}}. 
 #' 
 #' @return Plotted histograms of the prior distribution of parameters under the 
@@ -714,10 +755,39 @@ transform_mu <- function(parameters) {
 #' @concept parameters
 #' 
 #' @export
-plot_distribution <- function(...) {
+plot_distribution <- function(n, 
+                              as_list = FALSE, 
+                              bins = 13,
+                              ...) {
 
-    # Simulate several parameters
-    parameters <- generate_parameters(...)
+    # Check the dependencies to make this work
+    if(!requireNamespace("ggplot2")) {
+        stop(
+            "The `ggplot2` package is required to `plot` the distribution of the parameters. ",
+            "Please install."
+        )
+    }
+
+    # Change the value of as_list to TRUE if ggpubr is not available
+    if(!as_list) {
+        as_list <- !requireNamespace("ggpubr")
+
+        if(!requireNamespace("ggpubr")) {
+            warning(
+                "The `ggpubr` package is required to combine the plots for the different parameters ", 
+                "into one, but no such package is found. ", 
+                "Returning the plots in a list instead."
+            )
+        }
+    }
+
+    # Simulate several parameters 
+    parameters <- generate_parameters(n, ...)
+
+    # Also get the bounds of the parameters. Suppress warnings here, as they will 
+    # already have been thrown in the generate_parameters function
+    bounds <- get_parameters(...)$bounds |>
+        suppressWarnings()
 
     # Loop over each of the parameters and create histograms of the distribution
     # of these parameters
@@ -729,37 +799,38 @@ plot_distribution <- function(...) {
             setNames("X")
 
         # Compute how much variation there is in the parameter
-        interval <- diff(range(plot_data$X))
+        interval <- diff(bounds[i, ])
+
+        # Define the binwidth for this parameter
+        binwidth <- interval / bins
 
         # Create the general ggplot
         plt[[i]] <- ggplot2::ggplot(data = plot_data,
-                                    ggplot2::aes(x = as.numeric(X))) +
+                                    ggplot2::aes(x = X)) +
             ggplot2::geom_histogram(fill = "gray",
                                     color = "black",
-                                    binwidth = ifelse(interval != 0, 
-                                                      interval / 16,
-                                                      1e-3)) +
+                                    binwidth = binwidth) +
             ggplot2::labs(title = i,
                           x = "",
                           y = "Frequency") +
-            ggplot2::scale_x_continuous(labels = \(x) sprintf("%.2f", x)) +
-            # ggplot2::scale_x_continuous(labels = scales::scientific) +
+            ggplot2::scale_x_continuous(labels = \(x) sprintf("%.2f", x),
+                                        limits = bounds[i, ] + c(-0.1, 0.1) * interval) +
             ggplot2::theme_minimal() +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = -45, 
-                                                               hjust = 0))
-
-        # If there is no variation in the parameters, we change the limits so 
-        # that it is nicer for the eye.
-        if(interval == 0) {
-            plt[[i]] <- plt[[i]] +
-                ggplot2::scale_x_continuous(limits = plot_data$X[1] + c(-1e-2, 1e-2),
-                                            #labels = scales::scientific,
-                                            labels = \(x) sprintf("%.2f", x))
-        }
+                                                               hjust = 0),
+                           plot.title = ggplot2::element_text(hjust = 0.5))
     })
 
     # Bind plots together and return
-    return(ggpubr::ggarrange(plotlist = plt, 
-                             nrow = ceiling(sqrt(length(plt))),
-                             ncol = ceiling(sqrt(length(plt)))))
+    if(as_list) {
+        names(plt) <- colnames(parameters)
+        return(plt)
+    } else {
+        plt <- ggpubr::ggarrange(plotlist = plt, 
+                                 nrow = ceiling(sqrt(length(plt))),
+                                 ncol = ceiling(sqrt(length(plt)))) |>
+            suppressWarnings()
+
+        return(plt)
+    }
 }

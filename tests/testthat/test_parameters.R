@@ -160,3 +160,122 @@ testthat::test_that("Loading parameters works", {
         as.logical()
     testthat::expect_true(all(tst))
 })
+
+testthat::test_that("Get parameters works", {
+    ref <- params_from_csv
+    be <- ref$params_archetypes[ref$params_archetypes$name == "BaselineEuropean", ]
+
+    m_new <- ref$params_archetypes[ref$params_archetypes$name == "BigRushingDutch", ]
+    s_new <- diag(nrow(ref$params_sigma$BaselineEuropean))
+    b_new <- ref$params_bounds * 2
+    
+    #####################################################################
+    # CASE 1: Default, no file provided so predped defaults used
+
+    params <- get_parameters()
+
+    testthat::expect_equal(names(params), 
+                           c("mean", "Sigma", "bounds"))
+    testthat::expect_equal(params$mean, be)
+    testthat::expect_equal(params$Sigma, 
+                           ref$params_sigma$BaselineEuropean)
+    testthat::expect_equal(params$bounds, 
+                           ref$params_bounds)
+
+    #####################################################################
+    # CASE 2: Mean provided, rest is not
+
+    params <- get_parameters(mean = m_new) |>
+        suppressWarnings()
+
+    # Test the presence of warnings: Note that there are multiple warnings, so
+    # we need to use suppressWarnings() to avoid the test failing
+    testthat::expect_warning(get_parameters(mean = m_new)) |>
+        suppressWarnings()
+
+    # Test the output
+    testthat::expect_equal(params$mean, m_new)
+    testthat::expect_equal(params$Sigma, 
+                           ref$params_sigma$BaselineEuropean)
+    testthat::expect_equal(params$bounds, 
+                           ref$params_bounds)
+
+    #####################################################################
+    # CASE 3: Covariance provided, rest is not
+
+    params <- get_parameters(Sigma = s_new) |>
+        suppressWarnings()
+
+    # Test the presence of warnings: Note that there are multiple warnings, so
+    # we need to use suppressWarnings() to avoid the test failing
+    testthat::expect_warning(get_parameters(Sigma = s_new))|>
+        suppressWarnings()
+
+    # Test the output
+    testthat::expect_equal(params$mean, be)
+    testthat::expect_equal(params$Sigma, 
+                           s_new)
+    testthat::expect_equal(params$bounds, 
+                           ref$params_bounds)
+
+    #####################################################################
+    # CASE 4: Bounds provided, rest is not
+
+    params <- get_parameters(bounds = b_new) |>
+        suppressWarnings()
+
+    # Test the presence of warnings: Note that there are multiple warnings, so
+    # we need to use suppressWarnings() to avoid the test failing
+    testthat::expect_warning(get_parameters(bounds = b_new))|>
+        suppressWarnings()
+
+    # Test the output
+    testthat::expect_equal(params$mean, be)
+    testthat::expect_equal(params$Sigma, 
+                           ref$params_sigma$BaselineEuropean)
+    testthat::expect_equal(params$bounds, 
+                           b_new)
+})
+
+testthat::test_that("Generating parameters works", {
+    # Extract bounds. Is going to be useful in these tests.
+    bounds <- params_from_csv$params_bounds
+
+    # Use generate_parameters to generate 100 parameter sets with a variance of 
+    # 1, making sure all are drawn from about a uniform distribution
+    set.seed(1)
+    params <- generate_parameters(1000,
+                                  Sigma = diag(nrow(bounds)) |>
+                                    `rownames<-` (rownames(bounds)) |> 
+                                    `colnames<-` (rownames(bounds))) |>
+        suppressWarnings()
+
+    # Make sure all utility parameters are in the data.frame
+    testthat::expect_equal(colnames(params), 
+                           rownames(bounds))
+
+    # Make sure all parameters fall within their bound
+    tst <- sapply(rownames(bounds), 
+                  function(x) all(params[, x] <= bounds[x, 2] & 
+                                  params[, x] >= bounds[x, 1]))
+    testthat::expect_true(all(tst))
+})
+
+testthat::test_that("Plotting the distributions for the parameters works", {
+    # Extract bounds. Is going to be useful in these tests.
+    bounds <- params_from_csv$params_bounds
+
+    # Check whether the output is a list when asked for
+    plt <- plot_distribution(100, as_list = TRUE) |>
+        suppressMessages()
+
+    testthat::expect_true(is.list(plt))
+    testthat::expect_equal(names(plt), rownames(bounds))
+    testthat::expect_true(all(sapply(plt, function(x) ggplot2::is_ggplot(x))))
+
+    # Check whether the output is a ggplot object
+    plt <- plot_distribution(100, as_list = FALSE) |>
+        suppressMessages()
+
+    testthat::expect_true(ggplot2::is_ggplot(plt))
+})

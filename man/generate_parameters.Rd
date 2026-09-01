@@ -6,48 +6,14 @@
 \usage{
 generate_parameters(
   n = 1,
-  filename = NULL,
-  sep = ",",
-  archetype = "BaselineEuropean",
-  mean = NULL,
-  Sigma = NULL,
-  bounds = NULL,
   individual_differences = TRUE,
-  transform_covariance = TRUE
+  transform_covariance = TRUE,
+  ...
 )
 }
 \arguments{
 \item{n}{Integer denoting the number of parameters to generate. Defaults to 
 \code{1}.}
-
-\item{filename}{Character denoting the path to a file containing parameters. 
-Defaults to \code{NULL}, triggering reading in the csv-files that come with 
-predped.}
-
-\item{sep}{Character denoting the separator in case \code{x} is a delimited 
-file. Defaults to \code{","}.}
-
-\item{archetype}{String denoting the archetype to be used for the covariance
-matrix. Ignored if \code{Sigma} is provided. Defaults to \code{"BaselineEuropean"}.}
-
-\item{mean}{Dataframe containing the means for each of the parameters for 
-a given agent. Defaults to \code{NULL}, triggering reading in the data 
-instead.}
-
-\item{Sigma}{Either a covariance matrix that defines the individual differences
-on each of the parameters (when \code{transform_covariance = FALSE}), or a 
-matrix containing standard deviations for each of the parameters on its 
-diagonal and correlations between the parameters on its off-diagonal (when 
-\code{transform_covariance = TRUE}; see \code{\link[predped]{params_from_csv}}). 
-Default covariance matrices exist for each of the archetypes in 
-\code{\link[predped]{params_from_csv}} and thus changes with the value of 
-\code{archetype}. Defaults to \code{NULL}, triggering reading in the data
-(but only if \code{individual_differences = TRUE}).}
-
-\item{bounds}{Named numeric matrix containing the bounds for each of the 
-parameters. Usually provided in the parameter-list under name 
-\code{"params_bounds"}. Defaults to \code{NULL}, triggering reading in the 
-data (but only if \code{individual_differences = TRUE}).}
 
 \item{individual_differences}{Logical denoting whether to use the standard 
 deviations in the parameter list to create some variation in the parameters.
@@ -55,6 +21,8 @@ Defaults to \code{TRUE}.}
 
 \item{transform_covariance}{Logical denoting whether to transform \code{Sigma}
 to a proper covariance matrix or not. Defaults to \code{TRUE}.}
+
+\item{...}{Additional arguments to be passed to \code{\link[predped]{get_parameters}}.}
 }
 \value{
 Data.frame containing the generated parameter values.

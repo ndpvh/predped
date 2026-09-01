@@ -4,9 +4,20 @@
 \alias{plot_distribution}
 \title{Plot prior parameter distributions}
 \usage{
-plot_distribution(...)
+plot_distribution(n, as_list = FALSE, bins = 13, ...)
 }
 \arguments{
+\item{n}{Integer denoting the number of parameters to generate. Defaults to 
+\code{1}.}
+
+\item{as_list}{Logical denoting whether to return the plots as a list or to 
+paste them together in one coherent plot. If the latter (\code{FALSE}), then the
+\code{ggpubr} package is needed. Defaults to \code{FALSE} if \code{ggpubr} is 
+available.}
+
+\item{bins}{Integer denoting the number of bins to use for the histograms. 
+Defaults to \code{13}.}
+
 \item{...}{Arguments provided to the \code{\link[predped]{generate_parameters}}.}
 }
 \value{
