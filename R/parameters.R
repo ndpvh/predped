@@ -375,7 +375,6 @@ utility_parameters <- function(x) {
 #' @param transform_covariance Logical denoting whether to transform \code{Sigma}
 #' to a proper covariance matrix or not. Defaults to \code{TRUE}.
 #' @param ... Additional arguments to be passed to \code{\link[predped]{get_parameters}}.
-#' @inheritParams get_parameters
 #' 
 #' @return Data.frame containing the generated parameter values.
 #' 

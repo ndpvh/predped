@@ -223,8 +223,12 @@ import(methods)
 import(stats)
 importFrom(Rcpp,evalCpp)
 importFrom(cppRouting,get_path_pair)
-importFrom(dplyr,collect)
-importFrom(dplyr,tbl)
-importFrom(utils,capture.output)
-importFrom(utils,write.table)
+importFrom(dplyr,
+  collect,
+  tbl
+)
+importFrom(utils,
+  capture.output,
+  write.table
+)
 useDynLib(predped)
