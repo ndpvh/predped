@@ -1,8 +1,8 @@
 Package: predped
 Type: Package
 Title: Interface to Minds for Mobile Agents
-Version: 0.4.2
-Date: 2026-08-27
+Version: 0.4.3
+Date: 2026-08-31
 Description: 
     Helper functions to allow simulating pedestrian flow with the Minds for Mobile Agents (M4MA) pedestrian model. 
     Contains functions to generate environments, adapt pedestrian characteristics, and allow for a wide range of 
@@ -86,6 +86,5 @@ Remotes:
     m4ma/m4ma
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0
 LazyData: true
