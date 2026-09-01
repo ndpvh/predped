@@ -110,6 +110,7 @@ export(get_angles)
 export(get_angles_rcpp)
 export(get_group_member_data)
 export(get_group_member_data_rcpp)
+export(get_parameters)
 export(get_time_step)
 export(goal)
 export(goal_stack)
@@ -223,8 +224,12 @@ import(methods)
 import(stats)
 importFrom(Rcpp,evalCpp)
 importFrom(cppRouting,get_path_pair)
-importFrom(dplyr,collect)
-importFrom(dplyr,tbl)
-importFrom(utils,capture.output)
-importFrom(utils,write.table)
+importFrom(dplyr,
+  collect,
+  tbl
+)
+importFrom(utils,
+  capture.output,
+  write.table
+)
 useDynLib(predped)

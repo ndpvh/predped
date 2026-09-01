@@ -29,7 +29,7 @@ radians.}
 \code{\link[predped]{object-class}}, 
 \code{\link[predped]{polygon-class}}
 
-Other objects: 
+Other objects:
 \code{\link{circle-class}},
 \code{\link{object-class}},
 \code{\link{polygon-class}}

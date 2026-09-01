@@ -35,7 +35,7 @@ cannot be used to generate goals on.}
 \code{\link[predped]{rectangle-class}},
 \code{\link[predped]{initialize-polygon}}
 
-Other objects: 
+Other objects:
 \code{\link{circle-class}},
 \code{\link{object-class}},
 \code{\link{rectangle-class}}
