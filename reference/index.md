@@ -332,6 +332,8 @@
 
 - [`generate_parameters()`](https://github.com/ndpvh/predped/reference/generate_parameters.md)
   : Generate parameters
+- [`get_parameters()`](https://github.com/ndpvh/predped/reference/get_parameters.md)
+  : Get parameters
 - [`load_parameters()`](https://github.com/ndpvh/predped/reference/load_parameters.md)
   : Load parameters
 - [`params_from_csv`](https://github.com/ndpvh/predped/reference/params_from_csv.md)

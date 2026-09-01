@@ -8,10 +8,27 @@ of parameter values under the current specifications.
 ## Usage
 
 ``` r
-plot_distribution(...)
+plot_distribution(n, as_list = FALSE, bins = 13, ...)
 ```
 
 ## Arguments
+
+- n:
+
+  Integer denoting the number of parameters to generate. Defaults to
+  `1`.
+
+- as_list:
+
+  Logical denoting whether to return the plots as a list or to paste
+  them together in one coherent plot. If the latter (`FALSE`), then the
+  `ggpubr` package is needed. Defaults to `FALSE` if `ggpubr` is
+  available.
+
+- bins:
+
+  Integer denoting the number of bins to use for the histograms.
+  Defaults to `13`.
 
 - ...:
 

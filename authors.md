@@ -23,13 +23,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ndpvh/predped/tree/main/DESCRIPTION)
 
 Vanhasbroeck N, Heathcote A (2026). *predped: Interface to Minds for
-Mobile Agents*. R package version 0.4.2,
+Mobile Agents*. R package version 0.4.3,
 <https://github.com/ndpvh/predped>.
 
     @Manual{,
       title = {predped: Interface to Minds for Mobile Agents},
       author = {Niels Vanhasbroeck and Andrew Heathcote},
       year = {2026},
-      note = {R package version 0.4.2},
+      note = {R package version 0.4.3},
       url = {https://github.com/ndpvh/predped},
     }

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,16 @@
       <small>Source: <a href="https://github.com/ndpvh/predped/tree/main/NEWS.md"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.3" id="predped-v043">predped v0.4.3<a class="anchor" aria-label="anchor" href="#predped-v043"></a></h2>
+<p>Minor changes:</p>
+<ul><li>Adjusted the output of <code><a href="../reference/plot_distribution.html">plot_distribution()</a></code> so that it either pastes all plots together into one (default when <code>ggpubr</code> is available) or returns all plots in a list;</li>
+<li>Added a warning if users want plots to be pasted together but <code>ggpubr</code> is not available;</li>
+<li>Added an internal function <code><a href="../reference/generate_parameters.html">generate_parameters()</a></code> that underlies the behavior of <code><a href="../reference/plot_distribution.html">plot_distribution()</a></code> and <code><a href="../reference/generate_parameters.html">generate_parameters()</a></code>;</li>
+<li>Suppressed warnings when pasting together the plots of <code><a href="../reference/plot_distribution.html">plot_distribution()</a></code>, as they are harmless and hard to get rid of even when changing plot limits (<code>"removing values because they fall outside of limits"</code> of <code>geom_histogram()</code>);</li>
+<li>Adding tests for <code><a href="../reference/plot_distribution.html">plot_distribution()</a></code>, <code><a href="../reference/generate_parameters.html">generate_parameters()</a></code>, and <code><a href="../reference/get_parameters.html">get_parameters()</a></code>;</li>
+<li>Added tolerance to providing a message for the <code>weights</code> argument in <code><a href="../reference/predped-class.html">predped()</a></code>: This message was often displayed even with the default parameter set, limiting its usefulness for users.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="predped-v041">predped v0.4.1<a class="anchor" aria-label="anchor" href="#predped-v041"></a></h2>
 <p>Minor bugs were solved in this version:</p>

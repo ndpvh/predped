@@ -666,6 +666,7 @@ plot_distribution(
   Sigma = covariances,
   bounds = bounds
 )
+#> Loading required namespace: ggpubr
 ```
 
 ![One sees a series of histograms displaying the randomly drawn values

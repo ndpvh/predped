@@ -11,7 +11,7 @@ under the current specifications."><script type="text/javascript" async="" src="
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,14 +59,31 @@ under the current specifications.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_distribution</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_distribution</span><span class="op">(</span><span class="va">n</span>, as_list <span class="op">=</span> <span class="cn">FALSE</span>, bins <span class="op">=</span> <span class="fl">13</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dl><dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
+<dd><p>Integer denoting the number of parameters to generate. Defaults to
+<code>1</code>.</p></dd>
+
+
+<dt id="arg-as-list">as_list<a class="anchor" aria-label="anchor" href="#arg-as-list"></a></dt>
+<dd><p>Logical denoting whether to return the plots as a list or to
+paste them together in one coherent plot. If the latter (<code>FALSE</code>), then the
+<code>ggpubr</code> package is needed. Defaults to <code>FALSE</code> if <code>ggpubr</code> is
+available.</p></dd>
+
+
+<dt id="arg-bins">bins<a class="anchor" aria-label="anchor" href="#arg-bins"></a></dt>
+<dd><p>Integer denoting the number of bins to use for the histograms.
+Defaults to <code>13</code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Arguments provided to the <code><a href="generate_parameters.html">generate_parameters</a></code>.</p></dd>
 
 </dl></div>

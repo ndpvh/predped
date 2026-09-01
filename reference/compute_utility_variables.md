@@ -126,8 +126,3 @@ the values of the utility functions.
 `update-agent`, [`update`](https://rdrr.io/r/stats/update.html),
 [`update_position`](https://github.com/ndpvh/predped/reference/update_position.md),
 [`update`](https://rdrr.io/r/stats/update.html)
-
-[`simulate`](https://rdrr.io/r/stats/simulate.html), `simulate.state`,
-`update-agent`, [`update`](https://rdrr.io/r/stats/update.html),
-[`update_position`](https://github.com/ndpvh/predped/reference/update_position.md),
-[`update`](https://rdrr.io/r/stats/update.html)

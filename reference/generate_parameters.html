@@ -9,7 +9,7 @@ parameters to be used in simulation."><script type="text/javascript" async="" sr
 
     <a class="navbar-brand me-2" href="../index.html">predped</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,14 +58,9 @@ parameters to be used in simulation.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_parameters</span><span class="op">(</span></span>
 <span>  n <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  filename <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sep <span class="op">=</span> <span class="st">","</span>,</span>
-<span>  archetype <span class="op">=</span> <span class="st">"BaselineEuropean"</span>,</span>
-<span>  mean <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  Sigma <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  bounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  individual_differences <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  transform_covariance <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  transform_covariance <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,47 +73,6 @@ parameters to be used in simulation.</p>
 <code>1</code>.</p></dd>
 
 
-<dt id="arg-filename">filename<a class="anchor" aria-label="anchor" href="#arg-filename"></a></dt>
-<dd><p>Character denoting the path to a file containing parameters.
-Defaults to <code>NULL</code>, triggering reading in the csv-files that come with
-predped.</p></dd>
-
-
-<dt id="arg-sep">sep<a class="anchor" aria-label="anchor" href="#arg-sep"></a></dt>
-<dd><p>Character denoting the separator in case <code>x</code> is a delimited
-file. Defaults to <code>","</code>.</p></dd>
-
-
-<dt id="arg-archetype">archetype<a class="anchor" aria-label="anchor" href="#arg-archetype"></a></dt>
-<dd><p>String denoting the archetype to be used for the covariance
-matrix. Ignored if <code>Sigma</code> is provided. Defaults to <code>"BaselineEuropean"</code>.</p></dd>
-
-
-<dt id="arg-mean">mean<a class="anchor" aria-label="anchor" href="#arg-mean"></a></dt>
-<dd><p>Dataframe containing the means for each of the parameters for
-a given agent. Defaults to <code>NULL</code>, triggering reading in the data
-instead.</p></dd>
-
-
-<dt id="arg-sigma">Sigma<a class="anchor" aria-label="anchor" href="#arg-sigma"></a></dt>
-<dd><p>Either a covariance matrix that defines the individual differences
-on each of the parameters (when <code>transform_covariance = FALSE</code>), or a
-matrix containing standard deviations for each of the parameters on its
-diagonal and correlations between the parameters on its off-diagonal (when
-<code>transform_covariance = TRUE</code>; see <code><a href="params_from_csv.html">params_from_csv</a></code>).
-Default covariance matrices exist for each of the archetypes in
-<code><a href="params_from_csv.html">params_from_csv</a></code> and thus changes with the value of
-<code>archetype</code>. Defaults to <code>NULL</code>, triggering reading in the data
-(but only if <code>individual_differences = TRUE</code>).</p></dd>
-
-
-<dt id="arg-bounds">bounds<a class="anchor" aria-label="anchor" href="#arg-bounds"></a></dt>
-<dd><p>Named numeric matrix containing the bounds for each of the
-parameters. Usually provided in the parameter-list under name
-<code>"params_bounds"</code>. Defaults to <code>NULL</code>, triggering reading in the
-data (but only if <code>individual_differences = TRUE</code>).</p></dd>
-
-
 <dt id="arg-individual-differences">individual_differences<a class="anchor" aria-label="anchor" href="#arg-individual-differences"></a></dt>
 <dd><p>Logical denoting whether to use the standard
 deviations in the parameter list to create some variation in the parameters.
@@ -128,6 +82,10 @@ Defaults to <code>TRUE</code>.</p></dd>
 <dt id="arg-transform-covariance">transform_covariance<a class="anchor" aria-label="anchor" href="#arg-transform-covariance"></a></dt>
 <dd><p>Logical denoting whether to transform <code>Sigma</code>
 to a proper covariance matrix or not. Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments to be passed to <code><a href="get_parameters.html">get_parameters</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

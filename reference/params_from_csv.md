@@ -11,10 +11,6 @@ automatically come with the package.
 params_from_csv
 ```
 
-## Format
-
-An object of class `list` of length 3.
-
 ## Details
 
 \# Content of the slots
