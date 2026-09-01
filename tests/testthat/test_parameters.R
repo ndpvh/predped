@@ -266,14 +266,16 @@ testthat::test_that("Plotting the distributions for the parameters works", {
     bounds <- params_from_csv$params_bounds
 
     # Check whether the output is a list when asked for
-    plt <- plot_distribution(100, as_list = TRUE)
+    plt <- plot_distribution(100, as_list = TRUE) |>
+        suppressMessages()
 
     testthat::expect_true(is.list(plt))
     testthat::expect_equal(names(plt), rownames(bounds))
     testthat::expect_true(all(sapply(plt, function(x) ggplot2::is_ggplot(x))))
 
     # Check whether the output is a ggplot object
-    plt <- plot_distribution(100, as_list = FALSE)
+    plt <- plot_distribution(100, as_list = FALSE) |>
+        suppressMessages()
 
     testthat::expect_true(ggplot2::is_ggplot(plt))
 })
