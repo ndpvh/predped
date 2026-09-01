@@ -52,3 +52,4 @@ Define a parameter list containing means, covariances, and bounds based on
 either provided user-input or on a provided file. Serves as an internal 
 function.
 }
+\concept{parameters}

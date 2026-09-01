@@ -487,6 +487,8 @@ generate_parameters <- function(n = 1,
 #' 
 #' @rdname get_parameters
 #' 
+#' @concept parameters
+#' 
 #' @export
 get_parameters <- function(filename = NULL,
                            sep = ",",
