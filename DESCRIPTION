@@ -32,7 +32,7 @@ Authors@R: c(
 Maintainer: Niels Vanhasbroeck <niels.vanhasbroeck@gmail.com>
 URL: https://github.com/ndpvh/predped
 BugReports: https://github.com/ndpvh/predped/issues
-License: GPL-3 + file LICENSE
+License: file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.3.0)
